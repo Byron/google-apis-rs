@@ -19,10 +19,11 @@ use std::collections::BTreeMap;
 use serde_json as json;
 use std::io;
 use std::fs;
-use std::thread::sleep_ms;
+use std::thread::sleep;
+use std::time::Duration;
 
 pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, 
+              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
               Resource, ErrorResponse, remove_json_null_values};
 
 
@@ -135,7 +136,7 @@ impl<'a, C, A> Reseller<C, A>
         Reseller {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.10".to_string(),
+            _user_agent: "google-api-rust-client/0.1.11".to_string(),
         }
     }
 
@@ -147,7 +148,7 @@ impl<'a, C, A> Reseller<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.10`.
+    /// It defaults to `google-api-rust-client/0.1.11`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -175,23 +176,26 @@ impl<'a, C, A> Reseller<C, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Customer {
-    /// The alternate email of the customer.
-    #[serde(rename="alternateEmail")]
-    pub alternate_email: Option<String>,
     /// The domain name of the customer.
     #[serde(rename="customerDomain")]
     pub customer_domain: Option<String>,
-    /// The phone number of the customer.
-    #[serde(rename="phoneNumber")]
-    pub phone_number: Option<String>,
+    /// Whether the customer's primary domain has been verified.
+    #[serde(rename="customerDomainVerified")]
+    pub customer_domain_verified: Option<bool>,
+    /// The alternate email of the customer.
+    #[serde(rename="alternateEmail")]
+    pub alternate_email: Option<String>,
+    /// Identifies the resource as a customer.
+    pub kind: Option<String>,
     /// Ui url for customer resource.
     #[serde(rename="resourceUiUrl")]
     pub resource_ui_url: Option<String>,
+    /// The phone number of the customer.
+    #[serde(rename="phoneNumber")]
+    pub phone_number: Option<String>,
     /// The postal address of the customer.
     #[serde(rename="postalAddress")]
     pub postal_address: Option<Address>,
-    /// Identifies the resource as a customer.
-    pub kind: Option<String>,
     /// The id of the customer.
     #[serde(rename="customerId")]
     pub customer_id: Option<String>,
@@ -443,7 +447,12 @@ pub struct Subscription {
     /// Trial Settings of the subscription.
     #[serde(rename="trialSettings")]
     pub trial_settings: Option<SubscriptionTrialSettings>,
-    /// Suspension Reasons
+    /// field listing all current reasons the subscription is suspended. It is possible for a subscription to have multiple suspension reasons. A subscription's status is SUSPENDED until all pending suspensions are removed. Possible options include:  
+    /// - PENDING_TOS_ACCEPTANCE — The customer has not logged in and accepted the Google Apps Resold Terms of Services.  
+    /// - RENEWAL_WITH_TYPE_CANCEL — The customer's commitment ended and their service was cancelled at the end of their term.  
+    /// - RESELLER_INITIATED — A manual suspension invoked by a Reseller.  
+    /// - TRIAL_ENDED — The customer's trial expired without a plan selected.  
+    /// - OTHER — The customer is suspended for an internal Google reason (e.g. abuse or otherwise).
     #[serde(rename="suspensionReasons")]
     pub suspension_reasons: Option<Vec<String>>,
     /// Ui url for subscription resource.
@@ -904,7 +913,7 @@ impl<'a, C, A> CustomerUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "reseller.customers.update", 
+        dlg.begin(MethodInfo { id: "reseller.customers.update",
                                http_method: hyper::method::Method::Put });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("customerId", self._customer_id.to_string()));
@@ -946,14 +955,14 @@ impl<'a, C, A> CustomerUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = 
+        let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request);
                 remove_json_null_values(&mut value);
@@ -997,7 +1006,7 @@ impl<'a, C, A> CustomerUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -1007,10 +1016,10 @@ impl<'a, C, A> CustomerUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -1042,7 +1051,7 @@ impl<'a, C, A> CustomerUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     ///
     /// Sets the *request* property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn request(mut self, new_value: Customer) -> CustomerUpdateCall<'a, C, A> {
         self._request = new_value;
@@ -1052,7 +1061,7 @@ impl<'a, C, A> CustomerUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     ///
     /// Sets the *customer id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn customer_id(mut self, new_value: &str) -> CustomerUpdateCall<'a, C, A> {
         self._customer_id = new_value.to_string();
@@ -1070,12 +1079,12 @@ impl<'a, C, A> CustomerUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -1092,17 +1101,17 @@ impl<'a, C, A> CustomerUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::AppOrder`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CustomerUpdateCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CustomerUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1172,7 +1181,7 @@ impl<'a, C, A> CustomerInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "reseller.customers.insert", 
+        dlg.begin(MethodInfo { id: "reseller.customers.insert",
                                http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         if let Some(value) = self._customer_auth_token {
@@ -1195,14 +1204,14 @@ impl<'a, C, A> CustomerInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             self._scopes.insert(Scope::AppOrder.as_ref().to_string(), ());
         }
 
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = 
+        let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request);
                 remove_json_null_values(&mut value);
@@ -1246,7 +1255,7 @@ impl<'a, C, A> CustomerInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -1256,10 +1265,10 @@ impl<'a, C, A> CustomerInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -1291,7 +1300,7 @@ impl<'a, C, A> CustomerInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     ///
     /// Sets the *request* property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn request(mut self, new_value: Customer) -> CustomerInsertCall<'a, C, A> {
         self._request = new_value;
@@ -1316,12 +1325,12 @@ impl<'a, C, A> CustomerInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -1338,17 +1347,17 @@ impl<'a, C, A> CustomerInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::AppOrder`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CustomerInsertCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CustomerInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1417,7 +1426,7 @@ impl<'a, C, A> CustomerPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "reseller.customers.patch", 
+        dlg.begin(MethodInfo { id: "reseller.customers.patch",
                                http_method: hyper::method::Method::Patch });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("customerId", self._customer_id.to_string()));
@@ -1459,14 +1468,14 @@ impl<'a, C, A> CustomerPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = 
+        let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request);
                 remove_json_null_values(&mut value);
@@ -1510,7 +1519,7 @@ impl<'a, C, A> CustomerPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -1520,10 +1529,10 @@ impl<'a, C, A> CustomerPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -1555,7 +1564,7 @@ impl<'a, C, A> CustomerPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// Sets the *request* property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn request(mut self, new_value: Customer) -> CustomerPatchCall<'a, C, A> {
         self._request = new_value;
@@ -1565,7 +1574,7 @@ impl<'a, C, A> CustomerPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// Sets the *customer id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn customer_id(mut self, new_value: &str) -> CustomerPatchCall<'a, C, A> {
         self._customer_id = new_value.to_string();
@@ -1583,12 +1592,12 @@ impl<'a, C, A> CustomerPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -1605,17 +1614,17 @@ impl<'a, C, A> CustomerPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::AppOrder`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CustomerPatchCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CustomerPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1677,7 +1686,7 @@ impl<'a, C, A> CustomerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "reseller.customers.get", 
+        dlg.begin(MethodInfo { id: "reseller.customers.get",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
         params.push(("customerId", self._customer_id.to_string()));
@@ -1719,7 +1728,7 @@ impl<'a, C, A> CustomerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -1755,7 +1764,7 @@ impl<'a, C, A> CustomerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -1765,10 +1774,10 @@ impl<'a, C, A> CustomerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -1801,7 +1810,7 @@ impl<'a, C, A> CustomerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// Sets the *customer id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn customer_id(mut self, new_value: &str) -> CustomerGetCall<'a, C, A> {
         self._customer_id = new_value.to_string();
@@ -1819,12 +1828,12 @@ impl<'a, C, A> CustomerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -1841,17 +1850,17 @@ impl<'a, C, A> CustomerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::AppOrderReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CustomerGetCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CustomerGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1922,7 +1931,7 @@ impl<'a, C, A> SubscriptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "reseller.subscriptions.insert", 
+        dlg.begin(MethodInfo { id: "reseller.subscriptions.insert",
                                http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("customerId", self._customer_id.to_string()));
@@ -1967,14 +1976,14 @@ impl<'a, C, A> SubscriptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = 
+        let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request);
                 remove_json_null_values(&mut value);
@@ -2018,7 +2027,7 @@ impl<'a, C, A> SubscriptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -2028,10 +2037,10 @@ impl<'a, C, A> SubscriptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -2063,7 +2072,7 @@ impl<'a, C, A> SubscriptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// Sets the *request* property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn request(mut self, new_value: Subscription) -> SubscriptionInsertCall<'a, C, A> {
         self._request = new_value;
@@ -2073,7 +2082,7 @@ impl<'a, C, A> SubscriptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// Sets the *customer id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn customer_id(mut self, new_value: &str) -> SubscriptionInsertCall<'a, C, A> {
         self._customer_id = new_value.to_string();
@@ -2098,12 +2107,12 @@ impl<'a, C, A> SubscriptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -2120,17 +2129,17 @@ impl<'a, C, A> SubscriptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::AppOrder`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionInsertCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2194,7 +2203,7 @@ impl<'a, C, A> SubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "reseller.subscriptions.delete", 
+        dlg.begin(MethodInfo { id: "reseller.subscriptions.delete",
                                http_method: hyper::method::Method::Delete });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("customerId", self._customer_id.to_string()));
@@ -2237,7 +2246,7 @@ impl<'a, C, A> SubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -2273,7 +2282,7 @@ impl<'a, C, A> SubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -2283,10 +2292,10 @@ impl<'a, C, A> SubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -2309,7 +2318,7 @@ impl<'a, C, A> SubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// Sets the *customer id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn customer_id(mut self, new_value: &str) -> SubscriptionDeleteCall<'a, C, A> {
         self._customer_id = new_value.to_string();
@@ -2319,7 +2328,7 @@ impl<'a, C, A> SubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// Sets the *subscription id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn subscription_id(mut self, new_value: &str) -> SubscriptionDeleteCall<'a, C, A> {
         self._subscription_id = new_value.to_string();
@@ -2329,7 +2338,7 @@ impl<'a, C, A> SubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// Sets the *deletion type* query property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn deletion_type(mut self, new_value: &str) -> SubscriptionDeleteCall<'a, C, A> {
         self._deletion_type = new_value.to_string();
@@ -2347,12 +2356,12 @@ impl<'a, C, A> SubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -2369,17 +2378,17 @@ impl<'a, C, A> SubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::AppOrder`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionDeleteCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2442,7 +2451,7 @@ impl<'a, C, A> SubscriptionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "reseller.subscriptions.get", 
+        dlg.begin(MethodInfo { id: "reseller.subscriptions.get",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("customerId", self._customer_id.to_string()));
@@ -2485,7 +2494,7 @@ impl<'a, C, A> SubscriptionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -2521,7 +2530,7 @@ impl<'a, C, A> SubscriptionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -2531,10 +2540,10 @@ impl<'a, C, A> SubscriptionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -2567,7 +2576,7 @@ impl<'a, C, A> SubscriptionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// Sets the *customer id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn customer_id(mut self, new_value: &str) -> SubscriptionGetCall<'a, C, A> {
         self._customer_id = new_value.to_string();
@@ -2577,7 +2586,7 @@ impl<'a, C, A> SubscriptionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// Sets the *subscription id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn subscription_id(mut self, new_value: &str) -> SubscriptionGetCall<'a, C, A> {
         self._subscription_id = new_value.to_string();
@@ -2595,12 +2604,12 @@ impl<'a, C, A> SubscriptionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -2617,17 +2626,17 @@ impl<'a, C, A> SubscriptionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::AppOrderReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionGetCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2698,7 +2707,7 @@ impl<'a, C, A> SubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "reseller.subscriptions.list", 
+        dlg.begin(MethodInfo { id: "reseller.subscriptions.list",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
         if let Some(value) = self._page_token {
@@ -2733,7 +2742,7 @@ impl<'a, C, A> SubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             self._scopes.insert(Scope::AppOrderReadonly.as_ref().to_string(), ());
         }
 
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -2769,7 +2778,7 @@ impl<'a, C, A> SubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -2779,10 +2788,10 @@ impl<'a, C, A> SubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -2858,12 +2867,12 @@ impl<'a, C, A> SubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -2880,17 +2889,17 @@ impl<'a, C, A> SubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::AppOrderReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionListCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2960,7 +2969,7 @@ impl<'a, C, A> SubscriptionChangeRenewalSettingCall<'a, C, A> where C: BorrowMut
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "reseller.subscriptions.changeRenewalSettings", 
+        dlg.begin(MethodInfo { id: "reseller.subscriptions.changeRenewalSettings",
                                http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("customerId", self._customer_id.to_string()));
@@ -3003,14 +3012,14 @@ impl<'a, C, A> SubscriptionChangeRenewalSettingCall<'a, C, A> where C: BorrowMut
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = 
+        let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request);
                 remove_json_null_values(&mut value);
@@ -3054,7 +3063,7 @@ impl<'a, C, A> SubscriptionChangeRenewalSettingCall<'a, C, A> where C: BorrowMut
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -3064,10 +3073,10 @@ impl<'a, C, A> SubscriptionChangeRenewalSettingCall<'a, C, A> where C: BorrowMut
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -3099,7 +3108,7 @@ impl<'a, C, A> SubscriptionChangeRenewalSettingCall<'a, C, A> where C: BorrowMut
     ///
     /// Sets the *request* property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn request(mut self, new_value: RenewalSettings) -> SubscriptionChangeRenewalSettingCall<'a, C, A> {
         self._request = new_value;
@@ -3109,7 +3118,7 @@ impl<'a, C, A> SubscriptionChangeRenewalSettingCall<'a, C, A> where C: BorrowMut
     ///
     /// Sets the *customer id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn customer_id(mut self, new_value: &str) -> SubscriptionChangeRenewalSettingCall<'a, C, A> {
         self._customer_id = new_value.to_string();
@@ -3119,7 +3128,7 @@ impl<'a, C, A> SubscriptionChangeRenewalSettingCall<'a, C, A> where C: BorrowMut
     ///
     /// Sets the *subscription id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn subscription_id(mut self, new_value: &str) -> SubscriptionChangeRenewalSettingCall<'a, C, A> {
         self._subscription_id = new_value.to_string();
@@ -3137,12 +3146,12 @@ impl<'a, C, A> SubscriptionChangeRenewalSettingCall<'a, C, A> where C: BorrowMut
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -3159,17 +3168,17 @@ impl<'a, C, A> SubscriptionChangeRenewalSettingCall<'a, C, A> where C: BorrowMut
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::AppOrder`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionChangeRenewalSettingCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionChangeRenewalSettingCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3232,7 +3241,7 @@ impl<'a, C, A> SubscriptionStartPaidServiceCall<'a, C, A> where C: BorrowMut<hyp
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "reseller.subscriptions.startPaidService", 
+        dlg.begin(MethodInfo { id: "reseller.subscriptions.startPaidService",
                                http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("customerId", self._customer_id.to_string()));
@@ -3275,7 +3284,7 @@ impl<'a, C, A> SubscriptionStartPaidServiceCall<'a, C, A> where C: BorrowMut<hyp
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -3311,7 +3320,7 @@ impl<'a, C, A> SubscriptionStartPaidServiceCall<'a, C, A> where C: BorrowMut<hyp
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -3321,10 +3330,10 @@ impl<'a, C, A> SubscriptionStartPaidServiceCall<'a, C, A> where C: BorrowMut<hyp
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -3357,7 +3366,7 @@ impl<'a, C, A> SubscriptionStartPaidServiceCall<'a, C, A> where C: BorrowMut<hyp
     ///
     /// Sets the *customer id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn customer_id(mut self, new_value: &str) -> SubscriptionStartPaidServiceCall<'a, C, A> {
         self._customer_id = new_value.to_string();
@@ -3367,7 +3376,7 @@ impl<'a, C, A> SubscriptionStartPaidServiceCall<'a, C, A> where C: BorrowMut<hyp
     ///
     /// Sets the *subscription id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn subscription_id(mut self, new_value: &str) -> SubscriptionStartPaidServiceCall<'a, C, A> {
         self._subscription_id = new_value.to_string();
@@ -3385,12 +3394,12 @@ impl<'a, C, A> SubscriptionStartPaidServiceCall<'a, C, A> where C: BorrowMut<hyp
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -3407,17 +3416,17 @@ impl<'a, C, A> SubscriptionStartPaidServiceCall<'a, C, A> where C: BorrowMut<hyp
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::AppOrder`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionStartPaidServiceCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionStartPaidServiceCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3487,7 +3496,7 @@ impl<'a, C, A> SubscriptionChangeSeatCall<'a, C, A> where C: BorrowMut<hyper::Cl
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "reseller.subscriptions.changeSeats", 
+        dlg.begin(MethodInfo { id: "reseller.subscriptions.changeSeats",
                                http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("customerId", self._customer_id.to_string()));
@@ -3530,14 +3539,14 @@ impl<'a, C, A> SubscriptionChangeSeatCall<'a, C, A> where C: BorrowMut<hyper::Cl
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = 
+        let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request);
                 remove_json_null_values(&mut value);
@@ -3581,7 +3590,7 @@ impl<'a, C, A> SubscriptionChangeSeatCall<'a, C, A> where C: BorrowMut<hyper::Cl
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -3591,10 +3600,10 @@ impl<'a, C, A> SubscriptionChangeSeatCall<'a, C, A> where C: BorrowMut<hyper::Cl
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -3626,7 +3635,7 @@ impl<'a, C, A> SubscriptionChangeSeatCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// Sets the *request* property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn request(mut self, new_value: Seats) -> SubscriptionChangeSeatCall<'a, C, A> {
         self._request = new_value;
@@ -3636,7 +3645,7 @@ impl<'a, C, A> SubscriptionChangeSeatCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// Sets the *customer id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn customer_id(mut self, new_value: &str) -> SubscriptionChangeSeatCall<'a, C, A> {
         self._customer_id = new_value.to_string();
@@ -3646,7 +3655,7 @@ impl<'a, C, A> SubscriptionChangeSeatCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// Sets the *subscription id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn subscription_id(mut self, new_value: &str) -> SubscriptionChangeSeatCall<'a, C, A> {
         self._subscription_id = new_value.to_string();
@@ -3664,12 +3673,12 @@ impl<'a, C, A> SubscriptionChangeSeatCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -3686,17 +3695,17 @@ impl<'a, C, A> SubscriptionChangeSeatCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::AppOrder`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionChangeSeatCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionChangeSeatCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3759,7 +3768,7 @@ impl<'a, C, A> SubscriptionSuspendCall<'a, C, A> where C: BorrowMut<hyper::Clien
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "reseller.subscriptions.suspend", 
+        dlg.begin(MethodInfo { id: "reseller.subscriptions.suspend",
                                http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("customerId", self._customer_id.to_string()));
@@ -3802,7 +3811,7 @@ impl<'a, C, A> SubscriptionSuspendCall<'a, C, A> where C: BorrowMut<hyper::Clien
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -3838,7 +3847,7 @@ impl<'a, C, A> SubscriptionSuspendCall<'a, C, A> where C: BorrowMut<hyper::Clien
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -3848,10 +3857,10 @@ impl<'a, C, A> SubscriptionSuspendCall<'a, C, A> where C: BorrowMut<hyper::Clien
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -3884,7 +3893,7 @@ impl<'a, C, A> SubscriptionSuspendCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// Sets the *customer id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn customer_id(mut self, new_value: &str) -> SubscriptionSuspendCall<'a, C, A> {
         self._customer_id = new_value.to_string();
@@ -3894,7 +3903,7 @@ impl<'a, C, A> SubscriptionSuspendCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// Sets the *subscription id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn subscription_id(mut self, new_value: &str) -> SubscriptionSuspendCall<'a, C, A> {
         self._subscription_id = new_value.to_string();
@@ -3912,12 +3921,12 @@ impl<'a, C, A> SubscriptionSuspendCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -3934,17 +3943,17 @@ impl<'a, C, A> SubscriptionSuspendCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::AppOrder`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionSuspendCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionSuspendCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4007,7 +4016,7 @@ impl<'a, C, A> SubscriptionActivateCall<'a, C, A> where C: BorrowMut<hyper::Clie
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "reseller.subscriptions.activate", 
+        dlg.begin(MethodInfo { id: "reseller.subscriptions.activate",
                                http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("customerId", self._customer_id.to_string()));
@@ -4050,7 +4059,7 @@ impl<'a, C, A> SubscriptionActivateCall<'a, C, A> where C: BorrowMut<hyper::Clie
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -4086,7 +4095,7 @@ impl<'a, C, A> SubscriptionActivateCall<'a, C, A> where C: BorrowMut<hyper::Clie
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -4096,10 +4105,10 @@ impl<'a, C, A> SubscriptionActivateCall<'a, C, A> where C: BorrowMut<hyper::Clie
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -4132,7 +4141,7 @@ impl<'a, C, A> SubscriptionActivateCall<'a, C, A> where C: BorrowMut<hyper::Clie
     ///
     /// Sets the *customer id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn customer_id(mut self, new_value: &str) -> SubscriptionActivateCall<'a, C, A> {
         self._customer_id = new_value.to_string();
@@ -4142,7 +4151,7 @@ impl<'a, C, A> SubscriptionActivateCall<'a, C, A> where C: BorrowMut<hyper::Clie
     ///
     /// Sets the *subscription id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn subscription_id(mut self, new_value: &str) -> SubscriptionActivateCall<'a, C, A> {
         self._subscription_id = new_value.to_string();
@@ -4160,12 +4169,12 @@ impl<'a, C, A> SubscriptionActivateCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -4182,17 +4191,17 @@ impl<'a, C, A> SubscriptionActivateCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::AppOrder`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionActivateCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionActivateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4262,7 +4271,7 @@ impl<'a, C, A> SubscriptionChangePlanCall<'a, C, A> where C: BorrowMut<hyper::Cl
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "reseller.subscriptions.changePlan", 
+        dlg.begin(MethodInfo { id: "reseller.subscriptions.changePlan",
                                http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("customerId", self._customer_id.to_string()));
@@ -4305,14 +4314,14 @@ impl<'a, C, A> SubscriptionChangePlanCall<'a, C, A> where C: BorrowMut<hyper::Cl
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = 
+        let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request);
                 remove_json_null_values(&mut value);
@@ -4356,7 +4365,7 @@ impl<'a, C, A> SubscriptionChangePlanCall<'a, C, A> where C: BorrowMut<hyper::Cl
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -4366,10 +4375,10 @@ impl<'a, C, A> SubscriptionChangePlanCall<'a, C, A> where C: BorrowMut<hyper::Cl
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -4401,7 +4410,7 @@ impl<'a, C, A> SubscriptionChangePlanCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// Sets the *request* property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn request(mut self, new_value: ChangePlanRequest) -> SubscriptionChangePlanCall<'a, C, A> {
         self._request = new_value;
@@ -4411,7 +4420,7 @@ impl<'a, C, A> SubscriptionChangePlanCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// Sets the *customer id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn customer_id(mut self, new_value: &str) -> SubscriptionChangePlanCall<'a, C, A> {
         self._customer_id = new_value.to_string();
@@ -4421,7 +4430,7 @@ impl<'a, C, A> SubscriptionChangePlanCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// Sets the *subscription id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn subscription_id(mut self, new_value: &str) -> SubscriptionChangePlanCall<'a, C, A> {
         self._subscription_id = new_value.to_string();
@@ -4439,12 +4448,12 @@ impl<'a, C, A> SubscriptionChangePlanCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -4461,17 +4470,17 @@ impl<'a, C, A> SubscriptionChangePlanCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::AppOrder`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionChangePlanCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionChangePlanCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

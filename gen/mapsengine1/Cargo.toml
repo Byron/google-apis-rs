@@ -4,7 +4,7 @@
 [package]
 
 name = "google-mapsengine1"
-version = "0.1.10+20150629"
+version = "0.1.11+20151202"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Maps Engine (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/mapsengine1"

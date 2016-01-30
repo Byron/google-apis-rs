@@ -19,10 +19,11 @@ use std::collections::BTreeMap;
 use serde_json as json;
 use std::io;
 use std::fs;
-use std::thread::sleep_ms;
+use std::thread::sleep;
+use std::time::Duration;
 
 pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, 
+              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
               Resource, ErrorResponse, remove_json_null_values};
 
 
@@ -153,7 +154,7 @@ impl<'a, C, A> CalendarHub<C, A>
         CalendarHub {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.10".to_string(),
+            _user_agent: "google-api-rust-client/0.1.11".to_string(),
         }
     }
 
@@ -183,7 +184,7 @@ impl<'a, C, A> CalendarHub<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.10`.
+    /// It defaults to `google-api-rust-client/0.1.11`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1112,7 +1113,7 @@ pub struct Event {
     /// The color of the event. This is an ID referring to an entry in the event section of the colors definition (see the  colors endpoint). Optional.
     #[serde(rename="colorId")]
     pub color_id: Option<String>,
-    /// Whether anyone can invite themselves to the event. Optional. The default is False.
+    /// Whether anyone can invite themselves to the event (currently works for Google+ events only). Optional. The default is False.
     #[serde(rename="anyoneCanAddSelf")]
     pub anyone_can_add_self: Option<bool>,
     /// Information about the event's reminders for the authenticated user.
@@ -2292,7 +2293,7 @@ impl<'a, C, A> FreebusyQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "calendar.freebusy.query", 
+        dlg.begin(MethodInfo { id: "calendar.freebusy.query",
                                http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
         for &field in ["alt"].iter() {
@@ -2312,14 +2313,14 @@ impl<'a, C, A> FreebusyQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = 
+        let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request);
                 remove_json_null_values(&mut value);
@@ -2363,7 +2364,7 @@ impl<'a, C, A> FreebusyQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -2373,10 +2374,10 @@ impl<'a, C, A> FreebusyQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -2408,7 +2409,7 @@ impl<'a, C, A> FreebusyQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// Sets the *request* property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn request(mut self, new_value: FreeBusyRequest) -> FreebusyQueryCall<'a, C, A> {
         self._request = new_value;
@@ -2426,12 +2427,12 @@ impl<'a, C, A> FreebusyQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -2448,17 +2449,17 @@ impl<'a, C, A> FreebusyQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> FreebusyQueryCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> FreebusyQueryCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2525,7 +2526,7 @@ impl<'a, C, A> SettingListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "calendar.settings.list", 
+        dlg.begin(MethodInfo { id: "calendar.settings.list",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         if let Some(value) = self._sync_token {
@@ -2554,7 +2555,7 @@ impl<'a, C, A> SettingListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -2590,7 +2591,7 @@ impl<'a, C, A> SettingListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -2600,10 +2601,10 @@ impl<'a, C, A> SettingListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -2668,12 +2669,12 @@ impl<'a, C, A> SettingListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -2690,17 +2691,17 @@ impl<'a, C, A> SettingListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> SettingListCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SettingListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2774,7 +2775,7 @@ impl<'a, C, A> SettingWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "calendar.settings.watch", 
+        dlg.begin(MethodInfo { id: "calendar.settings.watch",
                                http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         if let Some(value) = self._sync_token {
@@ -2803,14 +2804,14 @@ impl<'a, C, A> SettingWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = 
+        let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request);
                 remove_json_null_values(&mut value);
@@ -2854,7 +2855,7 @@ impl<'a, C, A> SettingWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -2864,10 +2865,10 @@ impl<'a, C, A> SettingWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -2899,7 +2900,7 @@ impl<'a, C, A> SettingWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     ///
     /// Sets the *request* property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn request(mut self, new_value: Channel) -> SettingWatchCall<'a, C, A> {
         self._request = new_value;
@@ -2941,12 +2942,12 @@ impl<'a, C, A> SettingWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -2963,17 +2964,17 @@ impl<'a, C, A> SettingWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> SettingWatchCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SettingWatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3035,7 +3036,7 @@ impl<'a, C, A> SettingGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "calendar.settings.get", 
+        dlg.begin(MethodInfo { id: "calendar.settings.get",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
         params.push(("setting", self._setting.to_string()));
@@ -3077,7 +3078,7 @@ impl<'a, C, A> SettingGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -3113,7 +3114,7 @@ impl<'a, C, A> SettingGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -3123,10 +3124,10 @@ impl<'a, C, A> SettingGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -3159,7 +3160,7 @@ impl<'a, C, A> SettingGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// Sets the *setting* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn setting(mut self, new_value: &str) -> SettingGetCall<'a, C, A> {
         self._setting = new_value.to_string();
@@ -3177,12 +3178,12 @@ impl<'a, C, A> SettingGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -3199,17 +3200,17 @@ impl<'a, C, A> SettingGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> SettingGetCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SettingGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3280,7 +3281,7 @@ impl<'a, C, A> CalendarListUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "calendar.calendarList.update", 
+        dlg.begin(MethodInfo { id: "calendar.calendarList.update",
                                http_method: hyper::method::Method::Put });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("calendarId", self._calendar_id.to_string()));
@@ -3325,14 +3326,14 @@ impl<'a, C, A> CalendarListUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = 
+        let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request);
                 remove_json_null_values(&mut value);
@@ -3376,7 +3377,7 @@ impl<'a, C, A> CalendarListUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -3386,10 +3387,10 @@ impl<'a, C, A> CalendarListUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -3421,7 +3422,7 @@ impl<'a, C, A> CalendarListUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// Sets the *request* property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn request(mut self, new_value: CalendarListEntry) -> CalendarListUpdateCall<'a, C, A> {
         self._request = new_value;
@@ -3431,7 +3432,7 @@ impl<'a, C, A> CalendarListUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn calendar_id(mut self, new_value: &str) -> CalendarListUpdateCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
@@ -3456,12 +3457,12 @@ impl<'a, C, A> CalendarListUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -3478,17 +3479,17 @@ impl<'a, C, A> CalendarListUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CalendarListUpdateCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CalendarListUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3550,7 +3551,7 @@ impl<'a, C, A> CalendarListDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "calendar.calendarList.delete", 
+        dlg.begin(MethodInfo { id: "calendar.calendarList.delete",
                                http_method: hyper::method::Method::Delete });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((2 + self._additional_params.len()));
         params.push(("calendarId", self._calendar_id.to_string()));
@@ -3591,7 +3592,7 @@ impl<'a, C, A> CalendarListDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -3627,7 +3628,7 @@ impl<'a, C, A> CalendarListDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -3637,10 +3638,10 @@ impl<'a, C, A> CalendarListDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -3663,7 +3664,7 @@ impl<'a, C, A> CalendarListDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn calendar_id(mut self, new_value: &str) -> CalendarListDeleteCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
@@ -3681,12 +3682,12 @@ impl<'a, C, A> CalendarListDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -3703,17 +3704,17 @@ impl<'a, C, A> CalendarListDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CalendarListDeleteCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CalendarListDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3775,7 +3776,7 @@ impl<'a, C, A> CalendarListGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "calendar.calendarList.get", 
+        dlg.begin(MethodInfo { id: "calendar.calendarList.get",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
         params.push(("calendarId", self._calendar_id.to_string()));
@@ -3817,7 +3818,7 @@ impl<'a, C, A> CalendarListGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -3853,7 +3854,7 @@ impl<'a, C, A> CalendarListGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -3863,10 +3864,10 @@ impl<'a, C, A> CalendarListGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -3899,7 +3900,7 @@ impl<'a, C, A> CalendarListGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn calendar_id(mut self, new_value: &str) -> CalendarListGetCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
@@ -3917,12 +3918,12 @@ impl<'a, C, A> CalendarListGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -3939,17 +3940,17 @@ impl<'a, C, A> CalendarListGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CalendarListGetCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CalendarListGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4022,7 +4023,7 @@ impl<'a, C, A> CalendarListListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "calendar.calendarList.list", 
+        dlg.begin(MethodInfo { id: "calendar.calendarList.list",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
         if let Some(value) = self._sync_token {
@@ -4060,7 +4061,7 @@ impl<'a, C, A> CalendarListListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -4096,7 +4097,7 @@ impl<'a, C, A> CalendarListListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -4106,10 +4107,10 @@ impl<'a, C, A> CalendarListListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -4196,12 +4197,12 @@ impl<'a, C, A> CalendarListListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -4218,17 +4219,17 @@ impl<'a, C, A> CalendarListListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CalendarListListCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CalendarListListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4298,7 +4299,7 @@ impl<'a, C, A> CalendarListInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "calendar.calendarList.insert", 
+        dlg.begin(MethodInfo { id: "calendar.calendarList.insert",
                                http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         if let Some(value) = self._color_rgb_format {
@@ -4321,14 +4322,14 @@ impl<'a, C, A> CalendarListInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = 
+        let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request);
                 remove_json_null_values(&mut value);
@@ -4372,7 +4373,7 @@ impl<'a, C, A> CalendarListInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -4382,10 +4383,10 @@ impl<'a, C, A> CalendarListInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -4417,7 +4418,7 @@ impl<'a, C, A> CalendarListInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// Sets the *request* property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn request(mut self, new_value: CalendarListEntry) -> CalendarListInsertCall<'a, C, A> {
         self._request = new_value;
@@ -4442,12 +4443,12 @@ impl<'a, C, A> CalendarListInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -4464,17 +4465,17 @@ impl<'a, C, A> CalendarListInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CalendarListInsertCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CalendarListInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4545,7 +4546,7 @@ impl<'a, C, A> CalendarListPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "calendar.calendarList.patch", 
+        dlg.begin(MethodInfo { id: "calendar.calendarList.patch",
                                http_method: hyper::method::Method::Patch });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("calendarId", self._calendar_id.to_string()));
@@ -4590,14 +4591,14 @@ impl<'a, C, A> CalendarListPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = 
+        let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request);
                 remove_json_null_values(&mut value);
@@ -4641,7 +4642,7 @@ impl<'a, C, A> CalendarListPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -4651,10 +4652,10 @@ impl<'a, C, A> CalendarListPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -4686,7 +4687,7 @@ impl<'a, C, A> CalendarListPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
     ///
     /// Sets the *request* property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn request(mut self, new_value: CalendarListEntry) -> CalendarListPatchCall<'a, C, A> {
         self._request = new_value;
@@ -4696,7 +4697,7 @@ impl<'a, C, A> CalendarListPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn calendar_id(mut self, new_value: &str) -> CalendarListPatchCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
@@ -4721,12 +4722,12 @@ impl<'a, C, A> CalendarListPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -4743,17 +4744,17 @@ impl<'a, C, A> CalendarListPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CalendarListPatchCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CalendarListPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4833,7 +4834,7 @@ impl<'a, C, A> CalendarListWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "calendar.calendarList.watch", 
+        dlg.begin(MethodInfo { id: "calendar.calendarList.watch",
                                http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((9 + self._additional_params.len()));
         if let Some(value) = self._sync_token {
@@ -4871,14 +4872,14 @@ impl<'a, C, A> CalendarListWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = 
+        let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request);
                 remove_json_null_values(&mut value);
@@ -4922,7 +4923,7 @@ impl<'a, C, A> CalendarListWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -4932,10 +4933,10 @@ impl<'a, C, A> CalendarListWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -4967,7 +4968,7 @@ impl<'a, C, A> CalendarListWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
     ///
     /// Sets the *request* property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn request(mut self, new_value: Channel) -> CalendarListWatchCall<'a, C, A> {
         self._request = new_value;
@@ -5031,12 +5032,12 @@ impl<'a, C, A> CalendarListWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -5053,17 +5054,17 @@ impl<'a, C, A> CalendarListWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CalendarListWatchCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CalendarListWatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5132,7 +5133,7 @@ impl<'a, C, A> CalendarPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "calendar.calendars.patch", 
+        dlg.begin(MethodInfo { id: "calendar.calendars.patch",
                                http_method: hyper::method::Method::Patch });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("calendarId", self._calendar_id.to_string()));
@@ -5174,14 +5175,14 @@ impl<'a, C, A> CalendarPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = 
+        let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request);
                 remove_json_null_values(&mut value);
@@ -5225,7 +5226,7 @@ impl<'a, C, A> CalendarPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -5235,10 +5236,10 @@ impl<'a, C, A> CalendarPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -5270,7 +5271,7 @@ impl<'a, C, A> CalendarPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// Sets the *request* property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn request(mut self, new_value: Calendar) -> CalendarPatchCall<'a, C, A> {
         self._request = new_value;
@@ -5280,7 +5281,7 @@ impl<'a, C, A> CalendarPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn calendar_id(mut self, new_value: &str) -> CalendarPatchCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
@@ -5298,12 +5299,12 @@ impl<'a, C, A> CalendarPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -5320,17 +5321,17 @@ impl<'a, C, A> CalendarPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CalendarPatchCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CalendarPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5392,7 +5393,7 @@ impl<'a, C, A> CalendarDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "calendar.calendars.delete", 
+        dlg.begin(MethodInfo { id: "calendar.calendars.delete",
                                http_method: hyper::method::Method::Delete });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((2 + self._additional_params.len()));
         params.push(("calendarId", self._calendar_id.to_string()));
@@ -5433,7 +5434,7 @@ impl<'a, C, A> CalendarDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -5469,7 +5470,7 @@ impl<'a, C, A> CalendarDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -5479,10 +5480,10 @@ impl<'a, C, A> CalendarDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -5505,7 +5506,7 @@ impl<'a, C, A> CalendarDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn calendar_id(mut self, new_value: &str) -> CalendarDeleteCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
@@ -5523,12 +5524,12 @@ impl<'a, C, A> CalendarDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -5545,17 +5546,17 @@ impl<'a, C, A> CalendarDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CalendarDeleteCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CalendarDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5617,7 +5618,7 @@ impl<'a, C, A> CalendarGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "calendar.calendars.get", 
+        dlg.begin(MethodInfo { id: "calendar.calendars.get",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
         params.push(("calendarId", self._calendar_id.to_string()));
@@ -5659,7 +5660,7 @@ impl<'a, C, A> CalendarGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -5695,7 +5696,7 @@ impl<'a, C, A> CalendarGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -5705,10 +5706,10 @@ impl<'a, C, A> CalendarGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -5741,7 +5742,7 @@ impl<'a, C, A> CalendarGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn calendar_id(mut self, new_value: &str) -> CalendarGetCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
@@ -5759,12 +5760,12 @@ impl<'a, C, A> CalendarGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -5781,17 +5782,17 @@ impl<'a, C, A> CalendarGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CalendarGetCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CalendarGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5853,7 +5854,7 @@ impl<'a, C, A> CalendarClearCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "calendar.calendars.clear", 
+        dlg.begin(MethodInfo { id: "calendar.calendars.clear",
                                http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((2 + self._additional_params.len()));
         params.push(("calendarId", self._calendar_id.to_string()));
@@ -5894,7 +5895,7 @@ impl<'a, C, A> CalendarClearCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -5930,7 +5931,7 @@ impl<'a, C, A> CalendarClearCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -5940,10 +5941,10 @@ impl<'a, C, A> CalendarClearCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -5966,7 +5967,7 @@ impl<'a, C, A> CalendarClearCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn calendar_id(mut self, new_value: &str) -> CalendarClearCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
@@ -5984,12 +5985,12 @@ impl<'a, C, A> CalendarClearCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -6006,17 +6007,17 @@ impl<'a, C, A> CalendarClearCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CalendarClearCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CalendarClearCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6084,7 +6085,7 @@ impl<'a, C, A> CalendarInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "calendar.calendars.insert", 
+        dlg.begin(MethodInfo { id: "calendar.calendars.insert",
                                http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
         for &field in ["alt"].iter() {
@@ -6104,14 +6105,14 @@ impl<'a, C, A> CalendarInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = 
+        let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request);
                 remove_json_null_values(&mut value);
@@ -6155,7 +6156,7 @@ impl<'a, C, A> CalendarInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -6165,10 +6166,10 @@ impl<'a, C, A> CalendarInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -6200,7 +6201,7 @@ impl<'a, C, A> CalendarInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     ///
     /// Sets the *request* property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn request(mut self, new_value: Calendar) -> CalendarInsertCall<'a, C, A> {
         self._request = new_value;
@@ -6218,12 +6219,12 @@ impl<'a, C, A> CalendarInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -6240,17 +6241,17 @@ impl<'a, C, A> CalendarInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CalendarInsertCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CalendarInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6319,7 +6320,7 @@ impl<'a, C, A> CalendarUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "calendar.calendars.update", 
+        dlg.begin(MethodInfo { id: "calendar.calendars.update",
                                http_method: hyper::method::Method::Put });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("calendarId", self._calendar_id.to_string()));
@@ -6361,14 +6362,14 @@ impl<'a, C, A> CalendarUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = 
+        let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request);
                 remove_json_null_values(&mut value);
@@ -6412,7 +6413,7 @@ impl<'a, C, A> CalendarUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -6422,10 +6423,10 @@ impl<'a, C, A> CalendarUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -6457,7 +6458,7 @@ impl<'a, C, A> CalendarUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     ///
     /// Sets the *request* property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn request(mut self, new_value: Calendar) -> CalendarUpdateCall<'a, C, A> {
         self._request = new_value;
@@ -6467,7 +6468,7 @@ impl<'a, C, A> CalendarUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn calendar_id(mut self, new_value: &str) -> CalendarUpdateCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
@@ -6485,12 +6486,12 @@ impl<'a, C, A> CalendarUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -6507,17 +6508,17 @@ impl<'a, C, A> CalendarUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CalendarUpdateCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CalendarUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6594,7 +6595,7 @@ impl<'a, C, A> AclWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "calendar.acl.watch", 
+        dlg.begin(MethodInfo { id: "calendar.acl.watch",
                                http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
         params.push(("calendarId", self._calendar_id.to_string()));
@@ -6648,14 +6649,14 @@ impl<'a, C, A> AclWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = 
+        let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request);
                 remove_json_null_values(&mut value);
@@ -6699,7 +6700,7 @@ impl<'a, C, A> AclWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -6709,10 +6710,10 @@ impl<'a, C, A> AclWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -6744,7 +6745,7 @@ impl<'a, C, A> AclWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     ///
     /// Sets the *request* property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn request(mut self, new_value: Channel) -> AclWatchCall<'a, C, A> {
         self._request = new_value;
@@ -6754,7 +6755,7 @@ impl<'a, C, A> AclWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn calendar_id(mut self, new_value: &str) -> AclWatchCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
@@ -6803,12 +6804,12 @@ impl<'a, C, A> AclWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -6825,17 +6826,17 @@ impl<'a, C, A> AclWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AclWatchCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AclWatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6904,7 +6905,7 @@ impl<'a, C, A> AclInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "calendar.acl.insert", 
+        dlg.begin(MethodInfo { id: "calendar.acl.insert",
                                http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("calendarId", self._calendar_id.to_string()));
@@ -6946,14 +6947,14 @@ impl<'a, C, A> AclInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = 
+        let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request);
                 remove_json_null_values(&mut value);
@@ -6997,7 +6998,7 @@ impl<'a, C, A> AclInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -7007,10 +7008,10 @@ impl<'a, C, A> AclInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -7042,7 +7043,7 @@ impl<'a, C, A> AclInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     ///
     /// Sets the *request* property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn request(mut self, new_value: AclRule) -> AclInsertCall<'a, C, A> {
         self._request = new_value;
@@ -7052,7 +7053,7 @@ impl<'a, C, A> AclInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn calendar_id(mut self, new_value: &str) -> AclInsertCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
@@ -7070,12 +7071,12 @@ impl<'a, C, A> AclInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -7092,17 +7093,17 @@ impl<'a, C, A> AclInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AclInsertCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AclInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7172,7 +7173,7 @@ impl<'a, C, A> AclUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "calendar.acl.update", 
+        dlg.begin(MethodInfo { id: "calendar.acl.update",
                                http_method: hyper::method::Method::Put });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("calendarId", self._calendar_id.to_string()));
@@ -7215,14 +7216,14 @@ impl<'a, C, A> AclUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = 
+        let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request);
                 remove_json_null_values(&mut value);
@@ -7266,7 +7267,7 @@ impl<'a, C, A> AclUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -7276,10 +7277,10 @@ impl<'a, C, A> AclUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -7311,7 +7312,7 @@ impl<'a, C, A> AclUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     ///
     /// Sets the *request* property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn request(mut self, new_value: AclRule) -> AclUpdateCall<'a, C, A> {
         self._request = new_value;
@@ -7321,7 +7322,7 @@ impl<'a, C, A> AclUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn calendar_id(mut self, new_value: &str) -> AclUpdateCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
@@ -7331,7 +7332,7 @@ impl<'a, C, A> AclUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     ///
     /// Sets the *rule id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn rule_id(mut self, new_value: &str) -> AclUpdateCall<'a, C, A> {
         self._rule_id = new_value.to_string();
@@ -7349,12 +7350,12 @@ impl<'a, C, A> AclUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -7371,17 +7372,17 @@ impl<'a, C, A> AclUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AclUpdateCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AclUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7451,7 +7452,7 @@ impl<'a, C, A> AclPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "calendar.acl.patch", 
+        dlg.begin(MethodInfo { id: "calendar.acl.patch",
                                http_method: hyper::method::Method::Patch });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("calendarId", self._calendar_id.to_string()));
@@ -7494,14 +7495,14 @@ impl<'a, C, A> AclPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = 
+        let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request);
                 remove_json_null_values(&mut value);
@@ -7545,7 +7546,7 @@ impl<'a, C, A> AclPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -7555,10 +7556,10 @@ impl<'a, C, A> AclPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -7590,7 +7591,7 @@ impl<'a, C, A> AclPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     ///
     /// Sets the *request* property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn request(mut self, new_value: AclRule) -> AclPatchCall<'a, C, A> {
         self._request = new_value;
@@ -7600,7 +7601,7 @@ impl<'a, C, A> AclPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn calendar_id(mut self, new_value: &str) -> AclPatchCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
@@ -7610,7 +7611,7 @@ impl<'a, C, A> AclPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     ///
     /// Sets the *rule id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn rule_id(mut self, new_value: &str) -> AclPatchCall<'a, C, A> {
         self._rule_id = new_value.to_string();
@@ -7628,12 +7629,12 @@ impl<'a, C, A> AclPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -7650,17 +7651,17 @@ impl<'a, C, A> AclPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AclPatchCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AclPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7730,7 +7731,7 @@ impl<'a, C, A> AclListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "calendar.acl.list", 
+        dlg.begin(MethodInfo { id: "calendar.acl.list",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
         params.push(("calendarId", self._calendar_id.to_string()));
@@ -7784,7 +7785,7 @@ impl<'a, C, A> AclListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -7820,7 +7821,7 @@ impl<'a, C, A> AclListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -7830,10 +7831,10 @@ impl<'a, C, A> AclListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -7866,7 +7867,7 @@ impl<'a, C, A> AclListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn calendar_id(mut self, new_value: &str) -> AclListCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
@@ -7915,12 +7916,12 @@ impl<'a, C, A> AclListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -7937,17 +7938,17 @@ impl<'a, C, A> AclListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AclListCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AclListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8010,7 +8011,7 @@ impl<'a, C, A> AclDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "calendar.acl.delete", 
+        dlg.begin(MethodInfo { id: "calendar.acl.delete",
                                http_method: hyper::method::Method::Delete });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
         params.push(("calendarId", self._calendar_id.to_string()));
@@ -8052,7 +8053,7 @@ impl<'a, C, A> AclDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -8088,7 +8089,7 @@ impl<'a, C, A> AclDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -8098,10 +8099,10 @@ impl<'a, C, A> AclDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -8124,7 +8125,7 @@ impl<'a, C, A> AclDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn calendar_id(mut self, new_value: &str) -> AclDeleteCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
@@ -8134,7 +8135,7 @@ impl<'a, C, A> AclDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     ///
     /// Sets the *rule id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn rule_id(mut self, new_value: &str) -> AclDeleteCall<'a, C, A> {
         self._rule_id = new_value.to_string();
@@ -8152,12 +8153,12 @@ impl<'a, C, A> AclDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -8174,17 +8175,17 @@ impl<'a, C, A> AclDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AclDeleteCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AclDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8247,7 +8248,7 @@ impl<'a, C, A> AclGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "calendar.acl.get", 
+        dlg.begin(MethodInfo { id: "calendar.acl.get",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("calendarId", self._calendar_id.to_string()));
@@ -8290,7 +8291,7 @@ impl<'a, C, A> AclGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -8326,7 +8327,7 @@ impl<'a, C, A> AclGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -8336,10 +8337,10 @@ impl<'a, C, A> AclGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -8372,7 +8373,7 @@ impl<'a, C, A> AclGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn calendar_id(mut self, new_value: &str) -> AclGetCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
@@ -8382,7 +8383,7 @@ impl<'a, C, A> AclGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
     ///
     /// Sets the *rule id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn rule_id(mut self, new_value: &str) -> AclGetCall<'a, C, A> {
         self._rule_id = new_value.to_string();
@@ -8400,12 +8401,12 @@ impl<'a, C, A> AclGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -8422,17 +8423,17 @@ impl<'a, C, A> AclGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AclGetCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AclGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8500,7 +8501,7 @@ impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "calendar.channels.stop", 
+        dlg.begin(MethodInfo { id: "calendar.channels.stop",
                                http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((2 + self._additional_params.len()));
         for &field in [].iter() {
@@ -8519,14 +8520,14 @@ impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = 
+        let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request);
                 remove_json_null_values(&mut value);
@@ -8570,7 +8571,7 @@ impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -8580,10 +8581,10 @@ impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -8605,7 +8606,7 @@ impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// Sets the *request* property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn request(mut self, new_value: Channel) -> ChannelStopCall<'a, C, A> {
         self._request = new_value;
@@ -8623,12 +8624,12 @@ impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -8645,17 +8646,17 @@ impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ChannelStopCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ChannelStopCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8716,7 +8717,7 @@ impl<'a, C, A> ColorGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "calendar.colors.get", 
+        dlg.begin(MethodInfo { id: "calendar.colors.get",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((2 + self._additional_params.len()));
         for &field in ["alt"].iter() {
@@ -8736,7 +8737,7 @@ impl<'a, C, A> ColorGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -8772,7 +8773,7 @@ impl<'a, C, A> ColorGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -8782,10 +8783,10 @@ impl<'a, C, A> ColorGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -8826,12 +8827,12 @@ impl<'a, C, A> ColorGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -8848,17 +8849,17 @@ impl<'a, C, A> ColorGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ColorGetCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ColorGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8923,7 +8924,7 @@ impl<'a, C, A> EventDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "calendar.events.delete", 
+        dlg.begin(MethodInfo { id: "calendar.events.delete",
                                http_method: hyper::method::Method::Delete });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("calendarId", self._calendar_id.to_string()));
@@ -8968,7 +8969,7 @@ impl<'a, C, A> EventDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -9004,7 +9005,7 @@ impl<'a, C, A> EventDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -9014,10 +9015,10 @@ impl<'a, C, A> EventDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -9040,7 +9041,7 @@ impl<'a, C, A> EventDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn calendar_id(mut self, new_value: &str) -> EventDeleteCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
@@ -9050,7 +9051,7 @@ impl<'a, C, A> EventDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// Sets the *event id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn event_id(mut self, new_value: &str) -> EventDeleteCall<'a, C, A> {
         self._event_id = new_value.to_string();
@@ -9075,12 +9076,12 @@ impl<'a, C, A> EventDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -9097,17 +9098,17 @@ impl<'a, C, A> EventDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EventDeleteCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EventDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9182,7 +9183,7 @@ impl<'a, C, A> EventInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "calendar.events.insert", 
+        dlg.begin(MethodInfo { id: "calendar.events.insert",
                                http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
         params.push(("calendarId", self._calendar_id.to_string()));
@@ -9233,14 +9234,14 @@ impl<'a, C, A> EventInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = 
+        let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request);
                 remove_json_null_values(&mut value);
@@ -9284,7 +9285,7 @@ impl<'a, C, A> EventInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -9294,10 +9295,10 @@ impl<'a, C, A> EventInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -9329,7 +9330,7 @@ impl<'a, C, A> EventInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// Sets the *request* property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn request(mut self, new_value: Event) -> EventInsertCall<'a, C, A> {
         self._request = new_value;
@@ -9339,7 +9340,7 @@ impl<'a, C, A> EventInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn calendar_id(mut self, new_value: &str) -> EventInsertCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
@@ -9378,12 +9379,12 @@ impl<'a, C, A> EventInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -9400,17 +9401,17 @@ impl<'a, C, A> EventInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EventInsertCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EventInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9481,7 +9482,7 @@ impl<'a, C, A> EventImportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "calendar.events.import", 
+        dlg.begin(MethodInfo { id: "calendar.events.import",
                                http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("calendarId", self._calendar_id.to_string()));
@@ -9526,14 +9527,14 @@ impl<'a, C, A> EventImportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = 
+        let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request);
                 remove_json_null_values(&mut value);
@@ -9577,7 +9578,7 @@ impl<'a, C, A> EventImportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -9587,10 +9588,10 @@ impl<'a, C, A> EventImportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -9622,7 +9623,7 @@ impl<'a, C, A> EventImportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// Sets the *request* property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn request(mut self, new_value: Event) -> EventImportCall<'a, C, A> {
         self._request = new_value;
@@ -9632,7 +9633,7 @@ impl<'a, C, A> EventImportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn calendar_id(mut self, new_value: &str) -> EventImportCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
@@ -9657,12 +9658,12 @@ impl<'a, C, A> EventImportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -9679,17 +9680,17 @@ impl<'a, C, A> EventImportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EventImportCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EventImportCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9770,7 +9771,7 @@ impl<'a, C, A> EventInstanceCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "calendar.events.instances", 
+        dlg.begin(MethodInfo { id: "calendar.events.instances",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((13 + self._additional_params.len()));
         params.push(("calendarId", self._calendar_id.to_string()));
@@ -9840,7 +9841,7 @@ impl<'a, C, A> EventInstanceCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -9876,7 +9877,7 @@ impl<'a, C, A> EventInstanceCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -9886,10 +9887,10 @@ impl<'a, C, A> EventInstanceCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -9922,7 +9923,7 @@ impl<'a, C, A> EventInstanceCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn calendar_id(mut self, new_value: &str) -> EventInstanceCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
@@ -9932,7 +9933,7 @@ impl<'a, C, A> EventInstanceCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// Sets the *event id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn event_id(mut self, new_value: &str) -> EventInstanceCall<'a, C, A> {
         self._event_id = new_value.to_string();
@@ -10013,12 +10014,12 @@ impl<'a, C, A> EventInstanceCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -10035,17 +10036,17 @@ impl<'a, C, A> EventInstanceCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EventInstanceCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EventInstanceCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10114,7 +10115,7 @@ impl<'a, C, A> EventGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "calendar.events.get", 
+        dlg.begin(MethodInfo { id: "calendar.events.get",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
         params.push(("calendarId", self._calendar_id.to_string()));
@@ -10166,7 +10167,7 @@ impl<'a, C, A> EventGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -10202,7 +10203,7 @@ impl<'a, C, A> EventGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -10212,10 +10213,10 @@ impl<'a, C, A> EventGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -10248,7 +10249,7 @@ impl<'a, C, A> EventGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn calendar_id(mut self, new_value: &str) -> EventGetCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
@@ -10258,7 +10259,7 @@ impl<'a, C, A> EventGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     ///
     /// Sets the *event id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn event_id(mut self, new_value: &str) -> EventGetCall<'a, C, A> {
         self._event_id = new_value.to_string();
@@ -10297,12 +10298,12 @@ impl<'a, C, A> EventGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -10319,17 +10320,17 @@ impl<'a, C, A> EventGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EventGetCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EventGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10425,7 +10426,7 @@ impl<'a, C, A> EventListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "calendar.events.list", 
+        dlg.begin(MethodInfo { id: "calendar.events.list",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((20 + self._additional_params.len()));
         params.push(("calendarId", self._calendar_id.to_string()));
@@ -10526,7 +10527,7 @@ impl<'a, C, A> EventListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -10562,7 +10563,7 @@ impl<'a, C, A> EventListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -10572,10 +10573,10 @@ impl<'a, C, A> EventListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -10608,7 +10609,7 @@ impl<'a, C, A> EventListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn calendar_id(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
@@ -10760,12 +10761,12 @@ impl<'a, C, A> EventListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -10782,17 +10783,17 @@ impl<'a, C, A> EventListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EventListCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EventListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10870,7 +10871,7 @@ impl<'a, C, A> EventPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "calendar.events.patch", 
+        dlg.begin(MethodInfo { id: "calendar.events.patch",
                                http_method: hyper::method::Method::Patch });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((9 + self._additional_params.len()));
         params.push(("calendarId", self._calendar_id.to_string()));
@@ -10925,14 +10926,14 @@ impl<'a, C, A> EventPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = 
+        let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request);
                 remove_json_null_values(&mut value);
@@ -10976,7 +10977,7 @@ impl<'a, C, A> EventPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -10986,10 +10987,10 @@ impl<'a, C, A> EventPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -11021,7 +11022,7 @@ impl<'a, C, A> EventPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// Sets the *request* property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn request(mut self, new_value: Event) -> EventPatchCall<'a, C, A> {
         self._request = new_value;
@@ -11031,7 +11032,7 @@ impl<'a, C, A> EventPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn calendar_id(mut self, new_value: &str) -> EventPatchCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
@@ -11041,7 +11042,7 @@ impl<'a, C, A> EventPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// Sets the *event id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn event_id(mut self, new_value: &str) -> EventPatchCall<'a, C, A> {
         self._event_id = new_value.to_string();
@@ -11087,12 +11088,12 @@ impl<'a, C, A> EventPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -11109,17 +11110,17 @@ impl<'a, C, A> EventPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EventPatchCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EventPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11185,7 +11186,7 @@ impl<'a, C, A> EventMoveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "calendar.events.move", 
+        dlg.begin(MethodInfo { id: "calendar.events.move",
                                http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("calendarId", self._calendar_id.to_string()));
@@ -11232,7 +11233,7 @@ impl<'a, C, A> EventMoveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -11268,7 +11269,7 @@ impl<'a, C, A> EventMoveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -11278,10 +11279,10 @@ impl<'a, C, A> EventMoveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -11314,7 +11315,7 @@ impl<'a, C, A> EventMoveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn calendar_id(mut self, new_value: &str) -> EventMoveCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
@@ -11324,7 +11325,7 @@ impl<'a, C, A> EventMoveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     ///
     /// Sets the *event id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn event_id(mut self, new_value: &str) -> EventMoveCall<'a, C, A> {
         self._event_id = new_value.to_string();
@@ -11334,7 +11335,7 @@ impl<'a, C, A> EventMoveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     ///
     /// Sets the *destination* query property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn destination(mut self, new_value: &str) -> EventMoveCall<'a, C, A> {
         self._destination = new_value.to_string();
@@ -11359,12 +11360,12 @@ impl<'a, C, A> EventMoveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -11381,17 +11382,17 @@ impl<'a, C, A> EventMoveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EventMoveCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EventMoveCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11469,7 +11470,7 @@ impl<'a, C, A> EventUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "calendar.events.update", 
+        dlg.begin(MethodInfo { id: "calendar.events.update",
                                http_method: hyper::method::Method::Put });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((9 + self._additional_params.len()));
         params.push(("calendarId", self._calendar_id.to_string()));
@@ -11524,14 +11525,14 @@ impl<'a, C, A> EventUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = 
+        let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request);
                 remove_json_null_values(&mut value);
@@ -11575,7 +11576,7 @@ impl<'a, C, A> EventUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -11585,10 +11586,10 @@ impl<'a, C, A> EventUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -11620,7 +11621,7 @@ impl<'a, C, A> EventUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// Sets the *request* property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn request(mut self, new_value: Event) -> EventUpdateCall<'a, C, A> {
         self._request = new_value;
@@ -11630,7 +11631,7 @@ impl<'a, C, A> EventUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn calendar_id(mut self, new_value: &str) -> EventUpdateCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
@@ -11640,7 +11641,7 @@ impl<'a, C, A> EventUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// Sets the *event id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn event_id(mut self, new_value: &str) -> EventUpdateCall<'a, C, A> {
         self._event_id = new_value.to_string();
@@ -11686,12 +11687,12 @@ impl<'a, C, A> EventUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -11708,17 +11709,17 @@ impl<'a, C, A> EventUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EventUpdateCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EventUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11821,7 +11822,7 @@ impl<'a, C, A> EventWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "calendar.events.watch", 
+        dlg.begin(MethodInfo { id: "calendar.events.watch",
                                http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((21 + self._additional_params.len()));
         params.push(("calendarId", self._calendar_id.to_string()));
@@ -11922,14 +11923,14 @@ impl<'a, C, A> EventWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = 
+        let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request);
                 remove_json_null_values(&mut value);
@@ -11973,7 +11974,7 @@ impl<'a, C, A> EventWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -11983,10 +11984,10 @@ impl<'a, C, A> EventWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -12018,7 +12019,7 @@ impl<'a, C, A> EventWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// Sets the *request* property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn request(mut self, new_value: Channel) -> EventWatchCall<'a, C, A> {
         self._request = new_value;
@@ -12028,7 +12029,7 @@ impl<'a, C, A> EventWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn calendar_id(mut self, new_value: &str) -> EventWatchCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
@@ -12180,12 +12181,12 @@ impl<'a, C, A> EventWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -12202,17 +12203,17 @@ impl<'a, C, A> EventWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EventWatchCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EventWatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -12277,7 +12278,7 @@ impl<'a, C, A> EventQuickAddCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "calendar.events.quickAdd", 
+        dlg.begin(MethodInfo { id: "calendar.events.quickAdd",
                                http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("calendarId", self._calendar_id.to_string()));
@@ -12323,7 +12324,7 @@ impl<'a, C, A> EventQuickAddCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -12359,7 +12360,7 @@ impl<'a, C, A> EventQuickAddCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -12369,10 +12370,10 @@ impl<'a, C, A> EventQuickAddCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -12405,7 +12406,7 @@ impl<'a, C, A> EventQuickAddCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn calendar_id(mut self, new_value: &str) -> EventQuickAddCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
@@ -12415,7 +12416,7 @@ impl<'a, C, A> EventQuickAddCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// Sets the *text* query property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn text(mut self, new_value: &str) -> EventQuickAddCall<'a, C, A> {
         self._text = new_value.to_string();
@@ -12440,12 +12441,12 @@ impl<'a, C, A> EventQuickAddCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -12462,17 +12463,17 @@ impl<'a, C, A> EventQuickAddCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EventQuickAddCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EventQuickAddCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

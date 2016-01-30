@@ -6,7 +6,7 @@ DO NOT EDIT !
 The MIT License (MIT)
 =====================
 
-Copyright © `2015` `Sebastian Thiel`
+Copyright © `2015-2016` `Sebastian Thiel`
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation

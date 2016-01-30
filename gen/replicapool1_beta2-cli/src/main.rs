@@ -20,7 +20,7 @@ use clap::{App, SubCommand, Arg};
 
 mod cmn;
 
-use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg, 
+use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
           calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
@@ -36,22 +36,22 @@ enum DoitError {
     ApiError(api::Error),
 }
 
-struct Engine<'n, 'a> {
-    opt: ArgMatches<'n, 'a>,
+struct Engine<'n> {
+    opt: ArgMatches<'n>,
     hub: api::Replicapool<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
 
 
-impl<'n, 'a> Engine<'n, 'a> {
-    fn _instance_group_managers_abandon_instances(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+impl<'n> Engine<'n> {
+    fn _instance_group_managers_abandon_instances(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
         let mut object = json::value::Value::Object(Default::default());
         
-        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -65,8 +65,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-           
-            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "instances" => Some(("instances", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
@@ -81,7 +81,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
         let mut request: api::InstanceGroupManagersAbandonInstancesRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.instance_group_managers().abandon_instances(request, opt.value_of("project").unwrap_or(""), opt.value_of("zone").unwrap_or(""), opt.value_of("instance-group-manager").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -94,7 +94,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -107,7 +107,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -130,10 +130,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _instance_group_managers_delete(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _instance_group_managers_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.instance_group_managers().delete(opt.value_of("project").unwrap_or(""), opt.value_of("zone").unwrap_or(""), opt.value_of("instance-group-manager").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -146,7 +146,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -159,7 +159,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -182,13 +182,13 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _instance_group_managers_delete_instances(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _instance_group_managers_delete_instances(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
         let mut object = json::value::Value::Object(Default::default());
         
-        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -202,8 +202,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-           
-            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "instances" => Some(("instances", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
@@ -218,7 +218,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
         let mut request: api::InstanceGroupManagersDeleteInstancesRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.instance_group_managers().delete_instances(request, opt.value_of("project").unwrap_or(""), opt.value_of("zone").unwrap_or(""), opt.value_of("instance-group-manager").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -231,7 +231,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -244,7 +244,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -267,10 +267,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _instance_group_managers_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _instance_group_managers_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.instance_group_managers().get(opt.value_of("project").unwrap_or(""), opt.value_of("zone").unwrap_or(""), opt.value_of("instance-group-manager").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -283,7 +283,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -296,7 +296,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -319,13 +319,13 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _instance_group_managers_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _instance_group_managers_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
         let mut object = json::value::Value::Object(Default::default());
         
-        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -339,8 +339,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-           
-            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "target-size" => Some(("targetSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "group" => Some(("group", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -368,7 +368,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         let mut request: api::InstanceGroupManager = json::value::from_value(object).unwrap();
         let size: i32 = arg_from_str(&opt.value_of("size").unwrap_or(""), err, "<size>", "integer");
         let mut call = self.hub.instance_group_managers().insert(request, opt.value_of("project").unwrap_or(""), opt.value_of("zone").unwrap_or(""), size);
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -381,7 +381,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -394,7 +394,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -417,10 +417,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _instance_group_managers_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _instance_group_managers_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.instance_group_managers().list(opt.value_of("project").unwrap_or(""), opt.value_of("zone").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
@@ -442,7 +442,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["filter", "page-token", "max-results"].iter().map(|v|*v));
@@ -456,7 +456,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -479,13 +479,13 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _instance_group_managers_recreate_instances(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _instance_group_managers_recreate_instances(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
         let mut object = json::value::Value::Object(Default::default());
         
-        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -499,8 +499,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-           
-            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "instances" => Some(("instances", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
@@ -515,7 +515,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
         let mut request: api::InstanceGroupManagersRecreateInstancesRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.instance_group_managers().recreate_instances(request, opt.value_of("project").unwrap_or(""), opt.value_of("zone").unwrap_or(""), opt.value_of("instance-group-manager").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -528,7 +528,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -541,7 +541,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -564,11 +564,11 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _instance_group_managers_resize(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _instance_group_managers_resize(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let size: i32 = arg_from_str(&opt.value_of("size").unwrap_or(""), err, "<size>", "integer");
         let mut call = self.hub.instance_group_managers().resize(opt.value_of("project").unwrap_or(""), opt.value_of("zone").unwrap_or(""), opt.value_of("instance-group-manager").unwrap_or(""), size);
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -581,7 +581,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -594,7 +594,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -617,13 +617,13 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _instance_group_managers_set_instance_template(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _instance_group_managers_set_instance_template(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
         let mut object = json::value::Value::Object(Default::default());
         
-        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -637,8 +637,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-           
-            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "instance-template" => Some(("instanceTemplate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
@@ -653,7 +653,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
         let mut request: api::InstanceGroupManagersSetInstanceTemplateRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.instance_group_managers().set_instance_template(request, opt.value_of("project").unwrap_or(""), opt.value_of("zone").unwrap_or(""), opt.value_of("instance-group-manager").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -666,7 +666,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -679,7 +679,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -702,13 +702,13 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _instance_group_managers_set_target_pools(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _instance_group_managers_set_target_pools(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
         let mut object = json::value::Value::Object(Default::default());
         
-        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -722,8 +722,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-           
-            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "target-pools" => Some(("targetPools", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "fingerprint" => Some(("fingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -739,7 +739,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
         let mut request: api::InstanceGroupManagersSetTargetPoolsRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.instance_group_managers().set_target_pools(request, opt.value_of("project").unwrap_or(""), opt.value_of("zone").unwrap_or(""), opt.value_of("instance-group-manager").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -752,7 +752,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -765,7 +765,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -788,10 +788,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _zone_operations_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _zone_operations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.zone_operations().get(opt.value_of("project").unwrap_or(""), opt.value_of("zone").unwrap_or(""), opt.value_of("operation").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -804,7 +804,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -817,7 +817,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -840,10 +840,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _zone_operations_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _zone_operations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.zone_operations().list(opt.value_of("project").unwrap_or(""), opt.value_of("zone").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
@@ -865,7 +865,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["filter", "page-token", "max-results"].iter().map(|v|*v));
@@ -879,7 +879,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -976,14 +976,14 @@ impl<'n, 'a> Engine<'n, 'a> {
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    fn new(opt: ArgMatches<'a, 'n>) -> Result<Engine<'a, 'n>, InvalidOptionsError> {
+    fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
         let (config_dir, secret) = {
             let config_dir = match cmn::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "replicapool1-beta2-secret.json", 
+            match cmn::application_secret_from_directory(&config_dir, "replicapool1-beta2-secret.json",
                                                          "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
@@ -1003,7 +1003,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                                           db_dir: config_dir.clone(),
                                         }, None);
 
-        let client = 
+        let client =
             if opt.is_present("debug") {
                 hyper::Client::with_connector(mock::TeeConnector {
                         connector: hyper::net::HttpsConnector::<hyper::net::Openssl>::default()
@@ -1042,7 +1042,7 @@ fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
         ("instance-group-managers", "methods: 'abandon-instances', 'delete', 'delete-instances', 'get', 'insert', 'list', 'recreate-instances', 'resize', 'set-instance-template' and 'set-target-pools'", vec![
-            ("abandon-instances",  
+            ("abandon-instances",
                     Some(r##"Removes the specified instances from the managed instance group, and from any target pools of which they were members, without deleting the instances."##),
                     "Details at http://byron.github.io/google-apis-rs/google_replicapool1_beta2_cli/instance-group-managers_abandon-instances",
                   vec![
@@ -1082,7 +1082,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("delete",  
+            ("delete",
                     Some(r##"Deletes the instance group manager and all instances contained within. If you'd like to delete the manager without deleting the instances, you must first abandon the instances to remove them from the group."##),
                     "Details at http://byron.github.io/google-apis-rs/google_replicapool1_beta2_cli/instance-group-managers_delete",
                   vec![
@@ -1116,7 +1116,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("delete-instances",  
+            ("delete-instances",
                     Some(r##"Deletes the specified instances. The instances are deleted, then removed from the instance group and any target pools of which they were a member. The targetSize of the instance group manager is reduced by the number of instances deleted."##),
                     "Details at http://byron.github.io/google-apis-rs/google_replicapool1_beta2_cli/instance-group-managers_delete-instances",
                   vec![
@@ -1156,7 +1156,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("get",  
+            ("get",
                     Some(r##"Returns the specified Instance Group Manager resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_replicapool1_beta2_cli/instance-group-managers_get",
                   vec![
@@ -1190,7 +1190,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("insert",  
+            ("insert",
                     Some(r##"Creates an instance group manager, as well as the instance group and the specified number of instances."##),
                     "Details at http://byron.github.io/google-apis-rs/google_replicapool1_beta2_cli/instance-group-managers_insert",
                   vec![
@@ -1230,7 +1230,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("list",  
+            ("list",
                     Some(r##"Retrieves the list of Instance Group Manager resources contained within the specified zone."##),
                     "Details at http://byron.github.io/google-apis-rs/google_replicapool1_beta2_cli/instance-group-managers_list",
                   vec![
@@ -1258,7 +1258,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("recreate-instances",  
+            ("recreate-instances",
                     Some(r##"Recreates the specified instances. The instances are deleted, then recreated using the instance group manager's current instance template."##),
                     "Details at http://byron.github.io/google-apis-rs/google_replicapool1_beta2_cli/instance-group-managers_recreate-instances",
                   vec![
@@ -1298,7 +1298,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("resize",  
+            ("resize",
                     Some(r##"Resizes the managed instance group up or down. If resized up, new instances are created using the current instance template. If resized down, instances are removed in the order outlined in Resizing a managed instance group."##),
                     "Details at http://byron.github.io/google-apis-rs/google_replicapool1_beta2_cli/instance-group-managers_resize",
                   vec![
@@ -1338,7 +1338,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("set-instance-template",  
+            ("set-instance-template",
                     Some(r##"Sets the instance template to use when creating new instances in this group. Existing instances are not affected."##),
                     "Details at http://byron.github.io/google-apis-rs/google_replicapool1_beta2_cli/instance-group-managers_set-instance-template",
                   vec![
@@ -1378,7 +1378,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("set-target-pools",  
+            ("set-target-pools",
                     Some(r##"Modifies the target pools to which all new instances in this group are assigned. Existing instances in the group are not affected."##),
                     "Details at http://byron.github.io/google-apis-rs/google_replicapool1_beta2_cli/instance-group-managers_set-target-pools",
                   vec![
@@ -1421,7 +1421,7 @@ fn main() {
             ]),
         
         ("zone-operations", "methods: 'get' and 'list'", vec![
-            ("get",  
+            ("get",
                     Some(r##"Retrieves the specified zone-specific operation resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_replicapool1_beta2_cli/zone-operations_get",
                   vec![
@@ -1455,7 +1455,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("list",  
+            ("list",
                     Some(r##"Retrieves the list of operation resources contained within the specified zone."##),
                     "Details at http://byron.github.io/google-apis-rs/google_replicapool1_beta2_cli/zone-operations_list",
                   vec![
@@ -1489,7 +1489,7 @@ fn main() {
     
     let mut app = App::new("replicapool1-beta2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.2+20150708")
+           .version("0.3.3+20150708")
            .about("The Google Compute Engine Instance Group Manager API provides groups of homogenous Compute Engine Instances.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_replicapool1_beta2_cli")
            .arg(Arg::with_name("url")
@@ -1513,7 +1513,7 @@ fn main() {
                    .multiple(false)
                    .takes_value(false));
            
-           for &(main_command_name, ref about, ref subcommands) in arg_data.iter() {
+           for &(main_command_name, about, ref subcommands) in arg_data.iter() {
                let mut mcmd = SubCommand::with_name(main_command_name).about(about);
            
                for &(sub_command_name, ref desc, url_info, ref args) in subcommands {
@@ -1524,7 +1524,7 @@ fn main() {
                    scmd = scmd.after_help(url_info);
            
                    for &(ref arg_name, ref flag, ref desc, ref required, ref multi) in args {
-                       let arg_name_str = 
+                       let arg_name_str =
                            match (arg_name, flag) {
                                    (&Some(an), _       ) => an,
                                    (_        , &Some(f)) => f,

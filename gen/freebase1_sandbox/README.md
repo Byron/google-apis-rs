@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-freebase1_sandbox` library allows access to all features of the *Google freebase* service.
 
-This documentation was generated from *freebase* crate version *0.1.10+20150715*, where *20150715* is the exact revision of the *freebase:v1sandbox* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.10*.
+This documentation was generated from *freebase* crate version *0.1.11+20150715*, where *20150715* is the exact revision of the *freebase:v1sandbox* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
 
 Everything else about the *freebase* *v1_sandbox* API can be found at the
 [official documentation site](https://developers.google.com/freebase/).

@@ -1,4 +1,4 @@
-site_name: urlshortener v0.3.2+20150519
+site_name: urlshortener v0.3.3+20150519
 site_url: http://byron.github.io/google-apis-rs/google-urlshortener1-cli
 site_description: Write integrating applications with bcore
 
@@ -15,5 +15,5 @@ pages:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015, `Sebastian Thiel`
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
 

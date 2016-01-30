@@ -20,7 +20,7 @@ use clap::{App, SubCommand, Arg};
 
 mod cmn;
 
-use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg, 
+use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
           calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
@@ -36,19 +36,19 @@ enum DoitError {
     ApiError(api::Error),
 }
 
-struct Engine<'n, 'a> {
-    opt: ArgMatches<'n, 'a>,
+struct Engine<'n> {
+    opt: ArgMatches<'n>,
     hub: api::Drive<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
 
 
-impl<'n, 'a> Engine<'n, 'a> {
-    fn _about_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+impl<'n> Engine<'n> {
+    fn _about_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.about().get();
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-change-id" => {
@@ -70,7 +70,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["include-subscribed", "max-change-id-count", "start-change-id"].iter().map(|v|*v));
@@ -84,7 +84,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -107,10 +107,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _apps_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _apps_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.apps().get(opt.value_of("app-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -123,7 +123,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -136,7 +136,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -159,10 +159,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _apps_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _apps_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.apps().list();
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "language-code" => {
@@ -184,7 +184,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["language-code", "app-filter-extensions", "app-filter-mime-types"].iter().map(|v|*v));
@@ -198,7 +198,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -221,10 +221,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _changes_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _changes_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.changes().get(opt.value_of("change-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -237,7 +237,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -250,7 +250,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -273,10 +273,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _changes_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _changes_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.changes().list();
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-change-id" => {
@@ -307,7 +307,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["include-subscribed", "include-deleted", "max-results", "page-token", "spaces", "start-change-id"].iter().map(|v|*v));
@@ -321,7 +321,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -344,13 +344,13 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _changes_watch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _changes_watch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
         let mut object = json::value::Value::Object(Default::default());
         
-        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -364,8 +364,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-           
-            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "resource-uri" => Some(("resourceUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -389,7 +389,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
         let mut request: api::Channel = json::value::from_value(object).unwrap();
         let mut call = self.hub.changes().watch(request);
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-change-id" => {
@@ -420,7 +420,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["include-subscribed", "include-deleted", "max-results", "page-token", "spaces", "start-change-id"].iter().map(|v|*v));
@@ -434,7 +434,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -457,13 +457,13 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _channels_stop(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _channels_stop(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
         let mut object = json::value::Value::Object(Default::default());
         
-        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -477,8 +477,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-           
-            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "resource-uri" => Some(("resourceUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -502,7 +502,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
         let mut request: api::Channel = json::value::from_value(object).unwrap();
         let mut call = self.hub.channels().stop(request);
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -515,7 +515,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -528,7 +528,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             match match protocol {
@@ -543,10 +543,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _children_delete(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _children_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.children().delete(opt.value_of("folder-id").unwrap_or(""), opt.value_of("child-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -559,7 +559,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -572,7 +572,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             match match protocol {
@@ -587,10 +587,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _children_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _children_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.children().get(opt.value_of("folder-id").unwrap_or(""), opt.value_of("child-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -603,7 +603,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -616,7 +616,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -639,13 +639,13 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _children_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _children_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
         let mut object = json::value::Value::Object(Default::default());
         
-        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -659,8 +659,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-           
-            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "child-link" => Some(("childLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -678,7 +678,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
         let mut request: api::ChildReference = json::value::from_value(object).unwrap();
         let mut call = self.hub.children().insert(request, opt.value_of("folder-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -691,7 +691,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -704,7 +704,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -727,10 +727,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _children_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _children_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.children().list(opt.value_of("folder-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "q" => {
@@ -755,7 +755,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["q", "page-token", "max-results", "order-by"].iter().map(|v|*v));
@@ -769,7 +769,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -792,10 +792,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _comments_delete(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _comments_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.comments().delete(opt.value_of("file-id").unwrap_or(""), opt.value_of("comment-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -808,7 +808,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -821,7 +821,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             match match protocol {
@@ -836,10 +836,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _comments_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _comments_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.comments().get(opt.value_of("file-id").unwrap_or(""), opt.value_of("comment-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "include-deleted" => {
@@ -855,7 +855,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["include-deleted"].iter().map(|v|*v));
@@ -869,7 +869,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -892,13 +892,13 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _comments_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _comments_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
         let mut object = json::value::Value::Object(Default::default());
         
-        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -912,8 +912,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-           
-            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -947,7 +947,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
         let mut request: api::Comment = json::value::from_value(object).unwrap();
         let mut call = self.hub.comments().insert(request, opt.value_of("file-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -960,7 +960,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -973,7 +973,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -996,10 +996,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _comments_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _comments_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.comments().list(opt.value_of("file-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "updated-min" => {
@@ -1024,7 +1024,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["updated-min", "include-deleted", "max-results", "page-token"].iter().map(|v|*v));
@@ -1038,7 +1038,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -1061,13 +1061,13 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _comments_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _comments_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
         let mut object = json::value::Value::Object(Default::default());
         
-        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -1081,8 +1081,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-           
-            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1116,7 +1116,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
         let mut request: api::Comment = json::value::from_value(object).unwrap();
         let mut call = self.hub.comments().patch(request, opt.value_of("file-id").unwrap_or(""), opt.value_of("comment-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -1129,7 +1129,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -1142,7 +1142,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -1165,13 +1165,13 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _comments_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _comments_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
         let mut object = json::value::Value::Object(Default::default());
         
-        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -1185,8 +1185,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-           
-            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1220,7 +1220,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
         let mut request: api::Comment = json::value::from_value(object).unwrap();
         let mut call = self.hub.comments().update(request, opt.value_of("file-id").unwrap_or(""), opt.value_of("comment-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -1233,7 +1233,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -1246,7 +1246,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -1269,13 +1269,13 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _files_copy(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _files_copy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
         let mut object = json::value::Value::Object(Default::default());
         
-        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -1289,8 +1289,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-           
-            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "mime-type" => Some(("mimeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "last-viewed-by-me-date" => Some(("lastViewedByMeDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1408,7 +1408,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
         let mut request: api::File = json::value::from_value(object).unwrap();
         let mut call = self.hub.files().copy(request, opt.value_of("file-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "visibility" => {
@@ -1442,7 +1442,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["convert", "ocr-language", "visibility", "pinned", "ocr", "timed-text-track-name", "timed-text-language"].iter().map(|v|*v));
@@ -1456,7 +1456,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -1479,10 +1479,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _files_delete(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _files_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.files().delete(opt.value_of("file-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -1495,7 +1495,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -1508,7 +1508,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             match match protocol {
@@ -1523,10 +1523,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _files_empty_trash(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _files_empty_trash(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.files().empty_trash();
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -1539,7 +1539,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -1552,7 +1552,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             match match protocol {
@@ -1567,10 +1567,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _files_generate_ids(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _files_generate_ids(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.files().generate_ids();
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "space" => {
@@ -1589,7 +1589,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["max-results", "space"].iter().map(|v|*v));
@@ -1603,7 +1603,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -1626,11 +1626,11 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _files_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _files_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut download_mode = false;
         let mut call = self.hub.files().get(opt.value_of("file-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-viewed-date" => {
@@ -1658,7 +1658,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["revision-id", "update-viewed-date", "acknowledge-abuse", "projection"].iter().map(|v|*v));
@@ -1672,7 +1672,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -1700,13 +1700,13 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _files_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _files_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
         let mut object = json::value::Value::Object(Default::default());
         
-        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -1720,8 +1720,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-           
-            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "mime-type" => Some(("mimeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "last-viewed-by-me-date" => Some(("lastViewedByMeDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1839,7 +1839,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
         let mut request: api::File = json::value::from_value(object).unwrap();
         let mut call = self.hub.files().insert(request);
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "visibility" => {
@@ -1876,7 +1876,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["convert", "use-content-as-indexable-text", "ocr-language", "visibility", "pinned", "ocr", "timed-text-track-name", "timed-text-language"].iter().map(|v|*v));
@@ -1885,7 +1885,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
             }
         }
-        let vals = opt.values_of("mode").unwrap();
+        let vals = opt.values_of("mode").unwrap().collect::<Vec<&str>>();
         let protocol = calltype_from_str(vals[0], ["simple", "resumable"].iter().map(|&v| v.to_string()).collect(), err);
         let mut input_file = input_file_from_opts(vals[1], err);
         let mime_type = input_mime_from_opts(opt.value_of("mime").unwrap_or("application/octet-stream"), err);
@@ -1893,7 +1893,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -1917,10 +1917,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _files_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _files_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.files().list();
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "spaces" => {
@@ -1954,7 +1954,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["order-by", "projection", "max-results", "q", "page-token", "spaces", "corpus"].iter().map(|v|*v));
@@ -1968,7 +1968,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -1991,13 +1991,13 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _files_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _files_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
         let mut object = json::value::Value::Object(Default::default());
         
-        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -2011,8 +2011,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-           
-            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "mime-type" => Some(("mimeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "last-viewed-by-me-date" => Some(("lastViewedByMeDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2130,7 +2130,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
         let mut request: api::File = json::value::from_value(object).unwrap();
         let mut call = self.hub.files().patch(request, opt.value_of("file-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "use-content-as-indexable-text" => {
@@ -2182,7 +2182,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["add-parents", "convert", "ocr", "set-modified-date", "modified-date-behavior", "use-content-as-indexable-text", "ocr-language", "new-revision", "pinned", "remove-parents", "update-viewed-date", "timed-text-track-name", "timed-text-language"].iter().map(|v|*v));
@@ -2196,7 +2196,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -2219,10 +2219,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _files_touch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _files_touch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.files().touch(opt.value_of("file-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -2235,7 +2235,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -2248,7 +2248,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -2271,10 +2271,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _files_trash(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _files_trash(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.files().trash(opt.value_of("file-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -2287,7 +2287,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -2300,7 +2300,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -2323,10 +2323,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _files_untrash(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _files_untrash(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.files().untrash(opt.value_of("file-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -2339,7 +2339,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -2352,7 +2352,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -2375,13 +2375,13 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _files_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _files_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
         let mut object = json::value::Value::Object(Default::default());
         
-        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -2395,8 +2395,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-           
-            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "mime-type" => Some(("mimeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "last-viewed-by-me-date" => Some(("lastViewedByMeDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2514,7 +2514,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
         let mut request: api::File = json::value::from_value(object).unwrap();
         let mut call = self.hub.files().update(request, opt.value_of("file-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "use-content-as-indexable-text" => {
@@ -2566,7 +2566,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["add-parents", "convert", "ocr", "set-modified-date", "modified-date-behavior", "use-content-as-indexable-text", "ocr-language", "new-revision", "pinned", "remove-parents", "update-viewed-date", "timed-text-track-name", "timed-text-language"].iter().map(|v|*v));
@@ -2575,7 +2575,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
             }
         }
-        let vals = opt.values_of("mode").unwrap();
+        let vals = opt.values_of("mode").unwrap().collect::<Vec<&str>>();
         let protocol = calltype_from_str(vals[0], ["simple", "resumable"].iter().map(|&v| v.to_string()).collect(), err);
         let mut input_file = input_file_from_opts(vals[1], err);
         let mime_type = input_mime_from_opts(opt.value_of("mime").unwrap_or("application/octet-stream"), err);
@@ -2583,7 +2583,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -2607,13 +2607,13 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _files_watch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _files_watch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
         let mut object = json::value::Value::Object(Default::default());
         
-        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -2627,8 +2627,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-           
-            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "resource-uri" => Some(("resourceUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2653,7 +2653,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         let mut request: api::Channel = json::value::from_value(object).unwrap();
         let mut download_mode = false;
         let mut call = self.hub.files().watch(request, opt.value_of("file-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-viewed-date" => {
@@ -2681,7 +2681,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["revision-id", "update-viewed-date", "acknowledge-abuse", "projection"].iter().map(|v|*v));
@@ -2695,7 +2695,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -2723,10 +2723,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _parents_delete(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _parents_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.parents().delete(opt.value_of("file-id").unwrap_or(""), opt.value_of("parent-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -2739,7 +2739,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -2752,7 +2752,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             match match protocol {
@@ -2767,10 +2767,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _parents_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _parents_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.parents().get(opt.value_of("file-id").unwrap_or(""), opt.value_of("parent-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -2783,7 +2783,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -2796,7 +2796,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -2819,13 +2819,13 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _parents_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _parents_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
         let mut object = json::value::Value::Object(Default::default());
         
-        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -2839,8 +2839,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-           
-            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2859,7 +2859,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
         let mut request: api::ParentReference = json::value::from_value(object).unwrap();
         let mut call = self.hub.parents().insert(request, opt.value_of("file-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -2872,7 +2872,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -2885,7 +2885,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -2908,10 +2908,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _parents_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _parents_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.parents().list(opt.value_of("file-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -2924,7 +2924,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -2937,7 +2937,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -2960,10 +2960,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _permissions_delete(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _permissions_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.permissions().delete(opt.value_of("file-id").unwrap_or(""), opt.value_of("permission-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -2976,7 +2976,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -2989,7 +2989,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             match match protocol {
@@ -3004,10 +3004,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _permissions_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _permissions_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.permissions().get(opt.value_of("file-id").unwrap_or(""), opt.value_of("permission-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -3020,7 +3020,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -3033,7 +3033,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -3056,10 +3056,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _permissions_get_id_for_email(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _permissions_get_id_for_email(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.permissions().get_id_for_email(opt.value_of("email").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -3072,7 +3072,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -3085,7 +3085,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -3108,13 +3108,13 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _permissions_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _permissions_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
         let mut object = json::value::Value::Object(Default::default());
         
-        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -3128,8 +3128,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-           
-            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "with-link" => Some(("withLink", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "domain" => Some(("domain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3157,7 +3157,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
         let mut request: api::Permission = json::value::from_value(object).unwrap();
         let mut call = self.hub.permissions().insert(request, opt.value_of("file-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "send-notification-emails" => {
@@ -3176,7 +3176,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["email-message", "send-notification-emails"].iter().map(|v|*v));
@@ -3190,7 +3190,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -3213,10 +3213,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _permissions_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _permissions_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.permissions().list(opt.value_of("file-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -3229,7 +3229,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -3242,7 +3242,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -3265,13 +3265,13 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _permissions_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _permissions_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
         let mut object = json::value::Value::Object(Default::default());
         
-        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -3285,8 +3285,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-           
-            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "with-link" => Some(("withLink", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "domain" => Some(("domain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3314,7 +3314,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
         let mut request: api::Permission = json::value::from_value(object).unwrap();
         let mut call = self.hub.permissions().patch(request, opt.value_of("file-id").unwrap_or(""), opt.value_of("permission-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "transfer-ownership" => {
@@ -3330,7 +3330,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["transfer-ownership"].iter().map(|v|*v));
@@ -3344,7 +3344,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -3367,13 +3367,13 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _permissions_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _permissions_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
         let mut object = json::value::Value::Object(Default::default());
         
-        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -3387,8 +3387,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-           
-            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "with-link" => Some(("withLink", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "domain" => Some(("domain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3416,7 +3416,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
         let mut request: api::Permission = json::value::from_value(object).unwrap();
         let mut call = self.hub.permissions().update(request, opt.value_of("file-id").unwrap_or(""), opt.value_of("permission-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "transfer-ownership" => {
@@ -3432,7 +3432,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["transfer-ownership"].iter().map(|v|*v));
@@ -3446,7 +3446,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -3469,10 +3469,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _properties_delete(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _properties_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.properties().delete(opt.value_of("file-id").unwrap_or(""), opt.value_of("property-key").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "visibility" => {
@@ -3488,7 +3488,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["visibility"].iter().map(|v|*v));
@@ -3502,7 +3502,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             match match protocol {
@@ -3517,10 +3517,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _properties_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _properties_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.properties().get(opt.value_of("file-id").unwrap_or(""), opt.value_of("property-key").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "visibility" => {
@@ -3536,7 +3536,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["visibility"].iter().map(|v|*v));
@@ -3550,7 +3550,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -3573,13 +3573,13 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _properties_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _properties_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
         let mut object = json::value::Value::Object(Default::default());
         
-        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -3593,8 +3593,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-           
-            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "value" => Some(("value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3614,7 +3614,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
         let mut request: api::Property = json::value::from_value(object).unwrap();
         let mut call = self.hub.properties().insert(request, opt.value_of("file-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -3627,7 +3627,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -3640,7 +3640,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -3663,10 +3663,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _properties_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _properties_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.properties().list(opt.value_of("file-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -3679,7 +3679,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -3692,7 +3692,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -3715,13 +3715,13 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _properties_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _properties_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
         let mut object = json::value::Value::Object(Default::default());
         
-        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -3735,8 +3735,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-           
-            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "value" => Some(("value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3756,7 +3756,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
         let mut request: api::Property = json::value::from_value(object).unwrap();
         let mut call = self.hub.properties().patch(request, opt.value_of("file-id").unwrap_or(""), opt.value_of("property-key").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "visibility" => {
@@ -3772,7 +3772,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["visibility"].iter().map(|v|*v));
@@ -3786,7 +3786,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -3809,13 +3809,13 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _properties_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _properties_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
         let mut object = json::value::Value::Object(Default::default());
         
-        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -3829,8 +3829,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-           
-            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "value" => Some(("value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3850,7 +3850,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
         let mut request: api::Property = json::value::from_value(object).unwrap();
         let mut call = self.hub.properties().update(request, opt.value_of("file-id").unwrap_or(""), opt.value_of("property-key").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "visibility" => {
@@ -3866,7 +3866,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["visibility"].iter().map(|v|*v));
@@ -3880,7 +3880,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -3903,11 +3903,11 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _realtime_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _realtime_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut download_mode = false;
         let mut call = self.hub.realtime().get(opt.value_of("file-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "revision" => {
@@ -3926,7 +3926,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["revision"].iter().map(|v|*v));
@@ -3940,7 +3940,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -3964,10 +3964,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _realtime_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _realtime_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.realtime().update(opt.value_of("file-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "base-revision" => {
@@ -3983,7 +3983,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["base-revision"].iter().map(|v|*v));
@@ -3992,7 +3992,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
             }
         }
-        let vals = opt.values_of("mode").unwrap();
+        let vals = opt.values_of("mode").unwrap().collect::<Vec<&str>>();
         let protocol = calltype_from_str(vals[0], ["simple", "resumable"].iter().map(|&v| v.to_string()).collect(), err);
         let mut input_file = input_file_from_opts(vals[1], err);
         let mime_type = input_mime_from_opts(opt.value_of("mime").unwrap_or("application/octet-stream"), err);
@@ -4000,7 +4000,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             match match protocol {
@@ -4016,10 +4016,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _replies_delete(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _replies_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.replies().delete(opt.value_of("file-id").unwrap_or(""), opt.value_of("comment-id").unwrap_or(""), opt.value_of("reply-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -4032,7 +4032,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -4045,7 +4045,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             match match protocol {
@@ -4060,10 +4060,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _replies_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _replies_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.replies().get(opt.value_of("file-id").unwrap_or(""), opt.value_of("comment-id").unwrap_or(""), opt.value_of("reply-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "include-deleted" => {
@@ -4079,7 +4079,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["include-deleted"].iter().map(|v|*v));
@@ -4093,7 +4093,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -4116,13 +4116,13 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _replies_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _replies_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
         let mut object = json::value::Value::Object(Default::default());
         
-        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -4136,8 +4136,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-           
-            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "author.picture.url" => Some(("author.picture.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -4165,7 +4165,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
         let mut request: api::CommentReply = json::value::from_value(object).unwrap();
         let mut call = self.hub.replies().insert(request, opt.value_of("file-id").unwrap_or(""), opt.value_of("comment-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -4178,7 +4178,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -4191,7 +4191,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -4214,10 +4214,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _replies_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _replies_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.replies().list(opt.value_of("file-id").unwrap_or(""), opt.value_of("comment-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
@@ -4239,7 +4239,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["page-token", "include-deleted", "max-results"].iter().map(|v|*v));
@@ -4253,7 +4253,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -4276,13 +4276,13 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _replies_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _replies_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
         let mut object = json::value::Value::Object(Default::default());
         
-        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -4296,8 +4296,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-           
-            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "author.picture.url" => Some(("author.picture.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -4325,7 +4325,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
         let mut request: api::CommentReply = json::value::from_value(object).unwrap();
         let mut call = self.hub.replies().patch(request, opt.value_of("file-id").unwrap_or(""), opt.value_of("comment-id").unwrap_or(""), opt.value_of("reply-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -4338,7 +4338,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -4351,7 +4351,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -4374,13 +4374,13 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _replies_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _replies_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
         let mut object = json::value::Value::Object(Default::default());
         
-        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -4394,8 +4394,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-           
-            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "author.picture.url" => Some(("author.picture.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -4423,7 +4423,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
         let mut request: api::CommentReply = json::value::from_value(object).unwrap();
         let mut call = self.hub.replies().update(request, opt.value_of("file-id").unwrap_or(""), opt.value_of("comment-id").unwrap_or(""), opt.value_of("reply-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -4436,7 +4436,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -4449,7 +4449,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -4472,10 +4472,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _revisions_delete(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _revisions_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.revisions().delete(opt.value_of("file-id").unwrap_or(""), opt.value_of("revision-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -4488,7 +4488,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -4501,7 +4501,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             match match protocol {
@@ -4516,10 +4516,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _revisions_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _revisions_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.revisions().get(opt.value_of("file-id").unwrap_or(""), opt.value_of("revision-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -4532,7 +4532,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -4545,7 +4545,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -4568,10 +4568,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _revisions_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _revisions_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.revisions().list(opt.value_of("file-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -4584,7 +4584,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -4597,7 +4597,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -4620,13 +4620,13 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _revisions_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _revisions_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
         let mut object = json::value::Value::Object(Default::default());
         
-        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -4640,8 +4640,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-           
-            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "mime-type" => Some(("mimeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "pinned" => Some(("pinned", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -4678,7 +4678,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
         let mut request: api::Revision = json::value::from_value(object).unwrap();
         let mut call = self.hub.revisions().patch(request, opt.value_of("file-id").unwrap_or(""), opt.value_of("revision-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -4691,7 +4691,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -4704,7 +4704,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -4727,13 +4727,13 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _revisions_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _revisions_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
         let mut object = json::value::Value::Object(Default::default());
         
-        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -4747,8 +4747,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-           
-            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "mime-type" => Some(("mimeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "pinned" => Some(("pinned", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -4785,7 +4785,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
         let mut request: api::Revision = json::value::from_value(object).unwrap();
         let mut call = self.hub.revisions().update(request, opt.value_of("file-id").unwrap_or(""), opt.value_of("revision-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -4798,7 +4798,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -4811,7 +4811,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -5140,14 +5140,14 @@ impl<'n, 'a> Engine<'n, 'a> {
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    fn new(opt: ArgMatches<'a, 'n>) -> Result<Engine<'a, 'n>, InvalidOptionsError> {
+    fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
         let (config_dir, secret) = {
             let config_dir = match cmn::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "drive2-secret.json", 
+            match cmn::application_secret_from_directory(&config_dir, "drive2-secret.json",
                                                          "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"De0ub0IbWruJbBXUyseFYvZ-\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"276875258587-5gbp23a7aqnrl6p06c0jt5fskuktactq.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
@@ -5167,7 +5167,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                                           db_dir: config_dir.clone(),
                                         }, None);
 
-        let client = 
+        let client =
             if opt.is_present("debug") {
                 hyper::Client::with_connector(mock::TeeConnector {
                         connector: hyper::net::HttpsConnector::<hyper::net::Openssl>::default()
@@ -5207,7 +5207,7 @@ fn main() {
     let upload_value_names = ["mode", "file"];
     let arg_data = [
         ("about", "methods: 'get'", vec![
-            ("get",  
+            ("get",
                     Some(r##"Gets the information about the current user along with Drive API settings"##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/about_get",
                   vec![
@@ -5226,7 +5226,7 @@ fn main() {
             ]),
         
         ("apps", "methods: 'get' and 'list'", vec![
-            ("get",  
+            ("get",
                     Some(r##"Gets a specific app."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/apps_get",
                   vec![
@@ -5248,7 +5248,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("list",  
+            ("list",
                     Some(r##"Lists a user's installed apps."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/apps_list",
                   vec![
@@ -5267,7 +5267,7 @@ fn main() {
             ]),
         
         ("changes", "methods: 'get', 'list' and 'watch'", vec![
-            ("get",  
+            ("get",
                     Some(r##"Gets a specific change."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/changes_get",
                   vec![
@@ -5289,7 +5289,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("list",  
+            ("list",
                     Some(r##"Lists the changes for a user."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/changes_list",
                   vec![
@@ -5305,7 +5305,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("watch",  
+            ("watch",
                     Some(r##"Subscribe to changes for a user."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/changes_watch",
                   vec![
@@ -5330,7 +5330,7 @@ fn main() {
             ]),
         
         ("channels", "methods: 'stop'", vec![
-            ("stop",  
+            ("stop",
                     Some(r##"Stop watching resources through this channel"##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/channels_stop",
                   vec![
@@ -5349,7 +5349,7 @@ fn main() {
             ]),
         
         ("children", "methods: 'delete', 'get', 'insert' and 'list'", vec![
-            ("delete",  
+            ("delete",
                     Some(r##"Removes a child from a folder."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/children_delete",
                   vec![
@@ -5371,7 +5371,7 @@ fn main() {
                      Some(false),
                      Some(true)),
                   ]),
-            ("get",  
+            ("get",
                     Some(r##"Gets a specific child reference."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/children_get",
                   vec![
@@ -5399,7 +5399,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("insert",  
+            ("insert",
                     Some(r##"Inserts a file into a folder."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/children_insert",
                   vec![
@@ -5427,7 +5427,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("list",  
+            ("list",
                     Some(r##"Lists a folder's children."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/children_list",
                   vec![
@@ -5452,7 +5452,7 @@ fn main() {
             ]),
         
         ("comments", "methods: 'delete', 'get', 'insert', 'list', 'patch' and 'update'", vec![
-            ("delete",  
+            ("delete",
                     Some(r##"Deletes a comment."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/comments_delete",
                   vec![
@@ -5474,7 +5474,7 @@ fn main() {
                      Some(false),
                      Some(true)),
                   ]),
-            ("get",  
+            ("get",
                     Some(r##"Gets a comment by ID."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/comments_get",
                   vec![
@@ -5502,7 +5502,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("insert",  
+            ("insert",
                     Some(r##"Creates a new comment on the given file."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/comments_insert",
                   vec![
@@ -5530,7 +5530,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("list",  
+            ("list",
                     Some(r##"Lists a file's comments."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/comments_list",
                   vec![
@@ -5552,7 +5552,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("patch",  
+            ("patch",
                     Some(r##"Updates an existing comment. This method supports patch semantics."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/comments_patch",
                   vec![
@@ -5586,7 +5586,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("update",  
+            ("update",
                     Some(r##"Updates an existing comment."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/comments_update",
                   vec![
@@ -5623,7 +5623,7 @@ fn main() {
             ]),
         
         ("files", "methods: 'copy', 'delete', 'empty-trash', 'generate-ids', 'get', 'insert', 'list', 'patch', 'touch', 'trash', 'untrash', 'update' and 'watch'", vec![
-            ("copy",  
+            ("copy",
                     Some(r##"Creates a copy of the specified file."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/files_copy",
                   vec![
@@ -5651,7 +5651,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("delete",  
+            ("delete",
                     Some(r##"Permanently deletes a file by ID. Skips the trash. The currently authenticated user must own the file."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/files_delete",
                   vec![
@@ -5667,7 +5667,7 @@ fn main() {
                      Some(false),
                      Some(true)),
                   ]),
-            ("empty-trash",  
+            ("empty-trash",
                     Some(r##"Permanently deletes all of the user's trashed files."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/files_empty-trash",
                   vec![
@@ -5677,7 +5677,7 @@ fn main() {
                      Some(false),
                      Some(true)),
                   ]),
-            ("generate-ids",  
+            ("generate-ids",
                     Some(r##"Generates a set of file IDs which can be provided in insert requests."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/files_generate-ids",
                   vec![
@@ -5693,7 +5693,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("get",  
+            ("get",
                     Some(r##"Gets a file's metadata by ID."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/files_get",
                   vec![
@@ -5715,7 +5715,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("insert",  
+            ("insert",
                     Some(r##"Insert a new file."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/files_insert",
                   vec![
@@ -5743,7 +5743,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("list",  
+            ("list",
                     Some(r##"Lists the user's files."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/files_list",
                   vec![
@@ -5759,7 +5759,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("patch",  
+            ("patch",
                     Some(r##"Updates file metadata and/or content. This method supports patch semantics."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/files_patch",
                   vec![
@@ -5787,7 +5787,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("touch",  
+            ("touch",
                     Some(r##"Set the file's updated time to the current server time."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/files_touch",
                   vec![
@@ -5809,7 +5809,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("trash",  
+            ("trash",
                     Some(r##"Moves a file to the trash. The currently authenticated user must own the file."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/files_trash",
                   vec![
@@ -5831,7 +5831,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("untrash",  
+            ("untrash",
                     Some(r##"Restores a file from the trash."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/files_untrash",
                   vec![
@@ -5853,7 +5853,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("update",  
+            ("update",
                     Some(r##"Updates file metadata and/or content."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/files_update",
                   vec![
@@ -5887,7 +5887,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("watch",  
+            ("watch",
                     Some(r##"Subscribe to changes on a file"##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/files_watch",
                   vec![
@@ -5918,7 +5918,7 @@ fn main() {
             ]),
         
         ("parents", "methods: 'delete', 'get', 'insert' and 'list'", vec![
-            ("delete",  
+            ("delete",
                     Some(r##"Removes a parent from a file."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/parents_delete",
                   vec![
@@ -5940,7 +5940,7 @@ fn main() {
                      Some(false),
                      Some(true)),
                   ]),
-            ("get",  
+            ("get",
                     Some(r##"Gets a specific parent reference."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/parents_get",
                   vec![
@@ -5968,7 +5968,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("insert",  
+            ("insert",
                     Some(r##"Adds a parent folder for a file."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/parents_insert",
                   vec![
@@ -5996,7 +5996,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("list",  
+            ("list",
                     Some(r##"Lists a file's parents."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/parents_list",
                   vec![
@@ -6021,7 +6021,7 @@ fn main() {
             ]),
         
         ("permissions", "methods: 'delete', 'get', 'get-id-for-email', 'insert', 'list', 'patch' and 'update'", vec![
-            ("delete",  
+            ("delete",
                     Some(r##"Deletes a permission from a file."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/permissions_delete",
                   vec![
@@ -6043,7 +6043,7 @@ fn main() {
                      Some(false),
                      Some(true)),
                   ]),
-            ("get",  
+            ("get",
                     Some(r##"Gets a permission by ID."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/permissions_get",
                   vec![
@@ -6071,7 +6071,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("get-id-for-email",  
+            ("get-id-for-email",
                     Some(r##"Returns the permission ID for an email address."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/permissions_get-id-for-email",
                   vec![
@@ -6093,7 +6093,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("insert",  
+            ("insert",
                     Some(r##"Inserts a permission for a file."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/permissions_insert",
                   vec![
@@ -6121,7 +6121,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("list",  
+            ("list",
                     Some(r##"Lists a file's permissions."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/permissions_list",
                   vec![
@@ -6143,7 +6143,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("patch",  
+            ("patch",
                     Some(r##"Updates a permission using patch semantics."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/permissions_patch",
                   vec![
@@ -6177,7 +6177,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("update",  
+            ("update",
                     Some(r##"Updates a permission."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/permissions_update",
                   vec![
@@ -6214,7 +6214,7 @@ fn main() {
             ]),
         
         ("properties", "methods: 'delete', 'get', 'insert', 'list', 'patch' and 'update'", vec![
-            ("delete",  
+            ("delete",
                     Some(r##"Deletes a property."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/properties_delete",
                   vec![
@@ -6236,7 +6236,7 @@ fn main() {
                      Some(false),
                      Some(true)),
                   ]),
-            ("get",  
+            ("get",
                     Some(r##"Gets a property by its key."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/properties_get",
                   vec![
@@ -6264,8 +6264,8 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("insert",  
-                    Some(r##"Adds a property to a file."##),
+            ("insert",
+                    Some(r##"Adds a property to a file, or updates it if it already exists."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/properties_insert",
                   vec![
                     (Some(r##"file-id"##),
@@ -6292,7 +6292,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("list",  
+            ("list",
                     Some(r##"Lists a file's properties."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/properties_list",
                   vec![
@@ -6314,8 +6314,8 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("patch",  
-                    Some(r##"Updates a property. This method supports patch semantics."##),
+            ("patch",
+                    Some(r##"Updates a property, or adds it if it doesn't exist. This method supports patch semantics."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/properties_patch",
                   vec![
                     (Some(r##"file-id"##),
@@ -6348,8 +6348,8 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("update",  
-                    Some(r##"Updates a property."##),
+            ("update",
+                    Some(r##"Updates a property, or adds it if it doesn't exist."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/properties_update",
                   vec![
                     (Some(r##"file-id"##),
@@ -6385,7 +6385,7 @@ fn main() {
             ]),
         
         ("realtime", "methods: 'get' and 'update'", vec![
-            ("get",  
+            ("get",
                     Some(r##"Exports the contents of the Realtime API data model associated with this file as JSON."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/realtime_get",
                   vec![
@@ -6407,7 +6407,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("update",  
+            ("update",
                     Some(r##"Overwrites the Realtime API data model associated with this file with the provided JSON data model."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/realtime_update",
                   vec![
@@ -6432,7 +6432,7 @@ fn main() {
             ]),
         
         ("replies", "methods: 'delete', 'get', 'insert', 'list', 'patch' and 'update'", vec![
-            ("delete",  
+            ("delete",
                     Some(r##"Deletes a reply."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/replies_delete",
                   vec![
@@ -6460,7 +6460,7 @@ fn main() {
                      Some(false),
                      Some(true)),
                   ]),
-            ("get",  
+            ("get",
                     Some(r##"Gets a reply."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/replies_get",
                   vec![
@@ -6494,7 +6494,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("insert",  
+            ("insert",
                     Some(r##"Creates a new reply to the given comment."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/replies_insert",
                   vec![
@@ -6528,7 +6528,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("list",  
+            ("list",
                     Some(r##"Lists all of the replies to a comment."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/replies_list",
                   vec![
@@ -6556,7 +6556,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("patch",  
+            ("patch",
                     Some(r##"Updates an existing reply. This method supports patch semantics."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/replies_patch",
                   vec![
@@ -6596,7 +6596,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("update",  
+            ("update",
                     Some(r##"Updates an existing reply."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/replies_update",
                   vec![
@@ -6639,7 +6639,7 @@ fn main() {
             ]),
         
         ("revisions", "methods: 'delete', 'get', 'list', 'patch' and 'update'", vec![
-            ("delete",  
+            ("delete",
                     Some(r##"Removes a revision."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/revisions_delete",
                   vec![
@@ -6661,7 +6661,7 @@ fn main() {
                      Some(false),
                      Some(true)),
                   ]),
-            ("get",  
+            ("get",
                     Some(r##"Gets a specific revision."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/revisions_get",
                   vec![
@@ -6689,7 +6689,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("list",  
+            ("list",
                     Some(r##"Lists a file's revisions."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/revisions_list",
                   vec![
@@ -6711,7 +6711,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("patch",  
+            ("patch",
                     Some(r##"Updates a revision. This method supports patch semantics."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/revisions_patch",
                   vec![
@@ -6745,7 +6745,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("update",  
+            ("update",
                     Some(r##"Updates a revision."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/revisions_update",
                   vec![
@@ -6785,7 +6785,7 @@ fn main() {
     
     let mut app = App::new("drive2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.2+20151008")
+           .version("0.3.3+20160126")
            .about("The API to interact with Drive.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_drive2_cli")
            .arg(Arg::with_name("url")
@@ -6809,7 +6809,7 @@ fn main() {
                    .multiple(false)
                    .takes_value(false));
            
-           for &(main_command_name, ref about, ref subcommands) in arg_data.iter() {
+           for &(main_command_name, about, ref subcommands) in arg_data.iter() {
                let mut mcmd = SubCommand::with_name(main_command_name).about(about);
            
                for &(sub_command_name, ref desc, url_info, ref args) in subcommands {
@@ -6820,7 +6820,7 @@ fn main() {
                    scmd = scmd.after_help(url_info);
            
                    for &(ref arg_name, ref flag, ref desc, ref required, ref multi) in args {
-                       let arg_name_str = 
+                       let arg_name_str =
                            match (arg_name, flag) {
                                    (&Some(an), _       ) => an,
                                    (_        , &Some(f)) => f,

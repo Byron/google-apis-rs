@@ -1,4 +1,4 @@
-site_name: QPX Express v0.3.2+20140321
+site_name: QPX Express v0.3.3+20140321
 site_url: http://byron.github.io/google-apis-rs/google-qpxexpress1-cli
 site_description: Write integrating applications with bcore
 
@@ -13,5 +13,5 @@ pages:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015, `Sebastian Thiel`
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
 

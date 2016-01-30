@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-manager1_beta2` library allows access to all features of the *Google manager* service.
 
-This documentation was generated from *manager* crate version *0.1.10+20140915*, where *20140915* is the exact revision of the *manager:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.10*.
+This documentation was generated from *manager* crate version *0.1.11+20140915*, where *20140915* is the exact revision of the *manager:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
 
 Everything else about the *manager* *v1_beta2* API can be found at the
 [official documentation site](https://developers.google.com/deployment-manager/).

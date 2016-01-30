@@ -1,0 +1,29 @@
+# DO NOT EDIT !
+# This file was generated automatically from 'src/mako/Cargo.toml.mako'
+# DO NOT EDIT !
+[package]
+
+name = "google-appengine1_beta5"
+version = "0.1.11+20160121"
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
+description = "A complete library to interact with appengine (protocol v1beta5)"
+repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/appengine1_beta5"
+homepage = "https://cloud.google.com/appengine/docs/admin-api/"
+documentation = "http://byron.github.io/google-apis-rs/google_appengine1_beta5"
+license = "MIT"
+keywords = ["appengine", "google", "protocol", "web", "api"]
+build = "src/build.rs"
+
+
+[dependencies]
+hyper = "0.7"
+mime = "0.1.0"
+serde = ">= 0.6.0"
+serde_json = ">= 0.6.0"
+yup-oauth2 = ">= 0.5.4"
+url = ">= 0.5"
+
+[build-dependencies]
+syntex = { version = ">= 0.23" }
+serde_codegen = { version = ">= 0.6" }
+

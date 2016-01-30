@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *books* crate version *0.1.10+20150921*, where *20150921* is the exact revision of the *books:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.10*.
+//! This documentation was generated from *books* crate version *0.1.11+20151218*, where *20151218* is the exact revision of the *books:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
 //! 
 //! Everything else about the *books* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/books/docs/v1/getting_started).
@@ -31,6 +31,8 @@
 //!  * [*get*](struct.PersonalizedstreamGetCall.html)
 //! * promooffer
 //!  * [*accept*](struct.PromoofferAcceptCall.html), [*dismiss*](struct.PromoofferDismisCall.html) and [*get*](struct.PromoofferGetCall.html)
+//! * series
+//!  * [*get*](struct.SeryGetCall.html) and [*membership get*](struct.SeryMembershipGetCall.html)
 //! * [volumes](struct.Volume.html)
 //!  * [*associated list*](struct.VolumeAssociatedListCall.html), [*get*](struct.VolumeGetCall.html), [*list*](struct.VolumeListCall.html), [*mybooks list*](struct.VolumeMybookListCall.html), [*recommended list*](struct.VolumeRecommendedListCall.html), [*recommended rate*](struct.VolumeRecommendedRateCall.html) and [*useruploaded list*](struct.VolumeUseruploadedListCall.html)
 //! 
@@ -121,18 +123,18 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.volumes().list("q")
-//!              .start_index(18)
-//!              .source("elitr")
+//!              .start_index(8)
+//!              .source("diam")
 //!              .show_preorders(false)
-//!              .projection("ipsum")
-//!              .print_type("invidunt")
-//!              .partner("accusam")
-//!              .order_by("labore")
-//!              .max_results(22)
-//!              .library_restrict("nonumy")
-//!              .lang_restrict("sed")
-//!              .filter("diam")
-//!              .download("magna")
+//!              .projection("dolor")
+//!              .print_type("Lorem")
+//!              .partner("dolor")
+//!              .order_by("vero")
+//!              .max_results(10)
+//!              .library_restrict("takimata")
+//!              .lang_restrict("dolores")
+//!              .filter("consetetur")
+//!              .download("erat")
 //!              .doit();
 //! 
 //! match result {

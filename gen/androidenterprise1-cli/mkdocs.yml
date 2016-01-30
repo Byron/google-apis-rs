@@ -1,4 +1,4 @@
-site_name: Android Enterprise v0.3.2+20150922
+site_name: Android Enterprise v0.3.3+20160106
 site_url: http://byron.github.io/google-apis-rs/google-androidenterprise1-cli
 site_description: Write integrating applications with bcore
 
@@ -27,10 +27,12 @@ pages:
 - ['enterprises_delete.md', 'Enterprises', 'Delete']
 - ['enterprises_enroll.md', 'Enterprises', 'Enroll']
 - ['enterprises_get.md', 'Enterprises', 'Get']
+- ['enterprises_get-store-layout.md', 'Enterprises', 'Get Store Layout']
 - ['enterprises_insert.md', 'Enterprises', 'Insert']
 - ['enterprises_list.md', 'Enterprises', 'List']
 - ['enterprises_send-test-push-notification.md', 'Enterprises', 'Send Test Push Notification']
 - ['enterprises_set-account.md', 'Enterprises', 'Set Account']
+- ['enterprises_set-store-layout.md', 'Enterprises', 'Set Store Layout']
 - ['enterprises_unenroll.md', 'Enterprises', 'Unenroll']
 - ['entitlements_delete.md', 'Entitlements', 'Delete']
 - ['entitlements_get.md', 'Entitlements', 'Get']
@@ -52,6 +54,18 @@ pages:
 - ['products_get-app-restrictions-schema.md', 'Products', 'Get App Restrictions Schema']
 - ['products_get-permissions.md', 'Products', 'Get Permissions']
 - ['products_update-permissions.md', 'Products', 'Update Permissions']
+- ['storelayoutclusters_delete.md', 'Storelayoutclusters', 'Delete']
+- ['storelayoutclusters_get.md', 'Storelayoutclusters', 'Get']
+- ['storelayoutclusters_insert.md', 'Storelayoutclusters', 'Insert']
+- ['storelayoutclusters_list.md', 'Storelayoutclusters', 'List']
+- ['storelayoutclusters_patch.md', 'Storelayoutclusters', 'Patch']
+- ['storelayoutclusters_update.md', 'Storelayoutclusters', 'Update']
+- ['storelayoutpages_delete.md', 'Storelayoutpages', 'Delete']
+- ['storelayoutpages_get.md', 'Storelayoutpages', 'Get']
+- ['storelayoutpages_insert.md', 'Storelayoutpages', 'Insert']
+- ['storelayoutpages_list.md', 'Storelayoutpages', 'List']
+- ['storelayoutpages_patch.md', 'Storelayoutpages', 'Patch']
+- ['storelayoutpages_update.md', 'Storelayoutpages', 'Update']
 - ['users_generate-token.md', 'Users', 'Generate Token']
 - ['users_get.md', 'Users', 'Get']
 - ['users_get-available-product-set.md', 'Users', 'Get Available Product Set']
@@ -61,5 +75,5 @@ pages:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015, `Sebastian Thiel`
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
 

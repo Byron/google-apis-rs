@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *plus* crate version *0.1.10+20151014*, where *20151014* is the exact revision of the *plus:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.10*.
+//! This documentation was generated from *plus* crate version *0.1.11+20160127*, where *20160127* is the exact revision of the *plus:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
 //! 
 //! Everything else about the *plus* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/+/api/).
@@ -15,8 +15,6 @@
 //!  * [*get*](struct.ActivityGetCall.html), [*list*](struct.ActivityListCall.html) and [*search*](struct.ActivitySearchCall.html)
 //! * [comments](struct.Comment.html)
 //!  * [*get*](struct.CommentGetCall.html) and [*list*](struct.CommentListCall.html)
-//! * [moments](struct.Moment.html)
-//!  * [*insert*](struct.MomentInsertCall.html) and [*list*](struct.MomentListCall.html)
 //! * people
 //!  * [*get*](struct.PeopleGetCall.html), [*list*](struct.PeopleListCall.html), [*list by activity*](struct.PeopleListByActivityCall.html) and [*search*](struct.PeopleSearchCall.html)
 //! 
@@ -102,9 +100,9 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.people().list("userId", "collection")
-//!              .page_token("duo")
-//!              .order_by("et")
-//!              .max_results(61)
+//!              .page_token("labore")
+//!              .order_by("eirmod")
+//!              .max_results(68)
 //!              .doit();
 //! 
 //! match result {

@@ -1,4 +1,4 @@
-site_name: gan v0.3.2+20130205
+site_name: gan v0.3.3+20130205
 site_url: http://byron.github.io/google-apis-rs/google-gan1_beta1-cli
 site_description: Write integrating applications with bcore
 
@@ -22,5 +22,5 @@ pages:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015, `Sebastian Thiel`
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
 

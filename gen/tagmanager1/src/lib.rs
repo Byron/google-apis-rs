@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Tag Manager* crate version *0.1.10+20151008*, where *20151008* is the exact revision of the *tagmanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.10*.
+//! This documentation was generated from *Tag Manager* crate version *0.1.11+20151112*, where *20151112* is the exact revision of the *tagmanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
 //! 
 //! Everything else about the *Tag Manager* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/tag-manager/api/v1/).
@@ -136,9 +136,9 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.accounts().containers_move_folders_update("accountId", "containerId", "folderId")
-//!              .add_variable_id("clita")
-//!              .add_trigger_id("diam")
-//!              .add_tag_id("justo")
+//!              .add_variable_id("diam")
+//!              .add_trigger_id("justo")
+//!              .add_tag_id("est")
 //!              .doit();
 //! 
 //! match result {

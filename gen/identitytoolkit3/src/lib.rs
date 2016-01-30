@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Identity Toolkit* crate version *0.1.10+20151008*, where *20151008* is the exact revision of the *identitytoolkit:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.10*.
+//! This documentation was generated from *Identity Toolkit* crate version *0.1.11+20160125*, where *20160125* is the exact revision of the *identitytoolkit:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
 //! 
 //! Everything else about the *Identity Toolkit* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/identity-toolkit/v3/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.IdentityToolkit.html) ... 
 //! 
 //! * [relyingparty](struct.Relyingparty.html)
-//!  * [*create auth uri*](struct.RelyingpartyCreateAuthUriCall.html), [*delete account*](struct.RelyingpartyDeleteAccountCall.html), [*download account*](struct.RelyingpartyDownloadAccountCall.html), [*get account info*](struct.RelyingpartyGetAccountInfoCall.html), [*get oob confirmation code*](struct.RelyingpartyGetOobConfirmationCodeCall.html), [*get public keys*](struct.RelyingpartyGetPublicKeyCall.html), [*get recaptcha param*](struct.RelyingpartyGetRecaptchaParamCall.html), [*reset password*](struct.RelyingpartyResetPasswordCall.html), [*set account info*](struct.RelyingpartySetAccountInfoCall.html), [*upload account*](struct.RelyingpartyUploadAccountCall.html), [*verify assertion*](struct.RelyingpartyVerifyAssertionCall.html) and [*verify password*](struct.RelyingpartyVerifyPasswordCall.html)
+//!  * [*create auth uri*](struct.RelyingpartyCreateAuthUriCall.html), [*delete account*](struct.RelyingpartyDeleteAccountCall.html), [*download account*](struct.RelyingpartyDownloadAccountCall.html), [*get account info*](struct.RelyingpartyGetAccountInfoCall.html), [*get oob confirmation code*](struct.RelyingpartyGetOobConfirmationCodeCall.html), [*get project config*](struct.RelyingpartyGetProjectConfigCall.html), [*get public keys*](struct.RelyingpartyGetPublicKeyCall.html), [*get recaptcha param*](struct.RelyingpartyGetRecaptchaParamCall.html), [*reset password*](struct.RelyingpartyResetPasswordCall.html), [*set account info*](struct.RelyingpartySetAccountInfoCall.html), [*sign out user*](struct.RelyingpartySignOutUserCall.html), [*upload account*](struct.RelyingpartyUploadAccountCall.html), [*verify assertion*](struct.RelyingpartyVerifyAssertionCall.html), [*verify custom token*](struct.RelyingpartyVerifyCustomTokenCall.html) and [*verify password*](struct.RelyingpartyVerifyPasswordCall.html)
 //! 
 //! 
 //! 

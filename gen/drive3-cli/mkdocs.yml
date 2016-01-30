@@ -1,0 +1,50 @@
+site_name: drive v0.3.3+20160126
+site_url: http://byron.github.io/google-apis-rs/google-drive3-cli
+site_description: Write integrating applications with bcore
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/drive3-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['about_get.md', 'About', 'Get']
+- ['changes_get-start-page-token.md', 'Changes', 'Get Start Page Token']
+- ['changes_list.md', 'Changes', 'List']
+- ['changes_watch.md', 'Changes', 'Watch']
+- ['channels_stop.md', 'Channels', 'Stop']
+- ['comments_create.md', 'Comments', 'Create']
+- ['comments_delete.md', 'Comments', 'Delete']
+- ['comments_get.md', 'Comments', 'Get']
+- ['comments_list.md', 'Comments', 'List']
+- ['comments_update.md', 'Comments', 'Update']
+- ['files_copy.md', 'Files', 'Copy']
+- ['files_create.md', 'Files', 'Create']
+- ['files_delete.md', 'Files', 'Delete']
+- ['files_empty-trash.md', 'Files', 'Empty Trash']
+- ['files_export.md', 'Files', 'Export']
+- ['files_generate-ids.md', 'Files', 'Generate Ids']
+- ['files_get.md', 'Files', 'Get']
+- ['files_list.md', 'Files', 'List']
+- ['files_update.md', 'Files', 'Update']
+- ['files_watch.md', 'Files', 'Watch']
+- ['permissions_create.md', 'Permissions', 'Create']
+- ['permissions_delete.md', 'Permissions', 'Delete']
+- ['permissions_get.md', 'Permissions', 'Get']
+- ['permissions_list.md', 'Permissions', 'List']
+- ['permissions_update.md', 'Permissions', 'Update']
+- ['replies_create.md', 'Replies', 'Create']
+- ['replies_delete.md', 'Replies', 'Delete']
+- ['replies_get.md', 'Replies', 'Get']
+- ['replies_list.md', 'Replies', 'List']
+- ['replies_update.md', 'Replies', 'Update']
+- ['revisions_delete.md', 'Revisions', 'Delete']
+- ['revisions_get.md', 'Revisions', 'Get']
+- ['revisions_list.md', 'Revisions', 'List']
+- ['revisions_update.md', 'Revisions', 'Update']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+

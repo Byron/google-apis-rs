@@ -1,4 +1,4 @@
-site_name: directory v0.3.2+20151005
+site_name: directory v0.3.3+20151208
 site_url: http://byron.github.io/google-apis-rs/google-admin1_directory-cli
 site_description: Write integrating applications with bcore
 
@@ -59,6 +59,12 @@ pages:
 - ['orgunits_patch.md', 'Orgunits', 'Patch']
 - ['orgunits_update.md', 'Orgunits', 'Update']
 - ['privileges_list.md', 'Privileges', 'List']
+- ['resources_calendars-delete.md', 'Resources', 'Calendars Delete']
+- ['resources_calendars-get.md', 'Resources', 'Calendars Get']
+- ['resources_calendars-insert.md', 'Resources', 'Calendars Insert']
+- ['resources_calendars-list.md', 'Resources', 'Calendars List']
+- ['resources_calendars-patch.md', 'Resources', 'Calendars Patch']
+- ['resources_calendars-update.md', 'Resources', 'Calendars Update']
 - ['role-assignments_delete.md', 'Role Assignments', 'Delete']
 - ['role-assignments_get.md', 'Role Assignments', 'Get']
 - ['role-assignments_insert.md', 'Role Assignments', 'Insert']
@@ -101,5 +107,5 @@ pages:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015, `Sebastian Thiel`
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
 

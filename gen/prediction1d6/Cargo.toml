@@ -4,7 +4,7 @@
 [package]
 
 name = "google-prediction1d6"
-version = "0.1.10+20140522"
+version = "0.1.11+20151102"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with prediction (protocol v1.6)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/prediction1d6"
@@ -20,7 +20,7 @@ hyper = "0.7"
 mime = "0.1.0"
 serde = ">= 0.6.0"
 serde_json = ">= 0.6.0"
-yup-oauth2 = "0.5"
+yup-oauth2 = ">= 0.5.4"
 url = ">= 0.5"
 
 [build-dependencies]

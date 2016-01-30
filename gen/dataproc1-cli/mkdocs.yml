@@ -1,0 +1,18 @@
+site_name: dataproc v0.3.3+20151209
+site_url: http://byron.github.io/google-apis-rs/google-dataproc1-cli
+site_description: Write integrating applications with bcore
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/dataproc1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['media_download.md', 'Media', 'Download']
+- ['media_upload.md', 'Media', 'Upload']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+

@@ -20,7 +20,7 @@ use clap::{App, SubCommand, Arg};
 
 mod cmn;
 
-use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg, 
+use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
           calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
@@ -36,22 +36,22 @@ enum DoitError {
     ApiError(api::Error),
 }
 
-struct Engine<'n, 'a> {
-    opt: ArgMatches<'n, 'a>,
+struct Engine<'n> {
+    opt: ArgMatches<'n>,
     hub: api::Spectrum<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
 
 
-impl<'n, 'a> Engine<'n, 'a> {
-    fn _paws_get_spectrum(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+impl<'n> Engine<'n> {
+    fn _paws_get_spectrum(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
         let mut object = json::value::Value::Object(Default::default());
         
-        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -65,8 +65,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-           
-            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "device-desc.etsi-en-device-type" => Some(("deviceDesc.etsiEnDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-desc.fcc-id" => Some(("deviceDesc.fccId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -132,7 +132,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
         let mut request: api::PawsGetSpectrumRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.paws().get_spectrum(request);
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -145,7 +145,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -178,13 +178,13 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _paws_get_spectrum_batch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _paws_get_spectrum_batch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
         let mut object = json::value::Value::Object(Default::default());
         
-        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -198,8 +198,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-           
-            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "device-desc.etsi-en-device-type" => Some(("deviceDesc.etsiEnDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-desc.fcc-id" => Some(("deviceDesc.fccId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -259,7 +259,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
         let mut request: api::PawsGetSpectrumBatchRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.paws().get_spectrum_batch(request);
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -272,7 +272,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -305,13 +305,13 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _paws_init(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _paws_init(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
         let mut object = json::value::Value::Object(Default::default());
         
-        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -325,8 +325,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-           
-            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "device-desc.etsi-en-device-type" => Some(("deviceDesc.etsiEnDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-desc.fcc-id" => Some(("deviceDesc.fccId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -358,7 +358,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
         let mut request: api::PawsInitRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.paws().init(request);
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -371,7 +371,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -404,13 +404,13 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _paws_notify_spectrum_use(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _paws_notify_spectrum_use(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
         let mut object = json::value::Value::Object(Default::default());
         
-        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -424,8 +424,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-           
-            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "device-desc.etsi-en-device-type" => Some(("deviceDesc.etsiEnDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-desc.fcc-id" => Some(("deviceDesc.fccId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -457,7 +457,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
         let mut request: api::PawsNotifySpectrumUseRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.paws().notify_spectrum_use(request);
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -470,7 +470,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -503,13 +503,13 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _paws_register(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _paws_register(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
         let mut object = json::value::Value::Object(Default::default());
         
-        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -523,8 +523,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-           
-            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "device-desc.etsi-en-device-type" => Some(("deviceDesc.etsiEnDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-desc.fcc-id" => Some(("deviceDesc.fccId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -579,7 +579,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
         let mut request: api::PawsRegisterRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.paws().register(request);
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -592,7 +592,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -625,13 +625,13 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _paws_verify_device(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _paws_verify_device(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
         let mut object = json::value::Value::Object(Default::default());
         
-        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -645,8 +645,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-           
-            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -662,7 +662,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
         let mut request: api::PawsVerifyDeviceRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.paws().verify_device(request);
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -675,7 +675,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -756,14 +756,14 @@ impl<'n, 'a> Engine<'n, 'a> {
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    fn new(opt: ArgMatches<'a, 'n>) -> Result<Engine<'a, 'n>, InvalidOptionsError> {
+    fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
         let (config_dir, secret) = {
             let config_dir = match cmn::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "spectrum1-explorer-secret.json", 
+            match cmn::application_secret_from_directory(&config_dir, "spectrum1-explorer-secret.json",
                                                          "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
@@ -783,7 +783,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                                           db_dir: config_dir.clone(),
                                         }, None);
 
-        let client = 
+        let client =
             if opt.is_present("debug") {
                 hyper::Client::with_connector(mock::TeeConnector {
                         connector: hyper::net::HttpsConnector::<hyper::net::Openssl>::default()
@@ -822,7 +822,7 @@ fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
         ("paws", "methods: 'get-spectrum', 'get-spectrum-batch', 'init', 'notify-spectrum-use', 'register' and 'verify-device'", vec![
-            ("get-spectrum",  
+            ("get-spectrum",
                     Some(r##"Requests information about the available spectrum for a device at a location. Requests from a fixed-mode device must include owner information so the device can be registered with the database."##),
                     "Details at http://byron.github.io/google-apis-rs/google_spectrum1_explorer_cli/paws_get-spectrum",
                   vec![
@@ -844,7 +844,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("get-spectrum-batch",  
+            ("get-spectrum-batch",
                     Some(r##"The Google Spectrum Database does not support batch requests, so this method always yields an UNIMPLEMENTED error."##),
                     "Details at http://byron.github.io/google-apis-rs/google_spectrum1_explorer_cli/paws_get-spectrum-batch",
                   vec![
@@ -866,7 +866,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("init",  
+            ("init",
                     Some(r##"Initializes the connection between a white space device and the database."##),
                     "Details at http://byron.github.io/google-apis-rs/google_spectrum1_explorer_cli/paws_init",
                   vec![
@@ -888,7 +888,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("notify-spectrum-use",  
+            ("notify-spectrum-use",
                     Some(r##"Notifies the database that the device has selected certain frequency ranges for transmission. Only to be invoked when required by the regulator. The Google Spectrum Database does not operate in domains that require notification, so this always yields an UNIMPLEMENTED error."##),
                     "Details at http://byron.github.io/google-apis-rs/google_spectrum1_explorer_cli/paws_notify-spectrum-use",
                   vec![
@@ -910,7 +910,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("register",  
+            ("register",
                     Some(r##"The Google Spectrum Database implements registration in the getSpectrum method. As such this always returns an UNIMPLEMENTED error."##),
                     "Details at http://byron.github.io/google-apis-rs/google_spectrum1_explorer_cli/paws_register",
                   vec![
@@ -932,7 +932,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("verify-device",  
+            ("verify-device",
                     Some(r##"Validates a device for white space use in accordance with regulatory rules. The Google Spectrum Database does not support master/slave configurations, so this always yields an UNIMPLEMENTED error."##),
                     "Details at http://byron.github.io/google-apis-rs/google_spectrum1_explorer_cli/paws_verify-device",
                   vec![
@@ -960,7 +960,7 @@ fn main() {
     
     let mut app = App::new("spectrum1-explorer")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.2+20150716")
+           .version("0.3.3+20151209")
            .about("API for spectrum-management functions.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_spectrum1_explorer_cli")
            .arg(Arg::with_name("folder")
@@ -979,7 +979,7 @@ fn main() {
                    .multiple(false)
                    .takes_value(false));
            
-           for &(main_command_name, ref about, ref subcommands) in arg_data.iter() {
+           for &(main_command_name, about, ref subcommands) in arg_data.iter() {
                let mut mcmd = SubCommand::with_name(main_command_name).about(about);
            
                for &(sub_command_name, ref desc, url_info, ref args) in subcommands {
@@ -990,7 +990,7 @@ fn main() {
                    scmd = scmd.after_help(url_info);
            
                    for &(ref arg_name, ref flag, ref desc, ref required, ref multi) in args {
-                       let arg_name_str = 
+                       let arg_name_str =
                            match (arg_name, flag) {
                                    (&Some(an), _       ) => an,
                                    (_        , &Some(f)) => f,

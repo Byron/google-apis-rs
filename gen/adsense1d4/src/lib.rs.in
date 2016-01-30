@@ -19,10 +19,11 @@ use std::collections::BTreeMap;
 use serde_json as json;
 use std::io;
 use std::fs;
-use std::thread::sleep_ms;
+use std::thread::sleep;
+use std::time::Duration;
 
 pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, 
+              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
               Resource, ErrorResponse, remove_json_null_values};
 
 
@@ -139,7 +140,7 @@ impl<'a, C, A> AdSense<C, A>
         AdSense {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.10".to_string(),
+            _user_agent: "google-api-rust-client/0.1.11".to_string(),
         }
     }
 
@@ -175,7 +176,7 @@ impl<'a, C, A> AdSense<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.10`.
+    /// It defaults to `google-api-rust-client/0.1.11`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -368,7 +369,7 @@ impl NestedType for AdsenseReportsGenerateResponseHeaders {}
 impl Part for AdsenseReportsGenerateResponseHeaders {}
 
 
-/// Settings specific to WAP mobile content ads (AFMC).
+/// Settings specific to WAP mobile content ads (AFMC) - deprecated.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -475,7 +476,7 @@ impl NestedType for AdUnitContentAdsSettingsBackupOption {}
 impl Part for AdUnitContentAdsSettingsBackupOption {}
 
 
-/// Settings specific to feed ads (AFF).
+/// Settings specific to feed ads (AFF) - deprecated.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -560,7 +561,7 @@ pub struct CustomChannelTargetingInfo {
     /// The language of the sites ads will be displayed on.
     #[serde(rename="siteLanguage")]
     pub site_language: Option<String>,
-    /// The locations in which ads appear. (Only valid for content and mobile content ads). Acceptable values for content ads are: TOP_LEFT, TOP_CENTER, TOP_RIGHT, MIDDLE_LEFT, MIDDLE_CENTER, MIDDLE_RIGHT, BOTTOM_LEFT, BOTTOM_CENTER, BOTTOM_RIGHT, MULTIPLE_LOCATIONS. Acceptable values for mobile content ads are: TOP, MIDDLE, BOTTOM, MULTIPLE_LOCATIONS.
+    /// The locations in which ads appear. (Only valid for content and mobile content ads (deprecated)). Acceptable values for content ads are: TOP_LEFT, TOP_CENTER, TOP_RIGHT, MIDDLE_LEFT, MIDDLE_CENTER, MIDDLE_RIGHT, BOTTOM_LEFT, BOTTOM_CENTER, BOTTOM_RIGHT, MULTIPLE_LOCATIONS. Acceptable values for mobile content ads (deprecated) are: TOP, MIDDLE, BOTTOM, MULTIPLE_LOCATIONS.
     pub location: Option<String>,
     /// The name used to describe this channel externally.
     #[serde(rename="adsAppearOn")]
@@ -642,18 +643,18 @@ pub struct AdUnit {
     pub code: Option<String>,
     /// Name of this ad unit.
     pub name: Option<String>,
-    /// Settings specific to feed ads (AFF).
+    /// Settings specific to feed ads (AFF) - deprecated.
     #[serde(rename="feedAdsSettings")]
     pub feed_ads_settings: Option<AdUnitFeedAdsSettings>,
     /// ID of the saved ad style which holds this ad unit's style information.
     #[serde(rename="savedStyleId")]
     pub saved_style_id: Option<String>,
-    /// Settings specific to content ads (AFC) and highend mobile content ads (AFMC).
+    /// Settings specific to content ads (AFC) and highend mobile content ads (AFMC - deprecated).
     #[serde(rename="contentAdsSettings")]
     pub content_ads_settings: Option<AdUnitContentAdsSettings>,
     /// Unique identifier of this ad unit. This should be considered an opaque identifier; it is not safe to rely on it being in any particular format.
     pub id: Option<String>,
-    /// Settings specific to WAP mobile content ads (AFMC).
+    /// Settings specific to WAP mobile content ads (AFMC) - deprecated.
     #[serde(rename="mobileContentAdsSettings")]
     pub mobile_content_ads_settings: Option<AdUnitMobileContentAdsSettings>,
     /// Custom style information specific to this ad unit.
@@ -869,7 +870,7 @@ pub struct Accounts {
 impl ResponseResult for Accounts {}
 
 
-/// Settings specific to content ads (AFC) and highend mobile content ads (AFMC).
+/// Settings specific to content ads (AFC) and highend mobile content ads (AFMC - deprecated).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -2187,7 +2188,7 @@ impl<'a, C, A> UrlchannelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "adsense.urlchannels.list", 
+        dlg.begin(MethodInfo { id: "adsense.urlchannels.list",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("adClientId", self._ad_client_id.to_string()));
@@ -2235,7 +2236,7 @@ impl<'a, C, A> UrlchannelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -2271,7 +2272,7 @@ impl<'a, C, A> UrlchannelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -2281,10 +2282,10 @@ impl<'a, C, A> UrlchannelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -2317,7 +2318,7 @@ impl<'a, C, A> UrlchannelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     ///
     /// Sets the *ad client id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn ad_client_id(mut self, new_value: &str) -> UrlchannelListCall<'a, C, A> {
         self._ad_client_id = new_value.to_string();
@@ -2349,12 +2350,12 @@ impl<'a, C, A> UrlchannelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -2371,17 +2372,17 @@ impl<'a, C, A> UrlchannelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UrlchannelListCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UrlchannelListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2448,7 +2449,7 @@ impl<'a, C, A> AdunitCustomchannelListCall<'a, C, A> where C: BorrowMut<hyper::C
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "adsense.adunits.customchannels.list", 
+        dlg.begin(MethodInfo { id: "adsense.adunits.customchannels.list",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("adClientId", self._ad_client_id.to_string()));
@@ -2497,7 +2498,7 @@ impl<'a, C, A> AdunitCustomchannelListCall<'a, C, A> where C: BorrowMut<hyper::C
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -2533,7 +2534,7 @@ impl<'a, C, A> AdunitCustomchannelListCall<'a, C, A> where C: BorrowMut<hyper::C
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -2543,10 +2544,10 @@ impl<'a, C, A> AdunitCustomchannelListCall<'a, C, A> where C: BorrowMut<hyper::C
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -2579,7 +2580,7 @@ impl<'a, C, A> AdunitCustomchannelListCall<'a, C, A> where C: BorrowMut<hyper::C
     ///
     /// Sets the *ad client id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn ad_client_id(mut self, new_value: &str) -> AdunitCustomchannelListCall<'a, C, A> {
         self._ad_client_id = new_value.to_string();
@@ -2589,7 +2590,7 @@ impl<'a, C, A> AdunitCustomchannelListCall<'a, C, A> where C: BorrowMut<hyper::C
     ///
     /// Sets the *ad unit id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn ad_unit_id(mut self, new_value: &str) -> AdunitCustomchannelListCall<'a, C, A> {
         self._ad_unit_id = new_value.to_string();
@@ -2621,12 +2622,12 @@ impl<'a, C, A> AdunitCustomchannelListCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -2643,17 +2644,17 @@ impl<'a, C, A> AdunitCustomchannelListCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AdunitCustomchannelListCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AdunitCustomchannelListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2716,7 +2717,7 @@ impl<'a, C, A> AdunitGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "adsense.adunits.get", 
+        dlg.begin(MethodInfo { id: "adsense.adunits.get",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("adClientId", self._ad_client_id.to_string()));
@@ -2759,7 +2760,7 @@ impl<'a, C, A> AdunitGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -2795,7 +2796,7 @@ impl<'a, C, A> AdunitGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -2805,10 +2806,10 @@ impl<'a, C, A> AdunitGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -2841,7 +2842,7 @@ impl<'a, C, A> AdunitGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     ///
     /// Sets the *ad client id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn ad_client_id(mut self, new_value: &str) -> AdunitGetCall<'a, C, A> {
         self._ad_client_id = new_value.to_string();
@@ -2851,7 +2852,7 @@ impl<'a, C, A> AdunitGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     ///
     /// Sets the *ad unit id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn ad_unit_id(mut self, new_value: &str) -> AdunitGetCall<'a, C, A> {
         self._ad_unit_id = new_value.to_string();
@@ -2869,12 +2870,12 @@ impl<'a, C, A> AdunitGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -2891,17 +2892,17 @@ impl<'a, C, A> AdunitGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AdunitGetCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AdunitGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2969,7 +2970,7 @@ impl<'a, C, A> AdunitListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "adsense.adunits.list", 
+        dlg.begin(MethodInfo { id: "adsense.adunits.list",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("adClientId", self._ad_client_id.to_string()));
@@ -3020,7 +3021,7 @@ impl<'a, C, A> AdunitListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -3056,7 +3057,7 @@ impl<'a, C, A> AdunitListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -3066,10 +3067,10 @@ impl<'a, C, A> AdunitListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -3102,7 +3103,7 @@ impl<'a, C, A> AdunitListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// Sets the *ad client id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn ad_client_id(mut self, new_value: &str) -> AdunitListCall<'a, C, A> {
         self._ad_client_id = new_value.to_string();
@@ -3141,12 +3142,12 @@ impl<'a, C, A> AdunitListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -3163,17 +3164,17 @@ impl<'a, C, A> AdunitListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AdunitListCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AdunitListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3236,7 +3237,7 @@ impl<'a, C, A> AdunitGetAdCodeCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "adsense.adunits.getAdCode", 
+        dlg.begin(MethodInfo { id: "adsense.adunits.getAdCode",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("adClientId", self._ad_client_id.to_string()));
@@ -3279,7 +3280,7 @@ impl<'a, C, A> AdunitGetAdCodeCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -3315,7 +3316,7 @@ impl<'a, C, A> AdunitGetAdCodeCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -3325,10 +3326,10 @@ impl<'a, C, A> AdunitGetAdCodeCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -3361,7 +3362,7 @@ impl<'a, C, A> AdunitGetAdCodeCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// Sets the *ad client id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn ad_client_id(mut self, new_value: &str) -> AdunitGetAdCodeCall<'a, C, A> {
         self._ad_client_id = new_value.to_string();
@@ -3371,7 +3372,7 @@ impl<'a, C, A> AdunitGetAdCodeCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// Sets the *ad unit id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn ad_unit_id(mut self, new_value: &str) -> AdunitGetAdCodeCall<'a, C, A> {
         self._ad_unit_id = new_value.to_string();
@@ -3389,12 +3390,12 @@ impl<'a, C, A> AdunitGetAdCodeCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -3411,17 +3412,17 @@ impl<'a, C, A> AdunitGetAdCodeCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AdunitGetAdCodeCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AdunitGetAdCodeCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3486,7 +3487,7 @@ impl<'a, C, A> AdclientListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "adsense.adclients.list", 
+        dlg.begin(MethodInfo { id: "adsense.adclients.list",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         if let Some(value) = self._page_token {
@@ -3512,7 +3513,7 @@ impl<'a, C, A> AdclientListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -3548,7 +3549,7 @@ impl<'a, C, A> AdclientListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -3558,10 +3559,10 @@ impl<'a, C, A> AdclientListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -3616,12 +3617,12 @@ impl<'a, C, A> AdclientListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -3638,17 +3639,17 @@ impl<'a, C, A> AdclientListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AdclientListCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AdclientListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3710,7 +3711,7 @@ impl<'a, C, A> AlertDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "adsense.alerts.delete", 
+        dlg.begin(MethodInfo { id: "adsense.alerts.delete",
                                http_method: hyper::method::Method::Delete });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((2 + self._additional_params.len()));
         params.push(("alertId", self._alert_id.to_string()));
@@ -3751,7 +3752,7 @@ impl<'a, C, A> AlertDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -3787,7 +3788,7 @@ impl<'a, C, A> AlertDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -3797,10 +3798,10 @@ impl<'a, C, A> AlertDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -3823,7 +3824,7 @@ impl<'a, C, A> AlertDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// Sets the *alert id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn alert_id(mut self, new_value: &str) -> AlertDeleteCall<'a, C, A> {
         self._alert_id = new_value.to_string();
@@ -3841,12 +3842,12 @@ impl<'a, C, A> AlertDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -3863,17 +3864,17 @@ impl<'a, C, A> AlertDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AlertDeleteCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AlertDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3936,7 +3937,7 @@ impl<'a, C, A> AlertListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "adsense.alerts.list", 
+        dlg.begin(MethodInfo { id: "adsense.alerts.list",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
         if let Some(value) = self._locale {
@@ -3959,7 +3960,7 @@ impl<'a, C, A> AlertListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -3995,7 +3996,7 @@ impl<'a, C, A> AlertListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -4005,10 +4006,10 @@ impl<'a, C, A> AlertListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -4056,12 +4057,12 @@ impl<'a, C, A> AlertListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -4078,17 +4079,17 @@ impl<'a, C, A> AlertListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AlertListCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AlertListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4153,7 +4154,7 @@ impl<'a, C, A> SavedadstyleListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "adsense.savedadstyles.list", 
+        dlg.begin(MethodInfo { id: "adsense.savedadstyles.list",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         if let Some(value) = self._page_token {
@@ -4179,7 +4180,7 @@ impl<'a, C, A> SavedadstyleListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -4215,7 +4216,7 @@ impl<'a, C, A> SavedadstyleListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -4225,10 +4226,10 @@ impl<'a, C, A> SavedadstyleListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -4283,12 +4284,12 @@ impl<'a, C, A> SavedadstyleListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -4305,17 +4306,17 @@ impl<'a, C, A> SavedadstyleListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> SavedadstyleListCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SavedadstyleListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4377,7 +4378,7 @@ impl<'a, C, A> SavedadstyleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "adsense.savedadstyles.get", 
+        dlg.begin(MethodInfo { id: "adsense.savedadstyles.get",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
         params.push(("savedAdStyleId", self._saved_ad_style_id.to_string()));
@@ -4419,7 +4420,7 @@ impl<'a, C, A> SavedadstyleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -4455,7 +4456,7 @@ impl<'a, C, A> SavedadstyleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -4465,10 +4466,10 @@ impl<'a, C, A> SavedadstyleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -4501,7 +4502,7 @@ impl<'a, C, A> SavedadstyleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// Sets the *saved ad style id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn saved_ad_style_id(mut self, new_value: &str) -> SavedadstyleGetCall<'a, C, A> {
         self._saved_ad_style_id = new_value.to_string();
@@ -4519,12 +4520,12 @@ impl<'a, C, A> SavedadstyleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -4541,17 +4542,17 @@ impl<'a, C, A> SavedadstyleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> SavedadstyleGetCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SavedadstyleGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4616,7 +4617,7 @@ impl<'a, C, A> ReportSavedListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "adsense.reports.saved.list", 
+        dlg.begin(MethodInfo { id: "adsense.reports.saved.list",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         if let Some(value) = self._page_token {
@@ -4642,7 +4643,7 @@ impl<'a, C, A> ReportSavedListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -4678,7 +4679,7 @@ impl<'a, C, A> ReportSavedListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -4688,10 +4689,10 @@ impl<'a, C, A> ReportSavedListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -4746,12 +4747,12 @@ impl<'a, C, A> ReportSavedListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -4768,17 +4769,17 @@ impl<'a, C, A> ReportSavedListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ReportSavedListCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ReportSavedListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4866,7 +4867,7 @@ impl<'a, C, A> ReportGenerateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "adsense.reports.generate", 
+        dlg.begin(MethodInfo { id: "adsense.reports.generate",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((13 + self._additional_params.len()));
         params.push(("startDate", self._start_date.to_string()));
@@ -4954,7 +4955,7 @@ impl<'a, C, A> ReportGenerateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -4990,7 +4991,7 @@ impl<'a, C, A> ReportGenerateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -5000,10 +5001,10 @@ impl<'a, C, A> ReportGenerateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -5036,7 +5037,7 @@ impl<'a, C, A> ReportGenerateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     ///
     /// Sets the *start date* query property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn start_date(mut self, new_value: &str) -> ReportGenerateCall<'a, C, A> {
         self._start_date = new_value.to_string();
@@ -5046,7 +5047,7 @@ impl<'a, C, A> ReportGenerateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     ///
     /// Sets the *end date* query property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn end_date(mut self, new_value: &str) -> ReportGenerateCall<'a, C, A> {
         self._end_date = new_value.to_string();
@@ -5139,12 +5140,12 @@ impl<'a, C, A> ReportGenerateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -5161,17 +5162,17 @@ impl<'a, C, A> ReportGenerateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ReportGenerateCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ReportGenerateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5239,7 +5240,7 @@ impl<'a, C, A> ReportSavedGenerateCall<'a, C, A> where C: BorrowMut<hyper::Clien
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "adsense.reports.saved.generate", 
+        dlg.begin(MethodInfo { id: "adsense.reports.saved.generate",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("savedReportId", self._saved_report_id.to_string()));
@@ -5290,7 +5291,7 @@ impl<'a, C, A> ReportSavedGenerateCall<'a, C, A> where C: BorrowMut<hyper::Clien
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -5326,7 +5327,7 @@ impl<'a, C, A> ReportSavedGenerateCall<'a, C, A> where C: BorrowMut<hyper::Clien
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -5336,10 +5337,10 @@ impl<'a, C, A> ReportSavedGenerateCall<'a, C, A> where C: BorrowMut<hyper::Clien
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -5372,7 +5373,7 @@ impl<'a, C, A> ReportSavedGenerateCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// Sets the *saved report id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn saved_report_id(mut self, new_value: &str) -> ReportSavedGenerateCall<'a, C, A> {
         self._saved_report_id = new_value.to_string();
@@ -5411,12 +5412,12 @@ impl<'a, C, A> ReportSavedGenerateCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -5433,17 +5434,17 @@ impl<'a, C, A> ReportSavedGenerateCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ReportSavedGenerateCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ReportSavedGenerateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5506,7 +5507,7 @@ impl<'a, C, A> AccountAlertDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "adsense.accounts.alerts.delete", 
+        dlg.begin(MethodInfo { id: "adsense.accounts.alerts.delete",
                                http_method: hyper::method::Method::Delete });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
         params.push(("accountId", self._account_id.to_string()));
@@ -5548,7 +5549,7 @@ impl<'a, C, A> AccountAlertDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -5584,7 +5585,7 @@ impl<'a, C, A> AccountAlertDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -5594,10 +5595,10 @@ impl<'a, C, A> AccountAlertDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -5620,7 +5621,7 @@ impl<'a, C, A> AccountAlertDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// Sets the *account id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn account_id(mut self, new_value: &str) -> AccountAlertDeleteCall<'a, C, A> {
         self._account_id = new_value.to_string();
@@ -5630,7 +5631,7 @@ impl<'a, C, A> AccountAlertDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// Sets the *alert id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn alert_id(mut self, new_value: &str) -> AccountAlertDeleteCall<'a, C, A> {
         self._alert_id = new_value.to_string();
@@ -5648,12 +5649,12 @@ impl<'a, C, A> AccountAlertDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -5670,17 +5671,17 @@ impl<'a, C, A> AccountAlertDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountAlertDeleteCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountAlertDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5744,7 +5745,7 @@ impl<'a, C, A> AccountAlertListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "adsense.accounts.alerts.list", 
+        dlg.begin(MethodInfo { id: "adsense.accounts.alerts.list",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("accountId", self._account_id.to_string()));
@@ -5789,7 +5790,7 @@ impl<'a, C, A> AccountAlertListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -5825,7 +5826,7 @@ impl<'a, C, A> AccountAlertListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -5835,10 +5836,10 @@ impl<'a, C, A> AccountAlertListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -5871,7 +5872,7 @@ impl<'a, C, A> AccountAlertListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// Sets the *account id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn account_id(mut self, new_value: &str) -> AccountAlertListCall<'a, C, A> {
         self._account_id = new_value.to_string();
@@ -5896,12 +5897,12 @@ impl<'a, C, A> AccountAlertListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -5918,17 +5919,17 @@ impl<'a, C, A> AccountAlertListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountAlertListCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountAlertListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5997,7 +5998,7 @@ impl<'a, C, A> AccountReportSavedGenerateCall<'a, C, A> where C: BorrowMut<hyper
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "adsense.accounts.reports.saved.generate", 
+        dlg.begin(MethodInfo { id: "adsense.accounts.reports.saved.generate",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
         params.push(("accountId", self._account_id.to_string()));
@@ -6049,7 +6050,7 @@ impl<'a, C, A> AccountReportSavedGenerateCall<'a, C, A> where C: BorrowMut<hyper
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -6085,7 +6086,7 @@ impl<'a, C, A> AccountReportSavedGenerateCall<'a, C, A> where C: BorrowMut<hyper
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -6095,10 +6096,10 @@ impl<'a, C, A> AccountReportSavedGenerateCall<'a, C, A> where C: BorrowMut<hyper
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -6131,7 +6132,7 @@ impl<'a, C, A> AccountReportSavedGenerateCall<'a, C, A> where C: BorrowMut<hyper
     ///
     /// Sets the *account id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn account_id(mut self, new_value: &str) -> AccountReportSavedGenerateCall<'a, C, A> {
         self._account_id = new_value.to_string();
@@ -6141,7 +6142,7 @@ impl<'a, C, A> AccountReportSavedGenerateCall<'a, C, A> where C: BorrowMut<hyper
     ///
     /// Sets the *saved report id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn saved_report_id(mut self, new_value: &str) -> AccountReportSavedGenerateCall<'a, C, A> {
         self._saved_report_id = new_value.to_string();
@@ -6180,12 +6181,12 @@ impl<'a, C, A> AccountReportSavedGenerateCall<'a, C, A> where C: BorrowMut<hyper
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -6202,17 +6203,17 @@ impl<'a, C, A> AccountReportSavedGenerateCall<'a, C, A> where C: BorrowMut<hyper
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountReportSavedGenerateCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountReportSavedGenerateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6277,7 +6278,7 @@ impl<'a, C, A> AccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "adsense.accounts.list", 
+        dlg.begin(MethodInfo { id: "adsense.accounts.list",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         if let Some(value) = self._page_token {
@@ -6303,7 +6304,7 @@ impl<'a, C, A> AccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -6339,7 +6340,7 @@ impl<'a, C, A> AccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -6349,10 +6350,10 @@ impl<'a, C, A> AccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -6407,12 +6408,12 @@ impl<'a, C, A> AccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -6429,17 +6430,17 @@ impl<'a, C, A> AccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountListCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6501,7 +6502,7 @@ impl<'a, C, A> AccountPaymentListCall<'a, C, A> where C: BorrowMut<hyper::Client
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "adsense.accounts.payments.list", 
+        dlg.begin(MethodInfo { id: "adsense.accounts.payments.list",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
         params.push(("accountId", self._account_id.to_string()));
@@ -6543,7 +6544,7 @@ impl<'a, C, A> AccountPaymentListCall<'a, C, A> where C: BorrowMut<hyper::Client
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -6579,7 +6580,7 @@ impl<'a, C, A> AccountPaymentListCall<'a, C, A> where C: BorrowMut<hyper::Client
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -6589,10 +6590,10 @@ impl<'a, C, A> AccountPaymentListCall<'a, C, A> where C: BorrowMut<hyper::Client
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -6625,7 +6626,7 @@ impl<'a, C, A> AccountPaymentListCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// Sets the *account id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn account_id(mut self, new_value: &str) -> AccountPaymentListCall<'a, C, A> {
         self._account_id = new_value.to_string();
@@ -6643,12 +6644,12 @@ impl<'a, C, A> AccountPaymentListCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -6665,17 +6666,17 @@ impl<'a, C, A> AccountPaymentListCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountPaymentListCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountPaymentListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6738,7 +6739,7 @@ impl<'a, C, A> AccountSavedadstyleGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "adsense.accounts.savedadstyles.get", 
+        dlg.begin(MethodInfo { id: "adsense.accounts.savedadstyles.get",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("accountId", self._account_id.to_string()));
@@ -6781,7 +6782,7 @@ impl<'a, C, A> AccountSavedadstyleGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -6817,7 +6818,7 @@ impl<'a, C, A> AccountSavedadstyleGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -6827,10 +6828,10 @@ impl<'a, C, A> AccountSavedadstyleGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -6863,7 +6864,7 @@ impl<'a, C, A> AccountSavedadstyleGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// Sets the *account id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn account_id(mut self, new_value: &str) -> AccountSavedadstyleGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
@@ -6873,7 +6874,7 @@ impl<'a, C, A> AccountSavedadstyleGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// Sets the *saved ad style id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn saved_ad_style_id(mut self, new_value: &str) -> AccountSavedadstyleGetCall<'a, C, A> {
         self._saved_ad_style_id = new_value.to_string();
@@ -6891,12 +6892,12 @@ impl<'a, C, A> AccountSavedadstyleGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -6913,17 +6914,17 @@ impl<'a, C, A> AccountSavedadstyleGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountSavedadstyleGetCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountSavedadstyleGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6987,7 +6988,7 @@ impl<'a, C, A> AccountAdunitGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "adsense.accounts.adunits.get", 
+        dlg.begin(MethodInfo { id: "adsense.accounts.adunits.get",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("accountId", self._account_id.to_string()));
@@ -7031,7 +7032,7 @@ impl<'a, C, A> AccountAdunitGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -7067,7 +7068,7 @@ impl<'a, C, A> AccountAdunitGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -7077,10 +7078,10 @@ impl<'a, C, A> AccountAdunitGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -7113,7 +7114,7 @@ impl<'a, C, A> AccountAdunitGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// Sets the *account id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn account_id(mut self, new_value: &str) -> AccountAdunitGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
@@ -7123,7 +7124,7 @@ impl<'a, C, A> AccountAdunitGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// Sets the *ad client id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn ad_client_id(mut self, new_value: &str) -> AccountAdunitGetCall<'a, C, A> {
         self._ad_client_id = new_value.to_string();
@@ -7133,7 +7134,7 @@ impl<'a, C, A> AccountAdunitGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// Sets the *ad unit id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn ad_unit_id(mut self, new_value: &str) -> AccountAdunitGetCall<'a, C, A> {
         self._ad_unit_id = new_value.to_string();
@@ -7151,12 +7152,12 @@ impl<'a, C, A> AccountAdunitGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -7173,17 +7174,17 @@ impl<'a, C, A> AccountAdunitGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountAdunitGetCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountAdunitGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7247,7 +7248,7 @@ impl<'a, C, A> AccountCustomchannelGetCall<'a, C, A> where C: BorrowMut<hyper::C
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "adsense.accounts.customchannels.get", 
+        dlg.begin(MethodInfo { id: "adsense.accounts.customchannels.get",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("accountId", self._account_id.to_string()));
@@ -7291,7 +7292,7 @@ impl<'a, C, A> AccountCustomchannelGetCall<'a, C, A> where C: BorrowMut<hyper::C
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -7327,7 +7328,7 @@ impl<'a, C, A> AccountCustomchannelGetCall<'a, C, A> where C: BorrowMut<hyper::C
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -7337,10 +7338,10 @@ impl<'a, C, A> AccountCustomchannelGetCall<'a, C, A> where C: BorrowMut<hyper::C
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -7373,7 +7374,7 @@ impl<'a, C, A> AccountCustomchannelGetCall<'a, C, A> where C: BorrowMut<hyper::C
     ///
     /// Sets the *account id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn account_id(mut self, new_value: &str) -> AccountCustomchannelGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
@@ -7383,7 +7384,7 @@ impl<'a, C, A> AccountCustomchannelGetCall<'a, C, A> where C: BorrowMut<hyper::C
     ///
     /// Sets the *ad client id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn ad_client_id(mut self, new_value: &str) -> AccountCustomchannelGetCall<'a, C, A> {
         self._ad_client_id = new_value.to_string();
@@ -7393,7 +7394,7 @@ impl<'a, C, A> AccountCustomchannelGetCall<'a, C, A> where C: BorrowMut<hyper::C
     ///
     /// Sets the *custom channel id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn custom_channel_id(mut self, new_value: &str) -> AccountCustomchannelGetCall<'a, C, A> {
         self._custom_channel_id = new_value.to_string();
@@ -7411,12 +7412,12 @@ impl<'a, C, A> AccountCustomchannelGetCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -7433,17 +7434,17 @@ impl<'a, C, A> AccountCustomchannelGetCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountCustomchannelGetCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountCustomchannelGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7513,7 +7514,7 @@ impl<'a, C, A> AccountCustomchannelAdunitListCall<'a, C, A> where C: BorrowMut<h
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "adsense.accounts.customchannels.adunits.list", 
+        dlg.begin(MethodInfo { id: "adsense.accounts.customchannels.adunits.list",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
         params.push(("accountId", self._account_id.to_string()));
@@ -7566,7 +7567,7 @@ impl<'a, C, A> AccountCustomchannelAdunitListCall<'a, C, A> where C: BorrowMut<h
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -7602,7 +7603,7 @@ impl<'a, C, A> AccountCustomchannelAdunitListCall<'a, C, A> where C: BorrowMut<h
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -7612,10 +7613,10 @@ impl<'a, C, A> AccountCustomchannelAdunitListCall<'a, C, A> where C: BorrowMut<h
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -7648,7 +7649,7 @@ impl<'a, C, A> AccountCustomchannelAdunitListCall<'a, C, A> where C: BorrowMut<h
     ///
     /// Sets the *account id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn account_id(mut self, new_value: &str) -> AccountCustomchannelAdunitListCall<'a, C, A> {
         self._account_id = new_value.to_string();
@@ -7658,7 +7659,7 @@ impl<'a, C, A> AccountCustomchannelAdunitListCall<'a, C, A> where C: BorrowMut<h
     ///
     /// Sets the *ad client id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn ad_client_id(mut self, new_value: &str) -> AccountCustomchannelAdunitListCall<'a, C, A> {
         self._ad_client_id = new_value.to_string();
@@ -7668,7 +7669,7 @@ impl<'a, C, A> AccountCustomchannelAdunitListCall<'a, C, A> where C: BorrowMut<h
     ///
     /// Sets the *custom channel id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn custom_channel_id(mut self, new_value: &str) -> AccountCustomchannelAdunitListCall<'a, C, A> {
         self._custom_channel_id = new_value.to_string();
@@ -7707,12 +7708,12 @@ impl<'a, C, A> AccountCustomchannelAdunitListCall<'a, C, A> where C: BorrowMut<h
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -7729,17 +7730,17 @@ impl<'a, C, A> AccountCustomchannelAdunitListCall<'a, C, A> where C: BorrowMut<h
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountCustomchannelAdunitListCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountCustomchannelAdunitListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7805,7 +7806,7 @@ impl<'a, C, A> AccountReportSavedListCall<'a, C, A> where C: BorrowMut<hyper::Cl
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "adsense.accounts.reports.saved.list", 
+        dlg.begin(MethodInfo { id: "adsense.accounts.reports.saved.list",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("accountId", self._account_id.to_string()));
@@ -7853,7 +7854,7 @@ impl<'a, C, A> AccountReportSavedListCall<'a, C, A> where C: BorrowMut<hyper::Cl
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -7889,7 +7890,7 @@ impl<'a, C, A> AccountReportSavedListCall<'a, C, A> where C: BorrowMut<hyper::Cl
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -7899,10 +7900,10 @@ impl<'a, C, A> AccountReportSavedListCall<'a, C, A> where C: BorrowMut<hyper::Cl
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -7935,7 +7936,7 @@ impl<'a, C, A> AccountReportSavedListCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// Sets the *account id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn account_id(mut self, new_value: &str) -> AccountReportSavedListCall<'a, C, A> {
         self._account_id = new_value.to_string();
@@ -7967,12 +7968,12 @@ impl<'a, C, A> AccountReportSavedListCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -7989,17 +7990,17 @@ impl<'a, C, A> AccountReportSavedListCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountReportSavedListCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountReportSavedListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8066,7 +8067,7 @@ impl<'a, C, A> AccountUrlchannelListCall<'a, C, A> where C: BorrowMut<hyper::Cli
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "adsense.accounts.urlchannels.list", 
+        dlg.begin(MethodInfo { id: "adsense.accounts.urlchannels.list",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("accountId", self._account_id.to_string()));
@@ -8115,7 +8116,7 @@ impl<'a, C, A> AccountUrlchannelListCall<'a, C, A> where C: BorrowMut<hyper::Cli
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -8151,7 +8152,7 @@ impl<'a, C, A> AccountUrlchannelListCall<'a, C, A> where C: BorrowMut<hyper::Cli
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -8161,10 +8162,10 @@ impl<'a, C, A> AccountUrlchannelListCall<'a, C, A> where C: BorrowMut<hyper::Cli
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -8197,7 +8198,7 @@ impl<'a, C, A> AccountUrlchannelListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     ///
     /// Sets the *account id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn account_id(mut self, new_value: &str) -> AccountUrlchannelListCall<'a, C, A> {
         self._account_id = new_value.to_string();
@@ -8207,7 +8208,7 @@ impl<'a, C, A> AccountUrlchannelListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     ///
     /// Sets the *ad client id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn ad_client_id(mut self, new_value: &str) -> AccountUrlchannelListCall<'a, C, A> {
         self._ad_client_id = new_value.to_string();
@@ -8239,12 +8240,12 @@ impl<'a, C, A> AccountUrlchannelListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -8261,17 +8262,17 @@ impl<'a, C, A> AccountUrlchannelListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountUrlchannelListCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountUrlchannelListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8340,7 +8341,7 @@ impl<'a, C, A> AccountAdunitListCall<'a, C, A> where C: BorrowMut<hyper::Client>
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "adsense.accounts.adunits.list", 
+        dlg.begin(MethodInfo { id: "adsense.accounts.adunits.list",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
         params.push(("accountId", self._account_id.to_string()));
@@ -8392,7 +8393,7 @@ impl<'a, C, A> AccountAdunitListCall<'a, C, A> where C: BorrowMut<hyper::Client>
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -8428,7 +8429,7 @@ impl<'a, C, A> AccountAdunitListCall<'a, C, A> where C: BorrowMut<hyper::Client>
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -8438,10 +8439,10 @@ impl<'a, C, A> AccountAdunitListCall<'a, C, A> where C: BorrowMut<hyper::Client>
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -8474,7 +8475,7 @@ impl<'a, C, A> AccountAdunitListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     ///
     /// Sets the *account id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn account_id(mut self, new_value: &str) -> AccountAdunitListCall<'a, C, A> {
         self._account_id = new_value.to_string();
@@ -8484,7 +8485,7 @@ impl<'a, C, A> AccountAdunitListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     ///
     /// Sets the *ad client id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn ad_client_id(mut self, new_value: &str) -> AccountAdunitListCall<'a, C, A> {
         self._ad_client_id = new_value.to_string();
@@ -8523,12 +8524,12 @@ impl<'a, C, A> AccountAdunitListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -8545,17 +8546,17 @@ impl<'a, C, A> AccountAdunitListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountAdunitListCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountAdunitListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8642,7 +8643,7 @@ impl<'a, C, A> AccountReportGenerateCall<'a, C, A> where C: BorrowMut<hyper::Cli
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "adsense.accounts.reports.generate", 
+        dlg.begin(MethodInfo { id: "adsense.accounts.reports.generate",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((13 + self._additional_params.len()));
         params.push(("accountId", self._account_id.to_string()));
@@ -8745,7 +8746,7 @@ impl<'a, C, A> AccountReportGenerateCall<'a, C, A> where C: BorrowMut<hyper::Cli
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -8781,7 +8782,7 @@ impl<'a, C, A> AccountReportGenerateCall<'a, C, A> where C: BorrowMut<hyper::Cli
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -8791,10 +8792,10 @@ impl<'a, C, A> AccountReportGenerateCall<'a, C, A> where C: BorrowMut<hyper::Cli
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -8827,7 +8828,7 @@ impl<'a, C, A> AccountReportGenerateCall<'a, C, A> where C: BorrowMut<hyper::Cli
     ///
     /// Sets the *account id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn account_id(mut self, new_value: &str) -> AccountReportGenerateCall<'a, C, A> {
         self._account_id = new_value.to_string();
@@ -8837,7 +8838,7 @@ impl<'a, C, A> AccountReportGenerateCall<'a, C, A> where C: BorrowMut<hyper::Cli
     ///
     /// Sets the *start date* query property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn start_date(mut self, new_value: &str) -> AccountReportGenerateCall<'a, C, A> {
         self._start_date = new_value.to_string();
@@ -8847,7 +8848,7 @@ impl<'a, C, A> AccountReportGenerateCall<'a, C, A> where C: BorrowMut<hyper::Cli
     ///
     /// Sets the *end date* query property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn end_date(mut self, new_value: &str) -> AccountReportGenerateCall<'a, C, A> {
         self._end_date = new_value.to_string();
@@ -8932,12 +8933,12 @@ impl<'a, C, A> AccountReportGenerateCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -8954,17 +8955,17 @@ impl<'a, C, A> AccountReportGenerateCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountReportGenerateCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountReportGenerateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9030,7 +9031,7 @@ impl<'a, C, A> AccountAdclientListCall<'a, C, A> where C: BorrowMut<hyper::Clien
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "adsense.accounts.adclients.list", 
+        dlg.begin(MethodInfo { id: "adsense.accounts.adclients.list",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("accountId", self._account_id.to_string()));
@@ -9078,7 +9079,7 @@ impl<'a, C, A> AccountAdclientListCall<'a, C, A> where C: BorrowMut<hyper::Clien
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -9114,7 +9115,7 @@ impl<'a, C, A> AccountAdclientListCall<'a, C, A> where C: BorrowMut<hyper::Clien
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -9124,10 +9125,10 @@ impl<'a, C, A> AccountAdclientListCall<'a, C, A> where C: BorrowMut<hyper::Clien
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -9160,7 +9161,7 @@ impl<'a, C, A> AccountAdclientListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// Sets the *account id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn account_id(mut self, new_value: &str) -> AccountAdclientListCall<'a, C, A> {
         self._account_id = new_value.to_string();
@@ -9192,12 +9193,12 @@ impl<'a, C, A> AccountAdclientListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -9214,17 +9215,17 @@ impl<'a, C, A> AccountAdclientListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountAdclientListCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountAdclientListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9291,7 +9292,7 @@ impl<'a, C, A> AccountCustomchannelListCall<'a, C, A> where C: BorrowMut<hyper::
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "adsense.accounts.customchannels.list", 
+        dlg.begin(MethodInfo { id: "adsense.accounts.customchannels.list",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("accountId", self._account_id.to_string()));
@@ -9340,7 +9341,7 @@ impl<'a, C, A> AccountCustomchannelListCall<'a, C, A> where C: BorrowMut<hyper::
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -9376,7 +9377,7 @@ impl<'a, C, A> AccountCustomchannelListCall<'a, C, A> where C: BorrowMut<hyper::
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -9386,10 +9387,10 @@ impl<'a, C, A> AccountCustomchannelListCall<'a, C, A> where C: BorrowMut<hyper::
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -9422,7 +9423,7 @@ impl<'a, C, A> AccountCustomchannelListCall<'a, C, A> where C: BorrowMut<hyper::
     ///
     /// Sets the *account id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn account_id(mut self, new_value: &str) -> AccountCustomchannelListCall<'a, C, A> {
         self._account_id = new_value.to_string();
@@ -9432,7 +9433,7 @@ impl<'a, C, A> AccountCustomchannelListCall<'a, C, A> where C: BorrowMut<hyper::
     ///
     /// Sets the *ad client id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn ad_client_id(mut self, new_value: &str) -> AccountCustomchannelListCall<'a, C, A> {
         self._ad_client_id = new_value.to_string();
@@ -9464,12 +9465,12 @@ impl<'a, C, A> AccountCustomchannelListCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -9486,17 +9487,17 @@ impl<'a, C, A> AccountCustomchannelListCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountCustomchannelListCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountCustomchannelListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9562,7 +9563,7 @@ impl<'a, C, A> AccountSavedadstyleListCall<'a, C, A> where C: BorrowMut<hyper::C
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "adsense.accounts.savedadstyles.list", 
+        dlg.begin(MethodInfo { id: "adsense.accounts.savedadstyles.list",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("accountId", self._account_id.to_string()));
@@ -9610,7 +9611,7 @@ impl<'a, C, A> AccountSavedadstyleListCall<'a, C, A> where C: BorrowMut<hyper::C
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -9646,7 +9647,7 @@ impl<'a, C, A> AccountSavedadstyleListCall<'a, C, A> where C: BorrowMut<hyper::C
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -9656,10 +9657,10 @@ impl<'a, C, A> AccountSavedadstyleListCall<'a, C, A> where C: BorrowMut<hyper::C
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -9692,7 +9693,7 @@ impl<'a, C, A> AccountSavedadstyleListCall<'a, C, A> where C: BorrowMut<hyper::C
     ///
     /// Sets the *account id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn account_id(mut self, new_value: &str) -> AccountSavedadstyleListCall<'a, C, A> {
         self._account_id = new_value.to_string();
@@ -9724,12 +9725,12 @@ impl<'a, C, A> AccountSavedadstyleListCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -9746,17 +9747,17 @@ impl<'a, C, A> AccountSavedadstyleListCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountSavedadstyleListCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountSavedadstyleListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9820,7 +9821,7 @@ impl<'a, C, A> AccountAdunitGetAdCodeCall<'a, C, A> where C: BorrowMut<hyper::Cl
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "adsense.accounts.adunits.getAdCode", 
+        dlg.begin(MethodInfo { id: "adsense.accounts.adunits.getAdCode",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("accountId", self._account_id.to_string()));
@@ -9864,7 +9865,7 @@ impl<'a, C, A> AccountAdunitGetAdCodeCall<'a, C, A> where C: BorrowMut<hyper::Cl
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -9900,7 +9901,7 @@ impl<'a, C, A> AccountAdunitGetAdCodeCall<'a, C, A> where C: BorrowMut<hyper::Cl
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -9910,10 +9911,10 @@ impl<'a, C, A> AccountAdunitGetAdCodeCall<'a, C, A> where C: BorrowMut<hyper::Cl
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -9946,7 +9947,7 @@ impl<'a, C, A> AccountAdunitGetAdCodeCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// Sets the *account id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn account_id(mut self, new_value: &str) -> AccountAdunitGetAdCodeCall<'a, C, A> {
         self._account_id = new_value.to_string();
@@ -9956,7 +9957,7 @@ impl<'a, C, A> AccountAdunitGetAdCodeCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// Sets the *ad client id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn ad_client_id(mut self, new_value: &str) -> AccountAdunitGetAdCodeCall<'a, C, A> {
         self._ad_client_id = new_value.to_string();
@@ -9966,7 +9967,7 @@ impl<'a, C, A> AccountAdunitGetAdCodeCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// Sets the *ad unit id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn ad_unit_id(mut self, new_value: &str) -> AccountAdunitGetAdCodeCall<'a, C, A> {
         self._ad_unit_id = new_value.to_string();
@@ -9984,12 +9985,12 @@ impl<'a, C, A> AccountAdunitGetAdCodeCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -10006,17 +10007,17 @@ impl<'a, C, A> AccountAdunitGetAdCodeCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountAdunitGetAdCodeCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountAdunitGetAdCodeCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10084,7 +10085,7 @@ impl<'a, C, A> AccountAdunitCustomchannelListCall<'a, C, A> where C: BorrowMut<h
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "adsense.accounts.adunits.customchannels.list", 
+        dlg.begin(MethodInfo { id: "adsense.accounts.adunits.customchannels.list",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
         params.push(("accountId", self._account_id.to_string()));
@@ -10134,7 +10135,7 @@ impl<'a, C, A> AccountAdunitCustomchannelListCall<'a, C, A> where C: BorrowMut<h
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -10170,7 +10171,7 @@ impl<'a, C, A> AccountAdunitCustomchannelListCall<'a, C, A> where C: BorrowMut<h
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -10180,10 +10181,10 @@ impl<'a, C, A> AccountAdunitCustomchannelListCall<'a, C, A> where C: BorrowMut<h
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -10216,7 +10217,7 @@ impl<'a, C, A> AccountAdunitCustomchannelListCall<'a, C, A> where C: BorrowMut<h
     ///
     /// Sets the *account id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn account_id(mut self, new_value: &str) -> AccountAdunitCustomchannelListCall<'a, C, A> {
         self._account_id = new_value.to_string();
@@ -10226,7 +10227,7 @@ impl<'a, C, A> AccountAdunitCustomchannelListCall<'a, C, A> where C: BorrowMut<h
     ///
     /// Sets the *ad client id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn ad_client_id(mut self, new_value: &str) -> AccountAdunitCustomchannelListCall<'a, C, A> {
         self._ad_client_id = new_value.to_string();
@@ -10236,7 +10237,7 @@ impl<'a, C, A> AccountAdunitCustomchannelListCall<'a, C, A> where C: BorrowMut<h
     ///
     /// Sets the *ad unit id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn ad_unit_id(mut self, new_value: &str) -> AccountAdunitCustomchannelListCall<'a, C, A> {
         self._ad_unit_id = new_value.to_string();
@@ -10268,12 +10269,12 @@ impl<'a, C, A> AccountAdunitCustomchannelListCall<'a, C, A> where C: BorrowMut<h
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -10290,17 +10291,17 @@ impl<'a, C, A> AccountAdunitCustomchannelListCall<'a, C, A> where C: BorrowMut<h
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountAdunitCustomchannelListCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountAdunitCustomchannelListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10364,7 +10365,7 @@ impl<'a, C, A> AccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "adsense.accounts.get", 
+        dlg.begin(MethodInfo { id: "adsense.accounts.get",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("accountId", self._account_id.to_string()));
@@ -10409,7 +10410,7 @@ impl<'a, C, A> AccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -10445,7 +10446,7 @@ impl<'a, C, A> AccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -10455,10 +10456,10 @@ impl<'a, C, A> AccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -10491,7 +10492,7 @@ impl<'a, C, A> AccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// Sets the *account id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn account_id(mut self, new_value: &str) -> AccountGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
@@ -10516,12 +10517,12 @@ impl<'a, C, A> AccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -10538,17 +10539,17 @@ impl<'a, C, A> AccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountGetCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10609,7 +10610,7 @@ impl<'a, C, A> PaymentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "adsense.payments.list", 
+        dlg.begin(MethodInfo { id: "adsense.payments.list",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((2 + self._additional_params.len()));
         for &field in ["alt"].iter() {
@@ -10629,7 +10630,7 @@ impl<'a, C, A> PaymentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -10665,7 +10666,7 @@ impl<'a, C, A> PaymentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -10675,10 +10676,10 @@ impl<'a, C, A> PaymentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -10719,12 +10720,12 @@ impl<'a, C, A> PaymentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -10741,17 +10742,17 @@ impl<'a, C, A> PaymentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PaymentListCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PaymentListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10812,7 +10813,7 @@ impl<'a, C, A> MetadataDimensionListCall<'a, C, A> where C: BorrowMut<hyper::Cli
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "adsense.metadata.dimensions.list", 
+        dlg.begin(MethodInfo { id: "adsense.metadata.dimensions.list",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((2 + self._additional_params.len()));
         for &field in ["alt"].iter() {
@@ -10832,7 +10833,7 @@ impl<'a, C, A> MetadataDimensionListCall<'a, C, A> where C: BorrowMut<hyper::Cli
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -10868,7 +10869,7 @@ impl<'a, C, A> MetadataDimensionListCall<'a, C, A> where C: BorrowMut<hyper::Cli
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -10878,10 +10879,10 @@ impl<'a, C, A> MetadataDimensionListCall<'a, C, A> where C: BorrowMut<hyper::Cli
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -10922,12 +10923,12 @@ impl<'a, C, A> MetadataDimensionListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -10944,17 +10945,17 @@ impl<'a, C, A> MetadataDimensionListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> MetadataDimensionListCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> MetadataDimensionListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11015,7 +11016,7 @@ impl<'a, C, A> MetadataMetricListCall<'a, C, A> where C: BorrowMut<hyper::Client
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "adsense.metadata.metrics.list", 
+        dlg.begin(MethodInfo { id: "adsense.metadata.metrics.list",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((2 + self._additional_params.len()));
         for &field in ["alt"].iter() {
@@ -11035,7 +11036,7 @@ impl<'a, C, A> MetadataMetricListCall<'a, C, A> where C: BorrowMut<hyper::Client
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -11071,7 +11072,7 @@ impl<'a, C, A> MetadataMetricListCall<'a, C, A> where C: BorrowMut<hyper::Client
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -11081,10 +11082,10 @@ impl<'a, C, A> MetadataMetricListCall<'a, C, A> where C: BorrowMut<hyper::Client
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -11125,12 +11126,12 @@ impl<'a, C, A> MetadataMetricListCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -11147,17 +11148,17 @@ impl<'a, C, A> MetadataMetricListCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> MetadataMetricListCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> MetadataMetricListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11220,7 +11221,7 @@ impl<'a, C, A> CustomchannelGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "adsense.customchannels.get", 
+        dlg.begin(MethodInfo { id: "adsense.customchannels.get",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("adClientId", self._ad_client_id.to_string()));
@@ -11263,7 +11264,7 @@ impl<'a, C, A> CustomchannelGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -11299,7 +11300,7 @@ impl<'a, C, A> CustomchannelGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -11309,10 +11310,10 @@ impl<'a, C, A> CustomchannelGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -11345,7 +11346,7 @@ impl<'a, C, A> CustomchannelGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// Sets the *ad client id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn ad_client_id(mut self, new_value: &str) -> CustomchannelGetCall<'a, C, A> {
         self._ad_client_id = new_value.to_string();
@@ -11355,7 +11356,7 @@ impl<'a, C, A> CustomchannelGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// Sets the *custom channel id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn custom_channel_id(mut self, new_value: &str) -> CustomchannelGetCall<'a, C, A> {
         self._custom_channel_id = new_value.to_string();
@@ -11373,12 +11374,12 @@ impl<'a, C, A> CustomchannelGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -11395,17 +11396,17 @@ impl<'a, C, A> CustomchannelGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CustomchannelGetCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CustomchannelGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11471,7 +11472,7 @@ impl<'a, C, A> CustomchannelListCall<'a, C, A> where C: BorrowMut<hyper::Client>
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "adsense.customchannels.list", 
+        dlg.begin(MethodInfo { id: "adsense.customchannels.list",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("adClientId", self._ad_client_id.to_string()));
@@ -11519,7 +11520,7 @@ impl<'a, C, A> CustomchannelListCall<'a, C, A> where C: BorrowMut<hyper::Client>
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -11555,7 +11556,7 @@ impl<'a, C, A> CustomchannelListCall<'a, C, A> where C: BorrowMut<hyper::Client>
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -11565,10 +11566,10 @@ impl<'a, C, A> CustomchannelListCall<'a, C, A> where C: BorrowMut<hyper::Client>
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -11601,7 +11602,7 @@ impl<'a, C, A> CustomchannelListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     ///
     /// Sets the *ad client id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn ad_client_id(mut self, new_value: &str) -> CustomchannelListCall<'a, C, A> {
         self._ad_client_id = new_value.to_string();
@@ -11633,12 +11634,12 @@ impl<'a, C, A> CustomchannelListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -11655,17 +11656,17 @@ impl<'a, C, A> CustomchannelListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CustomchannelListCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CustomchannelListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11734,7 +11735,7 @@ impl<'a, C, A> CustomchannelAdunitListCall<'a, C, A> where C: BorrowMut<hyper::C
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "adsense.customchannels.adunits.list", 
+        dlg.begin(MethodInfo { id: "adsense.customchannels.adunits.list",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
         params.push(("adClientId", self._ad_client_id.to_string()));
@@ -11786,7 +11787,7 @@ impl<'a, C, A> CustomchannelAdunitListCall<'a, C, A> where C: BorrowMut<hyper::C
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -11822,7 +11823,7 @@ impl<'a, C, A> CustomchannelAdunitListCall<'a, C, A> where C: BorrowMut<hyper::C
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -11832,10 +11833,10 @@ impl<'a, C, A> CustomchannelAdunitListCall<'a, C, A> where C: BorrowMut<hyper::C
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -11868,7 +11869,7 @@ impl<'a, C, A> CustomchannelAdunitListCall<'a, C, A> where C: BorrowMut<hyper::C
     ///
     /// Sets the *ad client id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn ad_client_id(mut self, new_value: &str) -> CustomchannelAdunitListCall<'a, C, A> {
         self._ad_client_id = new_value.to_string();
@@ -11878,7 +11879,7 @@ impl<'a, C, A> CustomchannelAdunitListCall<'a, C, A> where C: BorrowMut<hyper::C
     ///
     /// Sets the *custom channel id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn custom_channel_id(mut self, new_value: &str) -> CustomchannelAdunitListCall<'a, C, A> {
         self._custom_channel_id = new_value.to_string();
@@ -11917,12 +11918,12 @@ impl<'a, C, A> CustomchannelAdunitListCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -11939,17 +11940,17 @@ impl<'a, C, A> CustomchannelAdunitListCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CustomchannelAdunitListCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CustomchannelAdunitListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

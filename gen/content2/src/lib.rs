@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Shopping Content* crate version *0.1.10+20151002*, where *20151002* is the exact revision of the *content:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.10*.
+//! This documentation was generated from *Shopping Content* crate version *0.1.11+20160115*, where *20160115* is the exact revision of the *content:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
 //! 
 //! Everything else about the *Shopping Content* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/shopping-content).
@@ -126,13 +126,13 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.orders().list("merchantId")
-//!              .add_statuses("ea")
-//!              .placed_date_start("et")
-//!              .placed_date_end("dolor")
-//!              .page_token("diam")
-//!              .order_by("kasd")
-//!              .max_results(14)
-//!              .acknowledged(true)
+//!              .add_statuses("dolor")
+//!              .placed_date_start("diam")
+//!              .placed_date_end("kasd")
+//!              .page_token("invidunt")
+//!              .order_by("rebum.")
+//!              .max_results(50)
+//!              .acknowledged(false)
 //!              .doit();
 //! 
 //! match result {

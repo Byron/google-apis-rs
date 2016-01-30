@@ -19,10 +19,11 @@ use std::collections::BTreeMap;
 use serde_json as json;
 use std::io;
 use std::fs;
-use std::thread::sleep_ms;
+use std::thread::sleep;
+use std::time::Duration;
 
 pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, 
+              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
               Resource, ErrorResponse, remove_json_null_values};
 
 
@@ -141,7 +142,7 @@ impl<'a, C, A> Plus<C, A>
         Plus {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.10".to_string(),
+            _user_agent: "google-api-rust-client/0.1.11".to_string(),
         }
     }
 
@@ -151,15 +152,12 @@ impl<'a, C, A> Plus<C, A>
     pub fn comments(&'a self) -> CommentMethods<'a, C, A> {
         CommentMethods { hub: &self }
     }
-    pub fn moments(&'a self) -> MomentMethods<'a, C, A> {
-        MomentMethods { hub: &self }
-    }
     pub fn people(&'a self) -> PeopleMethods<'a, C, A> {
         PeopleMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.10`.
+    /// It defaults to `google-api-rust-client/0.1.11`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -511,157 +509,6 @@ impl NestedType for CommentObject {}
 impl Part for CommentObject {}
 
 
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ItemScope {
-    /// The start date and time of the event (in ISO 8601 date format).
-    #[serde(rename="startDate")]
-    pub start_date: Option<String>,
-    /// The end date and time of the event (in ISO 8601 date format).
-    #[serde(rename="endDate")]
-    pub end_date: Option<String>,
-    /// The text that is the result of the app activity. For example, if a user leaves a review of a restaurant, this might be the text of the review.
-    pub text: Option<String>,
-    /// A URL to the image that represents this result. For example, if a user writes a review of a restaurant and attaches a photo of their meal, you might use that photo as the result.image.
-    pub image: Option<String>,
-    /// Review rating.
-    #[serde(rename="reviewRating")]
-    pub review_rating: Option<Option<Box<ItemScope>>>,
-    /// Date of birth.
-    #[serde(rename="birthDate")]
-    pub birth_date: Option<String>,
-    /// The initial date that the result was published. For example, a user writes a comment on a blog, which has a result.dateCreated of when they submit it. If the blog users comment moderation, the result.datePublished value would match the date when the owner approved the message.
-    #[serde(rename="datePublished")]
-    pub date_published: Option<String>,
-    /// Address locality.
-    #[serde(rename="addressLocality")]
-    pub address_locality: Option<String>,
-    /// The duration of the item (movie, audio recording, event, etc.) in ISO 8601 date format.
-    pub duration: Option<String>,
-    /// An additional name for a Person, can be used for a middle name.
-    #[serde(rename="additionalName")]
-    pub additional_name: Option<Vec<String>>,
-    /// Worst possible rating value that a result might obtain. This property defines the lower bound for the ratingValue.
-    #[serde(rename="worstRating")]
-    pub worst_rating: Option<String>,
-    /// A list of contributors to this result.
-    pub contributor: Option<Vec<ItemScope>>,
-    /// A URL to a thumbnail image that represents this result.
-    #[serde(rename="thumbnailUrl")]
-    pub thumbnail_url: Option<String>,
-    /// An identifier for the object. Your app can choose how to identify objects. The object.id is required if you are writing an action that does not have a corresponding web page or object.url property.
-    pub id: Option<String>,
-    /// Post office box number.
-    #[serde(rename="postOfficeBoxNumber")]
-    pub post_office_box_number: Option<String>,
-    /// A person attending the event.
-    pub attendees: Option<Vec<ItemScope>>,
-    /// The person or persons who created this result. In the example of restaurant reviews, this might be the reviewer's name.
-    pub author: Option<Vec<ItemScope>>,
-    /// The encoding.
-    pub associated_media: Option<Vec<ItemScope>>,
-    /// Best possible rating value that a result might obtain. This property defines the upper bound for the ratingValue. For example, you might have a 5 star rating scale, you would provide 5 as the value for this property.
-    #[serde(rename="bestRating")]
-    pub best_rating: Option<String>,
-    /// Address country.
-    #[serde(rename="addressCountry")]
-    pub address_country: Option<i64>,
-    /// The width of the media object.
-    pub width: Option<String>,
-    /// Street address.
-    #[serde(rename="streetAddress")]
-    pub street_address: Option<String>,
-    /// The location of the event or organization.
-    pub location: Option<Option<Box<ItemScope>>>,
-    /// Latitude.
-    pub latitude: Option<f64>,
-    /// From http://schema.org/MusicRecording, the artist that performed this recording.
-    #[serde(rename="byArtist")]
-    pub by_artist: Option<Option<Box<ItemScope>>>,
-    /// The schema.org URL that best describes the referenced object and matches the type of moment.
-    #[serde(rename="type")]
-    pub type_: Option<String>,
-    /// The date the result was last modified such as the date that a review was last edited.
-    #[serde(rename="dateModified")]
-    pub date_modified: Option<String>,
-    /// File size in (mega/kilo) bytes.
-    #[serde(rename="contentSize")]
-    pub content_size: Option<String>,
-    /// Actual bytes of the media object, for example the image file or video file.
-    #[serde(rename="contentUrl")]
-    pub content_url: Option<String>,
-    /// Family name. This property can be used with givenName instead of the name property.
-    #[serde(rename="familyName")]
-    pub family_name: Option<String>,
-    /// The string that describes the content of the result.
-    pub description: Option<String>,
-    /// Property of http://schema.org/TVEpisode indicating which series the episode belongs to.
-    #[serde(rename="partOfTVSeries")]
-    pub part_of_tv_series: Option<Option<Box<ItemScope>>>,
-    /// The subject matter of the content.
-    pub about: Option<Option<Box<ItemScope>>>,
-    /// The date the result was created such as the date that a review was first created.
-    #[serde(rename="dateCreated")]
-    pub date_created: Option<String>,
-    /// Postal code.
-    #[serde(rename="postalCode")]
-    pub postal_code: Option<String>,
-    /// Number of attendees.
-    #[serde(rename="attendeeCount")]
-    pub attendee_count: Option<i32>,
-    /// From http://schema.org/MusicRecording, which album a song is in.
-    #[serde(rename="inAlbum")]
-    pub in_album: Option<Option<Box<ItemScope>>>,
-    /// Postal address.
-    pub address: Option<Option<Box<ItemScope>>>,
-    /// The height of the media object.
-    pub height: Option<String>,
-    /// Geo coordinates.
-    pub geo: Option<Option<Box<ItemScope>>>,
-    /// A URL pointing to a player for a specific video. In general, this is the information in the src element of an embed tag and should not be the same as the content of the loc tag.
-    #[serde(rename="embedUrl")]
-    pub embed_url: Option<String>,
-    /// The exchange traded instrument associated with a Corporation object. The tickerSymbol is expressed as an exchange and an instrument name separated by a space character. For the exchange component of the tickerSymbol attribute, we recommend using the controlled vocabulary of Market Identifier Codes (MIC) specified in ISO15022.
-    #[serde(rename="tickerSymbol")]
-    pub ticker_symbol: Option<String>,
-    /// The name of the result. In the example of a restaurant review, this might be the summary the user gave their review such as "Great ambiance, but overpriced."
-    pub name: Option<String>,
-    /// Identifies this resource as an itemScope.
-    pub kind: Option<String>,
-    /// From http://schema.org/MusicRecording, the audio file.
-    pub audio: Option<Option<Box<ItemScope>>>,
-    /// Player type that is required. For example: Flash or Silverlight.
-    #[serde(rename="playerType")]
-    pub player_type: Option<String>,
-    /// The main performer or performers of the event-for example, a presenter, musician, or actor.
-    pub performers: Option<Vec<ItemScope>>,
-    /// The URL that points to the result object. For example, a permalink directly to a restaurant reviewer's comment.
-    pub url: Option<String>,
-    /// Gender of the person.
-    pub gender: Option<String>,
-    /// Longitude.
-    pub longitude: Option<f64>,
-    /// Thumbnail image for an image or video.
-    pub thumbnail: Option<Option<Box<ItemScope>>>,
-    /// Address region.
-    #[serde(rename="addressRegion")]
-    pub address_region: Option<String>,
-    /// The caption for this object.
-    pub caption: Option<String>,
-    /// Rating value.
-    #[serde(rename="ratingValue")]
-    pub rating_value: Option<String>,
-    /// Given name. This property can be used with familyName instead of the name property.
-    #[serde(rename="givenName")]
-    pub given_name: Option<String>,
-}
-
-impl Part for ItemScope {}
-
-
 /// The preview image for photos or videos.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -775,32 +622,18 @@ impl NestedType for ActivityObjectActorClientSpecificActorInfoYoutubeActorInfo {
 impl Part for ActivityObjectActorClientSpecificActorInfoYoutubeActorInfo {}
 
 
-/// The person who performed this activity.
+/// The physical address of the place.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ActivityActor {
-    /// The name of the actor, suitable for display.
-    #[serde(rename="displayName")]
-    pub display_name: Option<String>,
-    /// An object representation of the individual components of name.
-    pub name: Option<ActivityActorName>,
-    /// The link to the actor's Google profile.
-    pub url: Option<String>,
-    /// The image representation of the actor.
-    pub image: Option<ActivityActorImage>,
-    /// Actor info specific to particular clients.
-    #[serde(rename="clientSpecificActorInfo")]
-    pub client_specific_actor_info: Option<ActivityActorClientSpecificActorInfo>,
-    /// The ID of the actor's Person resource.
-    pub id: Option<String>,
-    /// Verification status of actor.
-    pub verification: Option<ActivityActorVerification>,
+pub struct PlaceAddress {
+    /// The formatted address for display.
+    pub formatted: Option<String>,
 }
 
-impl NestedType for ActivityActor {}
-impl Part for ActivityActor {}
+impl NestedType for PlaceAddress {}
+impl Part for PlaceAddress {}
 
 
 /// The service provider that initially published this activity.
@@ -882,41 +715,6 @@ pub struct PersonCoverCoverInfo {
 
 impl NestedType for PersonCoverCoverInfo {}
 impl Part for PersonCoverCoverInfo {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list moments](struct.MomentListCall.html) (none)
-/// * [insert moments](struct.MomentInsertCall.html) (request|response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Moment {
-    /// Time stamp of when the action occurred in RFC3339 format.
-    #[serde(rename="startDate")]
-    pub start_date: Option<String>,
-    /// Identifies this resource as a moment.
-    pub kind: Option<String>,
-    /// The object on which the action was performed.
-    pub target: Option<ItemScope>,
-    /// The object on which the action was performed. Specifying this is equivalent with specifying "target". Note that responses from the server will use the "target" field instead for backward-compatibility with older clients.
-    pub object: Option<ItemScope>,
-    /// The schema.org type for the type of moment to write. For example, http://schema.org/AddAction. Note that responses from the server will use the Google schema type instead for backward-compatibility with older clients. For example, http://schemas.google.com/AddActivity.
-    #[serde(rename="type")]
-    pub type_: Option<String>,
-    /// The moment ID.
-    pub id: Option<String>,
-    /// The object generated by performing the action on the object. For example, a user writes a review of a restaurant, the object is the restaurant and the result is the review.
-    pub result: Option<ItemScope>,
-}
-
-impl RequestValue for Moment {}
-impl Resource for Moment {}
-impl ResponseResult for Moment {}
 
 
 /// The image representation of this actor.
@@ -1238,37 +1036,24 @@ impl Part for CommentActorClientSpecificActorInfoYoutubeActorInfo {}
 
 /// There is no detailed description.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list moments](struct.MomentListCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct MomentsFeed {
-    /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// Identifies this resource as a collection of moments. Value: "plus#momentsFeed".
+pub struct Place {
+    /// The position of the place.
+    pub position: Option<PlacePosition>,
+    /// Identifies this resource as a place. Value: "plus#place".
     pub kind: Option<String>,
-    /// The title of this collection of moments.
-    pub title: Option<String>,
-    /// The moments in this page of results.
-    pub items: Option<Vec<Moment>>,
-    /// The RFC 339 timestamp for when this collection of moments was last updated.
-    pub updated: Option<String>,
-    /// Link to the next page of moments.
-    #[serde(rename="nextLink")]
-    pub next_link: Option<String>,
-    /// ETag of this response for caching purposes.
-    pub etag: Option<String>,
-    /// Link to this page of moments.
-    #[serde(rename="selfLink")]
-    pub self_link: Option<String>,
+    /// The display name of the place.
+    #[serde(rename="displayName")]
+    pub display_name: Option<String>,
+    /// The id of the place.
+    pub id: Option<String>,
+    /// The physical address of the place.
+    pub address: Option<PlaceAddress>,
 }
 
-impl ResponseResult for MomentsFeed {}
+impl Part for Place {}
 
 
 /// Verification status of actor.
@@ -1284,6 +1069,34 @@ pub struct CommentActorVerification {
 
 impl NestedType for CommentActorVerification {}
 impl Part for CommentActorVerification {}
+
+
+/// The person who performed this activity.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ActivityActor {
+    /// The name of the actor, suitable for display.
+    #[serde(rename="displayName")]
+    pub display_name: Option<String>,
+    /// An object representation of the individual components of name.
+    pub name: Option<ActivityActorName>,
+    /// The link to the actor's Google profile.
+    pub url: Option<String>,
+    /// The image representation of the actor.
+    pub image: Option<ActivityActorImage>,
+    /// Actor info specific to particular clients.
+    #[serde(rename="clientSpecificActorInfo")]
+    pub client_specific_actor_info: Option<ActivityActorClientSpecificActorInfo>,
+    /// The ID of the actor's Person resource.
+    pub id: Option<String>,
+    /// Verification status of actor.
+    pub verification: Option<ActivityActorVerification>,
+}
+
+impl NestedType for ActivityActor {}
+impl Part for ActivityActor {}
 
 
 /// There is no detailed description.
@@ -1479,20 +1292,6 @@ impl NestedType for ActivityObjectAttachmentsThumbnailsImage {}
 impl Part for ActivityObjectAttachmentsThumbnailsImage {}
 
 
-/// The physical address of the place.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PlaceAddress {
-    /// The formatted address for display.
-    pub formatted: Option<String>,
-}
-
-impl NestedType for PlaceAddress {}
-impl Part for PlaceAddress {}
-
-
 /// The object of this activity.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1527,28 +1326,6 @@ pub struct ActivityObject {
 
 impl NestedType for ActivityObject {}
 impl Part for ActivityObject {}
-
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Place {
-    /// The position of the place.
-    pub position: Option<PlacePosition>,
-    /// Identifies this resource as a place. Value: "plus#place".
-    pub kind: Option<String>,
-    /// The display name of the place.
-    #[serde(rename="displayName")]
-    pub display_name: Option<String>,
-    /// The id of the place.
-    pub id: Option<String>,
-    /// The physical address of the place.
-    pub address: Option<PlaceAddress>,
-}
-
-impl Part for Place {}
 
 
 /// Comments in reply to this activity.
@@ -1588,92 +1365,6 @@ impl Part for ActivityObjectActorClientSpecificActorInfo {}
 // ###################
 // MethodBuilders ###
 // #################
-
-/// A builder providing access to all methods supported on *moment* resources.
-/// It is not used directly, but through the `Plus` hub.
-///
-/// # Example
-///
-/// Instantiate a resource builder
-///
-/// ```test_harness,no_run
-/// extern crate hyper;
-/// extern crate yup_oauth2 as oauth2;
-/// extern crate google_plus1 as plus1;
-/// 
-/// # #[test] fn egal() {
-/// use std::default::Default;
-/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// use plus1::Plus;
-/// 
-/// let secret: ApplicationSecret = Default::default();
-/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-///                               hyper::Client::new(),
-///                               <MemoryStorage as Default>::default(), None);
-/// let mut hub = Plus::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `insert(...)` and `list(...)`
-/// // to build up your call.
-/// let rb = hub.moments();
-/// # }
-/// ```
-pub struct MomentMethods<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Plus<C, A>,
-}
-
-impl<'a, C, A> MethodsBuilder for MomentMethods<'a, C, A> {}
-
-impl<'a, C, A> MomentMethods<'a, C, A> {
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Record a moment representing a user's action such as making a purchase or commenting on a blog.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `userId` - The ID of the user to record actions for. The only valid values are "me" and the ID of the authenticated user.
-    /// * `collection` - The collection to which to write moments.
-    pub fn insert(&self, request: Moment, user_id: &str, collection: &str) -> MomentInsertCall<'a, C, A> {
-        MomentInsertCall {
-            hub: self.hub,
-            _request: request,
-            _user_id: user_id.to_string(),
-            _collection: collection.to_string(),
-            _debug: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// List all of the moments for a particular user.
-    /// 
-    /// # Arguments
-    ///
-    /// * `userId` - The ID of the user to get moments for. The special value "me" can be used to indicate the authenticated user.
-    /// * `collection` - The collection of moments to list.
-    pub fn list(&self, user_id: &str, collection: &str) -> MomentListCall<'a, C, A> {
-        MomentListCall {
-            hub: self.hub,
-            _user_id: user_id.to_string(),
-            _collection: collection.to_string(),
-            _type_: Default::default(),
-            _target_url: Default::default(),
-            _page_token: Default::default(),
-            _max_results: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-}
-
-
 
 /// A builder providing access to all methods supported on *activity* resources.
 /// It is not used directly, but through the `Plus` hub.
@@ -1980,593 +1671,6 @@ impl<'a, C, A> PeopleMethods<'a, C, A> {
 // CallBuilders   ###
 // #################
 
-/// Record a moment representing a user's action such as making a purchase or commenting on a blog.
-///
-/// A builder for the *insert* method supported by a *moment* resource.
-/// It is not used directly, but through a `MomentMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_plus1 as plus1;
-/// use plus1::Moment;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use plus1::Plus;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::new(),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Plus::new(hyper::Client::new(), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = Moment::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.moments().insert(req, "userId", "collection")
-///              .debug(true)
-///              .doit();
-/// # }
-/// ```
-pub struct MomentInsertCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Plus<C, A>,
-    _request: Moment,
-    _user_id: String,
-    _collection: String,
-    _debug: Option<bool>,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for MomentInsertCall<'a, C, A> {}
-
-impl<'a, C, A> MomentInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Moment)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "plus.moments.insert", 
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
-        params.push(("userId", self._user_id.to_string()));
-        params.push(("collection", self._collection.to_string()));
-        if let Some(value) = self._debug {
-            params.push(("debug", value.to_string()));
-        }
-        for &field in ["alt", "userId", "collection", "debug"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = "https://www.googleapis.com/plus/v1/people/{userId}/moments/{collection}".to_string();
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Login.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{userId}", "userId"), ("{collection}", "collection")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["collection", "userId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-        
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = 
-            {
-                let mut value = json::value::to_value(&self._request);
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call, 
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Moment) -> MomentInsertCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// The ID of the user to record actions for. The only valid values are "me" and the ID of the authenticated user.
-    ///
-    /// Sets the *user id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call, 
-    /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> MomentInsertCall<'a, C, A> {
-        self._user_id = new_value.to_string();
-        self
-    }
-    /// The collection to which to write moments.
-    ///
-    /// Sets the *collection* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call, 
-    /// we provide this method for API completeness.
-    pub fn collection(mut self, new_value: &str) -> MomentInsertCall<'a, C, A> {
-        self._collection = new_value.to_string();
-        self
-    }
-    /// Return the moment as written. Should be used only for debugging.
-    ///
-    /// Sets the *debug* query property to the given value.
-    pub fn debug(mut self, new_value: bool) -> MomentInsertCall<'a, C, A> {
-        self._debug = Some(new_value);
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MomentInsertCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    /// 
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MomentInsertCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    /// 
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Login`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// 
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> MomentInsertCall<'a, C, A> 
-                                                        where T: AsRef<str> {
-        self._scopes.insert(scope.as_ref().to_string(), ());
-        self
-    }
-}
-
-
-/// List all of the moments for a particular user.
-///
-/// A builder for the *list* method supported by a *moment* resource.
-/// It is not used directly, but through a `MomentMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_plus1 as plus1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use plus1::Plus;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::new(),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Plus::new(hyper::Client::new(), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.moments().list("userId", "collection")
-///              .type_("dolores")
-///              .target_url("gubergren")
-///              .page_token("sadipscing")
-///              .max_results(70)
-///              .doit();
-/// # }
-/// ```
-pub struct MomentListCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Plus<C, A>,
-    _user_id: String,
-    _collection: String,
-    _type_: Option<String>,
-    _target_url: Option<String>,
-    _page_token: Option<String>,
-    _max_results: Option<u32>,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for MomentListCall<'a, C, A> {}
-
-impl<'a, C, A> MomentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, MomentsFeed)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "plus.moments.list", 
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
-        params.push(("userId", self._user_id.to_string()));
-        params.push(("collection", self._collection.to_string()));
-        if let Some(value) = self._type_ {
-            params.push(("type", value.to_string()));
-        }
-        if let Some(value) = self._target_url {
-            params.push(("targetUrl", value.to_string()));
-        }
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._max_results {
-            params.push(("maxResults", value.to_string()));
-        }
-        for &field in ["alt", "userId", "collection", "type", "targetUrl", "pageToken", "maxResults"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = "https://www.googleapis.com/plus/v1/people/{userId}/moments/{collection}".to_string();
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Login.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{userId}", "userId"), ("{collection}", "collection")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["collection", "userId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-        
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The ID of the user to get moments for. The special value "me" can be used to indicate the authenticated user.
-    ///
-    /// Sets the *user id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call, 
-    /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> MomentListCall<'a, C, A> {
-        self._user_id = new_value.to_string();
-        self
-    }
-    /// The collection of moments to list.
-    ///
-    /// Sets the *collection* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call, 
-    /// we provide this method for API completeness.
-    pub fn collection(mut self, new_value: &str) -> MomentListCall<'a, C, A> {
-        self._collection = new_value.to_string();
-        self
-    }
-    /// Only moments of this type will be returned.
-    ///
-    /// Sets the *type* query property to the given value.
-    pub fn type_(mut self, new_value: &str) -> MomentListCall<'a, C, A> {
-        self._type_ = Some(new_value.to_string());
-        self
-    }
-    /// Only moments containing this targetUrl will be returned.
-    ///
-    /// Sets the *target url* query property to the given value.
-    pub fn target_url(mut self, new_value: &str) -> MomentListCall<'a, C, A> {
-        self._target_url = Some(new_value.to_string());
-        self
-    }
-    /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of "nextPageToken" from the previous response.
-    ///
-    /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> MomentListCall<'a, C, A> {
-        self._page_token = Some(new_value.to_string());
-        self
-    }
-    /// The maximum number of moments to include in the response, which is used for paging. For any response, the actual number returned might be less than the specified maxResults.
-    ///
-    /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> MomentListCall<'a, C, A> {
-        self._max_results = Some(new_value);
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MomentListCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    /// 
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MomentListCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    /// 
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Login`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// 
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> MomentListCall<'a, C, A> 
-                                                        where T: AsRef<str> {
-        self._scopes.insert(scope.as_ref().to_string(), ());
-        self
-    }
-}
-
-
 /// Search public activities.
 ///
 /// A builder for the *search* method supported by a *activity* resource.
@@ -2594,10 +1698,10 @@ impl<'a, C, A> MomentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.activities().search("query")
-///              .page_token("no")
-///              .order_by("justo")
-///              .max_results(80)
-///              .language("et")
+///              .page_token("erat")
+///              .order_by("labore")
+///              .max_results(92)
+///              .language("nonumy")
 ///              .doit();
 /// # }
 /// ```
@@ -2629,7 +1733,7 @@ impl<'a, C, A> ActivitySearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "plus.activities.search", 
+        dlg.begin(MethodInfo { id: "plus.activities.search",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
         params.push(("query", self._query.to_string()));
@@ -2662,7 +1766,7 @@ impl<'a, C, A> ActivitySearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             self._scopes.insert(Scope::Login.as_ref().to_string(), ());
         }
 
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -2698,7 +1802,7 @@ impl<'a, C, A> ActivitySearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -2708,10 +1812,10 @@ impl<'a, C, A> ActivitySearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -2744,7 +1848,7 @@ impl<'a, C, A> ActivitySearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     ///
     /// Sets the *query* query property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn query(mut self, new_value: &str) -> ActivitySearchCall<'a, C, A> {
         self._query = new_value.to_string();
@@ -2790,12 +1894,12 @@ impl<'a, C, A> ActivitySearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -2812,17 +1916,17 @@ impl<'a, C, A> ActivitySearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Login`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ActivitySearchCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ActivitySearchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2884,7 +1988,7 @@ impl<'a, C, A> ActivityGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "plus.activities.get", 
+        dlg.begin(MethodInfo { id: "plus.activities.get",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
         params.push(("activityId", self._activity_id.to_string()));
@@ -2926,7 +2030,7 @@ impl<'a, C, A> ActivityGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -2962,7 +2066,7 @@ impl<'a, C, A> ActivityGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -2972,10 +2076,10 @@ impl<'a, C, A> ActivityGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -3008,7 +2112,7 @@ impl<'a, C, A> ActivityGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// Sets the *activity id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn activity_id(mut self, new_value: &str) -> ActivityGetCall<'a, C, A> {
         self._activity_id = new_value.to_string();
@@ -3026,12 +2130,12 @@ impl<'a, C, A> ActivityGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -3048,17 +2152,17 @@ impl<'a, C, A> ActivityGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Login`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ActivityGetCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ActivityGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3093,8 +2197,8 @@ impl<'a, C, A> ActivityGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.activities().list("userId", "collection")
-///              .page_token("Lorem")
-///              .max_results(80)
+///              .page_token("aliquyam")
+///              .max_results(35)
 ///              .doit();
 /// # }
 /// ```
@@ -3125,7 +2229,7 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "plus.activities.list", 
+        dlg.begin(MethodInfo { id: "plus.activities.list",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("userId", self._user_id.to_string()));
@@ -3174,7 +2278,7 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -3210,7 +2314,7 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -3220,10 +2324,10 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -3256,7 +2360,7 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     ///
     /// Sets the *user id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn user_id(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._user_id = new_value.to_string();
@@ -3266,7 +2370,7 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     ///
     /// Sets the *collection* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn collection(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._collection = new_value.to_string();
@@ -3298,12 +2402,12 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -3320,17 +2424,17 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Login`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ActivityListCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ActivityListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3365,9 +2469,9 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.comments().list("activityId")
-///              .sort_order("aliquyam")
-///              .page_token("sea")
-///              .max_results(46)
+///              .sort_order("justo")
+///              .page_token("justo")
+///              .max_results(67)
 ///              .doit();
 /// # }
 /// ```
@@ -3398,7 +2502,7 @@ impl<'a, C, A> CommentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "plus.comments.list", 
+        dlg.begin(MethodInfo { id: "plus.comments.list",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("activityId", self._activity_id.to_string()));
@@ -3449,7 +2553,7 @@ impl<'a, C, A> CommentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -3485,7 +2589,7 @@ impl<'a, C, A> CommentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -3495,10 +2599,10 @@ impl<'a, C, A> CommentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -3531,7 +2635,7 @@ impl<'a, C, A> CommentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// Sets the *activity id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn activity_id(mut self, new_value: &str) -> CommentListCall<'a, C, A> {
         self._activity_id = new_value.to_string();
@@ -3570,12 +2674,12 @@ impl<'a, C, A> CommentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -3592,17 +2696,17 @@ impl<'a, C, A> CommentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Login`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CommentListCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CommentListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3664,7 +2768,7 @@ impl<'a, C, A> CommentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "plus.comments.get", 
+        dlg.begin(MethodInfo { id: "plus.comments.get",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
         params.push(("commentId", self._comment_id.to_string()));
@@ -3706,7 +2810,7 @@ impl<'a, C, A> CommentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -3742,7 +2846,7 @@ impl<'a, C, A> CommentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -3752,10 +2856,10 @@ impl<'a, C, A> CommentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -3788,7 +2892,7 @@ impl<'a, C, A> CommentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// Sets the *comment id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn comment_id(mut self, new_value: &str) -> CommentGetCall<'a, C, A> {
         self._comment_id = new_value.to_string();
@@ -3806,12 +2910,12 @@ impl<'a, C, A> CommentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -3828,17 +2932,17 @@ impl<'a, C, A> CommentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Login`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CommentGetCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CommentGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3873,9 +2977,9 @@ impl<'a, C, A> CommentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.people().search("query")
-///              .page_token("sadipscing")
-///              .max_results(53)
-///              .language("eirmod")
+///              .page_token("ipsum")
+///              .max_results(96)
+///              .language("et")
 ///              .doit();
 /// # }
 /// ```
@@ -3906,7 +3010,7 @@ impl<'a, C, A> PeopleSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "plus.people.search", 
+        dlg.begin(MethodInfo { id: "plus.people.search",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("query", self._query.to_string()));
@@ -3936,7 +3040,7 @@ impl<'a, C, A> PeopleSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             self._scopes.insert(Scope::Login.as_ref().to_string(), ());
         }
 
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -3972,7 +3076,7 @@ impl<'a, C, A> PeopleSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -3982,10 +3086,10 @@ impl<'a, C, A> PeopleSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -4018,7 +3122,7 @@ impl<'a, C, A> PeopleSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     ///
     /// Sets the *query* query property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn query(mut self, new_value: &str) -> PeopleSearchCall<'a, C, A> {
         self._query = new_value.to_string();
@@ -4057,12 +3161,12 @@ impl<'a, C, A> PeopleSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -4079,17 +3183,17 @@ impl<'a, C, A> PeopleSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Login`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PeopleSearchCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PeopleSearchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4124,8 +3228,8 @@ impl<'a, C, A> PeopleSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.people().list_by_activity("activityId", "collection")
-///              .page_token("no")
-///              .max_results(65)
+///              .page_token("sea")
+///              .max_results(46)
 ///              .doit();
 /// # }
 /// ```
@@ -4156,7 +3260,7 @@ impl<'a, C, A> PeopleListByActivityCall<'a, C, A> where C: BorrowMut<hyper::Clie
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "plus.people.listByActivity", 
+        dlg.begin(MethodInfo { id: "plus.people.listByActivity",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("activityId", self._activity_id.to_string()));
@@ -4205,7 +3309,7 @@ impl<'a, C, A> PeopleListByActivityCall<'a, C, A> where C: BorrowMut<hyper::Clie
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -4241,7 +3345,7 @@ impl<'a, C, A> PeopleListByActivityCall<'a, C, A> where C: BorrowMut<hyper::Clie
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -4251,10 +3355,10 @@ impl<'a, C, A> PeopleListByActivityCall<'a, C, A> where C: BorrowMut<hyper::Clie
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -4287,7 +3391,7 @@ impl<'a, C, A> PeopleListByActivityCall<'a, C, A> where C: BorrowMut<hyper::Clie
     ///
     /// Sets the *activity id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn activity_id(mut self, new_value: &str) -> PeopleListByActivityCall<'a, C, A> {
         self._activity_id = new_value.to_string();
@@ -4297,7 +3401,7 @@ impl<'a, C, A> PeopleListByActivityCall<'a, C, A> where C: BorrowMut<hyper::Clie
     ///
     /// Sets the *collection* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn collection(mut self, new_value: &str) -> PeopleListByActivityCall<'a, C, A> {
         self._collection = new_value.to_string();
@@ -4329,12 +3433,12 @@ impl<'a, C, A> PeopleListByActivityCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -4351,17 +3455,17 @@ impl<'a, C, A> PeopleListByActivityCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Login`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PeopleListByActivityCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PeopleListByActivityCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4396,9 +3500,9 @@ impl<'a, C, A> PeopleListByActivityCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.people().list("userId", "collection")
-///              .page_token("invidunt")
-///              .order_by("aliquyam")
-///              .max_results(28)
+///              .page_token("sadipscing")
+///              .order_by("dolor")
+///              .max_results(62)
 ///              .doit();
 /// # }
 /// ```
@@ -4430,7 +3534,7 @@ impl<'a, C, A> PeopleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "plus.people.list", 
+        dlg.begin(MethodInfo { id: "plus.people.list",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
         params.push(("userId", self._user_id.to_string()));
@@ -4482,7 +3586,7 @@ impl<'a, C, A> PeopleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -4518,7 +3622,7 @@ impl<'a, C, A> PeopleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -4528,10 +3632,10 @@ impl<'a, C, A> PeopleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -4564,7 +3668,7 @@ impl<'a, C, A> PeopleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// Sets the *user id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn user_id(mut self, new_value: &str) -> PeopleListCall<'a, C, A> {
         self._user_id = new_value.to_string();
@@ -4574,7 +3678,7 @@ impl<'a, C, A> PeopleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// Sets the *collection* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn collection(mut self, new_value: &str) -> PeopleListCall<'a, C, A> {
         self._collection = new_value.to_string();
@@ -4613,12 +3717,12 @@ impl<'a, C, A> PeopleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -4635,17 +3739,17 @@ impl<'a, C, A> PeopleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Login`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PeopleListCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PeopleListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4707,7 +3811,7 @@ impl<'a, C, A> PeopleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "plus.people.get", 
+        dlg.begin(MethodInfo { id: "plus.people.get",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
         params.push(("userId", self._user_id.to_string()));
@@ -4749,7 +3853,7 @@ impl<'a, C, A> PeopleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -4785,7 +3889,7 @@ impl<'a, C, A> PeopleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -4795,10 +3899,10 @@ impl<'a, C, A> PeopleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -4831,7 +3935,7 @@ impl<'a, C, A> PeopleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     ///
     /// Sets the *user id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn user_id(mut self, new_value: &str) -> PeopleGetCall<'a, C, A> {
         self._user_id = new_value.to_string();
@@ -4849,12 +3953,12 @@ impl<'a, C, A> PeopleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -4871,17 +3975,17 @@ impl<'a, C, A> PeopleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::Login`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PeopleGetCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PeopleGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

@@ -1,4 +1,4 @@
-site_name: logging v0.3.2+20151007
+site_name: logging v0.3.3+20160104
 site_url: http://byron.github.io/google-apis-rs/google-logging2_beta1-cli
 site_description: Write integrating applications with bcore
 
@@ -9,8 +9,22 @@ site_dir: build_html
 
 pages:
 - ['index.md', 'Home']
+- ['entries_list.md', 'Entries', 'List']
+- ['entries_write.md', 'Entries', 'Write']
+- ['monitored-resource-descriptors_list.md', 'Monitored Resource Descriptors', 'List']
+- ['projects_logs-delete.md', 'Projects', 'Logs Delete']
+- ['projects_metrics-create.md', 'Projects', 'Metrics Create']
+- ['projects_metrics-delete.md', 'Projects', 'Metrics Delete']
+- ['projects_metrics-get.md', 'Projects', 'Metrics Get']
+- ['projects_metrics-list.md', 'Projects', 'Metrics List']
+- ['projects_metrics-update.md', 'Projects', 'Metrics Update']
+- ['projects_sinks-create.md', 'Projects', 'Sinks Create']
+- ['projects_sinks-delete.md', 'Projects', 'Sinks Delete']
+- ['projects_sinks-get.md', 'Projects', 'Sinks Get']
+- ['projects_sinks-list.md', 'Projects', 'Sinks List']
+- ['projects_sinks-update.md', 'Projects', 'Sinks Update']
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015, `Sebastian Thiel`
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
 

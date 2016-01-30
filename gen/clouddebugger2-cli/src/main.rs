@@ -20,7 +20,7 @@ use clap::{App, SubCommand, Arg};
 
 mod cmn;
 
-use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg, 
+use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
           calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
@@ -36,23 +36,26 @@ enum DoitError {
     ApiError(api::Error),
 }
 
-struct Engine<'n, 'a> {
-    opt: ArgMatches<'n, 'a>,
+struct Engine<'n> {
+    opt: ArgMatches<'n>,
     hub: api::Clouddebugger<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
 
 
-impl<'n, 'a> Engine<'n, 'a> {
-    fn _controller_debuggees_breakpoints_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+impl<'n> Engine<'n> {
+    fn _controller_debuggees_breakpoints_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.controller().debuggees_breakpoints_list(opt.value_of("debuggee-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "wait-token" => {
                     call = call.wait_token(value.unwrap_or(""));
+                },
+                "success-on-timeout" => {
+                    call = call.success_on_timeout(arg_from_str(value.unwrap_or("false"), err, "success-on-timeout", "boolean"));
                 },
                 _ => {
                     let mut found = false;
@@ -64,10 +67,10 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["wait-token"].iter().map(|v|*v));
+                                                                           v.extend(["wait-token", "success-on-timeout"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -78,7 +81,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -101,13 +104,13 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _controller_debuggees_breakpoints_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _controller_debuggees_breakpoints_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
         let mut object = json::value::Value::Object(Default::default());
         
-        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -121,8 +124,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-           
-            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "breakpoint.status.is-error" => Some(("breakpoint.status.isError", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "breakpoint.status.refers-to" => Some(("breakpoint.status.refersTo", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -152,7 +155,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
         let mut request: api::UpdateActiveBreakpointRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.controller().debuggees_breakpoints_update(request, opt.value_of("debuggee-id").unwrap_or(""), opt.value_of("id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -165,7 +168,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -178,7 +181,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -201,13 +204,13 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _controller_debuggees_register(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _controller_debuggees_register(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
         let mut object = json::value::Value::Object(Default::default());
         
-        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -221,8 +224,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-           
-            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "debuggee.status.is-error" => Some(("debuggee.status.isError", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "debuggee.status.refers-to" => Some(("debuggee.status.refersTo", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -248,7 +251,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
         let mut request: api::RegisterDebuggeeRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.controller().debuggees_register(request);
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -261,7 +264,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -274,7 +277,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -297,10 +300,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _debugger_debuggees_breakpoints_delete(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _debugger_debuggees_breakpoints_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.debugger().debuggees_breakpoints_delete(opt.value_of("debuggee-id").unwrap_or(""), opt.value_of("breakpoint-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -313,7 +316,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -326,7 +329,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -349,10 +352,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _debugger_debuggees_breakpoints_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _debugger_debuggees_breakpoints_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.debugger().debuggees_breakpoints_get(opt.value_of("debuggee-id").unwrap_or(""), opt.value_of("breakpoint-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -365,7 +368,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -378,7 +381,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -401,10 +404,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _debugger_debuggees_breakpoints_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _debugger_debuggees_breakpoints_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.debugger().debuggees_breakpoints_list(opt.value_of("debuggee-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "wait-token" => {
@@ -432,7 +435,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["strip-results", "include-inactive", "action-value", "wait-token", "include-all-users"].iter().map(|v|*v));
@@ -446,7 +449,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -469,13 +472,13 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _debugger_debuggees_breakpoints_set(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _debugger_debuggees_breakpoints_set(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
         let mut object = json::value::Value::Object(Default::default());
         
-        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -489,8 +492,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-           
-            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "status.is-error" => Some(("status.isError", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "status.refers-to" => Some(("status.refersTo", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -520,7 +523,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
         let mut request: api::Breakpoint = json::value::from_value(object).unwrap();
         let mut call = self.hub.debugger().debuggees_breakpoints_set(request, opt.value_of("debuggee-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -533,7 +536,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -546,7 +549,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -569,10 +572,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _debugger_debuggees_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _debugger_debuggees_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.debugger().debuggees_list();
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "project" => {
@@ -591,7 +594,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["project", "include-inactive"].iter().map(|v|*v));
@@ -605,7 +608,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
@@ -690,14 +693,14 @@ impl<'n, 'a> Engine<'n, 'a> {
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    fn new(opt: ArgMatches<'a, 'n>) -> Result<Engine<'a, 'n>, InvalidOptionsError> {
+    fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
         let (config_dir, secret) = {
             let config_dir = match cmn::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "clouddebugger2-secret.json", 
+            match cmn::application_secret_from_directory(&config_dir, "clouddebugger2-secret.json",
                                                          "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
@@ -717,7 +720,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                                           db_dir: config_dir.clone(),
                                         }, None);
 
-        let client = 
+        let client =
             if opt.is_present("debug") {
                 hyper::Client::with_connector(mock::TeeConnector {
                         connector: hyper::net::HttpsConnector::<hyper::net::Openssl>::default()
@@ -760,8 +763,8 @@ fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
         ("controller", "methods: 'debuggees-breakpoints-list', 'debuggees-breakpoints-update' and 'debuggees-register'", vec![
-            ("debuggees-breakpoints-list",  
-                    Some(r##"Returns the list of all active breakpoints for the specified debuggee. The breakpoint specification (location, condition, and expression fields) is semantically immutable, although the field values may change. For example, an agent may update the location line number to reflect the actual line the breakpoint was set to, but that doesn't change the breakpoint semantics. Thus, an agent does not need to check if a breakpoint has changed when it encounters the same breakpoint on a successive call. Moreover, an agent should remember breakpoints that are complete until the controller removes them from the active list to avoid setting those breakpoints again."##),
+            ("debuggees-breakpoints-list",
+                    Some(r##"Returns the list of all active breakpoints for the debuggee. The breakpoint specification (location, condition, and expression fields) is semantically immutable, although the field values may change. For example, an agent may update the location line number to reflect the actual line where the breakpoint was set, but this doesn't change the breakpoint semantics. This means that an agent does not need to check if a breakpoint has changed when it encounters the same breakpoint on a successive call. Moreover, an agent should remember the breakpoints that are completed until the controller removes them from the active list to avoid setting those breakpoints again."##),
                     "Details at http://byron.github.io/google-apis-rs/google_clouddebugger2_cli/controller_debuggees-breakpoints-list",
                   vec![
                     (Some(r##"debuggee-id"##),
@@ -782,8 +785,8 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("debuggees-breakpoints-update",  
-                    Some(r##"Updates the breakpoint state or mutable fields. The entire Breakpoint protobuf must be sent back to the controller. Updates to active breakpoint fields are only allowed if the new value does not change the breakpoint specification. Updates to the 'location', 'condition' and 'expression' fields should not alter the breakpoint semantics. They are restricted to changes such as canonicalizing a value or snapping the location to the correct line of code."##),
+            ("debuggees-breakpoints-update",
+                    Some(r##"Updates the breakpoint state or mutable fields. The entire Breakpoint message must be sent back to the controller service. Updates to active breakpoint fields are only allowed if the new value does not change the breakpoint specification. Updates to the `location`, `condition` and `expression` fields should not alter the breakpoint semantics. These may only make changes such as canonicalizing a value or snapping the location to the correct line of code."##),
                     "Details at http://byron.github.io/google-apis-rs/google_clouddebugger2_cli/controller_debuggees-breakpoints-update",
                   vec![
                     (Some(r##"debuggee-id"##),
@@ -816,8 +819,8 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("debuggees-register",  
-                    Some(r##"Registers the debuggee with the controller. All agents should call this API with the same request content to get back the same stable 'debuggee_id'. Agents should call this API again whenever ListActiveBreakpoints or UpdateActiveBreakpoint return the error google.rpc.Code.NOT_FOUND. It allows the server to disable the agent or recover from any registration loss. If the debuggee is disabled server, the response will have is_disabled' set to true."##),
+            ("debuggees-register",
+                    Some(r##"Registers the debuggee with the controller service. All agents attached to the same application should call this method with the same request content to get back the same stable `debuggee_id`. Agents should call this method again whenever `google.rpc.Code.NOT_FOUND` is returned from any controller method. This allows the controller service to disable the agent or recover from any data loss. If the debuggee is disabled by the server, the response will have `is_disabled` set to `true`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_clouddebugger2_cli/controller_debuggees-register",
                   vec![
                     (Some(r##"kv"##),
@@ -841,19 +844,19 @@ fn main() {
             ]),
         
         ("debugger", "methods: 'debuggees-breakpoints-delete', 'debuggees-breakpoints-get', 'debuggees-breakpoints-list', 'debuggees-breakpoints-set' and 'debuggees-list'", vec![
-            ("debuggees-breakpoints-delete",  
+            ("debuggees-breakpoints-delete",
                     Some(r##"Deletes the breakpoint from the debuggee."##),
                     "Details at http://byron.github.io/google-apis-rs/google_clouddebugger2_cli/debugger_debuggees-breakpoints-delete",
                   vec![
                     (Some(r##"debuggee-id"##),
                      None,
-                     Some(r##"The debuggee id to delete the breakpoint from."##),
+                     Some(r##"ID of the debuggee whose breakpoint to delete."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"breakpoint-id"##),
                      None,
-                     Some(r##"The breakpoint to delete."##),
+                     Some(r##"ID of the breakpoint to delete."##),
                      Some(true),
                      Some(false)),
         
@@ -869,19 +872,19 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("debuggees-breakpoints-get",  
+            ("debuggees-breakpoints-get",
                     Some(r##"Gets breakpoint information."##),
                     "Details at http://byron.github.io/google-apis-rs/google_clouddebugger2_cli/debugger_debuggees-breakpoints-get",
                   vec![
                     (Some(r##"debuggee-id"##),
                      None,
-                     Some(r##"The debuggee id to get the breakpoint from."##),
+                     Some(r##"ID of the debuggee whose breakpoint to get."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"breakpoint-id"##),
                      None,
-                     Some(r##"The breakpoint to get."##),
+                     Some(r##"ID of the breakpoint to get."##),
                      Some(true),
                      Some(false)),
         
@@ -897,13 +900,13 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("debuggees-breakpoints-list",  
-                    Some(r##"Lists all breakpoints of the debuggee that the user has access to."##),
+            ("debuggees-breakpoints-list",
+                    Some(r##"Lists all breakpoints for the debuggee."##),
                     "Details at http://byron.github.io/google-apis-rs/google_clouddebugger2_cli/debugger_debuggees-breakpoints-list",
                   vec![
                     (Some(r##"debuggee-id"##),
                      None,
-                     Some(r##"The debuggee id to list breakpoint from."##),
+                     Some(r##"ID of the debuggee whose breakpoints to list."##),
                      Some(true),
                      Some(false)),
         
@@ -919,13 +922,13 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("debuggees-breakpoints-set",  
+            ("debuggees-breakpoints-set",
                     Some(r##"Sets the breakpoint to the debuggee."##),
                     "Details at http://byron.github.io/google-apis-rs/google_clouddebugger2_cli/debugger_debuggees-breakpoints-set",
                   vec![
                     (Some(r##"debuggee-id"##),
                      None,
-                     Some(r##"The debuggee id to set the breakpoint to."##),
+                     Some(r##"ID of the debuggee where the breakpoint is to be set."##),
                      Some(true),
                      Some(false)),
         
@@ -947,7 +950,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("debuggees-list",  
+            ("debuggees-list",
                     Some(r##"Lists all the debuggees that the user can set breakpoints to."##),
                     "Details at http://byron.github.io/google-apis-rs/google_clouddebugger2_cli/debugger_debuggees-list",
                   vec![
@@ -969,7 +972,7 @@ fn main() {
     
     let mut app = App::new("clouddebugger2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.2+20150725")
+           .version("0.3.3+20151123")
            .about("Lets you examine the stack and variables of your running application without stopping or slowing it down.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_clouddebugger2_cli")
            .arg(Arg::with_name("url")
@@ -993,7 +996,7 @@ fn main() {
                    .multiple(false)
                    .takes_value(false));
            
-           for &(main_command_name, ref about, ref subcommands) in arg_data.iter() {
+           for &(main_command_name, about, ref subcommands) in arg_data.iter() {
                let mut mcmd = SubCommand::with_name(main_command_name).about(about);
            
                for &(sub_command_name, ref desc, url_info, ref args) in subcommands {
@@ -1004,7 +1007,7 @@ fn main() {
                    scmd = scmd.after_help(url_info);
            
                    for &(ref arg_name, ref flag, ref desc, ref required, ref multi) in args {
-                       let arg_name_str = 
+                       let arg_name_str =
                            match (arg_name, flag) {
                                    (&Some(an), _       ) => an,
                                    (_        , &Some(f)) => f,

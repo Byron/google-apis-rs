@@ -1,4 +1,4 @@
-site_name: genomics v0.3.2+20151014
+site_name: genomics v0.3.3+20160124
 site_url: http://byron.github.io/google-apis-rs/google-genomics1-cli
 site_description: Write integrating applications with bcore
 
@@ -24,7 +24,6 @@ pages:
 - ['datasets_test-iam-permissions.md', 'Datasets', 'Test Iam Permissions']
 - ['datasets_undelete.md', 'Datasets', 'Undelete']
 - ['operations_cancel.md', 'Operations', 'Cancel']
-- ['operations_delete.md', 'Operations', 'Delete']
 - ['operations_get.md', 'Operations', 'Get']
 - ['operations_list.md', 'Operations', 'List']
 - ['readgroupsets_coveragebuckets-list.md', 'Readgroupsets', 'Coveragebuckets List']
@@ -35,6 +34,7 @@ pages:
 - ['readgroupsets_patch.md', 'Readgroupsets', 'Patch']
 - ['readgroupsets_search.md', 'Readgroupsets', 'Search']
 - ['reads_search.md', 'Reads', 'Search']
+- ['reads_stream.md', 'Reads', 'Stream']
 - ['references_bases-list.md', 'References', 'Bases List']
 - ['references_get.md', 'References', 'Get']
 - ['references_search.md', 'References', 'Search']
@@ -46,6 +46,7 @@ pages:
 - ['variants_import.md', 'Variants', 'Import']
 - ['variants_patch.md', 'Variants', 'Patch']
 - ['variants_search.md', 'Variants', 'Search']
+- ['variants_stream.md', 'Variants', 'Stream']
 - ['variantsets_create.md', 'Variantsets', 'Create']
 - ['variantsets_delete.md', 'Variantsets', 'Delete']
 - ['variantsets_export.md', 'Variantsets', 'Export']
@@ -55,5 +56,5 @@ pages:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015, `Sebastian Thiel`
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
 

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *taskqueue* crate version *0.1.10+20141111*, where *20141111* is the exact revision of the *taskqueue:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.10*.
+//! This documentation was generated from *taskqueue* crate version *0.1.11+20141111*, where *20141111* is the exact revision of the *taskqueue:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
 //! 
 //! Everything else about the *taskqueue* *v1_beta2* API can be found at the
 //! [official documentation site](https://developers.google.com/appengine/docs/python/taskqueue/rest).

@@ -19,10 +19,11 @@ use std::collections::BTreeMap;
 use serde_json as json;
 use std::io;
 use std::fs;
-use std::thread::sleep_ms;
+use std::thread::sleep;
+use std::time::Duration;
 
 pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, 
+              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
               Resource, ErrorResponse, remove_json_null_values};
 
 
@@ -140,7 +141,7 @@ impl<'a, C, A> Clouddebugger<C, A>
         Clouddebugger {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.10".to_string(),
+            _user_agent: "google-api-rust-client/0.1.11".to_string(),
         }
     }
 
@@ -152,7 +153,7 @@ impl<'a, C, A> Clouddebugger<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.10`.
+    /// It defaults to `google-api-rust-client/0.1.11`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -166,7 +167,22 @@ impl<'a, C, A> Clouddebugger<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// The response of listing breakpoints.
+/// An ExtendedSourceContext is a SourceContext combined with additional details describing the context.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ExtendedSourceContext {
+    /// Labels with user defined metadata.
+    pub labels: Option<HashMap<String, String>>,
+    /// Any source context.
+    pub context: Option<SourceContext>,
+}
+
+impl Part for ExtendedSourceContext {}
+
+
+/// Response for listing breakpoints.
 /// 
 /// # Activities
 /// 
@@ -177,10 +193,10 @@ impl<'a, C, A> Clouddebugger<C, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListBreakpointsResponse {
-    /// A wait token that can be used in the next call to ListBreakpoints to block until the list of breakpoints has changes.
+    /// A wait token that can be used in the next call to `list` (REST) or `ListBreakpoints` (RPC) to block until the list of breakpoints has changes.
     #[serde(rename="nextWaitToken")]
     pub next_wait_token: Option<String>,
-    /// List of all breakpoints with complete state. The fields 'id' and 'location' are guranteed to be set on each breakpoint.
+    /// List of all breakpoints with complete state. The fields `id` and `location` are guaranteed to be set on each breakpoint.
     pub breakpoints: Option<Vec<Breakpoint>>,
 }
 
@@ -210,20 +226,20 @@ impl Part for CloudWorkspaceSourceContext {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct StackFrame {
-    /// The unmangled function name at the call site.
+    /// Demangled function name at the call site.
     pub function: Option<String>,
-    /// The source location of the call site.
+    /// Source location of the call site.
     pub location: Option<SourceLocation>,
-    /// The set of local variables at the stack frame location. Note that this might not be populated for all stack frames.
+    /// Set of local variables at the stack frame location. Note that this might not be populated for all stack frames.
     pub locals: Option<Vec<Variable>>,
-    /// The set of arguments passed to this function Note that this might not be populated for all stack frames.
+    /// Set of arguments passed to this function. Note that this might not be populated for all stack frames.
     pub arguments: Option<Vec<Variable>>,
 }
 
 impl Part for StackFrame {}
 
 
-/// The response of listing debuggees.
+/// Response for listing debuggees.
 /// 
 /// # Activities
 /// 
@@ -234,14 +250,14 @@ impl Part for StackFrame {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListDebuggeesResponse {
-    /// The list of debuggees accessible to the calling user. Note that the description field is the only human readable field that should be displayed to the user. The fields 'debuggee.id' and 'description' are guranteed to be set on each debuggee.
+    /// List of debuggees accessible to the calling user. Note that the `description` field is the only human readable field that should be displayed to the user. The fields `debuggee.id` and `description` fields are guaranteed to be set on each debuggee.
     pub debuggees: Option<Vec<Debuggee>>,
 }
 
 impl ResponseResult for ListDebuggeesResponse {}
 
 
-/// The request to register a debuggee.
+/// Request to register a debuggee.
 /// 
 /// # Activities
 /// 
@@ -252,14 +268,14 @@ impl ResponseResult for ListDebuggeesResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RegisterDebuggeeRequest {
-    /// The debuggee information to register. The fields 'project', 'uniquifier', 'description' and 'agent_version' of the debuggee must be set.
+    /// Debuggee information to register. The fields `project`, `uniquifier`, `description` and `agent_version` of the debuggee must be set.
     pub debuggee: Option<Debuggee>,
 }
 
 impl RequestValue for RegisterDebuggeeRequest {}
 
 
-/// The response of updating an active breakpoint. The message is defined to allow future extensions.
+/// Response for updating an active breakpoint. The message is defined to allow future extensions.
 /// 
 /// # Activities
 /// 
@@ -291,7 +307,22 @@ pub struct ProjectRepoId {
 impl Part for ProjectRepoId {}
 
 
-/// The response of listing active breakpoints.
+/// An alias to a repo revision.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AliasContext {
+    /// The alias kind.
+    pub kind: Option<String>,
+    /// The alias name.
+    pub name: Option<String>,
+}
+
+impl Part for AliasContext {}
+
+
+/// Response for listing active breakpoints.
 /// 
 /// # Activities
 /// 
@@ -302,10 +333,13 @@ impl Part for ProjectRepoId {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListActiveBreakpointsResponse {
+    /// The `wait_expired` field is set to true by the server when the request times out and the field `success_on_timeout` is set to true.
+    #[serde(rename="waitExpired")]
+    pub wait_expired: Option<bool>,
     /// A wait token that can be used in the next method call to block until the list of breakpoints changes.
     #[serde(rename="nextWaitToken")]
     pub next_wait_token: Option<String>,
-    /// List of all active breakpoints. The fields 'id' and 'location' are guranteed to be set on each breakpoint.
+    /// List of all active breakpoints. The fields `id` and `location` are guaranteed to be set on each breakpoint.
     pub breakpoints: Option<Vec<Breakpoint>>,
 }
 
@@ -318,6 +352,9 @@ impl ResponseResult for ListActiveBreakpointsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CloudRepoSourceContext {
+    /// An alias, which may be a branch or tag.
+    #[serde(rename="aliasContext")]
+    pub alias_context: Option<AliasContext>,
     /// A revision ID.
     #[serde(rename="revisionId")]
     pub revision_id: Option<String>,
@@ -369,6 +406,9 @@ impl ResponseResult for Empty {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GerritSourceContext {
+    /// An alias, which may be a branch or tag.
+    #[serde(rename="aliasContext")]
+    pub alias_context: Option<AliasContext>,
     /// A revision (commit) ID.
     #[serde(rename="revisionId")]
     pub revision_id: Option<String>,
@@ -386,7 +426,7 @@ pub struct GerritSourceContext {
 impl Part for GerritSourceContext {}
 
 
-/// The response of registering a debuggee.
+/// Response for registering a debuggee.
 /// 
 /// # Activities
 /// 
@@ -397,7 +437,7 @@ impl Part for GerritSourceContext {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RegisterDebuggeeResponse {
-    /// The debuggee resource. The field 'id' is guranteed to be set (in addition to the echoed fields).
+    /// Debuggee resource. The field `id` is guranteed to be set (in addition to the echoed fields).
     pub debuggee: Option<Debuggee>,
 }
 
@@ -425,7 +465,7 @@ pub struct SourceContext {
 impl Part for SourceContext {}
 
 
-/// The request to update an active breakpoint.
+/// Request to update an active breakpoint.
 /// 
 /// # Activities
 /// 
@@ -436,7 +476,7 @@ impl Part for SourceContext {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UpdateActiveBreakpointRequest {
-    /// The updated breakpoint information. The field 'id' must be set.
+    /// Updated breakpoint information. The field 'id' must be set.
     pub breakpoint: Option<Breakpoint>,
 }
 
@@ -449,44 +489,47 @@ impl RequestValue for UpdateActiveBreakpointRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SourceLocation {
-    /// A path to the source file within the source context of the target binary.
+    /// Path to the source file within the source context of the target binary.
     pub path: Option<String>,
-    /// The line inside the file (first line value is '1').
+    /// Line inside the file. The first line in the file has the value `1`.
     pub line: Option<i32>,
 }
 
 impl Part for SourceLocation {}
 
 
-/// Represents the application to debug. The application may include one or more replicated processes executing the same code. Each of these processes is attached with a debugger agent, carrying out the debugging commands. The agents attached to the same debuggee are identified by using exactly the same fields' values when registering.
+/// Represents the application to debug. The application may include one or more replicated processes executing the same code. Each of these processes is attached with a debugger agent, carrying out the debugging commands. The agents attached to the same debuggee are identified by using exactly the same field values when registering.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Debuggee {
-    /// Human readable message to be displayed to the user about this debuggee. Absense of this field indicates no message. The message can be either informational or error.
+    /// Human readable message to be displayed to the user about this debuggee. Absence of this field indicates no status. The message can be either informational or an error status.
     pub status: Option<StatusMessage>,
-    /// A human readable description of the debuggee. Recommended to include human readable project name, environment name, and version information .
+    /// Human readable description of the debuggee. Including a human-readable project name, environment name and version information is recommended.
     pub description: Option<String>,
-    /// If set to true, indicates that the agent should disable itself and detach from the debuggee.
+    /// If set to `true`, indicates that the agent should disable itself and detach from the debuggee.
     #[serde(rename="isDisabled")]
     pub is_disabled: Option<bool>,
     /// A set of custom debuggee properties, populated by the agent, to be displayed to the user.
     pub labels: Option<HashMap<String, String>>,
-    /// The debuggee uniqifier within the project. Any string that id the application within the project can be used. Recomended to include environement and version or build id's.
+    /// Debuggee uniquifier within the project. Any string that identifies the application within the project can be used. Including environment and version or build IDs is recommended.
     pub uniquifier: Option<String>,
-    /// The project the debuggee is associated with. Use the project number when registering a Google Cloud Platform project.
+    /// Project the debuggee is associated with. Use the project number when registering a Google Cloud Platform project.
     pub project: Option<String>,
-    /// Repository snapshots containing the source code of the project.
+    /// References to the locations and revisions of the source code used in the deployed application. NOTE: This field is deprecated. Consumers should use `ext_source_contexts` if it is not empty. Debug agents should populate both this field and `ext_source_contexts`.
     #[serde(rename="sourceContexts")]
     pub source_contexts: Option<Vec<SourceContext>>,
-    /// Version ID of the agent release. The version ID is structured as following: "domain/type/vmajor.minor" (for example "google.com/gcp-java/v1.1").
+    /// References to the locations and revisions of the source code used in the deployed application. Contexts describing a remote repo related to the source code have a `category` label of `remote_repo`. Source snapshot source contexts have a `category` of `snapshot`.
+    #[serde(rename="extSourceContexts")]
+    pub ext_source_contexts: Option<Vec<ExtendedSourceContext>>,
+    /// Version ID of the agent release. The version ID is structured as following: `domain/type/vmajor.minor` (for example `google.com/gcp-java/v1.1`).
     #[serde(rename="agentVersion")]
     pub agent_version: Option<String>,
-    /// If set to true indicates that the debuggee has not been seen by the Controller service in the last active time period (defined by the server).
+    /// If set to `true`, indicates that the debuggee is considered as inactive by the Controller service.
     #[serde(rename="isInactive")]
     pub is_inactive: Option<bool>,
-    /// Debuggee unique identifer generated by the server.
+    /// Unique identifier for the debuggee generated by the controller service.
     pub id: Option<String>,
 }
 
@@ -501,7 +544,7 @@ impl Part for Debuggee {}
 pub struct FormatMessage {
     /// Optional parameters to be embedded into the message.
     pub parameters: Option<Vec<String>>,
-    /// Format template of the message. The "format" uses placeholders "$0", "$1", etc. to reference parameters. "$$" can be used to denote the '$' character. Examples: "Failed to load '$0' which helps debug $1 the first time it is loaded. Again, $0 is very important." "Please pay $$10 to use $0 instead of $1."
+    /// Format template for the message. The `format` uses placeholders `$0`, `$1`, etc. to reference parameters. `$$` can be used to denote the `$` character. Examples: * `Failed to load '$0' which helps debug $1 the first time it is loaded. Again, $0 is very important.` * `Please pay $$10 to use $0 instead of $1.`
     pub format: Option<String>,
 }
 
@@ -551,74 +594,77 @@ impl Part for CloudWorkspaceId {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Breakpoint {
-    /// Breakpoint status. The status includes an error flag and a human readable message. This field will usually stay unset. The message can be either informational or error. Nevertheless, clients should always display the text message back to the user. Error status of a breakpoint indicates complete failure. Example (non-final state): 'Still loading symbols...' Examples (final state): 'Failed to insert breakpoint' referring to breakpoint, 'Field f not found in class C' referring to condition, ...
+    /// Breakpoint status. The status includes an error flag and a human readable message. This field is usually unset. The message can be either informational or an error message. Regardless, clients should always display the text message back to the user. Error status indicates complete failure of the breakpoint. Example (non-final state): `Still loading symbols...` Examples (final state): * `Invalid line number` referring to location * `Field f not found in class C` referring to condition
     pub status: Option<StatusMessage>,
-    /// The variable_table exists to aid with computation, memory and network traffic optimization. It enables storing a variable once and reference it from multiple variables, including variables stored in the variable_table itself. For example, the object 'this', which may appear at many levels of the stack, can have all of it's data stored once in this table. The stack frame variables then would hold only a reference to it. The variable var_index field is an index into this repeated field. The stored objects are nameless and get their name from the referencing variable. The effective variable is a merge of the referencing veariable and the referenced variable.
+    /// The `variable_table` exists to aid with computation, memory and network traffic optimization. It enables storing a variable once and reference it from multiple variables, including variables stored in the `variable_table` itself. For example, the same `this` object, which may appear at many levels of the stack, can have all of its data stored once in this table. The stack frame variables then would hold only a reference to it. The variable `var_table_index` field is an index into this repeated field. The stored objects are nameless and get their name from the referencing variable. The effective variable is a merge of the referencing veariable and the referenced variable.
     #[serde(rename="variableTable")]
     pub variable_table: Option<Vec<Variable>>,
-    /// The e-mail of the user that created this breakpoint
+    /// E-mail address of the user that created this breakpoint
     #[serde(rename="userEmail")]
     pub user_email: Option<String>,
-    /// Indicates the severity of the log. Only relevant when action is "LOG".
+    /// Indicates the severity of the log. Only relevant when action is `LOG`.
     #[serde(rename="logLevel")]
     pub log_level: Option<String>,
     /// Breakpoint identifier, unique in the scope of the debuggee.
     pub id: Option<String>,
-    /// Only relevant when action is "LOG". Defines the message to log when the breakpoint hits. The message may include parameter placeholders "$0", "$1", etc. These placeholders will be replaced with the evaluated value of the appropriate expression. Expressions not referenced in "log_message_format" will not be logged. Example: "Poisonous message received, id = $0, count = $1" with expressions = [ "message.id", "message.count" ].
+    /// Only relevant when action is `LOG`. Defines the message to log when the breakpoint hits. The message may include parameter placeholders `$0`, `$1`, etc. These placeholders are replaced with the evaluated value of the appropriate expression. Expressions not referenced in `log_message_format` are not logged. Example: `Message received, id = $0, count = $1` with `expressions` = `[ message.id, message.count ]`.
     #[serde(rename="logMessageFormat")]
     pub log_message_format: Option<String>,
     /// The stack at breakpoint time.
     #[serde(rename="stackFrames")]
     pub stack_frames: Option<Vec<StackFrame>>,
-    /// The breakpoint source location.
+    /// Breakpoint source location.
     pub location: Option<SourceLocation>,
-    /// The time this breakpoint was finalized as seen by the server. The value is in seconds resolution.
+    /// Time this breakpoint was finalized as seen by the server in seconds resolution.
     #[serde(rename="finalTime")]
     pub final_time: Option<String>,
-    /// Defines what to do when the breakpoint hits.
+    /// Action that the agent should perform when the code at the breakpoint location is hit.
     pub action: Option<String>,
-    /// A list of read-only expressions to evaluate at the breakpoint location. The expressions are composed using expressions in the programming language at the source location. If the breakpoint action is "LOG", the evaluated expressions are included in log statements.
+    /// List of read-only expressions to evaluate at the breakpoint location. The expressions are composed using expressions in the programming language at the source location. If the breakpoint action is `LOG`, the evaluated expressions are included in log statements.
     pub expressions: Option<Vec<String>>,
     /// When true, indicates that this is a final result and the breakpoint state will not change from here on.
     #[serde(rename="isFinalState")]
     pub is_final_state: Option<bool>,
-    /// The evaluated expressions' values at breakpoint time. The evaluated expressions appear in exactly the same order they are listed in the 'expressions' field. The 'name' field holds the original expression text, the 'value'/'members' field holds the result of the evaluated expression. If the expression can not be evaluated, an error text is placed in the value field.
+    /// Values of evaluated expressions at breakpoint time. The evaluated expressions appear in exactly the same order they are listed in the `expressions` field. The `name` field holds the original expression text, the `value` or `members` field holds the result of the evaluated expression. If the expression cannot be evaluated, the `status` inside the `Variable` will indicate an error and contain the error text.
     #[serde(rename="evaluatedExpressions")]
     pub evaluated_expressions: Option<Vec<Variable>>,
-    /// The time this breakpoint was created by the server. The value is in seconds resolution.
+    /// Time this breakpoint was created by the server in seconds resolution.
     #[serde(rename="createTime")]
     pub create_time: Option<String>,
-    /// A condition to trigger the breakpoint. The condition is a compound boolean expression composed using expressions in a programming language at the source location.
+    /// Condition that triggers the breakpoint. The condition is a compound boolean expression composed using expressions in a programming language at the source location.
     pub condition: Option<String>,
 }
 
 impl RequestValue for Breakpoint {}
 
 
-/// Represents a variable or an argument possibly of a compound object type. 1. A simple variable such as, int x = 5 is represented as: { name: "x", value: "5" } 2. A compound object such as, struct T { int m1; int m2; }; T x = { 3, 7 }; is represented as: { name: "x", members { name: "m1", value: "3" }, members { name: "m2", value: "7" } } 3. A pointer where the pointee was captured such as, T x = { 3, 7 }; T* p = &x; is represented as: { name: "p", value: "0x00500500", members { name: "m1", value: "3" }, members { name: "m2", value: "7" } } 4. A pointer where the pointee was not captured or is inaccessible such as, T* p = new T; is represented as: { name: "p", value: "0x00400400", members { value: "" } } the value text should decribe the reason for the missing value. such as , ,
-/// . note that a null pointer should not have members. 5. An unnamed value such as, int* p = new int(7); is represented as, { name: "p", value: "0x00500500", members { value: "7" } } 6. An unnamed pointer where the pointee was not captured such as, int* p = new int(7); int** pp = &p; is represented as: { name: "pp", value: "0x00500500", members { value: "0x00400400", members { value: "" } } } To optimize computation, memory and network traffic, variables that repeat in the output multiple times can be stored once in a shared variable table and be referenced using the var_index field. The variables stored in the shared table are nameless and are essentially a partition of the complete variable. To reconstruct the complete variable merge the referencing variable with the referenced variable. When using the shared variable table, variables can be represented as: T x = { 3, 7 }; T* p = &x; T& r = x; are represented as, { name: "x", var_index: 3 } { name: "p", value "0x00500500", var_index: 3 } { name: "r", var_index: 3 } with shared variable table entry #3: { members { name: "m1", value: "3" }, members { name: "m2", value: "7" } } Note that the pointer address is stored with the referencing variable and not with the referenced variable, to allow the referenced variable to be shared between pointer and references.
+/// Represents a variable or an argument possibly of a compound object type. Note how the following variables are represented: 1) A simple variable: int x = 5 { name: "x", value: "5", type: "int" } // Captured variable 2) A compound object: struct T { int m1; int m2; }; T x = { 3, 7 }; { // Captured variable name: "x", type: "T", members { name: "m1", value: "3", type: "int" }, members { name: "m2", value: "7", type: "int" } } 3) A pointer where the pointee was captured: T x = { 3, 7 }; T* p = &x; { // Captured variable name: "p", type: "T*", value: "0x00500500", members { name: "m1", value: "3", type: "int" }, members { name: "m2", value: "7", type: "int" } } 4) A pointer where the pointee was not captured: T* p = new T; { // Captured variable name: "p", type: "T*", value: "0x00400400" status { is_error: true, description { format: "unavailable" } } } The status should describe the reason for the missing value, such as ``, ``, `
+/// `. Note that a null pointer should not have members. 5) An unnamed value: int* p = new int(7); { // Captured variable name: "p", value: "0x00500500", type: "int*", members { value: "7", type: "int" } } 6) An unnamed pointer where the pointee was not captured: int* p = new int(7); int** pp = &p; { // Captured variable name: "pp", value: "0x00500500", type: "int**", members { value: "0x00400400", type: "int*" status { is_error: true, description: { format: "unavailable" } } } } } To optimize computation, memory and network traffic, variables that repeat in the output multiple times can be stored once in a shared variable table and be referenced using the `var_table_index` field. The variables stored in the shared table are nameless and are essentially a partition of the complete variable. To reconstruct the complete variable, merge the referencing variable with the referenced variable. When using the shared variable table, the following variables: T x = { 3, 7 }; T* p = &x; T& r = x; { name: "x", var_table_index: 3, type: "T" } // Captured variables { name: "p", value "0x00500500", type="T*", var_table_index: 3 } { name: "r", type="T&", var_table_index: 3 } { // Shared variable table entry #3: members { name: "m1", value: "3", type: "int" }, members { name: "m2", value: "7", type: "int" } } Note that the pointer address is stored with the referencing variable and not with the referenced variable. This allows the referenced variable to be shared between pointers and references. The type field is optional. The debugger agent may or may not support it.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Variable {
-    /// Status associated with the variable. This field will usually stay unset. A status of a single variable only applies to that variable or expression. The rest of breakpoint data still remains valid. Variables might be reported in error state even when breakpoint is not in final state. The message may refer to variable name with "refers_to" set to "VARIABLE_NAME". Alternatively "refers_to" will be set to "VARIABLE_VALUE". In either case variable value and members will be unset. Example of error message applied to name: "Invalid expression syntax". Example of information message applied to value: "Not captured". Examples of error message applied to value: "Malformed string", "Field f not found in class C", "Null pointer dereference".
+    /// Status associated with the variable. This field will usually stay unset. A status of a single variable only applies to that variable or expression. The rest of breakpoint data still remains valid. Variables might be reported in error state even when breakpoint is not in final state. The message may refer to variable name with `refers_to` set to `VARIABLE_NAME`. Alternatively `refers_to` will be set to `VARIABLE_VALUE`. In either case variable value and members will be unset. Example of error message applied to name: `Invalid expression syntax`. Example of information message applied to value: `Not captured`. Examples of error message applied to value: * `Malformed string`, * `Field f not found in class C` * `Null pointer dereference`
     pub status: Option<StatusMessage>,
-    /// The simple value of the variable.
-    pub value: Option<String>,
-    /// This is a reference to a variable in the shared variable table. More than one variable can reference the same variable in the table. The var_index field is an index into variable_table in Breakpoint.
+    /// Name of the variable, if any.
+    pub name: Option<String>,
+    /// Reference to a variable in the shared variable table. More than one variable can reference the same variable in the table. The `var_table_index` field is an index into `variable_table` in Breakpoint.
     #[serde(rename="varTableIndex")]
     pub var_table_index: Option<i32>,
-    /// The members contained or pointed to by the variable.
+    /// Variable type (e.g. `MyClass`). If the variable is split with `var_table_index`, `type` goes next to `value`. The interpretation of a type is agent specific. It is recommended to include the dynamic type rather than a static type of an object.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// Members contained or pointed to by the variable.
     pub members: Option<Vec<Variable>>,
-    /// The name of the variable, if any.
-    pub name: Option<String>,
+    /// Simple value of the variable.
+    pub value: Option<String>,
 }
 
 impl Part for Variable {}
 
 
-/// The response of setting a breakpoint.
+/// Response for setting a breakpoint.
 /// 
 /// # Activities
 /// 
@@ -629,14 +675,14 @@ impl Part for Variable {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SetBreakpointResponse {
-    /// The breakpoint resource. The field 'id' is guranteed to be set (in addition to the echoed fileds).
+    /// Breakpoint resource. The field `id` is guaranteed to be set (in addition to the echoed fileds).
     pub breakpoint: Option<Breakpoint>,
 }
 
 impl ResponseResult for SetBreakpointResponse {}
 
 
-/// Represents a contextual status message. The message can indicate an error or informational status, and refer to specific parts of the containing object. For example, the Breakpoint.status field can indicate an error referring to the BREAKPOINT_SOURCE_LOCATION with the message "Location not found".
+/// Represents a contextual status message. The message can indicate an error or informational status, and refer to specific parts of the containing object. For example, the `Breakpoint.status` field can indicate an error referring to the `BREAKPOINT_SOURCE_LOCATION` with the message `Location not found`.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -655,7 +701,7 @@ pub struct StatusMessage {
 impl Part for StatusMessage {}
 
 
-/// The response of getting breakpoint information.
+/// Response for getting breakpoint information.
 /// 
 /// # Activities
 /// 
@@ -666,7 +712,7 @@ impl Part for StatusMessage {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GetBreakpointResponse {
-    /// The complete breakpoint state. The fields 'id' and 'location' are guranteed to be set.
+    /// Complete breakpoint state. The fields `id` and `location` are guaranteed to be set.
     pub breakpoint: Option<Breakpoint>,
 }
 
@@ -718,7 +764,7 @@ impl<'a, C, A> ControllerMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the breakpoint state or mutable fields. The entire Breakpoint protobuf must be sent back to the controller. Updates to active breakpoint fields are only allowed if the new value does not change the breakpoint specification. Updates to the 'location', 'condition' and 'expression' fields should not alter the breakpoint semantics. They are restricted to changes such as canonicalizing a value or snapping the location to the correct line of code.
+    /// Updates the breakpoint state or mutable fields. The entire Breakpoint message must be sent back to the controller service. Updates to active breakpoint fields are only allowed if the new value does not change the breakpoint specification. Updates to the `location`, `condition` and `expression` fields should not alter the breakpoint semantics. These may only make changes such as canonicalizing a value or snapping the location to the correct line of code.
     /// 
     /// # Arguments
     ///
@@ -739,7 +785,7 @@ impl<'a, C, A> ControllerMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Registers the debuggee with the controller. All agents should call this API with the same request content to get back the same stable 'debuggee_id'. Agents should call this API again whenever ListActiveBreakpoints or UpdateActiveBreakpoint return the error google.rpc.Code.NOT_FOUND. It allows the server to disable the agent or recover from any registration loss. If the debuggee is disabled server, the response will have is_disabled' set to true.
+    /// Registers the debuggee with the controller service. All agents attached to the same application should call this method with the same request content to get back the same stable `debuggee_id`. Agents should call this method again whenever `google.rpc.Code.NOT_FOUND` is returned from any controller method. This allows the controller service to disable the agent or recover from any data loss. If the debuggee is disabled by the server, the response will have `is_disabled` set to `true`.
     /// 
     /// # Arguments
     ///
@@ -756,7 +802,7 @@ impl<'a, C, A> ControllerMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns the list of all active breakpoints for the specified debuggee. The breakpoint specification (location, condition, and expression fields) is semantically immutable, although the field values may change. For example, an agent may update the location line number to reflect the actual line the breakpoint was set to, but that doesn't change the breakpoint semantics. Thus, an agent does not need to check if a breakpoint has changed when it encounters the same breakpoint on a successive call. Moreover, an agent should remember breakpoints that are complete until the controller removes them from the active list to avoid setting those breakpoints again.
+    /// Returns the list of all active breakpoints for the debuggee. The breakpoint specification (location, condition, and expression fields) is semantically immutable, although the field values may change. For example, an agent may update the location line number to reflect the actual line where the breakpoint was set, but this doesn't change the breakpoint semantics. This means that an agent does not need to check if a breakpoint has changed when it encounters the same breakpoint on a successive call. Moreover, an agent should remember the breakpoints that are completed until the controller removes them from the active list to avoid setting those breakpoints again.
     /// 
     /// # Arguments
     ///
@@ -766,6 +812,7 @@ impl<'a, C, A> ControllerMethods<'a, C, A> {
             hub: self.hub,
             _debuggee_id: debuggee_id.to_string(),
             _wait_token: Default::default(),
+            _success_on_timeout: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -819,8 +866,8 @@ impl<'a, C, A> DebuggerMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `debuggeeId` - The debuggee id to get the breakpoint from.
-    /// * `breakpointId` - The breakpoint to get.
+    /// * `debuggeeId` - ID of the debuggee whose breakpoint to get.
+    /// * `breakpointId` - ID of the breakpoint to get.
     pub fn debuggees_breakpoints_get(&self, debuggee_id: &str, breakpoint_id: &str) -> DebuggerDebuggeeBreakpointGetCall<'a, C, A> {
         DebuggerDebuggeeBreakpointGetCall {
             hub: self.hub,
@@ -838,8 +885,8 @@ impl<'a, C, A> DebuggerMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `debuggeeId` - The debuggee id to delete the breakpoint from.
-    /// * `breakpointId` - The breakpoint to delete.
+    /// * `debuggeeId` - ID of the debuggee whose breakpoint to delete.
+    /// * `breakpointId` - ID of the breakpoint to delete.
     pub fn debuggees_breakpoints_delete(&self, debuggee_id: &str, breakpoint_id: &str) -> DebuggerDebuggeeBreakpointDeleteCall<'a, C, A> {
         DebuggerDebuggeeBreakpointDeleteCall {
             hub: self.hub,
@@ -872,7 +919,7 @@ impl<'a, C, A> DebuggerMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `debuggeeId` - The debuggee id to set the breakpoint to.
+    /// * `debuggeeId` - ID of the debuggee where the breakpoint is to be set.
     pub fn debuggees_breakpoints_set(&self, request: Breakpoint, debuggee_id: &str) -> DebuggerDebuggeeBreakpointSetCall<'a, C, A> {
         DebuggerDebuggeeBreakpointSetCall {
             hub: self.hub,
@@ -886,11 +933,11 @@ impl<'a, C, A> DebuggerMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all breakpoints of the debuggee that the user has access to.
+    /// Lists all breakpoints for the debuggee.
     /// 
     /// # Arguments
     ///
-    /// * `debuggeeId` - The debuggee id to list breakpoint from.
+    /// * `debuggeeId` - ID of the debuggee whose breakpoints to list.
     pub fn debuggees_breakpoints_list(&self, debuggee_id: &str) -> DebuggerDebuggeeBreakpointListCall<'a, C, A> {
         DebuggerDebuggeeBreakpointListCall {
             hub: self.hub,
@@ -915,7 +962,7 @@ impl<'a, C, A> DebuggerMethods<'a, C, A> {
 // CallBuilders   ###
 // #################
 
-/// Updates the breakpoint state or mutable fields. The entire Breakpoint protobuf must be sent back to the controller. Updates to active breakpoint fields are only allowed if the new value does not change the breakpoint specification. Updates to the 'location', 'condition' and 'expression' fields should not alter the breakpoint semantics. They are restricted to changes such as canonicalizing a value or snapping the location to the correct line of code.
+/// Updates the breakpoint state or mutable fields. The entire Breakpoint message must be sent back to the controller service. Updates to active breakpoint fields are only allowed if the new value does not change the breakpoint specification. Updates to the `location`, `condition` and `expression` fields should not alter the breakpoint semantics. These may only make changes such as canonicalizing a value or snapping the location to the correct line of code.
 ///
 /// A builder for the *debuggees.breakpoints.update* method supported by a *controller* resource.
 /// It is not used directly, but through a `ControllerMethods` instance.
@@ -977,7 +1024,7 @@ impl<'a, C, A> ControllerDebuggeeBreakpointUpdateCall<'a, C, A> where C: BorrowM
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "clouddebugger.controller.debuggees.breakpoints.update", 
+        dlg.begin(MethodInfo { id: "clouddebugger.controller.debuggees.breakpoints.update",
                                http_method: hyper::method::Method::Put });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("debuggeeId", self._debuggee_id.to_string()));
@@ -1020,14 +1067,14 @@ impl<'a, C, A> ControllerDebuggeeBreakpointUpdateCall<'a, C, A> where C: BorrowM
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = 
+        let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request);
                 remove_json_null_values(&mut value);
@@ -1071,7 +1118,7 @@ impl<'a, C, A> ControllerDebuggeeBreakpointUpdateCall<'a, C, A> where C: BorrowM
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -1081,10 +1128,10 @@ impl<'a, C, A> ControllerDebuggeeBreakpointUpdateCall<'a, C, A> where C: BorrowM
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -1116,7 +1163,7 @@ impl<'a, C, A> ControllerDebuggeeBreakpointUpdateCall<'a, C, A> where C: BorrowM
     ///
     /// Sets the *request* property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn request(mut self, new_value: UpdateActiveBreakpointRequest) -> ControllerDebuggeeBreakpointUpdateCall<'a, C, A> {
         self._request = new_value;
@@ -1126,7 +1173,7 @@ impl<'a, C, A> ControllerDebuggeeBreakpointUpdateCall<'a, C, A> where C: BorrowM
     ///
     /// Sets the *debuggee id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn debuggee_id(mut self, new_value: &str) -> ControllerDebuggeeBreakpointUpdateCall<'a, C, A> {
         self._debuggee_id = new_value.to_string();
@@ -1136,7 +1183,7 @@ impl<'a, C, A> ControllerDebuggeeBreakpointUpdateCall<'a, C, A> where C: BorrowM
     ///
     /// Sets the *id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn id(mut self, new_value: &str) -> ControllerDebuggeeBreakpointUpdateCall<'a, C, A> {
         self._id = new_value.to_string();
@@ -1154,12 +1201,12 @@ impl<'a, C, A> ControllerDebuggeeBreakpointUpdateCall<'a, C, A> where C: BorrowM
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *bearer_token* (query-string) - OAuth bearer token.
@@ -1182,17 +1229,17 @@ impl<'a, C, A> ControllerDebuggeeBreakpointUpdateCall<'a, C, A> where C: BorrowM
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ControllerDebuggeeBreakpointUpdateCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ControllerDebuggeeBreakpointUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1200,7 +1247,7 @@ impl<'a, C, A> ControllerDebuggeeBreakpointUpdateCall<'a, C, A> where C: BorrowM
 }
 
 
-/// Registers the debuggee with the controller. All agents should call this API with the same request content to get back the same stable 'debuggee_id'. Agents should call this API again whenever ListActiveBreakpoints or UpdateActiveBreakpoint return the error google.rpc.Code.NOT_FOUND. It allows the server to disable the agent or recover from any registration loss. If the debuggee is disabled server, the response will have is_disabled' set to true.
+/// Registers the debuggee with the controller service. All agents attached to the same application should call this method with the same request content to get back the same stable `debuggee_id`. Agents should call this method again whenever `google.rpc.Code.NOT_FOUND` is returned from any controller method. This allows the controller service to disable the agent or recover from any data loss. If the debuggee is disabled by the server, the response will have `is_disabled` set to `true`.
 ///
 /// A builder for the *debuggees.register* method supported by a *controller* resource.
 /// It is not used directly, but through a `ControllerMethods` instance.
@@ -1260,7 +1307,7 @@ impl<'a, C, A> ControllerDebuggeeRegisterCall<'a, C, A> where C: BorrowMut<hyper
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "clouddebugger.controller.debuggees.register", 
+        dlg.begin(MethodInfo { id: "clouddebugger.controller.debuggees.register",
                                http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
         for &field in ["alt"].iter() {
@@ -1280,14 +1327,14 @@ impl<'a, C, A> ControllerDebuggeeRegisterCall<'a, C, A> where C: BorrowMut<hyper
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = 
+        let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request);
                 remove_json_null_values(&mut value);
@@ -1331,7 +1378,7 @@ impl<'a, C, A> ControllerDebuggeeRegisterCall<'a, C, A> where C: BorrowMut<hyper
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -1341,10 +1388,10 @@ impl<'a, C, A> ControllerDebuggeeRegisterCall<'a, C, A> where C: BorrowMut<hyper
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -1376,7 +1423,7 @@ impl<'a, C, A> ControllerDebuggeeRegisterCall<'a, C, A> where C: BorrowMut<hyper
     ///
     /// Sets the *request* property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn request(mut self, new_value: RegisterDebuggeeRequest) -> ControllerDebuggeeRegisterCall<'a, C, A> {
         self._request = new_value;
@@ -1394,12 +1441,12 @@ impl<'a, C, A> ControllerDebuggeeRegisterCall<'a, C, A> where C: BorrowMut<hyper
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *bearer_token* (query-string) - OAuth bearer token.
@@ -1422,17 +1469,17 @@ impl<'a, C, A> ControllerDebuggeeRegisterCall<'a, C, A> where C: BorrowMut<hyper
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ControllerDebuggeeRegisterCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ControllerDebuggeeRegisterCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1440,7 +1487,7 @@ impl<'a, C, A> ControllerDebuggeeRegisterCall<'a, C, A> where C: BorrowMut<hyper
 }
 
 
-/// Returns the list of all active breakpoints for the specified debuggee. The breakpoint specification (location, condition, and expression fields) is semantically immutable, although the field values may change. For example, an agent may update the location line number to reflect the actual line the breakpoint was set to, but that doesn't change the breakpoint semantics. Thus, an agent does not need to check if a breakpoint has changed when it encounters the same breakpoint on a successive call. Moreover, an agent should remember breakpoints that are complete until the controller removes them from the active list to avoid setting those breakpoints again.
+/// Returns the list of all active breakpoints for the debuggee. The breakpoint specification (location, condition, and expression fields) is semantically immutable, although the field values may change. For example, an agent may update the location line number to reflect the actual line where the breakpoint was set, but this doesn't change the breakpoint semantics. This means that an agent does not need to check if a breakpoint has changed when it encounters the same breakpoint on a successive call. Moreover, an agent should remember the breakpoints that are completed until the controller removes them from the active list to avoid setting those breakpoints again.
 ///
 /// A builder for the *debuggees.breakpoints.list* method supported by a *controller* resource.
 /// It is not used directly, but through a `ControllerMethods` instance.
@@ -1468,6 +1515,7 @@ impl<'a, C, A> ControllerDebuggeeRegisterCall<'a, C, A> where C: BorrowMut<hyper
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.controller().debuggees_breakpoints_list("debuggeeId")
 ///              .wait_token("dolores")
+///              .success_on_timeout(false)
 ///              .doit();
 /// # }
 /// ```
@@ -1477,6 +1525,7 @@ pub struct ControllerDebuggeeBreakpointListCall<'a, C, A>
     hub: &'a Clouddebugger<C, A>,
     _debuggee_id: String,
     _wait_token: Option<String>,
+    _success_on_timeout: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -1496,14 +1545,17 @@ impl<'a, C, A> ControllerDebuggeeBreakpointListCall<'a, C, A> where C: BorrowMut
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "clouddebugger.controller.debuggees.breakpoints.list", 
+        dlg.begin(MethodInfo { id: "clouddebugger.controller.debuggees.breakpoints.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("debuggeeId", self._debuggee_id.to_string()));
         if let Some(value) = self._wait_token {
             params.push(("waitToken", value.to_string()));
         }
-        for &field in ["alt", "debuggeeId", "waitToken"].iter() {
+        if let Some(value) = self._success_on_timeout {
+            params.push(("successOnTimeout", value.to_string()));
+        }
+        for &field in ["alt", "debuggeeId", "waitToken", "successOnTimeout"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -1541,7 +1593,7 @@ impl<'a, C, A> ControllerDebuggeeBreakpointListCall<'a, C, A> where C: BorrowMut
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -1577,7 +1629,7 @@ impl<'a, C, A> ControllerDebuggeeBreakpointListCall<'a, C, A> where C: BorrowMut
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -1587,10 +1639,10 @@ impl<'a, C, A> ControllerDebuggeeBreakpointListCall<'a, C, A> where C: BorrowMut
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -1623,17 +1675,24 @@ impl<'a, C, A> ControllerDebuggeeBreakpointListCall<'a, C, A> where C: BorrowMut
     ///
     /// Sets the *debuggee id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn debuggee_id(mut self, new_value: &str) -> ControllerDebuggeeBreakpointListCall<'a, C, A> {
         self._debuggee_id = new_value.to_string();
         self
     }
-    /// A wait token that, if specified, blocks the method call until the list of active breakpoints has changed, or a server selected timeout has expired. The value should be set from the last returned response. The error code google.rpc.Code.ABORTED is returned on wait timeout (which does not require the agent to re-register with the server)
+    /// A wait token that, if specified, blocks the method call until the list of active breakpoints has changed, or a server selected timeout has expired. The value should be set from the last returned response.
     ///
     /// Sets the *wait token* query property to the given value.
     pub fn wait_token(mut self, new_value: &str) -> ControllerDebuggeeBreakpointListCall<'a, C, A> {
         self._wait_token = Some(new_value.to_string());
+        self
+    }
+    /// If set to `true`, returns `google.rpc.Code.OK` status and sets the `wait_expired` response field to `true` when the server-selected timeout has expired (recommended). If set to `false`, returns `google.rpc.Code.ABORTED` status when the server-selected timeout has expired (deprecated).
+    ///
+    /// Sets the *success on timeout* query property to the given value.
+    pub fn success_on_timeout(mut self, new_value: bool) -> ControllerDebuggeeBreakpointListCall<'a, C, A> {
+        self._success_on_timeout = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -1648,12 +1707,12 @@ impl<'a, C, A> ControllerDebuggeeBreakpointListCall<'a, C, A> where C: BorrowMut
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *bearer_token* (query-string) - OAuth bearer token.
@@ -1676,17 +1735,17 @@ impl<'a, C, A> ControllerDebuggeeBreakpointListCall<'a, C, A> where C: BorrowMut
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ControllerDebuggeeBreakpointListCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ControllerDebuggeeBreakpointListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1749,7 +1808,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointGetCall<'a, C, A> where C: BorrowMut<hy
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "clouddebugger.debugger.debuggees.breakpoints.get", 
+        dlg.begin(MethodInfo { id: "clouddebugger.debugger.debuggees.breakpoints.get",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("debuggeeId", self._debuggee_id.to_string()));
@@ -1792,7 +1851,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointGetCall<'a, C, A> where C: BorrowMut<hy
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -1828,7 +1887,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointGetCall<'a, C, A> where C: BorrowMut<hy
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -1838,10 +1897,10 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointGetCall<'a, C, A> where C: BorrowMut<hy
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -1870,21 +1929,21 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointGetCall<'a, C, A> where C: BorrowMut<hy
     }
 
 
-    /// The debuggee id to get the breakpoint from.
+    /// ID of the debuggee whose breakpoint to get.
     ///
     /// Sets the *debuggee id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn debuggee_id(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointGetCall<'a, C, A> {
         self._debuggee_id = new_value.to_string();
         self
     }
-    /// The breakpoint to get.
+    /// ID of the breakpoint to get.
     ///
     /// Sets the *breakpoint id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn breakpoint_id(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointGetCall<'a, C, A> {
         self._breakpoint_id = new_value.to_string();
@@ -1902,12 +1961,12 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointGetCall<'a, C, A> where C: BorrowMut<hy
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *bearer_token* (query-string) - OAuth bearer token.
@@ -1930,17 +1989,17 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointGetCall<'a, C, A> where C: BorrowMut<hy
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> DebuggerDebuggeeBreakpointGetCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> DebuggerDebuggeeBreakpointGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2003,7 +2062,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointDeleteCall<'a, C, A> where C: BorrowMut
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "clouddebugger.debugger.debuggees.breakpoints.delete", 
+        dlg.begin(MethodInfo { id: "clouddebugger.debugger.debuggees.breakpoints.delete",
                                http_method: hyper::method::Method::Delete });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("debuggeeId", self._debuggee_id.to_string()));
@@ -2046,7 +2105,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointDeleteCall<'a, C, A> where C: BorrowMut
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -2082,7 +2141,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointDeleteCall<'a, C, A> where C: BorrowMut
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -2092,10 +2151,10 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointDeleteCall<'a, C, A> where C: BorrowMut
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -2124,21 +2183,21 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointDeleteCall<'a, C, A> where C: BorrowMut
     }
 
 
-    /// The debuggee id to delete the breakpoint from.
+    /// ID of the debuggee whose breakpoint to delete.
     ///
     /// Sets the *debuggee id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn debuggee_id(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointDeleteCall<'a, C, A> {
         self._debuggee_id = new_value.to_string();
         self
     }
-    /// The breakpoint to delete.
+    /// ID of the breakpoint to delete.
     ///
     /// Sets the *breakpoint id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn breakpoint_id(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointDeleteCall<'a, C, A> {
         self._breakpoint_id = new_value.to_string();
@@ -2156,12 +2215,12 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointDeleteCall<'a, C, A> where C: BorrowMut
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *bearer_token* (query-string) - OAuth bearer token.
@@ -2184,17 +2243,17 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointDeleteCall<'a, C, A> where C: BorrowMut
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> DebuggerDebuggeeBreakpointDeleteCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> DebuggerDebuggeeBreakpointDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2229,8 +2288,8 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointDeleteCall<'a, C, A> where C: BorrowMut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.debugger().debuggees_list()
-///              .project("amet.")
-///              .include_inactive(false)
+///              .project("erat")
+///              .include_inactive(true)
 ///              .doit();
 /// # }
 /// ```
@@ -2259,7 +2318,7 @@ impl<'a, C, A> DebuggerDebuggeeListCall<'a, C, A> where C: BorrowMut<hyper::Clie
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "clouddebugger.debugger.debuggees.list", 
+        dlg.begin(MethodInfo { id: "clouddebugger.debugger.debuggees.list",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         if let Some(value) = self._project {
@@ -2285,7 +2344,7 @@ impl<'a, C, A> DebuggerDebuggeeListCall<'a, C, A> where C: BorrowMut<hyper::Clie
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -2321,7 +2380,7 @@ impl<'a, C, A> DebuggerDebuggeeListCall<'a, C, A> where C: BorrowMut<hyper::Clie
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -2331,10 +2390,10 @@ impl<'a, C, A> DebuggerDebuggeeListCall<'a, C, A> where C: BorrowMut<hyper::Clie
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -2363,14 +2422,14 @@ impl<'a, C, A> DebuggerDebuggeeListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
-    /// Set to the project number of the Google Cloud Platform to list the debuggees that are part of that project.
+    /// Project number of a Google Cloud project whose debuggees to list.
     ///
     /// Sets the *project* query property to the given value.
     pub fn project(mut self, new_value: &str) -> DebuggerDebuggeeListCall<'a, C, A> {
         self._project = Some(new_value.to_string());
         self
     }
-    /// When set to true the result includes all debuggees, otherwise only debugees that are active.
+    /// When set to `true`, the result includes all debuggees. Otherwise, the result includes only debuggees that are active.
     ///
     /// Sets the *include inactive* query property to the given value.
     pub fn include_inactive(mut self, new_value: bool) -> DebuggerDebuggeeListCall<'a, C, A> {
@@ -2389,12 +2448,12 @@ impl<'a, C, A> DebuggerDebuggeeListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *bearer_token* (query-string) - OAuth bearer token.
@@ -2417,17 +2476,17 @@ impl<'a, C, A> DebuggerDebuggeeListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> DebuggerDebuggeeListCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> DebuggerDebuggeeListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2496,7 +2555,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointSetCall<'a, C, A> where C: BorrowMut<hy
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "clouddebugger.debugger.debuggees.breakpoints.set", 
+        dlg.begin(MethodInfo { id: "clouddebugger.debugger.debuggees.breakpoints.set",
                                http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("debuggeeId", self._debuggee_id.to_string()));
@@ -2538,14 +2597,14 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointSetCall<'a, C, A> where C: BorrowMut<hy
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = 
+        let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request);
                 remove_json_null_values(&mut value);
@@ -2589,7 +2648,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointSetCall<'a, C, A> where C: BorrowMut<hy
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -2599,10 +2658,10 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointSetCall<'a, C, A> where C: BorrowMut<hy
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -2634,17 +2693,17 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointSetCall<'a, C, A> where C: BorrowMut<hy
     ///
     /// Sets the *request* property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn request(mut self, new_value: Breakpoint) -> DebuggerDebuggeeBreakpointSetCall<'a, C, A> {
         self._request = new_value;
         self
     }
-    /// The debuggee id to set the breakpoint to.
+    /// ID of the debuggee where the breakpoint is to be set.
     ///
     /// Sets the *debuggee id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn debuggee_id(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointSetCall<'a, C, A> {
         self._debuggee_id = new_value.to_string();
@@ -2662,12 +2721,12 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointSetCall<'a, C, A> where C: BorrowMut<hy
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *bearer_token* (query-string) - OAuth bearer token.
@@ -2690,17 +2749,17 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointSetCall<'a, C, A> where C: BorrowMut<hy
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> DebuggerDebuggeeBreakpointSetCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> DebuggerDebuggeeBreakpointSetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2708,7 +2767,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointSetCall<'a, C, A> where C: BorrowMut<hy
 }
 
 
-/// Lists all breakpoints of the debuggee that the user has access to.
+/// Lists all breakpoints for the debuggee.
 ///
 /// A builder for the *debuggees.breakpoints.list* method supported by a *debugger* resource.
 /// It is not used directly, but through a `DebuggerMethods` instance.
@@ -2735,11 +2794,11 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointSetCall<'a, C, A> where C: BorrowMut<hy
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.debugger().debuggees_breakpoints_list("debuggeeId")
-///              .wait_token("nonumy")
-///              .strip_results(true)
+///              .wait_token("dolores")
+///              .strip_results(false)
 ///              .include_inactive(false)
-///              .include_all_users(false)
-///              .action_value("aliquyam")
+///              .include_all_users(true)
+///              .action_value("ea")
 ///              .doit();
 /// # }
 /// ```
@@ -2772,7 +2831,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointListCall<'a, C, A> where C: BorrowMut<h
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "clouddebugger.debugger.debuggees.breakpoints.list", 
+        dlg.begin(MethodInfo { id: "clouddebugger.debugger.debuggees.breakpoints.list",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
         params.push(("debuggeeId", self._debuggee_id.to_string()));
@@ -2829,7 +2888,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointListCall<'a, C, A> where C: BorrowMut<h
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -2865,7 +2924,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointListCall<'a, C, A> where C: BorrowMut<h
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -2875,10 +2934,10 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointListCall<'a, C, A> where C: BorrowMut<h
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -2907,38 +2966,38 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointListCall<'a, C, A> where C: BorrowMut<h
     }
 
 
-    /// The debuggee id to list breakpoint from.
+    /// ID of the debuggee whose breakpoints to list.
     ///
     /// Sets the *debuggee id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn debuggee_id(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointListCall<'a, C, A> {
         self._debuggee_id = new_value.to_string();
         self
     }
-    /// A wait token that, if specified, blocks the call until the breakpoints list has changed, or a server selected timeout has expired. The value should be set from the last response to ListBreakpoints. The error code ABORTED is returned on wait timeout, which should be called again with the same wait_token.
+    /// A wait token that, if specified, blocks the call until the breakpoints list has changed, or a server selected timeout has expired. The value should be set from the last response. The error code `google.rpc.Code.ABORTED` (RPC) is returned on wait timeout, which should be called again with the same `wait_token`.
     ///
     /// Sets the *wait token* query property to the given value.
     pub fn wait_token(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointListCall<'a, C, A> {
         self._wait_token = Some(new_value.to_string());
         self
     }
-    /// When set to true the response breakpoints will be stripped of the results fields: stack_frames, evaluated_expressions and variable_table.
+    /// When set to `true`, the response breakpoints are stripped of the results fields: `stack_frames`, `evaluated_expressions` and `variable_table`.
     ///
     /// Sets the *strip results* query property to the given value.
     pub fn strip_results(mut self, new_value: bool) -> DebuggerDebuggeeBreakpointListCall<'a, C, A> {
         self._strip_results = Some(new_value);
         self
     }
-    /// When set to true the response includes active and inactive breakpoints, otherwise only active breakpoints are returned.
+    /// When set to `true`, the response includes active and inactive breakpoints. Otherwise, it includes only active breakpoints.
     ///
     /// Sets the *include inactive* query property to the given value.
     pub fn include_inactive(mut self, new_value: bool) -> DebuggerDebuggeeBreakpointListCall<'a, C, A> {
         self._include_inactive = Some(new_value);
         self
     }
-    /// When set to true the response includes the list of breakpoints set by any user, otherwise only breakpoints set by the caller.
+    /// When set to `true`, the response includes the list of breakpoints set by any user. Otherwise, it includes only breakpoints set by the caller.
     ///
     /// Sets the *include all users* query property to the given value.
     pub fn include_all_users(mut self, new_value: bool) -> DebuggerDebuggeeBreakpointListCall<'a, C, A> {
@@ -2964,12 +3023,12 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointListCall<'a, C, A> where C: BorrowMut<h
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *bearer_token* (query-string) - OAuth bearer token.
@@ -2992,17 +3051,17 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointListCall<'a, C, A> where C: BorrowMut<h
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> DebuggerDebuggeeBreakpointListCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> DebuggerDebuggeeBreakpointListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

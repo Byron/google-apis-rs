@@ -1,4 +1,4 @@
-site_name: DoubleClick Bid Manager v0.3.2+20150925
+site_name: DoubleClick Bid Manager v0.3.3+20160120
 site_url: http://byron.github.io/google-apis-rs/google-doubleclickbidmanager1-cli
 site_description: Write integrating applications with bcore
 
@@ -17,8 +17,9 @@ pages:
 - ['queries_listqueries.md', 'Queries', 'Listqueries']
 - ['queries_runquery.md', 'Queries', 'Runquery']
 - ['reports_listreports.md', 'Reports', 'Listreports']
+- ['rubicon_notifyproposalchange.md', 'Rubicon', 'Notifyproposalchange']
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015, `Sebastian Thiel`
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
 

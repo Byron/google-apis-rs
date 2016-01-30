@@ -17,14 +17,14 @@ Everything else about the *directory* API can be found at the
 
 You can download the pre-compiled 64bit binaries for the following platforms:
 
-* ![icon](http://megaicons.net/static/img/icons_sizes/6/140/16/ubuntu-icon.png) [ubuntu](http://dl.byronimo.de/google.rs/cli/0.3.2/ubuntu/admin1-directory.tar.gz)
-* ![icon](http://hydra-media.cursecdn.com/wow.gamepedia.com/a/a2/Apple-icon-16x16.png?version=25ddd67ac3dd3b634478e3978b76cb74) [osx](http://dl.byronimo.de/google.rs/cli/0.3.2/osx/admin1-directory.tar.gz)
+* ![icon](http://megaicons.net/static/img/icons_sizes/6/140/16/ubuntu-icon.png) [ubuntu](http://dl.byronimo.de/google.rs/cli/0.3.3/ubuntu/admin1-directory.tar.gz)
+* ![icon](http://hydra-media.cursecdn.com/wow.gamepedia.com/a/a2/Apple-icon-16x16.png?version=25ddd67ac3dd3b634478e3978b76cb74) [osx](http://dl.byronimo.de/google.rs/cli/0.3.3/osx/admin1-directory.tar.gz)
 
 Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/admin1_directory-cli).
 
 # Usage
 
-This documentation was generated from the *directory* API at revision *20151005*. The CLI is at version *0.3.2*.
+This documentation was generated from the *directory* API at revision *20151208*. The CLI is at version *0.3.3*.
 
 ```bash
 admin1-directory [options]
@@ -90,6 +90,13 @@ admin1-directory [options]
                 update <customer-id> <org-unit-path>... (-r <kv>)... [-p <v>]... [-o <out>]
         privileges
                 list <customer> [-p <v>]... [-o <out>]
+        resources
+                calendars-delete <customer> <calendar-resource-id> [-p <v>]...
+                calendars-get <customer> <calendar-resource-id> [-p <v>]... [-o <out>]
+                calendars-insert <customer> (-r <kv>)... [-p <v>]... [-o <out>]
+                calendars-list <customer> [-p <v>]... [-o <out>]
+                calendars-patch <customer> <calendar-resource-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                calendars-update <customer> <calendar-resource-id> (-r <kv>)... [-p <v>]... [-o <out>]
         role-assignments
                 delete <customer> <role-assignment-id> [-p <v>]...
                 get <customer> <role-assignment-id> [-p <v>]... [-o <out>]
@@ -139,18 +146,18 @@ admin1-directory [options]
 
 Configuration:
   [--scope <url>]...
-            Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it. 
+            Specify the authentication a method should be executed in. Each scope
+            requires the user to grant this application permission to use it.
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
-            A directory into which we will store our persistent data. Defaults to 
+            A directory into which we will store our persistent data. Defaults to
             a user-writable directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
   --debug
-            Output all server communication to standard error. `tx` and `rx` are placed 
+            Output all server communication to standard error. `tx` and `rx` are placed
             into the same stream.
   --debug-auth
-            Output all communication related to authentication to standard error. `tx` 
+            Output all communication related to authentication to standard error. `tx`
             and `rx` are placed into the same stream.
 
 ```

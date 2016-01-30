@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-books1` library allows access to all features of the *Google books* service.
 
-This documentation was generated from *books* crate version *0.1.10+20150921*, where *20150921* is the exact revision of the *books:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.10*.
+This documentation was generated from *books* crate version *0.1.11+20151218*, where *20151218* is the exact revision of the *books:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
 
 Everything else about the *books* *v1* API can be found at the
 [official documentation site](https://developers.google.com/books/docs/v1/getting_started).
@@ -33,6 +33,8 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
  * [*get*](http://byron.github.io/google-apis-rs/google_books1/struct.PersonalizedstreamGetCall.html)
 * promooffer
  * [*accept*](http://byron.github.io/google-apis-rs/google_books1/struct.PromoofferAcceptCall.html), [*dismiss*](http://byron.github.io/google-apis-rs/google_books1/struct.PromoofferDismisCall.html) and [*get*](http://byron.github.io/google-apis-rs/google_books1/struct.PromoofferGetCall.html)
+* series
+ * [*get*](http://byron.github.io/google-apis-rs/google_books1/struct.SeryGetCall.html) and [*membership get*](http://byron.github.io/google-apis-rs/google_books1/struct.SeryMembershipGetCall.html)
 * [volumes](http://byron.github.io/google-apis-rs/google_books1/struct.Volume.html)
  * [*associated list*](http://byron.github.io/google-apis-rs/google_books1/struct.VolumeAssociatedListCall.html), [*get*](http://byron.github.io/google-apis-rs/google_books1/struct.VolumeGetCall.html), [*list*](http://byron.github.io/google-apis-rs/google_books1/struct.VolumeListCall.html), [*mybooks list*](http://byron.github.io/google-apis-rs/google_books1/struct.VolumeMybookListCall.html), [*recommended list*](http://byron.github.io/google-apis-rs/google_books1/struct.VolumeRecommendedListCall.html), [*recommended rate*](http://byron.github.io/google-apis-rs/google_books1/struct.VolumeRecommendedRateCall.html) and [*useruploaded list*](http://byron.github.io/google-apis-rs/google_books1/struct.VolumeUseruploadedListCall.html)
 

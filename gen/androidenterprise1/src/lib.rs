@@ -2,10 +2,10 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Android Enterprise* crate version *0.1.10+20150922*, where *20150922* is the exact revision of the *androidenterprise:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.10*.
+//! This documentation was generated from *Android Enterprise* crate version *0.1.11+20160106*, where *20160106* is the exact revision of the *androidenterprise:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
 //! 
 //! Everything else about the *Android Enterprise* *v1* API can be found at the
-//! [official documentation site](https://developers.google.com/play/enterprise).
+//! [official documentation site](https://developers.google.com/android/work/play/emm-api).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/androidenterprise1).
 //! # Features
 //! 
@@ -18,7 +18,7 @@
 //! * [devices](struct.Device.html)
 //!  * [*get*](struct.DeviceGetCall.html), [*get state*](struct.DeviceGetStateCall.html), [*list*](struct.DeviceListCall.html) and [*set state*](struct.DeviceSetStateCall.html)
 //! * [enterprises](struct.Enterprise.html)
-//!  * [*delete*](struct.EnterpriseDeleteCall.html), [*enroll*](struct.EnterpriseEnrollCall.html), [*get*](struct.EnterpriseGetCall.html), [*insert*](struct.EnterpriseInsertCall.html), [*list*](struct.EnterpriseListCall.html), [*send test push notification*](struct.EnterpriseSendTestPushNotificationCall.html), [*set account*](struct.EnterpriseSetAccountCall.html) and [*unenroll*](struct.EnterpriseUnenrollCall.html)
+//!  * [*delete*](struct.EnterpriseDeleteCall.html), [*enroll*](struct.EnterpriseEnrollCall.html), [*get*](struct.EnterpriseGetCall.html), [*get store layout*](struct.EnterpriseGetStoreLayoutCall.html), [*insert*](struct.EnterpriseInsertCall.html), [*list*](struct.EnterpriseListCall.html), [*send test push notification*](struct.EnterpriseSendTestPushNotificationCall.html), [*set account*](struct.EnterpriseSetAccountCall.html), [*set store layout*](struct.EnterpriseSetStoreLayoutCall.html) and [*unenroll*](struct.EnterpriseUnenrollCall.html)
 //! * [entitlements](struct.Entitlement.html)
 //!  * [*delete*](struct.EntitlementDeleteCall.html), [*get*](struct.EntitlementGetCall.html), [*list*](struct.EntitlementListCall.html), [*patch*](struct.EntitlementPatchCall.html) and [*update*](struct.EntitlementUpdateCall.html)
 //! * grouplicenses
@@ -31,6 +31,10 @@
 //!  * [*get*](struct.PermissionGetCall.html)
 //! * [products](struct.Product.html)
 //!  * [*approve*](struct.ProductApproveCall.html), [*generate approval url*](struct.ProductGenerateApprovalUrlCall.html), [*get*](struct.ProductGetCall.html), [*get app restrictions schema*](struct.ProductGetAppRestrictionsSchemaCall.html), [*get permissions*](struct.ProductGetPermissionCall.html) and [*update permissions*](struct.ProductUpdatePermissionCall.html)
+//! * storelayoutclusters
+//!  * [*delete*](struct.StorelayoutclusterDeleteCall.html), [*get*](struct.StorelayoutclusterGetCall.html), [*insert*](struct.StorelayoutclusterInsertCall.html), [*list*](struct.StorelayoutclusterListCall.html), [*patch*](struct.StorelayoutclusterPatchCall.html) and [*update*](struct.StorelayoutclusterUpdateCall.html)
+//! * storelayoutpages
+//!  * [*delete*](struct.StorelayoutpageDeleteCall.html), [*get*](struct.StorelayoutpageGetCall.html), [*insert*](struct.StorelayoutpageInsertCall.html), [*list*](struct.StorelayoutpageListCall.html), [*patch*](struct.StorelayoutpagePatchCall.html) and [*update*](struct.StorelayoutpageUpdateCall.html)
 //! * [users](struct.User.html)
 //!  * [*generate token*](struct.UserGenerateTokenCall.html), [*get*](struct.UserGetCall.html), [*get available product set*](struct.UserGetAvailableProductSetCall.html), [*list*](struct.UserListCall.html), [*revoke token*](struct.UserRevokeTokenCall.html) and [*set available product set*](struct.UserSetAvailableProductSetCall.html)
 //! 
@@ -67,15 +71,16 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.users().revoke_token(...).doit()
-//! let r = hub.collectionviewers().update(...).doit()
-//! let r = hub.collectionviewers().patch(...).doit()
-//! let r = hub.users().list(...).doit()
-//! let r = hub.collectionviewers().get(...).doit()
-//! let r = hub.users().set_available_product_set(...).doit()
-//! let r = hub.users().generate_token(...).doit()
-//! let r = hub.users().get_available_product_set(...).doit()
-//! let r = hub.users().get(...).doit()
+//! let r = hub.enterprises().send_test_push_notification(...).doit()
+//! let r = hub.enterprises().set_store_layout(...).doit()
+//! let r = hub.enterprises().get_store_layout(...).doit()
+//! let r = hub.enterprises().list(...).doit()
+//! let r = hub.enterprises().unenroll(...).doit()
+//! let r = hub.enterprises().set_account(...).doit()
+//! let r = hub.enterprises().delete(...).doit()
+//! let r = hub.enterprises().enroll(...).doit()
+//! let r = hub.enterprises().insert(...).doit()
+//! let r = hub.enterprises().get(...).doit()
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -100,7 +105,7 @@
 //! extern crate hyper;
 //! extern crate yup_oauth2 as oauth2;
 //! extern crate google_androidenterprise1 as androidenterprise1;
-//! use androidenterprise1::User;
+//! use androidenterprise1::StoreLayout;
 //! use androidenterprise1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
@@ -122,12 +127,12 @@
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req = User::default();
+//! let mut req = StoreLayout::default();
 //! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.collectionviewers().update(req, "enterpriseId", "collectionId", "userId")
+//! let result = hub.enterprises().set_store_layout(req, "enterpriseId")
 //!              .doit();
 //! 
 //! match result {

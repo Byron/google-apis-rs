@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *cloudtrace* crate version *0.1.10+20150825*, where *20150825* is the exact revision of the *cloudtrace:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.10*.
+//! This documentation was generated from *cloudtrace* crate version *0.1.11+20151207*, where *20151207* is the exact revision of the *cloudtrace:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
 //! 
 //! Everything else about the *cloudtrace* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/tools/cloud-trace).
@@ -14,9 +14,6 @@
 //! * projects
 //!  * [*patch traces*](struct.ProjectPatchTraceCall.html), [*traces get*](struct.ProjectTraceGetCall.html) and [*traces list*](struct.ProjectTraceListCall.html)
 //! 
-//! Other activities are ...
-//! 
-//! * [get discovery](struct.MethodGetDiscoveryCall.html)
 //! 
 //! 
 //! 

@@ -17,14 +17,14 @@ Everything else about the *Identity Toolkit* API can be found at the
 
 You can download the pre-compiled 64bit binaries for the following platforms:
 
-* ![icon](http://megaicons.net/static/img/icons_sizes/6/140/16/ubuntu-icon.png) [ubuntu](http://dl.byronimo.de/google.rs/cli/0.3.2/ubuntu/identitytoolkit3.tar.gz)
-* ![icon](http://hydra-media.cursecdn.com/wow.gamepedia.com/a/a2/Apple-icon-16x16.png?version=25ddd67ac3dd3b634478e3978b76cb74) [osx](http://dl.byronimo.de/google.rs/cli/0.3.2/osx/identitytoolkit3.tar.gz)
+* ![icon](http://megaicons.net/static/img/icons_sizes/6/140/16/ubuntu-icon.png) [ubuntu](http://dl.byronimo.de/google.rs/cli/0.3.3/ubuntu/identitytoolkit3.tar.gz)
+* ![icon](http://hydra-media.cursecdn.com/wow.gamepedia.com/a/a2/Apple-icon-16x16.png?version=25ddd67ac3dd3b634478e3978b76cb74) [osx](http://dl.byronimo.de/google.rs/cli/0.3.3/osx/identitytoolkit3.tar.gz)
 
 Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/identitytoolkit3-cli).
 
 # Usage
 
-This documentation was generated from the *Identity Toolkit* API at revision *20151008*. The CLI is at version *0.3.2*.
+This documentation was generated from the *Identity Toolkit* API at revision *20160125*. The CLI is at version *0.3.3*.
 
 ```bash
 identitytoolkit3 [options]
@@ -34,25 +34,28 @@ identitytoolkit3 [options]
                 download-account (-r <kv>)... [-p <v>]... [-o <out>]
                 get-account-info (-r <kv>)... [-p <v>]... [-o <out>]
                 get-oob-confirmation-code (-r <kv>)... [-p <v>]... [-o <out>]
+                get-project-config [-p <v>]... [-o <out>]
                 get-public-keys [-p <v>]... [-o <out>]
                 get-recaptcha-param [-p <v>]... [-o <out>]
                 reset-password (-r <kv>)... [-p <v>]... [-o <out>]
                 set-account-info (-r <kv>)... [-p <v>]... [-o <out>]
+                sign-out-user (-r <kv>)... [-p <v>]... [-o <out>]
                 upload-account (-r <kv>)... [-p <v>]... [-o <out>]
                 verify-assertion (-r <kv>)... [-p <v>]... [-o <out>]
+                verify-custom-token (-r <kv>)... [-p <v>]... [-o <out>]
                 verify-password (-r <kv>)... [-p <v>]... [-o <out>]
   identitytoolkit3 --help
 
 Configuration:
   --config-dir <folder>
-            A directory into which we will store our persistent data. Defaults to 
+            A directory into which we will store our persistent data. Defaults to
             a user-writable directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
   --debug
-            Output all server communication to standard error. `tx` and `rx` are placed 
+            Output all server communication to standard error. `tx` and `rx` are placed
             into the same stream.
   --debug-auth
-            Output all communication related to authentication to standard error. `tx` 
+            Output all communication related to authentication to standard error. `tx`
             and `rx` are placed into the same stream.
 
 ```

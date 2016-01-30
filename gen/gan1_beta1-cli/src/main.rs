@@ -20,7 +20,7 @@ use clap::{App, SubCommand, Arg};
 
 mod cmn;
 
-use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg, 
+use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
           calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
@@ -36,19 +36,19 @@ enum DoitError {
     ApiError(api::Error),
 }
 
-struct Engine<'n, 'a> {
-    opt: ArgMatches<'n, 'a>,
+struct Engine<'n> {
+    opt: ArgMatches<'n>,
     hub: api::Gan<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
 
 
-impl<'n, 'a> Engine<'n, 'a> {
-    fn _advertisers_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+impl<'n> Engine<'n> {
+    fn _advertisers_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.advertisers().get(opt.value_of("role").unwrap_or(""), opt.value_of("role-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "advertiser-id" => {
@@ -64,7 +64,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["advertiser-id"].iter().map(|v|*v));
@@ -98,10 +98,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _advertisers_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _advertisers_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.advertisers().list(opt.value_of("role").unwrap_or(""), opt.value_of("role-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "relationship-status" => {
@@ -135,7 +135,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["relationship-status", "min-seven-day-epc", "advertiser-category", "max-results", "page-token", "min-ninety-day-epc", "min-payout-rank"].iter().map(|v|*v));
@@ -169,10 +169,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _cc_offers_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _cc_offers_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.cc_offers().list(opt.value_of("publisher").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "projection" => {
@@ -191,7 +191,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["advertiser", "projection"].iter().map(|v|*v));
@@ -225,10 +225,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _events_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _events_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.events().list(opt.value_of("role").unwrap_or(""), opt.value_of("role-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "type" => {
@@ -289,7 +289,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["status", "sku", "modify-date-max", "type", "link-id", "event-date-min", "member-id", "product-category", "order-id", "page-token", "advertiser-id", "max-results", "charge-type", "modify-date-min", "event-date-max", "publisher-id"].iter().map(|v|*v));
@@ -323,10 +323,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _links_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _links_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.links().get(opt.value_of("role").unwrap_or(""), opt.value_of("role-id").unwrap_or(""), opt.value_of("link-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -339,7 +339,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -372,13 +372,13 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _links_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _links_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
         let mut object = json::value::Value::Object(Default::default());
         
-        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -392,8 +392,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-           
-            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "link-type" => Some(("linkType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "start-date" => Some(("startDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -441,7 +441,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
         let mut request: api::Link = json::value::from_value(object).unwrap();
         let mut call = self.hub.links().insert(request, opt.value_of("role").unwrap_or(""), opt.value_of("role-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -454,7 +454,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
@@ -487,10 +487,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _links_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _links_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.links().list(opt.value_of("role").unwrap_or(""), opt.value_of("role-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-date-min" => {
@@ -542,7 +542,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["start-date-min", "link-type", "relationship-status", "search-text", "create-date-max", "create-date-min", "asset-size", "start-date-max", "advertiser-id", "page-token", "max-results", "promotion-type", "authorship"].iter().map(|v|*v));
@@ -576,10 +576,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _publishers_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _publishers_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.publishers().get(opt.value_of("role").unwrap_or(""), opt.value_of("role-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "publisher-id" => {
@@ -595,7 +595,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["publisher-id"].iter().map(|v|*v));
@@ -629,10 +629,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _publishers_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _publishers_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.publishers().list(opt.value_of("role").unwrap_or(""), opt.value_of("role-id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "relationship-status" => {
@@ -666,7 +666,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["publisher-category", "relationship-status", "min-seven-day-epc", "min-ninety-day-epc", "page-token", "max-results", "min-payout-rank"].iter().map(|v|*v));
@@ -700,10 +700,10 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _reports_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _reports_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.reports().get(opt.value_of("role").unwrap_or(""), opt.value_of("role-id").unwrap_or(""), opt.value_of("report-type").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "status" => {
@@ -749,7 +749,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["status", "start-date", "end-date", "advertiser-id", "link-id", "max-results", "order-id", "start-index", "event-type", "calculate-totals", "publisher-id"].iter().map(|v|*v));
@@ -883,14 +883,14 @@ impl<'n, 'a> Engine<'n, 'a> {
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    fn new(opt: ArgMatches<'a, 'n>) -> Result<Engine<'a, 'n>, InvalidOptionsError> {
+    fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
         let (config_dir, secret) = {
             let config_dir = match cmn::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "gan1-beta1-secret.json", 
+            match cmn::application_secret_from_directory(&config_dir, "gan1-beta1-secret.json",
                                                          "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
@@ -910,7 +910,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                                           db_dir: config_dir.clone(),
                                         }, None);
 
-        let client = 
+        let client =
             if opt.is_present("debug") {
                 hyper::Client::with_connector(mock::TeeConnector {
                         connector: hyper::net::HttpsConnector::<hyper::net::Openssl>::default()
@@ -949,7 +949,7 @@ fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
         ("advertisers", "methods: 'get' and 'list'", vec![
-            ("get",  
+            ("get",
                     Some(r##"Retrieves data about a single advertiser if that the requesting advertiser/publisher has access to it. Only publishers can lookup advertisers. Advertisers can request information about themselves by omitting the advertiserId query parameter."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gan1_beta1_cli/advertisers_get",
                   vec![
@@ -977,7 +977,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("list",  
+            ("list",
                     Some(r##"Retrieves data about all advertisers that the requesting advertiser/publisher has access to."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gan1_beta1_cli/advertisers_list",
                   vec![
@@ -1008,7 +1008,7 @@ fn main() {
             ]),
         
         ("cc-offers", "methods: 'list'", vec![
-            ("list",  
+            ("list",
                     Some(r##"Retrieves credit card offers for the given publisher."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gan1_beta1_cli/cc-offers_list",
                   vec![
@@ -1033,7 +1033,7 @@ fn main() {
             ]),
         
         ("events", "methods: 'list'", vec![
-            ("list",  
+            ("list",
                     Some(r##"Retrieves event data for a given advertiser/publisher."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gan1_beta1_cli/events_list",
                   vec![
@@ -1064,7 +1064,7 @@ fn main() {
             ]),
         
         ("links", "methods: 'get', 'insert' and 'list'", vec![
-            ("get",  
+            ("get",
                     Some(r##"Retrieves data about a single link if the requesting advertiser/publisher has access to it. Advertisers can look up their own links. Publishers can look up visible links or links belonging to advertisers they are in a relationship with."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gan1_beta1_cli/links_get",
                   vec![
@@ -1098,7 +1098,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("insert",  
+            ("insert",
                     Some(r##"Inserts a new link."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gan1_beta1_cli/links_insert",
                   vec![
@@ -1132,7 +1132,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("list",  
+            ("list",
                     Some(r##"Retrieves all links that match the query parameters."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gan1_beta1_cli/links_list",
                   vec![
@@ -1163,7 +1163,7 @@ fn main() {
             ]),
         
         ("publishers", "methods: 'get' and 'list'", vec![
-            ("get",  
+            ("get",
                     Some(r##"Retrieves data about a single advertiser if that the requesting advertiser/publisher has access to it. Only advertisers can look up publishers. Publishers can request information about themselves by omitting the publisherId query parameter."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gan1_beta1_cli/publishers_get",
                   vec![
@@ -1191,7 +1191,7 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("list",  
+            ("list",
                     Some(r##"Retrieves data about all publishers that the requesting advertiser/publisher has access to."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gan1_beta1_cli/publishers_list",
                   vec![
@@ -1222,7 +1222,7 @@ fn main() {
             ]),
         
         ("reports", "methods: 'get'", vec![
-            ("get",  
+            ("get",
                     Some(r##"Retrieves a report of the specified type."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gan1_beta1_cli/reports_get",
                   vec![
@@ -1262,7 +1262,7 @@ fn main() {
     
     let mut app = App::new("gan1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.2+20130205")
+           .version("0.3.3+20130205")
            .about("Lets you have programmatic access to your Google Affiliate Network data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_gan1_beta1_cli")
            .arg(Arg::with_name("folder")
@@ -1281,7 +1281,7 @@ fn main() {
                    .multiple(false)
                    .takes_value(false));
            
-           for &(main_command_name, ref about, ref subcommands) in arg_data.iter() {
+           for &(main_command_name, about, ref subcommands) in arg_data.iter() {
                let mut mcmd = SubCommand::with_name(main_command_name).about(about);
            
                for &(sub_command_name, ref desc, url_info, ref args) in subcommands {
@@ -1292,7 +1292,7 @@ fn main() {
                    scmd = scmd.after_help(url_info);
            
                    for &(ref arg_name, ref flag, ref desc, ref required, ref multi) in args {
-                       let arg_name_str = 
+                       let arg_name_str =
                            match (arg_name, flag) {
                                    (&Some(an), _       ) => an,
                                    (_        , &Some(f)) => f,

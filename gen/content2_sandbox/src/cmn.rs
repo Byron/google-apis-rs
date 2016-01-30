@@ -5,7 +5,8 @@ use std;
 use std::fmt::{self, Display};
 use std::str::FromStr;
 use std::error;
-use std::thread::sleep_ms;
+use std::thread::sleep;
+use std::time::Duration;
 
 use mime::{Mime, TopLevel, SubLevel, Attr, Value};
 use oauth2::{TokenType, Retry, self};
@@ -43,7 +44,7 @@ pub trait RequestValue {}
 /// This might be a bug within the google API schema.
 pub trait UnusedType {}
 
-/// Identifies types which are only used as part of other types, which 
+/// Identifies types which are only used as part of other types, which
 /// usually are carrying the `Resource` trait.
 pub trait Part {}
 
@@ -78,7 +79,7 @@ pub struct ErrorResponse {
 pub struct ServerError {
     errors: Vec<ServerMessage>,
     code: u16,
-    message: String,   
+    message: String,
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -115,11 +116,11 @@ impl hyper::net::NetworkStream for DummyNetworkStream {
         Ok("127.0.0.1:1337".parse().unwrap())
     }
 
-    fn set_read_timeout(&self, _dur: Option<std::time::Duration>) -> io::Result<()> {
+    fn set_read_timeout(&self, _dur: Option<Duration>) -> io::Result<()> {
         Ok(())
     }
 
-    fn set_write_timeout(&self, _dur: Option<std::time::Duration>) -> io::Result<()> {
+    fn set_write_timeout(&self, _dur: Option<Duration>) -> io::Result<()> {
         Ok(())
     }
 }
@@ -128,7 +129,7 @@ impl hyper::net::NetworkStream for DummyNetworkStream {
 /// A trait specifying functionality to help controlling any request performed by the API.
 /// The trait has a conservative default implementation.
 ///
-/// It contains methods to deal with all common issues, as well with the ones related to 
+/// It contains methods to deal with all common issues, as well with the ones related to
 /// uploading media
 pub trait Delegate {
 
@@ -136,12 +137,12 @@ pub trait Delegate {
     /// information if he is interesting in knowing more context when further calls to it
     /// are made.
     /// The matching `finished()` call will always be made, no matter whether or not the API
-    /// request was successful. That way, the delegate may easily maintain a clean state 
+    /// request was successful. That way, the delegate may easily maintain a clean state
     /// between various API calls.
     fn begin(&mut self, MethodInfo) {}
 
     /// Called whenever there is an [HttpError](http://hyperium.github.io/hyper/hyper/error/enum.HttpError.html), usually if there are network problems.
-    /// 
+    ///
     /// If you choose to retry after a duration, the duration should be chosen using the
     /// [exponential backoff algorithm](http://en.wikipedia.org/wiki/Exponential_backoff).
     ///
@@ -150,7 +151,7 @@ pub trait Delegate {
         Retry::Abort
     }
 
-    /// Called whenever there is the need for your applications API key after 
+    /// Called whenever there is the need for your applications API key after
     /// the official authenticator implementation didn't provide one, for some reason.
     /// If this method returns None as well, the underlying operation will fail
     fn api_key(&mut self) -> Option<String> {
@@ -179,7 +180,7 @@ pub trait Delegate {
     }
 
     /// Called after we have retrieved a new upload URL for a resumable upload to store it
-    /// in case we fail or cancel. That way, we can attempt to resume the upload later, 
+    /// in case we fail or cancel. That way, we can attempt to resume the upload later,
     /// see `upload_url()`.
     /// It will also be called with None after a successful upload, which allows the delegate
     /// to forget the URL. That way, we will not attempt to resume an upload that has already
@@ -191,7 +192,7 @@ pub trait Delegate {
     /// Called whenever a server response could not be decoded from json.
     /// It's for informational purposes only, the caller will return with an error
     /// accordingly.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `json_encoded_value` - The json-encoded value which failed to decode.
@@ -202,7 +203,7 @@ pub trait Delegate {
     }
 
     /// Called whenever the http request returns with a non-success status code.
-    /// This can involve authentication issues, or anything else that very much 
+    /// This can involve authentication issues, or anything else that very much
     /// depends on the used API method.
     /// The delegate should check the status, header and decoded json error to decide
     /// whether to retry or not. In the latter case, the underlying call will fail.
@@ -213,7 +214,7 @@ pub trait Delegate {
         Retry::Abort
     }
 
-    /// Called prior to sending the main request of the given method. It can be used to time 
+    /// Called prior to sending the main request of the given method. It can be used to time
     /// the call or to print progress information.
     /// It's also useful as you can be sure that a request will definitely be made.
     fn pre_request(&mut self) { }
@@ -232,14 +233,14 @@ pub trait Delegate {
     fn cancel_chunk_upload(&mut self, chunk: &ContentRange) -> bool {
         let _ = chunk;
         false
-    }    
+    }
 
     /// Called before the API request method returns, in every case. It can be used to clean up
     /// internal state between calls to the API.
     /// This call always has a matching call to `begin(...)`.
     ///
     /// # Arguments
-    /// 
+    ///
     /// * `is_success` - a true value indicates the operation was successful. If false, you should
     ///                  discard all values stored during `store_upload_url`.
     fn finished(&mut self, is_success: bool) {
@@ -304,9 +305,9 @@ impl Display for Error {
             Error::BadRequest(ref err) => {
                 try!(writeln!(f, "Bad Requst ({}): {}", err.error.code, err.error.message));
                 for err in err.error.errors.iter() {
-                    try!(writeln!(f, "    {}: {}, {}{}", 
-                                            err.domain, 
-                                            err.message, 
+                    try!(writeln!(f, "    {}: {}, {}{}",
+                                            err.domain,
+                                            err.message,
                                             err.reason,
                                             match &err.location {
                                                 &Some(ref loc) => format!("@{}", loc),
@@ -317,13 +318,13 @@ impl Display for Error {
             },
             Error::MissingToken(ref err) =>
                 writeln!(f, "Token retrieval failed with error: {}", err),
-            Error::Cancelled => 
+            Error::Cancelled =>
                 writeln!(f, "Operation cancelled by delegate"),
             Error::FieldClash(field) =>
                 writeln!(f, "The custom parameter '{}' is already provided natively by the CallBuilder.", field),
-            Error::JsonDecodeError(ref json_str, ref err) 
+            Error::JsonDecodeError(ref json_str, ref err)
                 => writeln!(f, "{}: {}", err, json_str),
-            Error::Failure(ref response) => 
+            Error::Failure(ref response) =>
                 writeln!(f, "Http status indicates failure: {:?}", response),
         }
     }
@@ -418,8 +419,8 @@ impl<'a> MultiPartReader<'a> {
 
 impl<'a> Read for MultiPartReader<'a> {
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
-        match (self.raw_parts.len(), 
-               self.current_part.is_none(), 
+        match (self.raw_parts.len(),
+               self.current_part.is_none(),
                self.last_part_boundary.is_none()) {
             (_, _, false) => {
                 let br = self.last_part_boundary.as_mut().unwrap().read(buf).unwrap_or(0);
@@ -432,7 +433,7 @@ impl<'a> Read for MultiPartReader<'a> {
             (n, true, _) if n > 0 => {
                 let (headers, reader) = self.raw_parts.remove(0);
                 let mut c = Cursor::new(Vec::<u8>::new());
-                (write!(&mut c, "{}--{}{}{}{}", LINE_ENDING, BOUNDARY, LINE_ENDING, 
+                (write!(&mut c, "{}--{}{}{}{}", LINE_ENDING, BOUNDARY, LINE_ENDING,
                                                 headers, LINE_ENDING)).unwrap();
                 c.seek(SeekFrom::Start(0)).unwrap();
                 self.current_part = Some((c, reader));
@@ -446,12 +447,12 @@ impl<'a> Read for MultiPartReader<'a> {
             let b = c.read(buf).unwrap_or(0);
             (b, reader.read(&mut buf[b..]))
         };
-        
+
         match rr {
             Ok(bytes_read) => {
                 if hb < buf.len() && bytes_read == 0 {
                     if self.is_last_part() {
-                        // before clearing the last part, we will add the boundary that 
+                        // before clearing the last part, we will add the boundary that
                         // will be written last
                         self.last_part_boundary = Some(Cursor::new(
                                                         format!("{}--{}--", LINE_ENDING, BOUNDARY).into_bytes()))
@@ -498,7 +499,7 @@ impl<'a> Read for MultiPartReader<'a> {
 
 /// The `X-Upload-Content-Type` header.
 ///
-/// Generated via rustc --pretty expanded -Z unstable-options, and manually 
+/// Generated via rustc --pretty expanded -Z unstable-options, and manually
 /// processed to be more readable.
 #[derive(PartialEq, Debug, Clone)]
 pub struct XUploadContentType(pub Mime);
@@ -657,7 +658,7 @@ impl<'a, A> ResumableUploadHelper<'a, A>
                         Some(hh) if r.status == StatusCode::PermanentRedirect => hh,
                         None|Some(_) => {
                             if let Retry::After(d) = self.delegate.http_failure(&r, None, None) {
-                                sleep_ms(d.num_milliseconds() as u32);
+                                sleep(d);
                                 continue;
                             }
                             return Err(Ok(r))
@@ -667,7 +668,7 @@ impl<'a, A> ResumableUploadHelper<'a, A>
                 }
                 Err(err) => {
                     if let Retry::After(d) = self.delegate.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     return Err(Err(err))
@@ -725,10 +726,10 @@ impl<'a, A> ResumableUploadHelper<'a, A>
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let Retry::After(d) = self.delegate.http_failure(&res, 
+                        if let Retry::After(d) = self.delegate.http_failure(&res,
                                                         json::from_str(&json_err).ok(),
                                                         json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                     }
@@ -736,7 +737,7 @@ impl<'a, A> ResumableUploadHelper<'a, A>
                 },
                 Err(err) => {
                     if let Retry::After(d) = self.delegate.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     return Some(Err(err))

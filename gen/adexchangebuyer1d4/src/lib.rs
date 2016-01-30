@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Ad Exchange Buyer* crate version *0.1.10+20150909*, where *20150909* is the exact revision of the *adexchangebuyer:v1.4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.10*.
+//! This documentation was generated from *Ad Exchange Buyer* crate version *0.1.11+20160118*, where *20160118* is the exact revision of the *adexchangebuyer:v1.4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
 //! 
 //! Everything else about the *Ad Exchange Buyer* *v1d4* API can be found at the
 //! [official documentation site](https://developers.google.com/ad-exchange/buyer-rest).
@@ -17,30 +17,20 @@
 //!  * [*get*](struct.BillingInfoGetCall.html) and [*list*](struct.BillingInfoListCall.html)
 //! * [budget](struct.Budget.html)
 //!  * [*get*](struct.BudgetGetCall.html), [*patch*](struct.BudgetPatchCall.html) and [*update*](struct.BudgetUpdateCall.html)
-//! * clientaccess
-//!  * [*delete*](struct.ClientaccesDeleteCall.html), [*get*](struct.ClientaccesGetCall.html), [*insert*](struct.ClientaccesInsertCall.html), [*list*](struct.ClientaccesListCall.html), [*patch*](struct.ClientaccesPatchCall.html) and [*update*](struct.ClientaccesUpdateCall.html)
 //! * [creatives](struct.Creative.html)
-//!  * [*get*](struct.CreativeGetCall.html), [*insert*](struct.CreativeInsertCall.html) and [*list*](struct.CreativeListCall.html)
-//! * deals
-//!  * [*get*](struct.DealGetCall.html)
+//!  * [*add deal*](struct.CreativeAddDealCall.html), [*get*](struct.CreativeGetCall.html), [*insert*](struct.CreativeInsertCall.html), [*list*](struct.CreativeListCall.html) and [*remove deal*](struct.CreativeRemoveDealCall.html)
 //! * marketplacedeals
 //!  * [*delete*](struct.MarketplacedealDeleteCall.html), [*insert*](struct.MarketplacedealInsertCall.html), [*list*](struct.MarketplacedealListCall.html) and [*update*](struct.MarketplacedealUpdateCall.html)
 //! * marketplacenotes
 //!  * [*insert*](struct.MarketplacenoteInsertCall.html) and [*list*](struct.MarketplacenoteListCall.html)
-//! * marketplaceoffers
-//!  * [*get*](struct.MarketplaceofferGetCall.html) and [*search*](struct.MarketplaceofferSearchCall.html)
-//! * marketplaceorders
-//!  * [*get*](struct.MarketplaceorderGetCall.html), [*insert*](struct.MarketplaceorderInsertCall.html), [*patch*](struct.MarketplaceorderPatchCall.html), [*search*](struct.MarketplaceorderSearchCall.html) and [*update*](struct.MarketplaceorderUpdateCall.html)
-//! * negotiationrounds
-//!  * [*insert*](struct.NegotiationroundInsertCall.html)
-//! * negotiations
-//!  * [*get*](struct.NegotiationGetCall.html), [*insert*](struct.NegotiationInsertCall.html) and [*list*](struct.NegotiationListCall.html)
-//! * offers
-//!  * [*get*](struct.OfferGetCall.html), [*insert*](struct.OfferInsertCall.html) and [*list*](struct.OfferListCall.html)
 //! * [performance report](struct.PerformanceReport.html)
 //!  * [*list*](struct.PerformanceReportListCall.html)
 //! * [pretargeting config](struct.PretargetingConfig.html)
 //!  * [*delete*](struct.PretargetingConfigDeleteCall.html), [*get*](struct.PretargetingConfigGetCall.html), [*insert*](struct.PretargetingConfigInsertCall.html), [*list*](struct.PretargetingConfigListCall.html), [*patch*](struct.PretargetingConfigPatchCall.html) and [*update*](struct.PretargetingConfigUpdateCall.html)
+//! * [products](struct.Product.html)
+//!  * [*get*](struct.ProductGetCall.html) and [*search*](struct.ProductSearchCall.html)
+//! * [proposals](struct.Proposal.html)
+//!  * [*get*](struct.ProposalGetCall.html), [*insert*](struct.ProposalInsertCall.html), [*patch*](struct.ProposalPatchCall.html), [*search*](struct.ProposalSearchCall.html) and [*update*](struct.ProposalUpdateCall.html)
 //! 
 //! 
 //! 
@@ -75,10 +65,11 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.pretargeting_config().insert(...).doit()
-//! let r = hub.pretargeting_config().patch(...).doit()
-//! let r = hub.pretargeting_config().get(...).doit()
-//! let r = hub.pretargeting_config().update(...).doit()
+//! let r = hub.creatives().remove_deal(...).doit()
+//! let r = hub.creatives().add_deal(...).doit()
+//! let r = hub.creatives().insert(...).doit()
+//! let r = hub.creatives().list(...).doit()
+//! let r = hub.creatives().get(...).doit()
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -103,7 +94,6 @@
 //! extern crate hyper;
 //! extern crate yup_oauth2 as oauth2;
 //! extern crate google_adexchangebuyer1d4 as adexchangebuyer1d4;
-//! use adexchangebuyer1d4::PretargetingConfig;
 //! use adexchangebuyer1d4::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
@@ -122,15 +112,16 @@
 //!                               hyper::Client::new(),
 //!                               <MemoryStorage as Default>::default(), None);
 //! let mut hub = AdExchangeBuyer::new(hyper::Client::new(), auth);
-//! // As the method needs a request, you would usually fill it with the desired information
-//! // into the respective structure. Some of the parts shown here might not be applicable !
-//! // Values shown here are possibly random and not representative !
-//! let mut req = PretargetingConfig::default();
-//! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.pretargeting_config().patch(req, "accountId", "configId")
+//! let result = hub.creatives().list()
+//!              .page_token("voluptua.")
+//!              .open_auction_status_filter("Lorem")
+//!              .max_results(90)
+//!              .deals_status_filter("justo")
+//!              .add_buyer_creative_id("sit")
+//!              .add_account_id(-26)
 //!              .doit();
 //! 
 //! match result {

@@ -4,7 +4,7 @@
 [package]
 
 name = "google-blogger3"
-version = "0.1.10+20150422"
+version = "0.1.11+20150422"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with blogger (protocol v3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/blogger3"

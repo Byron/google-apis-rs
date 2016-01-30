@@ -17,14 +17,14 @@ Everything else about the *storage* API can be found at the
 
 You can download the pre-compiled 64bit binaries for the following platforms:
 
-* ![icon](http://megaicons.net/static/img/icons_sizes/6/140/16/ubuntu-icon.png) [ubuntu](http://dl.byronimo.de/google.rs/cli/0.3.2/ubuntu/storage1.tar.gz)
-* ![icon](http://hydra-media.cursecdn.com/wow.gamepedia.com/a/a2/Apple-icon-16x16.png?version=25ddd67ac3dd3b634478e3978b76cb74) [osx](http://dl.byronimo.de/google.rs/cli/0.3.2/osx/storage1.tar.gz)
+* ![icon](http://megaicons.net/static/img/icons_sizes/6/140/16/ubuntu-icon.png) [ubuntu](http://dl.byronimo.de/google.rs/cli/0.3.3/ubuntu/storage1.tar.gz)
+* ![icon](http://hydra-media.cursecdn.com/wow.gamepedia.com/a/a2/Apple-icon-16x16.png?version=25ddd67ac3dd3b634478e3978b76cb74) [osx](http://dl.byronimo.de/google.rs/cli/0.3.3/osx/storage1.tar.gz)
 
 Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/storage1-cli).
 
 # Usage
 
-This documentation was generated from the *storage* API at revision *20151007*. The CLI is at version *0.3.2*.
+This documentation was generated from the *storage* API at revision *20151229*. The CLI is at version *0.3.3*.
 
 ```bash
 storage1 [options]
@@ -73,18 +73,18 @@ storage1 [options]
 
 Configuration:
   [--scope <url>]...
-            Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it. 
+            Specify the authentication a method should be executed in. Each scope
+            requires the user to grant this application permission to use it.
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
-            A directory into which we will store our persistent data. Defaults to 
+            A directory into which we will store our persistent data. Defaults to
             a user-writable directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
   --debug
-            Output all server communication to standard error. `tx` and `rx` are placed 
+            Output all server communication to standard error. `tx` and `rx` are placed
             into the same stream.
   --debug-auth
-            Output all communication related to authentication to standard error. `tx` 
+            Output all communication related to authentication to standard error. `tx`
             and `rx` are placed into the same stream.
 
 ```

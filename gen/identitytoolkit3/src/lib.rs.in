@@ -19,10 +19,11 @@ use std::collections::BTreeMap;
 use serde_json as json;
 use std::io;
 use std::fs;
-use std::thread::sleep_ms;
+use std::thread::sleep;
+use std::time::Duration;
 
 pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, 
+              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
               Resource, ErrorResponse, remove_json_null_values};
 
 
@@ -110,7 +111,7 @@ impl<'a, C, A> IdentityToolkit<C, A>
         IdentityToolkit {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.10".to_string(),
+            _user_agent: "google-api-rust-client/0.1.11".to_string(),
         }
     }
 
@@ -119,7 +120,7 @@ impl<'a, C, A> IdentityToolkit<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.10`.
+    /// It defaults to `google-api-rust-client/0.1.11`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -133,6 +134,26 @@ impl<'a, C, A> IdentityToolkit<C, A>
 // ############
 // SCHEMAS ###
 // ##########
+/// Respone of uploading accounts in batch.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [upload account relyingparty](struct.RelyingpartyUploadAccountCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UploadAccountResponse {
+    /// The fixed string "identitytoolkit#UploadAccountResponse".
+    pub kind: Option<String>,
+    /// The error encountered while processing the account info.
+    pub error: Option<Vec<UploadAccountResponseError>>,
+}
+
+impl ResponseResult for UploadAccountResponse {}
+
+
 /// Request of getting a code for user confirmation (reset password, change email etc.)
 /// 
 /// # Activities
@@ -186,72 +207,46 @@ pub struct CreateAuthUriResponse {
     /// True if captcha is required.
     #[serde(rename="captchaRequired")]
     pub captcha_required: Option<bool>,
-    /// The URI used by the IDP to authenticate the user.
-    #[serde(rename="authUri")]
-    pub auth_uri: Option<String>,
     /// Whether the user is registered if the identifier is an email.
     pub registered: Option<bool>,
-    /// The provider ID of the auth URI.
-    #[serde(rename="providerId")]
-    pub provider_id: Option<String>,
+    /// all providers the user has once used to do federated login
+    #[serde(rename="allProviders")]
+    pub all_providers: Option<Vec<String>>,
     /// True if the authUri is for user's existing provider.
     #[serde(rename="forExistingProvider")]
     pub for_existing_provider: Option<bool>,
+    /// Session ID which should be passed in the following verifyAssertion request.
+    #[serde(rename="sessionId")]
+    pub session_id: Option<String>,
+    /// The provider ID of the auth URI.
+    #[serde(rename="providerId")]
+    pub provider_id: Option<String>,
+    /// The URI used by the IDP to authenticate the user.
+    #[serde(rename="authUri")]
+    pub auth_uri: Option<String>,
 }
 
 impl ResponseResult for CreateAuthUriResponse {}
 
 
-/// Request to set the account information.
+/// Response of resetting the password.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [set account info relyingparty](struct.RelyingpartySetAccountInfoCall.html) (request)
+/// * [reset password relyingparty](struct.RelyingpartyResetPasswordCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct IdentitytoolkitRelyingpartySetAccountInfoRequest {
-    /// The name of the user.
-    #[serde(rename="displayName")]
-    pub display_name: Option<String>,
-    /// The local ID of the user.
-    #[serde(rename="localId")]
-    pub local_id: Option<String>,
-    /// Timestamp in seconds for valid login token.
-    #[serde(rename="validSince")]
-    pub valid_since: Option<String>,
-    /// Mark the user to upgrade to federated login.
-    #[serde(rename="upgradeToFederatedLogin")]
-    pub upgrade_to_federated_login: Option<bool>,
-    /// Response to the captcha.
-    #[serde(rename="captchaResponse")]
-    pub captcha_response: Option<String>,
-    /// Mark the email as verified or not.
-    #[serde(rename="emailVerified")]
-    pub email_verified: Option<bool>,
-    /// Whether to disable the user.
-    #[serde(rename="disableUser")]
-    pub disable_user: Option<bool>,
-    /// The captcha challenge.
-    #[serde(rename="captchaChallenge")]
-    pub captcha_challenge: Option<String>,
-    /// The GITKit token of the authenticated user.
-    #[serde(rename="idToken")]
-    pub id_token: Option<String>,
-    /// The associated IDPs of the user.
-    pub provider: Option<Vec<String>>,
-    /// The out-of-band code of the change email request.
-    #[serde(rename="oobCode")]
-    pub oob_code: Option<String>,
-    /// The new password of the user.
-    pub password: Option<String>,
-    /// The email of the user.
+pub struct ResetPasswordResponse {
+    /// The fixed string "identitytoolkit#ResetPasswordResponse".
+    pub kind: Option<String>,
+    /// The user's email.
     pub email: Option<String>,
 }
 
-impl RequestValue for IdentitytoolkitRelyingpartySetAccountInfoRequest {}
+impl ResponseResult for ResetPasswordResponse {}
 
 
 /// Request to delete account.
@@ -265,12 +260,43 @@ impl RequestValue for IdentitytoolkitRelyingpartySetAccountInfoRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IdentitytoolkitRelyingpartyDeleteAccountRequest {
+    /// GCP project number of the requesting delegated app. Currently only intended for Firebase V1 migration.
+    #[serde(rename="delegatedProjectNumber")]
+    pub delegated_project_number: Option<String>,
     /// The local ID of the user.
     #[serde(rename="localId")]
     pub local_id: Option<String>,
 }
 
 impl RequestValue for IdentitytoolkitRelyingpartyDeleteAccountRequest {}
+
+
+/// Response of getting the project configuration.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [get project config relyingparty](struct.RelyingpartyGetProjectConfigCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct IdentitytoolkitRelyingpartyGetProjectConfigResponse {
+    /// Project ID of the relying party.
+    #[serde(rename="projectId")]
+    pub project_id: Option<String>,
+    /// Browser API key, needed when making http request to Apiary.
+    #[serde(rename="apiKey")]
+    pub api_key: Option<String>,
+    /// Whether to allow password user sign in or sign up.
+    #[serde(rename="allowPasswordUser")]
+    pub allow_password_user: Option<bool>,
+    /// OAuth2 provider configuration.
+    #[serde(rename="idpConfig")]
+    pub idp_config: Option<Vec<IdpConfig>>,
+}
+
+impl ResponseResult for IdentitytoolkitRelyingpartyGetProjectConfigResponse {}
 
 
 /// Response of getting a code for user confirmation (reset password, change email etc.).
@@ -289,6 +315,8 @@ pub struct GetOobConfirmationCodeResponse {
     /// The code to be send to the user.
     #[serde(rename="oobCode")]
     pub oob_code: Option<String>,
+    /// The email address that the email is sent to.
+    pub email: Option<String>,
 }
 
 impl ResponseResult for GetOobConfirmationCodeResponse {}
@@ -341,6 +369,28 @@ pub struct DownloadAccountResponse {
 impl ResponseResult for DownloadAccountResponse {}
 
 
+/// Request to sign out user.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [sign out user relyingparty](struct.RelyingpartySignOutUserCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct IdentitytoolkitRelyingpartySignOutUserRequest {
+    /// Instance id token of the app.
+    #[serde(rename="instanceId")]
+    pub instance_id: Option<String>,
+    /// The local ID of the user.
+    #[serde(rename="localId")]
+    pub local_id: Option<String>,
+}
+
+impl RequestValue for IdentitytoolkitRelyingpartySignOutUserRequest {}
+
+
 /// Response of getting recaptcha param.
 /// 
 /// # Activities
@@ -365,31 +415,25 @@ pub struct GetRecaptchaParamResponse {
 impl ResponseResult for GetRecaptchaParamResponse {}
 
 
-/// Request to reset the password.
+/// Response from verifying a custom token
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [reset password relyingparty](struct.RelyingpartyResetPasswordCall.html) (request)
+/// * [verify custom token relyingparty](struct.RelyingpartyVerifyCustomTokenCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct IdentitytoolkitRelyingpartyResetPasswordRequest {
-    /// The new password inputted by the user.
-    #[serde(rename="newPassword")]
-    pub new_password: Option<String>,
-    /// The old password inputted by the user.
-    #[serde(rename="oldPassword")]
-    pub old_password: Option<String>,
-    /// The confirmation code.
-    #[serde(rename="oobCode")]
-    pub oob_code: Option<String>,
-    /// The email address of the user.
-    pub email: Option<String>,
+pub struct VerifyCustomTokenResponse {
+    /// The GITKit token for authenticated user.
+    #[serde(rename="idToken")]
+    pub id_token: Option<String>,
+    /// The fixed string "identitytoolkit#VerifyCustomTokenResponse".
+    pub kind: Option<String>,
 }
 
-impl RequestValue for IdentitytoolkitRelyingpartyResetPasswordRequest {}
+impl ResponseResult for VerifyCustomTokenResponse {}
 
 
 /// Response of verifying the IDP assertion.
@@ -496,6 +540,27 @@ pub struct VerifyAssertionResponse {
 impl ResponseResult for VerifyAssertionResponse {}
 
 
+/// Template for a single idp configuration.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct IdpConfig {
+    /// Percent of users who will be prompted/redirected federated login for this IDP.
+    #[serde(rename="experimentPercent")]
+    pub experiment_percent: Option<i32>,
+    /// Whether this IDP is enabled.
+    pub enabled: Option<bool>,
+    /// OAuth2 client ID.
+    #[serde(rename="clientId")]
+    pub client_id: Option<String>,
+    /// OAuth2 provider.
+    pub provider: Option<String>,
+}
+
+impl Part for IdpConfig {}
+
+
 /// The error encountered while processing the account info.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -512,24 +577,31 @@ impl NestedType for UploadAccountResponseError {}
 impl Part for UploadAccountResponseError {}
 
 
-/// Respone of uploading accounts in batch.
+/// Request to reset the password.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [upload account relyingparty](struct.RelyingpartyUploadAccountCall.html) (response)
+/// * [reset password relyingparty](struct.RelyingpartyResetPasswordCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct UploadAccountResponse {
-    /// The fixed string "identitytoolkit#UploadAccountResponse".
-    pub kind: Option<String>,
-    /// The error encountered while processing the account info.
-    pub error: Option<Vec<UploadAccountResponseError>>,
+pub struct IdentitytoolkitRelyingpartyResetPasswordRequest {
+    /// The new password inputted by the user.
+    #[serde(rename="newPassword")]
+    pub new_password: Option<String>,
+    /// The old password inputted by the user.
+    #[serde(rename="oldPassword")]
+    pub old_password: Option<String>,
+    /// The confirmation code.
+    #[serde(rename="oobCode")]
+    pub oob_code: Option<String>,
+    /// The email address of the user.
+    pub email: Option<String>,
 }
 
-impl ResponseResult for UploadAccountResponse {}
+impl RequestValue for IdentitytoolkitRelyingpartyResetPasswordRequest {}
 
 
 /// Request to upload user account in batch.
@@ -546,6 +618,9 @@ pub struct IdentitytoolkitRelyingpartyUploadAccountRequest {
     /// The password hash algorithm.
     #[serde(rename="hashAlgorithm")]
     pub hash_algorithm: Option<String>,
+    /// GCP project number of the requesting delegated app. Currently only intended for Firebase V1 migration.
+    #[serde(rename="delegatedProjectNumber")]
+    pub delegated_project_number: Option<String>,
     /// Memory cost for hash calculation. Used by scrypt similar algorithms.
     #[serde(rename="memoryCost")]
     pub memory_cost: Option<i32>,
@@ -607,24 +682,62 @@ pub struct VerifyPasswordResponse {
 impl ResponseResult for VerifyPasswordResponse {}
 
 
-/// Response of resetting the password.
+/// Request to set the account information.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [reset password relyingparty](struct.RelyingpartyResetPasswordCall.html) (response)
+/// * [set account info relyingparty](struct.RelyingpartySetAccountInfoCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ResetPasswordResponse {
-    /// The fixed string "identitytoolkit#ResetPasswordResponse".
-    pub kind: Option<String>,
-    /// The user's email.
+pub struct IdentitytoolkitRelyingpartySetAccountInfoRequest {
+    /// The captcha challenge.
+    #[serde(rename="captchaChallenge")]
+    pub captcha_challenge: Option<String>,
+    /// GCP project number of the requesting delegated app. Currently only intended for Firebase V1 migration.
+    #[serde(rename="delegatedProjectNumber")]
+    pub delegated_project_number: Option<String>,
+    /// The name of the user.
+    #[serde(rename="displayName")]
+    pub display_name: Option<String>,
+    /// The local ID of the user.
+    #[serde(rename="localId")]
+    pub local_id: Option<String>,
+    /// Timestamp in seconds for valid login token.
+    #[serde(rename="validSince")]
+    pub valid_since: Option<String>,
+    /// Mark the user to upgrade to federated login.
+    #[serde(rename="upgradeToFederatedLogin")]
+    pub upgrade_to_federated_login: Option<bool>,
+    /// Instance id token of the app.
+    #[serde(rename="instanceId")]
+    pub instance_id: Option<String>,
+    /// Mark the email as verified or not.
+    #[serde(rename="emailVerified")]
+    pub email_verified: Option<bool>,
+    /// Whether to disable the user.
+    #[serde(rename="disableUser")]
+    pub disable_user: Option<bool>,
+    /// Response to the captcha.
+    #[serde(rename="captchaResponse")]
+    pub captcha_response: Option<String>,
+    /// The GITKit token of the authenticated user.
+    #[serde(rename="idToken")]
+    pub id_token: Option<String>,
+    /// The associated IDPs of the user.
+    pub provider: Option<Vec<String>>,
+    /// The out-of-band code of the change email request.
+    #[serde(rename="oobCode")]
+    pub oob_code: Option<String>,
+    /// The new password of the user.
+    pub password: Option<String>,
+    /// The email of the user.
     pub email: Option<String>,
 }
 
-impl ResponseResult for ResetPasswordResponse {}
+impl RequestValue for IdentitytoolkitRelyingpartySetAccountInfoRequest {}
 
 
 /// Respone of deleting account.
@@ -643,6 +756,25 @@ pub struct DeleteAccountResponse {
 }
 
 impl ResponseResult for DeleteAccountResponse {}
+
+
+/// Response of signing out user.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [sign out user relyingparty](struct.RelyingpartySignOutUserCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct IdentitytoolkitRelyingpartySignOutUserResponse {
+    /// The local ID of the user.
+    #[serde(rename="localId")]
+    pub local_id: Option<String>,
+}
+
+impl ResponseResult for IdentitytoolkitRelyingpartySignOutUserResponse {}
 
 
 /// Request to get the IDP authentication URL.
@@ -703,9 +835,15 @@ pub struct IdentitytoolkitRelyingpartyVerifyPasswordRequest {
     /// Response to the captcha.
     #[serde(rename="captchaResponse")]
     pub captcha_response: Option<String>,
+    /// GCP project number of the requesting delegated app. Currently only intended for Firebase V1 migration.
+    #[serde(rename="delegatedProjectNumber")]
+    pub delegated_project_number: Option<String>,
     /// The captcha challenge.
     #[serde(rename="captchaChallenge")]
     pub captcha_challenge: Option<String>,
+    /// Instance id token of the app.
+    #[serde(rename="instanceId")]
+    pub instance_id: Option<String>,
     /// The password inputed by the user.
     pub password: Option<String>,
     /// The email of the user.
@@ -757,47 +895,25 @@ pub struct IdentitytoolkitRelyingpartyGetPublicKeysResponse(Option<HashMap<Strin
 impl ResponseResult for IdentitytoolkitRelyingpartyGetPublicKeysResponse {}
 
 
-/// Template for an individual account info.
+/// Request to verify a custom token
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [verify custom token relyingparty](struct.RelyingpartyVerifyCustomTokenCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct UserInfo {
-    /// The name of the user.
-    #[serde(rename="displayName")]
-    pub display_name: Option<String>,
-    /// The local ID of the user.
-    #[serde(rename="localId")]
-    pub local_id: Option<String>,
-    /// Timestamp in seconds for valid login token.
-    #[serde(rename="validSince")]
-    pub valid_since: Option<String>,
-    /// The URL of the user profile photo.
-    #[serde(rename="photoUrl")]
-    pub photo_url: Option<String>,
-    /// Whether the email has been verified.
-    #[serde(rename="emailVerified")]
-    pub email_verified: Option<bool>,
-    /// The user's hashed password.
-    #[serde(rename="passwordHash")]
-    pub password_hash: Option<String>,
-    /// Whether the user is disabled.
-    pub disabled: Option<bool>,
-    /// Version of the user's password.
-    pub version: Option<i32>,
-    /// The IDP of the user.
-    #[serde(rename="providerUserInfo")]
-    pub provider_user_info: Option<Vec<UserInfoProviderUserInfo>>,
-    /// The timestamp when the password was last updated.
-    #[serde(rename="passwordUpdatedAt")]
-    pub password_updated_at: Option<f64>,
-    /// The user's password salt.
-    pub salt: Option<String>,
-    /// The email of the user.
-    pub email: Option<String>,
+pub struct IdentitytoolkitRelyingpartyVerifyCustomTokenRequest {
+    /// Instance id token of the app.
+    #[serde(rename="instanceId")]
+    pub instance_id: Option<String>,
+    /// The custom token to verify
+    pub token: Option<String>,
 }
 
-impl Part for UserInfo {}
+impl RequestValue for IdentitytoolkitRelyingpartyVerifyCustomTokenRequest {}
 
 
 /// Request to download user account in batch.
@@ -814,6 +930,9 @@ pub struct IdentitytoolkitRelyingpartyDownloadAccountRequest {
     /// The token for the next page. This should be taken from the previous response.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
+    /// GCP project number of the requesting delegated app. Currently only intended for Firebase V1 migration.
+    #[serde(rename="delegatedProjectNumber")]
+    pub delegated_project_number: Option<String>,
     /// The max number of results to return in the response.
     #[serde(rename="maxResults")]
     pub max_results: Option<u32>,
@@ -863,6 +982,43 @@ pub struct GetAccountInfoResponse {
 impl ResponseResult for GetAccountInfoResponse {}
 
 
+/// Request to verify the IDP assertion.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [verify assertion relyingparty](struct.RelyingpartyVerifyAssertionCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct IdentitytoolkitRelyingpartyVerifyAssertionRequest {
+    /// The post body if the request is a HTTP POST.
+    #[serde(rename="postBody")]
+    pub post_body: Option<String>,
+    /// GCP project number of the requesting delegated app. Currently only intended for Firebase V1 migration.
+    #[serde(rename="delegatedProjectNumber")]
+    pub delegated_project_number: Option<String>,
+    /// Instance id token of the app.
+    #[serde(rename="instanceId")]
+    pub instance_id: Option<String>,
+    /// The URI to which the IDP redirects the user back. It may contain federated login result params added by the IDP.
+    #[serde(rename="requestUri")]
+    pub request_uri: Option<String>,
+    /// Whether to return refresh tokens.
+    #[serde(rename="returnRefreshToken")]
+    pub return_refresh_token: Option<bool>,
+    /// Session ID, which should match the one in previous createAuthUri request.
+    #[serde(rename="sessionId")]
+    pub session_id: Option<String>,
+    /// The GITKit token for the non-trusted IDP pending to be confirmed by the user.
+    #[serde(rename="pendingIdToken")]
+    pub pending_id_token: Option<String>,
+}
+
+impl RequestValue for IdentitytoolkitRelyingpartyVerifyAssertionRequest {}
+
+
 /// Respone of setting the account information.
 /// 
 /// # Activities
@@ -895,32 +1051,47 @@ pub struct SetAccountInfoResponse {
 impl ResponseResult for SetAccountInfoResponse {}
 
 
-/// Request to verify the IDP assertion.
+/// Template for an individual account info.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [verify assertion relyingparty](struct.RelyingpartyVerifyAssertionCall.html) (request)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct IdentitytoolkitRelyingpartyVerifyAssertionRequest {
-    /// The URI to which the IDP redirects the user back. It may contain federated login result params added by the IDP.
-    #[serde(rename="requestUri")]
-    pub request_uri: Option<String>,
-    /// The post body if the request is a HTTP POST.
-    #[serde(rename="postBody")]
-    pub post_body: Option<String>,
-    /// Whether to return refresh tokens.
-    #[serde(rename="returnRefreshToken")]
-    pub return_refresh_token: Option<bool>,
-    /// The GITKit token for the non-trusted IDP pending to be confirmed by the user.
-    #[serde(rename="pendingIdToken")]
-    pub pending_id_token: Option<String>,
+pub struct UserInfo {
+    /// The name of the user.
+    #[serde(rename="displayName")]
+    pub display_name: Option<String>,
+    /// The local ID of the user.
+    #[serde(rename="localId")]
+    pub local_id: Option<String>,
+    /// Timestamp in seconds for valid login token.
+    #[serde(rename="validSince")]
+    pub valid_since: Option<String>,
+    /// The URL of the user profile photo.
+    #[serde(rename="photoUrl")]
+    pub photo_url: Option<String>,
+    /// Whether the email has been verified.
+    #[serde(rename="emailVerified")]
+    pub email_verified: Option<bool>,
+    /// The user's hashed password.
+    #[serde(rename="passwordHash")]
+    pub password_hash: Option<String>,
+    /// Whether the user is disabled.
+    pub disabled: Option<bool>,
+    /// Version of the user's password.
+    pub version: Option<i32>,
+    /// The IDP of the user.
+    #[serde(rename="providerUserInfo")]
+    pub provider_user_info: Option<Vec<UserInfoProviderUserInfo>>,
+    /// The timestamp when the password was last updated.
+    #[serde(rename="passwordUpdatedAt")]
+    pub password_updated_at: Option<f64>,
+    /// The user's password salt.
+    pub salt: Option<String>,
+    /// The email of the user.
+    pub email: Option<String>,
 }
 
-impl RequestValue for IdentitytoolkitRelyingpartyVerifyAssertionRequest {}
+impl Part for UserInfo {}
 
 
 
@@ -951,7 +1122,7 @@ impl RequestValue for IdentitytoolkitRelyingpartyVerifyAssertionRequest {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = IdentityToolkit::new(hyper::Client::new(), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `create_auth_uri(...)`, `delete_account(...)`, `download_account(...)`, `get_account_info(...)`, `get_oob_confirmation_code(...)`, `get_public_keys(...)`, `get_recaptcha_param(...)`, `reset_password(...)`, `set_account_info(...)`, `upload_account(...)`, `verify_assertion(...)` and `verify_password(...)`
+/// // like `create_auth_uri(...)`, `delete_account(...)`, `download_account(...)`, `get_account_info(...)`, `get_oob_confirmation_code(...)`, `get_project_config(...)`, `get_public_keys(...)`, `get_recaptcha_param(...)`, `reset_password(...)`, `set_account_info(...)`, `sign_out_user(...)`, `upload_account(...)`, `verify_assertion(...)`, `verify_custom_token(...)` and `verify_password(...)`
 /// // to build up your call.
 /// let rb = hub.relyingparty();
 /// # }
@@ -1011,6 +1182,22 @@ impl<'a, C, A> RelyingpartyMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Sign out user.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    pub fn sign_out_user(&self, request: IdentitytoolkitRelyingpartySignOutUserRequest) -> RelyingpartySignOutUserCall<'a, C, A> {
+        RelyingpartySignOutUserCall {
+            hub: self.hub,
+            _request: request,
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Verifies the assertion returned by the IdP.
     /// 
     /// # Arguments
@@ -1050,6 +1237,22 @@ impl<'a, C, A> RelyingpartyMethods<'a, C, A> {
     /// * `request` - No description provided.
     pub fn get_account_info(&self, request: IdentitytoolkitRelyingpartyGetAccountInfoRequest) -> RelyingpartyGetAccountInfoCall<'a, C, A> {
         RelyingpartyGetAccountInfoCall {
+            hub: self.hub,
+            _request: request,
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Verifies the developer asserted ID token.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    pub fn verify_custom_token(&self, request: IdentitytoolkitRelyingpartyVerifyCustomTokenRequest) -> RelyingpartyVerifyCustomTokenCall<'a, C, A> {
+        RelyingpartyVerifyCustomTokenCall {
             hub: self.hub,
             _request: request,
             _delegate: Default::default(),
@@ -1147,6 +1350,17 @@ impl<'a, C, A> RelyingpartyMethods<'a, C, A> {
             _additional_params: Default::default(),
         }
     }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Get project configuration.
+    pub fn get_project_config(&self) -> RelyingpartyGetProjectConfigCall<'a, C, A> {
+        RelyingpartyGetProjectConfigCall {
+            hub: self.hub,
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
 }
 
 
@@ -1216,7 +1430,7 @@ impl<'a, C, A> RelyingpartyGetOobConfirmationCodeCall<'a, C, A> where C: BorrowM
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "identitytoolkit.relyingparty.getOobConfirmationCode", 
+        dlg.begin(MethodInfo { id: "identitytoolkit.relyingparty.getOobConfirmationCode",
                                http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
         for &field in ["alt"].iter() {
@@ -1245,14 +1459,14 @@ impl<'a, C, A> RelyingpartyGetOobConfirmationCodeCall<'a, C, A> where C: BorrowM
             }
         }
 
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = 
+        let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request);
                 remove_json_null_values(&mut value);
@@ -1281,7 +1495,7 @@ impl<'a, C, A> RelyingpartyGetOobConfirmationCodeCall<'a, C, A> where C: BorrowM
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -1291,10 +1505,10 @@ impl<'a, C, A> RelyingpartyGetOobConfirmationCodeCall<'a, C, A> where C: BorrowM
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -1326,7 +1540,7 @@ impl<'a, C, A> RelyingpartyGetOobConfirmationCodeCall<'a, C, A> where C: BorrowM
     ///
     /// Sets the *request* property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn request(mut self, new_value: Relyingparty) -> RelyingpartyGetOobConfirmationCodeCall<'a, C, A> {
         self._request = new_value;
@@ -1344,12 +1558,12 @@ impl<'a, C, A> RelyingpartyGetOobConfirmationCodeCall<'a, C, A> where C: BorrowM
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -1420,7 +1634,7 @@ impl<'a, C, A> RelyingpartyGetPublicKeyCall<'a, C, A> where C: BorrowMut<hyper::
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "identitytoolkit.relyingparty.getPublicKeys", 
+        dlg.begin(MethodInfo { id: "identitytoolkit.relyingparty.getPublicKeys",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((2 + self._additional_params.len()));
         for &field in ["alt"].iter() {
@@ -1449,7 +1663,7 @@ impl<'a, C, A> RelyingpartyGetPublicKeyCall<'a, C, A> where C: BorrowMut<hyper::
             }
         }
 
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -1470,7 +1684,7 @@ impl<'a, C, A> RelyingpartyGetPublicKeyCall<'a, C, A> where C: BorrowMut<hyper::
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -1480,10 +1694,10 @@ impl<'a, C, A> RelyingpartyGetPublicKeyCall<'a, C, A> where C: BorrowMut<hyper::
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -1524,12 +1738,12 @@ impl<'a, C, A> RelyingpartyGetPublicKeyCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -1607,7 +1821,7 @@ impl<'a, C, A> RelyingpartyCreateAuthUriCall<'a, C, A> where C: BorrowMut<hyper:
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "identitytoolkit.relyingparty.createAuthUri", 
+        dlg.begin(MethodInfo { id: "identitytoolkit.relyingparty.createAuthUri",
                                http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
         for &field in ["alt"].iter() {
@@ -1636,14 +1850,14 @@ impl<'a, C, A> RelyingpartyCreateAuthUriCall<'a, C, A> where C: BorrowMut<hyper:
             }
         }
 
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = 
+        let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request);
                 remove_json_null_values(&mut value);
@@ -1672,7 +1886,7 @@ impl<'a, C, A> RelyingpartyCreateAuthUriCall<'a, C, A> where C: BorrowMut<hyper:
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -1682,10 +1896,10 @@ impl<'a, C, A> RelyingpartyCreateAuthUriCall<'a, C, A> where C: BorrowMut<hyper:
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -1717,7 +1931,7 @@ impl<'a, C, A> RelyingpartyCreateAuthUriCall<'a, C, A> where C: BorrowMut<hyper:
     ///
     /// Sets the *request* property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn request(mut self, new_value: IdentitytoolkitRelyingpartyCreateAuthUriRequest) -> RelyingpartyCreateAuthUriCall<'a, C, A> {
         self._request = new_value;
@@ -1735,12 +1949,12 @@ impl<'a, C, A> RelyingpartyCreateAuthUriCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -1751,6 +1965,217 @@ impl<'a, C, A> RelyingpartyCreateAuthUriCall<'a, C, A> where C: BorrowMut<hyper:
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyCreateAuthUriCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+}
+
+
+/// Sign out user.
+///
+/// A builder for the *signOutUser* method supported by a *relyingparty* resource.
+/// It is not used directly, but through a `RelyingpartyMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_identitytoolkit3 as identitytoolkit3;
+/// use identitytoolkit3::IdentitytoolkitRelyingpartySignOutUserRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use identitytoolkit3::IdentityToolkit;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = IdentityToolkit::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = IdentitytoolkitRelyingpartySignOutUserRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.relyingparty().sign_out_user(req)
+///              .doit();
+/// # }
+/// ```
+pub struct RelyingpartySignOutUserCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a IdentityToolkit<C, A>,
+    _request: IdentitytoolkitRelyingpartySignOutUserRequest,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+}
+
+impl<'a, C, A> CallBuilder for RelyingpartySignOutUserCall<'a, C, A> {}
+
+impl<'a, C, A> RelyingpartySignOutUserCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, IdentitytoolkitRelyingpartySignOutUserResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "identitytoolkit.relyingparty.signOutUser",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        for &field in ["alt"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/signOutUser".to_string();
+        
+        let mut key = self.hub.auth.borrow_mut().api_key();
+        if key.is_none() {
+            key = dlg.api_key();
+        }
+        match key {
+            Some(value) => params.push(("key", value)),
+            None => {
+                dlg.finished(false);
+                return Err(Error::MissingAPIKey)
+            }
+        }
+
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request);
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: IdentitytoolkitRelyingpartySignOutUserRequest) -> RelyingpartySignOutUserCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartySignOutUserCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartySignOutUserCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1818,7 +2243,7 @@ impl<'a, C, A> RelyingpartyVerifyAssertionCall<'a, C, A> where C: BorrowMut<hype
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "identitytoolkit.relyingparty.verifyAssertion", 
+        dlg.begin(MethodInfo { id: "identitytoolkit.relyingparty.verifyAssertion",
                                http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
         for &field in ["alt"].iter() {
@@ -1847,14 +2272,14 @@ impl<'a, C, A> RelyingpartyVerifyAssertionCall<'a, C, A> where C: BorrowMut<hype
             }
         }
 
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = 
+        let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request);
                 remove_json_null_values(&mut value);
@@ -1883,7 +2308,7 @@ impl<'a, C, A> RelyingpartyVerifyAssertionCall<'a, C, A> where C: BorrowMut<hype
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -1893,10 +2318,10 @@ impl<'a, C, A> RelyingpartyVerifyAssertionCall<'a, C, A> where C: BorrowMut<hype
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -1928,7 +2353,7 @@ impl<'a, C, A> RelyingpartyVerifyAssertionCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// Sets the *request* property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn request(mut self, new_value: IdentitytoolkitRelyingpartyVerifyAssertionRequest) -> RelyingpartyVerifyAssertionCall<'a, C, A> {
         self._request = new_value;
@@ -1946,12 +2371,12 @@ impl<'a, C, A> RelyingpartyVerifyAssertionCall<'a, C, A> where C: BorrowMut<hype
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -2029,7 +2454,7 @@ impl<'a, C, A> RelyingpartyUploadAccountCall<'a, C, A> where C: BorrowMut<hyper:
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "identitytoolkit.relyingparty.uploadAccount", 
+        dlg.begin(MethodInfo { id: "identitytoolkit.relyingparty.uploadAccount",
                                http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
         for &field in ["alt"].iter() {
@@ -2058,14 +2483,14 @@ impl<'a, C, A> RelyingpartyUploadAccountCall<'a, C, A> where C: BorrowMut<hyper:
             }
         }
 
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = 
+        let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request);
                 remove_json_null_values(&mut value);
@@ -2094,7 +2519,7 @@ impl<'a, C, A> RelyingpartyUploadAccountCall<'a, C, A> where C: BorrowMut<hyper:
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -2104,10 +2529,10 @@ impl<'a, C, A> RelyingpartyUploadAccountCall<'a, C, A> where C: BorrowMut<hyper:
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -2139,7 +2564,7 @@ impl<'a, C, A> RelyingpartyUploadAccountCall<'a, C, A> where C: BorrowMut<hyper:
     ///
     /// Sets the *request* property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn request(mut self, new_value: IdentitytoolkitRelyingpartyUploadAccountRequest) -> RelyingpartyUploadAccountCall<'a, C, A> {
         self._request = new_value;
@@ -2157,12 +2582,12 @@ impl<'a, C, A> RelyingpartyUploadAccountCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -2240,7 +2665,7 @@ impl<'a, C, A> RelyingpartyGetAccountInfoCall<'a, C, A> where C: BorrowMut<hyper
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "identitytoolkit.relyingparty.getAccountInfo", 
+        dlg.begin(MethodInfo { id: "identitytoolkit.relyingparty.getAccountInfo",
                                http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
         for &field in ["alt"].iter() {
@@ -2269,14 +2694,14 @@ impl<'a, C, A> RelyingpartyGetAccountInfoCall<'a, C, A> where C: BorrowMut<hyper
             }
         }
 
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = 
+        let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request);
                 remove_json_null_values(&mut value);
@@ -2305,7 +2730,7 @@ impl<'a, C, A> RelyingpartyGetAccountInfoCall<'a, C, A> where C: BorrowMut<hyper
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -2315,10 +2740,10 @@ impl<'a, C, A> RelyingpartyGetAccountInfoCall<'a, C, A> where C: BorrowMut<hyper
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -2350,7 +2775,7 @@ impl<'a, C, A> RelyingpartyGetAccountInfoCall<'a, C, A> where C: BorrowMut<hyper
     ///
     /// Sets the *request* property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn request(mut self, new_value: IdentitytoolkitRelyingpartyGetAccountInfoRequest) -> RelyingpartyGetAccountInfoCall<'a, C, A> {
         self._request = new_value;
@@ -2368,12 +2793,12 @@ impl<'a, C, A> RelyingpartyGetAccountInfoCall<'a, C, A> where C: BorrowMut<hyper
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -2384,6 +2809,217 @@ impl<'a, C, A> RelyingpartyGetAccountInfoCall<'a, C, A> where C: BorrowMut<hyper
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyGetAccountInfoCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+}
+
+
+/// Verifies the developer asserted ID token.
+///
+/// A builder for the *verifyCustomToken* method supported by a *relyingparty* resource.
+/// It is not used directly, but through a `RelyingpartyMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_identitytoolkit3 as identitytoolkit3;
+/// use identitytoolkit3::IdentitytoolkitRelyingpartyVerifyCustomTokenRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use identitytoolkit3::IdentityToolkit;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = IdentityToolkit::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = IdentitytoolkitRelyingpartyVerifyCustomTokenRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.relyingparty().verify_custom_token(req)
+///              .doit();
+/// # }
+/// ```
+pub struct RelyingpartyVerifyCustomTokenCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a IdentityToolkit<C, A>,
+    _request: IdentitytoolkitRelyingpartyVerifyCustomTokenRequest,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+}
+
+impl<'a, C, A> CallBuilder for RelyingpartyVerifyCustomTokenCall<'a, C, A> {}
+
+impl<'a, C, A> RelyingpartyVerifyCustomTokenCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, VerifyCustomTokenResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "identitytoolkit.relyingparty.verifyCustomToken",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        for &field in ["alt"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyCustomToken".to_string();
+        
+        let mut key = self.hub.auth.borrow_mut().api_key();
+        if key.is_none() {
+            key = dlg.api_key();
+        }
+        match key {
+            Some(value) => params.push(("key", value)),
+            None => {
+                dlg.finished(false);
+                return Err(Error::MissingAPIKey)
+            }
+        }
+
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request);
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: IdentitytoolkitRelyingpartyVerifyCustomTokenRequest) -> RelyingpartyVerifyCustomTokenCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartyVerifyCustomTokenCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyVerifyCustomTokenCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2451,7 +3087,7 @@ impl<'a, C, A> RelyingpartyResetPasswordCall<'a, C, A> where C: BorrowMut<hyper:
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "identitytoolkit.relyingparty.resetPassword", 
+        dlg.begin(MethodInfo { id: "identitytoolkit.relyingparty.resetPassword",
                                http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
         for &field in ["alt"].iter() {
@@ -2480,14 +3116,14 @@ impl<'a, C, A> RelyingpartyResetPasswordCall<'a, C, A> where C: BorrowMut<hyper:
             }
         }
 
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = 
+        let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request);
                 remove_json_null_values(&mut value);
@@ -2516,7 +3152,7 @@ impl<'a, C, A> RelyingpartyResetPasswordCall<'a, C, A> where C: BorrowMut<hyper:
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -2526,10 +3162,10 @@ impl<'a, C, A> RelyingpartyResetPasswordCall<'a, C, A> where C: BorrowMut<hyper:
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -2561,7 +3197,7 @@ impl<'a, C, A> RelyingpartyResetPasswordCall<'a, C, A> where C: BorrowMut<hyper:
     ///
     /// Sets the *request* property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn request(mut self, new_value: IdentitytoolkitRelyingpartyResetPasswordRequest) -> RelyingpartyResetPasswordCall<'a, C, A> {
         self._request = new_value;
@@ -2579,12 +3215,12 @@ impl<'a, C, A> RelyingpartyResetPasswordCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -2662,7 +3298,7 @@ impl<'a, C, A> RelyingpartyDownloadAccountCall<'a, C, A> where C: BorrowMut<hype
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "identitytoolkit.relyingparty.downloadAccount", 
+        dlg.begin(MethodInfo { id: "identitytoolkit.relyingparty.downloadAccount",
                                http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
         for &field in ["alt"].iter() {
@@ -2691,14 +3327,14 @@ impl<'a, C, A> RelyingpartyDownloadAccountCall<'a, C, A> where C: BorrowMut<hype
             }
         }
 
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = 
+        let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request);
                 remove_json_null_values(&mut value);
@@ -2727,7 +3363,7 @@ impl<'a, C, A> RelyingpartyDownloadAccountCall<'a, C, A> where C: BorrowMut<hype
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -2737,10 +3373,10 @@ impl<'a, C, A> RelyingpartyDownloadAccountCall<'a, C, A> where C: BorrowMut<hype
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -2772,7 +3408,7 @@ impl<'a, C, A> RelyingpartyDownloadAccountCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// Sets the *request* property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn request(mut self, new_value: IdentitytoolkitRelyingpartyDownloadAccountRequest) -> RelyingpartyDownloadAccountCall<'a, C, A> {
         self._request = new_value;
@@ -2790,12 +3426,12 @@ impl<'a, C, A> RelyingpartyDownloadAccountCall<'a, C, A> where C: BorrowMut<hype
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -2873,7 +3509,7 @@ impl<'a, C, A> RelyingpartySetAccountInfoCall<'a, C, A> where C: BorrowMut<hyper
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "identitytoolkit.relyingparty.setAccountInfo", 
+        dlg.begin(MethodInfo { id: "identitytoolkit.relyingparty.setAccountInfo",
                                http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
         for &field in ["alt"].iter() {
@@ -2902,14 +3538,14 @@ impl<'a, C, A> RelyingpartySetAccountInfoCall<'a, C, A> where C: BorrowMut<hyper
             }
         }
 
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = 
+        let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request);
                 remove_json_null_values(&mut value);
@@ -2938,7 +3574,7 @@ impl<'a, C, A> RelyingpartySetAccountInfoCall<'a, C, A> where C: BorrowMut<hyper
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -2948,10 +3584,10 @@ impl<'a, C, A> RelyingpartySetAccountInfoCall<'a, C, A> where C: BorrowMut<hyper
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -2983,7 +3619,7 @@ impl<'a, C, A> RelyingpartySetAccountInfoCall<'a, C, A> where C: BorrowMut<hyper
     ///
     /// Sets the *request* property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn request(mut self, new_value: IdentitytoolkitRelyingpartySetAccountInfoRequest) -> RelyingpartySetAccountInfoCall<'a, C, A> {
         self._request = new_value;
@@ -3001,12 +3637,12 @@ impl<'a, C, A> RelyingpartySetAccountInfoCall<'a, C, A> where C: BorrowMut<hyper
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -3084,7 +3720,7 @@ impl<'a, C, A> RelyingpartyDeleteAccountCall<'a, C, A> where C: BorrowMut<hyper:
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "identitytoolkit.relyingparty.deleteAccount", 
+        dlg.begin(MethodInfo { id: "identitytoolkit.relyingparty.deleteAccount",
                                http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
         for &field in ["alt"].iter() {
@@ -3113,14 +3749,14 @@ impl<'a, C, A> RelyingpartyDeleteAccountCall<'a, C, A> where C: BorrowMut<hyper:
             }
         }
 
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = 
+        let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request);
                 remove_json_null_values(&mut value);
@@ -3149,7 +3785,7 @@ impl<'a, C, A> RelyingpartyDeleteAccountCall<'a, C, A> where C: BorrowMut<hyper:
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -3159,10 +3795,10 @@ impl<'a, C, A> RelyingpartyDeleteAccountCall<'a, C, A> where C: BorrowMut<hyper:
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -3194,7 +3830,7 @@ impl<'a, C, A> RelyingpartyDeleteAccountCall<'a, C, A> where C: BorrowMut<hyper:
     ///
     /// Sets the *request* property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn request(mut self, new_value: IdentitytoolkitRelyingpartyDeleteAccountRequest) -> RelyingpartyDeleteAccountCall<'a, C, A> {
         self._request = new_value;
@@ -3212,12 +3848,12 @@ impl<'a, C, A> RelyingpartyDeleteAccountCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -3288,7 +3924,7 @@ impl<'a, C, A> RelyingpartyGetRecaptchaParamCall<'a, C, A> where C: BorrowMut<hy
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "identitytoolkit.relyingparty.getRecaptchaParam", 
+        dlg.begin(MethodInfo { id: "identitytoolkit.relyingparty.getRecaptchaParam",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((2 + self._additional_params.len()));
         for &field in ["alt"].iter() {
@@ -3317,7 +3953,7 @@ impl<'a, C, A> RelyingpartyGetRecaptchaParamCall<'a, C, A> where C: BorrowMut<hy
             }
         }
 
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -3338,7 +3974,7 @@ impl<'a, C, A> RelyingpartyGetRecaptchaParamCall<'a, C, A> where C: BorrowMut<hy
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -3348,10 +3984,10 @@ impl<'a, C, A> RelyingpartyGetRecaptchaParamCall<'a, C, A> where C: BorrowMut<hy
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -3392,12 +4028,12 @@ impl<'a, C, A> RelyingpartyGetRecaptchaParamCall<'a, C, A> where C: BorrowMut<hy
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -3475,7 +4111,7 @@ impl<'a, C, A> RelyingpartyVerifyPasswordCall<'a, C, A> where C: BorrowMut<hyper
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "identitytoolkit.relyingparty.verifyPassword", 
+        dlg.begin(MethodInfo { id: "identitytoolkit.relyingparty.verifyPassword",
                                http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
         for &field in ["alt"].iter() {
@@ -3504,14 +4140,14 @@ impl<'a, C, A> RelyingpartyVerifyPasswordCall<'a, C, A> where C: BorrowMut<hyper
             }
         }
 
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = 
+        let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request);
                 remove_json_null_values(&mut value);
@@ -3540,7 +4176,7 @@ impl<'a, C, A> RelyingpartyVerifyPasswordCall<'a, C, A> where C: BorrowMut<hyper
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -3550,10 +4186,10 @@ impl<'a, C, A> RelyingpartyVerifyPasswordCall<'a, C, A> where C: BorrowMut<hyper
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -3585,7 +4221,7 @@ impl<'a, C, A> RelyingpartyVerifyPasswordCall<'a, C, A> where C: BorrowMut<hyper
     ///
     /// Sets the *request* property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn request(mut self, new_value: IdentitytoolkitRelyingpartyVerifyPasswordRequest) -> RelyingpartyVerifyPasswordCall<'a, C, A> {
         self._request = new_value;
@@ -3603,12 +4239,12 @@ impl<'a, C, A> RelyingpartyVerifyPasswordCall<'a, C, A> where C: BorrowMut<hyper
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -3619,6 +4255,186 @@ impl<'a, C, A> RelyingpartyVerifyPasswordCall<'a, C, A> where C: BorrowMut<hyper
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyVerifyPasswordCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+}
+
+
+/// Get project configuration.
+///
+/// A builder for the *getProjectConfig* method supported by a *relyingparty* resource.
+/// It is not used directly, but through a `RelyingpartyMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_identitytoolkit3 as identitytoolkit3;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use identitytoolkit3::IdentityToolkit;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = IdentityToolkit::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.relyingparty().get_project_config()
+///              .doit();
+/// # }
+/// ```
+pub struct RelyingpartyGetProjectConfigCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a IdentityToolkit<C, A>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+}
+
+impl<'a, C, A> CallBuilder for RelyingpartyGetProjectConfigCall<'a, C, A> {}
+
+impl<'a, C, A> RelyingpartyGetProjectConfigCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, IdentitytoolkitRelyingpartyGetProjectConfigResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "identitytoolkit.relyingparty.getProjectConfig",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((2 + self._additional_params.len()));
+        for &field in ["alt"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/getProjectConfig".to_string();
+        
+        let mut key = self.hub.auth.borrow_mut().api_key();
+        if key.is_none() {
+            key = dlg.api_key();
+        }
+        match key {
+            Some(value) => params.push(("key", value)),
+            None => {
+                dlg.finished(false);
+                return Err(Error::MissingAPIKey)
+            }
+        }
+
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()));
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartyGetProjectConfigCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyGetProjectConfigCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

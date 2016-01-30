@@ -2,10 +2,10 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *appengine* crate version *0.1.10+20150831*, where *20150831* is the exact revision of the *appengine:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.10*.
+//! This documentation was generated from *appengine* crate version *0.1.11+20160121*, where *20160121* is the exact revision of the *appengine:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
 //! 
 //! Everything else about the *appengine* *v1_beta4* API can be found at the
-//! [official documentation site](https://developers.google.com/appengine/).
+//! [official documentation site](https://cloud.google.com/appengine/docs/admin-api/).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/appengine1_beta4).
 //! # Features
 //! 

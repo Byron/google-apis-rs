@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-youtube3` library allows access to all features of the *Google YouTube* service.
 
-This documentation was generated from *YouTube* crate version *0.1.10+20151012*, where *20151012* is the exact revision of the *youtube:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.10*.
+This documentation was generated from *YouTube* crate version *0.1.11+20160111*, where *20160111* is the exact revision of the *youtube:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
 
 Everything else about the *YouTube* *v3* API can be found at the
 [official documentation site](https://developers.google.com/youtube/v3).
@@ -27,6 +27,8 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
  * [*insert*](http://byron.github.io/google-apis-rs/google_youtube3/struct.CommentThreadInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_youtube3/struct.CommentThreadListCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_youtube3/struct.CommentThreadUpdateCall.html)
 * [comments](http://byron.github.io/google-apis-rs/google_youtube3/struct.Comment.html)
  * [*delete*](http://byron.github.io/google-apis-rs/google_youtube3/struct.CommentDeleteCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_youtube3/struct.CommentInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_youtube3/struct.CommentListCall.html), [*mark as spam*](http://byron.github.io/google-apis-rs/google_youtube3/struct.CommentMarkAsSpamCall.html), [*set moderation status*](http://byron.github.io/google-apis-rs/google_youtube3/struct.CommentSetModerationStatuCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_youtube3/struct.CommentUpdateCall.html)
+* [fan funding events](http://byron.github.io/google-apis-rs/google_youtube3/struct.FanFundingEvent.html)
+ * [*list*](http://byron.github.io/google-apis-rs/google_youtube3/struct.FanFundingEventListCall.html)
 * [guide categories](http://byron.github.io/google-apis-rs/google_youtube3/struct.GuideCategory.html)
  * [*list*](http://byron.github.io/google-apis-rs/google_youtube3/struct.GuideCategoryListCall.html)
 * [i18n languages](http://byron.github.io/google-apis-rs/google_youtube3/struct.I18nLanguage.html)
@@ -34,7 +36,13 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
 * [i18n regions](http://byron.github.io/google-apis-rs/google_youtube3/struct.I18nRegion.html)
  * [*list*](http://byron.github.io/google-apis-rs/google_youtube3/struct.I18nRegionListCall.html)
 * [live broadcasts](http://byron.github.io/google-apis-rs/google_youtube3/struct.LiveBroadcast.html)
- * [*bind*](http://byron.github.io/google-apis-rs/google_youtube3/struct.LiveBroadcastBindCall.html), [*bind_direct*](http://byron.github.io/google-apis-rs/google_youtube3/struct.LiveBroadcastBindDirectCall.html), [*control*](http://byron.github.io/google-apis-rs/google_youtube3/struct.LiveBroadcastControlCall.html), [*delete*](http://byron.github.io/google-apis-rs/google_youtube3/struct.LiveBroadcastDeleteCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_youtube3/struct.LiveBroadcastInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_youtube3/struct.LiveBroadcastListCall.html), [*transition*](http://byron.github.io/google-apis-rs/google_youtube3/struct.LiveBroadcastTransitionCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_youtube3/struct.LiveBroadcastUpdateCall.html)
+ * [*bind*](http://byron.github.io/google-apis-rs/google_youtube3/struct.LiveBroadcastBindCall.html), [*control*](http://byron.github.io/google-apis-rs/google_youtube3/struct.LiveBroadcastControlCall.html), [*delete*](http://byron.github.io/google-apis-rs/google_youtube3/struct.LiveBroadcastDeleteCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_youtube3/struct.LiveBroadcastInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_youtube3/struct.LiveBroadcastListCall.html), [*transition*](http://byron.github.io/google-apis-rs/google_youtube3/struct.LiveBroadcastTransitionCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_youtube3/struct.LiveBroadcastUpdateCall.html)
+* [live chat bans](http://byron.github.io/google-apis-rs/google_youtube3/struct.LiveChatBan.html)
+ * [*delete*](http://byron.github.io/google-apis-rs/google_youtube3/struct.LiveChatBanDeleteCall.html) and [*insert*](http://byron.github.io/google-apis-rs/google_youtube3/struct.LiveChatBanInsertCall.html)
+* [live chat messages](http://byron.github.io/google-apis-rs/google_youtube3/struct.LiveChatMessage.html)
+ * [*delete*](http://byron.github.io/google-apis-rs/google_youtube3/struct.LiveChatMessageDeleteCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_youtube3/struct.LiveChatMessageInsertCall.html) and [*list*](http://byron.github.io/google-apis-rs/google_youtube3/struct.LiveChatMessageListCall.html)
+* [live chat moderators](http://byron.github.io/google-apis-rs/google_youtube3/struct.LiveChatModerator.html)
+ * [*delete*](http://byron.github.io/google-apis-rs/google_youtube3/struct.LiveChatModeratorDeleteCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_youtube3/struct.LiveChatModeratorInsertCall.html) and [*list*](http://byron.github.io/google-apis-rs/google_youtube3/struct.LiveChatModeratorListCall.html)
 * [live streams](http://byron.github.io/google-apis-rs/google_youtube3/struct.LiveStream.html)
  * [*delete*](http://byron.github.io/google-apis-rs/google_youtube3/struct.LiveStreamDeleteCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_youtube3/struct.LiveStreamInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_youtube3/struct.LiveStreamListCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_youtube3/struct.LiveStreamUpdateCall.html)
 * [playlist items](http://byron.github.io/google-apis-rs/google_youtube3/struct.PlaylistItem.html)
@@ -43,6 +51,8 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
  * [*delete*](http://byron.github.io/google-apis-rs/google_youtube3/struct.PlaylistDeleteCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_youtube3/struct.PlaylistInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_youtube3/struct.PlaylistListCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_youtube3/struct.PlaylistUpdateCall.html)
 * search
  * [*list*](http://byron.github.io/google-apis-rs/google_youtube3/struct.SearchListCall.html)
+* [sponsors](http://byron.github.io/google-apis-rs/google_youtube3/struct.Sponsor.html)
+ * [*list*](http://byron.github.io/google-apis-rs/google_youtube3/struct.SponsorListCall.html)
 * [subscriptions](http://byron.github.io/google-apis-rs/google_youtube3/struct.Subscription.html)
  * [*delete*](http://byron.github.io/google-apis-rs/google_youtube3/struct.SubscriptionDeleteCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_youtube3/struct.SubscriptionInsertCall.html) and [*list*](http://byron.github.io/google-apis-rs/google_youtube3/struct.SubscriptionListCall.html)
 * [thumbnails](http://byron.github.io/google-apis-rs/google_youtube3/struct.Thumbnail.html)
@@ -59,12 +69,12 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
 
 Upload supported by ...
 
-* [*set watermarks*](http://byron.github.io/google-apis-rs/google_youtube3/struct.WatermarkSetCall.html)
-* [*insert channel banners*](http://byron.github.io/google-apis-rs/google_youtube3/struct.ChannelBannerInsertCall.html)
 * [*set thumbnails*](http://byron.github.io/google-apis-rs/google_youtube3/struct.ThumbnailSetCall.html)
 * [*insert captions*](http://byron.github.io/google-apis-rs/google_youtube3/struct.CaptionInsertCall.html)
-* [*update captions*](http://byron.github.io/google-apis-rs/google_youtube3/struct.CaptionUpdateCall.html)
 * [*insert videos*](http://byron.github.io/google-apis-rs/google_youtube3/struct.VideoInsertCall.html)
+* [*set watermarks*](http://byron.github.io/google-apis-rs/google_youtube3/struct.WatermarkSetCall.html)
+* [*insert channel banners*](http://byron.github.io/google-apis-rs/google_youtube3/struct.ChannelBannerInsertCall.html)
+* [*update captions*](http://byron.github.io/google-apis-rs/google_youtube3/struct.CaptionUpdateCall.html)
 
 Download supported by ...
 
@@ -104,14 +114,13 @@ let r = hub.resource().activity(...).doit()
 Or specifically ...
 
 ```ignore
-let r = hub.live_broadcasts().control(...).doit()
-let r = hub.live_broadcasts().insert(...).doit()
-let r = hub.live_broadcasts().bind_direct(...).doit()
-let r = hub.live_broadcasts().list(...).doit()
-let r = hub.live_broadcasts().transition(...).doit()
-let r = hub.live_broadcasts().update(...).doit()
-let r = hub.live_broadcasts().delete(...).doit()
-let r = hub.live_broadcasts().bind(...).doit()
+let r = hub.videos().rate(...).doit()
+let r = hub.videos().report_abuse(...).doit()
+let r = hub.videos().get_rating(...).doit()
+let r = hub.videos().list(...).doit()
+let r = hub.videos().insert(...).doit()
+let r = hub.videos().update(...).doit()
+let r = hub.videos().delete(...).doit()
 ```
 
 The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -156,14 +165,17 @@ let mut hub = YouTube::new(hyper::Client::new(), auth);
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
-let result = hub.live_broadcasts().list("part")
-             .page_token("sit")
-             .on_behalf_of_content_owner_channel("Stet")
-             .on_behalf_of_content_owner("sed")
-             .mine(false)
-             .max_results(83)
-             .id("kasd")
-             .broadcast_status("accusam")
+let result = hub.videos().list("part")
+             .video_category_id("sit")
+             .region_code("Stet")
+             .page_token("sed")
+             .on_behalf_of_content_owner("et")
+             .my_rating("dolores")
+             .max_results(38)
+             .locale("accusam")
+             .id("takimata")
+             .hl("justo")
+             .chart("amet.")
              .doit();
 
 match result {

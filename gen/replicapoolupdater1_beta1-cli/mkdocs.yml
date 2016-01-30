@@ -1,4 +1,4 @@
-site_name: replicapoolupdater v0.3.2+20150904
+site_name: replicapoolupdater v0.3.3+20160107
 site_url: http://byron.github.io/google-apis-rs/google-replicapoolupdater1_beta1-cli
 site_description: Write integrating applications with bcore
 
@@ -22,5 +22,5 @@ pages:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015, `Sebastian Thiel`
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
 

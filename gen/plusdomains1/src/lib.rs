@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *plusDomains* crate version *0.1.10+20151014*, where *20151014* is the exact revision of the *plusDomains:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.10*.
+//! This documentation was generated from *plusDomains* crate version *0.1.11+20160127*, where *20160127* is the exact revision of the *plusDomains:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
 //! 
 //! Everything else about the *plusDomains* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/+/domains/).

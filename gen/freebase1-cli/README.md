@@ -17,14 +17,14 @@ Everything else about the *freebase* API can be found at the
 
 You can download the pre-compiled 64bit binaries for the following platforms:
 
-* ![icon](http://megaicons.net/static/img/icons_sizes/6/140/16/ubuntu-icon.png) [ubuntu](http://dl.byronimo.de/google.rs/cli/0.3.2/ubuntu/freebase1.tar.gz)
-* ![icon](http://hydra-media.cursecdn.com/wow.gamepedia.com/a/a2/Apple-icon-16x16.png?version=25ddd67ac3dd3b634478e3978b76cb74) [osx](http://dl.byronimo.de/google.rs/cli/0.3.2/osx/freebase1.tar.gz)
+* ![icon](http://megaicons.net/static/img/icons_sizes/6/140/16/ubuntu-icon.png) [ubuntu](http://dl.byronimo.de/google.rs/cli/0.3.3/ubuntu/freebase1.tar.gz)
+* ![icon](http://hydra-media.cursecdn.com/wow.gamepedia.com/a/a2/Apple-icon-16x16.png?version=25ddd67ac3dd3b634478e3978b76cb74) [osx](http://dl.byronimo.de/google.rs/cli/0.3.3/osx/freebase1.tar.gz)
 
 Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/freebase1-cli).
 
 # Usage
 
-This documentation was generated from the *freebase* API at revision *20150728*. The CLI is at version *0.3.2*.
+This documentation was generated from the *freebase* API at revision *20150728*. The CLI is at version *0.3.3*.
 
 ```bash
 freebase1 [options]
@@ -35,14 +35,14 @@ freebase1 [options]
 
 Configuration:
   --config-dir <folder>
-            A directory into which we will store our persistent data. Defaults to 
+            A directory into which we will store our persistent data. Defaults to
             a user-writable directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
   --debug
-            Output all server communication to standard error. `tx` and `rx` are placed 
+            Output all server communication to standard error. `tx` and `rx` are placed
             into the same stream.
   --debug-auth
-            Output all communication related to authentication to standard error. `tx` 
+            Output all communication related to authentication to standard error. `tx`
             and `rx` are placed into the same stream.
 
 ```

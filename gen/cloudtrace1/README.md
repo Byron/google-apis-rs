@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-cloudtrace1` library allows access to all features of the *Google cloudtrace* service.
 
-This documentation was generated from *cloudtrace* crate version *0.1.10+20150825*, where *20150825* is the exact revision of the *cloudtrace:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.10*.
+This documentation was generated from *cloudtrace* crate version *0.1.11+20151207*, where *20151207* is the exact revision of the *cloudtrace:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
 
 Everything else about the *cloudtrace* *v1* API can be found at the
 [official documentation site](https://cloud.google.com/tools/cloud-trace).
@@ -16,9 +16,6 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
 * projects
  * [*patch traces*](http://byron.github.io/google-apis-rs/google_cloudtrace1/struct.ProjectPatchTraceCall.html), [*traces get*](http://byron.github.io/google-apis-rs/google_cloudtrace1/struct.ProjectTraceGetCall.html) and [*traces list*](http://byron.github.io/google-apis-rs/google_cloudtrace1/struct.ProjectTraceListCall.html)
 
-Other activities are ...
-
-* [get discovery](http://byron.github.io/google-apis-rs/google_cloudtrace1/struct.MethodGetDiscoveryCall.html)
 
 
 

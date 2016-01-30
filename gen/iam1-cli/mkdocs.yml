@@ -1,0 +1,29 @@
+site_name: iam v0.3.3+20160129
+site_url: http://byron.github.io/google-apis-rs/google-iam1-cli
+site_description: Write integrating applications with bcore
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/iam1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['projects_service-accounts-create.md', 'Projects', 'Service Accounts Create']
+- ['projects_service-accounts-delete.md', 'Projects', 'Service Accounts Delete']
+- ['projects_service-accounts-get.md', 'Projects', 'Service Accounts Get']
+- ['projects_service-accounts-get-iam-policy.md', 'Projects', 'Service Accounts Get Iam Policy']
+- ['projects_service-accounts-keys-create.md', 'Projects', 'Service Accounts Keys Create']
+- ['projects_service-accounts-keys-delete.md', 'Projects', 'Service Accounts Keys Delete']
+- ['projects_service-accounts-keys-get.md', 'Projects', 'Service Accounts Keys Get']
+- ['projects_service-accounts-keys-list.md', 'Projects', 'Service Accounts Keys List']
+- ['projects_service-accounts-list.md', 'Projects', 'Service Accounts List']
+- ['projects_service-accounts-set-iam-policy.md', 'Projects', 'Service Accounts Set Iam Policy']
+- ['projects_service-accounts-sign-blob.md', 'Projects', 'Service Accounts Sign Blob']
+- ['projects_service-accounts-test-iam-permissions.md', 'Projects', 'Service Accounts Test Iam Permissions']
+- ['projects_service-accounts-update.md', 'Projects', 'Service Accounts Update']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+

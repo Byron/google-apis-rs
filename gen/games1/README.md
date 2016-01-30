@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-games1` library allows access to all features of the *Google Games* service.
 
-This documentation was generated from *Games* crate version *0.1.10+20151012*, where *20151012* is the exact revision of the *games:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.10*.
+This documentation was generated from *Games* crate version *0.1.11+20160126*, where *20160126* is the exact revision of the *games:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
 
 Everything else about the *Games* *v1* API can be found at the
 [official documentation site](https://developers.google.com/games/services/).
@@ -18,7 +18,7 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
 * achievements
  * [*increment*](http://byron.github.io/google-apis-rs/google_games1/struct.AchievementIncrementCall.html), [*list*](http://byron.github.io/google-apis-rs/google_games1/struct.AchievementListCall.html), [*reveal*](http://byron.github.io/google-apis-rs/google_games1/struct.AchievementRevealCall.html), [*set steps at least*](http://byron.github.io/google-apis-rs/google_games1/struct.AchievementSetStepsAtLeastCall.html), [*unlock*](http://byron.github.io/google-apis-rs/google_games1/struct.AchievementUnlockCall.html) and [*update multiple*](http://byron.github.io/google-apis-rs/google_games1/struct.AchievementUpdateMultipleCall.html)
 * [applications](http://byron.github.io/google-apis-rs/google_games1/struct.Application.html)
- * [*get*](http://byron.github.io/google-apis-rs/google_games1/struct.ApplicationGetCall.html) and [*played*](http://byron.github.io/google-apis-rs/google_games1/struct.ApplicationPlayedCall.html)
+ * [*get*](http://byron.github.io/google-apis-rs/google_games1/struct.ApplicationGetCall.html), [*played*](http://byron.github.io/google-apis-rs/google_games1/struct.ApplicationPlayedCall.html) and [*verify*](http://byron.github.io/google-apis-rs/google_games1/struct.ApplicationVerifyCall.html)
 * events
  * [*list by player*](http://byron.github.io/google-apis-rs/google_games1/struct.EventListByPlayerCall.html), [*list definitions*](http://byron.github.io/google-apis-rs/google_games1/struct.EventListDefinitionCall.html) and [*record*](http://byron.github.io/google-apis-rs/google_games1/struct.EventRecordCall.html)
 * [leaderboards](http://byron.github.io/google-apis-rs/google_games1/struct.Leaderboard.html)

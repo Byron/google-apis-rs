@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *YouTube* crate version *0.1.10+20151012*, where *20151012* is the exact revision of the *youtube:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.10*.
+//! This documentation was generated from *YouTube* crate version *0.1.11+20160111*, where *20160111* is the exact revision of the *youtube:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
 //! 
 //! Everything else about the *YouTube* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/youtube/v3).
@@ -25,6 +25,8 @@
 //!  * [*insert*](struct.CommentThreadInsertCall.html), [*list*](struct.CommentThreadListCall.html) and [*update*](struct.CommentThreadUpdateCall.html)
 //! * [comments](struct.Comment.html)
 //!  * [*delete*](struct.CommentDeleteCall.html), [*insert*](struct.CommentInsertCall.html), [*list*](struct.CommentListCall.html), [*mark as spam*](struct.CommentMarkAsSpamCall.html), [*set moderation status*](struct.CommentSetModerationStatuCall.html) and [*update*](struct.CommentUpdateCall.html)
+//! * [fan funding events](struct.FanFundingEvent.html)
+//!  * [*list*](struct.FanFundingEventListCall.html)
 //! * [guide categories](struct.GuideCategory.html)
 //!  * [*list*](struct.GuideCategoryListCall.html)
 //! * [i18n languages](struct.I18nLanguage.html)
@@ -32,7 +34,13 @@
 //! * [i18n regions](struct.I18nRegion.html)
 //!  * [*list*](struct.I18nRegionListCall.html)
 //! * [live broadcasts](struct.LiveBroadcast.html)
-//!  * [*bind*](struct.LiveBroadcastBindCall.html), [*bind_direct*](struct.LiveBroadcastBindDirectCall.html), [*control*](struct.LiveBroadcastControlCall.html), [*delete*](struct.LiveBroadcastDeleteCall.html), [*insert*](struct.LiveBroadcastInsertCall.html), [*list*](struct.LiveBroadcastListCall.html), [*transition*](struct.LiveBroadcastTransitionCall.html) and [*update*](struct.LiveBroadcastUpdateCall.html)
+//!  * [*bind*](struct.LiveBroadcastBindCall.html), [*control*](struct.LiveBroadcastControlCall.html), [*delete*](struct.LiveBroadcastDeleteCall.html), [*insert*](struct.LiveBroadcastInsertCall.html), [*list*](struct.LiveBroadcastListCall.html), [*transition*](struct.LiveBroadcastTransitionCall.html) and [*update*](struct.LiveBroadcastUpdateCall.html)
+//! * [live chat bans](struct.LiveChatBan.html)
+//!  * [*delete*](struct.LiveChatBanDeleteCall.html) and [*insert*](struct.LiveChatBanInsertCall.html)
+//! * [live chat messages](struct.LiveChatMessage.html)
+//!  * [*delete*](struct.LiveChatMessageDeleteCall.html), [*insert*](struct.LiveChatMessageInsertCall.html) and [*list*](struct.LiveChatMessageListCall.html)
+//! * [live chat moderators](struct.LiveChatModerator.html)
+//!  * [*delete*](struct.LiveChatModeratorDeleteCall.html), [*insert*](struct.LiveChatModeratorInsertCall.html) and [*list*](struct.LiveChatModeratorListCall.html)
 //! * [live streams](struct.LiveStream.html)
 //!  * [*delete*](struct.LiveStreamDeleteCall.html), [*insert*](struct.LiveStreamInsertCall.html), [*list*](struct.LiveStreamListCall.html) and [*update*](struct.LiveStreamUpdateCall.html)
 //! * [playlist items](struct.PlaylistItem.html)
@@ -41,6 +49,8 @@
 //!  * [*delete*](struct.PlaylistDeleteCall.html), [*insert*](struct.PlaylistInsertCall.html), [*list*](struct.PlaylistListCall.html) and [*update*](struct.PlaylistUpdateCall.html)
 //! * search
 //!  * [*list*](struct.SearchListCall.html)
+//! * [sponsors](struct.Sponsor.html)
+//!  * [*list*](struct.SponsorListCall.html)
 //! * [subscriptions](struct.Subscription.html)
 //!  * [*delete*](struct.SubscriptionDeleteCall.html), [*insert*](struct.SubscriptionInsertCall.html) and [*list*](struct.SubscriptionListCall.html)
 //! * [thumbnails](struct.Thumbnail.html)
@@ -57,12 +67,12 @@
 //! 
 //! Upload supported by ...
 //! 
-//! * [*set watermarks*](struct.WatermarkSetCall.html)
-//! * [*insert channel banners*](struct.ChannelBannerInsertCall.html)
 //! * [*set thumbnails*](struct.ThumbnailSetCall.html)
 //! * [*insert captions*](struct.CaptionInsertCall.html)
-//! * [*update captions*](struct.CaptionUpdateCall.html)
 //! * [*insert videos*](struct.VideoInsertCall.html)
+//! * [*set watermarks*](struct.WatermarkSetCall.html)
+//! * [*insert channel banners*](struct.ChannelBannerInsertCall.html)
+//! * [*update captions*](struct.CaptionUpdateCall.html)
 //! 
 //! Download supported by ...
 //! 
@@ -104,14 +114,13 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.live_broadcasts().control(...).doit()
-//! let r = hub.live_broadcasts().insert(...).doit()
-//! let r = hub.live_broadcasts().bind_direct(...).doit()
-//! let r = hub.live_broadcasts().list(...).doit()
-//! let r = hub.live_broadcasts().transition(...).doit()
-//! let r = hub.live_broadcasts().update(...).doit()
-//! let r = hub.live_broadcasts().delete(...).doit()
-//! let r = hub.live_broadcasts().bind(...).doit()
+//! let r = hub.videos().rate(...).doit()
+//! let r = hub.videos().report_abuse(...).doit()
+//! let r = hub.videos().get_rating(...).doit()
+//! let r = hub.videos().list(...).doit()
+//! let r = hub.videos().insert(...).doit()
+//! let r = hub.videos().update(...).doit()
+//! let r = hub.videos().delete(...).doit()
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -157,14 +166,17 @@
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.live_broadcasts().list("part")
-//!              .page_token("Lorem")
-//!              .on_behalf_of_content_owner_channel("dolor")
-//!              .on_behalf_of_content_owner("vero")
-//!              .mine(false)
-//!              .max_results(93)
-//!              .id("dolores")
-//!              .broadcast_status("consetetur")
+//! let result = hub.videos().list("part")
+//!              .video_category_id("sit")
+//!              .region_code("amet")
+//!              .page_token("eirmod")
+//!              .on_behalf_of_content_owner("sanctus")
+//!              .my_rating("Lorem")
+//!              .max_results(100)
+//!              .locale("diam")
+//!              .id("eirmod")
+//!              .hl("sadipscing")
+//!              .chart("Lorem")
 //!              .doit();
 //! 
 //! match result {

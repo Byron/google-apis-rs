@@ -19,10 +19,11 @@ use std::collections::BTreeMap;
 use serde_json as json;
 use std::io;
 use std::fs;
-use std::thread::sleep_ms;
+use std::thread::sleep;
+use std::time::Duration;
 
 pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, 
+              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
               Resource, ErrorResponse, remove_json_null_values};
 
 
@@ -134,7 +135,7 @@ impl<'a, C, A> Appengine<C, A>
         Appengine {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.10".to_string(),
+            _user_agent: "google-api-rust-client/0.1.11".to_string(),
         }
     }
 
@@ -143,7 +144,7 @@ impl<'a, C, A> Appengine<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.10`.
+    /// It defaults to `google-api-rust-client/0.1.11`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -157,6 +158,191 @@ impl<'a, C, A> Appengine<C, A>
 // ############
 // SCHEMAS ###
 // ##########
+/// Used to specify extra network settings (for VM runtimes only).
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Network {
+    /// A tag to apply to the VM instance during creation.
+    #[serde(rename="instanceTag")]
+    pub instance_tag: Option<String>,
+    /// A list of ports (or port pairs) to forward from the VM into the app container.
+    #[serde(rename="forwardedPorts")]
+    pub forwarded_ports: Option<Vec<String>>,
+    /// The Google Compute Engine network where the VMs will be created. If not specified, or empty, the network named "default" will be used. (The short name should be specified, not the resource path.)
+    pub name: Option<String>,
+}
+
+impl Part for Network {}
+
+
+/// An Application contains the top-level configuration of an App Engine application.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [get apps](struct.AppGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Application {
+    /// The full path to the application in the API. Example: "apps/myapp". @OutputOnly
+    pub name: Option<String>,
+    /// A Google Cloud Storage bucket which can be used for storing files associated with an application. This bucket is associated with the application and can be used by the gcloud deployment commands. @OutputOnly
+    #[serde(rename="codeBucket")]
+    pub code_bucket: Option<String>,
+    /// A Google Cloud Storage bucket which can be used by the application to store content. @OutputOnly
+    #[serde(rename="defaultBucket")]
+    pub default_bucket: Option<String>,
+    /// HTTP path dispatch rules for requests to the app that do not explicitly target a module or version. The rules are order-dependent.
+    #[serde(rename="dispatchRules")]
+    pub dispatch_rules: Option<Vec<UrlDispatchRule>>,
+    /// The relative name/path of the application. Example: "myapp". @OutputOnly
+    pub id: Option<String>,
+    /// The location from which the application will be run. Choices are "us-central" for United States and "europe-west" for European Union. Application instances will run out of data centers in the chosen location and all of the application's End User Content will be stored at rest in the chosen location. The default is "us-central".
+    pub location: Option<String>,
+}
+
+impl ResponseResult for Application {}
+
+
+/// A Version is a specific set of source code and configuration files deployed to a module.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [modules versions create apps](struct.AppModuleVersionCreateCall.html) (request)
+/// * [modules versions get apps](struct.AppModuleVersionGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Version {
+    /// A module with basic scaling will create an instance when the application receives a request. The instance will be turned down when the app becomes idle. Basic scaling is ideal for work that is intermittent or driven by user activity.
+    #[serde(rename="basicScaling")]
+    pub basic_scaling: Option<BasicScaling>,
+    /// Beta settings supplied to the application via metadata.
+    #[serde(rename="betaSettings")]
+    pub beta_settings: Option<HashMap<String, String>>,
+    /// A module with manual scaling runs continuously, allowing you to perform complex initialization and rely on the state of its memory over time.
+    #[serde(rename="manualScaling")]
+    pub manual_scaling: Option<ManualScaling>,
+    /// Creation time of this version. This will be between the start and end times of the operation that creates this version. @OutputOnly
+    #[serde(rename="creationTime")]
+    pub creation_time: Option<String>,
+    /// Whether to deploy this app in a VM container.
+    pub vm: Option<bool>,
+    /// Before an application can receive email or XMPP messages, the application must be configured to enable the service.
+    #[serde(rename="inboundServices")]
+    pub inbound_services: Option<Vec<String>>,
+    /// The frontend instance class to use to run this app. Valid values are `[F1, F2, F4, F4_1G]`. Default: "F1"
+    #[serde(rename="instanceClass")]
+    pub instance_class: Option<String>,
+    /// Code and application artifacts that make up this version. Only returned in `GET` requests if `view=FULL` is set. May only be set on create requests; once created, is immutable.
+    pub deployment: Option<Deployment>,
+    /// Custom static error pages instead of these generic error pages, (limit 10 KB/page) Only returned in `GET` requests if `view=FULL` is set. May only be set on create requests; once created, is immutable.
+    #[serde(rename="errorHandlers")]
+    pub error_handlers: Option<Vec<ErrorHandler>>,
+    /// The current serving status of this version. Only `SERVING` versions will have instances created or billed for. If this field is unset when a version is created, `SERVING` status will be assumed. It is an error to explicitly set this field to `SERVING_STATUS_UNSPECIFIED`.
+    #[serde(rename="servingStatus")]
+    pub serving_status: Option<String>,
+    /// The relative name/path of the Version within the module. Example: "v1". Version specifiers can contain lowercase letters, digits, and hyphens. It cannot begin with the prefix `ah-` and the names `default` and `latest` are reserved and cannot be used.
+    pub id: Option<String>,
+    /// If true, multiple requests can be dispatched to the app at once.
+    pub threadsafe: Option<bool>,
+    /// Serving configuration for Google Cloud Endpoints. Only returned in `GET` requests if `view=FULL` is set. May only be set on create requests; once created, is immutable.
+    #[serde(rename="apiConfig")]
+    pub api_config: Option<ApiConfigHandler>,
+    /// Go only. Files that match this pattern will not be built into the app. May only be set on create requests.
+    #[serde(rename="nobuildFilesRegex")]
+    pub nobuild_files_regex: Option<String>,
+    /// Used to specify extra network settings (for VM runtimes only).
+    pub network: Option<Network>,
+    /// An ordered list of URL Matching patterns that should be applied to incoming requests. The first matching URL consumes the request, and subsequent handlers are not attempted. Only returned in `GET` requests if `view=FULL` is set. May only be set on create requests; once created, is immutable.
+    pub handlers: Option<Vec<UrlMap>>,
+    /// Configure health checking for the VM instances. Unhealthy VM instances will be stopped and replaced with new instances. Only returned in `GET` requests if `view=FULL` is set. May only be set on create requests; once created, is immutable.
+    #[serde(rename="healthCheck")]
+    pub health_check: Option<HealthCheck>,
+    /// The length of time a static file served by a static file handler ought to be cached by web proxies and browsers, if the handler does not specify its own expiration. Only returned in `GET` requests if `view=FULL` is set. May only be set on create requests; once created, is immutable.
+    #[serde(rename="defaultExpiration")]
+    pub default_expiration: Option<String>,
+    /// The full path to the Version resource in the API. Example: "apps/myapp/modules/default/versions/v1". @OutputOnly
+    pub name: Option<String>,
+    /// Configuration for Python runtime third-party libraries required by the application. Only returned in `GET` requests if `view=FULL` is set. May only be set on create requests; once created, is immutable.
+    pub libraries: Option<Vec<Library>>,
+    /// The email address of the user who created this version. @OutputOnly
+    pub deployer: Option<String>,
+    /// The App Engine execution environment to use for this version. Default: "1"
+    pub env: Option<String>,
+    /// Automatic scaling is the scaling policy that App Engine has used since its inception. It is based on request rate, response latencies, and other application metrics.
+    #[serde(rename="automaticScaling")]
+    pub automatic_scaling: Option<AutomaticScaling>,
+    /// The desired runtime. Values can include python27, java7, go, etc.
+    pub runtime: Option<String>,
+    /// Environment variables made available to the application. Only returned in `GET` requests if `view=FULL` is set. May only be set on create requests; once created, is immutable.
+    #[serde(rename="envVariables")]
+    pub env_variables: Option<HashMap<String, String>>,
+    /// Used to specify how many machine resources an app version needs (for VM runtimes only).
+    pub resources: Option<Resources>,
+}
+
+impl RequestValue for Version {}
+impl ResponseResult for Version {}
+
+
+/// A Python runtime third-party library required by the application.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Library {
+    /// The version of the library to select, or "latest".
+    pub version: Option<String>,
+    /// The name of the library, e.g. "PIL" or "django".
+    pub name: Option<String>,
+}
+
+impl Part for Library {}
+
+
+/// Target scaling by CPU usage.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CpuUtilization {
+    /// Target (0-1) CPU utilization ratio to maintain when scaling.
+    #[serde(rename="targetUtilization")]
+    pub target_utilization: Option<f64>,
+    /// The period of time over which CPU utilization is calculated.
+    #[serde(rename="aggregationWindowLength")]
+    pub aggregation_window_length: Option<String>,
+}
+
+impl Part for CpuUtilization {}
+
+
+/// Used to specify how many machine resources an app version needs.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Resources {
+    /// How much disk size, in GB, an app version needs.
+    #[serde(rename="diskGb")]
+    pub disk_gb: Option<f64>,
+    /// How many CPU cores an app version needs.
+    pub cpu: Option<f64>,
+    /// How much memory, in GB, an app version needs.
+    #[serde(rename="memoryGb")]
+    pub memory_gb: Option<f64>,
+}
+
+impl Part for Resources {}
+
+
 /// Response message for `Modules.ListModules`.
 /// 
 /// # Activities
@@ -176,6 +362,177 @@ pub struct ListModulesResponse {
 }
 
 impl ResponseResult for ListModulesResponse {}
+
+
+/// The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). The error model is designed to be: - Simple to use and understand for most users - Flexible enough to meet unexpected needs # Overview The `Status` message contains three pieces of data: error code, error message, and error details. The error code should be an enum value of google.rpc.Code, but it may accept additional error codes if needed. The error message should be a developer-facing English message that helps developers *understand* and *resolve* the error. If a localized user-facing error message is needed, put the localized message in the error details or localize it in the client. The optional error details may contain arbitrary information about the error. There is a predefined set of error detail types in the package `google.rpc` which can be used for common error conditions. # Language mapping The `Status` message is the logical representation of the error model, but it is not necessarily the actual wire format. When the `Status` message is exposed in different client libraries and different wire protocols, it can be mapped differently. For example, it will likely be mapped to some exceptions in Java, but more likely mapped to some error codes in C. # Other uses The error model and the `Status` message can be used in a variety of environments, either with or without APIs, to provide a consistent developer experience across different environments. Example uses of this error model include: - Partial errors. If a service needs to return partial errors to the client, it may embed the `Status` in the normal response to indicate the partial errors. - Workflow errors. A typical workflow has multiple steps. Each step may have a `Status` message for error reporting purpose. - Batch operations. If a client uses batch request and batch response, the `Status` message should be used directly inside batch response, one for each error sub-response. - Asynchronous operations. If an API call embeds asynchronous operation results in its response, the status of those operations should be represented directly using the `Status` message. - Logging. If some API errors are stored in logs, the message `Status` could be used directly after any stripping needed for security/privacy reasons.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Status {
+    /// A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the google.rpc.Status.details field, or localized by the client.
+    pub message: Option<String>,
+    /// The status code, which should be an enum value of google.rpc.Code.
+    pub code: Option<i32>,
+    /// A list of messages that carry the error details. There will be a common set of message types for APIs to use.
+    pub details: Option<Vec<HashMap<String, String>>>,
+}
+
+impl Part for Status {}
+
+
+/// A module with basic scaling will create an instance when the application receives a request. The instance will be turned down when the app becomes idle. Basic scaling is ideal for work that is intermittent or driven by user activity.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BasicScaling {
+    /// The instance will be shut down this amount of time after receiving its last request.
+    #[serde(rename="idleTimeout")]
+    pub idle_timeout: Option<String>,
+    /// The maximum number of instances for App Engine to create for this version.
+    #[serde(rename="maxInstances")]
+    pub max_instances: Option<i32>,
+}
+
+impl Part for BasicScaling {}
+
+
+/// Files served directly to the user for a given URL, such as images, CSS stylesheets, or JavaScript source files. Static file handlers describe which files in the application directory are static files, and which URLs serve them.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct StaticFilesHandler {
+    /// If specified, all files served by this handler will be served using the specified MIME type. If not specified, the MIME type for a file will be derived from the file's filename extension.
+    #[serde(rename="mimeType")]
+    pub mime_type: Option<String>,
+    /// The length of time a static file served by this handler ought to be cached by web proxies and browsers.
+    pub expiration: Option<String>,
+    /// The path to the static files matched by the URL pattern, from the application root directory. The path can refer to text matched in groupings in the URL pattern.
+    pub path: Option<String>,
+    /// A regular expression that matches the file paths for all files that will be referenced by this handler.
+    #[serde(rename="uploadPathRegex")]
+    pub upload_path_regex: Option<String>,
+    /// If true, this UrlMap entry does not match the request unless the file referenced by the handler also exists. If no such file exists, processing will continue with the next UrlMap that matches the requested URL.
+    #[serde(rename="requireMatchingFile")]
+    pub require_matching_file: Option<bool>,
+    /// HTTP headers to use for all responses from these URLs.
+    #[serde(rename="httpHeaders")]
+    pub http_headers: Option<HashMap<String, String>>,
+    /// By default, files declared in static file handlers are uploaded as static data and are only served to end users, they cannot be read by an application. If this field is set to true, the files are also uploaded as code data so your application can read them. Both uploads are charged against your code and static data storage resource quotas.
+    #[serde(rename="applicationReadable")]
+    pub application_readable: Option<bool>,
+}
+
+impl Part for StaticFilesHandler {}
+
+
+/// Target scaling by network usage (for VM runtimes only).
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct NetworkUtilization {
+    /// Target bytes per second received.
+    #[serde(rename="targetReceivedBytesPerSec")]
+    pub target_received_bytes_per_sec: Option<i32>,
+    /// Target bytes per second sent.
+    #[serde(rename="targetSentBytesPerSec")]
+    pub target_sent_bytes_per_sec: Option<i32>,
+    /// Target packets per second sent.
+    #[serde(rename="targetSentPacketsPerSec")]
+    pub target_sent_packets_per_sec: Option<i32>,
+    /// Target packets per second received.
+    #[serde(rename="targetReceivedPacketsPerSec")]
+    pub target_received_packets_per_sec: Option<i32>,
+}
+
+impl Part for NetworkUtilization {}
+
+
+/// Response message for `Versions.ListVersions`.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [modules versions list apps](struct.AppModuleVersionListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListVersionsResponse {
+    /// Continuation token for fetching the next page of results.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The versions belonging to the requested application module.
+    pub versions: Option<Vec<Version>>,
+}
+
+impl ResponseResult for ListVersionsResponse {}
+
+
+/// Code and application artifacts used to deploy a version to App Engine.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Deployment {
+    /// A manifest of files stored in Google Cloud Storage which should be included as part of this application. All files must be readable using the credentials supplied with this call.
+    pub files: Option<HashMap<String, FileInfo>>,
+    /// The origin of the source code for this deployment. There can be more than one source reference per Version if source code is distributed among multiple repositories.
+    #[serde(rename="sourceReferences")]
+    pub source_references: Option<Vec<SourceReference>>,
+    /// If supplied, a docker (container) image which should be used to start the application. Only applicable to the 'vm' runtime.
+    pub container: Option<ContainerInfo>,
+}
+
+impl Part for Deployment {}
+
+
+/// Executes a script to handle the request that matches the URL pattern.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ScriptHandler {
+    /// Specifies the path to the script from the application root directory.
+    #[serde(rename="scriptPath")]
+    pub script_path: Option<String>,
+}
+
+impl Part for ScriptHandler {}
+
+
+/// Rules to match an HTTP request and dispatch that request to a module.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UrlDispatchRule {
+    /// The pathname within the host. This must start with a '/'. A single '*' (glob) can be included at the end of the path. The sum of the lengths of the domain and path may not exceed 100 characters.
+    pub path: Option<String>,
+    /// The domain name to match on. Supports '*' (glob) wildcarding on the left-hand side of a '.'. If empty, all domains will be matched (the same as '*').
+    pub domain: Option<String>,
+    /// The resource id of a Module in this application that should service the matched request. The Module must already exist. Example: "default".
+    pub module: Option<String>,
+}
+
+impl Part for UrlDispatchRule {}
+
+
+/// Use Google Cloud Endpoints to handle requests.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ApiEndpointHandler {
+    /// Specifies the path to the script from the application root directory.
+    #[serde(rename="scriptPath")]
+    pub script_path: Option<String>,
+}
+
+impl Part for ApiEndpointHandler {}
 
 
 /// Configure health checking for the VM instances. Unhealthy VM instances will be killed and replaced with new instances.
@@ -255,139 +612,6 @@ pub struct StaticDirectoryHandler {
 impl Part for StaticDirectoryHandler {}
 
 
-/// An Application contains the top-level configuration of an App Engine application.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [get apps](struct.AppGetCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Application {
-    /// HTTP path dispatch rules for requests to the app that do not explicitly target a module or version. The rules are order-dependent.
-    #[serde(rename="dispatchRules")]
-    pub dispatch_rules: Option<Vec<UrlDispatchRule>>,
-    /// The location from which the application will be run. Choices are "us-central" for United States and "europe-west" for European Union. Application instances will run out of data centers in the chosen location and all of the application's End User Content will be stored at rest in the chosen location. The default is "us-central".
-    pub location: Option<String>,
-    /// The relative name/path of the application. Example: "myapp". @OutputOnly
-    pub id: Option<String>,
-    /// The full path to the application in the API. Example: "apps/myapp". @OutputOnly
-    pub name: Option<String>,
-    /// A Google Cloud Storage bucket which can be used for storing files associated with an application. This bucket is associated with the application and can be used by the gcloud deployment commands. @OutputOnly
-    #[serde(rename="codeBucket")]
-    pub code_bucket: Option<String>,
-}
-
-impl ResponseResult for Application {}
-
-
-/// A Version is a specific set of source code and configuration files deployed to a module.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [modules versions create apps](struct.AppModuleVersionCreateCall.html) (request)
-/// * [modules versions get apps](struct.AppModuleVersionGetCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Version {
-    /// A module with basic scaling will create an instance when the application receives a request. The instance will be turned down when the app becomes idle. Basic scaling is ideal for work that is intermittent or driven by user activity.
-    #[serde(rename="basicScaling")]
-    pub basic_scaling: Option<BasicScaling>,
-    /// Beta settings supplied to the application via metadata.
-    #[serde(rename="betaSettings")]
-    pub beta_settings: Option<HashMap<String, String>>,
-    /// A module with manual scaling runs continuously, allowing you to perform complex initialization and rely on the state of its memory over time.
-    #[serde(rename="manualScaling")]
-    pub manual_scaling: Option<ManualScaling>,
-    /// Creation time of this version. This will be between the start and end times of the operation that creates this version. @OutputOnly
-    #[serde(rename="creationTime")]
-    pub creation_time: Option<String>,
-    /// Whether to deploy this app in a VM container (deprecated, use "env":"2").
-    pub vm: Option<bool>,
-    /// Before an application can receive email or XMPP messages, the application must be configured to enable the service.
-    #[serde(rename="inboundServices")]
-    pub inbound_services: Option<Vec<String>>,
-    /// The frontend instance class to use to run this app. Valid values are `[F1, F2, F4, F4_1G]`. Default: "F1"
-    #[serde(rename="instanceClass")]
-    pub instance_class: Option<String>,
-    /// Code and application artifacts that make up this version. Only returned in `GET` requests if `view=FULL` is set. May only be set on create requests; once created, is immutable.
-    pub deployment: Option<Deployment>,
-    /// Custom static error pages instead of these generic error pages, (limit 10 KB/page) Only returned in `GET` requests if `view=FULL` is set. May only be set on create requests; once created, is immutable.
-    #[serde(rename="errorHandlers")]
-    pub error_handlers: Option<Vec<ErrorHandler>>,
-    /// The current serving status of this version. Only `SERVING` versions will have instances created or billed for. If this field is unset when a version is created, `SERVING` status will be assumed. It is an error to explicitly set this field to `SERVING_STATUS_UNSPECIFIED`.
-    #[serde(rename="servingStatus")]
-    pub serving_status: Option<String>,
-    /// The relative name/path of the Version within the module. Example: "v1". Version specifiers can contain lowercase letters, digits, and hyphens. It cannot begin with the prefix `ah-` and the names `default` and `latest` are reserved and cannot be used.
-    pub id: Option<String>,
-    /// If true, multiple requests can be dispatched to the app at once.
-    pub threadsafe: Option<bool>,
-    /// Serving configuration for Google Cloud Endpoints. Only returned in `GET` requests if `view=FULL` is set. May only be set on create requests; once created, is immutable.
-    #[serde(rename="apiConfig")]
-    pub api_config: Option<ApiConfigHandler>,
-    /// Go only. Files that match this pattern will not be built into the app. May only be set on create requests.
-    #[serde(rename="nobuildFilesRegex")]
-    pub nobuild_files_regex: Option<String>,
-    /// Used to specify extra network settings (for VM runtimes only).
-    pub network: Option<Network>,
-    /// An ordered list of URL Matching patterns that should be applied to incoming requests. The first matching URL consumes the request, and subsequent handlers are not attempted. Only returned in `GET` requests if `view=FULL` is set. May only be set on create requests; once created, is immutable.
-    pub handlers: Option<Vec<UrlMap>>,
-    /// Configure health checking for the VM instances. Unhealthy VM instances will be stopped and replaced with new instances. Only returned in `GET` requests if `view=FULL` is set. May only be set on create requests; once created, is immutable.
-    #[serde(rename="healthCheck")]
-    pub health_check: Option<HealthCheck>,
-    /// The length of time a static file served by a static file handler ought to be cached by web proxies and browsers, if the handler does not specify its own expiration. Only returned in `GET` requests if `view=FULL` is set. May only be set on create requests; once created, is immutable.
-    #[serde(rename="defaultExpiration")]
-    pub default_expiration: Option<String>,
-    /// The full path to the Version resource in the API. Example: "apps/myapp/modules/default/versions/v1". @OutputOnly
-    pub name: Option<String>,
-    /// Configuration for Python runtime third-party libraries required by the application. Only returned in `GET` requests if `view=FULL` is set. May only be set on create requests; once created, is immutable.
-    pub libraries: Option<Vec<Library>>,
-    /// The email address of the user who created this version. @OutputOnly
-    pub deployer: Option<String>,
-    /// The App Engine execution environment to use for this version. Default: "1"
-    pub env: Option<String>,
-    /// Automatic scaling is the scaling policy that App Engine has used since its inception. It is based on request rate, response latencies, and other application metrics.
-    #[serde(rename="automaticScaling")]
-    pub automatic_scaling: Option<AutomaticScaling>,
-    /// The desired runtime. Values can include python27, java7, go, etc.
-    pub runtime: Option<String>,
-    /// Environment variables made available to the application. Only returned in `GET` requests if `view=FULL` is set. May only be set on create requests; once created, is immutable.
-    #[serde(rename="envVariables")]
-    pub env_variables: Option<HashMap<String, String>>,
-    /// Used to specify how many machine resources an app version needs (for VM runtimes only).
-    pub resources: Option<Resources>,
-}
-
-impl RequestValue for Version {}
-impl ResponseResult for Version {}
-
-
-/// Response message for `Versions.ListVersions`.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [modules versions list apps](struct.AppModuleVersionListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListVersionsResponse {
-    /// Continuation token for fetching the next page of results.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The versions belonging to the requested application module.
-    pub versions: Option<Vec<Version>>,
-}
-
-impl ResponseResult for ListVersionsResponse {}
-
-
 /// Automatic scaling is the scaling policy that App Engine has used since its inception. It is based on request rate, response latencies, and other application metrics.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -397,15 +621,24 @@ pub struct AutomaticScaling {
     /// Target scaling by CPU usage.
     #[serde(rename="cpuUtilization")]
     pub cpu_utilization: Option<CpuUtilization>,
+    /// Target scaling by network usage.
+    #[serde(rename="networkUtilization")]
+    pub network_utilization: Option<NetworkUtilization>,
+    /// The minimum number of idle instances that App Engine should maintain for this version. Only applies to the default version of a module, since other versions are not expected to receive significant traffic.
+    #[serde(rename="minIdleInstances")]
+    pub min_idle_instances: Option<i32>,
     /// The maximum amount of time that App Engine should allow a request to wait in the pending queue before starting a new instance to handle it.
     #[serde(rename="maxPendingLatency")]
     pub max_pending_latency: Option<String>,
     /// The maximum number of idle instances that App Engine should maintain for this version.
     #[serde(rename="maxIdleInstances")]
     pub max_idle_instances: Option<i32>,
-    /// The minimum number of idle instances that App Engine should maintain for this version. Only applies to the default version of a module, since other versions are not expected to receive significant traffic.
-    #[serde(rename="minIdleInstances")]
-    pub min_idle_instances: Option<i32>,
+    /// Target scaling by disk usage.
+    #[serde(rename="diskUtilization")]
+    pub disk_utilization: Option<DiskUtilization>,
+    /// Target scaling by request utilization.
+    #[serde(rename="requestUtilization")]
+    pub request_utilization: Option<RequestUtilization>,
     /// The amount of time that the [Autoscaler](https://cloud.google.com/compute/docs/autoscaler/) should wait between changes to the number of virtual machines. Applies only to the VM runtime.
     #[serde(rename="coolDownPeriod")]
     pub cool_down_period: Option<String>,
@@ -471,7 +704,7 @@ pub struct FileInfo {
     /// The MIME type of the file; if unspecified, the value from Google Cloud Storage will be used.
     #[serde(rename="mimeType")]
     pub mime_type: Option<String>,
-    /// The URL source to use to fetch this file. Must be a URL to a resource in Google Cloud Storage.
+    /// The URL source to use to fetch this file. Must be a URL to a resource in Google Cloud Storage in the form 'http(s)://storage.googleapis.com/\/\'.
     #[serde(rename="sourceUrl")]
     pub source_url: Option<String>,
     /// The SHA1 (160 bits) hash of the file in hex.
@@ -482,142 +715,7 @@ pub struct FileInfo {
 impl Part for FileInfo {}
 
 
-/// Configuration for traffic splitting for versions within a single module. Traffic splitting allows traffic directed to the module to be assigned to one of several versions in a fractional way, enabling experiments and canarying new builds, for example.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TrafficSplit {
-    /// Which mechanism should be used as a selector when choosing a version to send a request to. The traffic selection algorithm will be stable for either type until allocations are changed.
-    #[serde(rename="shardBy")]
-    pub shard_by: Option<String>,
-    /// Mapping from module version IDs within the module to fractional (0.000, 1] allocations of traffic for that version. Each version may only be specified once, but some versions in the module may not have any traffic allocation. Modules that have traffic allocated in this field may not be deleted until the module is deleted, or their traffic allocation is removed. Allocations must sum to 1. Supports precision up to two decimal places for IP-based splits and up to three decimal places for cookie-based splits.
-    pub allocations: Option<HashMap<String, f64>>,
-}
-
-impl Part for TrafficSplit {}
-
-
-/// Target scaling by CPU usage.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CpuUtilization {
-    /// Target (0-1) CPU utilization ratio to maintain when scaling.
-    #[serde(rename="targetUtilization")]
-    pub target_utilization: Option<f64>,
-    /// The period of time over which CPU utilization is calculated.
-    #[serde(rename="aggregationWindowLength")]
-    pub aggregation_window_length: Option<String>,
-}
-
-impl Part for CpuUtilization {}
-
-
-/// This resource represents a long-running operation that is the result of a network API call.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [modules versions delete apps](struct.AppModuleVersionDeleteCall.html) (response)
-/// * [modules versions create apps](struct.AppModuleVersionCreateCall.html) (response)
-/// * [operations get apps](struct.AppOperationGetCall.html) (response)
-/// * [modules delete apps](struct.AppModuleDeleteCall.html) (response)
-/// * [modules patch apps](struct.AppModulePatchCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Operation {
-    /// Service-specific metadata associated with the operation. It typically contains progress information and common metadata such as create time. Some services might not provide such metadata. Any method that returns a long-running operation should document the metadata type, if any.
-    pub metadata: Option<HashMap<String, String>>,
-    /// If the value is `false`, it means the operation is still in progress. If true, the operation is completed, and either `error` or `response` is available.
-    pub done: Option<bool>,
-    /// The normal response of the operation in case of success. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.
-    pub response: Option<HashMap<String, String>>,
-    /// The server-assigned name, which is only unique within the same service that originally returns it. If you use the default HTTP mapping above, the `name` should have the format of `operations/some/unique/name`.
-    pub name: Option<String>,
-    /// The error result of the operation in case of failure.
-    pub error: Option<Status>,
-}
-
-impl ResponseResult for Operation {}
-
-
-/// Used to specify how many machine resources an app version needs.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Resources {
-    /// How much disk size, in GB, an app version needs.
-    #[serde(rename="diskGb")]
-    pub disk_gb: Option<f64>,
-    /// How many CPU cores an app version needs.
-    pub cpu: Option<f64>,
-    /// How much memory, in GB, an app version needs.
-    #[serde(rename="memoryGb")]
-    pub memory_gb: Option<f64>,
-}
-
-impl Part for Resources {}
-
-
-/// Used to specify extra network settings (for VM runtimes only).
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Network {
-    /// A tag to apply to the VM instance during creation.
-    #[serde(rename="instanceTag")]
-    pub instance_tag: Option<String>,
-    /// A list of ports (or port pairs) to forward from the VM into the app container.
-    #[serde(rename="forwardedPorts")]
-    pub forwarded_ports: Option<Vec<String>>,
-    /// The Google Compute Engine network where the VMs will be created. If not specified, or empty, the network named "default" will be used. (The short name should be specified, not the resource path.)
-    pub name: Option<String>,
-}
-
-impl Part for Network {}
-
-
-/// The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). The error model is designed to be: - Simple to use and understand for most users - Flexible enough to meet unexpected needs # Overview The `Status` message contains three pieces of data: error code, error message, and error details. The error code should be an enum value of [google.rpc.Code][google.rpc.Code], but it may accept additional error codes if needed. The error message should be a developer-facing English message that helps developers *understand* and *resolve* the error. If a localized user-facing error message is needed, put the localized message in the error details or localize it in the client. The optional error details may contain arbitrary information about the error. There is a predefined set of error detail types in the package `google.rpc` which can be used for common error conditions. # Language mapping The `Status` message is the logical representation of the error model, but it is not necessarily the actual wire format. When the `Status` message is exposed in different client libraries and different wire protocols, it can be mapped differently. For example, it will likely be mapped to some exceptions in Java, but more likely mapped to some error codes in C. # Other uses The error model and the `Status` message can be used in a variety of environments, either with or without APIs, to provide a consistent developer experience across different environments. Example uses of this error model include: - Partial errors. If a service needs to return partial errors to the client, it may embed the `Status` in the normal response to indicate the partial errors. - Workflow errors. A typical workflow has multiple steps. Each step may have a `Status` message for error reporting purpose. - Batch operations. If a client uses batch request and batch response, the `Status` message should be used directly inside batch response, one for each error sub-response. - Asynchronous operations. If an API call embeds asynchronous operation results in its response, the status of those operations should be represented directly using the `Status` message. - Logging. If some API errors are stored in logs, the message `Status` could be used directly after any stripping needed for security/privacy reasons.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Status {
-    /// A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the [google.rpc.Status.details][google.rpc.Status.details] field, or localized by the client.
-    pub message: Option<String>,
-    /// The status code, which should be an enum value of [google.rpc.Code][google.rpc.Code].
-    pub code: Option<i32>,
-    /// A list of messages that carry the error details. There will be a common set of message types for APIs to use.
-    pub details: Option<Vec<HashMap<String, String>>>,
-}
-
-impl Part for Status {}
-
-
-/// A module with basic scaling will create an instance when the application receives a request. The instance will be turned down when the app becomes idle. Basic scaling is ideal for work that is intermittent or driven by user activity.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BasicScaling {
-    /// The instance will be shut down this amount of time after receiving its last request.
-    #[serde(rename="idleTimeout")]
-    pub idle_timeout: Option<String>,
-    /// The maximum number of instances for App Engine to create for this version.
-    #[serde(rename="maxInstances")]
-    pub max_instances: Option<i32>,
-}
-
-impl Part for BasicScaling {}
-
-
-/// The response message for [Operations.ListOperations][google.longrunning.Operations.ListOperations].
+/// The response message for Operations.ListOperations.
 /// 
 /// # Activities
 /// 
@@ -636,36 +734,6 @@ pub struct ListOperationsResponse {
 }
 
 impl ResponseResult for ListOperationsResponse {}
-
-
-/// Files served directly to the user for a given URL, such as images, CSS stylesheets, or JavaScript source files. Static file handlers describe which files in the application directory are static files, and which URLs serve them.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct StaticFilesHandler {
-    /// If specified, all files served by this handler will be served using the specified MIME type. If not specified, the MIME type for a file will be derived from the file's filename extension.
-    #[serde(rename="mimeType")]
-    pub mime_type: Option<String>,
-    /// The length of time a static file served by this handler ought to be cached by web proxies and browsers.
-    pub expiration: Option<String>,
-    /// The path to the static files matched by the URL pattern, from the application root directory. The path can refer to text matched in groupings in the URL pattern.
-    pub path: Option<String>,
-    /// A regular expression that matches the file paths for all files that will be referenced by this handler.
-    #[serde(rename="uploadPathRegex")]
-    pub upload_path_regex: Option<String>,
-    /// If true, this [UrlMap][google.appengine.v1beta4.UrlMap] entry does not match the request unless the file referenced by the handler also exists. If no such file exists, processing will continue with the next [UrlMap][google.appengine.v1beta4.UrlMap] that matches the requested URL.
-    #[serde(rename="requireMatchingFile")]
-    pub require_matching_file: Option<bool>,
-    /// HTTP headers to use for all responses from these URLs.
-    #[serde(rename="httpHeaders")]
-    pub http_headers: Option<HashMap<String, String>>,
-    /// By default, files declared in static file handlers are uploaded as static data and are only served to end users, they cannot be read by an application. If this field is set to true, the files are also uploaded as code data so your application can read them. Both uploads are charged against your code and static data storage resource quotas.
-    #[serde(rename="applicationReadable")]
-    pub application_readable: Option<bool>,
-}
-
-impl Part for StaticFilesHandler {}
 
 
 /// A module with manual scaling runs continuously, allowing you to perform complex initialization and rely on the state of its memory over time.
@@ -717,55 +785,6 @@ pub struct ApiConfigHandler {
 impl Part for ApiConfigHandler {}
 
 
-/// A Python runtime third-party library required by the application.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Library {
-    /// The version of the library to select, or "latest".
-    pub version: Option<String>,
-    /// The name of the library, e.g. "PIL" or "django".
-    pub name: Option<String>,
-}
-
-impl Part for Library {}
-
-
-/// A reference to a particular snapshot of the source tree used to build and deploy the application.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SourceReference {
-    /// The canonical (and persistent) identifier of the deployed revision, i.e. any kind of aliases including tags or branch names are not allowed. Example (git): "2198322f89e0bb2e25021667c2ed489d1fd34e6b"
-    #[serde(rename="revisionId")]
-    pub revision_id: Option<String>,
-    /// Optional. A URI string identifying the repository. Example: "https://source.developers.google.com/p/app-123/r/default"
-    pub repository: Option<String>,
-}
-
-impl Part for SourceReference {}
-
-
-/// Code and application artifacts used to deploy a version to App Engine.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Deployment {
-    /// A manifest of files stored in Google Cloud Storage which should be included as part of this application. All files must be readable using the credentials supplied with this call.
-    pub files: Option<HashMap<String, FileInfo>>,
-    /// The origin of the source code for this deployment. There can be more than one source reference per Version if source code is distributed among multiple repositories.
-    #[serde(rename="sourceReferences")]
-    pub source_references: Option<Vec<SourceReference>>,
-    /// If supplied, a docker (container) image which should be used to start the application. Only applicable to the 'vm' runtime.
-    pub container: Option<ContainerInfo>,
-}
-
-impl Part for Deployment {}
-
-
 /// A module is a component of an application that provides a single service or configuration. A module has a collection of versions that define a specific set of code used to implement the functionality of that module.
 /// 
 /// # Activities
@@ -790,49 +809,106 @@ impl RequestValue for Module {}
 impl ResponseResult for Module {}
 
 
-/// Executes a script to handle the request that matches the URL pattern.
+/// A reference to a particular snapshot of the source tree used to build and deploy the application.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ScriptHandler {
-    /// Specifies the path to the script from the application root directory.
-    #[serde(rename="scriptPath")]
-    pub script_path: Option<String>,
+pub struct SourceReference {
+    /// The canonical (and persistent) identifier of the deployed revision, i.e. any kind of aliases including tags or branch names are not allowed. Example (git): "2198322f89e0bb2e25021667c2ed489d1fd34e6b"
+    #[serde(rename="revisionId")]
+    pub revision_id: Option<String>,
+    /// Optional. A URI string identifying the repository. Example: "https://source.developers.google.com/p/app-123/r/default"
+    pub repository: Option<String>,
 }
 
-impl Part for ScriptHandler {}
+impl Part for SourceReference {}
 
 
-/// Rules to match an HTTP request and dispatch that request to a module.
+/// Target scaling by disk usage (for VM runtimes only).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct UrlDispatchRule {
-    /// The pathname within the host. This must start with a '/'. A single '*' (glob) can be included at the end of the path. The sum of the lengths of the domain and path may not exceed 100 characters.
-    pub path: Option<String>,
-    /// The domain name to match on. Supports '*' (glob) wildcarding on the left-hand side of a '.'. If empty, all domains will be matched (the same as '*').
-    pub domain: Option<String>,
-    /// The resource id of a Module in this application that should service the matched request. The Module must already exist. Example: "default".
-    pub module: Option<String>,
+pub struct DiskUtilization {
+    /// Target ops per second written.
+    #[serde(rename="targetWriteOpsPerSec")]
+    pub target_write_ops_per_sec: Option<i32>,
+    /// Target bytes per second read.
+    #[serde(rename="targetReadBytesPerSec")]
+    pub target_read_bytes_per_sec: Option<i32>,
+    /// Target ops per second read.
+    #[serde(rename="targetReadOpsPerSec")]
+    pub target_read_ops_per_sec: Option<i32>,
+    /// Target bytes per second written.
+    #[serde(rename="targetWriteBytesPerSec")]
+    pub target_write_bytes_per_sec: Option<i32>,
 }
 
-impl Part for UrlDispatchRule {}
+impl Part for DiskUtilization {}
 
 
-/// Use Google Cloud Endpoints to handle requests.
+/// Target scaling by request utilization (for VM runtimes only).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ApiEndpointHandler {
-    /// Specifies the path to the script from the application root directory.
-    #[serde(rename="scriptPath")]
-    pub script_path: Option<String>,
+pub struct RequestUtilization {
+    /// Target number of concurrent requests.
+    #[serde(rename="targetConcurrentRequests")]
+    pub target_concurrent_requests: Option<i32>,
+    /// Target requests per second.
+    #[serde(rename="targetRequestCountPerSec")]
+    pub target_request_count_per_sec: Option<i32>,
 }
 
-impl Part for ApiEndpointHandler {}
+impl Part for RequestUtilization {}
+
+
+/// Configuration for traffic splitting for versions within a single module. Traffic splitting allows traffic directed to the module to be assigned to one of several versions in a fractional way, enabling experiments and canarying new builds, for example.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TrafficSplit {
+    /// Which mechanism should be used as a selector when choosing a version to send a request to. The traffic selection algorithm will be stable for either type until allocations are changed.
+    #[serde(rename="shardBy")]
+    pub shard_by: Option<String>,
+    /// Mapping from module version IDs within the module to fractional (0.000, 1] allocations of traffic for that version. Each version may only be specified once, but some versions in the module may not have any traffic allocation. Modules that have traffic allocated in this field may not be deleted until the module is deleted, or their traffic allocation is removed. Allocations must sum to 1. Supports precision up to two decimal places for IP-based splits and up to three decimal places for cookie-based splits.
+    pub allocations: Option<HashMap<String, f64>>,
+}
+
+impl Part for TrafficSplit {}
+
+
+/// This resource represents a long-running operation that is the result of a network API call.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [modules versions delete apps](struct.AppModuleVersionDeleteCall.html) (response)
+/// * [modules versions create apps](struct.AppModuleVersionCreateCall.html) (response)
+/// * [operations get apps](struct.AppOperationGetCall.html) (response)
+/// * [modules delete apps](struct.AppModuleDeleteCall.html) (response)
+/// * [modules patch apps](struct.AppModulePatchCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Operation {
+    /// Service-specific metadata associated with the operation. It typically contains progress information and common metadata such as create time. Some services might not provide such metadata. Any method that returns a long-running operation should document the metadata type, if any.
+    pub metadata: Option<HashMap<String, String>>,
+    /// If the value is `false`, it means the operation is still in progress. If true, the operation is completed, and either `error` or `response` is available.
+    pub done: Option<bool>,
+    /// The normal response of the operation in case of success. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.
+    pub response: Option<HashMap<String, String>>,
+    /// The server-assigned name, which is only unique within the same service that originally returns it. If you use the default HTTP mapping above, the `name` should have the format of `operations/some/unique/name`.
+    pub name: Option<String>,
+    /// The error result of the operation in case of failure.
+    pub error: Option<Status>,
+}
+
+impl ResponseResult for Operation {}
 
 
 
@@ -1176,7 +1252,7 @@ impl<'a, C, A> AppModulePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "appengine.apps.modules.patch", 
+        dlg.begin(MethodInfo { id: "appengine.apps.modules.patch",
                                http_method: hyper::method::Method::Patch });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
         params.push(("appsId", self._apps_id.to_string()));
@@ -1225,14 +1301,14 @@ impl<'a, C, A> AppModulePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = 
+        let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request);
                 remove_json_null_values(&mut value);
@@ -1276,7 +1352,7 @@ impl<'a, C, A> AppModulePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -1286,10 +1362,10 @@ impl<'a, C, A> AppModulePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -1321,7 +1397,7 @@ impl<'a, C, A> AppModulePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     ///
     /// Sets the *request* property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn request(mut self, new_value: Module) -> AppModulePatchCall<'a, C, A> {
         self._request = new_value;
@@ -1331,7 +1407,7 @@ impl<'a, C, A> AppModulePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     ///
     /// Sets the *apps id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn apps_id(mut self, new_value: &str) -> AppModulePatchCall<'a, C, A> {
         self._apps_id = new_value.to_string();
@@ -1341,7 +1417,7 @@ impl<'a, C, A> AppModulePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     ///
     /// Sets the *modules id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn modules_id(mut self, new_value: &str) -> AppModulePatchCall<'a, C, A> {
         self._modules_id = new_value.to_string();
@@ -1373,12 +1449,12 @@ impl<'a, C, A> AppModulePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *bearer_token* (query-string) - OAuth bearer token.
@@ -1401,17 +1477,17 @@ impl<'a, C, A> AppModulePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AppModulePatchCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AppModulePatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1477,7 +1553,7 @@ impl<'a, C, A> AppModuleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "appengine.apps.modules.list", 
+        dlg.begin(MethodInfo { id: "appengine.apps.modules.list",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("appsId", self._apps_id.to_string()));
@@ -1525,7 +1601,7 @@ impl<'a, C, A> AppModuleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -1561,7 +1637,7 @@ impl<'a, C, A> AppModuleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -1571,10 +1647,10 @@ impl<'a, C, A> AppModuleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -1607,7 +1683,7 @@ impl<'a, C, A> AppModuleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// Sets the *apps id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn apps_id(mut self, new_value: &str) -> AppModuleListCall<'a, C, A> {
         self._apps_id = new_value.to_string();
@@ -1639,12 +1715,12 @@ impl<'a, C, A> AppModuleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *bearer_token* (query-string) - OAuth bearer token.
@@ -1667,17 +1743,17 @@ impl<'a, C, A> AppModuleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AppModuleListCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AppModuleListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1740,7 +1816,7 @@ impl<'a, C, A> AppModuleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "appengine.apps.modules.get", 
+        dlg.begin(MethodInfo { id: "appengine.apps.modules.get",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("appsId", self._apps_id.to_string()));
@@ -1783,7 +1859,7 @@ impl<'a, C, A> AppModuleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -1819,7 +1895,7 @@ impl<'a, C, A> AppModuleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -1829,10 +1905,10 @@ impl<'a, C, A> AppModuleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -1865,7 +1941,7 @@ impl<'a, C, A> AppModuleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     ///
     /// Sets the *apps id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn apps_id(mut self, new_value: &str) -> AppModuleGetCall<'a, C, A> {
         self._apps_id = new_value.to_string();
@@ -1875,7 +1951,7 @@ impl<'a, C, A> AppModuleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     ///
     /// Sets the *modules id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn modules_id(mut self, new_value: &str) -> AppModuleGetCall<'a, C, A> {
         self._modules_id = new_value.to_string();
@@ -1893,12 +1969,12 @@ impl<'a, C, A> AppModuleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *bearer_token* (query-string) - OAuth bearer token.
@@ -1921,17 +1997,17 @@ impl<'a, C, A> AppModuleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AppModuleGetCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AppModuleGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1995,7 +2071,7 @@ impl<'a, C, A> AppGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "appengine.apps.get", 
+        dlg.begin(MethodInfo { id: "appengine.apps.get",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("appsId", self._apps_id.to_string()));
@@ -2040,7 +2116,7 @@ impl<'a, C, A> AppGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -2076,7 +2152,7 @@ impl<'a, C, A> AppGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -2086,10 +2162,10 @@ impl<'a, C, A> AppGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -2122,13 +2198,13 @@ impl<'a, C, A> AppGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
     ///
     /// Sets the *apps id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn apps_id(mut self, new_value: &str) -> AppGetCall<'a, C, A> {
         self._apps_id = new_value.to_string();
         self
     }
-    /// Certain resources associated with an application are created on-demand. Controls whether these resources should be created when performing the `GET` operation. If specified and any resources cloud not be created, the request will fail with an error code.
+    /// Certain resources associated with an application are created on-demand. Controls whether these resources should be created when performing the `GET` operation. If specified and any resources could not be created, the request will fail with an error code. Additionally, this parameter can cause the request to take longer to complete.
     ///
     /// Sets the *ensure resources exist* query property to the given value.
     pub fn ensure_resources_exist(mut self, new_value: bool) -> AppGetCall<'a, C, A> {
@@ -2147,12 +2223,12 @@ impl<'a, C, A> AppGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *bearer_token* (query-string) - OAuth bearer token.
@@ -2175,17 +2251,17 @@ impl<'a, C, A> AppGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AppGetCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AppGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2248,7 +2324,7 @@ impl<'a, C, A> AppModuleDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "appengine.apps.modules.delete", 
+        dlg.begin(MethodInfo { id: "appengine.apps.modules.delete",
                                http_method: hyper::method::Method::Delete });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("appsId", self._apps_id.to_string()));
@@ -2291,7 +2367,7 @@ impl<'a, C, A> AppModuleDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -2327,7 +2403,7 @@ impl<'a, C, A> AppModuleDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -2337,10 +2413,10 @@ impl<'a, C, A> AppModuleDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -2373,7 +2449,7 @@ impl<'a, C, A> AppModuleDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// Sets the *apps id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn apps_id(mut self, new_value: &str) -> AppModuleDeleteCall<'a, C, A> {
         self._apps_id = new_value.to_string();
@@ -2383,7 +2459,7 @@ impl<'a, C, A> AppModuleDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// Sets the *modules id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn modules_id(mut self, new_value: &str) -> AppModuleDeleteCall<'a, C, A> {
         self._modules_id = new_value.to_string();
@@ -2401,12 +2477,12 @@ impl<'a, C, A> AppModuleDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *bearer_token* (query-string) - OAuth bearer token.
@@ -2429,17 +2505,17 @@ impl<'a, C, A> AppModuleDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AppModuleDeleteCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AppModuleDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2502,7 +2578,7 @@ impl<'a, C, A> AppOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "appengine.apps.operations.get", 
+        dlg.begin(MethodInfo { id: "appengine.apps.operations.get",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("appsId", self._apps_id.to_string()));
@@ -2545,7 +2621,7 @@ impl<'a, C, A> AppOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -2581,7 +2657,7 @@ impl<'a, C, A> AppOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -2591,10 +2667,10 @@ impl<'a, C, A> AppOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -2627,7 +2703,7 @@ impl<'a, C, A> AppOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// Sets the *apps id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn apps_id(mut self, new_value: &str) -> AppOperationGetCall<'a, C, A> {
         self._apps_id = new_value.to_string();
@@ -2637,7 +2713,7 @@ impl<'a, C, A> AppOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// Sets the *operations id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn operations_id(mut self, new_value: &str) -> AppOperationGetCall<'a, C, A> {
         self._operations_id = new_value.to_string();
@@ -2655,12 +2731,12 @@ impl<'a, C, A> AppOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *bearer_token* (query-string) - OAuth bearer token.
@@ -2683,17 +2759,17 @@ impl<'a, C, A> AppOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AppOperationGetCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AppOperationGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2761,7 +2837,7 @@ impl<'a, C, A> AppOperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "appengine.apps.operations.list", 
+        dlg.begin(MethodInfo { id: "appengine.apps.operations.list",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("appsId", self._apps_id.to_string()));
@@ -2812,7 +2888,7 @@ impl<'a, C, A> AppOperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -2848,7 +2924,7 @@ impl<'a, C, A> AppOperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -2858,10 +2934,10 @@ impl<'a, C, A> AppOperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -2894,7 +2970,7 @@ impl<'a, C, A> AppOperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// Sets the *apps id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn apps_id(mut self, new_value: &str) -> AppOperationListCall<'a, C, A> {
         self._apps_id = new_value.to_string();
@@ -2933,12 +3009,12 @@ impl<'a, C, A> AppOperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *bearer_token* (query-string) - OAuth bearer token.
@@ -2961,17 +3037,17 @@ impl<'a, C, A> AppOperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AppOperationListCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AppOperationListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3035,7 +3111,7 @@ impl<'a, C, A> AppModuleVersionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "appengine.apps.modules.versions.delete", 
+        dlg.begin(MethodInfo { id: "appengine.apps.modules.versions.delete",
                                http_method: hyper::method::Method::Delete });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("appsId", self._apps_id.to_string()));
@@ -3079,7 +3155,7 @@ impl<'a, C, A> AppModuleVersionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -3115,7 +3191,7 @@ impl<'a, C, A> AppModuleVersionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -3125,10 +3201,10 @@ impl<'a, C, A> AppModuleVersionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -3161,7 +3237,7 @@ impl<'a, C, A> AppModuleVersionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// Sets the *apps id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn apps_id(mut self, new_value: &str) -> AppModuleVersionDeleteCall<'a, C, A> {
         self._apps_id = new_value.to_string();
@@ -3171,7 +3247,7 @@ impl<'a, C, A> AppModuleVersionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// Sets the *modules id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn modules_id(mut self, new_value: &str) -> AppModuleVersionDeleteCall<'a, C, A> {
         self._modules_id = new_value.to_string();
@@ -3181,7 +3257,7 @@ impl<'a, C, A> AppModuleVersionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// Sets the *versions id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn versions_id(mut self, new_value: &str) -> AppModuleVersionDeleteCall<'a, C, A> {
         self._versions_id = new_value.to_string();
@@ -3199,12 +3275,12 @@ impl<'a, C, A> AppModuleVersionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *bearer_token* (query-string) - OAuth bearer token.
@@ -3227,17 +3303,17 @@ impl<'a, C, A> AppModuleVersionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AppModuleVersionDeleteCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AppModuleVersionDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3307,7 +3383,7 @@ impl<'a, C, A> AppModuleVersionCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "appengine.apps.modules.versions.create", 
+        dlg.begin(MethodInfo { id: "appengine.apps.modules.versions.create",
                                http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("appsId", self._apps_id.to_string()));
@@ -3350,14 +3426,14 @@ impl<'a, C, A> AppModuleVersionCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = 
+        let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request);
                 remove_json_null_values(&mut value);
@@ -3401,7 +3477,7 @@ impl<'a, C, A> AppModuleVersionCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -3411,10 +3487,10 @@ impl<'a, C, A> AppModuleVersionCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -3446,7 +3522,7 @@ impl<'a, C, A> AppModuleVersionCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// Sets the *request* property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn request(mut self, new_value: Version) -> AppModuleVersionCreateCall<'a, C, A> {
         self._request = new_value;
@@ -3456,7 +3532,7 @@ impl<'a, C, A> AppModuleVersionCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// Sets the *apps id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn apps_id(mut self, new_value: &str) -> AppModuleVersionCreateCall<'a, C, A> {
         self._apps_id = new_value.to_string();
@@ -3466,7 +3542,7 @@ impl<'a, C, A> AppModuleVersionCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// Sets the *modules id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn modules_id(mut self, new_value: &str) -> AppModuleVersionCreateCall<'a, C, A> {
         self._modules_id = new_value.to_string();
@@ -3484,12 +3560,12 @@ impl<'a, C, A> AppModuleVersionCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *bearer_token* (query-string) - OAuth bearer token.
@@ -3512,17 +3588,17 @@ impl<'a, C, A> AppModuleVersionCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AppModuleVersionCreateCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AppModuleVersionCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3588,7 +3664,7 @@ impl<'a, C, A> AppModuleVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "appengine.apps.modules.versions.get", 
+        dlg.begin(MethodInfo { id: "appengine.apps.modules.versions.get",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("appsId", self._apps_id.to_string()));
@@ -3635,7 +3711,7 @@ impl<'a, C, A> AppModuleVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -3671,7 +3747,7 @@ impl<'a, C, A> AppModuleVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -3681,10 +3757,10 @@ impl<'a, C, A> AppModuleVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -3717,7 +3793,7 @@ impl<'a, C, A> AppModuleVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// Sets the *apps id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn apps_id(mut self, new_value: &str) -> AppModuleVersionGetCall<'a, C, A> {
         self._apps_id = new_value.to_string();
@@ -3727,7 +3803,7 @@ impl<'a, C, A> AppModuleVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// Sets the *modules id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn modules_id(mut self, new_value: &str) -> AppModuleVersionGetCall<'a, C, A> {
         self._modules_id = new_value.to_string();
@@ -3737,7 +3813,7 @@ impl<'a, C, A> AppModuleVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// Sets the *versions id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn versions_id(mut self, new_value: &str) -> AppModuleVersionGetCall<'a, C, A> {
         self._versions_id = new_value.to_string();
@@ -3762,12 +3838,12 @@ impl<'a, C, A> AppModuleVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *bearer_token* (query-string) - OAuth bearer token.
@@ -3790,17 +3866,17 @@ impl<'a, C, A> AppModuleVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AppModuleVersionGetCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AppModuleVersionGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3869,7 +3945,7 @@ impl<'a, C, A> AppModuleVersionListCall<'a, C, A> where C: BorrowMut<hyper::Clie
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "appengine.apps.modules.versions.list", 
+        dlg.begin(MethodInfo { id: "appengine.apps.modules.versions.list",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
         params.push(("appsId", self._apps_id.to_string()));
@@ -3921,7 +3997,7 @@ impl<'a, C, A> AppModuleVersionListCall<'a, C, A> where C: BorrowMut<hyper::Clie
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -3957,7 +4033,7 @@ impl<'a, C, A> AppModuleVersionListCall<'a, C, A> where C: BorrowMut<hyper::Clie
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(d);
                         continue;
                     }
                     dlg.finished(false);
@@ -3967,10 +4043,10 @@ impl<'a, C, A> AppModuleVersionListCall<'a, C, A> where C: BorrowMut<hyper::Clie
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(d);
                             continue;
                         }
                         dlg.finished(false);
@@ -4003,7 +4079,7 @@ impl<'a, C, A> AppModuleVersionListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     ///
     /// Sets the *apps id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn apps_id(mut self, new_value: &str) -> AppModuleVersionListCall<'a, C, A> {
         self._apps_id = new_value.to_string();
@@ -4013,7 +4089,7 @@ impl<'a, C, A> AppModuleVersionListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     ///
     /// Sets the *modules id* path property to the given value.
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     pub fn modules_id(mut self, new_value: &str) -> AppModuleVersionListCall<'a, C, A> {
         self._modules_id = new_value.to_string();
@@ -4052,12 +4128,12 @@ impl<'a, C, A> AppModuleVersionListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
-    /// 
+    ///
     /// # Additional Parameters
     ///
     /// * *bearer_token* (query-string) - OAuth bearer token.
@@ -4080,17 +4156,17 @@ impl<'a, C, A> AppModuleVersionListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AppModuleVersionListCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AppModuleVersionListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

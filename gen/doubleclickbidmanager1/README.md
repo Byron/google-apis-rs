@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-doubleclickbidmanager1` library allows access to all features of the *Google DoubleClick Bid Manager* service.
 
-This documentation was generated from *DoubleClick Bid Manager* crate version *0.1.10+20150925*, where *20150925* is the exact revision of the *doubleclickbidmanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.10*.
+This documentation was generated from *DoubleClick Bid Manager* crate version *0.1.11+20160120*, where *20160120* is the exact revision of the *doubleclickbidmanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
 
 Everything else about the *DoubleClick Bid Manager* *v1* API can be found at the
 [official documentation site](https://developers.google.com/bid-manager/).
@@ -19,6 +19,8 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
  * [*createquery*](http://byron.github.io/google-apis-rs/google_doubleclickbidmanager1/struct.QueryCreatequeryCall.html), [*deletequery*](http://byron.github.io/google-apis-rs/google_doubleclickbidmanager1/struct.QueryDeletequeryCall.html), [*getquery*](http://byron.github.io/google-apis-rs/google_doubleclickbidmanager1/struct.QueryGetqueryCall.html), [*listqueries*](http://byron.github.io/google-apis-rs/google_doubleclickbidmanager1/struct.QueryListqueryCall.html) and [*runquery*](http://byron.github.io/google-apis-rs/google_doubleclickbidmanager1/struct.QueryRunqueryCall.html)
 * [reports](http://byron.github.io/google-apis-rs/google_doubleclickbidmanager1/struct.Report.html)
  * [*listreports*](http://byron.github.io/google-apis-rs/google_doubleclickbidmanager1/struct.ReportListreportCall.html)
+* rubicon
+ * [*notifyproposalchange*](http://byron.github.io/google-apis-rs/google_doubleclickbidmanager1/struct.RubiconNotifyproposalchangeCall.html)
 
 
 

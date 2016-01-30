@@ -1,4 +1,4 @@
-site_name: cloudtrace v0.3.2+20150825
+site_name: cloudtrace v0.3.3+20151207
 site_url: http://byron.github.io/google-apis-rs/google-cloudtrace1-cli
 site_description: Write integrating applications with bcore
 
@@ -9,12 +9,11 @@ site_dir: build_html
 
 pages:
 - ['index.md', 'Home']
-- ['methods_get-discovery.md', 'Methods', 'Get Discovery']
 - ['projects_patch-traces.md', 'Projects', 'Patch Traces']
 - ['projects_traces-get.md', 'Projects', 'Traces Get']
 - ['projects_traces-list.md', 'Projects', 'Traces List']
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015, `Sebastian Thiel`
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
 

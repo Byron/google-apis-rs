@@ -4,7 +4,7 @@
 [package]
 
 name = "google-replicapoolupdater1_beta1"
-version = "0.1.10+20150904"
+version = "0.1.11+20160107"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with replicapoolupdater (protocol v1beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/replicapoolupdater1_beta1"
@@ -20,7 +20,7 @@ hyper = "0.7"
 mime = "0.1.0"
 serde = ">= 0.6.0"
 serde_json = ">= 0.6.0"
-yup-oauth2 = "0.5"
+yup-oauth2 = ">= 0.5.4"
 url = ">= 0.5"
 
 [build-dependencies]

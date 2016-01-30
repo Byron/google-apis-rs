@@ -1,4 +1,4 @@
-site_name: Games v0.3.2+20151012
+site_name: Games v0.3.3+20160126
 site_url: http://byron.github.io/google-apis-rs/google-games1-cli
 site_description: Write integrating applications with bcore
 
@@ -18,6 +18,7 @@ pages:
 - ['achievements_update-multiple.md', 'Achievements', 'Update Multiple']
 - ['applications_get.md', 'Applications', 'Get']
 - ['applications_played.md', 'Applications', 'Played']
+- ['applications_verify.md', 'Applications', 'Verify']
 - ['events_list-by-player.md', 'Events', 'List By Player']
 - ['events_list-definitions.md', 'Events', 'List Definitions']
 - ['events_record.md', 'Events', 'Record']
@@ -64,5 +65,5 @@ pages:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015, `Sebastian Thiel`
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
 

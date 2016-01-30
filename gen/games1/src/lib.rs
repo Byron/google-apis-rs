@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Games* crate version *0.1.10+20151012*, where *20151012* is the exact revision of the *games:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.10*.
+//! This documentation was generated from *Games* crate version *0.1.11+20160126*, where *20160126* is the exact revision of the *games:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
 //! 
 //! Everything else about the *Games* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/games/services/).
@@ -16,7 +16,7 @@
 //! * achievements
 //!  * [*increment*](struct.AchievementIncrementCall.html), [*list*](struct.AchievementListCall.html), [*reveal*](struct.AchievementRevealCall.html), [*set steps at least*](struct.AchievementSetStepsAtLeastCall.html), [*unlock*](struct.AchievementUnlockCall.html) and [*update multiple*](struct.AchievementUpdateMultipleCall.html)
 //! * [applications](struct.Application.html)
-//!  * [*get*](struct.ApplicationGetCall.html) and [*played*](struct.ApplicationPlayedCall.html)
+//!  * [*get*](struct.ApplicationGetCall.html), [*played*](struct.ApplicationPlayedCall.html) and [*verify*](struct.ApplicationVerifyCall.html)
 //! * events
 //!  * [*list by player*](struct.EventListByPlayerCall.html), [*list definitions*](struct.EventListDefinitionCall.html) and [*record*](struct.EventRecordCall.html)
 //! * [leaderboards](struct.Leaderboard.html)
@@ -128,9 +128,9 @@
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.turn_based_matches().leave_turn("matchId", -74)
-//!              .pending_participant_id("dolor")
-//!              .language("diam")
+//! let result = hub.turn_based_matches().leave_turn("matchId", -48)
+//!              .pending_participant_id("diam")
+//!              .language("kasd")
 //!              .doit();
 //! 
 //! match result {

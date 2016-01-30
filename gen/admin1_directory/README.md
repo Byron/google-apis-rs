@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-admin1_directory` library allows access to all features of the *Google directory* service.
 
-This documentation was generated from *directory* crate version *0.1.10+20151005*, where *20151005* is the exact revision of the *admin:directory_v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.10*.
+This documentation was generated from *directory* crate version *0.1.11+20151208*, where *20151208* is the exact revision of the *admin:directory_v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
 
 Everything else about the *directory* *v1_directory* API can be found at the
 [official documentation site](https://developers.google.com/admin-sdk/directory/).
@@ -37,6 +37,8 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
  * [*delete*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.OrgunitDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.OrgunitGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.OrgunitInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.OrgunitListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.OrgunitPatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.OrgunitUpdateCall.html)
 * [privileges](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.Privilege.html)
  * [*list*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.PrivilegeListCall.html)
+* resources
+ * [*calendars delete*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.ResourceCalendarDeleteCall.html), [*calendars get*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.ResourceCalendarGetCall.html), [*calendars insert*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.ResourceCalendarInsertCall.html), [*calendars list*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.ResourceCalendarListCall.html), [*calendars patch*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.ResourceCalendarPatchCall.html) and [*calendars update*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.ResourceCalendarUpdateCall.html)
 * [role assignments](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.RoleAssignment.html)
  * [*delete*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.RoleAssignmentDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.RoleAssignmentGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.RoleAssignmentInsertCall.html) and [*list*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.RoleAssignmentListCall.html)
 * [roles](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.Role.html)

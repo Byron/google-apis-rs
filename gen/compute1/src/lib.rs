@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *compute* crate version *0.1.10+20151015*, where *20151015* is the exact revision of the *compute:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.10*.
+//! This documentation was generated from *compute* crate version *0.1.11+20160120*, where *20160120* is the exact revision of the *compute:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
 //! 
 //! Everything else about the *compute* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/compute/docs/reference/latest/).
@@ -44,7 +44,7 @@
 //! * [instance templates](struct.InstanceTemplate.html)
 //!  * [*delete*](struct.InstanceTemplateDeleteCall.html), [*get*](struct.InstanceTemplateGetCall.html), [*insert*](struct.InstanceTemplateInsertCall.html) and [*list*](struct.InstanceTemplateListCall.html)
 //! * [instances](struct.Instance.html)
-//!  * [*add access config*](struct.InstanceAddAccessConfigCall.html), [*aggregated list*](struct.InstanceAggregatedListCall.html), [*attach disk*](struct.InstanceAttachDiskCall.html), [*delete*](struct.InstanceDeleteCall.html), [*delete access config*](struct.InstanceDeleteAccessConfigCall.html), [*detach disk*](struct.InstanceDetachDiskCall.html), [*get*](struct.InstanceGetCall.html), [*get serial port output*](struct.InstanceGetSerialPortOutputCall.html), [*insert*](struct.InstanceInsertCall.html), [*list*](struct.InstanceListCall.html), [*reset*](struct.InstanceResetCall.html), [*set disk auto delete*](struct.InstanceSetDiskAutoDeleteCall.html), [*set metadata*](struct.InstanceSetMetadataCall.html), [*set scheduling*](struct.InstanceSetSchedulingCall.html), [*set tags*](struct.InstanceSetTagCall.html), [*start*](struct.InstanceStartCall.html) and [*stop*](struct.InstanceStopCall.html)
+//!  * [*add access config*](struct.InstanceAddAccessConfigCall.html), [*aggregated list*](struct.InstanceAggregatedListCall.html), [*attach disk*](struct.InstanceAttachDiskCall.html), [*delete*](struct.InstanceDeleteCall.html), [*delete access config*](struct.InstanceDeleteAccessConfigCall.html), [*detach disk*](struct.InstanceDetachDiskCall.html), [*get*](struct.InstanceGetCall.html), [*get serial port output*](struct.InstanceGetSerialPortOutputCall.html), [*insert*](struct.InstanceInsertCall.html), [*list*](struct.InstanceListCall.html), [*reset*](struct.InstanceResetCall.html), [*set disk auto delete*](struct.InstanceSetDiskAutoDeleteCall.html), [*set machine type*](struct.InstanceSetMachineTypeCall.html), [*set metadata*](struct.InstanceSetMetadataCall.html), [*set scheduling*](struct.InstanceSetSchedulingCall.html), [*set tags*](struct.InstanceSetTagCall.html), [*start*](struct.InstanceStartCall.html) and [*stop*](struct.InstanceStopCall.html)
 //! * [licenses](struct.License.html)
 //!  * [*get*](struct.LicenseGetCall.html)
 //! * [machine types](struct.MachineType.html)
@@ -63,6 +63,8 @@
 //!  * [*delete*](struct.SnapshotDeleteCall.html), [*get*](struct.SnapshotGetCall.html) and [*list*](struct.SnapshotListCall.html)
 //! * [ssl certificates](struct.SslCertificate.html)
 //!  * [*delete*](struct.SslCertificateDeleteCall.html), [*get*](struct.SslCertificateGetCall.html), [*insert*](struct.SslCertificateInsertCall.html) and [*list*](struct.SslCertificateListCall.html)
+//! * [subnetworks](struct.Subnetwork.html)
+//!  * [*aggregated list*](struct.SubnetworkAggregatedListCall.html), [*delete*](struct.SubnetworkDeleteCall.html), [*get*](struct.SubnetworkGetCall.html), [*insert*](struct.SubnetworkInsertCall.html) and [*list*](struct.SubnetworkListCall.html)
 //! * [target http proxies](struct.TargetHttpProxy.html)
 //!  * [*delete*](struct.TargetHttpProxyDeleteCall.html), [*get*](struct.TargetHttpProxyGetCall.html), [*insert*](struct.TargetHttpProxyInsertCall.html), [*list*](struct.TargetHttpProxyListCall.html) and [*set url map*](struct.TargetHttpProxySetUrlMapCall.html)
 //! * [target https proxies](struct.TargetHttpsProxy.html)
@@ -121,6 +123,7 @@
 //! let r = hub.target_https_proxies().delete(...).doit()
 //! let r = hub.firewalls().patch(...).doit()
 //! let r = hub.vpn_tunnels().delete(...).doit()
+//! let r = hub.backend_services().delete(...).doit()
 //! let r = hub.global_forwarding_rules().set_target(...).doit()
 //! let r = hub.instances().insert(...).doit()
 //! let r = hub.global_forwarding_rules().delete(...).doit()
@@ -136,6 +139,7 @@
 //! let r = hub.https_health_checks().delete(...).doit()
 //! let r = hub.autoscalers().insert(...).doit()
 //! let r = hub.instance_groups().insert(...).doit()
+//! let r = hub.instances().set_tags(...).doit()
 //! let r = hub.instance_group_managers().delete_instances(...).doit()
 //! let r = hub.instance_group_managers().set_instance_template(...).doit()
 //! let r = hub.target_pools().insert(...).doit()
@@ -145,7 +149,7 @@
 //! let r = hub.https_health_checks().insert(...).doit()
 //! let r = hub.target_pools().remove_health_check(...).doit()
 //! let r = hub.target_https_proxies().set_url_map(...).doit()
-//! let r = hub.backend_services().delete(...).doit()
+//! let r = hub.instances().set_machine_type(...).doit()
 //! let r = hub.url_maps().insert(...).doit()
 //! let r = hub.instances().add_access_config(...).doit()
 //! let r = hub.addresses().insert(...).doit()
@@ -170,7 +174,7 @@
 //! let r = hub.target_https_proxies().set_ssl_certificates(...).doit()
 //! let r = hub.networks().insert(...).doit()
 //! let r = hub.instance_group_managers().abandon_instances(...).doit()
-//! let r = hub.instances().set_tags(...).doit()
+//! let r = hub.subnetworks().insert(...).doit()
 //! let r = hub.snapshots().delete(...).doit()
 //! let r = hub.target_https_proxies().insert(...).doit()
 //! let r = hub.instances().detach_disk(...).doit()
@@ -190,6 +194,7 @@
 //! let r = hub.autoscalers().delete(...).doit()
 //! let r = hub.https_health_checks().update(...).doit()
 //! let r = hub.url_maps().patch(...).doit()
+//! let r = hub.subnetworks().delete(...).doit()
 //! let r = hub.instances().stop(...).doit()
 //! let r = hub.target_pools().add_instance(...).doit()
 //! let r = hub.target_pools().remove_instance(...).doit()
@@ -262,7 +267,7 @@
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.instances().set_disk_auto_delete("project", "zone", "instance", false, "deviceName")
+//! let result = hub.instances().set_disk_auto_delete("project", "zone", "instance", true, "deviceName")
 //!              .doit();
 //! 
 //! match result {

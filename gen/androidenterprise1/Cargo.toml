@@ -4,11 +4,11 @@
 [package]
 
 name = "google-androidenterprise1"
-version = "0.1.10+20150922"
+version = "0.1.11+20160106"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Android Enterprise (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/androidenterprise1"
-homepage = "https://developers.google.com/play/enterprise"
+homepage = "https://developers.google.com/android/work/play/emm-api"
 documentation = "http://byron.github.io/google-apis-rs/google_androidenterprise1"
 license = "MIT"
 keywords = ["androidenterprise", "google", "protocol", "web", "api"]

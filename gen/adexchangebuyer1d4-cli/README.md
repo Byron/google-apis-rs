@@ -17,14 +17,14 @@ Everything else about the *Ad Exchange Buyer* API can be found at the
 
 You can download the pre-compiled 64bit binaries for the following platforms:
 
-* ![icon](http://megaicons.net/static/img/icons_sizes/6/140/16/ubuntu-icon.png) [ubuntu](http://dl.byronimo.de/google.rs/cli/0.3.2/ubuntu/adexchangebuyer1d4.tar.gz)
-* ![icon](http://hydra-media.cursecdn.com/wow.gamepedia.com/a/a2/Apple-icon-16x16.png?version=25ddd67ac3dd3b634478e3978b76cb74) [osx](http://dl.byronimo.de/google.rs/cli/0.3.2/osx/adexchangebuyer1d4.tar.gz)
+* ![icon](http://megaicons.net/static/img/icons_sizes/6/140/16/ubuntu-icon.png) [ubuntu](http://dl.byronimo.de/google.rs/cli/0.3.3/ubuntu/adexchangebuyer1d4.tar.gz)
+* ![icon](http://hydra-media.cursecdn.com/wow.gamepedia.com/a/a2/Apple-icon-16x16.png?version=25ddd67ac3dd3b634478e3978b76cb74) [osx](http://dl.byronimo.de/google.rs/cli/0.3.3/osx/adexchangebuyer1d4.tar.gz)
 
 Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/adexchangebuyer1d4-cli).
 
 # Usage
 
-This documentation was generated from the *Ad Exchange Buyer* API at revision *20150909*. The CLI is at version *0.3.2*.
+This documentation was generated from the *Ad Exchange Buyer* API at revision *20160118*. The CLI is at version *0.3.3*.
 
 ```bash
 adexchangebuyer1d4 [options]
@@ -40,46 +40,20 @@ adexchangebuyer1d4 [options]
                 get <account-id> <billing-id> [-p <v>]... [-o <out>]
                 patch <account-id> <billing-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 update <account-id> <billing-id> (-r <kv>)... [-p <v>]... [-o <out>]
-        clientaccess
-                delete <client-account-id> <sponsor-account-id> [-p <v>]...
-                get <client-account-id> <sponsor-account-id> [-p <v>]... [-o <out>]
-                insert (-r <kv>)... [-p <v>]... [-o <out>]
-                list (-r <kv>)... [-p <v>]... [-o <out>]
-                patch <client-account-id> <sponsor-account-id> (-r <kv>)... [-p <v>]... [-o <out>]
-                update <client-account-id> <sponsor-account-id> (-r <kv>)... [-p <v>]... [-o <out>]
         creatives
+                add-deal <account-id> <buyer-creative-id> <deal-id> [-p <v>]...
                 get <account-id> <buyer-creative-id> [-p <v>]... [-o <out>]
                 insert (-r <kv>)... [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]
-        deals
-                get <deal-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                remove-deal <account-id> <buyer-creative-id> <deal-id> [-p <v>]...
         marketplacedeals
-                delete <order-id> (-r <kv>)... [-p <v>]... [-o <out>]
-                insert <order-id> (-r <kv>)... [-p <v>]... [-o <out>]
-                list <order-id> [-p <v>]... [-o <out>]
-                update <order-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                delete <proposal-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                insert <proposal-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <proposal-id> [-p <v>]... [-o <out>]
+                update <proposal-id> (-r <kv>)... [-p <v>]... [-o <out>]
         marketplacenotes
-                insert <order-id> (-r <kv>)... [-p <v>]... [-o <out>]
-                list <order-id> [-p <v>]... [-o <out>]
-        marketplaceoffers
-                get <offer-id> [-p <v>]... [-o <out>]
-                search [-p <v>]... [-o <out>]
-        marketplaceorders
-                get <order-id> [-p <v>]... [-o <out>]
-                insert (-r <kv>)... [-p <v>]... [-o <out>]
-                patch <order-id> <revision-number> <update-action> (-r <kv>)... [-p <v>]... [-o <out>]
-                search [-p <v>]... [-o <out>]
-                update <order-id> <revision-number> <update-action> (-r <kv>)... [-p <v>]... [-o <out>]
-        negotiationrounds
-                insert <negotiation-id> (-r <kv>)... [-p <v>]... [-o <out>]
-        negotiations
-                get <negotiation-id> (-r <kv>)... [-p <v>]... [-o <out>]
-                insert (-r <kv>)... [-p <v>]... [-o <out>]
-                list (-r <kv>)... [-p <v>]... [-o <out>]
-        offers
-                get <offer-id> [-p <v>]... [-o <out>]
-                insert (-r <kv>)... [-p <v>]... [-o <out>]
-                list (-r <kv>)... [-p <v>]... [-o <out>]
+                insert <proposal-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <proposal-id> [-p <v>]... [-o <out>]
         performance-report
                 list <account-id> <end-date-time> <start-date-time> [-p <v>]... [-o <out>]
         pretargeting-config
@@ -89,22 +63,31 @@ adexchangebuyer1d4 [options]
                 list <account-id> [-p <v>]... [-o <out>]
                 patch <account-id> <config-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 update <account-id> <config-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        products
+                get <product-id> [-p <v>]... [-o <out>]
+                search [-p <v>]... [-o <out>]
+        proposals
+                get <proposal-id> [-p <v>]... [-o <out>]
+                insert (-r <kv>)... [-p <v>]... [-o <out>]
+                patch <proposal-id> <revision-number> <update-action> (-r <kv>)... [-p <v>]... [-o <out>]
+                search [-p <v>]... [-o <out>]
+                update <proposal-id> <revision-number> <update-action> (-r <kv>)... [-p <v>]... [-o <out>]
   adexchangebuyer1d4 --help
 
 Configuration:
   [--scope <url>]...
-            Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it. 
+            Specify the authentication a method should be executed in. Each scope
+            requires the user to grant this application permission to use it.
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
-            A directory into which we will store our persistent data. Defaults to 
+            A directory into which we will store our persistent data. Defaults to
             a user-writable directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
   --debug
-            Output all server communication to standard error. `tx` and `rx` are placed 
+            Output all server communication to standard error. `tx` and `rx` are placed
             into the same stream.
   --debug-auth
-            Output all communication related to authentication to standard error. `tx` 
+            Output all communication related to authentication to standard error. `tx`
             and `rx` are placed into the same stream.
 
 ```

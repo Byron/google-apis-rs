@@ -17,14 +17,14 @@ Everything else about the *plus* API can be found at the
 
 You can download the pre-compiled 64bit binaries for the following platforms:
 
-* ![icon](http://megaicons.net/static/img/icons_sizes/6/140/16/ubuntu-icon.png) [ubuntu](http://dl.byronimo.de/google.rs/cli/0.3.2/ubuntu/plus1.tar.gz)
-* ![icon](http://hydra-media.cursecdn.com/wow.gamepedia.com/a/a2/Apple-icon-16x16.png?version=25ddd67ac3dd3b634478e3978b76cb74) [osx](http://dl.byronimo.de/google.rs/cli/0.3.2/osx/plus1.tar.gz)
+* ![icon](http://megaicons.net/static/img/icons_sizes/6/140/16/ubuntu-icon.png) [ubuntu](http://dl.byronimo.de/google.rs/cli/0.3.3/ubuntu/plus1.tar.gz)
+* ![icon](http://hydra-media.cursecdn.com/wow.gamepedia.com/a/a2/Apple-icon-16x16.png?version=25ddd67ac3dd3b634478e3978b76cb74) [osx](http://dl.byronimo.de/google.rs/cli/0.3.3/osx/plus1.tar.gz)
 
 Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/plus1-cli).
 
 # Usage
 
-This documentation was generated from the *plus* API at revision *20151014*. The CLI is at version *0.3.2*.
+This documentation was generated from the *plus* API at revision *20160127*. The CLI is at version *0.3.3*.
 
 ```bash
 plus1 [options]
@@ -35,9 +35,6 @@ plus1 [options]
         comments
                 get <comment-id> [-p <v>]... [-o <out>]
                 list <activity-id> [-p <v>]... [-o <out>]
-        moments
-                insert <user-id> <collection> (-r <kv>)... [-p <v>]... [-o <out>]
-                list <user-id> <collection> [-p <v>]... [-o <out>]
         people
                 get <user-id> [-p <v>]... [-o <out>]
                 list <user-id> <collection> [-p <v>]... [-o <out>]
@@ -47,18 +44,18 @@ plus1 [options]
 
 Configuration:
   [--scope <url>]...
-            Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it. 
+            Specify the authentication a method should be executed in. Each scope
+            requires the user to grant this application permission to use it.
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
-            A directory into which we will store our persistent data. Defaults to 
+            A directory into which we will store our persistent data. Defaults to
             a user-writable directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
   --debug
-            Output all server communication to standard error. `tx` and `rx` are placed 
+            Output all server communication to standard error. `tx` and `rx` are placed
             into the same stream.
   --debug-auth
-            Output all communication related to authentication to standard error. `tx` 
+            Output all communication related to authentication to standard error. `tx`
             and `rx` are placed into the same stream.
 
 ```

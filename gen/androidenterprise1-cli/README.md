@@ -11,20 +11,20 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
 Everything else about the *Android Enterprise* API can be found at the
-[official documentation site](https://developers.google.com/play/enterprise).
+[official documentation site](https://developers.google.com/android/work/play/emm-api).
 
 # Downloads
 
 You can download the pre-compiled 64bit binaries for the following platforms:
 
-* ![icon](http://megaicons.net/static/img/icons_sizes/6/140/16/ubuntu-icon.png) [ubuntu](http://dl.byronimo.de/google.rs/cli/0.3.2/ubuntu/androidenterprise1.tar.gz)
-* ![icon](http://hydra-media.cursecdn.com/wow.gamepedia.com/a/a2/Apple-icon-16x16.png?version=25ddd67ac3dd3b634478e3978b76cb74) [osx](http://dl.byronimo.de/google.rs/cli/0.3.2/osx/androidenterprise1.tar.gz)
+* ![icon](http://megaicons.net/static/img/icons_sizes/6/140/16/ubuntu-icon.png) [ubuntu](http://dl.byronimo.de/google.rs/cli/0.3.3/ubuntu/androidenterprise1.tar.gz)
+* ![icon](http://hydra-media.cursecdn.com/wow.gamepedia.com/a/a2/Apple-icon-16x16.png?version=25ddd67ac3dd3b634478e3978b76cb74) [osx](http://dl.byronimo.de/google.rs/cli/0.3.3/osx/androidenterprise1.tar.gz)
 
 Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/androidenterprise1-cli).
 
 # Usage
 
-This documentation was generated from the *Android Enterprise* API at revision *20150922*. The CLI is at version *0.3.2*.
+This documentation was generated from the *Android Enterprise* API at revision *20160106*. The CLI is at version *0.3.3*.
 
 ```bash
 androidenterprise1 [options]
@@ -50,10 +50,12 @@ androidenterprise1 [options]
                 delete <enterprise-id> [-p <v>]...
                 enroll <token> (-r <kv>)... [-p <v>]... [-o <out>]
                 get <enterprise-id> [-p <v>]... [-o <out>]
+                get-store-layout <enterprise-id> [-p <v>]... [-o <out>]
                 insert <token> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <domain> [-p <v>]... [-o <out>]
                 send-test-push-notification <enterprise-id> [-p <v>]... [-o <out>]
                 set-account <enterprise-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                set-store-layout <enterprise-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 unenroll <enterprise-id> [-p <v>]...
         entitlements
                 delete <enterprise-id> <user-id> <entitlement-id> [-p <v>]...
@@ -81,6 +83,20 @@ androidenterprise1 [options]
                 get-app-restrictions-schema <enterprise-id> <product-id> [-p <v>]... [-o <out>]
                 get-permissions <enterprise-id> <product-id> [-p <v>]... [-o <out>]
                 update-permissions <enterprise-id> <product-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        storelayoutclusters
+                delete <enterprise-id> <page-id> <cluster-id> [-p <v>]...
+                get <enterprise-id> <page-id> <cluster-id> [-p <v>]... [-o <out>]
+                insert <enterprise-id> <page-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <enterprise-id> <page-id> [-p <v>]... [-o <out>]
+                patch <enterprise-id> <page-id> <cluster-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <enterprise-id> <page-id> <cluster-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        storelayoutpages
+                delete <enterprise-id> <page-id> [-p <v>]...
+                get <enterprise-id> <page-id> [-p <v>]... [-o <out>]
+                insert <enterprise-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <enterprise-id> [-p <v>]... [-o <out>]
+                patch <enterprise-id> <page-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <enterprise-id> <page-id> (-r <kv>)... [-p <v>]... [-o <out>]
         users
                 generate-token <enterprise-id> <user-id> [-p <v>]... [-o <out>]
                 get <enterprise-id> <user-id> [-p <v>]... [-o <out>]
@@ -92,18 +108,18 @@ androidenterprise1 [options]
 
 Configuration:
   [--scope <url>]...
-            Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it. 
+            Specify the authentication a method should be executed in. Each scope
+            requires the user to grant this application permission to use it.
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
-            A directory into which we will store our persistent data. Defaults to 
+            A directory into which we will store our persistent data. Defaults to
             a user-writable directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
   --debug
-            Output all server communication to standard error. `tx` and `rx` are placed 
+            Output all server communication to standard error. `tx` and `rx` are placed
             into the same stream.
   --debug-auth
-            Output all communication related to authentication to standard error. `tx` 
+            Output all communication related to authentication to standard error. `tx`
             and `rx` are placed into the same stream.
 
 ```

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *clouddebugger* crate version *0.1.10+20150725*, where *20150725* is the exact revision of the *clouddebugger:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.10*.
+//! This documentation was generated from *clouddebugger* crate version *0.1.11+20151123*, where *20151123* is the exact revision of the *clouddebugger:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
 //! 
 //! Everything else about the *clouddebugger* *v2* API can be found at the
 //! [official documentation site](https://cloud.google.com/tools/cloud-debugger).

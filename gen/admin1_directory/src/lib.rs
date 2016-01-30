@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *directory* crate version *0.1.10+20151005*, where *20151005* is the exact revision of the *admin:directory_v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.10*.
+//! This documentation was generated from *directory* crate version *0.1.11+20151208*, where *20151208* is the exact revision of the *admin:directory_v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
 //! 
 //! Everything else about the *directory* *v1_directory* API can be found at the
 //! [official documentation site](https://developers.google.com/admin-sdk/directory/).
@@ -35,6 +35,8 @@
 //!  * [*delete*](struct.OrgunitDeleteCall.html), [*get*](struct.OrgunitGetCall.html), [*insert*](struct.OrgunitInsertCall.html), [*list*](struct.OrgunitListCall.html), [*patch*](struct.OrgunitPatchCall.html) and [*update*](struct.OrgunitUpdateCall.html)
 //! * [privileges](struct.Privilege.html)
 //!  * [*list*](struct.PrivilegeListCall.html)
+//! * resources
+//!  * [*calendars delete*](struct.ResourceCalendarDeleteCall.html), [*calendars get*](struct.ResourceCalendarGetCall.html), [*calendars insert*](struct.ResourceCalendarInsertCall.html), [*calendars list*](struct.ResourceCalendarListCall.html), [*calendars patch*](struct.ResourceCalendarPatchCall.html) and [*calendars update*](struct.ResourceCalendarUpdateCall.html)
 //! * [role assignments](struct.RoleAssignment.html)
 //!  * [*delete*](struct.RoleAssignmentDeleteCall.html), [*get*](struct.RoleAssignmentGetCall.html), [*insert*](struct.RoleAssignmentInsertCall.html) and [*list*](struct.RoleAssignmentListCall.html)
 //! * [roles](struct.Role.html)
@@ -159,17 +161,17 @@
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.users().watch(req)
 //!              .view_type("et")
-//!              .sort_order("Stet")
-//!              .show_deleted("sed")
-//!              .query("dolor")
-//!              .projection("sanctus")
-//!              .page_token("dolore")
-//!              .order_by("Lorem")
-//!              .max_results(-96)
-//!              .event("consetetur")
-//!              .domain("eirmod")
-//!              .customer("labore")
-//!              .custom_field_mask("gubergren")
+//!              .sort_order("sadipscing")
+//!              .show_deleted("accusam")
+//!              .query("magna")
+//!              .projection("Lorem")
+//!              .page_token("rebum.")
+//!              .order_by("et")
+//!              .max_results(-64)
+//!              .event("eos")
+//!              .domain("dolores")
+//!              .customer("vero")
+//!              .custom_field_mask("consetetur")
 //!              .doit();
 //! 
 //! match result {

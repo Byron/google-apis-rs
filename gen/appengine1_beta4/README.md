@@ -5,10 +5,10 @@ DO NOT EDIT !
 -->
 The `google-appengine1_beta4` library allows access to all features of the *Google appengine* service.
 
-This documentation was generated from *appengine* crate version *0.1.10+20150831*, where *20150831* is the exact revision of the *appengine:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.10*.
+This documentation was generated from *appengine* crate version *0.1.11+20160121*, where *20160121* is the exact revision of the *appengine:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
 
 Everything else about the *appengine* *v1_beta4* API can be found at the
-[official documentation site](https://developers.google.com/appengine/).
+[official documentation site](https://cloud.google.com/appengine/docs/admin-api/).
 # Features
 
 Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google_appengine1_beta4/struct.Appengine.html) ... 

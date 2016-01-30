@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *genomics* crate version *0.1.10+20151014*, where *20151014* is the exact revision of the *genomics:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.10*.
+//! This documentation was generated from *genomics* crate version *0.1.11+20160124*, where *20160124* is the exact revision of the *genomics:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/genomics1).
 //! # Features
 //! 
@@ -13,17 +13,17 @@
 //! * [datasets](struct.Dataset.html)
 //!  * [*create*](struct.DatasetCreateCall.html), [*delete*](struct.DatasetDeleteCall.html), [*get*](struct.DatasetGetCall.html), [*get iam policy*](struct.DatasetGetIamPolicyCall.html), [*list*](struct.DatasetListCall.html), [*patch*](struct.DatasetPatchCall.html), [*set iam policy*](struct.DatasetSetIamPolicyCall.html), [*test iam permissions*](struct.DatasetTestIamPermissionCall.html) and [*undelete*](struct.DatasetUndeleteCall.html)
 //! * [operations](struct.Operation.html)
-//!  * [*cancel*](struct.OperationCancelCall.html), [*delete*](struct.OperationDeleteCall.html), [*get*](struct.OperationGetCall.html) and [*list*](struct.OperationListCall.html)
+//!  * [*cancel*](struct.OperationCancelCall.html), [*get*](struct.OperationGetCall.html) and [*list*](struct.OperationListCall.html)
 //! * readgroupsets
 //!  * [*coveragebuckets list*](struct.ReadgroupsetCoveragebucketListCall.html), [*delete*](struct.ReadgroupsetDeleteCall.html), [*export*](struct.ReadgroupsetExportCall.html), [*get*](struct.ReadgroupsetGetCall.html), [*import*](struct.ReadgroupsetImportCall.html), [*patch*](struct.ReadgroupsetPatchCall.html) and [*search*](struct.ReadgroupsetSearchCall.html)
 //! * [reads](struct.Read.html)
-//!  * [*search*](struct.ReadSearchCall.html)
+//!  * [*search*](struct.ReadSearchCall.html) and [*stream*](struct.ReadStreamCall.html)
 //! * [references](struct.Reference.html)
 //!  * [*bases list*](struct.ReferenceBaseListCall.html), [*get*](struct.ReferenceGetCall.html) and [*search*](struct.ReferenceSearchCall.html)
 //! * referencesets
 //!  * [*get*](struct.ReferencesetGetCall.html) and [*search*](struct.ReferencesetSearchCall.html)
 //! * [variants](struct.Variant.html)
-//!  * [*create*](struct.VariantCreateCall.html), [*delete*](struct.VariantDeleteCall.html), [*get*](struct.VariantGetCall.html), [*import*](struct.VariantImportCall.html), [*patch*](struct.VariantPatchCall.html) and [*search*](struct.VariantSearchCall.html)
+//!  * [*create*](struct.VariantCreateCall.html), [*delete*](struct.VariantDeleteCall.html), [*get*](struct.VariantGetCall.html), [*import*](struct.VariantImportCall.html), [*patch*](struct.VariantPatchCall.html), [*search*](struct.VariantSearchCall.html) and [*stream*](struct.VariantStreamCall.html)
 //! * variantsets
 //!  * [*create*](struct.VariantsetCreateCall.html), [*delete*](struct.VariantsetDeleteCall.html), [*export*](struct.VariantsetExportCall.html), [*get*](struct.VariantsetGetCall.html), [*patch*](struct.VariantsetPatchCall.html) and [*search*](struct.VariantsetSearchCall.html)
 //! 
@@ -121,7 +121,7 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.datasets().patch(req, "datasetId")
-//!              .update_mask("amet")
+//!              .update_mask("et")
 //!              .doit();
 //! 
 //! match result {

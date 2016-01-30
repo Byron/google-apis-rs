@@ -1,4 +1,4 @@
-site_name: plus v0.3.2+20151014
+site_name: plus v0.3.3+20160127
 site_url: http://byron.github.io/google-apis-rs/google-plus1-cli
 site_description: Write integrating applications with bcore
 
@@ -14,8 +14,6 @@ pages:
 - ['activities_search.md', 'Activities', 'Search']
 - ['comments_get.md', 'Comments', 'Get']
 - ['comments_list.md', 'Comments', 'List']
-- ['moments_insert.md', 'Moments', 'Insert']
-- ['moments_list.md', 'Moments', 'List']
 - ['people_get.md', 'People', 'Get']
 - ['people_list.md', 'People', 'List']
 - ['people_list-by-activity.md', 'People', 'List By Activity']
@@ -23,5 +21,5 @@ pages:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015, `Sebastian Thiel`
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
 

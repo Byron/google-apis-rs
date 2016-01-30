@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-youtubeanalytics1` library allows access to all features of the *Google YouTube Analytics* service.
 
-This documentation was generated from *YouTube Analytics* crate version *0.1.10+20150921*, where *20150921* is the exact revision of the *youtubeAnalytics:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.10*.
+This documentation was generated from *YouTube Analytics* crate version *0.1.11+20151211*, where *20151211* is the exact revision of the *youtubeAnalytics:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
 
 Everything else about the *YouTube Analytics* *v1* API can be found at the
 [official documentation site](http://developers.google.com/youtube/analytics/).
@@ -104,9 +104,10 @@ let mut hub = YouTubeAnalytics::new(hyper::Client::new(), auth);
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
 let result = hub.groups().list()
-             .on_behalf_of_content_owner("eirmod")
-             .mine(true)
-             .id("Stet")
+             .page_token("eirmod")
+             .on_behalf_of_content_owner("sit")
+             .mine(false)
+             .id("sed")
              .doit();
 
 match result {
