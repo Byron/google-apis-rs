@@ -22,7 +22,7 @@ make:
     - source: main.rs
       output_dir: src
 cargo:
-  build_version: "0.3.2"
+  build_version: "0.3.3"
   keywords: [cli]
   is_executable: YES
   dependencies:

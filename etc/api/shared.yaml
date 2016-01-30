@@ -51,7 +51,7 @@ urls:
   authenticator_delegate: ../yup-oauth2/trait.AuthenticatorDelegate.html
 copyright:
   license_abbrev: "MIT"
-  # should at some point be 2015-2016 ... 
-  years: '2015'
+  # should at some point be 2015-2016 ...
+  years: '2015-2016'
   authors:
     - 'Sebastian Thiel'
