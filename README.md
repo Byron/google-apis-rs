@@ -47,8 +47,8 @@ To generate the APIs yourself, you will need to meet the following prerequisites
 * **an internet connection and wget**
  * Make will download all other prerequisites automatically into hidden directories within this repository, which requires it to make some downloads via wget.
 * **Rust Stable**
- * This project compiles on *stable* Rust only. You might consider using [Multirust][multirust] to control
-   the toolchain on a per-project basis
+ * This project compiles on *stable* Rust *1.6 or greater* only. You might consider using [Multirust][multirust] to control
+   the toolchain on a per-project basis.
 
 ## Using Make
 
