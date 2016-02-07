@@ -521,11 +521,9 @@ match result {
         % endif ## p.name == 'part' and request_value:
         % if p.get('repeated', False):
         if ${pname}.len() > 0 {
-            let mut s = String::new();
             for f in ${pname}.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("${p.name}", f.to_string()));
             }
-            params.push(("${p.name}", s));
         }
         % elif not is_required_property(p):
         if let Some(value) = ${pname} {
