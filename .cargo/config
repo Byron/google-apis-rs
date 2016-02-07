@@ -1,3 +1,2 @@
 [build]
 target-dir = "target"
-lock-kind = "wait"
