@@ -29,8 +29,8 @@ name = "${util.program_name()}"
 hyper = "0.7"
 ## Must match the one hyper uses, otherwise there are duplicate similarly named `Mime` structs
 mime = "0.1.0"
-serde = ">= 0.6.0"
-serde_json = ">= 0.6.0"
+serde = ">= 0.7.0"
+serde_json = ">= 0.7.0"
 yup-oauth2 = ">= 0.5.4"
 % for dep in cargo.get('dependencies', list()):
 ${dep}
