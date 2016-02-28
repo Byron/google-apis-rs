@@ -7,7 +7,8 @@
 * **make:**  use venv-python to run any utility ([4bb7a33e](https://github.com/Byron/google-apis-rs/commit/4bb7a33e9370f520b985f96aa8229b659320ff1d))
 * **parameters:** previously the separator used in the request was incorrect, causing 
   the request to fail. This has been fixed [by this PR](https://github.com/Byron/google-apis-rs/pull/147).
-
+* **serde:** update to serde 0.7, which allows to ignore unkonwn fields.
+  That way, your library will work for longer, as it will just ignore possibly added fields.
 
 <a name=""></a>
 ## cli-v0.3.3:api-v0.1.11 (2016-01-30)
