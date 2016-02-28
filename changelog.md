@@ -1,5 +1,16 @@
+<a name="api-v0.1.12"></a>
+## api-v0.1.12 (2016-02-28)
+
+
+#### Bug Fixes
+
+* **make:**  use venv-python to run any utility ([4bb7a33e](https://github.com/Byron/google-apis-rs/commit/4bb7a33e9370f520b985f96aa8229b659320ff1d))
+* **parameters:** previously the separator used in the request was incorrect, causing 
+  the request to fail. This has been fixed [by this PR](https://github.com/Byron/google-apis-rs/pull/147).
+
+
 <a name=""></a>
-## cli-v0.3.3:cli-v0.1.11 (2016-01-30)
+## cli-v0.3.3:api-v0.1.11 (2016-01-30)
 
 
 #### Bug Fixes
