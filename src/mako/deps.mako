@@ -188,5 +188,5 @@ ${fake_target}:
 % endfor
 
 update-json: ${' '.join(json_api_targets)}
-	$(API_VERSION_GEN) $(API_DIR) $(API_LIST) $(API_LIST)
+	$(PYTHON) $(API_VERSION_GEN) $(API_DIR) $(API_LIST) $(API_LIST)
 % endif
