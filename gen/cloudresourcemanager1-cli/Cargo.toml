@@ -1,0 +1,35 @@
+# DO NOT EDIT !
+# This file was generated automatically from 'src/mako/Cargo.toml.mako'
+# DO NOT EDIT !
+[package]
+
+name = "google-cloudresourcemanager1-cli"
+version = "0.3.3+20160225"
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
+description = "A complete library to interact with cloudresourcemanager (protocol v1)"
+repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/cloudresourcemanager1-cli"
+homepage = "https://cloud.google.com/resource-manager"
+documentation = "http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli"
+license = "MIT"
+keywords = ["cloudresourcemanager", "google", "cli"]
+
+[[bin]]
+name = "cloudresourcemanager1"
+
+[dependencies]
+hyper = "0.7"
+mime = "0.1.0"
+serde = ">= 0.7.0"
+serde_json = ">= 0.7.0"
+yup-oauth2 = ">= 0.5.4"
+strsim = "0.4"
+yup-hyper-mock = "1.0"
+clap = "2.0"
+
+[build-dependencies]
+syntex = { version = ">= 0.23" }
+serde_codegen = { version = ">= 0.6" }
+
+
+[dependencies.google-cloudresourcemanager1]
+path = "../cloudresourcemanager1"

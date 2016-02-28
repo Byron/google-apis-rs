@@ -14569,7 +14569,7 @@ fn main() {
         
                     (Some(r##"region"##),
                      None,
-                     Some(r##"The name of the region for this request."##),
+                     Some(r##"Name of the region for this request."##),
                      Some(true),
                      Some(false)),
         
@@ -14603,7 +14603,7 @@ fn main() {
         
                     (Some(r##"region"##),
                      None,
-                     Some(r##"The name of the region for this request."##),
+                     Some(r##"Name of the region for this request."##),
                      Some(true),
                      Some(false)),
         
@@ -14637,7 +14637,7 @@ fn main() {
         
                     (Some(r##"region"##),
                      None,
-                     Some(r##"The name of the region for this request."##),
+                     Some(r##"Name of the region for this request."##),
                      Some(true),
                      Some(false)),
         
@@ -14660,7 +14660,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves a list of address resources contained within the specified region."##),
+                    Some(r##"Retrieves a list of addresses contained within the specified region."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/addresses_list",
                   vec![
                     (Some(r##"project"##),
@@ -14671,7 +14671,7 @@ fn main() {
         
                     (Some(r##"region"##),
                      None,
-                     Some(r##"The name of the region for this request."##),
+                     Some(r##"Name of the region for this request."##),
                      Some(true),
                      Some(false)),
         
@@ -14713,7 +14713,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("delete",
-                    Some(r##"Deletes the specified autoscaler resource."##),
+                    Some(r##"Deletes the specified autoscaler."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/autoscalers_delete",
                   vec![
                     (Some(r##"project"##),
@@ -14724,13 +14724,13 @@ fn main() {
         
                     (Some(r##"zone"##),
                      None,
-                     Some(r##"Name of the zone scoping this request."##),
+                     Some(r##"Name of the zone for this request."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"autoscaler"##),
                      None,
-                     Some(r##"Name of the persistent autoscaler resource to delete."##),
+                     Some(r##"Name of the autoscaler to delete."##),
                      Some(true),
                      Some(false)),
         
@@ -14747,7 +14747,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Returns the specified autoscaler resource."##),
+                    Some(r##"Returns the specified autoscaler resource. Get a list of available autoscalers by making a list() request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/autoscalers_get",
                   vec![
                     (Some(r##"project"##),
@@ -14758,13 +14758,13 @@ fn main() {
         
                     (Some(r##"zone"##),
                      None,
-                     Some(r##"Name of the zone scoping this request."##),
+                     Some(r##"Name of the zone for this request."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"autoscaler"##),
                      None,
-                     Some(r##"Name of the persistent autoscaler resource to return."##),
+                     Some(r##"Name of the autoscaler to return."##),
                      Some(true),
                      Some(false)),
         
@@ -14781,7 +14781,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("insert",
-                    Some(r##"Creates an autoscaler resource in the specified project using the data included in the request."##),
+                    Some(r##"Creates an autoscaler in the specified project using the data included in the request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/autoscalers_insert",
                   vec![
                     (Some(r##"project"##),
@@ -14792,7 +14792,7 @@ fn main() {
         
                     (Some(r##"zone"##),
                      None,
-                     Some(r##"Name of the zone scoping this request."##),
+                     Some(r##"Name of the zone for this request."##),
                      Some(true),
                      Some(false)),
         
@@ -14815,7 +14815,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves a list of autoscaler resources contained within the specified zone."##),
+                    Some(r##"Retrieves a list of autoscalers contained within the specified zone."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/autoscalers_list",
                   vec![
                     (Some(r##"project"##),
@@ -14826,7 +14826,7 @@ fn main() {
         
                     (Some(r##"zone"##),
                      None,
-                     Some(r##"Name of the zone scoping this request."##),
+                     Some(r##"Name of the zone for this request."##),
                      Some(true),
                      Some(false)),
         
@@ -14843,7 +14843,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("patch",
-                    Some(r##"Updates an autoscaler resource in the specified project using the data included in the request. This method supports patch semantics."##),
+                    Some(r##"Updates an autoscaler in the specified project using the data included in the request. This method supports patch semantics."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/autoscalers_patch",
                   vec![
                     (Some(r##"project"##),
@@ -14854,13 +14854,13 @@ fn main() {
         
                     (Some(r##"zone"##),
                      None,
-                     Some(r##"Name of the zone scoping this request."##),
+                     Some(r##"Name of the zone for this request."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"autoscaler"##),
                      None,
-                     Some(r##"Name of the autoscaler resource to update."##),
+                     Some(r##"Name of the autoscaler to update."##),
                      Some(true),
                      Some(false)),
         
@@ -14883,7 +14883,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Updates an autoscaler resource in the specified project using the data included in the request."##),
+                    Some(r##"Updates an autoscaler in the specified project using the data included in the request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/autoscalers_update",
                   vec![
                     (Some(r##"project"##),
@@ -14894,7 +14894,7 @@ fn main() {
         
                     (Some(r##"zone"##),
                      None,
-                     Some(r##"Name of the zone scoping this request."##),
+                     Some(r##"Name of the zone for this request."##),
                      Some(true),
                      Some(false)),
         
@@ -14948,7 +14948,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Returns the specified BackendService resource."##),
+                    Some(r##"Returns the specified BackendService resource. Get a list of available backend services by making a list() request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/backend-services_get",
                   vec![
                     (Some(r##"project"##),
@@ -15131,7 +15131,7 @@ fn main() {
         
         ("disk-types", "methods: 'aggregated-list', 'get' and 'list'", vec![
             ("aggregated-list",
-                    Some(r##"Retrieves an aggregated list of disk type resources."##),
+                    Some(r##"Retrieves an aggregated list of disk types."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/disk-types_aggregated-list",
                   vec![
                     (Some(r##"project"##),
@@ -15153,7 +15153,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Returns the specified disk type resource."##),
+                    Some(r##"Returns the specified disk type. Get a list of available disk types by making a list() request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/disk-types_get",
                   vec![
                     (Some(r##"project"##),
@@ -15170,7 +15170,7 @@ fn main() {
         
                     (Some(r##"disk-type"##),
                      None,
-                     Some(r##"Name of the disk type resource to return."##),
+                     Some(r##"Name of the disk type to return."##),
                      Some(true),
                      Some(false)),
         
@@ -15187,7 +15187,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves a list of disk type resources available to the specified project."##),
+                    Some(r##"Retrieves a list of disk types available to the specified project."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/disk-types_list",
                   vec![
                     (Some(r##"project"##),
@@ -15314,7 +15314,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Returns a specified persistent disk."##),
+                    Some(r##"Returns a specified persistent disk. Get a list of available persistent disks by making a list() request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/disks_get",
                   vec![
                     (Some(r##"project"##),
@@ -15348,7 +15348,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("insert",
-                    Some(r##"Creates a persistent disk in the specified project using the data included in the request."##),
+                    Some(r##"Creates a persistent disk in the specified project using the data in the request. You can create a disk with a sourceImage, a sourceSnapshot, or create an empty 200 GB data disk by omitting all properties. You can also create a disk that is larger than the default size by specifying the sizeGb property."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/disks_insert",
                   vec![
                     (Some(r##"project"##),
@@ -15413,7 +15413,7 @@ fn main() {
         
         ("firewalls", "methods: 'delete', 'get', 'insert', 'list', 'patch' and 'update'", vec![
             ("delete",
-                    Some(r##"Deletes the specified firewall resource."##),
+                    Some(r##"Deletes the specified firewall."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/firewalls_delete",
                   vec![
                     (Some(r##"project"##),
@@ -15424,7 +15424,7 @@ fn main() {
         
                     (Some(r##"firewall"##),
                      None,
-                     Some(r##"Name of the firewall resource to delete."##),
+                     Some(r##"Name of the firewall rule to delete."##),
                      Some(true),
                      Some(false)),
         
@@ -15441,7 +15441,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Returns the specified firewall resource."##),
+                    Some(r##"Returns the specified firewall."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/firewalls_get",
                   vec![
                     (Some(r##"project"##),
@@ -15452,7 +15452,7 @@ fn main() {
         
                     (Some(r##"firewall"##),
                      None,
-                     Some(r##"Name of the firewall resource to return."##),
+                     Some(r##"Name of the firewall rule to return."##),
                      Some(true),
                      Some(false)),
         
@@ -15469,7 +15469,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("insert",
-                    Some(r##"Creates a firewall resource in the specified project using the data included in the request."##),
+                    Some(r##"Creates a firewall rule in the specified project using the data included in the request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/firewalls_insert",
                   vec![
                     (Some(r##"project"##),
@@ -15497,7 +15497,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves the list of firewall resources available to the specified project."##),
+                    Some(r##"Retrieves the list of firewall rules available to the specified project."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/firewalls_list",
                   vec![
                     (Some(r##"project"##),
@@ -15519,7 +15519,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("patch",
-                    Some(r##"Updates the specified firewall resource with the data included in the request. This method supports patch semantics."##),
+                    Some(r##"Updates the specified firewall rule with the data included in the request. This method supports patch semantics."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/firewalls_patch",
                   vec![
                     (Some(r##"project"##),
@@ -15530,7 +15530,7 @@ fn main() {
         
                     (Some(r##"firewall"##),
                      None,
-                     Some(r##"Name of the firewall resource to update."##),
+                     Some(r##"Name of the firewall rule to update."##),
                      Some(true),
                      Some(false)),
         
@@ -15553,7 +15553,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Updates the specified firewall resource with the data included in the request."##),
+                    Some(r##"Updates the specified firewall rule with the data included in the request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/firewalls_update",
                   vec![
                     (Some(r##"project"##),
@@ -15564,7 +15564,7 @@ fn main() {
         
                     (Some(r##"firewall"##),
                      None,
-                     Some(r##"Name of the firewall resource to update."##),
+                     Some(r##"Name of the firewall rule to update."##),
                      Some(true),
                      Some(false)),
         
@@ -15813,7 +15813,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Returns the specified address resource."##),
+                    Some(r##"Returns the specified address resource. Get a list of available addresses by making a list() request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/global-addresses_get",
                   vec![
                     (Some(r##"project"##),
@@ -15869,7 +15869,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves a list of global address resources."##),
+                    Some(r##"Retrieves a list of global addresses."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/global-addresses_list",
                   vec![
                     (Some(r##"project"##),
@@ -15922,7 +15922,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Returns the specified ForwardingRule resource."##),
+                    Some(r##"Returns the specified ForwardingRule resource. Get a list of available forwarding rules by making a list() request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/global-forwarding-rules_get",
                   vec![
                     (Some(r##"project"##),
@@ -16081,7 +16081,7 @@ fn main() {
                      Some(true)),
                   ]),
             ("get",
-                    Some(r##"Retrieves the specified Operations resource."##),
+                    Some(r##"Retrieves the specified Operations resource. Get a list of operations by making a list() request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/global-operations_get",
                   vec![
                     (Some(r##"project"##),
@@ -16162,7 +16162,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Returns the specified HttpHealthCheck resource."##),
+                    Some(r##"Returns the specified HttpHealthCheck resource. Get a list of available HTTP health checks by making a list() request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/http-health-checks_get",
                   vec![
                     (Some(r##"project"##),
@@ -16339,7 +16339,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Returns the specified HttpsHealthCheck resource."##),
+                    Some(r##"Returns the specified HttpsHealthCheck resource. Get a list of available HTTPS health checks by making a list() request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/https-health-checks_get",
                   vec![
                     (Some(r##"project"##),
@@ -16488,7 +16488,7 @@ fn main() {
         
         ("images", "methods: 'delete', 'deprecate', 'get', 'insert' and 'list'", vec![
             ("delete",
-                    Some(r##"Deletes the specified image resource."##),
+                    Some(r##"Deletes the specified image."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/images_delete",
                   vec![
                     (Some(r##"project"##),
@@ -16552,7 +16552,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Returns the specified image resource."##),
+                    Some(r##"Returns the specified image. Get a list of available images by making a list() request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/images_get",
                   vec![
                     (Some(r##"project"##),
@@ -16580,7 +16580,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("insert",
-                    Some(r##"Creates an image resource in the specified project using the data included in the request."##),
+                    Some(r##"Creates an image in the specified project using the data included in the request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/images_insert",
                   vec![
                     (Some(r##"project"##),
@@ -16771,7 +16771,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Returns all of the details about the specified managed instance group."##),
+                    Some(r##"Returns all of the details about the specified managed instance group. Get a list of available managed instance groups by making a list() request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/instance-group-managers_get",
                   vec![
                     (Some(r##"project"##),
@@ -17064,7 +17064,7 @@ fn main() {
         
         ("instance-groups", "methods: 'add-instances', 'aggregated-list', 'delete', 'get', 'insert', 'list', 'list-instances', 'remove-instances' and 'set-named-ports'", vec![
             ("add-instances",
-                    Some(r##"Adds a list of instances to the specified instance group. Read  Adding instances for more information."##),
+                    Some(r##"Adds a list of instances to the specified instance group. All of the instances in the instance group must be in the same network/subnetwork. Read  Adding instances for more information."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/instance-groups_add-instances",
                   vec![
                     (Some(r##"project"##),
@@ -17160,7 +17160,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Returns the specified instance group resource."##),
+                    Some(r##"Returns the specified instance group. Get a list of available instance groups by making a list() request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/instance-groups_get",
                   vec![
                     (Some(r##"project"##),
@@ -17379,7 +17379,7 @@ fn main() {
         
         ("instance-templates", "methods: 'delete', 'get', 'insert' and 'list'", vec![
             ("delete",
-                    Some(r##"Deletes the specified instance template."##),
+                    Some(r##"Deletes the specified instance template. If you delete an instance template that is being referenced from another instance group, the instance group will not be able to create or recreate virtual machine instances. Deleting an instance template is permanent and cannot be undone."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/instance-templates_delete",
                   vec![
                     (Some(r##"project"##),
@@ -17407,7 +17407,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Returns the specified instance template resource."##),
+                    Some(r##"Returns the specified instance template. Get a list of available instance templates by making a list() request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/instance-templates_get",
                   vec![
                     (Some(r##"project"##),
@@ -17534,7 +17534,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("aggregated-list",
-                    Some(r##"Retrieves aggregated list of instance resources."##),
+                    Some(r##"Retrieves aggregated list of instances."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/instances_aggregated-list",
                   vec![
                     (Some(r##"project"##),
@@ -17573,7 +17573,7 @@ fn main() {
         
                     (Some(r##"instance"##),
                      None,
-                     Some(r##"Instance name."##),
+                     Some(r##"The instance name for this request."##),
                      Some(true),
                      Some(false)),
         
@@ -17716,7 +17716,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Returns the specified instance resource."##),
+                    Some(r##"Returns the specified Instance resource. Get a list of available instances by making a list() request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/instances_get",
                   vec![
                     (Some(r##"project"##),
@@ -17818,7 +17818,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves the list of instance resources contained within the specified zone."##),
+                    Some(r##"Retrieves the list of instances contained within the specified zone."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/instances_list",
                   vec![
                     (Some(r##"project"##),
@@ -18157,7 +18157,7 @@ fn main() {
         
         ("licenses", "methods: 'get'", vec![
             ("get",
-                    Some(r##"Returns the specified license resource."##),
+                    Some(r##"Returns the specified License resource. Get a list of available licenses by making a list() request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/licenses_get",
                   vec![
                     (Some(r##"project"##),
@@ -18168,7 +18168,7 @@ fn main() {
         
                     (Some(r##"license"##),
                      None,
-                     Some(r##"Name of the license resource to return."##),
+                     Some(r##"Name of the License resource to return."##),
                      Some(true),
                      Some(false)),
         
@@ -18188,7 +18188,7 @@ fn main() {
         
         ("machine-types", "methods: 'aggregated-list', 'get' and 'list'", vec![
             ("aggregated-list",
-                    Some(r##"Retrieves an aggregated list of machine type resources."##),
+                    Some(r##"Retrieves an aggregated list of machine types."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/machine-types_aggregated-list",
                   vec![
                     (Some(r##"project"##),
@@ -18210,7 +18210,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Returns the specified machine type resource."##),
+                    Some(r##"Returns the specified machine type. Get a list of available machine types by making a list() request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/machine-types_get",
                   vec![
                     (Some(r##"project"##),
@@ -18227,7 +18227,7 @@ fn main() {
         
                     (Some(r##"machine-type"##),
                      None,
-                     Some(r##"Name of the machine type resource to return."##),
+                     Some(r##"Name of the machine type to return."##),
                      Some(true),
                      Some(false)),
         
@@ -18244,7 +18244,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves a list of machine type resources available to the specified project."##),
+                    Some(r##"Retrieves a list of machine types available to the specified project."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/machine-types_list",
                   vec![
                     (Some(r##"project"##),
@@ -18275,7 +18275,7 @@ fn main() {
         
         ("networks", "methods: 'delete', 'get', 'insert' and 'list'", vec![
             ("delete",
-                    Some(r##"Deletes the specified network resource."##),
+                    Some(r##"Deletes the specified network."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/networks_delete",
                   vec![
                     (Some(r##"project"##),
@@ -18286,7 +18286,7 @@ fn main() {
         
                     (Some(r##"network"##),
                      None,
-                     Some(r##"Name of the network resource to delete."##),
+                     Some(r##"Name of the network to delete."##),
                      Some(true),
                      Some(false)),
         
@@ -18303,7 +18303,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Returns the specified network resource."##),
+                    Some(r##"Returns the specified network. Get a list of available networks by making a list() request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/networks_get",
                   vec![
                     (Some(r##"project"##),
@@ -18314,7 +18314,7 @@ fn main() {
         
                     (Some(r##"network"##),
                      None,
-                     Some(r##"Name of the network resource to return."##),
+                     Some(r##"Name of the network to return."##),
                      Some(true),
                      Some(false)),
         
@@ -18331,7 +18331,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("insert",
-                    Some(r##"Creates a network resource in the specified project using the data included in the request."##),
+                    Some(r##"Creates a network in the specified project using the data included in the request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/networks_insert",
                   vec![
                     (Some(r##"project"##),
@@ -18359,7 +18359,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves the list of network resources available to the specified project."##),
+                    Some(r##"Retrieves the list of networks available to the specified project."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/networks_list",
                   vec![
                     (Some(r##"project"##),
@@ -18384,7 +18384,7 @@ fn main() {
         
         ("projects", "methods: 'get', 'move-disk', 'move-instance', 'set-common-instance-metadata' and 'set-usage-export-bucket'", vec![
             ("get",
-                    Some(r##"Returns the specified project resource."##),
+                    Some(r##"Returns the specified Project resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/projects_get",
                   vec![
                     (Some(r##"project"##),
@@ -18532,7 +18532,7 @@ fn main() {
         
                     (Some(r##"region"##),
                      None,
-                     Some(r##"Name of the region scoping this request."##),
+                     Some(r##"Name of the region for this request."##),
                      Some(true),
                      Some(false)),
         
@@ -18560,7 +18560,7 @@ fn main() {
         
                     (Some(r##"region"##),
                      None,
-                     Some(r##"Name of the region scoping this request."##),
+                     Some(r##"Name of the region for this request."##),
                      Some(true),
                      Some(false)),
         
@@ -18594,7 +18594,7 @@ fn main() {
         
                     (Some(r##"region"##),
                      None,
-                     Some(r##"Name of the region scoping this request."##),
+                     Some(r##"Name of the region for this request."##),
                      Some(true),
                      Some(false)),
         
@@ -18614,7 +18614,7 @@ fn main() {
         
         ("regions", "methods: 'get' and 'list'", vec![
             ("get",
-                    Some(r##"Returns the specified region resource."##),
+                    Some(r##"Returns the specified Region resource. Get a list of available regions by making a list() request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/regions_get",
                   vec![
                     (Some(r##"project"##),
@@ -18667,7 +18667,7 @@ fn main() {
         
         ("routes", "methods: 'delete', 'get', 'insert' and 'list'", vec![
             ("delete",
-                    Some(r##"Deletes the specified route resource."##),
+                    Some(r##"Deletes the specified Route resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/routes_delete",
                   vec![
                     (Some(r##"project"##),
@@ -18678,7 +18678,7 @@ fn main() {
         
                     (Some(r##"route"##),
                      None,
-                     Some(r##"Name of the route resource to delete."##),
+                     Some(r##"Name of the Route resource to delete."##),
                      Some(true),
                      Some(false)),
         
@@ -18695,7 +18695,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Returns the specified route resource."##),
+                    Some(r##"Returns the specified Route resource. Get a list of available routes by making a list() request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/routes_get",
                   vec![
                     (Some(r##"project"##),
@@ -18706,7 +18706,7 @@ fn main() {
         
                     (Some(r##"route"##),
                      None,
-                     Some(r##"Name of the route resource to return."##),
+                     Some(r##"Name of the Route resource to return."##),
                      Some(true),
                      Some(false)),
         
@@ -18723,7 +18723,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("insert",
-                    Some(r##"Creates a route resource in the specified project using the data included in the request."##),
+                    Some(r##"Creates a Route resource in the specified project using the data included in the request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/routes_insert",
                   vec![
                     (Some(r##"project"##),
@@ -18751,7 +18751,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves the list of route resources available to the specified project."##),
+                    Some(r##"Retrieves the list of Route resources available to the specified project."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/routes_list",
                   vec![
                     (Some(r##"project"##),
@@ -18806,7 +18806,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Returns the specified Snapshot resource."##),
+                    Some(r##"Returns the specified Snapshot resource. Get a list of available snapshots by making a list() request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/snapshots_get",
                   vec![
                     (Some(r##"project"##),
@@ -18887,7 +18887,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Returns the specified SslCertificate resource."##),
+                    Some(r##"Returns the specified SslCertificate resource. Get a list of available SSL certificates by making a list() request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/ssl-certificates_get",
                   vec![
                     (Some(r##"project"##),
@@ -19024,7 +19024,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Returns the specified subnetwork."##),
+                    Some(r##"Returns the specified subnetwork. Get a list of available subnetworks by making a list() request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/subnetworks_get",
                   vec![
                     (Some(r##"project"##),
@@ -19151,7 +19151,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Returns the specified TargetHttpProxy resource."##),
+                    Some(r##"Returns the specified TargetHttpProxy resource. Get a list of available target HTTP proxies by making a list() request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/target-http-proxies_get",
                   vec![
                     (Some(r##"project"##),
@@ -19240,7 +19240,7 @@ fn main() {
         
                     (Some(r##"target-http-proxy"##),
                      None,
-                     Some(r##"Name of the TargetHttpProxy resource whose URL map is to be set."##),
+                     Some(r##"Name of the TargetHttpProxy to set a URL map for."##),
                      Some(true),
                      Some(false)),
         
@@ -19294,7 +19294,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Returns the specified TargetHttpsProxy resource."##),
+                    Some(r##"Returns the specified TargetHttpsProxy resource. Get a list of available target HTTPS proxies by making a list() request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/target-https-proxies_get",
                   vec![
                     (Some(r##"project"##),
@@ -19383,7 +19383,7 @@ fn main() {
         
                     (Some(r##"target-https-proxy"##),
                      None,
-                     Some(r##"Name of the TargetHttpsProxy resource whose SSLCertificate is to be set."##),
+                     Some(r##"Name of the TargetHttpsProxy resource to set an SslCertificates resource for."##),
                      Some(true),
                      Some(false)),
         
@@ -19499,7 +19499,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Returns the specified TargetInstance resource."##),
+                    Some(r##"Returns the specified TargetInstance resource. Get a list of available target instances by making a list() request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/target-instances_get",
                   vec![
                     (Some(r##"project"##),
@@ -19598,12 +19598,12 @@ fn main() {
         
         ("target-pools", "methods: 'add-health-check', 'add-instance', 'aggregated-list', 'delete', 'get', 'get-health', 'insert', 'list', 'remove-health-check', 'remove-instance' and 'set-backup'", vec![
             ("add-health-check",
-                    Some(r##"Adds health check URL to targetPool."##),
+                    Some(r##"Adds health check URLs to a target pool."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/target-pools_add-health-check",
                   vec![
                     (Some(r##"project"##),
                      None,
-                     None,
+                     Some(r##"Project ID for this request."##),
                      Some(true),
                      Some(false)),
         
@@ -19615,7 +19615,7 @@ fn main() {
         
                     (Some(r##"target-pool"##),
                      None,
-                     Some(r##"Name of the TargetPool resource to which health_check_url is to be added."##),
+                     Some(r##"Name of the target pool to add a health check to."##),
                      Some(true),
                      Some(false)),
         
@@ -19638,12 +19638,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("add-instance",
-                    Some(r##"Adds instance URL to targetPool."##),
+                    Some(r##"Adds an instance to a target pool."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/target-pools_add-instance",
                   vec![
                     (Some(r##"project"##),
                      None,
-                     None,
+                     Some(r##"Project ID for this request."##),
                      Some(true),
                      Some(false)),
         
@@ -19655,7 +19655,7 @@ fn main() {
         
                     (Some(r##"target-pool"##),
                      None,
-                     Some(r##"Name of the TargetPool resource to which instance_url is to be added."##),
+                     Some(r##"Name of the TargetPool resource to add instances to."##),
                      Some(true),
                      Some(false)),
         
@@ -19700,7 +19700,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("delete",
-                    Some(r##"Deletes the specified TargetPool resource."##),
+                    Some(r##"Deletes the specified target pool."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/target-pools_delete",
                   vec![
                     (Some(r##"project"##),
@@ -19734,7 +19734,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Returns the specified TargetPool resource."##),
+                    Some(r##"Returns the specified target pool. Get a list of available target pools by making a list() request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/target-pools_get",
                   vec![
                     (Some(r##"project"##),
@@ -19768,12 +19768,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("get-health",
-                    Some(r##"Gets the most recent health check results for each IP for the given instance that is referenced by the given TargetPool."##),
+                    Some(r##"Gets the most recent health check results for each IP for the instance that is referenced by the given target pool."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/target-pools_get-health",
                   vec![
                     (Some(r##"project"##),
                      None,
-                     None,
+                     Some(r##"Project ID for this request."##),
                      Some(true),
                      Some(false)),
         
@@ -19808,7 +19808,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("insert",
-                    Some(r##"Creates a TargetPool resource in the specified project and region using the data included in the request."##),
+                    Some(r##"Creates a target pool in the specified project and region using the data included in the request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/target-pools_insert",
                   vec![
                     (Some(r##"project"##),
@@ -19842,7 +19842,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves a list of TargetPool resources available to the specified project and region."##),
+                    Some(r##"Retrieves a list of target pools available to the specified project and region."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/target-pools_list",
                   vec![
                     (Some(r##"project"##),
@@ -19870,24 +19870,24 @@ fn main() {
                      Some(false)),
                   ]),
             ("remove-health-check",
-                    Some(r##"Removes health check URL from targetPool."##),
+                    Some(r##"Removes health check URL from a target pool."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/target-pools_remove-health-check",
                   vec![
                     (Some(r##"project"##),
                      None,
-                     None,
+                     Some(r##"Project ID for this request."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"region"##),
                      None,
-                     Some(r##"Name of the region scoping this request."##),
+                     Some(r##"Name of the region for this request."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"target-pool"##),
                      None,
-                     Some(r##"Name of the TargetPool resource to which health_check_url is to be removed."##),
+                     Some(r##"Name of the target pool to remove health checks from."##),
                      Some(true),
                      Some(false)),
         
@@ -19910,12 +19910,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("remove-instance",
-                    Some(r##"Removes instance URL from targetPool."##),
+                    Some(r##"Removes instance URL from a target pool."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/target-pools_remove-instance",
                   vec![
                     (Some(r##"project"##),
                      None,
-                     None,
+                     Some(r##"Project ID for this request."##),
                      Some(true),
                      Some(false)),
         
@@ -19927,7 +19927,7 @@ fn main() {
         
                     (Some(r##"target-pool"##),
                      None,
-                     Some(r##"Name of the TargetPool resource to which instance_url is to be removed."##),
+                     Some(r##"Name of the TargetPool resource to remove instances from."##),
                      Some(true),
                      Some(false)),
         
@@ -19950,7 +19950,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("set-backup",
-                    Some(r##"Changes backup pool configurations."##),
+                    Some(r##"Changes a backup target pool's configurations."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/target-pools_set-backup",
                   vec![
                     (Some(r##"project"##),
@@ -19967,7 +19967,7 @@ fn main() {
         
                     (Some(r##"target-pool"##),
                      None,
-                     Some(r##"Name of the TargetPool resource for which the backup is to be set."##),
+                     Some(r##"Name of the TargetPool resource to set a backup pool for."##),
                      Some(true),
                      Some(false)),
         
@@ -19993,7 +19993,7 @@ fn main() {
         
         ("target-vpn-gateways", "methods: 'aggregated-list', 'delete', 'get', 'insert' and 'list'", vec![
             ("aggregated-list",
-                    Some(r##"Retrieves an aggregated list of target VPN gateways ."##),
+                    Some(r##"Retrieves an aggregated list of target VPN gateways."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/target-vpn-gateways_aggregated-list",
                   vec![
                     (Some(r##"project"##),
@@ -20015,7 +20015,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("delete",
-                    Some(r##"Deletes the specified TargetVpnGateway resource."##),
+                    Some(r##"Deletes the specified target VPN gateway."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/target-vpn-gateways_delete",
                   vec![
                     (Some(r##"project"##),
@@ -20026,13 +20026,13 @@ fn main() {
         
                     (Some(r##"region"##),
                      None,
-                     Some(r##"The name of the region for this request."##),
+                     Some(r##"Name of the region for this request."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"target-vpn-gateway"##),
                      None,
-                     Some(r##"Name of the TargetVpnGateway resource to delete."##),
+                     Some(r##"Name of the target VPN gateway to delete."##),
                      Some(true),
                      Some(false)),
         
@@ -20049,7 +20049,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Returns the specified TargetVpnGateway resource."##),
+                    Some(r##"Returns the specified target VPN gateway. Get a list of available target VPN gateways by making a list() request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/target-vpn-gateways_get",
                   vec![
                     (Some(r##"project"##),
@@ -20060,13 +20060,13 @@ fn main() {
         
                     (Some(r##"region"##),
                      None,
-                     Some(r##"The name of the region for this request."##),
+                     Some(r##"Name of the region for this request."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"target-vpn-gateway"##),
                      None,
-                     Some(r##"Name of the TargetVpnGateway resource to return."##),
+                     Some(r##"Name of the target VPN gateway to return."##),
                      Some(true),
                      Some(false)),
         
@@ -20083,7 +20083,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("insert",
-                    Some(r##"Creates a TargetVpnGateway resource in the specified project and region using the data included in the request."##),
+                    Some(r##"Creates a target VPN gateway in the specified project and region using the data included in the request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/target-vpn-gateways_insert",
                   vec![
                     (Some(r##"project"##),
@@ -20094,7 +20094,7 @@ fn main() {
         
                     (Some(r##"region"##),
                      None,
-                     Some(r##"The name of the region for this request."##),
+                     Some(r##"Name of the region for this request."##),
                      Some(true),
                      Some(false)),
         
@@ -20117,7 +20117,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves a list of TargetVpnGateway resources available to the specified project and region."##),
+                    Some(r##"Retrieves a list of target VPN gateways available to the specified project and region."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/target-vpn-gateways_list",
                   vec![
                     (Some(r##"project"##),
@@ -20128,7 +20128,7 @@ fn main() {
         
                     (Some(r##"region"##),
                      None,
-                     Some(r##"The name of the region for this request."##),
+                     Some(r##"Name of the region for this request."##),
                      Some(true),
                      Some(false)),
         
@@ -20176,7 +20176,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Returns the specified UrlMap resource."##),
+                    Some(r##"Returns the specified UrlMap resource. Get a list of available URL maps by making a list() request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/url-maps_get",
                   vec![
                     (Some(r##"project"##),
@@ -20392,7 +20392,7 @@ fn main() {
         
                     (Some(r##"region"##),
                      None,
-                     Some(r##"The name of the region for this request."##),
+                     Some(r##"Name of the region for this request."##),
                      Some(true),
                      Some(false)),
         
@@ -20415,7 +20415,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Returns the specified VpnTunnel resource."##),
+                    Some(r##"Returns the specified VpnTunnel resource. Get a list of available VPN tunnels by making a list() request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/vpn-tunnels_get",
                   vec![
                     (Some(r##"project"##),
@@ -20426,7 +20426,7 @@ fn main() {
         
                     (Some(r##"region"##),
                      None,
-                     Some(r##"The name of the region for this request."##),
+                     Some(r##"Name of the region for this request."##),
                      Some(true),
                      Some(false)),
         
@@ -20460,7 +20460,7 @@ fn main() {
         
                     (Some(r##"region"##),
                      None,
-                     Some(r##"The name of the region for this request."##),
+                     Some(r##"Name of the region for this request."##),
                      Some(true),
                      Some(false)),
         
@@ -20494,7 +20494,7 @@ fn main() {
         
                     (Some(r##"region"##),
                      None,
-                     Some(r##"The name of the region for this request."##),
+                     Some(r##"Name of the region for this request."##),
                      Some(true),
                      Some(false)),
         
@@ -20525,7 +20525,7 @@ fn main() {
         
                     (Some(r##"zone"##),
                      None,
-                     Some(r##"Name of the zone scoping this request."##),
+                     Some(r##"Name of the zone for this request."##),
                      Some(true),
                      Some(false)),
         
@@ -20553,7 +20553,7 @@ fn main() {
         
                     (Some(r##"zone"##),
                      None,
-                     Some(r##"Name of the zone scoping this request."##),
+                     Some(r##"Name of the zone for this request."##),
                      Some(true),
                      Some(false)),
         
@@ -20587,7 +20587,7 @@ fn main() {
         
                     (Some(r##"zone"##),
                      None,
-                     Some(r##"Name of the zone scoping this request."##),
+                     Some(r##"Name of the zone for request."##),
                      Some(true),
                      Some(false)),
         
@@ -20607,7 +20607,7 @@ fn main() {
         
         ("zones", "methods: 'get' and 'list'", vec![
             ("get",
-                    Some(r##"Returns the specified zone resource."##),
+                    Some(r##"Returns the specified Zone resource. Get a list of available zones by making a list() request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/zones_get",
                   vec![
                     (Some(r##"project"##),
@@ -20635,7 +20635,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves the list of zone resources available to the specified project."##),
+                    Some(r##"Retrieves the list of Zone resources available to the specified project."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/zones_list",
                   vec![
                     (Some(r##"project"##),
@@ -20662,7 +20662,7 @@ fn main() {
     
     let mut app = App::new("compute1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.3+20160120")
+           .version("0.3.3+20160224")
            .about("API for the Google Compute Engine service.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_compute1_cli")
            .arg(Arg::with_name("url")

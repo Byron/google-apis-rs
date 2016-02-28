@@ -2774,11 +2774,9 @@ impl<'a, C, A> AssociationsessionStartCall<'a, C, A> where C: BorrowMut<hyper::C
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         if self._product_code.len() > 0 {
-            let mut s = String::new();
             for f in self._product_code.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("productCode", f.to_string()));
             }
-            params.push(("productCode", s));
         }
         params.push(("websiteUrl", self._website_url.to_string()));
         if let Some(value) = self._website_locale {
@@ -3262,18 +3260,14 @@ impl<'a, C, A> ReportGenerateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             params.push(("startIndex", value.to_string()));
         }
         if self._sort.len() > 0 {
-            let mut s = String::new();
             for f in self._sort.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("sort", f.to_string()));
             }
-            params.push(("sort", s));
         }
         if self._metric.len() > 0 {
-            let mut s = String::new();
             for f in self._metric.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("metric", f.to_string()));
             }
-            params.push(("metric", s));
         }
         if let Some(value) = self._max_results {
             params.push(("maxResults", value.to_string()));
@@ -3282,18 +3276,14 @@ impl<'a, C, A> ReportGenerateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             params.push(("locale", value.to_string()));
         }
         if self._filter.len() > 0 {
-            let mut s = String::new();
             for f in self._filter.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("filter", f.to_string()));
             }
-            params.push(("filter", s));
         }
         if self._dimension.len() > 0 {
-            let mut s = String::new();
             for f in self._dimension.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("dimension", f.to_string()));
             }
-            params.push(("dimension", s));
         }
         for &field in ["alt", "startDate", "endDate", "startIndex", "sort", "metric", "maxResults", "locale", "filter", "dimension"].iter() {
             if self._additional_params.contains_key(field) {
@@ -3857,11 +3847,9 @@ impl<'a, C, A> AccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
         if self._filter_ad_client_id.len() > 0 {
-            let mut s = String::new();
             for f in self._filter_ad_client_id.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("filterAdClientId", f.to_string()));
             }
-            params.push(("filterAdClientId", s));
         }
         for &field in ["alt", "filterAdClientId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -4086,11 +4074,9 @@ impl<'a, C, A> AccountAdunitGetAdCodeCall<'a, C, A> where C: BorrowMut<hyper::Cl
         params.push(("adClientId", self._ad_client_id.to_string()));
         params.push(("adUnitId", self._ad_unit_id.to_string()));
         if self._host_custom_channel_id.len() > 0 {
-            let mut s = String::new();
             for f in self._host_custom_channel_id.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("hostCustomChannelId", f.to_string()));
             }
-            params.push(("hostCustomChannelId", s));
         }
         for &field in ["alt", "accountId", "adClientId", "adUnitId", "hostCustomChannelId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -4378,18 +4364,14 @@ impl<'a, C, A> AccountReportGenerateCall<'a, C, A> where C: BorrowMut<hyper::Cli
             params.push(("startIndex", value.to_string()));
         }
         if self._sort.len() > 0 {
-            let mut s = String::new();
             for f in self._sort.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("sort", f.to_string()));
             }
-            params.push(("sort", s));
         }
         if self._metric.len() > 0 {
-            let mut s = String::new();
             for f in self._metric.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("metric", f.to_string()));
             }
-            params.push(("metric", s));
         }
         if let Some(value) = self._max_results {
             params.push(("maxResults", value.to_string()));
@@ -4398,18 +4380,14 @@ impl<'a, C, A> AccountReportGenerateCall<'a, C, A> where C: BorrowMut<hyper::Cli
             params.push(("locale", value.to_string()));
         }
         if self._filter.len() > 0 {
-            let mut s = String::new();
             for f in self._filter.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("filter", f.to_string()));
             }
-            params.push(("filter", s));
         }
         if self._dimension.len() > 0 {
-            let mut s = String::new();
             for f in self._dimension.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("dimension", f.to_string()));
             }
-            params.push(("dimension", s));
         }
         for &field in ["alt", "accountId", "startDate", "endDate", "startIndex", "sort", "metric", "maxResults", "locale", "filter", "dimension"].iter() {
             if self._additional_params.contains_key(field) {

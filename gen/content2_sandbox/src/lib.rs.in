@@ -503,8 +503,8 @@ impl Part for Price {}
 pub struct Order {
     /// Shipments of the order.
     pub shipments: Option<Vec<OrderShipment>>,
-    /// The status of the order.
-    pub status: Option<String>,
+    /// The details of the customer who placed the order.
+    pub customer: Option<OrderCustomer>,
     /// The status of the payment.
     #[serde(rename="paymentStatus")]
     pub payment_status: Option<String>,
@@ -513,8 +513,8 @@ pub struct Order {
     pub net_amount: Option<Price>,
     /// The REST id of the order. Globally unique.
     pub id: Option<String>,
-    /// The details of the customer who placed the order.
-    pub customer: Option<OrderCustomer>,
+    /// The details of the merchant provided promotions applied to the order. More details about the program are  here.
+    pub promotions: Option<Vec<OrderPromotion>>,
     /// Identifies what kind of resource this is. Value: the fixed string "content#order".
     pub kind: Option<String>,
     /// Line items that are ordered.
@@ -536,6 +536,8 @@ pub struct Order {
     /// The requested shipping option.
     #[serde(rename="shippingOption")]
     pub shipping_option: Option<String>,
+    /// The status of the order.
+    pub status: Option<String>,
     /// The details for the delivery.
     #[serde(rename="deliveryDetails")]
     pub delivery_details: Option<OrderDeliveryDetails>,
@@ -585,35 +587,42 @@ impl Part for TestOrderPaymentMethod {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct OrderAddress {
-    /// City, town or commune. May also include dependent localities or sublocalities (e.g. neighborhoods or suburbs).
-    pub locality: Option<String>,
-    /// CLDR country code (e.g. "US").
-    pub country: Option<String>,
-    /// Strings representing the lines of the printed label for mailing the order, for example:
-    /// John Smith
-    /// 1600 Amphitheatre Parkway
-    /// Mountain View, CA, 94043
-    /// United States
-    #[serde(rename="fullAddress")]
-    pub full_address: Option<Vec<String>>,
-    /// Street-level part of the address.
-    #[serde(rename="streetAddress")]
-    pub street_address: Option<Vec<String>>,
-    /// Postal Code or ZIP (e.g. "94043").
-    #[serde(rename="postalCode")]
-    pub postal_code: Option<String>,
-    /// Name of the recipient.
-    #[serde(rename="recipientName")]
-    pub recipient_name: Option<String>,
-    /// Whether the address is a post office box.
-    #[serde(rename="isPostOfficeBox")]
-    pub is_post_office_box: Option<bool>,
-    /// Top-level administrative subdivision of the country (e.g. "CA").
-    pub region: Option<String>,
+pub struct TestOrderLineItemProduct {
+    /// The CLDR territory code of the target country of the product.
+    #[serde(rename="targetCountry")]
+    pub target_country: Option<i64>,
+    /// The two-letter ISO 639-1 language code for the item.
+    #[serde(rename="contentLanguage")]
+    pub content_language: Option<String>,
+    /// The title of the product.
+    pub title: Option<String>,
+    /// Manufacturer Part Number (MPN) of the item. Optional.
+    pub mpn: Option<String>,
+    /// Variant attributes for the item. Optional.
+    #[serde(rename="variantAttributes")]
+    pub variant_attributes: Option<Vec<OrderLineItemProductVariantAttribute>>,
+    /// Brand of the item.
+    pub brand: Option<String>,
+    /// URL of an image of the item.
+    #[serde(rename="imageLink")]
+    pub image_link: Option<String>,
+    /// An identifier of the item.
+    #[serde(rename="offerId")]
+    pub offer_id: Option<String>,
+    /// Shared identifier for all variants of the same product. Optional.
+    #[serde(rename="itemGroupId")]
+    pub item_group_id: Option<String>,
+    /// Global Trade Item Number (GTIN) of the item. Optional.
+    pub gtin: Option<String>,
+    /// Condition or state of the item.
+    pub condition: Option<String>,
+    /// The price for the product.
+    pub price: Option<Price>,
+    /// The item's channel.
+    pub channel: Option<String>,
 }
 
-impl Part for OrderAddress {}
+impl Part for TestOrderLineItemProduct {}
 
 
 /// There is no detailed description.
@@ -621,14 +630,24 @@ impl Part for OrderAddress {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct OrderLineItemProductVariantAttribute {
-    /// The dimension of the variant.
-    pub dimension: Option<String>,
-    /// The value for the dimension.
-    pub value: Option<String>,
+pub struct OrderPromotionBenefit {
+    /// The OfferId(s) that were purchased in this order and map to this specific benefit of the promotion.
+    #[serde(rename="offerIds")]
+    pub offer_ids: Option<Vec<String>>,
+    /// The discount in the order price when the promotion is applied.
+    pub discount: Option<Price>,
+    /// Describes whether the promotion applies to products (e.g. 20% off) or to shipping (e.g. Free Shipping).
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// The impact on tax when the promotion is applied.
+    #[serde(rename="taxImpact")]
+    pub tax_impact: Option<Price>,
+    /// Further describes the benefit of the promotion. Note that we will expand on this enumeration as we support new promotion sub-types.
+    #[serde(rename="subType")]
+    pub sub_type: Option<String>,
 }
 
-impl Part for OrderLineItemProductVariantAttribute {}
+impl Part for OrderPromotionBenefit {}
 
 
 /// There is no detailed description.
@@ -700,42 +719,35 @@ impl Part for OrderCancellation {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TestOrderLineItemProduct {
-    /// The CLDR territory code of the target country of the product.
-    #[serde(rename="targetCountry")]
-    pub target_country: Option<i64>,
-    /// The two-letter ISO 639-1 language code for the item.
-    #[serde(rename="contentLanguage")]
-    pub content_language: Option<String>,
-    /// The title of the product.
-    pub title: Option<String>,
-    /// Manufacturer Part Number (MPN) of the item. Optional.
-    pub mpn: Option<String>,
-    /// Variant attributes for the item. Optional.
-    #[serde(rename="variantAttributes")]
-    pub variant_attributes: Option<Vec<OrderLineItemProductVariantAttribute>>,
-    /// Brand of the item.
-    pub brand: Option<String>,
-    /// URL of an image of the item.
-    #[serde(rename="imageLink")]
-    pub image_link: Option<String>,
-    /// An identifier of the item.
-    #[serde(rename="offerId")]
-    pub offer_id: Option<String>,
-    /// Shared identifier for all variants of the same product. Optional.
-    #[serde(rename="itemGroupId")]
-    pub item_group_id: Option<String>,
-    /// Global Trade Item Number (GTIN) of the item. Optional.
-    pub gtin: Option<String>,
-    /// Condition or state of the item.
-    pub condition: Option<String>,
-    /// The price for the product.
-    pub price: Option<Price>,
-    /// The item's channel.
-    pub channel: Option<String>,
+pub struct OrderAddress {
+    /// City, town or commune. May also include dependent localities or sublocalities (e.g. neighborhoods or suburbs).
+    pub locality: Option<String>,
+    /// CLDR country code (e.g. "US").
+    pub country: Option<String>,
+    /// Strings representing the lines of the printed label for mailing the order, for example:
+    /// John Smith
+    /// 1600 Amphitheatre Parkway
+    /// Mountain View, CA, 94043
+    /// United States
+    #[serde(rename="fullAddress")]
+    pub full_address: Option<Vec<String>>,
+    /// Street-level part of the address.
+    #[serde(rename="streetAddress")]
+    pub street_address: Option<Vec<String>>,
+    /// Postal Code or ZIP (e.g. "94043").
+    #[serde(rename="postalCode")]
+    pub postal_code: Option<String>,
+    /// Name of the recipient.
+    #[serde(rename="recipientName")]
+    pub recipient_name: Option<String>,
+    /// Whether the address is a post office box.
+    #[serde(rename="isPostOfficeBox")]
+    pub is_post_office_box: Option<bool>,
+    /// Top-level administrative subdivision of the country (e.g. "CA").
+    pub region: Option<String>,
 }
 
-impl Part for TestOrderLineItemProduct {}
+impl Part for OrderAddress {}
 
 
 /// There is no detailed description.
@@ -866,37 +878,45 @@ impl RequestValue for OrdersCancelLineItemRequest {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TestOrderCustomer {
-    /// If set, this indicates the user had a choice to opt in or out of providing marketing rights to the merchant. If unset, this indicates the user has already made this choice in a previous purchase, and was thus not shown the marketing right opt in/out checkbox during the Purchases on Google checkout flow. Optional.
-    #[serde(rename="explicitMarketingPreference")]
-    pub explicit_marketing_preference: Option<bool>,
-    /// Full name of the customer.
-    #[serde(rename="fullName")]
-    pub full_name: Option<String>,
-    /// Email address of the customer.
-    pub email: Option<String>,
+pub struct OrderPromotion {
+    /// The full title of the promotion.
+    #[serde(rename="longTitle")]
+    pub long_title: Option<String>,
+    /// Optional. The text code that corresponds to the promotion when applied on the retailer?s website.
+    #[serde(rename="genericRedemptionCode")]
+    pub generic_redemption_code: Option<String>,
+    /// no description provided
+    pub benefits: Option<Vec<OrderPromotionBenefit>>,
+    /// Indicates that the promotion is valid online.
+    #[serde(rename="redemptionChannel")]
+    pub redemption_channel: Option<String>,
+    /// Whether the promotion is applicable to all products or only specific products.
+    #[serde(rename="productApplicability")]
+    pub product_applicability: Option<String>,
+    /// The date and time frame when the promotion is active and ready for validation review. Note that the promotion live time may be delayed for a few hours due to the validation review.
+    /// Start date and end date are separated by a forward slash (/). The start date is specified by the format (YYYY-MM-DD), followed by the letter ?T?, the time of the day when the sale starts (in Greenwich Mean Time, GMT), followed by an expression of the time zone for the sale. The end date is in the same format.
+    #[serde(rename="effectiveDates")]
+    pub effective_dates: Option<String>,
+    /// The unique ID of the promotion.
+    pub id: Option<String>,
 }
 
-impl Part for TestOrderCustomer {}
+impl Part for OrderPromotion {}
 
 
 /// There is no detailed description.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [acknowledge orders](struct.OrderAcknowledgeCall.html) (request)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct OrdersAcknowledgeRequest {
-    /// The ID of the operation. Unique across all operations for a given order.
-    #[serde(rename="operationId")]
-    pub operation_id: Option<String>,
+pub struct OrderLineItemProductVariantAttribute {
+    /// The dimension of the variant.
+    pub dimension: Option<String>,
+    /// The value for the dimension.
+    pub value: Option<String>,
 }
 
-impl RequestValue for OrdersAcknowledgeRequest {}
+impl Part for OrderLineItemProductVariantAttribute {}
 
 
 /// There is no detailed description.
@@ -1102,6 +1122,25 @@ impl RequestValue for OrdersRefundRequest {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TestOrderCustomer {
+    /// If set, this indicates the user had a choice to opt in or out of providing marketing rights to the merchant. If unset, this indicates the user has already made this choice in a previous purchase, and was thus not shown the marketing right opt in/out checkbox during the Purchases on Google checkout flow. Optional.
+    #[serde(rename="explicitMarketingPreference")]
+    pub explicit_marketing_preference: Option<bool>,
+    /// Full name of the customer.
+    #[serde(rename="fullName")]
+    pub full_name: Option<String>,
+    /// Email address of the customer.
+    pub email: Option<String>,
+}
+
+impl Part for TestOrderCustomer {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OrdersCustomBatchRequestEntryCancel {
     /// The reason for the cancellation.
     pub reason: Option<String>,
@@ -1190,18 +1229,16 @@ impl Part for OrdersCustomBatchRequestEntryCancelLineItem {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [cancel orders](struct.OrderCancelCall.html) (response)
+/// * [acknowledge orders](struct.OrderAcknowledgeCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct OrdersCancelResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "content#ordersCancelResponse".
-    pub kind: Option<String>,
-    /// The status of the execution.
-    #[serde(rename="executionStatus")]
-    pub execution_status: Option<String>,
+pub struct OrdersAcknowledgeRequest {
+    /// The ID of the operation. Unique across all operations for a given order.
+    #[serde(rename="operationId")]
+    pub operation_id: Option<String>,
 }
 
-impl ResponseResult for OrdersCancelResponse {}
+impl RequestValue for OrdersAcknowledgeRequest {}
 
 
 /// There is no detailed description.
@@ -1427,6 +1464,27 @@ impl ResponseResult for OrdersShipLineItemsResponse {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
+/// * [cancel orders](struct.OrderCancelCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct OrdersCancelResponse {
+    /// Identifies what kind of resource this is. Value: the fixed string "content#ordersCancelResponse".
+    pub kind: Option<String>,
+    /// The status of the execution.
+    #[serde(rename="executionStatus")]
+    pub execution_status: Option<String>,
+}
+
+impl ResponseResult for OrdersCancelResponse {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
 /// * [updateshipment orders](struct.OrderUpdateshipmentCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -1495,6 +1553,8 @@ impl Part for OrdersCustomBatchRequestEntryRefund {}
 pub struct TestOrder {
     /// The details of the customer who placed the order.
     pub customer: Option<TestOrderCustomer>,
+    /// The details of the merchant provided promotions applied to the order. More details about the program are  here.
+    pub promotions: Option<Vec<OrderPromotion>>,
     /// Identifies what kind of resource this is. Value: the fixed string "content#testOrder".
     pub kind: Option<String>,
     /// Line items that are ordered. At least one line item must be provided.
@@ -2220,11 +2280,9 @@ impl<'a, C, A> OrderListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         let mut params: Vec<(&str, String)> = Vec::with_capacity((10 + self._additional_params.len()));
         params.push(("merchantId", self._merchant_id.to_string()));
         if self._statuses.len() > 0 {
-            let mut s = String::new();
             for f in self._statuses.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("statuses", f.to_string()));
             }
-            params.push(("statuses", s));
         }
         if let Some(value) = self._placed_date_start {
             params.push(("placedDateStart", value.to_string()));

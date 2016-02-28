@@ -3335,7 +3335,7 @@ pub struct CommentSnippet {
     pub moderation_status: Option<String>,
     /// The id of the author's YouTube channel, if any.
     #[serde(rename="authorChannelId")]
-    pub author_channel_id: Option<ChannelId>,
+    pub author_channel_id: Option<String>,
     /// The unique id of the parent comment, only set for replies.
     #[serde(rename="parentId")]
     pub parent_id: Option<String>,
@@ -3406,19 +3406,6 @@ pub struct LiveChatMessageAuthorDetails {
 }
 
 impl Part for LiveChatMessageAuthorDetails {}
-
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ChannelId {
-    /// no description provided
-    pub value: Option<String>,
-}
-
-impl Part for ChannelId {}
 
 
 /// Details about a channelsection, including playlists and channels.
@@ -3984,28 +3971,31 @@ pub struct VideoPlayer {
 impl Part for VideoPlayer {}
 
 
-/// Basic details about a channel, including title, description and thumbnails.
+/// Basic details about a channel, including title, description and thumbnails. Next available id: 15.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelSnippet {
-    /// The date and time that the channel was created. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
-    #[serde(rename="publishedAt")]
-    pub published_at: Option<String>,
-    /// A map of thumbnail images associated with the channel. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.
-    pub thumbnails: Option<ThumbnailDetails>,
+    /// The description of the channel.
+    pub description: Option<String>,
     /// The channel's title.
     pub title: Option<String>,
     /// The country of the channel.
     pub country: Option<String>,
-    /// Localized title and description, read-only.
-    pub localized: Option<ChannelLocalization>,
+    /// The custom url of the channel.
+    #[serde(rename="customUrl")]
+    pub custom_url: Option<String>,
     /// The language of the channel's default title and description.
     #[serde(rename="defaultLanguage")]
     pub default_language: Option<String>,
-    /// The description of the channel.
-    pub description: Option<String>,
+    /// The date and time that the channel was created. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
+    #[serde(rename="publishedAt")]
+    pub published_at: Option<String>,
+    /// Localized title and description, read-only.
+    pub localized: Option<ChannelLocalization>,
+    /// A map of thumbnail images associated with the channel. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.
+    pub thumbnails: Option<ThumbnailDetails>,
 }
 
 impl Part for ChannelSnippet {}
@@ -5269,6 +5259,9 @@ pub struct SearchListResponse {
     /// no description provided
     #[serde(rename="tokenPagination")]
     pub token_pagination: Option<TokenPagination>,
+    /// no description provided
+    #[serde(rename="regionCode")]
+    pub region_code: Option<String>,
     /// Etag of this resource.
     pub etag: Option<String>,
     /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.
@@ -5293,6 +5286,7 @@ impl ToParts for SearchListResponse {
         if self.visitor_id.is_some() { r = r + "visitorId,"; }
         if self.items.is_some() { r = r + "items,"; }
         if self.token_pagination.is_some() { r = r + "tokenPagination,"; }
+        if self.region_code.is_some() { r = r + "regionCode,"; }
         if self.etag.is_some() { r = r + "etag,"; }
         if self.prev_page_token.is_some() { r = r + "prevPageToken,"; }
         if self.page_info.is_some() { r = r + "pageInfo,"; }

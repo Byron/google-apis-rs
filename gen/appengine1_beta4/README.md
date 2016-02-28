@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-appengine1_beta4` library allows access to all features of the *Google appengine* service.
 
-This documentation was generated from *appengine* crate version *0.1.11+20160121*, where *20160121* is the exact revision of the *appengine:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
+This documentation was generated from *appengine* crate version *0.1.11+20160223*, where *20160223* is the exact revision of the *appengine:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
 
 Everything else about the *appengine* *v1_beta4* API can be found at the
 [official documentation site](https://cloud.google.com/appengine/docs/admin-api/).
@@ -14,7 +14,7 @@ Everything else about the *appengine* *v1_beta4* API can be found at the
 Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google_appengine1_beta4/struct.Appengine.html) ... 
 
 * apps
- * [*get*](http://byron.github.io/google-apis-rs/google_appengine1_beta4/struct.AppGetCall.html), [*modules delete*](http://byron.github.io/google-apis-rs/google_appengine1_beta4/struct.AppModuleDeleteCall.html), [*modules get*](http://byron.github.io/google-apis-rs/google_appengine1_beta4/struct.AppModuleGetCall.html), [*modules list*](http://byron.github.io/google-apis-rs/google_appengine1_beta4/struct.AppModuleListCall.html), [*modules patch*](http://byron.github.io/google-apis-rs/google_appengine1_beta4/struct.AppModulePatchCall.html), [*modules versions create*](http://byron.github.io/google-apis-rs/google_appengine1_beta4/struct.AppModuleVersionCreateCall.html), [*modules versions delete*](http://byron.github.io/google-apis-rs/google_appengine1_beta4/struct.AppModuleVersionDeleteCall.html), [*modules versions get*](http://byron.github.io/google-apis-rs/google_appengine1_beta4/struct.AppModuleVersionGetCall.html), [*modules versions list*](http://byron.github.io/google-apis-rs/google_appengine1_beta4/struct.AppModuleVersionListCall.html), [*operations get*](http://byron.github.io/google-apis-rs/google_appengine1_beta4/struct.AppOperationGetCall.html) and [*operations list*](http://byron.github.io/google-apis-rs/google_appengine1_beta4/struct.AppOperationListCall.html)
+ * [*get*](http://byron.github.io/google-apis-rs/google_appengine1_beta4/struct.AppGetCall.html), [*modules delete*](http://byron.github.io/google-apis-rs/google_appengine1_beta4/struct.AppModuleDeleteCall.html), [*modules get*](http://byron.github.io/google-apis-rs/google_appengine1_beta4/struct.AppModuleGetCall.html), [*modules list*](http://byron.github.io/google-apis-rs/google_appengine1_beta4/struct.AppModuleListCall.html), [*modules patch*](http://byron.github.io/google-apis-rs/google_appengine1_beta4/struct.AppModulePatchCall.html), [*modules versions create*](http://byron.github.io/google-apis-rs/google_appengine1_beta4/struct.AppModuleVersionCreateCall.html), [*modules versions delete*](http://byron.github.io/google-apis-rs/google_appengine1_beta4/struct.AppModuleVersionDeleteCall.html), [*modules versions get*](http://byron.github.io/google-apis-rs/google_appengine1_beta4/struct.AppModuleVersionGetCall.html), [*modules versions list*](http://byron.github.io/google-apis-rs/google_appengine1_beta4/struct.AppModuleVersionListCall.html), [*modules versions patch*](http://byron.github.io/google-apis-rs/google_appengine1_beta4/struct.AppModuleVersionPatchCall.html), [*operations get*](http://byron.github.io/google-apis-rs/google_appengine1_beta4/struct.AppOperationGetCall.html) and [*operations list*](http://byron.github.io/google-apis-rs/google_appengine1_beta4/struct.AppOperationListCall.html)
 
 
 
@@ -47,11 +47,12 @@ let r = hub.resource().activity(...).doit()
 Or specifically ...
 
 ```ignore
+let r = hub.apps().modules_patch(...).doit()
+let r = hub.apps().modules_delete(...).doit()
+let r = hub.apps().operations_get(...).doit()
+let r = hub.apps().modules_versions_patch(...).doit()
 let r = hub.apps().modules_versions_delete(...).doit()
 let r = hub.apps().modules_versions_create(...).doit()
-let r = hub.apps().operations_get(...).doit()
-let r = hub.apps().modules_delete(...).doit()
-let r = hub.apps().modules_patch(...).doit()
 ```
 
 The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 

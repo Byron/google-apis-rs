@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-genomics1` library allows access to all features of the *Google genomics* service.
 
-This documentation was generated from *genomics* crate version *0.1.11+20160124*, where *20160124* is the exact revision of the *genomics:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
+This documentation was generated from *genomics* crate version *0.1.11+20160224*, where *20160224* is the exact revision of the *genomics:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
 # Features
 
 Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google_genomics1/struct.Genomics.html) ... 
@@ -25,7 +25,7 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
 * referencesets
  * [*get*](http://byron.github.io/google-apis-rs/google_genomics1/struct.ReferencesetGetCall.html) and [*search*](http://byron.github.io/google-apis-rs/google_genomics1/struct.ReferencesetSearchCall.html)
 * [variants](http://byron.github.io/google-apis-rs/google_genomics1/struct.Variant.html)
- * [*create*](http://byron.github.io/google-apis-rs/google_genomics1/struct.VariantCreateCall.html), [*delete*](http://byron.github.io/google-apis-rs/google_genomics1/struct.VariantDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_genomics1/struct.VariantGetCall.html), [*import*](http://byron.github.io/google-apis-rs/google_genomics1/struct.VariantImportCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_genomics1/struct.VariantPatchCall.html), [*search*](http://byron.github.io/google-apis-rs/google_genomics1/struct.VariantSearchCall.html) and [*stream*](http://byron.github.io/google-apis-rs/google_genomics1/struct.VariantStreamCall.html)
+ * [*create*](http://byron.github.io/google-apis-rs/google_genomics1/struct.VariantCreateCall.html), [*delete*](http://byron.github.io/google-apis-rs/google_genomics1/struct.VariantDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_genomics1/struct.VariantGetCall.html), [*import*](http://byron.github.io/google-apis-rs/google_genomics1/struct.VariantImportCall.html), [*merge*](http://byron.github.io/google-apis-rs/google_genomics1/struct.VariantMergeCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_genomics1/struct.VariantPatchCall.html), [*search*](http://byron.github.io/google-apis-rs/google_genomics1/struct.VariantSearchCall.html) and [*stream*](http://byron.github.io/google-apis-rs/google_genomics1/struct.VariantStreamCall.html)
 * variantsets
  * [*create*](http://byron.github.io/google-apis-rs/google_genomics1/struct.VariantsetCreateCall.html), [*delete*](http://byron.github.io/google-apis-rs/google_genomics1/struct.VariantsetDeleteCall.html), [*export*](http://byron.github.io/google-apis-rs/google_genomics1/struct.VariantsetExportCall.html), [*get*](http://byron.github.io/google-apis-rs/google_genomics1/struct.VariantsetGetCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_genomics1/struct.VariantsetPatchCall.html) and [*search*](http://byron.github.io/google-apis-rs/google_genomics1/struct.VariantsetSearchCall.html)
 

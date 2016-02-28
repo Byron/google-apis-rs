@@ -1544,11 +1544,9 @@ impl<'a, C, A> CompanyGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             params.push(("requestMetadata.locale", value.to_string()));
         }
         if self._request_metadata_experiment_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._request_metadata_experiment_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("requestMetadata.experimentIds", f.to_string()));
             }
-            params.push(("requestMetadata.experimentIds", s));
         }
         if let Some(value) = self._order_by {
             params.push(("orderBy", value.to_string()));
@@ -2159,11 +2157,9 @@ impl<'a, C, A> CompanyListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             params.push(("view", value.to_string()));
         }
         if self._services.len() > 0 {
-            let mut s = String::new();
             for f in self._services.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("services", f.to_string()));
             }
-            params.push(("services", s));
         }
         if let Some(value) = self._request_metadata_user_overrides_user_id {
             params.push(("requestMetadata.userOverrides.userId", value.to_string()));
@@ -2184,11 +2180,9 @@ impl<'a, C, A> CompanyListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             params.push(("requestMetadata.locale", value.to_string()));
         }
         if self._request_metadata_experiment_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._request_metadata_experiment_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("requestMetadata.experimentIds", f.to_string()));
             }
-            params.push(("requestMetadata.experimentIds", s));
         }
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -2218,25 +2212,19 @@ impl<'a, C, A> CompanyListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             params.push(("maxMonthlyBudget.currencyCode", value.to_string()));
         }
         if self._language_codes.len() > 0 {
-            let mut s = String::new();
             for f in self._language_codes.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("languageCodes", f.to_string()));
             }
-            params.push(("languageCodes", s));
         }
         if self._industries.len() > 0 {
-            let mut s = String::new();
             for f in self._industries.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("industries", f.to_string()));
             }
-            params.push(("industries", s));
         }
         if self._gps_motivations.len() > 0 {
-            let mut s = String::new();
             for f in self._gps_motivations.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("gpsMotivations", f.to_string()));
             }
-            params.push(("gpsMotivations", s));
         }
         if let Some(value) = self._company_name {
             params.push(("companyName", value.to_string()));
@@ -2636,11 +2624,9 @@ impl<'a, C, A> UserStateListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             params.push(("requestMetadata.locale", value.to_string()));
         }
         if self._request_metadata_experiment_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._request_metadata_experiment_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("requestMetadata.experimentIds", f.to_string()));
             }
-            params.push(("requestMetadata.experimentIds", s));
         }
         for &field in ["alt", "requestMetadata.userOverrides.userId", "requestMetadata.userOverrides.ipAddress", "requestMetadata.trafficSource.trafficSubId", "requestMetadata.trafficSource.trafficSourceId", "requestMetadata.partnersSessionId", "requestMetadata.locale", "requestMetadata.experimentIds"].iter() {
             if self._additional_params.contains_key(field) {

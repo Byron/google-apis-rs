@@ -414,7 +414,7 @@ impl TokenStorage for JsonTokenStorage {
                     Err(err) =>
                         match err.kind() {
                             io::ErrorKind::NotFound => Ok(()),
-                            _ => Err(json::Error::IoError(err))
+                            _ => Err(json::Error::Io(err))
                         },
                     Ok(_) => Ok(()),
                 }
@@ -427,7 +427,7 @@ impl TokenStorage for JsonTokenStorage {
                             Err(serde_err) => Err(serde_err),
                         }
                     },
-                    Err(io_err) => Err(json::Error::IoError(io_err))
+                    Err(io_err) => Err(json::Error::Io(io_err))
                 }
             }
         }
@@ -444,7 +444,7 @@ impl TokenStorage for JsonTokenStorage {
             Err(io_err) => {
                 match io_err.kind() {
                     io::ErrorKind::NotFound => Ok(None),
-                    _ => Err(json::Error::IoError(io_err))
+                    _ => Err(json::Error::Io(io_err))
                 }
             }
         }
@@ -683,7 +683,7 @@ pub fn application_secret_from_directory(dir: &str,
                                             = json::from_str(json_console_secret).unwrap();
                             match json::to_writer_pretty(&mut f, &console_secret) {
                                 Err(serde_err) => match serde_err {
-                                    json::Error::IoError(err) => err,
+                                    json::Error::Io(err) => err,
                                     _ => panic!("Unexpected serde error: {:#?}", serde_err)
                                 },
                                 Ok(_) => continue,
@@ -696,7 +696,7 @@ pub fn application_secret_from_directory(dir: &str,
             },
             Ok(f) => {
                 match json::de::from_reader::<_, ConsoleApplicationSecret>(f) {
-                    Err(json::Error::IoError(err)) =>
+                    Err(json::Error::Io(err)) =>
                         return secret_io_error(err),
                     Err(json_err) =>
                         return Err(CLIError::Configuration(

@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Identity Toolkit* API at revision *20160125*. The CLI is at version *0.3.3*.
+This documentation was generated from the *Identity Toolkit* API at revision *20160216*. The CLI is at version *0.3.3*.
 
 ```bash
 identitytoolkit3 [options]
@@ -40,6 +40,7 @@ identitytoolkit3 [options]
                 reset-password (-r <kv>)... [-p <v>]... [-o <out>]
                 set-account-info (-r <kv>)... [-p <v>]... [-o <out>]
                 sign-out-user (-r <kv>)... [-p <v>]... [-o <out>]
+                signup-new-user (-r <kv>)... [-p <v>]... [-o <out>]
                 upload-account (-r <kv>)... [-p <v>]... [-o <out>]
                 verify-assertion (-r <kv>)... [-p <v>]... [-o <out>]
                 verify-custom-token (-r <kv>)... [-p <v>]... [-o <out>]

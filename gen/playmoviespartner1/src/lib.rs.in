@@ -872,25 +872,19 @@ impl<'a, C, A> AccountOrderListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         let mut params: Vec<(&str, String)> = Vec::with_capacity((10 + self._additional_params.len()));
         params.push(("accountId", self._account_id.to_string()));
         if self._studio_names.len() > 0 {
-            let mut s = String::new();
             for f in self._studio_names.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("studioNames", f.to_string()));
             }
-            params.push(("studioNames", s));
         }
         if self._status.len() > 0 {
-            let mut s = String::new();
             for f in self._status.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("status", f.to_string()));
             }
-            params.push(("status", s));
         }
         if self._pph_names.len() > 0 {
-            let mut s = String::new();
             for f in self._pph_names.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("pphNames", f.to_string()));
             }
-            params.push(("pphNames", s));
         }
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -1735,35 +1729,27 @@ impl<'a, C, A> AccountAvailListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         let mut params: Vec<(&str, String)> = Vec::with_capacity((11 + self._additional_params.len()));
         params.push(("accountId", self._account_id.to_string()));
         if self._video_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._video_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("videoIds", f.to_string()));
             }
-            params.push(("videoIds", s));
         }
         if let Some(value) = self._title {
             params.push(("title", value.to_string()));
         }
         if self._territories.len() > 0 {
-            let mut s = String::new();
             for f in self._territories.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("territories", f.to_string()));
             }
-            params.push(("territories", s));
         }
         if self._studio_names.len() > 0 {
-            let mut s = String::new();
             for f in self._studio_names.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("studioNames", f.to_string()));
             }
-            params.push(("studioNames", s));
         }
         if self._pph_names.len() > 0 {
-            let mut s = String::new();
             for f in self._pph_names.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("pphNames", f.to_string()));
             }
-            params.push(("pphNames", s));
         }
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -2347,28 +2333,22 @@ impl<'a, C, A> AccountStoreInfoListCall<'a, C, A> where C: BorrowMut<hyper::Clie
         let mut params: Vec<(&str, String)> = Vec::with_capacity((11 + self._additional_params.len()));
         params.push(("accountId", self._account_id.to_string()));
         if self._video_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._video_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("videoIds", f.to_string()));
             }
-            params.push(("videoIds", s));
         }
         if let Some(value) = self._video_id {
             params.push(("videoId", value.to_string()));
         }
         if self._studio_names.len() > 0 {
-            let mut s = String::new();
             for f in self._studio_names.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("studioNames", f.to_string()));
             }
-            params.push(("studioNames", s));
         }
         if self._pph_names.len() > 0 {
-            let mut s = String::new();
             for f in self._pph_names.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("pphNames", f.to_string()));
             }
-            params.push(("pphNames", s));
         }
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -2380,11 +2360,9 @@ impl<'a, C, A> AccountStoreInfoListCall<'a, C, A> where C: BorrowMut<hyper::Clie
             params.push(("name", value.to_string()));
         }
         if self._countries.len() > 0 {
-            let mut s = String::new();
             for f in self._countries.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("countries", f.to_string()));
             }
-            params.push(("countries", s));
         }
         for &field in ["alt", "accountId", "videoIds", "videoId", "studioNames", "pphNames", "pageToken", "pageSize", "name", "countries"].iter() {
             if self._additional_params.contains_key(field) {
@@ -2710,25 +2688,19 @@ impl<'a, C, A> AccountExperienceLocaleListCall<'a, C, A> where C: BorrowMut<hype
             params.push(("titleLevelEidr", value.to_string()));
         }
         if self._studio_names.len() > 0 {
-            let mut s = String::new();
             for f in self._studio_names.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("studioNames", f.to_string()));
             }
-            params.push(("studioNames", s));
         }
         if self._status.len() > 0 {
-            let mut s = String::new();
             for f in self._status.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("status", f.to_string()));
             }
-            params.push(("status", s));
         }
         if self._pph_names.len() > 0 {
-            let mut s = String::new();
             for f in self._pph_names.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("pphNames", f.to_string()));
             }
-            params.push(("pphNames", s));
         }
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));

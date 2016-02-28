@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *gmail* API at revision *20151214*. The CLI is at version *0.3.3*.
+This documentation was generated from the *gmail* API at revision *20160216*. The CLI is at version *0.3.3*.
 
 ```bash
 gmail1 [options]
@@ -44,6 +44,7 @@ gmail1 [options]
                 labels-patch <user-id> <id> (-r <kv>)... [-p <v>]... [-o <out>]
                 labels-update <user-id> <id> (-r <kv>)... [-p <v>]... [-o <out>]
                 messages-attachments-get <user-id> <message-id> <id> [-p <v>]... [-o <out>]
+                messages-batch-delete <user-id> (-r <kv>)... [-p <v>]...
                 messages-delete <user-id> <id> [-p <v>]...
                 messages-get <user-id> <id> [-p <v>]... [-o <out>]
                 messages-import <user-id> (-r <kv>)... (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]

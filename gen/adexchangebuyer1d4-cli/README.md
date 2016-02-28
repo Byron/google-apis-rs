@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Ad Exchange Buyer* API at revision *20160118*. The CLI is at version *0.3.3*.
+This documentation was generated from the *Ad Exchange Buyer* API at revision *20160222*. The CLI is at version *0.3.3*.
 
 ```bash
 adexchangebuyer1d4 [options]
@@ -71,7 +71,10 @@ adexchangebuyer1d4 [options]
                 insert (-r <kv>)... [-p <v>]... [-o <out>]
                 patch <proposal-id> <revision-number> <update-action> (-r <kv>)... [-p <v>]... [-o <out>]
                 search [-p <v>]... [-o <out>]
+                setupcomplete <proposal-id> [-p <v>]...
                 update <proposal-id> <revision-number> <update-action> (-r <kv>)... [-p <v>]... [-o <out>]
+        pubprofiles
+                list <account-id> [-p <v>]... [-o <out>]
   adexchangebuyer1d4 --help
 
 Configuration:

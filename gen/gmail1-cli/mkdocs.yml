@@ -1,4 +1,4 @@
-site_name: gmail v0.3.3+20151214
+site_name: gmail v0.3.3+20160216
 site_url: http://byron.github.io/google-apis-rs/google-gmail1-cli
 site_description: Write integrating applications with bcore
 
@@ -24,6 +24,7 @@ pages:
 - ['users_labels-patch.md', 'Users', 'Labels Patch']
 - ['users_labels-update.md', 'Users', 'Labels Update']
 - ['users_messages-attachments-get.md', 'Users', 'Messages Attachments Get']
+- ['users_messages-batch-delete.md', 'Users', 'Messages Batch Delete']
 - ['users_messages-delete.md', 'Users', 'Messages Delete']
 - ['users_messages-get.md', 'Users', 'Messages Get']
 - ['users_messages-import.md', 'Users', 'Messages Import']

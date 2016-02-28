@@ -188,6 +188,9 @@ impl Part for Network {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Application {
+    /// The hostname used to reach the application, as resolved by App Engine. @OutputOnly
+    #[serde(rename="defaultHostname")]
+    pub default_hostname: Option<String>,
     /// The full path to the application in the API. Example: "apps/myapp". @OutputOnly
     pub name: Option<String>,
     /// A Google Cloud Storage bucket which can be used for storing files associated with an application. This bucket is associated with the application and can be used by the gcloud deployment commands. @OutputOnly
@@ -199,10 +202,16 @@ pub struct Application {
     /// HTTP path dispatch rules for requests to the app that do not explicitly target a module or version. The rules are order-dependent.
     #[serde(rename="dispatchRules")]
     pub dispatch_rules: Option<Vec<UrlDispatchRule>>,
-    /// The relative name/path of the application. Example: "myapp". @OutputOnly
-    pub id: Option<String>,
+    /// Determines the cookie expiration policy for the application.
+    #[serde(rename="defaultCookieExpiration")]
+    pub default_cookie_expiration: Option<String>,
     /// The location from which the application will be run. Choices are "us-central" for United States and "europe-west" for European Union. Application instances will run out of data centers in the chosen location and all of the application's End User Content will be stored at rest in the chosen location. The default is "us-central".
     pub location: Option<String>,
+    /// If set, only users from the specified Google Apps authentication domain may access the application. If not set, any Google Account may access the application.
+    #[serde(rename="authDomain")]
+    pub auth_domain: Option<String>,
+    /// The relative name/path of the application. Example: "myapp".
+    pub id: Option<String>,
 }
 
 impl ResponseResult for Application {}
@@ -216,6 +225,7 @@ impl ResponseResult for Application {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [modules versions create apps](struct.AppModuleVersionCreateCall.html) (request)
+/// * [modules versions patch apps](struct.AppModuleVersionPatchCall.html) (request)
 /// * [modules versions get apps](struct.AppModuleVersionGetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -888,11 +898,12 @@ impl Part for TrafficSplit {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
+/// * [modules patch apps](struct.AppModulePatchCall.html) (response)
+/// * [modules delete apps](struct.AppModuleDeleteCall.html) (response)
+/// * [operations get apps](struct.AppOperationGetCall.html) (response)
+/// * [modules versions patch apps](struct.AppModuleVersionPatchCall.html) (response)
 /// * [modules versions delete apps](struct.AppModuleVersionDeleteCall.html) (response)
 /// * [modules versions create apps](struct.AppModuleVersionCreateCall.html) (response)
-/// * [operations get apps](struct.AppOperationGetCall.html) (response)
-/// * [modules delete apps](struct.AppModuleDeleteCall.html) (response)
-/// * [modules patch apps](struct.AppModulePatchCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Operation {
@@ -939,7 +950,7 @@ impl ResponseResult for Operation {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Appengine::new(hyper::Client::new(), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `get(...)`, `modules_delete(...)`, `modules_get(...)`, `modules_list(...)`, `modules_patch(...)`, `modules_versions_create(...)`, `modules_versions_delete(...)`, `modules_versions_get(...)`, `modules_versions_list(...)`, `operations_get(...)` and `operations_list(...)`
+/// // like `get(...)`, `modules_delete(...)`, `modules_get(...)`, `modules_list(...)`, `modules_patch(...)`, `modules_versions_create(...)`, `modules_versions_delete(...)`, `modules_versions_get(...)`, `modules_versions_list(...)`, `modules_versions_patch(...)`, `operations_get(...)` and `operations_list(...)`
 /// // to build up your call.
 /// let rb = hub.apps();
 /// # }
@@ -1065,6 +1076,30 @@ impl<'a, C, A> AppMethods<'a, C, A> {
             hub: self.hub,
             _apps_id: apps_id.to_string(),
             _operations_id: operations_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates an existing version. Note: UNIMPLEMENTED.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `appsId` - Part of `name`. Name of the resource to update. For example: "apps/myapp/modules/default/versions/1".
+    /// * `modulesId` - Part of `name`. See documentation of `appsId`.
+    /// * `versionsId` - Part of `name`. See documentation of `appsId`.
+    pub fn modules_versions_patch(&self, request: Version, apps_id: &str, modules_id: &str, versions_id: &str) -> AppModuleVersionPatchCall<'a, C, A> {
+        AppModuleVersionPatchCall {
+            hub: self.hub,
+            _request: request,
+            _apps_id: apps_id.to_string(),
+            _modules_id: modules_id.to_string(),
+            _versions_id: versions_id.to_string(),
+            _mask: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2777,6 +2812,315 @@ impl<'a, C, A> AppOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 }
 
 
+/// Updates an existing version. Note: UNIMPLEMENTED.
+///
+/// A builder for the *modules.versions.patch* method supported by a *app* resource.
+/// It is not used directly, but through a `AppMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_appengine1_beta4 as appengine1_beta4;
+/// use appengine1_beta4::Version;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use appengine1_beta4::Appengine;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Appengine::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Version::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.apps().modules_versions_patch(req, "appsId", "modulesId", "versionsId")
+///              .mask("ipsum")
+///              .doit();
+/// # }
+/// ```
+pub struct AppModuleVersionPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Appengine<C, A>,
+    _request: Version,
+    _apps_id: String,
+    _modules_id: String,
+    _versions_id: String,
+    _mask: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for AppModuleVersionPatchCall<'a, C, A> {}
+
+impl<'a, C, A> AppModuleVersionPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "appengine.apps.modules.versions.patch",
+                               http_method: hyper::method::Method::Patch });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        params.push(("appsId", self._apps_id.to_string()));
+        params.push(("modulesId", self._modules_id.to_string()));
+        params.push(("versionsId", self._versions_id.to_string()));
+        if let Some(value) = self._mask {
+            params.push(("mask", value.to_string()));
+        }
+        for &field in ["alt", "appsId", "modulesId", "versionsId", "mask"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://appengine.googleapis.com/v1beta4/apps/{appsId}/modules/{modulesId}/versions/{versionsId}".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{appsId}", "appsId"), ("{modulesId}", "modulesId"), ("{versionsId}", "versionsId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
+            for param_name in ["versionsId", "modulesId", "appsId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request);
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: Version) -> AppModuleVersionPatchCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Part of `name`. Name of the resource to update. For example: "apps/myapp/modules/default/versions/1".
+    ///
+    /// Sets the *apps id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn apps_id(mut self, new_value: &str) -> AppModuleVersionPatchCall<'a, C, A> {
+        self._apps_id = new_value.to_string();
+        self
+    }
+    /// Part of `name`. See documentation of `appsId`.
+    ///
+    /// Sets the *modules id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn modules_id(mut self, new_value: &str) -> AppModuleVersionPatchCall<'a, C, A> {
+        self._modules_id = new_value.to_string();
+        self
+    }
+    /// Part of `name`. See documentation of `appsId`.
+    ///
+    /// Sets the *versions id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn versions_id(mut self, new_value: &str) -> AppModuleVersionPatchCall<'a, C, A> {
+        self._versions_id = new_value.to_string();
+        self
+    }
+    /// Standard field mask for the set of fields to be updated.
+    ///
+    /// Sets the *mask* query property to the given value.
+    pub fn mask(mut self, new_value: &str) -> AppModuleVersionPatchCall<'a, C, A> {
+        self._mask = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AppModuleVersionPatchCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> AppModuleVersionPatchCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> AppModuleVersionPatchCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
 /// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding below allows API services to override the binding to use different resource name schemes, such as `users/*/operations`.
 ///
 /// A builder for the *operations.list* method supported by a *app* resource.
@@ -2805,8 +3149,8 @@ impl<'a, C, A> AppOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.apps().operations_list("appsId")
 ///              .page_token("et")
-///              .page_size(-41)
-///              .filter("ipsum")
+///              .page_size(-70)
+///              .filter("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -3633,7 +3977,7 @@ impl<'a, C, A> AppModuleVersionCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.apps().modules_versions_get("appsId", "modulesId", "versionsId")
-///              .view("sadipscing")
+///              .view("amet")
 ///              .doit();
 /// # }
 /// ```
@@ -3911,9 +4255,9 @@ impl<'a, C, A> AppModuleVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.apps().modules_versions_list("appsId", "modulesId")
-///              .view("elitr")
-///              .page_token("amet")
-///              .page_size(-60)
+///              .view("eirmod")
+///              .page_token("dolore")
+///              .page_size(-37)
 ///              .doit();
 /// # }
 /// ```

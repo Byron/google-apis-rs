@@ -200,27 +200,28 @@ pub struct MessagePartHeader {
 impl Part for MessagePartHeader {}
 
 
-/// The body of a single MIME message part.
+/// There is no detailed description.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [messages attachments get users](struct.UserMessageAttachmentGetCall.html) (response)
+/// * [history list users](struct.UserHistoryListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct MessagePartBody {
-    /// When present, contains the ID of an external attachment that can be retrieved in a separate messages.attachments.get request. When not present, the entire content of the message part body is contained in the data field.
-    #[serde(rename="attachmentId")]
-    pub attachment_id: Option<String>,
-    /// The body data of a MIME message part. May be empty for MIME container types that have no message body or when the body data is sent as a separate attachment. An attachment ID is present if the body data is contained in a separate attachment.
-    pub data: Option<String>,
-    /// Total number of bytes in the body of the message part.
-    pub size: Option<i32>,
+pub struct ListHistoryResponse {
+    /// Page token to retrieve the next page of results in the list.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The ID of the mailbox's current history record.
+    #[serde(rename="historyId")]
+    pub history_id: Option<String>,
+    /// List of history records. Any messages contained in the response will typically only have id and threadId fields populated.
+    pub history: Option<Vec<History>>,
 }
 
-impl ResponseResult for MessagePartBody {}
+impl ResponseResult for ListHistoryResponse {}
 
 
 /// A collection of messages representing a conversation.
@@ -417,31 +418,27 @@ pub struct HistoryMessageDeleted {
 impl Part for HistoryMessageDeleted {}
 
 
-/// A record of a change to the user's mailbox. Each history change may affect multiple messages in multiple ways.
+/// The body of a single MIME message part.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [messages attachments get users](struct.UserMessageAttachmentGetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct History {
-    /// Labels removed from messages in this history record.
-    #[serde(rename="labelsRemoved")]
-    pub labels_removed: Option<Vec<HistoryLabelRemoved>>,
-    /// Messages deleted (not Trashed) from the mailbox in this history record.
-    #[serde(rename="messagesDeleted")]
-    pub messages_deleted: Option<Vec<HistoryMessageDeleted>>,
-    /// Labels added to messages in this history record.
-    #[serde(rename="labelsAdded")]
-    pub labels_added: Option<Vec<HistoryLabelAdded>>,
-    /// List of messages changed in this history record. The fields for specific change types, such as messagesAdded may duplicate messages in this field. We recommend using the specific change-type fields instead of this.
-    pub messages: Option<Vec<Message>>,
-    /// The mailbox sequence ID.
-    pub id: Option<String>,
-    /// Messages added to the mailbox in this history record.
-    #[serde(rename="messagesAdded")]
-    pub messages_added: Option<Vec<HistoryMessageAdded>>,
+pub struct MessagePartBody {
+    /// When present, contains the ID of an external attachment that can be retrieved in a separate messages.attachments.get request. When not present, the entire content of the message part body is contained in the data field.
+    #[serde(rename="attachmentId")]
+    pub attachment_id: Option<String>,
+    /// The body data of a MIME message part. May be empty for MIME container types that have no message body or when the body data is sent as a separate attachment. An attachment ID is present if the body data is contained in a separate attachment.
+    pub data: Option<String>,
+    /// Total number of bytes in the body of the message part.
+    pub size: Option<i32>,
 }
 
-impl Part for History {}
+impl ResponseResult for MessagePartBody {}
 
 
 /// Profile for a Gmail user.
@@ -610,21 +607,15 @@ impl ResponseResult for ListMessagesResponse {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [history list users](struct.UserHistoryListCall.html) (response)
+/// * [messages batch delete users](struct.UserMessageBatchDeleteCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListHistoryResponse {
-    /// Page token to retrieve the next page of results in the list.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The ID of the mailbox's current history record.
-    #[serde(rename="historyId")]
-    pub history_id: Option<String>,
-    /// List of history records. Any messages contained in the response will typically only have id and threadId fields populated.
-    pub history: Option<Vec<History>>,
+pub struct BatchDeleteMessagesRequest {
+    /// The IDs of the messages to delete.
+    pub ids: Option<Vec<String>>,
 }
 
-impl ResponseResult for ListHistoryResponse {}
+impl RequestValue for BatchDeleteMessagesRequest {}
 
 
 /// There is no detailed description.
@@ -693,6 +684,33 @@ impl RequestValue for Message {}
 impl ResponseResult for Message {}
 
 
+/// A record of a change to the user's mailbox. Each history change may affect multiple messages in multiple ways.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct History {
+    /// Labels removed from messages in this history record.
+    #[serde(rename="labelsRemoved")]
+    pub labels_removed: Option<Vec<HistoryLabelRemoved>>,
+    /// Messages deleted (not Trashed) from the mailbox in this history record.
+    #[serde(rename="messagesDeleted")]
+    pub messages_deleted: Option<Vec<HistoryMessageDeleted>>,
+    /// Labels added to messages in this history record.
+    #[serde(rename="labelsAdded")]
+    pub labels_added: Option<Vec<HistoryLabelAdded>>,
+    /// List of messages changed in this history record. The fields for specific change types, such as messagesAdded may duplicate messages in this field. We recommend using the specific change-type fields instead of this.
+    pub messages: Option<Vec<Message>>,
+    /// The mailbox sequence ID.
+    pub id: Option<String>,
+    /// Messages added to the mailbox in this history record.
+    #[serde(rename="messagesAdded")]
+    pub messages_added: Option<Vec<HistoryMessageAdded>>,
+}
+
+impl Part for History {}
+
+
 /// Push notification watch response.
 /// 
 /// # Activities
@@ -742,7 +760,7 @@ impl ResponseResult for WatchResponse {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Gmail::new(hyper::Client::new(), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `drafts_create(...)`, `drafts_delete(...)`, `drafts_get(...)`, `drafts_list(...)`, `drafts_send(...)`, `drafts_update(...)`, `get_profile(...)`, `history_list(...)`, `labels_create(...)`, `labels_delete(...)`, `labels_get(...)`, `labels_list(...)`, `labels_patch(...)`, `labels_update(...)`, `messages_attachments_get(...)`, `messages_delete(...)`, `messages_get(...)`, `messages_import(...)`, `messages_insert(...)`, `messages_list(...)`, `messages_modify(...)`, `messages_send(...)`, `messages_trash(...)`, `messages_untrash(...)`, `stop(...)`, `threads_delete(...)`, `threads_get(...)`, `threads_list(...)`, `threads_modify(...)`, `threads_trash(...)`, `threads_untrash(...)` and `watch(...)`
+/// // like `drafts_create(...)`, `drafts_delete(...)`, `drafts_get(...)`, `drafts_list(...)`, `drafts_send(...)`, `drafts_update(...)`, `get_profile(...)`, `history_list(...)`, `labels_create(...)`, `labels_delete(...)`, `labels_get(...)`, `labels_list(...)`, `labels_patch(...)`, `labels_update(...)`, `messages_attachments_get(...)`, `messages_batch_delete(...)`, `messages_delete(...)`, `messages_get(...)`, `messages_import(...)`, `messages_insert(...)`, `messages_list(...)`, `messages_modify(...)`, `messages_send(...)`, `messages_trash(...)`, `messages_untrash(...)`, `stop(...)`, `threads_delete(...)`, `threads_get(...)`, `threads_list(...)`, `threads_modify(...)`, `threads_trash(...)`, `threads_untrash(...)` and `watch(...)`
 /// // to build up your call.
 /// let rb = hub.users();
 /// # }
@@ -953,14 +971,16 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all labels in the user's mailbox.
+    /// Deletes many messages by message ID. Provides no guarantees that messages were not already deleted or even existed at all.
     /// 
     /// # Arguments
     ///
+    /// * `request` - No description provided.
     /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
-    pub fn labels_list(&self, user_id: &str) -> UserLabelListCall<'a, C, A> {
-        UserLabelListCall {
+    pub fn messages_batch_delete(&self, request: BatchDeleteMessagesRequest, user_id: &str) -> UserMessageBatchDeleteCall<'a, C, A> {
+        UserMessageBatchDeleteCall {
             hub: self.hub,
+            _request: request,
             _user_id: user_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -1051,15 +1071,17 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Removes the specified thread from the trash.
+    /// Modifies the labels on the specified message.
     /// 
     /// # Arguments
     ///
+    /// * `request` - No description provided.
     /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
-    /// * `id` - The ID of the thread to remove from Trash.
-    pub fn threads_untrash(&self, user_id: &str, id: &str) -> UserThreadUntrashCall<'a, C, A> {
-        UserThreadUntrashCall {
+    /// * `id` - The ID of the message to modify.
+    pub fn messages_modify(&self, request: ModifyMessageRequest, user_id: &str, id: &str) -> UserMessageModifyCall<'a, C, A> {
+        UserMessageModifyCall {
             hub: self.hub,
+            _request: request,
             _user_id: user_id.to_string(),
             _id: id.to_string(),
             _delegate: Default::default(),
@@ -1193,27 +1215,6 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Modifies the labels on the specified message.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
-    /// * `id` - The ID of the message to modify.
-    pub fn messages_modify(&self, request: ModifyMessageRequest, user_id: &str, id: &str) -> UserMessageModifyCall<'a, C, A> {
-        UserMessageModifyCall {
-            hub: self.hub,
-            _request: request,
-            _user_id: user_id.to_string(),
-            _id: id.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
     /// Moves the specified thread to the trash.
     /// 
     /// # Arguments
@@ -1263,6 +1264,7 @@ impl<'a, C, A> UserMethods<'a, C, A> {
             _user_id: user_id.to_string(),
             _page_token: Default::default(),
             _max_results: Default::default(),
+            _include_spam_trash: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1333,6 +1335,25 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Removes the specified thread from the trash.
+    /// 
+    /// # Arguments
+    ///
+    /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
+    /// * `id` - The ID of the thread to remove from Trash.
+    pub fn threads_untrash(&self, user_id: &str, id: &str) -> UserThreadUntrashCall<'a, C, A> {
+        UserThreadUntrashCall {
+            hub: self.hub,
+            _user_id: user_id.to_string(),
+            _id: id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Gets the current user's Gmail profile.
     /// 
     /// # Arguments
@@ -1384,6 +1405,23 @@ impl<'a, C, A> UserMethods<'a, C, A> {
             _user_id: user_id.to_string(),
             _internal_date_source: Default::default(),
             _deleted: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Lists all labels in the user's mailbox.
+    /// 
+    /// # Arguments
+    ///
+    /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
+    pub fn labels_list(&self, user_id: &str) -> UserLabelListCall<'a, C, A> {
+        UserLabelListCall {
+            hub: self.hub,
+            _user_id: user_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4347,9 +4385,9 @@ impl<'a, C, A> UserMessageUntrashCall<'a, C, A> where C: BorrowMut<hyper::Client
 }
 
 
-/// Lists all labels in the user's mailbox.
+/// Deletes many messages by message ID. Provides no guarantees that messages were not already deleted or even existed at all.
 ///
-/// A builder for the *labels.list* method supported by a *user* resource.
+/// A builder for the *messages.batchDelete* method supported by a *user* resource.
 /// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
@@ -4360,6 +4398,7 @@ impl<'a, C, A> UserMessageUntrashCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// # extern crate hyper;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_gmail1 as gmail1;
+/// use gmail1::BatchDeleteMessagesRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -4370,30 +4409,36 @@ impl<'a, C, A> UserMessageUntrashCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = Gmail::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = BatchDeleteMessagesRequest::default();
+/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.users().labels_list("userId")
+/// let result = hub.users().messages_batch_delete(req, "userId")
 ///              .doit();
 /// # }
 /// ```
-pub struct UserLabelListCall<'a, C, A>
+pub struct UserMessageBatchDeleteCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Gmail<C, A>,
+    _request: BatchDeleteMessagesRequest,
     _user_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for UserLabelListCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for UserMessageBatchDeleteCall<'a, C, A> {}
 
-impl<'a, C, A> UserLabelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> UserMessageBatchDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, ListLabelsResponse)> {
+    pub fn doit(mut self) -> Result<hyper::client::Response> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -4401,11 +4446,11 @@ impl<'a, C, A> UserLabelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "gmail.users.labels.list",
-                               http_method: hyper::method::Method::Get });
+        dlg.begin(MethodInfo { id: "gmail.users.messages.batchDelete",
+                               http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
         params.push(("userId", self._user_id.to_string()));
-        for &field in ["alt", "userId"].iter() {
+        for &field in ["userId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -4415,11 +4460,10 @@ impl<'a, C, A> UserLabelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             params.push((&name, value.clone()));
         }
 
-        params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/labels".to_string();
+        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/messages/batchDelete".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Gmai.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userId}", "userId")].iter() {
@@ -4449,6 +4493,17 @@ impl<'a, C, A> UserLabelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request);
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
@@ -4466,11 +4521,15 @@ impl<'a, C, A> UserLabelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
 
                 dlg.pre_request();
                 req.send()
@@ -4501,17 +4560,7 @@ impl<'a, C, A> UserLabelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                             Ok(serr) => Err(Error::BadRequest(serr))
                         }
                     }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
+                    let result_value = res;
 
                     dlg.finished(true);
                     return Ok(result_value)
@@ -4521,13 +4570,22 @@ impl<'a, C, A> UserLabelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: BatchDeleteMessagesRequest) -> UserMessageBatchDeleteCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
     /// The user's email address. The special value me can be used to indicate the authenticated user.
     ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserLabelListCall<'a, C, A> {
+    pub fn user_id(mut self, new_value: &str) -> UserMessageBatchDeleteCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -4537,7 +4595,7 @@ impl<'a, C, A> UserLabelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserLabelListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserMessageBatchDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4558,7 +4616,7 @@ impl<'a, C, A> UserLabelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserLabelListCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserMessageBatchDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4567,7 +4625,7 @@ impl<'a, C, A> UserLabelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Readonly`.
+    /// `Scope::Gmai`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4575,7 +4633,7 @@ impl<'a, C, A> UserLabelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserLabelListCall<'a, C, A>
+    pub fn add_scope<T>(mut self, scope: T) -> UserMessageBatchDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5752,9 +5810,9 @@ impl<'a, C, A> UserLabelUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 }
 
 
-/// Removes the specified thread from the trash.
+/// Modifies the labels on the specified message.
 ///
-/// A builder for the *threads.untrash* method supported by a *user* resource.
+/// A builder for the *messages.modify* method supported by a *user* resource.
 /// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
@@ -5765,6 +5823,7 @@ impl<'a, C, A> UserLabelUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// # extern crate hyper;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_gmail1 as gmail1;
+/// use gmail1::ModifyMessageRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -5775,17 +5834,23 @@ impl<'a, C, A> UserLabelUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = Gmail::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = ModifyMessageRequest::default();
+/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.users().threads_untrash("userId", "id")
+/// let result = hub.users().messages_modify(req, "userId", "id")
 ///              .doit();
 /// # }
 /// ```
-pub struct UserThreadUntrashCall<'a, C, A>
+pub struct UserMessageModifyCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Gmail<C, A>,
+    _request: ModifyMessageRequest,
     _user_id: String,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -5793,13 +5858,13 @@ pub struct UserThreadUntrashCall<'a, C, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for UserThreadUntrashCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for UserMessageModifyCall<'a, C, A> {}
 
-impl<'a, C, A> UserThreadUntrashCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> UserMessageModifyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Thread)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Message)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -5807,9 +5872,9 @@ impl<'a, C, A> UserThreadUntrashCall<'a, C, A> where C: BorrowMut<hyper::Client>
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "gmail.users.threads.untrash",
+        dlg.begin(MethodInfo { id: "gmail.users.messages.modify",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("userId", self._user_id.to_string()));
         params.push(("id", self._id.to_string()));
         for &field in ["alt", "userId", "id"].iter() {
@@ -5824,7 +5889,7 @@ impl<'a, C, A> UserThreadUntrashCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/threads/{id}/untrash".to_string();
+        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/messages/{id}/modify".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Gmai.as_ref().to_string(), ());
         }
@@ -5856,6 +5921,17 @@ impl<'a, C, A> UserThreadUntrashCall<'a, C, A> where C: BorrowMut<hyper::Client>
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request);
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
@@ -5873,11 +5949,15 @@ impl<'a, C, A> UserThreadUntrashCall<'a, C, A> where C: BorrowMut<hyper::Client>
             };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
 
                 dlg.pre_request();
                 req.send()
@@ -5928,23 +6008,32 @@ impl<'a, C, A> UserThreadUntrashCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: ModifyMessageRequest) -> UserMessageModifyCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
     /// The user's email address. The special value me can be used to indicate the authenticated user.
     ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserThreadUntrashCall<'a, C, A> {
+    pub fn user_id(mut self, new_value: &str) -> UserMessageModifyCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
-    /// The ID of the thread to remove from Trash.
+    /// The ID of the message to modify.
     ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> UserThreadUntrashCall<'a, C, A> {
+    pub fn id(mut self, new_value: &str) -> UserMessageModifyCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -5954,7 +6043,7 @@ impl<'a, C, A> UserThreadUntrashCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserThreadUntrashCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserMessageModifyCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5975,7 +6064,7 @@ impl<'a, C, A> UserThreadUntrashCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserThreadUntrashCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserMessageModifyCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5992,7 +6081,7 @@ impl<'a, C, A> UserThreadUntrashCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserThreadUntrashCall<'a, C, A>
+    pub fn add_scope<T>(mut self, scope: T) -> UserMessageModifyCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6594,11 +6683,9 @@ impl<'a, C, A> UserThreadListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             params.push(("maxResults", value.to_string()));
         }
         if self._label_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._label_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("labelIds", f.to_string()));
             }
-            params.push(("labelIds", s));
         }
         if let Some(value) = self._include_spam_trash {
             params.push(("includeSpamTrash", value.to_string()));
@@ -7593,285 +7680,6 @@ impl<'a, C, A> UserMessageAttachmentGetCall<'a, C, A> where C: BorrowMut<hyper::
 }
 
 
-/// Modifies the labels on the specified message.
-///
-/// A builder for the *messages.modify* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_gmail1 as gmail1;
-/// use gmail1::ModifyMessageRequest;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use gmail1::Gmail;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::new(),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Gmail::new(hyper::Client::new(), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = ModifyMessageRequest::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.users().messages_modify(req, "userId", "id")
-///              .doit();
-/// # }
-/// ```
-pub struct UserMessageModifyCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Gmail<C, A>,
-    _request: ModifyMessageRequest,
-    _user_id: String,
-    _id: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for UserMessageModifyCall<'a, C, A> {}
-
-impl<'a, C, A> UserMessageModifyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Message)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "gmail.users.messages.modify",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
-        params.push(("userId", self._user_id.to_string()));
-        params.push(("id", self._id.to_string()));
-        for &field in ["alt", "userId", "id"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/messages/{id}/modify".to_string();
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Gmai.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{userId}", "userId"), ("{id}", "id")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["id", "userId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request);
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ModifyMessageRequest) -> UserMessageModifyCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// The user's email address. The special value me can be used to indicate the authenticated user.
-    ///
-    /// Sets the *user id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserMessageModifyCall<'a, C, A> {
-        self._user_id = new_value.to_string();
-        self
-    }
-    /// The ID of the message to modify.
-    ///
-    /// Sets the *id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> UserMessageModifyCall<'a, C, A> {
-        self._id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserMessageModifyCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserMessageModifyCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Gmai`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserMessageModifyCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._scopes.insert(scope.as_ref().to_string(), ());
-        self
-    }
-}
-
-
 /// Moves the specified thread to the trash.
 ///
 /// A builder for the *threads.trash* method supported by a *user* resource.
@@ -8414,8 +8222,9 @@ impl<'a, C, A> UserWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().drafts_list("userId")
-///              .page_token("voluptua.")
-///              .max_results(45)
+///              .page_token("consetetur")
+///              .max_results(49)
+///              .include_spam_trash(true)
 ///              .doit();
 /// # }
 /// ```
@@ -8426,6 +8235,7 @@ pub struct UserDraftListCall<'a, C, A>
     _user_id: String,
     _page_token: Option<String>,
     _max_results: Option<u32>,
+    _include_spam_trash: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -8447,7 +8257,7 @@ impl<'a, C, A> UserDraftListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "gmail.users.drafts.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("userId", self._user_id.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -8455,7 +8265,10 @@ impl<'a, C, A> UserDraftListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         if let Some(value) = self._max_results {
             params.push(("maxResults", value.to_string()));
         }
-        for &field in ["alt", "userId", "pageToken", "maxResults"].iter() {
+        if let Some(value) = self._include_spam_trash {
+            params.push(("includeSpamTrash", value.to_string()));
+        }
+        for &field in ["alt", "userId", "pageToken", "maxResults", "includeSpamTrash"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -8593,6 +8406,13 @@ impl<'a, C, A> UserDraftListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> UserDraftListCall<'a, C, A> {
         self._max_results = Some(new_value);
+        self
+    }
+    /// Include drafts from SPAM and TRASH in the results.
+    ///
+    /// Sets the *include spam trash* query property to the given value.
+    pub fn include_spam_trash(mut self, new_value: bool) -> UserDraftListCall<'a, C, A> {
+        self._include_spam_trash = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -9055,8 +8875,8 @@ impl<'a, C, A> UserMessageSendCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().messages_get("userId", "id")
-///              .add_metadata_headers("vero")
-///              .format("diam")
+///              .add_metadata_headers("sit")
+///              .format("vero")
 ///              .doit();
 /// # }
 /// ```
@@ -9093,11 +8913,9 @@ impl<'a, C, A> UserMessageGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         params.push(("userId", self._user_id.to_string()));
         params.push(("id", self._id.to_string()));
         if self._metadata_headers.len() > 0 {
-            let mut s = String::new();
             for f in self._metadata_headers.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("metadataHeaders", f.to_string()));
             }
-            params.push(("metadataHeaders", s));
         }
         if let Some(value) = self._format {
             params.push(("format", value.to_string()));
@@ -9332,10 +9150,10 @@ impl<'a, C, A> UserMessageGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().messages_list("userId")
-///              .q("consetetur")
-///              .page_token("sadipscing")
-///              .max_results(25)
-///              .add_label_ids("sadipscing")
+///              .q("rebum.")
+///              .page_token("consetetur")
+///              .max_results(57)
+///              .add_label_ids("vero")
 ///              .include_spam_trash(false)
 ///              .doit();
 /// # }
@@ -9383,11 +9201,9 @@ impl<'a, C, A> UserMessageListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             params.push(("maxResults", value.to_string()));
         }
         if self._label_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._label_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("labelIds", f.to_string()));
             }
-            params.push(("labelIds", s));
         }
         if let Some(value) = self._include_spam_trash {
             params.push(("includeSpamTrash", value.to_string()));
@@ -9599,6 +9415,254 @@ impl<'a, C, A> UserMessageListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> UserMessageListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+/// Removes the specified thread from the trash.
+///
+/// A builder for the *threads.untrash* method supported by a *user* resource.
+/// It is not used directly, but through a `UserMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_gmail1 as gmail1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use gmail1::Gmail;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Gmail::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.users().threads_untrash("userId", "id")
+///              .doit();
+/// # }
+/// ```
+pub struct UserThreadUntrashCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Gmail<C, A>,
+    _user_id: String,
+    _id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for UserThreadUntrashCall<'a, C, A> {}
+
+impl<'a, C, A> UserThreadUntrashCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Thread)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "gmail.users.threads.untrash",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        params.push(("userId", self._user_id.to_string()));
+        params.push(("id", self._id.to_string()));
+        for &field in ["alt", "userId", "id"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/threads/{id}/untrash".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Gmai.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{userId}", "userId"), ("{id}", "id")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["id", "userId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
+    ///
+    /// Sets the *user id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn user_id(mut self, new_value: &str) -> UserThreadUntrashCall<'a, C, A> {
+        self._user_id = new_value.to_string();
+        self
+    }
+    /// The ID of the thread to remove from Trash.
+    ///
+    /// Sets the *id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn id(mut self, new_value: &str) -> UserThreadUntrashCall<'a, C, A> {
+        self._id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserThreadUntrashCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> UserThreadUntrashCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Gmai`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> UserThreadUntrashCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9869,8 +9933,8 @@ impl<'a, C, A> UserGetProfileCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().threads_get("userId", "id")
-///              .add_metadata_headers("aliquyam")
-///              .format("Lorem")
+///              .add_metadata_headers("Lorem")
+///              .format("et")
 ///              .doit();
 /// # }
 /// ```
@@ -9907,11 +9971,9 @@ impl<'a, C, A> UserThreadGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         params.push(("userId", self._user_id.to_string()));
         params.push(("id", self._id.to_string()));
         if self._metadata_headers.len() > 0 {
-            let mut s = String::new();
             for f in self._metadata_headers.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("metadataHeaders", f.to_string()));
             }
-            params.push(("metadataHeaders", s));
         }
         if let Some(value) = self._format {
             params.push(("format", value.to_string()));
@@ -10153,8 +10215,8 @@ impl<'a, C, A> UserThreadGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().messages_insert(req, "userId")
-///              .internal_date_source("clita")
-///              .deleted(true)
+///              .internal_date_source("consetetur")
+///              .deleted(false)
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
@@ -10517,6 +10579,242 @@ impl<'a, C, A> UserMessageInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> UserMessageInsertCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+/// Lists all labels in the user's mailbox.
+///
+/// A builder for the *labels.list* method supported by a *user* resource.
+/// It is not used directly, but through a `UserMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_gmail1 as gmail1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use gmail1::Gmail;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Gmail::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.users().labels_list("userId")
+///              .doit();
+/// # }
+/// ```
+pub struct UserLabelListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Gmail<C, A>,
+    _user_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for UserLabelListCall<'a, C, A> {}
+
+impl<'a, C, A> UserLabelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListLabelsResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "gmail.users.labels.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        params.push(("userId", self._user_id.to_string()));
+        for &field in ["alt", "userId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/labels".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{userId}", "userId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["userId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
+    ///
+    /// Sets the *user id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn user_id(mut self, new_value: &str) -> UserLabelListCall<'a, C, A> {
+        self._user_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserLabelListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> UserLabelListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> UserLabelListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

@@ -4942,7 +4942,7 @@ fn main() {
         
         ("enterprises", "methods: 'delete', 'enroll', 'get', 'get-store-layout', 'insert', 'list', 'send-test-push-notification', 'set-account', 'set-store-layout' and 'unenroll'", vec![
             ("delete",
-                    Some(r##"Deletes the binding between the MDM and enterprise. This is now deprecated; use this to unenroll customers that were previously enrolled with the 'insert' call, then enroll them again with the 'enroll' call."##),
+                    Some(r##"Deletes the binding between the EMM and enterprise. This is now deprecated; use this to unenroll customers that were previously enrolled with the 'insert' call, then enroll them again with the 'enroll' call."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/enterprises_delete",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -4958,12 +4958,12 @@ fn main() {
                      Some(true)),
                   ]),
             ("enroll",
-                    Some(r##"Enrolls an enterprise with the calling MDM."##),
+                    Some(r##"Enrolls an enterprise with the calling EMM."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/enterprises_enroll",
                   vec![
                     (Some(r##"token"##),
                      None,
-                     Some(r##"The token provided by the enterprise to register the MDM."##),
+                     Some(r##"The token provided by the enterprise to register the EMM."##),
                      Some(true),
                      Some(false)),
         
@@ -5030,12 +5030,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("insert",
-                    Some(r##"Establishes the binding between the MDM and an enterprise. This is now deprecated; use enroll instead."##),
+                    Some(r##"Establishes the binding between the EMM and an enterprise. This is now deprecated; use enroll instead."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/enterprises_insert",
                   vec![
                     (Some(r##"token"##),
                      None,
-                     Some(r##"The token provided by the enterprise to register the MDM."##),
+                     Some(r##"The token provided by the enterprise to register the EMM."##),
                      Some(true),
                      Some(false)),
         
@@ -5080,7 +5080,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("send-test-push-notification",
-                    Some(r##"Sends a test push notification to validate the MDM integration with the Google Cloud Pub/Sub service for this enterprise."##),
+                    Some(r##"Sends a test push notification to validate the EMM integration with the Google Cloud Pub/Sub service for this enterprise."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/enterprises_send-test-push-notification",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -5158,7 +5158,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("unenroll",
-                    Some(r##"Unenrolls an enterprise from the calling MDM."##),
+                    Some(r##"Unenrolls an enterprise from the calling EMM."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/enterprises_unenroll",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -5804,7 +5804,9 @@ fn main() {
                      Some(false)),
                   ]),
             ("update-permissions",
-                    Some(r##"Updates the set of Android app permissions for this app that have been accepted by the enterprise."##),
+                    Some(r##"This method has been deprecated. To programmatically approve applications, you must use the iframe mechanism via the  generateApprovalUrl and  approve methods of the Products resource. For more information, see the  Play EMM API usage requirements.
+        
+        The updatePermissions method (deprecated) updates the set of Android app permissions for this app that have been accepted by the enterprise."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/products_update-permissions",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -6219,7 +6221,9 @@ fn main() {
         
         ("users", "methods: 'generate-token', 'get', 'get-available-product-set', 'list', 'revoke-token' and 'set-available-product-set'", vec![
             ("generate-token",
-                    Some(r##"Generates a token (activation code) to allow this user to configure their work account in the Android Setup Wizard. Revokes any previously generated token."##),
+                    Some(r##"Generates a token (activation code) to allow this user to configure their work account in the Android Setup Wizard. Revokes any previously generated token.
+        
+        This call only works with Google managed accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/users_generate-token",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -6303,7 +6307,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Looks up a user by email address. This only works for Google managed users."##),
+                    Some(r##"Looks up a user by their primary email address."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/users_list",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -6392,7 +6396,7 @@ fn main() {
     
     let mut app = App::new("androidenterprise1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.3+20160106")
+           .version("0.3.3+20160212")
            .about("Allows MDMs/EMMs and enterprises to manage the deployment of apps to Android for Work users.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli")
            .arg(Arg::with_name("url")

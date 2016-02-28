@@ -1,0 +1,29 @@
+# DO NOT EDIT !
+# This file was generated automatically from 'src/mako/Cargo.toml.mako'
+# DO NOT EDIT !
+[package]
+
+name = "google-people1"
+version = "0.1.11+20160210"
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
+description = "A complete library to interact with people (protocol v1)"
+repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/people1"
+homepage = "https://developers.google.com/people/"
+documentation = "http://byron.github.io/google-apis-rs/google_people1"
+license = "MIT"
+keywords = ["people", "google", "protocol", "web", "api"]
+build = "src/build.rs"
+
+
+[dependencies]
+hyper = "0.7"
+mime = "0.1.0"
+serde = ">= 0.7.0"
+serde_json = ">= 0.7.0"
+yup-oauth2 = ">= 0.5.4"
+url = ">= 0.5"
+
+[build-dependencies]
+syntex = { version = ">= 0.23" }
+serde_codegen = { version = ">= 0.6" }
+

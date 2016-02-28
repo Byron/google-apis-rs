@@ -1,4 +1,4 @@
-site_name: Ad Exchange Buyer v0.3.3+20160118
+site_name: Ad Exchange Buyer v0.3.3+20160222
 site_url: http://byron.github.io/google-apis-rs/google-adexchangebuyer1d4-cli
 site_description: Write integrating applications with bcore
 
@@ -42,7 +42,9 @@ pages:
 - ['proposals_insert.md', 'Proposals', 'Insert']
 - ['proposals_patch.md', 'Proposals', 'Patch']
 - ['proposals_search.md', 'Proposals', 'Search']
+- ['proposals_setupcomplete.md', 'Proposals', 'Setupcomplete']
 - ['proposals_update.md', 'Proposals', 'Update']
+- ['pubprofiles_list.md', 'Pubprofiles', 'List']
 
 theme: readthedocs
 

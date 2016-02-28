@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *dataproc* crate version *0.1.11+20151209*, where *20151209* is the exact revision of the *dataproc:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
+//! This documentation was generated from *dataproc* crate version *0.1.11+20160219*, where *20160219* is the exact revision of the *dataproc:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
 //! 
 //! Everything else about the *dataproc* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/dataproc/).
@@ -13,6 +13,8 @@
 //! 
 //! * [media](struct.Media.html)
 //!  * [*download*](struct.MediaDownloadCall.html) and [*upload*](struct.MediaUploadCall.html)
+//! * projects
+//!  * [*regions clusters create*](struct.ProjectRegionClusterCreateCall.html), [*regions clusters delete*](struct.ProjectRegionClusterDeleteCall.html), [*regions clusters diagnose*](struct.ProjectRegionClusterDiagnoseCall.html), [*regions clusters get*](struct.ProjectRegionClusterGetCall.html), [*regions clusters list*](struct.ProjectRegionClusterListCall.html), [*regions clusters patch*](struct.ProjectRegionClusterPatchCall.html), [*regions jobs cancel*](struct.ProjectRegionJobCancelCall.html), [*regions jobs delete*](struct.ProjectRegionJobDeleteCall.html), [*regions jobs get*](struct.ProjectRegionJobGetCall.html), [*regions jobs list*](struct.ProjectRegionJobListCall.html), [*regions jobs submit*](struct.ProjectRegionJobSubmitCall.html), [*regions operations cancel*](struct.ProjectRegionOperationCancelCall.html), [*regions operations delete*](struct.ProjectRegionOperationDeleteCall.html), [*regions operations get*](struct.ProjectRegionOperationGetCall.html) and [*regions operations list*](struct.ProjectRegionOperationListCall.html)
 //! 
 //! 
 //! Upload supported by ...
@@ -55,8 +57,11 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.media().upload(...).doit()
-//! let r = hub.media().download(...).doit()
+//! let r = hub.projects().regions_clusters_patch(...).doit()
+//! let r = hub.projects().regions_clusters_create(...).doit()
+//! let r = hub.projects().regions_operations_get(...).doit()
+//! let r = hub.projects().regions_clusters_delete(...).doit()
+//! let r = hub.projects().regions_clusters_diagnose(...).doit()
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -81,9 +86,8 @@
 //! extern crate hyper;
 //! extern crate yup_oauth2 as oauth2;
 //! extern crate google_dataproc1 as dataproc1;
-//! use dataproc1::Media;
+//! use dataproc1::Cluster;
 //! use dataproc1::{Result, Error};
-//! use std::fs;
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -104,13 +108,14 @@
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req = Media::default();
+//! let mut req = Cluster::default();
 //! 
 //! // You can configure optional parameters by calling the respective setters at will, and
-//! // execute the final call using `upload(...)`.
+//! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.media().upload(req, "resourceName")
-//!              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
+//! let result = hub.projects().regions_clusters_patch(req, "projectId", "region", "clusterName")
+//!              .update_mask("et")
+//!              .doit();
 //! 
 //! match result {
 //!     Err(e) => match e {

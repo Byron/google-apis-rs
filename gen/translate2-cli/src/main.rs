@@ -405,7 +405,7 @@ fn main() {
     
     let mut app = App::new("translate2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.3+20141123")
+           .version("0.3.3+20160217")
            .about("Lets you translate text from one language to another")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_translate2_cli")
            .arg(Arg::with_name("folder")

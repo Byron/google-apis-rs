@@ -1,4 +1,4 @@
-site_name: genomics v0.3.3+20160124
+site_name: genomics v0.3.3+20160224
 site_url: http://byron.github.io/google-apis-rs/google-genomics1-cli
 site_description: Write integrating applications with bcore
 
@@ -44,6 +44,7 @@ pages:
 - ['variants_delete.md', 'Variants', 'Delete']
 - ['variants_get.md', 'Variants', 'Get']
 - ['variants_import.md', 'Variants', 'Import']
+- ['variants_merge.md', 'Variants', 'Merge']
 - ['variants_patch.md', 'Variants', 'Patch']
 - ['variants_search.md', 'Variants', 'Search']
 - ['variants_stream.md', 'Variants', 'Stream']

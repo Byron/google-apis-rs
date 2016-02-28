@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Service Registry* API at revision *20160111*. The CLI is at version *0.3.3*.
+This documentation was generated from the *Service Registry* API at revision *20160225*. The CLI is at version *0.3.3*.
 
 ```bash
 serviceregistryalpha [options]

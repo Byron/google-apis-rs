@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Ad Exchange Buyer* crate version *0.1.11+20160118*, where *20160118* is the exact revision of the *adexchangebuyer:v1.4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
+//! This documentation was generated from *Ad Exchange Buyer* crate version *0.1.11+20160222*, where *20160222* is the exact revision of the *adexchangebuyer:v1.4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
 //! 
 //! Everything else about the *Ad Exchange Buyer* *v1d4* API can be found at the
 //! [official documentation site](https://developers.google.com/ad-exchange/buyer-rest).
@@ -30,7 +30,9 @@
 //! * [products](struct.Product.html)
 //!  * [*get*](struct.ProductGetCall.html) and [*search*](struct.ProductSearchCall.html)
 //! * [proposals](struct.Proposal.html)
-//!  * [*get*](struct.ProposalGetCall.html), [*insert*](struct.ProposalInsertCall.html), [*patch*](struct.ProposalPatchCall.html), [*search*](struct.ProposalSearchCall.html) and [*update*](struct.ProposalUpdateCall.html)
+//!  * [*get*](struct.ProposalGetCall.html), [*insert*](struct.ProposalInsertCall.html), [*patch*](struct.ProposalPatchCall.html), [*search*](struct.ProposalSearchCall.html), [*setupcomplete*](struct.ProposalSetupcompleteCall.html) and [*update*](struct.ProposalUpdateCall.html)
+//! * pubprofiles
+//!  * [*list*](struct.PubprofileListCall.html)
 //! 
 //! 
 //! 
@@ -65,11 +67,12 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.creatives().remove_deal(...).doit()
-//! let r = hub.creatives().add_deal(...).doit()
-//! let r = hub.creatives().insert(...).doit()
-//! let r = hub.creatives().list(...).doit()
-//! let r = hub.creatives().get(...).doit()
+//! let r = hub.proposals().update(...).doit()
+//! let r = hub.proposals().search(...).doit()
+//! let r = hub.proposals().insert(...).doit()
+//! let r = hub.proposals().setupcomplete(...).doit()
+//! let r = hub.proposals().patch(...).doit()
+//! let r = hub.proposals().get(...).doit()
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -94,6 +97,7 @@
 //! extern crate hyper;
 //! extern crate yup_oauth2 as oauth2;
 //! extern crate google_adexchangebuyer1d4 as adexchangebuyer1d4;
+//! use adexchangebuyer1d4::Proposal;
 //! use adexchangebuyer1d4::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
@@ -112,16 +116,15 @@
 //!                               hyper::Client::new(),
 //!                               <MemoryStorage as Default>::default(), None);
 //! let mut hub = AdExchangeBuyer::new(hyper::Client::new(), auth);
+//! // As the method needs a request, you would usually fill it with the desired information
+//! // into the respective structure. Some of the parts shown here might not be applicable !
+//! // Values shown here are possibly random and not representative !
+//! let mut req = Proposal::default();
+//! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.creatives().list()
-//!              .page_token("voluptua.")
-//!              .open_auction_status_filter("Lorem")
-//!              .max_results(90)
-//!              .deals_status_filter("justo")
-//!              .add_buyer_creative_id("sit")
-//!              .add_account_id(-26)
+//! let result = hub.proposals().update(req, "proposalId", "revisionNumber", "updateAction")
 //!              .doit();
 //! 
 //! match result {

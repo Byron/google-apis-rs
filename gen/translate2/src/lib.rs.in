@@ -691,11 +691,9 @@ impl<'a, C, A> DetectionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
         if self._q.len() > 0 {
-            let mut s = String::new();
             for f in self._q.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("q", f.to_string()));
             }
-            params.push(("q", s));
         }
         for &field in ["alt", "q"].iter() {
             if self._additional_params.contains_key(field) {
@@ -897,11 +895,9 @@ impl<'a, C, A> TranslationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
         if self._q.len() > 0 {
-            let mut s = String::new();
             for f in self._q.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("q", f.to_string()));
             }
-            params.push(("q", s));
         }
         params.push(("target", self._target.to_string()));
         if let Some(value) = self._source {
@@ -911,11 +907,9 @@ impl<'a, C, A> TranslationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             params.push(("format", value.to_string()));
         }
         if self._cid.len() > 0 {
-            let mut s = String::new();
             for f in self._cid.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("cid", f.to_string()));
             }
-            params.push(("cid", s));
         }
         for &field in ["alt", "q", "target", "source", "format", "cid"].iter() {
             if self._additional_params.contains_key(field) {

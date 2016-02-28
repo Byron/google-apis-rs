@@ -1551,7 +1551,7 @@ fn main() {
     
     let mut app = App::new("gamesconfiguration1-configuration")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.3+20160126")
+           .version("0.3.3+20160224")
            .about("The Publishing API for Google Play Game Services.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_gamesconfiguration1_configuration_cli")
            .arg(Arg::with_name("url")

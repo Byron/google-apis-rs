@@ -4,7 +4,7 @@
 [package]
 
 name = "google-androidenterprise1"
-version = "0.1.11+20160106"
+version = "0.1.11+20160212"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Android Enterprise (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/androidenterprise1"
@@ -18,8 +18,8 @@ build = "src/build.rs"
 [dependencies]
 hyper = "0.7"
 mime = "0.1.0"
-serde = ">= 0.6.0"
-serde_json = ">= 0.6.0"
+serde = ">= 0.7.0"
+serde_json = ">= 0.7.0"
 yup-oauth2 = ">= 0.5.4"
 url = ">= 0.5"
 

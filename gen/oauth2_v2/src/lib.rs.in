@@ -36,7 +36,7 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
 #[derive(PartialEq, Eq, Hash)]
 pub enum Scope {
-    /// Know your basic profile info and list of people in your circles.
+    /// Know the list of people in your circles, your age range, and language
     PluLogin,
 
     /// View your email address

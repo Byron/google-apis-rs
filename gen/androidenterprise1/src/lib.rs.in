@@ -263,7 +263,7 @@ impl ResponseResult for Install {}
 
 /// The existence of an entitlement resource means that a user has the right to use a particular app on any of their devices. This might be because the app is free or because they have been allocated a license to the app from a group license purchased by the enterprise.
 /// 
-/// It should always be true that a user has an app installed on one of their devices only if they have an entitlement to it. So if an entitlement is deleted, the app will be uninstalled from all devices. Similarly if the user installs an app (and is permitted to do so), or the MDM triggers an install of the app, an entitlement to that app is automatically created. If this is impossible - e.g. the enterprise has not purchased sufficient licenses - then installation fails.
+/// It should always be true that a user has an app installed on one of their devices only if they have an entitlement to it. So if an entitlement is deleted, the app will be uninstalled from all devices. Similarly if the user installs an app (and is permitted to do so), or the EMM triggers an install of the app, an entitlement to that app is automatically created. If this is impossible - e.g. the enterprise has not purchased sufficient licenses - then installation fails.
 /// 
 /// Note that entitlements are always user specific, not device specific; a user may have an entitlement even though they have not installed the app anywhere. Once they have an entitlement they can install the app on multiple devices.
 /// 
@@ -384,7 +384,7 @@ impl Part for ProductPermission {}
 
 /// A product represents an app in the Google Play Store that is available to at least some users in the enterprise. (Some apps are restricted to a single enterprise, and no information about them is made available outside that enterprise.)
 /// 
-/// The information provided for each product (localized name, icon, link to the full Google Play details page) is intended to allow a basic representation of the product within an MDM user interface.
+/// The information provided for each product (localized name, icon, link to the full Google Play details page) is intended to allow a basic representation of the product within an EMM user interface.
 /// 
 /// # Activities
 /// 
@@ -439,7 +439,7 @@ impl ResponseResult for Product {}
 
 /// A permission represents some extra capability, to be granted to an Android app, which requires explicit consent. An enterprise admin must consent to these permissions on behalf of their users before an entitlement for the app can be created.
 /// 
-/// The permissions collection is read-only. The information provided for each permission (localized name and description) is intended to be used in the MDM user interface when obtaining consent from the enterprise.
+/// The permissions collection is read-only. The information provided for each permission (localized name and description) is intended to be used in the EMM user interface when obtaining consent from the enterprise.
 /// 
 /// # Activities
 /// 
@@ -582,7 +582,7 @@ pub struct ApprovalUrlInfo {
 impl Part for ApprovalUrlInfo {}
 
 
-/// A device resource represents a mobile device managed by the MDM and belonging to a specific enterprise user.
+/// A device resource represents a mobile device managed by the EMM and belonging to a specific enterprise user.
 /// 
 /// This collection cannot be modified via the API; it is automatically populated as devices are set up to be managed.
 /// 
@@ -603,7 +603,7 @@ pub struct Device {
     /// The Google Play Services Android ID for the device encoded as a lowercase hex string, e.g. "123456789abcdef0".
     #[serde(rename="androidId")]
     pub android_id: Option<String>,
-    /// The mechanism by which this device is managed by the MDM. "managedDevice" means that the MDM's app is a device owner. "managedProfile" means that the MDM's app is the profile owner (and there is a separate personal profile which is not managed). "containerApp" means that the MDM's app is managing the Android for Work container app on the device.
+    /// The mechanism by which this device is managed by the EMM. "managedDevice" means that the EMM's app is a device owner. "managedProfile" means that the EMM's app is the profile owner (and there is a separate personal profile which is not managed). "containerApp" means that the EMM's app is managing the Android for Work container app on the device.
     #[serde(rename="managementType")]
     pub management_type: Option<String>,
 }
@@ -860,13 +860,13 @@ pub struct EnterprisesListResponse {
 impl ResponseResult for EnterprisesListResponse {}
 
 
-/// An enterprise resource represents a binding between an organisation and their MDM.
+/// An enterprise resource represents a binding between an organisation and their EMM.
 /// 
-/// To create an enterprise, an admin of the enterprise must first go through a Play for Work sign-up flow. At the end of this the admin will be presented with a token (a short opaque alphanumeric string). They must then present this to the MDM, who then supplies it to the enroll method. Until this is done the MDM will not have any access to the enterprise.
+/// To create an enterprise, an admin of the enterprise must first go through a Play for Work sign-up flow. At the end of this the admin will be presented with a token (a short opaque alphanumeric string). They must then present this to the EMM, who then supplies it to the enroll method. Until this is done the EMM will not have any access to the enterprise.
 /// 
-/// After calling enroll the MDM should call setAccount to specify the service account that will be allowed to act on behalf of the enterprise, which will be required for access to the enterprise's data through this API. Only one call of setAccount is allowed for a given enterprise; the only way to change the account later is to unenroll the enterprise and enroll it again (obtaining a new token).
+/// After calling enroll the EMM should call setAccount to specify the service account that will be allowed to act on behalf of the enterprise, which will be required for access to the enterprise's data through this API. Only one call of setAccount is allowed for a given enterprise; the only way to change the account later is to unenroll the enterprise and enroll it again (obtaining a new token).
 /// 
-/// The MDM can unenroll an enterprise in order to sever the binding between them. Re-enrolling an enterprise is possible, but requires a new token to be retrieved. Enterprises.unenroll requires the MDM's credentials (as enroll does), not the enterprise's. Enterprises.unenroll can only be used for enterprises that were previously enrolled with the enroll call. Any enterprises that were enrolled using the (deprecated) Enterprises.insert call must be unenrolled with Enterprises.delete and can then be re-enrolled using the Enterprises.enroll call.
+/// The EMM can unenroll an enterprise in order to sever the binding between them. Re-enrolling an enterprise is possible, but requires a new token to be retrieved. Enterprises.unenroll requires the EMM's credentials (as enroll does), not the enterprise's. Enterprises.unenroll can only be used for enterprises that were previously enrolled with the enroll call. Any enterprises that were enrolled using the (deprecated) Enterprises.insert call must be unenrolled with Enterprises.delete and can then be re-enrolled using the Enterprises.enroll call.
 /// 
 /// The ID for an enterprise is an opaque string. It is returned by insert and enroll and can also be retrieved if the enterprise's primary domain is known using the list method.
 /// 
@@ -904,7 +904,7 @@ impl Resource for Enterprise {}
 impl ResponseResult for Enterprise {}
 
 
-/// A UserToken is used by a user when setting up a managed device or profile with their work account on a device. When the user enters their email address and token (activation code) the appropriate MDM app can be automatically downloaded.
+/// A UserToken is used by a user when setting up a managed device or profile with their work account on a device. When the user enters their email address and token (activation code) the appropriate EMM app can be automatically downloaded.
 /// 
 /// # Activities
 /// 
@@ -1077,7 +1077,7 @@ impl ResponseResult for ProductPermissions {}
 
 /// A user resource represents an individual user within the enterprise's domain.
 /// 
-/// Note that each user is associated with a Google account based on the user's corporate email address (which must be in one of the enterprise's domains). As part of installing an MDM app to manage a device the Google account must be provisioned to the device, and so the user resource must be created before that. This can be done using the Google Admin SDK Directory API.
+/// Note that each user is associated with a Google account based on the user's corporate email address (which must be in one of the enterprise's domains). As part of installing the EMM's DPC app to manage a device the Google account must be provisioned to the device, and so the user resource must be created before that. This can be done using the Google Admin SDK Directory API.
 /// 
 /// The ID for a user is an opaque string. It can be retrieved using the list method queried by the user's primary email address.
 /// 
@@ -1557,7 +1557,7 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Looks up a user by email address. This only works for Google managed users.
+    /// Looks up a user by their primary email address.
     /// 
     /// # Arguments
     ///
@@ -1577,6 +1577,8 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Generates a token (activation code) to allow this user to configure their work account in the Android Setup Wizard. Revokes any previously generated token.
+    /// 
+    /// This call only works with Google managed accounts.
     /// 
     /// # Arguments
     ///
@@ -1959,7 +1961,7 @@ impl<'a, C, A> EnterpriseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Unenrolls an enterprise from the calling MDM.
+    /// Unenrolls an enterprise from the calling EMM.
     /// 
     /// # Arguments
     ///
@@ -1976,12 +1978,12 @@ impl<'a, C, A> EnterpriseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Establishes the binding between the MDM and an enterprise. This is now deprecated; use enroll instead.
+    /// Establishes the binding between the EMM and an enterprise. This is now deprecated; use enroll instead.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `token` - The token provided by the enterprise to register the MDM.
+    /// * `token` - The token provided by the enterprise to register the EMM.
     pub fn insert(&self, request: Enterprise, token: &str) -> EnterpriseInsertCall<'a, C, A> {
         EnterpriseInsertCall {
             hub: self.hub,
@@ -1995,7 +1997,7 @@ impl<'a, C, A> EnterpriseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sends a test push notification to validate the MDM integration with the Google Cloud Pub/Sub service for this enterprise.
+    /// Sends a test push notification to validate the EMM integration with the Google Cloud Pub/Sub service for this enterprise.
     /// 
     /// # Arguments
     ///
@@ -2082,12 +2084,12 @@ impl<'a, C, A> EnterpriseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Enrolls an enterprise with the calling MDM.
+    /// Enrolls an enterprise with the calling EMM.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `token` - The token provided by the enterprise to register the MDM.
+    /// * `token` - The token provided by the enterprise to register the EMM.
     pub fn enroll(&self, request: Enterprise, token: &str) -> EnterpriseEnrollCall<'a, C, A> {
         EnterpriseEnrollCall {
             hub: self.hub,
@@ -2120,7 +2122,7 @@ impl<'a, C, A> EnterpriseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes the binding between the MDM and enterprise. This is now deprecated; use this to unenroll customers that were previously enrolled with the 'insert' call, then enroll them again with the 'enroll' call.
+    /// Deletes the binding between the EMM and enterprise. This is now deprecated; use this to unenroll customers that were previously enrolled with the 'insert' call, then enroll them again with the 'enroll' call.
     /// 
     /// # Arguments
     ///
@@ -2794,7 +2796,9 @@ impl<'a, C, A> ProductMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the set of Android app permissions for this app that have been accepted by the enterprise.
+    /// This method has been deprecated. To programmatically approve applications, you must use the iframe mechanism via the  generateApprovalUrl and  approve methods of the Products resource. For more information, see the  Play EMM API usage requirements.
+    /// 
+    /// The updatePermissions method (deprecated) updates the set of Android app permissions for this app that have been accepted by the enterprise.
     /// 
     /// # Arguments
     ///
@@ -6350,7 +6354,7 @@ impl<'a, C, A> UserGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 }
 
 
-/// Looks up a user by email address. This only works for Google managed users.
+/// Looks up a user by their primary email address.
 ///
 /// A builder for the *list* method supported by a *user* resource.
 /// It is not used directly, but through a `UserMethods` instance.
@@ -6599,6 +6603,8 @@ impl<'a, C, A> UserListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
 
 /// Generates a token (activation code) to allow this user to configure their work account in the Android Setup Wizard. Revokes any previously generated token.
+/// 
+/// This call only works with Google managed accounts.
 ///
 /// A builder for the *generateToken* method supported by a *user* resource.
 /// It is not used directly, but through a `UserMethods` instance.
@@ -9831,7 +9837,7 @@ impl<'a, C, A> DeviceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 }
 
 
-/// Unenrolls an enterprise from the calling MDM.
+/// Unenrolls an enterprise from the calling EMM.
 ///
 /// A builder for the *unenroll* method supported by a *enterprise* resource.
 /// It is not used directly, but through a `EnterpriseMethods` instance.
@@ -10056,7 +10062,7 @@ impl<'a, C, A> EnterpriseUnenrollCall<'a, C, A> where C: BorrowMut<hyper::Client
 }
 
 
-/// Establishes the binding between the MDM and an enterprise. This is now deprecated; use enroll instead.
+/// Establishes the binding between the EMM and an enterprise. This is now deprecated; use enroll instead.
 ///
 /// A builder for the *insert* method supported by a *enterprise* resource.
 /// It is not used directly, but through a `EnterpriseMethods` instance.
@@ -10240,7 +10246,7 @@ impl<'a, C, A> EnterpriseInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._request = new_value;
         self
     }
-    /// The token provided by the enterprise to register the MDM.
+    /// The token provided by the enterprise to register the EMM.
     ///
     /// Sets the *token* query property to the given value.
     ///
@@ -10302,7 +10308,7 @@ impl<'a, C, A> EnterpriseInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 }
 
 
-/// Sends a test push notification to validate the MDM integration with the Google Cloud Pub/Sub service for this enterprise.
+/// Sends a test push notification to validate the EMM integration with the Google Cloud Pub/Sub service for this enterprise.
 ///
 /// A builder for the *sendTestPushNotification* method supported by a *enterprise* resource.
 /// It is not used directly, but through a `EnterpriseMethods` instance.
@@ -11492,7 +11498,7 @@ impl<'a, C, A> EnterpriseSetStoreLayoutCall<'a, C, A> where C: BorrowMut<hyper::
 }
 
 
-/// Enrolls an enterprise with the calling MDM.
+/// Enrolls an enterprise with the calling EMM.
 ///
 /// A builder for the *enroll* method supported by a *enterprise* resource.
 /// It is not used directly, but through a `EnterpriseMethods` instance.
@@ -11676,7 +11682,7 @@ impl<'a, C, A> EnterpriseEnrollCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._request = new_value;
         self
     }
-    /// The token provided by the enterprise to register the MDM.
+    /// The token provided by the enterprise to register the EMM.
     ///
     /// Sets the *token* query property to the given value.
     ///
@@ -12005,7 +12011,7 @@ impl<'a, C, A> EnterpriseSetAccountCall<'a, C, A> where C: BorrowMut<hyper::Clie
 }
 
 
-/// Deletes the binding between the MDM and enterprise. This is now deprecated; use this to unenroll customers that were previously enrolled with the 'insert' call, then enroll them again with the 'enroll' call.
+/// Deletes the binding between the EMM and enterprise. This is now deprecated; use this to unenroll customers that were previously enrolled with the 'insert' call, then enroll them again with the 'enroll' call.
 ///
 /// A builder for the *delete* method supported by a *enterprise* resource.
 /// It is not used directly, but through a `EnterpriseMethods` instance.
@@ -18041,7 +18047,9 @@ impl<'a, C, A> ProductGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 }
 
 
-/// Updates the set of Android app permissions for this app that have been accepted by the enterprise.
+/// This method has been deprecated. To programmatically approve applications, you must use the iframe mechanism via the  generateApprovalUrl and  approve methods of the Products resource. For more information, see the  Play EMM API usage requirements.
+/// 
+/// The updatePermissions method (deprecated) updates the set of Android app permissions for this app that have been accepted by the enterprise.
 ///
 /// A builder for the *updatePermissions* method supported by a *product* resource.
 /// It is not used directly, but through a `ProductMethods` instance.

@@ -4332,11 +4332,9 @@ impl<'a, C, A> UserDataSourceListCall<'a, C, A> where C: BorrowMut<hyper::Client
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("userId", self._user_id.to_string()));
         if self._data_type_name.len() > 0 {
-            let mut s = String::new();
             for f in self._data_type_name.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("dataTypeName", f.to_string()));
             }
-            params.push(("dataTypeName", s));
         }
         for &field in ["alt", "userId", "dataTypeName"].iter() {
             if self._additional_params.contains_key(field) {

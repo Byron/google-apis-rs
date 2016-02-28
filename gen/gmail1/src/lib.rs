@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *gmail* crate version *0.1.11+20151214*, where *20151214* is the exact revision of the *gmail:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
+//! This documentation was generated from *gmail* crate version *0.1.11+20160216*, where *20160216* is the exact revision of the *gmail:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
 //! 
 //! Everything else about the *gmail* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/gmail/api/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.Gmail.html) ... 
 //! 
 //! * users
-//!  * [*drafts create*](struct.UserDraftCreateCall.html), [*drafts delete*](struct.UserDraftDeleteCall.html), [*drafts get*](struct.UserDraftGetCall.html), [*drafts list*](struct.UserDraftListCall.html), [*drafts send*](struct.UserDraftSendCall.html), [*drafts update*](struct.UserDraftUpdateCall.html), [*get profile*](struct.UserGetProfileCall.html), [*history list*](struct.UserHistoryListCall.html), [*labels create*](struct.UserLabelCreateCall.html), [*labels delete*](struct.UserLabelDeleteCall.html), [*labels get*](struct.UserLabelGetCall.html), [*labels list*](struct.UserLabelListCall.html), [*labels patch*](struct.UserLabelPatchCall.html), [*labels update*](struct.UserLabelUpdateCall.html), [*messages attachments get*](struct.UserMessageAttachmentGetCall.html), [*messages delete*](struct.UserMessageDeleteCall.html), [*messages get*](struct.UserMessageGetCall.html), [*messages import*](struct.UserMessageImportCall.html), [*messages insert*](struct.UserMessageInsertCall.html), [*messages list*](struct.UserMessageListCall.html), [*messages modify*](struct.UserMessageModifyCall.html), [*messages send*](struct.UserMessageSendCall.html), [*messages trash*](struct.UserMessageTrashCall.html), [*messages untrash*](struct.UserMessageUntrashCall.html), [*stop*](struct.UserStopCall.html), [*threads delete*](struct.UserThreadDeleteCall.html), [*threads get*](struct.UserThreadGetCall.html), [*threads list*](struct.UserThreadListCall.html), [*threads modify*](struct.UserThreadModifyCall.html), [*threads trash*](struct.UserThreadTrashCall.html), [*threads untrash*](struct.UserThreadUntrashCall.html) and [*watch*](struct.UserWatchCall.html)
+//!  * [*drafts create*](struct.UserDraftCreateCall.html), [*drafts delete*](struct.UserDraftDeleteCall.html), [*drafts get*](struct.UserDraftGetCall.html), [*drafts list*](struct.UserDraftListCall.html), [*drafts send*](struct.UserDraftSendCall.html), [*drafts update*](struct.UserDraftUpdateCall.html), [*get profile*](struct.UserGetProfileCall.html), [*history list*](struct.UserHistoryListCall.html), [*labels create*](struct.UserLabelCreateCall.html), [*labels delete*](struct.UserLabelDeleteCall.html), [*labels get*](struct.UserLabelGetCall.html), [*labels list*](struct.UserLabelListCall.html), [*labels patch*](struct.UserLabelPatchCall.html), [*labels update*](struct.UserLabelUpdateCall.html), [*messages attachments get*](struct.UserMessageAttachmentGetCall.html), [*messages batch delete*](struct.UserMessageBatchDeleteCall.html), [*messages delete*](struct.UserMessageDeleteCall.html), [*messages get*](struct.UserMessageGetCall.html), [*messages import*](struct.UserMessageImportCall.html), [*messages insert*](struct.UserMessageInsertCall.html), [*messages list*](struct.UserMessageListCall.html), [*messages modify*](struct.UserMessageModifyCall.html), [*messages send*](struct.UserMessageSendCall.html), [*messages trash*](struct.UserMessageTrashCall.html), [*messages untrash*](struct.UserMessageUntrashCall.html), [*stop*](struct.UserStopCall.html), [*threads delete*](struct.UserThreadDeleteCall.html), [*threads get*](struct.UserThreadGetCall.html), [*threads list*](struct.UserThreadListCall.html), [*threads modify*](struct.UserThreadModifyCall.html), [*threads trash*](struct.UserThreadTrashCall.html), [*threads untrash*](struct.UserThreadUntrashCall.html) and [*watch*](struct.UserWatchCall.html)
 //! 
 //! 
 //! Upload supported by ...
@@ -118,8 +118,8 @@
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.users().messages_import(req, "userId")
 //!              .process_for_calendar(true)
-//!              .never_mark_spam(true)
-//!              .internal_date_source("sanctus")
+//!              .never_mark_spam(false)
+//!              .internal_date_source("At")
 //!              .deleted(false)
 //!              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 //! 

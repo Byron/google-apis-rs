@@ -10455,21 +10455,17 @@ impl<'a, C, A> EventListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             params.push(("showDeleted", value.to_string()));
         }
         if self._shared_extended_property.len() > 0 {
-            let mut s = String::new();
             for f in self._shared_extended_property.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("sharedExtendedProperty", f.to_string()));
             }
-            params.push(("sharedExtendedProperty", s));
         }
         if let Some(value) = self._q {
             params.push(("q", value.to_string()));
         }
         if self._private_extended_property.len() > 0 {
-            let mut s = String::new();
             for f in self._private_extended_property.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("privateExtendedProperty", f.to_string()));
             }
-            params.push(("privateExtendedProperty", s));
         }
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -11851,21 +11847,17 @@ impl<'a, C, A> EventWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             params.push(("showDeleted", value.to_string()));
         }
         if self._shared_extended_property.len() > 0 {
-            let mut s = String::new();
             for f in self._shared_extended_property.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("sharedExtendedProperty", f.to_string()));
             }
-            params.push(("sharedExtendedProperty", s));
         }
         if let Some(value) = self._q {
             params.push(("q", value.to_string()));
         }
         if self._private_extended_property.len() > 0 {
-            let mut s = String::new();
             for f in self._private_extended_property.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("privateExtendedProperty", f.to_string()));
             }
-            params.push(("privateExtendedProperty", s));
         }
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));

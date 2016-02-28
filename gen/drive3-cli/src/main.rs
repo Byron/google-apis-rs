@@ -823,6 +823,7 @@ impl<'n> Engine<'n> {
                     "last-modifying-user.photo-link" => Some(("lastModifyingUser.photoLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "folder-color-rgb" => Some(("folderColorRgb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-properties" => Some(("appProperties", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "capabilities.can-read-revisions" => Some(("capabilities.canReadRevisions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-copy" => Some(("capabilities.canCopy", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-share" => Some(("capabilities.canShare", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-edit" => Some(("capabilities.canEdit", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -878,7 +879,7 @@ impl<'n> Engine<'n> {
                     "starred" => Some(("starred", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "head-revision-id" => Some(("headRevisionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["altitude", "aperture", "app-properties", "camera-make", "camera-model", "can-comment", "can-copy", "can-edit", "can-share", "capabilities", "color-space", "content-hints", "created-time", "description", "display-name", "duration-millis", "email-address", "explicitly-trashed", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "head-revision-id", "height", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "iso-speed", "kind", "last-modifying-user", "latitude", "lens", "location", "longitude", "max-aperture-value", "md5-checksum", "me", "metering-mode", "mime-type", "modified-by-me-time", "modified-time", "name", "original-filename", "owned-by-me", "parents", "permission-id", "photo-link", "properties", "quota-bytes-used", "rotation", "sensor", "shared", "shared-with-me-time", "sharing-user", "size", "spaces", "starred", "subject-distance", "thumbnail", "thumbnail-link", "time", "trashed", "version", "video-media-metadata", "viewed-by-me", "viewed-by-me-time", "viewers-can-copy-content", "web-content-link", "web-view-link", "white-balance", "width", "writers-can-share"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["altitude", "aperture", "app-properties", "camera-make", "camera-model", "can-comment", "can-copy", "can-edit", "can-read-revisions", "can-share", "capabilities", "color-space", "content-hints", "created-time", "description", "display-name", "duration-millis", "email-address", "explicitly-trashed", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "head-revision-id", "height", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "iso-speed", "kind", "last-modifying-user", "latitude", "lens", "location", "longitude", "max-aperture-value", "md5-checksum", "me", "metering-mode", "mime-type", "modified-by-me-time", "modified-time", "name", "original-filename", "owned-by-me", "parents", "permission-id", "photo-link", "properties", "quota-bytes-used", "rotation", "sensor", "shared", "shared-with-me-time", "sharing-user", "size", "spaces", "starred", "subject-distance", "thumbnail", "thumbnail-link", "time", "trashed", "version", "video-media-metadata", "viewed-by-me", "viewed-by-me-time", "viewers-can-copy-content", "web-content-link", "web-view-link", "white-balance", "width", "writers-can-share"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -997,6 +998,7 @@ impl<'n> Engine<'n> {
                     "last-modifying-user.photo-link" => Some(("lastModifyingUser.photoLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "folder-color-rgb" => Some(("folderColorRgb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-properties" => Some(("appProperties", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "capabilities.can-read-revisions" => Some(("capabilities.canReadRevisions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-copy" => Some(("capabilities.canCopy", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-share" => Some(("capabilities.canShare", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-edit" => Some(("capabilities.canEdit", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1052,7 +1054,7 @@ impl<'n> Engine<'n> {
                     "starred" => Some(("starred", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "head-revision-id" => Some(("headRevisionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["altitude", "aperture", "app-properties", "camera-make", "camera-model", "can-comment", "can-copy", "can-edit", "can-share", "capabilities", "color-space", "content-hints", "created-time", "description", "display-name", "duration-millis", "email-address", "explicitly-trashed", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "head-revision-id", "height", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "iso-speed", "kind", "last-modifying-user", "latitude", "lens", "location", "longitude", "max-aperture-value", "md5-checksum", "me", "metering-mode", "mime-type", "modified-by-me-time", "modified-time", "name", "original-filename", "owned-by-me", "parents", "permission-id", "photo-link", "properties", "quota-bytes-used", "rotation", "sensor", "shared", "shared-with-me-time", "sharing-user", "size", "spaces", "starred", "subject-distance", "thumbnail", "thumbnail-link", "time", "trashed", "version", "video-media-metadata", "viewed-by-me", "viewed-by-me-time", "viewers-can-copy-content", "web-content-link", "web-view-link", "white-balance", "width", "writers-can-share"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["altitude", "aperture", "app-properties", "camera-make", "camera-model", "can-comment", "can-copy", "can-edit", "can-read-revisions", "can-share", "capabilities", "color-space", "content-hints", "created-time", "description", "display-name", "duration-millis", "email-address", "explicitly-trashed", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "head-revision-id", "height", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "iso-speed", "kind", "last-modifying-user", "latitude", "lens", "location", "longitude", "max-aperture-value", "md5-checksum", "me", "metering-mode", "mime-type", "modified-by-me-time", "modified-time", "name", "original-filename", "owned-by-me", "parents", "permission-id", "photo-link", "properties", "quota-bytes-used", "rotation", "sensor", "shared", "shared-with-me-time", "sharing-user", "size", "spaces", "starred", "subject-distance", "thumbnail", "thumbnail-link", "time", "trashed", "version", "video-media-metadata", "viewed-by-me", "viewed-by-me-time", "viewers-can-copy-content", "web-content-link", "web-view-link", "white-balance", "width", "writers-can-share"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1518,6 +1520,7 @@ impl<'n> Engine<'n> {
                     "last-modifying-user.photo-link" => Some(("lastModifyingUser.photoLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "folder-color-rgb" => Some(("folderColorRgb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-properties" => Some(("appProperties", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "capabilities.can-read-revisions" => Some(("capabilities.canReadRevisions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-copy" => Some(("capabilities.canCopy", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-share" => Some(("capabilities.canShare", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-edit" => Some(("capabilities.canEdit", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1573,7 +1576,7 @@ impl<'n> Engine<'n> {
                     "starred" => Some(("starred", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "head-revision-id" => Some(("headRevisionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["altitude", "aperture", "app-properties", "camera-make", "camera-model", "can-comment", "can-copy", "can-edit", "can-share", "capabilities", "color-space", "content-hints", "created-time", "description", "display-name", "duration-millis", "email-address", "explicitly-trashed", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "head-revision-id", "height", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "iso-speed", "kind", "last-modifying-user", "latitude", "lens", "location", "longitude", "max-aperture-value", "md5-checksum", "me", "metering-mode", "mime-type", "modified-by-me-time", "modified-time", "name", "original-filename", "owned-by-me", "parents", "permission-id", "photo-link", "properties", "quota-bytes-used", "rotation", "sensor", "shared", "shared-with-me-time", "sharing-user", "size", "spaces", "starred", "subject-distance", "thumbnail", "thumbnail-link", "time", "trashed", "version", "video-media-metadata", "viewed-by-me", "viewed-by-me-time", "viewers-can-copy-content", "web-content-link", "web-view-link", "white-balance", "width", "writers-can-share"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["altitude", "aperture", "app-properties", "camera-make", "camera-model", "can-comment", "can-copy", "can-edit", "can-read-revisions", "can-share", "capabilities", "color-space", "content-hints", "created-time", "description", "display-name", "duration-millis", "email-address", "explicitly-trashed", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "head-revision-id", "height", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "iso-speed", "kind", "last-modifying-user", "latitude", "lens", "location", "longitude", "max-aperture-value", "md5-checksum", "me", "metering-mode", "mime-type", "modified-by-me-time", "modified-time", "name", "original-filename", "owned-by-me", "parents", "permission-id", "photo-link", "properties", "quota-bytes-used", "rotation", "sensor", "shared", "shared-with-me-time", "sharing-user", "size", "spaces", "starred", "subject-distance", "thumbnail", "thumbnail-link", "time", "trashed", "version", "video-media-metadata", "viewed-by-me", "viewed-by-me-time", "viewers-can-copy-content", "web-content-link", "web-view-link", "white-balance", "width", "writers-can-share"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2924,7 +2927,7 @@ impl<'n> Engine<'n> {
             };
 
             match cmn::application_secret_from_directory(&config_dir, "drive3-secret.json",
-                                                         "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
+                                                         "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"De0ub0IbWruJbBXUyseFYvZ-\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"276875258587-5gbp23a7aqnrl6p06c0jt5fskuktactq.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
@@ -3310,7 +3313,7 @@ fn main() {
                      Some(true)),
                   ]),
             ("export",
-                    Some(r##"Exports a Google Doc to the requested MIME type."##),
+                    Some(r##"Exports a Google Doc to the requested MIME type and returns the exported content."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive3_cli/files_export",
                   vec![
                     (Some(r##"file-id"##),
@@ -3872,7 +3875,7 @@ fn main() {
     
     let mut app = App::new("drive3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.3+20160126")
+           .version("0.3.3+20160222")
            .about("The API to interact with Drive.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_drive3_cli")
            .arg(Arg::with_name("url")

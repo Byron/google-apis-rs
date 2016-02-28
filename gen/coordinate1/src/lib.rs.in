@@ -1467,11 +1467,9 @@ impl<'a, C, A> JobUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             params.push(("customerName", value.to_string()));
         }
         if self._custom_field.len() > 0 {
-            let mut s = String::new();
             for f in self._custom_field.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("customField", f.to_string()));
             }
-            params.push(("customField", s));
         }
         if let Some(value) = self._assignee {
             params.push(("assignee", value.to_string()));
@@ -1871,11 +1869,9 @@ impl<'a, C, A> JobPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
             params.push(("customerName", value.to_string()));
         }
         if self._custom_field.len() > 0 {
-            let mut s = String::new();
             for f in self._custom_field.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("customField", f.to_string()));
             }
-            params.push(("customField", s));
         }
         if let Some(value) = self._assignee {
             params.push(("assignee", value.to_string()));
@@ -2543,11 +2539,9 @@ impl<'a, C, A> JobInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             params.push(("customerName", value.to_string()));
         }
         if self._custom_field.len() > 0 {
-            let mut s = String::new();
             for f in self._custom_field.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("customField", f.to_string()));
             }
-            params.push(("customField", s));
         }
         if let Some(value) = self._assignee {
             params.push(("assignee", value.to_string()));

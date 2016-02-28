@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Tag Manager* crate version *0.1.11+20151112*, where *20151112* is the exact revision of the *tagmanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
+//! This documentation was generated from *Tag Manager* crate version *0.1.11+20160209*, where *20160209* is the exact revision of the *tagmanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
 //! 
 //! Everything else about the *Tag Manager* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/tag-manager/api/v1/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.TagManager.html) ... 
 //! 
 //! * [accounts](struct.Account.html)
-//!  * [*containers create*](struct.AccountContainerCreateCall.html), [*containers delete*](struct.AccountContainerDeleteCall.html), [*containers folders create*](struct.AccountContainerFolderCreateCall.html), [*containers folders delete*](struct.AccountContainerFolderDeleteCall.html), [*containers folders entities list*](struct.AccountContainerFolderEntityListCall.html), [*containers folders get*](struct.AccountContainerFolderGetCall.html), [*containers folders list*](struct.AccountContainerFolderListCall.html), [*containers folders update*](struct.AccountContainerFolderUpdateCall.html), [*containers get*](struct.AccountContainerGetCall.html), [*containers list*](struct.AccountContainerListCall.html), [*containers move_folders update*](struct.AccountContainerMoveFolderUpdateCall.html), [*containers tags create*](struct.AccountContainerTagCreateCall.html), [*containers tags delete*](struct.AccountContainerTagDeleteCall.html), [*containers tags get*](struct.AccountContainerTagGetCall.html), [*containers tags list*](struct.AccountContainerTagListCall.html), [*containers tags update*](struct.AccountContainerTagUpdateCall.html), [*containers triggers create*](struct.AccountContainerTriggerCreateCall.html), [*containers triggers delete*](struct.AccountContainerTriggerDeleteCall.html), [*containers triggers get*](struct.AccountContainerTriggerGetCall.html), [*containers triggers list*](struct.AccountContainerTriggerListCall.html), [*containers triggers update*](struct.AccountContainerTriggerUpdateCall.html), [*containers update*](struct.AccountContainerUpdateCall.html), [*containers variables create*](struct.AccountContainerVariableCreateCall.html), [*containers variables delete*](struct.AccountContainerVariableDeleteCall.html), [*containers variables get*](struct.AccountContainerVariableGetCall.html), [*containers variables list*](struct.AccountContainerVariableListCall.html), [*containers variables update*](struct.AccountContainerVariableUpdateCall.html), [*containers versions create*](struct.AccountContainerVersionCreateCall.html), [*containers versions delete*](struct.AccountContainerVersionDeleteCall.html), [*containers versions get*](struct.AccountContainerVersionGetCall.html), [*containers versions list*](struct.AccountContainerVersionListCall.html), [*containers versions publish*](struct.AccountContainerVersionPublishCall.html), [*containers versions restore*](struct.AccountContainerVersionRestoreCall.html), [*containers versions undelete*](struct.AccountContainerVersionUndeleteCall.html), [*containers versions update*](struct.AccountContainerVersionUpdateCall.html), [*get*](struct.AccountGetCall.html), [*list*](struct.AccountListCall.html), [*permissions create*](struct.AccountPermissionCreateCall.html), [*permissions delete*](struct.AccountPermissionDeleteCall.html), [*permissions get*](struct.AccountPermissionGetCall.html), [*permissions list*](struct.AccountPermissionListCall.html), [*permissions update*](struct.AccountPermissionUpdateCall.html) and [*update*](struct.AccountUpdateCall.html)
+//!  * [*containers create*](struct.AccountContainerCreateCall.html), [*containers delete*](struct.AccountContainerDeleteCall.html), [*containers environments create*](struct.AccountContainerEnvironmentCreateCall.html), [*containers environments delete*](struct.AccountContainerEnvironmentDeleteCall.html), [*containers environments get*](struct.AccountContainerEnvironmentGetCall.html), [*containers environments list*](struct.AccountContainerEnvironmentListCall.html), [*containers environments patch*](struct.AccountContainerEnvironmentPatchCall.html), [*containers environments update*](struct.AccountContainerEnvironmentUpdateCall.html), [*containers folders create*](struct.AccountContainerFolderCreateCall.html), [*containers folders delete*](struct.AccountContainerFolderDeleteCall.html), [*containers folders entities list*](struct.AccountContainerFolderEntityListCall.html), [*containers folders get*](struct.AccountContainerFolderGetCall.html), [*containers folders list*](struct.AccountContainerFolderListCall.html), [*containers folders update*](struct.AccountContainerFolderUpdateCall.html), [*containers get*](struct.AccountContainerGetCall.html), [*containers list*](struct.AccountContainerListCall.html), [*containers move_folders update*](struct.AccountContainerMoveFolderUpdateCall.html), [*containers reauthorize_environments update*](struct.AccountContainerReauthorizeEnvironmentUpdateCall.html), [*containers tags create*](struct.AccountContainerTagCreateCall.html), [*containers tags delete*](struct.AccountContainerTagDeleteCall.html), [*containers tags get*](struct.AccountContainerTagGetCall.html), [*containers tags list*](struct.AccountContainerTagListCall.html), [*containers tags update*](struct.AccountContainerTagUpdateCall.html), [*containers triggers create*](struct.AccountContainerTriggerCreateCall.html), [*containers triggers delete*](struct.AccountContainerTriggerDeleteCall.html), [*containers triggers get*](struct.AccountContainerTriggerGetCall.html), [*containers triggers list*](struct.AccountContainerTriggerListCall.html), [*containers triggers update*](struct.AccountContainerTriggerUpdateCall.html), [*containers update*](struct.AccountContainerUpdateCall.html), [*containers variables create*](struct.AccountContainerVariableCreateCall.html), [*containers variables delete*](struct.AccountContainerVariableDeleteCall.html), [*containers variables get*](struct.AccountContainerVariableGetCall.html), [*containers variables list*](struct.AccountContainerVariableListCall.html), [*containers variables update*](struct.AccountContainerVariableUpdateCall.html), [*containers versions create*](struct.AccountContainerVersionCreateCall.html), [*containers versions delete*](struct.AccountContainerVersionDeleteCall.html), [*containers versions get*](struct.AccountContainerVersionGetCall.html), [*containers versions list*](struct.AccountContainerVersionListCall.html), [*containers versions publish*](struct.AccountContainerVersionPublishCall.html), [*containers versions restore*](struct.AccountContainerVersionRestoreCall.html), [*containers versions undelete*](struct.AccountContainerVersionUndeleteCall.html), [*containers versions update*](struct.AccountContainerVersionUpdateCall.html), [*get*](struct.AccountGetCall.html), [*list*](struct.AccountListCall.html), [*permissions create*](struct.AccountPermissionCreateCall.html), [*permissions delete*](struct.AccountPermissionDeleteCall.html), [*permissions get*](struct.AccountPermissionGetCall.html), [*permissions list*](struct.AccountPermissionListCall.html), [*permissions update*](struct.AccountPermissionUpdateCall.html) and [*update*](struct.AccountUpdateCall.html)
 //! 
 //! 
 //! 
@@ -49,21 +49,26 @@
 //! ```ignore
 //! let r = hub.accounts().containers_list(...).doit()
 //! let r = hub.accounts().permissions_list(...).doit()
-//! let r = hub.accounts().containers_create(...).doit()
+//! let r = hub.accounts().containers_environments_create(...).doit()
 //! let r = hub.accounts().permissions_create(...).doit()
+//! let r = hub.accounts().containers_environments_delete(...).doit()
 //! let r = hub.accounts().permissions_delete(...).doit()
 //! let r = hub.accounts().containers_get(...).doit()
+//! let r = hub.accounts().containers_environments_patch(...).doit()
 //! let r = hub.accounts().containers_versions_list(...).doit()
 //! let r = hub.accounts().containers_triggers_update(...).doit()
 //! let r = hub.accounts().containers_triggers_get(...).doit()
 //! let r = hub.accounts().containers_delete(...).doit()
 //! let r = hub.accounts().containers_folders_delete(...).doit()
+//! let r = hub.accounts().containers_create(...).doit()
 //! let r = hub.accounts().containers_tags_delete(...).doit()
 //! let r = hub.accounts().containers_folders_entities_list(...).doit()
 //! let r = hub.accounts().containers_versions_undelete(...).doit()
+//! let r = hub.accounts().containers_environments_list(...).doit()
 //! let r = hub.accounts().containers_tags_list(...).doit()
 //! let r = hub.accounts().containers_versions_publish(...).doit()
 //! let r = hub.accounts().containers_folders_get(...).doit()
+//! let r = hub.accounts().containers_environments_get(...).doit()
 //! let r = hub.accounts().containers_tags_create(...).doit()
 //! let r = hub.accounts().containers_triggers_list(...).doit()
 //! let r = hub.accounts().containers_versions_delete(...).doit()
@@ -82,9 +87,11 @@
 //! let r = hub.accounts().list(...).doit()
 //! let r = hub.accounts().permissions_update(...).doit()
 //! let r = hub.accounts().containers_variables_delete(...).doit()
+//! let r = hub.accounts().containers_reauthorize_environments_update(...).doit()
 //! let r = hub.accounts().get(...).doit()
 //! let r = hub.accounts().containers_update(...).doit()
 //! let r = hub.accounts().containers_tags_update(...).doit()
+//! let r = hub.accounts().containers_environments_update(...).doit()
 //! let r = hub.accounts().containers_folders_create(...).doit()
 //! let r = hub.accounts().containers_folders_list(...).doit()
 //! let r = hub.accounts().containers_versions_update(...).doit()
@@ -114,6 +121,7 @@
 //! extern crate hyper;
 //! extern crate yup_oauth2 as oauth2;
 //! extern crate google_tagmanager1 as tagmanager1;
+//! use tagmanager1::Folder;
 //! use tagmanager1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
@@ -132,13 +140,18 @@
 //!                               hyper::Client::new(),
 //!                               <MemoryStorage as Default>::default(), None);
 //! let mut hub = TagManager::new(hyper::Client::new(), auth);
+//! // As the method needs a request, you would usually fill it with the desired information
+//! // into the respective structure. Some of the parts shown here might not be applicable !
+//! // Values shown here are possibly random and not representative !
+//! let mut req = Folder::default();
+//! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.accounts().containers_move_folders_update("accountId", "containerId", "folderId")
-//!              .add_variable_id("diam")
-//!              .add_trigger_id("justo")
-//!              .add_tag_id("est")
+//! let result = hub.accounts().containers_move_folders_update(req, "accountId", "containerId", "folderId")
+//!              .add_variable_id("clita")
+//!              .add_trigger_id("invidunt")
+//!              .add_tag_id("eirmod")
 //!              .doit();
 //! 
 //! match result {

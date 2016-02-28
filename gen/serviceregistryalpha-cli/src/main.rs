@@ -175,7 +175,6 @@ impl<'n> Engine<'n> {
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "address" => Some(("address", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "visibility.networks" => Some(("visibility.networks", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "visibility.projects" => Some(("visibility.projects", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "port" => Some(("port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "fingerprint" => Some(("fingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -184,7 +183,7 @@ impl<'n> Engine<'n> {
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address", "creation-timestamp", "description", "fingerprint", "id", "name", "networks", "port", "projects", "self-link", "state", "visibility"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address", "creation-timestamp", "description", "fingerprint", "id", "name", "networks", "port", "self-link", "state", "visibility"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -335,7 +334,6 @@ impl<'n> Engine<'n> {
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "address" => Some(("address", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "visibility.networks" => Some(("visibility.networks", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "visibility.projects" => Some(("visibility.projects", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "port" => Some(("port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "fingerprint" => Some(("fingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -344,7 +342,7 @@ impl<'n> Engine<'n> {
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address", "creation-timestamp", "description", "fingerprint", "id", "name", "networks", "port", "projects", "self-link", "state", "visibility"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address", "creation-timestamp", "description", "fingerprint", "id", "name", "networks", "port", "self-link", "state", "visibility"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -430,7 +428,6 @@ impl<'n> Engine<'n> {
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "address" => Some(("address", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "visibility.networks" => Some(("visibility.networks", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "visibility.projects" => Some(("visibility.projects", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "port" => Some(("port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "fingerprint" => Some(("fingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -439,7 +436,7 @@ impl<'n> Engine<'n> {
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address", "creation-timestamp", "description", "fingerprint", "id", "name", "networks", "port", "projects", "self-link", "state", "visibility"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address", "creation-timestamp", "description", "fingerprint", "id", "name", "networks", "port", "self-link", "state", "visibility"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -977,7 +974,7 @@ fn main() {
     
     let mut app = App::new("serviceregistryalpha")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.3+20160111")
+           .version("0.3.3+20160225")
            .about("The Service Registry API allows users to manage service endpoints in Service Registry and use DNS-based service discovery / name resolution.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_serviceregistryalpha_cli")
            .arg(Arg::with_name("url")

@@ -501,6 +501,21 @@ pub struct Type {
 impl Resource for Type {}
 
 
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DeploymentUpdateLabelEntry {
+    /// no description provided
+    pub key: Option<String>,
+    /// no description provided
+    pub value: Option<String>,
+}
+
+impl Part for DeploymentUpdateLabelEntry {}
+
+
 /// [Output Only] The array of errors encountered while processing this operation.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -549,6 +564,21 @@ pub struct OperationWarningsData {
 
 impl NestedType for OperationWarningsData {}
 impl Part for OperationWarningsData {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DeploymentLabelEntry {
+    /// no description provided
+    pub key: Option<String>,
+    /// no description provided
+    pub value: Option<String>,
+}
+
+impl Part for DeploymentLabelEntry {}
 
 
 /// [Output Only] If errors are generated during update of the resource, this field will be populated.
@@ -609,6 +639,8 @@ impl Part for ResourceUpdateWarnings {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DeploymentUpdate {
+    /// [Output Only] Map of labels; provided by the client when the resource is created or updated. Specifically: Label keys must be between 1 and 63 characters long and must conform to the following regular expression: [a-z]([-a-z0-9]*[a-z0-9])? Label values must be between 0 and 63 characters long and must conform to the regular expression ([a-z]([-a-z0-9]*[a-z0-9])?)?
+    pub labels: Option<Vec<DeploymentUpdateLabelEntry>>,
     /// [Output Only] URL of the manifest representing the update configuration of this deployment.
     pub manifest: Option<String>,
 }
@@ -669,10 +701,12 @@ impl ResponseResult for DeploymentsListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Deployment {
-    /// Name of the resource; provided by the client when the resource is created. The name must be 1-63 characters long, and comply with RFC1035. Specifically, the name must be 1-63 characters long and match the regular expression [a-z]([-a-z0-9]*[a-z0-9])? which means the first character must be a lowercase letter, and all following characters must be a dash, lowercase letter, or digit, except the last character, which cannot be a dash.
-    pub name: Option<String>,
     /// An optional user-provided description of the deployment.
     pub description: Option<String>,
+    /// Name of the resource; provided by the client when the resource is created. The name must be 1-63 characters long, and comply with RFC1035. Specifically, the name must be 1-63 characters long and match the regular expression [a-z]([-a-z0-9]*[a-z0-9])? which means the first character must be a lowercase letter, and all following characters must be a dash, lowercase letter, or digit, except the last character, which cannot be a dash.
+    pub name: Option<String>,
+    /// Map of labels; provided by the client when the resource is created or updated. Specifically: Label keys must be between 1 and 63 characters long and must conform to the following regular expression: [a-z]([-a-z0-9]*[a-z0-9])? Label values must be between 0 and 63 characters long and must conform to the regular expression ([a-z]([-a-z0-9]*[a-z0-9])?)?
+    pub labels: Option<Vec<DeploymentLabelEntry>>,
     /// [Output Only] If Deployment Manager is currently updating or previewing an update to this deployment, the updated configuration appears here.
     pub update: Option<DeploymentUpdate>,
     /// [Output Only] URL of the manifest representing the last manifest that was successfully deployed.

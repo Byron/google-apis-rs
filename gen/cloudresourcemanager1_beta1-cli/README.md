@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *cloudresourcemanager* API at revision *20160112*. The CLI is at version *0.3.3*.
+This documentation was generated from the *cloudresourcemanager* API at revision *20160225*. The CLI is at version *0.3.3*.
 
 ```bash
 cloudresourcemanager1-beta1 [options]
@@ -43,7 +43,7 @@ cloudresourcemanager1-beta1 [options]
                 list [-p <v>]... [-o <out>]
                 set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
-                undelete <project-id> [-p <v>]... [-o <out>]
+                undelete <project-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 update <project-id> (-r <kv>)... [-p <v>]... [-o <out>]
   cloudresourcemanager1-beta1 --help
 

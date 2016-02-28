@@ -94,6 +94,7 @@ impl Default for Scope {
 /// extern crate hyper;
 /// extern crate yup_oauth2 as oauth2;
 /// extern crate google_tagmanager1 as tagmanager1;
+/// use tagmanager1::Folder;
 /// use tagmanager1::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -112,10 +113,15 @@ impl Default for Scope {
 ///                               hyper::Client::new(),
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = TagManager::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Folder::default();
+/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.accounts().containers_move_folders_update("accountId", "containerId", "folderId")
+/// let result = hub.accounts().containers_move_folders_update(req, "accountId", "containerId", "folderId")
 ///              .add_variable_id("justo")
 ///              .add_trigger_id("amet.")
 ///              .add_tag_id("erat")
@@ -331,6 +337,28 @@ pub struct ListContainersResponse {
 impl ResponseResult for ListContainersResponse {}
 
 
+/// Publish container version response.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [containers versions publish accounts](struct.AccountContainerVersionPublishCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PublishContainerVersionResponse {
+    /// The container version created.
+    #[serde(rename="containerVersion")]
+    pub container_version: Option<ContainerVersion>,
+    /// Compiler errors or not.
+    #[serde(rename="compilerError")]
+    pub compiler_error: Option<bool>,
+}
+
+impl ResponseResult for PublishContainerVersionResponse {}
+
+
 /// Represents a Google Tag Manager Macro.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -404,21 +432,26 @@ impl ResponseResult for ListVariablesResponse {}
 /// 
 /// * [containers list accounts](struct.AccountContainerListCall.html) (none)
 /// * [permissions list accounts](struct.AccountPermissionListCall.html) (none)
-/// * [containers create accounts](struct.AccountContainerCreateCall.html) (none)
+/// * [containers environments create accounts](struct.AccountContainerEnvironmentCreateCall.html) (none)
 /// * [permissions create accounts](struct.AccountPermissionCreateCall.html) (none)
+/// * [containers environments delete accounts](struct.AccountContainerEnvironmentDeleteCall.html) (none)
 /// * [permissions delete accounts](struct.AccountPermissionDeleteCall.html) (none)
 /// * [containers get accounts](struct.AccountContainerGetCall.html) (none)
+/// * [containers environments patch accounts](struct.AccountContainerEnvironmentPatchCall.html) (none)
 /// * [containers versions list accounts](struct.AccountContainerVersionListCall.html) (none)
 /// * [containers triggers update accounts](struct.AccountContainerTriggerUpdateCall.html) (none)
 /// * [containers triggers get accounts](struct.AccountContainerTriggerGetCall.html) (none)
 /// * [containers delete accounts](struct.AccountContainerDeleteCall.html) (none)
 /// * [containers folders delete accounts](struct.AccountContainerFolderDeleteCall.html) (none)
+/// * [containers create accounts](struct.AccountContainerCreateCall.html) (none)
 /// * [containers tags delete accounts](struct.AccountContainerTagDeleteCall.html) (none)
 /// * [containers folders entities list accounts](struct.AccountContainerFolderEntityListCall.html) (none)
 /// * [containers versions undelete accounts](struct.AccountContainerVersionUndeleteCall.html) (none)
+/// * [containers environments list accounts](struct.AccountContainerEnvironmentListCall.html) (none)
 /// * [containers tags list accounts](struct.AccountContainerTagListCall.html) (none)
 /// * [containers versions publish accounts](struct.AccountContainerVersionPublishCall.html) (none)
 /// * [containers folders get accounts](struct.AccountContainerFolderGetCall.html) (none)
+/// * [containers environments get accounts](struct.AccountContainerEnvironmentGetCall.html) (none)
 /// * [containers tags create accounts](struct.AccountContainerTagCreateCall.html) (none)
 /// * [containers triggers list accounts](struct.AccountContainerTriggerListCall.html) (none)
 /// * [containers versions delete accounts](struct.AccountContainerVersionDeleteCall.html) (none)
@@ -437,9 +470,11 @@ impl ResponseResult for ListVariablesResponse {}
 /// * [list accounts](struct.AccountListCall.html) (none)
 /// * [permissions update accounts](struct.AccountPermissionUpdateCall.html) (none)
 /// * [containers variables delete accounts](struct.AccountContainerVariableDeleteCall.html) (none)
+/// * [containers reauthorize_environments update accounts](struct.AccountContainerReauthorizeEnvironmentUpdateCall.html) (none)
 /// * [get accounts](struct.AccountGetCall.html) (response)
 /// * [containers update accounts](struct.AccountContainerUpdateCall.html) (none)
 /// * [containers tags update accounts](struct.AccountContainerTagUpdateCall.html) (none)
+/// * [containers environments update accounts](struct.AccountContainerEnvironmentUpdateCall.html) (none)
 /// * [containers folders create accounts](struct.AccountContainerFolderCreateCall.html) (none)
 /// * [containers folders list accounts](struct.AccountContainerFolderListCall.html) (none)
 /// * [containers versions update accounts](struct.AccountContainerVersionUpdateCall.html) (none)
@@ -511,26 +546,57 @@ pub struct ListAccountsResponse {
 impl ResponseResult for ListAccountsResponse {}
 
 
-/// Publish container version response.
+/// Represents a Google Tag Manager Environment. Note that a user can create, delete and update environments of type USER, but can only update the enable_debug and url fields of environments of other types.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [containers versions publish accounts](struct.AccountContainerVersionPublishCall.html) (response)
+/// * [containers environments create accounts](struct.AccountContainerEnvironmentCreateCall.html) (request|response)
+/// * [containers environments update accounts](struct.AccountContainerEnvironmentUpdateCall.html) (request|response)
+/// * [containers environments patch accounts](struct.AccountContainerEnvironmentPatchCall.html) (request|response)
+/// * [containers environments get accounts](struct.AccountContainerEnvironmentGetCall.html) (response)
+/// * [containers reauthorize_environments update accounts](struct.AccountContainerReauthorizeEnvironmentUpdateCall.html) (request|response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PublishContainerVersionResponse {
-    /// The container version created.
-    #[serde(rename="containerVersion")]
-    pub container_version: Option<ContainerVersion>,
-    /// Compiler errors or not.
-    #[serde(rename="compilerError")]
-    pub compiler_error: Option<bool>,
+pub struct Environment {
+    /// The environment authorization code.
+    #[serde(rename="authorizationCode")]
+    pub authorization_code: Option<String>,
+    /// The environment description. Can be set or changed only on USER type environments.
+    pub description: Option<String>,
+    /// GTM Environment ID uniquely identifies the GTM Environment.
+    #[serde(rename="environmentId")]
+    pub environment_id: Option<String>,
+    /// Default preview page url for the environment.
+    pub url: Option<String>,
+    /// Whether or not to enable debug by default on for the environment.
+    #[serde(rename="enableDebug")]
+    pub enable_debug: Option<bool>,
+    /// GTM Container ID.
+    #[serde(rename="containerId")]
+    pub container_id: Option<String>,
+    /// The last update time-stamp for the authorization code.
+    #[serde(rename="authorizationTimestampMs")]
+    pub authorization_timestamp_ms: Option<String>,
+    /// 
+    #[serde(rename="containerVersionId")]
+    pub container_version_id: Option<String>,
+    /// The fingerprint of the GTM environment as computed at storage time. This value is recomputed whenever the environment is modified.
+    pub fingerprint: Option<String>,
+    /// GTM Account ID.
+    #[serde(rename="accountId")]
+    pub account_id: Option<String>,
+    /// The type of this environment.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// The environment display name. Can be set or changed only on USER type environments.
+    pub name: Option<String>,
 }
 
-impl ResponseResult for PublishContainerVersionResponse {}
+impl RequestValue for Environment {}
+impl ResponseResult for Environment {}
 
 
 /// Represents a Google Tag Manager Folder's contents.
@@ -555,75 +621,56 @@ pub struct FolderEntities {
 impl ResponseResult for FolderEntities {}
 
 
-/// Represents a Google Tag Manager Trigger
+/// Represents a Google Tag Manager Container Version.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [containers triggers update accounts](struct.AccountContainerTriggerUpdateCall.html) (request|response)
-/// * [containers triggers get accounts](struct.AccountContainerTriggerGetCall.html) (response)
-/// * [containers triggers create accounts](struct.AccountContainerTriggerCreateCall.html) (request|response)
+/// * [containers versions update accounts](struct.AccountContainerVersionUpdateCall.html) (request|response)
+/// * [containers versions get accounts](struct.AccountContainerVersionGetCall.html) (response)
+/// * [containers versions undelete accounts](struct.AccountContainerVersionUndeleteCall.html) (response)
+/// * [containers versions restore accounts](struct.AccountContainerVersionRestoreCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Trigger {
+pub struct ContainerVersion {
+    /// The container that this version was taken from.
+    pub container: Option<Container>,
     /// GTM Container ID.
     #[serde(rename="containerId")]
     pub container_id: Option<String>,
-    /// Globally unique id of the trigger that auto-generates this (a Form Submit, Link Click or Timer listener) if any. Used to make incompatible auto-events work together with trigger filtering based on trigger ids. This value is populated during output generation since the tags implied by triggers don't exist until then. Only valid for Form Submit, Link Click and Timer triggers.
-    #[serde(rename="uniqueTriggerId")]
-    pub unique_trigger_id: Option<Parameter>,
-    /// The Trigger ID uniquely identifies the GTM Trigger.
-    #[serde(rename="triggerId")]
-    pub trigger_id: Option<String>,
-    /// The fingerprint of the GTM Trigger as computed at storage time. This value is recomputed whenever the trigger is modified.
+    /// The triggers in the container that this version was taken from.
+    pub trigger: Option<Vec<Trigger>>,
+    /// A value of true indicates this container version has been deleted.
+    pub deleted: Option<bool>,
+    /// The macros in the container that this version was taken from.
+    #[serde(rename="macro")]
+    pub macro_: Option<Vec<Macro>>,
+    /// User notes on how to apply this container version in the container.
+    pub notes: Option<String>,
+    /// The rules in the container that this version was taken from.
+    pub rule: Option<Vec<Rule>>,
+    /// The tags in the container that this version was taken from.
+    pub tag: Option<Vec<Tag>>,
+    /// The Container Version ID uniquely identifies the GTM Container Version.
+    #[serde(rename="containerVersionId")]
+    pub container_version_id: Option<String>,
+    /// The fingerprint of the GTM Container Version as computed at storage time. This value is recomputed whenever the container version is modified.
     pub fingerprint: Option<String>,
-    /// Reloads the videos in the page that don't already have the YT API enabled. If false, only capture events from videos that already have the API enabled. Only valid for YouTube triggers.
-    #[serde(rename="enableAllVideos")]
-    pub enable_all_videos: Option<Parameter>,
+    /// The variables in the container that this version was taken from.
+    pub variable: Option<Vec<Variable>>,
+    /// The folders in the container that this version was taken from.
+    pub folder: Option<Vec<Folder>>,
     /// GTM Account ID.
     #[serde(rename="accountId")]
     pub account_id: Option<String>,
-    /// Name of the GTM event that is fired. Only valid for Timer triggers.
-    #[serde(rename="eventName")]
-    pub event_name: Option<Parameter>,
-    /// List of integer percentage values. The trigger will fire as each percentage is reached in any instrumented videos. Only valid for YouTube triggers.
-    #[serde(rename="videoPercentageList")]
-    pub video_percentage_list: Option<Parameter>,
-    /// Whether or not we should delay the form submissions or link opening until all of the tags have fired (by preventing the default action and later simulating the default action). Only valid for Form Submission and Link Click triggers.
-    #[serde(rename="waitForTags")]
-    pub wait_for_tags: Option<Parameter>,
-    /// Trigger display name.
+    /// Container version display name.
     pub name: Option<String>,
-    /// Time between triggering recurring Timer Events (in milliseconds). Only valid for Timer triggers.
-    pub interval: Option<Parameter>,
-    /// Used in the case of auto event tracking.
-    #[serde(rename="autoEventFilter")]
-    pub auto_event_filter: Option<Vec<Condition>>,
-    /// The trigger will only fire iff all Conditions are true.
-    pub filter: Option<Vec<Condition>>,
-    /// How long to wait (in milliseconds) for tags to fire when 'waits_for_tags' above evaluates to true. Only valid for Form Submission and Link Click triggers.
-    #[serde(rename="waitForTagsTimeout")]
-    pub wait_for_tags_timeout: Option<Parameter>,
-    /// Limit of the number of GTM events this Timer Trigger will fire. If no limit is set, we will continue to fire GTM events until the user leaves the page. Only valid for Timer triggers.
-    pub limit: Option<Parameter>,
-    /// Whether or not we should only fire tags if the form submit or link click event is not cancelled by some other event handler (e.g. because of validation). Only valid for Form Submission and Link Click triggers.
-    #[serde(rename="checkValidation")]
-    pub check_validation: Option<Parameter>,
-    /// Used in the case of custom event, which is fired iff all Conditions are true.
-    #[serde(rename="customEventFilter")]
-    pub custom_event_filter: Option<Vec<Condition>>,
-    /// Defines the data layer event that causes this trigger.
-    #[serde(rename="type")]
-    pub type_: Option<String>,
-    /// Parent folder id.
-    #[serde(rename="parentFolderId")]
-    pub parent_folder_id: Option<String>,
 }
 
-impl RequestValue for Trigger {}
-impl ResponseResult for Trigger {}
+impl RequestValue for ContainerVersion {}
+impl ResponseResult for ContainerVersion {}
 
 
 /// Create container versions response.
@@ -706,6 +753,7 @@ impl ResponseResult for UserAccess {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [containers folders update accounts](struct.AccountContainerFolderUpdateCall.html) (request|response)
+/// * [containers move_folders update accounts](struct.AccountContainerMoveFolderUpdateCall.html) (request)
 /// * [containers folders create accounts](struct.AccountContainerFolderCreateCall.html) (request|response)
 /// * [containers folders get accounts](struct.AccountContainerFolderGetCall.html) (response)
 /// 
@@ -773,6 +821,77 @@ pub struct ListTagsResponse {
 }
 
 impl ResponseResult for ListTagsResponse {}
+
+
+/// Represents a Google Tag Manager Trigger
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [containers triggers update accounts](struct.AccountContainerTriggerUpdateCall.html) (request|response)
+/// * [containers triggers get accounts](struct.AccountContainerTriggerGetCall.html) (response)
+/// * [containers triggers create accounts](struct.AccountContainerTriggerCreateCall.html) (request|response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Trigger {
+    /// GTM Container ID.
+    #[serde(rename="containerId")]
+    pub container_id: Option<String>,
+    /// Globally unique id of the trigger that auto-generates this (a Form Submit, Link Click or Timer listener) if any. Used to make incompatible auto-events work together with trigger filtering based on trigger ids. This value is populated during output generation since the tags implied by triggers don't exist until then. Only valid for Form Submit, Link Click and Timer triggers.
+    #[serde(rename="uniqueTriggerId")]
+    pub unique_trigger_id: Option<Parameter>,
+    /// The Trigger ID uniquely identifies the GTM Trigger.
+    #[serde(rename="triggerId")]
+    pub trigger_id: Option<String>,
+    /// The fingerprint of the GTM Trigger as computed at storage time. This value is recomputed whenever the trigger is modified.
+    pub fingerprint: Option<String>,
+    /// Reloads the videos in the page that don't already have the YT API enabled. If false, only capture events from videos that already have the API enabled. Only valid for YouTube triggers.
+    #[serde(rename="enableAllVideos")]
+    pub enable_all_videos: Option<Parameter>,
+    /// GTM Account ID.
+    #[serde(rename="accountId")]
+    pub account_id: Option<String>,
+    /// Name of the GTM event that is fired. Only valid for Timer triggers.
+    #[serde(rename="eventName")]
+    pub event_name: Option<Parameter>,
+    /// List of integer percentage values. The trigger will fire as each percentage is reached in any instrumented videos. Only valid for YouTube triggers.
+    #[serde(rename="videoPercentageList")]
+    pub video_percentage_list: Option<Parameter>,
+    /// Whether or not we should delay the form submissions or link opening until all of the tags have fired (by preventing the default action and later simulating the default action). Only valid for Form Submission and Link Click triggers.
+    #[serde(rename="waitForTags")]
+    pub wait_for_tags: Option<Parameter>,
+    /// Trigger display name.
+    pub name: Option<String>,
+    /// Time between triggering recurring Timer Events (in milliseconds). Only valid for Timer triggers.
+    pub interval: Option<Parameter>,
+    /// Used in the case of auto event tracking.
+    #[serde(rename="autoEventFilter")]
+    pub auto_event_filter: Option<Vec<Condition>>,
+    /// The trigger will only fire iff all Conditions are true.
+    pub filter: Option<Vec<Condition>>,
+    /// How long to wait (in milliseconds) for tags to fire when 'waits_for_tags' above evaluates to true. Only valid for Form Submission and Link Click triggers.
+    #[serde(rename="waitForTagsTimeout")]
+    pub wait_for_tags_timeout: Option<Parameter>,
+    /// Limit of the number of GTM events this Timer Trigger will fire. If no limit is set, we will continue to fire GTM events until the user leaves the page. Only valid for Timer triggers.
+    pub limit: Option<Parameter>,
+    /// Whether or not we should only fire tags if the form submit or link click event is not cancelled by some other event handler (e.g. because of validation). Only valid for Form Submission and Link Click triggers.
+    #[serde(rename="checkValidation")]
+    pub check_validation: Option<Parameter>,
+    /// Used in the case of custom event, which is fired iff all Conditions are true.
+    #[serde(rename="customEventFilter")]
+    pub custom_event_filter: Option<Vec<Condition>>,
+    /// Defines the data layer event that causes this trigger.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// Parent folder id.
+    #[serde(rename="parentFolderId")]
+    pub parent_folder_id: Option<String>,
+}
+
+impl RequestValue for Trigger {}
+impl ResponseResult for Trigger {}
 
 
 /// List Folders Response.
@@ -909,56 +1028,22 @@ pub struct ContainerVersionHeader {
 impl Part for ContainerVersionHeader {}
 
 
-/// Represents a Google Tag Manager Container Version.
+/// List Environments Response.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [containers versions update accounts](struct.AccountContainerVersionUpdateCall.html) (request|response)
-/// * [containers versions get accounts](struct.AccountContainerVersionGetCall.html) (response)
-/// * [containers versions undelete accounts](struct.AccountContainerVersionUndeleteCall.html) (response)
-/// * [containers versions restore accounts](struct.AccountContainerVersionRestoreCall.html) (response)
+/// * [containers environments list accounts](struct.AccountContainerEnvironmentListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ContainerVersion {
-    /// The container that this version was taken from.
-    pub container: Option<Container>,
-    /// GTM Container ID.
-    #[serde(rename="containerId")]
-    pub container_id: Option<String>,
-    /// The triggers in the container that this version was taken from.
-    pub trigger: Option<Vec<Trigger>>,
-    /// A value of true indicates this container version has been deleted.
-    pub deleted: Option<bool>,
-    /// The macros in the container that this version was taken from.
-    #[serde(rename="macro")]
-    pub macro_: Option<Vec<Macro>>,
-    /// User notes on how to apply this container version in the container.
-    pub notes: Option<String>,
-    /// The rules in the container that this version was taken from.
-    pub rule: Option<Vec<Rule>>,
-    /// The tags in the container that this version was taken from.
-    pub tag: Option<Vec<Tag>>,
-    /// The Container Version ID uniquely identifies the GTM Container Version.
-    #[serde(rename="containerVersionId")]
-    pub container_version_id: Option<String>,
-    /// The fingerprint of the GTM Container Version as computed at storage time. This value is recomputed whenever the container version is modified.
-    pub fingerprint: Option<String>,
-    /// The variables in the container that this version was taken from.
-    pub variable: Option<Vec<Variable>>,
-    /// The folders in the container that this version was taken from.
-    pub folder: Option<Vec<Folder>>,
-    /// GTM Account ID.
-    #[serde(rename="accountId")]
-    pub account_id: Option<String>,
-    /// Container version display name.
-    pub name: Option<String>,
+pub struct ListEnvironmentsResponse {
+    /// All Environments of a GTM Container.
+    pub environments: Option<Vec<Environment>>,
 }
 
-impl RequestValue for ContainerVersion {}
-impl ResponseResult for ContainerVersion {}
+impl ResponseResult for ListEnvironmentsResponse {}
 
 
 /// List container versions response.
@@ -1102,7 +1187,7 @@ impl Part for Condition {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = TagManager::new(hyper::Client::new(), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `containers_create(...)`, `containers_delete(...)`, `containers_folders_create(...)`, `containers_folders_delete(...)`, `containers_folders_entities_list(...)`, `containers_folders_get(...)`, `containers_folders_list(...)`, `containers_folders_update(...)`, `containers_get(...)`, `containers_list(...)`, `containers_move_folders_update(...)`, `containers_tags_create(...)`, `containers_tags_delete(...)`, `containers_tags_get(...)`, `containers_tags_list(...)`, `containers_tags_update(...)`, `containers_triggers_create(...)`, `containers_triggers_delete(...)`, `containers_triggers_get(...)`, `containers_triggers_list(...)`, `containers_triggers_update(...)`, `containers_update(...)`, `containers_variables_create(...)`, `containers_variables_delete(...)`, `containers_variables_get(...)`, `containers_variables_list(...)`, `containers_variables_update(...)`, `containers_versions_create(...)`, `containers_versions_delete(...)`, `containers_versions_get(...)`, `containers_versions_list(...)`, `containers_versions_publish(...)`, `containers_versions_restore(...)`, `containers_versions_undelete(...)`, `containers_versions_update(...)`, `get(...)`, `list(...)`, `permissions_create(...)`, `permissions_delete(...)`, `permissions_get(...)`, `permissions_list(...)`, `permissions_update(...)` and `update(...)`
+/// // like `containers_create(...)`, `containers_delete(...)`, `containers_environments_create(...)`, `containers_environments_delete(...)`, `containers_environments_get(...)`, `containers_environments_list(...)`, `containers_environments_patch(...)`, `containers_environments_update(...)`, `containers_folders_create(...)`, `containers_folders_delete(...)`, `containers_folders_entities_list(...)`, `containers_folders_get(...)`, `containers_folders_list(...)`, `containers_folders_update(...)`, `containers_get(...)`, `containers_list(...)`, `containers_move_folders_update(...)`, `containers_reauthorize_environments_update(...)`, `containers_tags_create(...)`, `containers_tags_delete(...)`, `containers_tags_get(...)`, `containers_tags_list(...)`, `containers_tags_update(...)`, `containers_triggers_create(...)`, `containers_triggers_delete(...)`, `containers_triggers_get(...)`, `containers_triggers_list(...)`, `containers_triggers_update(...)`, `containers_update(...)`, `containers_variables_create(...)`, `containers_variables_delete(...)`, `containers_variables_get(...)`, `containers_variables_list(...)`, `containers_variables_update(...)`, `containers_versions_create(...)`, `containers_versions_delete(...)`, `containers_versions_get(...)`, `containers_versions_list(...)`, `containers_versions_publish(...)`, `containers_versions_restore(...)`, `containers_versions_undelete(...)`, `containers_versions_update(...)`, `get(...)`, `list(...)`, `permissions_create(...)`, `permissions_delete(...)`, `permissions_get(...)`, `permissions_list(...)`, `permissions_update(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.accounts();
 /// # }
@@ -1153,17 +1238,19 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a Container.
+    /// Creates a GTM Environment.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
     /// * `accountId` - The GTM Account ID.
-    pub fn containers_create(&self, request: Container, account_id: &str) -> AccountContainerCreateCall<'a, C, A> {
-        AccountContainerCreateCall {
+    /// * `containerId` - The GTM Container ID.
+    pub fn containers_environments_create(&self, request: Environment, account_id: &str, container_id: &str) -> AccountContainerEnvironmentCreateCall<'a, C, A> {
+        AccountContainerEnvironmentCreateCall {
             hub: self.hub,
             _request: request,
             _account_id: account_id.to_string(),
+            _container_id: container_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1183,6 +1270,27 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _account_id: account_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes a GTM Environment.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - The GTM Account ID.
+    /// * `containerId` - The GTM Container ID.
+    /// * `environmentId` - The GTM Environment ID.
+    pub fn containers_environments_delete(&self, account_id: &str, container_id: &str, environment_id: &str) -> AccountContainerEnvironmentDeleteCall<'a, C, A> {
+        AccountContainerEnvironmentDeleteCall {
+            hub: self.hub,
+            _account_id: account_id.to_string(),
+            _container_id: container_id.to_string(),
+            _environment_id: environment_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1221,6 +1329,30 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
             hub: self.hub,
             _account_id: account_id.to_string(),
             _container_id: container_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates a GTM Environment. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - The GTM Account ID.
+    /// * `containerId` - The GTM Container ID.
+    /// * `environmentId` - The GTM Environment ID.
+    pub fn containers_environments_patch(&self, request: Environment, account_id: &str, container_id: &str, environment_id: &str) -> AccountContainerEnvironmentPatchCall<'a, C, A> {
+        AccountContainerEnvironmentPatchCall {
+            hub: self.hub,
+            _request: request,
+            _account_id: account_id.to_string(),
+            _container_id: container_id.to_string(),
+            _environment_id: environment_id.to_string(),
+            _fingerprint: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1335,6 +1467,25 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Creates a Container.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - The GTM Account ID.
+    pub fn containers_create(&self, request: Container, account_id: &str) -> AccountContainerCreateCall<'a, C, A> {
+        AccountContainerCreateCall {
+            hub: self.hub,
+            _request: request,
+            _account_id: account_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Deletes a GTM Tag.
     /// 
     /// # Arguments
@@ -1398,6 +1549,25 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Lists all GTM Environments of a GTM Container.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - The GTM Account ID.
+    /// * `containerId` - The GTM Container ID.
+    pub fn containers_environments_list(&self, account_id: &str, container_id: &str) -> AccountContainerEnvironmentListCall<'a, C, A> {
+        AccountContainerEnvironmentListCall {
+            hub: self.hub,
+            _account_id: account_id.to_string(),
+            _container_id: container_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Lists all GTM Tags of a Container.
     /// 
     /// # Arguments
@@ -1452,6 +1622,27 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
             _account_id: account_id.to_string(),
             _container_id: container_id.to_string(),
             _folder_id: folder_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets a GTM Environment.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - The GTM Account ID.
+    /// * `containerId` - The GTM Container ID.
+    /// * `environmentId` - The GTM Environment ID.
+    pub fn containers_environments_get(&self, account_id: &str, container_id: &str, environment_id: &str) -> AccountContainerEnvironmentGetCall<'a, C, A> {
+        AccountContainerEnvironmentGetCall {
+            hub: self.hub,
+            _account_id: account_id.to_string(),
+            _container_id: container_id.to_string(),
+            _environment_id: environment_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1585,12 +1776,14 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
+    /// * `request` - No description provided.
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `folderId` - The GTM Folder ID.
-    pub fn containers_move_folders_update(&self, account_id: &str, container_id: &str, folder_id: &str) -> AccountContainerMoveFolderUpdateCall<'a, C, A> {
+    pub fn containers_move_folders_update(&self, request: Folder, account_id: &str, container_id: &str, folder_id: &str) -> AccountContainerMoveFolderUpdateCall<'a, C, A> {
         AccountContainerMoveFolderUpdateCall {
             hub: self.hub,
+            _request: request,
             _account_id: account_id.to_string(),
             _container_id: container_id.to_string(),
             _folder_id: folder_id.to_string(),
@@ -1598,6 +1791,7 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
             _trigger_id: Default::default(),
             _tag_id: Default::default(),
             _delegate: Default::default(),
+            _scopes: Default::default(),
             _additional_params: Default::default(),
         }
     }
@@ -1827,6 +2021,29 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Re-generates the authorization code for a GTM Environment.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - The GTM Account ID.
+    /// * `containerId` - The GTM Container ID.
+    /// * `environmentId` - The GTM Environment ID.
+    pub fn containers_reauthorize_environments_update(&self, request: Environment, account_id: &str, container_id: &str, environment_id: &str) -> AccountContainerReauthorizeEnvironmentUpdateCall<'a, C, A> {
+        AccountContainerReauthorizeEnvironmentUpdateCall {
+            hub: self.hub,
+            _request: request,
+            _account_id: account_id.to_string(),
+            _container_id: container_id.to_string(),
+            _environment_id: environment_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Gets a GTM Account.
     /// 
     /// # Arguments
@@ -1881,6 +2098,30 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
             _account_id: account_id.to_string(),
             _container_id: container_id.to_string(),
             _tag_id: tag_id.to_string(),
+            _fingerprint: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates a GTM Environment.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - The GTM Account ID.
+    /// * `containerId` - The GTM Container ID.
+    /// * `environmentId` - The GTM Environment ID.
+    pub fn containers_environments_update(&self, request: Environment, account_id: &str, container_id: &str, environment_id: &str) -> AccountContainerEnvironmentUpdateCall<'a, C, A> {
+        AccountContainerEnvironmentUpdateCall {
+            hub: self.hub,
+            _request: request,
+            _account_id: account_id.to_string(),
+            _container_id: container_id.to_string(),
+            _environment_id: environment_id.to_string(),
             _fingerprint: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -2478,9 +2719,9 @@ impl<'a, C, A> AccountPermissionListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 }
 
 
-/// Creates a Container.
+/// Creates a GTM Environment.
 ///
-/// A builder for the *containers.create* method supported by a *account* resource.
+/// A builder for the *containers.environments.create* method supported by a *account* resource.
 /// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
@@ -2491,7 +2732,7 @@ impl<'a, C, A> AccountPermissionListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// # extern crate hyper;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_tagmanager1 as tagmanager1;
-/// use tagmanager1::Container;
+/// use tagmanager1::Environment;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -2505,33 +2746,34 @@ impl<'a, C, A> AccountPermissionListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = Container::default();
+/// let mut req = Environment::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.accounts().containers_create(req, "accountId")
+/// let result = hub.accounts().containers_environments_create(req, "accountId", "containerId")
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountContainerCreateCall<'a, C, A>
+pub struct AccountContainerEnvironmentCreateCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a TagManager<C, A>,
-    _request: Container,
+    _request: Environment,
     _account_id: String,
+    _container_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for AccountContainerCreateCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for AccountContainerEnvironmentCreateCall<'a, C, A> {}
 
-impl<'a, C, A> AccountContainerCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> AccountContainerEnvironmentCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Container)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Environment)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -2539,11 +2781,12 @@ impl<'a, C, A> AccountContainerCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "tagmanager.accounts.containers.create",
+        dlg.begin(MethodInfo { id: "tagmanager.accounts.containers.environments.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("accountId", self._account_id.to_string()));
-        for &field in ["alt", "accountId"].iter() {
+        params.push(("containerId", self._container_id.to_string()));
+        for &field in ["alt", "accountId", "containerId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -2555,12 +2798,12 @@ impl<'a, C, A> AccountContainerCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers".to_string();
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/environments".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{accountId}", "accountId")].iter() {
+        for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId")].iter() {
             let mut replace_with: Option<&str> = None;
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -2571,8 +2814,8 @@ impl<'a, C, A> AccountContainerCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["accountId"].iter() {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["containerId", "accountId"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -2679,7 +2922,7 @@ impl<'a, C, A> AccountContainerCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Container) -> AccountContainerCreateCall<'a, C, A> {
+    pub fn request(mut self, new_value: Environment) -> AccountContainerEnvironmentCreateCall<'a, C, A> {
         self._request = new_value;
         self
     }
@@ -2689,8 +2932,18 @@ impl<'a, C, A> AccountContainerCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerCreateCall<'a, C, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerEnvironmentCreateCall<'a, C, A> {
         self._account_id = new_value.to_string();
+        self
+    }
+    /// The GTM Container ID.
+    ///
+    /// Sets the *container id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerEnvironmentCreateCall<'a, C, A> {
+        self._container_id = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -2699,7 +2952,7 @@ impl<'a, C, A> AccountContainerCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerCreateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerEnvironmentCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2720,7 +2973,7 @@ impl<'a, C, A> AccountContainerCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerCreateCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerEnvironmentCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2737,7 +2990,7 @@ impl<'a, C, A> AccountContainerCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerCreateCall<'a, C, A>
+    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerEnvironmentCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3005,6 +3258,255 @@ impl<'a, C, A> AccountPermissionCreateCall<'a, C, A> where C: BorrowMut<hyper::C
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountPermissionCreateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+/// Deletes a GTM Environment.
+///
+/// A builder for the *containers.environments.delete* method supported by a *account* resource.
+/// It is not used directly, but through a `AccountMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use tagmanager1::TagManager;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = TagManager::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.accounts().containers_environments_delete("accountId", "containerId", "environmentId")
+///              .doit();
+/// # }
+/// ```
+pub struct AccountContainerEnvironmentDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a TagManager<C, A>,
+    _account_id: String,
+    _container_id: String,
+    _environment_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for AccountContainerEnvironmentDeleteCall<'a, C, A> {}
+
+impl<'a, C, A> AccountContainerEnvironmentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<hyper::client::Response> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "tagmanager.accounts.containers.environments.delete",
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        params.push(("accountId", self._account_id.to_string()));
+        params.push(("containerId", self._container_id.to_string()));
+        params.push(("environmentId", self._environment_id.to_string()));
+        for &field in ["accountId", "containerId", "environmentId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/environments/{environmentId}".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId"), ("{environmentId}", "environmentId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
+            for param_name in ["environmentId", "containerId", "accountId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = res;
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The GTM Account ID.
+    ///
+    /// Sets the *account id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerEnvironmentDeleteCall<'a, C, A> {
+        self._account_id = new_value.to_string();
+        self
+    }
+    /// The GTM Container ID.
+    ///
+    /// Sets the *container id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerEnvironmentDeleteCall<'a, C, A> {
+        self._container_id = new_value.to_string();
+        self
+    }
+    /// The GTM Environment ID.
+    ///
+    /// Sets the *environment id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn environment_id(mut self, new_value: &str) -> AccountContainerEnvironmentDeleteCall<'a, C, A> {
+        self._environment_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerEnvironmentDeleteCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerEnvironmentDeleteCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::EditContainer`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerEnvironmentDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3497,6 +3999,309 @@ impl<'a, C, A> AccountContainerGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
 }
 
 
+/// Updates a GTM Environment. This method supports patch semantics.
+///
+/// A builder for the *containers.environments.patch* method supported by a *account* resource.
+/// It is not used directly, but through a `AccountMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
+/// use tagmanager1::Environment;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use tagmanager1::TagManager;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = TagManager::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Environment::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.accounts().containers_environments_patch(req, "accountId", "containerId", "environmentId")
+///              .fingerprint("Lorem")
+///              .doit();
+/// # }
+/// ```
+pub struct AccountContainerEnvironmentPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a TagManager<C, A>,
+    _request: Environment,
+    _account_id: String,
+    _container_id: String,
+    _environment_id: String,
+    _fingerprint: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for AccountContainerEnvironmentPatchCall<'a, C, A> {}
+
+impl<'a, C, A> AccountContainerEnvironmentPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Environment)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "tagmanager.accounts.containers.environments.patch",
+                               http_method: hyper::method::Method::Patch });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        params.push(("accountId", self._account_id.to_string()));
+        params.push(("containerId", self._container_id.to_string()));
+        params.push(("environmentId", self._environment_id.to_string()));
+        if let Some(value) = self._fingerprint {
+            params.push(("fingerprint", value.to_string()));
+        }
+        for &field in ["alt", "accountId", "containerId", "environmentId", "fingerprint"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/environments/{environmentId}".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId"), ("{environmentId}", "environmentId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
+            for param_name in ["environmentId", "containerId", "accountId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request);
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: Environment) -> AccountContainerEnvironmentPatchCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The GTM Account ID.
+    ///
+    /// Sets the *account id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerEnvironmentPatchCall<'a, C, A> {
+        self._account_id = new_value.to_string();
+        self
+    }
+    /// The GTM Container ID.
+    ///
+    /// Sets the *container id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerEnvironmentPatchCall<'a, C, A> {
+        self._container_id = new_value.to_string();
+        self
+    }
+    /// The GTM Environment ID.
+    ///
+    /// Sets the *environment id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn environment_id(mut self, new_value: &str) -> AccountContainerEnvironmentPatchCall<'a, C, A> {
+        self._environment_id = new_value.to_string();
+        self
+    }
+    /// When provided, this fingerprint must match the fingerprint of the environment in storage.
+    ///
+    /// Sets the *fingerprint* query property to the given value.
+    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerEnvironmentPatchCall<'a, C, A> {
+        self._fingerprint = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerEnvironmentPatchCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerEnvironmentPatchCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::EditContainer`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerEnvironmentPatchCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
 /// Lists all Container Versions of a GTM Container.
 ///
 /// A builder for the *containers.versions.list* method supported by a *account* resource.
@@ -3802,7 +4607,7 @@ impl<'a, C, A> AccountContainerVersionListCall<'a, C, A> where C: BorrowMut<hype
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_triggers_update(req, "accountId", "containerId", "triggerId")
-///              .fingerprint("Lorem")
+///              .fingerprint("sadipscing")
 ///              .doit();
 /// # }
 /// ```
@@ -4818,6 +5623,273 @@ impl<'a, C, A> AccountContainerFolderDeleteCall<'a, C, A> where C: BorrowMut<hyp
 }
 
 
+/// Creates a Container.
+///
+/// A builder for the *containers.create* method supported by a *account* resource.
+/// It is not used directly, but through a `AccountMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
+/// use tagmanager1::Container;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use tagmanager1::TagManager;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = TagManager::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Container::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.accounts().containers_create(req, "accountId")
+///              .doit();
+/// # }
+/// ```
+pub struct AccountContainerCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a TagManager<C, A>,
+    _request: Container,
+    _account_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for AccountContainerCreateCall<'a, C, A> {}
+
+impl<'a, C, A> AccountContainerCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Container)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "tagmanager.accounts.containers.create",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        params.push(("accountId", self._account_id.to_string()));
+        for &field in ["alt", "accountId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{accountId}", "accountId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["accountId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request);
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: Container) -> AccountContainerCreateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The GTM Account ID.
+    ///
+    /// Sets the *account id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerCreateCall<'a, C, A> {
+        self._account_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerCreateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerCreateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::EditContainer`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerCreateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
 /// Deletes a GTM Tag.
 ///
 /// A builder for the *containers.tags.delete* method supported by a *account* resource.
@@ -5587,6 +6659,254 @@ impl<'a, C, A> AccountContainerVersionUndeleteCall<'a, C, A> where C: BorrowMut<
 }
 
 
+/// Lists all GTM Environments of a GTM Container.
+///
+/// A builder for the *containers.environments.list* method supported by a *account* resource.
+/// It is not used directly, but through a `AccountMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use tagmanager1::TagManager;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = TagManager::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.accounts().containers_environments_list("accountId", "containerId")
+///              .doit();
+/// # }
+/// ```
+pub struct AccountContainerEnvironmentListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a TagManager<C, A>,
+    _account_id: String,
+    _container_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for AccountContainerEnvironmentListCall<'a, C, A> {}
+
+impl<'a, C, A> AccountContainerEnvironmentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListEnvironmentsResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "tagmanager.accounts.containers.environments.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        params.push(("accountId", self._account_id.to_string()));
+        params.push(("containerId", self._container_id.to_string()));
+        for &field in ["alt", "accountId", "containerId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/environments".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["containerId", "accountId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The GTM Account ID.
+    ///
+    /// Sets the *account id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerEnvironmentListCall<'a, C, A> {
+        self._account_id = new_value.to_string();
+        self
+    }
+    /// The GTM Container ID.
+    ///
+    /// Sets the *container id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerEnvironmentListCall<'a, C, A> {
+        self._container_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerEnvironmentListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerEnvironmentListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerEnvironmentListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
 /// Lists all GTM Tags of a Container.
 ///
 /// A builder for the *containers.tags.list* method supported by a *account* resource.
@@ -5862,7 +7182,7 @@ impl<'a, C, A> AccountContainerTagListCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_versions_publish("accountId", "containerId", "containerVersionId")
-///              .fingerprint("duo")
+///              .fingerprint("dolor")
 ///              .doit();
 /// # }
 /// ```
@@ -6360,6 +7680,266 @@ impl<'a, C, A> AccountContainerFolderGetCall<'a, C, A> where C: BorrowMut<hyper:
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountContainerFolderGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+/// Gets a GTM Environment.
+///
+/// A builder for the *containers.environments.get* method supported by a *account* resource.
+/// It is not used directly, but through a `AccountMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use tagmanager1::TagManager;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = TagManager::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.accounts().containers_environments_get("accountId", "containerId", "environmentId")
+///              .doit();
+/// # }
+/// ```
+pub struct AccountContainerEnvironmentGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a TagManager<C, A>,
+    _account_id: String,
+    _container_id: String,
+    _environment_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for AccountContainerEnvironmentGetCall<'a, C, A> {}
+
+impl<'a, C, A> AccountContainerEnvironmentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Environment)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "tagmanager.accounts.containers.environments.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        params.push(("accountId", self._account_id.to_string()));
+        params.push(("containerId", self._container_id.to_string()));
+        params.push(("environmentId", self._environment_id.to_string()));
+        for &field in ["alt", "accountId", "containerId", "environmentId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/environments/{environmentId}".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId"), ("{environmentId}", "environmentId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
+            for param_name in ["environmentId", "containerId", "accountId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The GTM Account ID.
+    ///
+    /// Sets the *account id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerEnvironmentGetCall<'a, C, A> {
+        self._account_id = new_value.to_string();
+        self
+    }
+    /// The GTM Container ID.
+    ///
+    /// Sets the *container id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerEnvironmentGetCall<'a, C, A> {
+        self._container_id = new_value.to_string();
+        self
+    }
+    /// The GTM Environment ID.
+    ///
+    /// Sets the *environment id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn environment_id(mut self, new_value: &str) -> AccountContainerEnvironmentGetCall<'a, C, A> {
+        self._environment_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerEnvironmentGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerEnvironmentGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerEnvironmentGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7176,7 +8756,7 @@ impl<'a, C, A> AccountContainerVersionDeleteCall<'a, C, A> where C: BorrowMut<hy
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().update(req, "accountId")
-///              .fingerprint("dolor")
+///              .fingerprint("sadipscing")
 ///              .doit();
 /// # }
 /// ```
@@ -7962,6 +9542,7 @@ impl<'a, C, A> AccountPermissionGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// # extern crate hyper;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_tagmanager1 as tagmanager1;
+/// use tagmanager1::Folder;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -7972,13 +9553,18 @@ impl<'a, C, A> AccountPermissionGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = TagManager::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Folder::default();
+/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.accounts().containers_move_folders_update("accountId", "containerId", "folderId")
-///              .add_variable_id("justo")
-///              .add_trigger_id("sit")
-///              .add_tag_id("vero")
+/// let result = hub.accounts().containers_move_folders_update(req, "accountId", "containerId", "folderId")
+///              .add_variable_id("Lorem")
+///              .add_trigger_id("et")
+///              .add_tag_id("clita")
 ///              .doit();
 /// # }
 /// ```
@@ -7986,6 +9572,7 @@ pub struct AccountContainerMoveFolderUpdateCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a TagManager<C, A>,
+    _request: Folder,
     _account_id: String,
     _container_id: String,
     _folder_id: String,
@@ -7994,6 +9581,7 @@ pub struct AccountContainerMoveFolderUpdateCall<'a, C, A>
     _tag_id: Vec<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, A> CallBuilder for AccountContainerMoveFolderUpdateCall<'a, C, A> {}
@@ -8012,30 +9600,24 @@ impl<'a, C, A> AccountContainerMoveFolderUpdateCall<'a, C, A> where C: BorrowMut
         };
         dlg.begin(MethodInfo { id: "tagmanager.accounts.containers.move_folders.update",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
         params.push(("accountId", self._account_id.to_string()));
         params.push(("containerId", self._container_id.to_string()));
         params.push(("folderId", self._folder_id.to_string()));
         if self._variable_id.len() > 0 {
-            let mut s = String::new();
             for f in self._variable_id.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("variableId", f.to_string()));
             }
-            params.push(("variableId", s));
         }
         if self._trigger_id.len() > 0 {
-            let mut s = String::new();
             for f in self._trigger_id.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("triggerId", f.to_string()));
             }
-            params.push(("triggerId", s));
         }
         if self._tag_id.len() > 0 {
-            let mut s = String::new();
             for f in self._tag_id.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("tagId", f.to_string()));
             }
-            params.push(("tagId", s));
         }
         for &field in ["accountId", "containerId", "folderId", "variableId", "triggerId", "tagId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -8049,17 +9631,8 @@ impl<'a, C, A> AccountContainerMoveFolderUpdateCall<'a, C, A> where C: BorrowMut
 
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/move_folders/{folderId}".to_string();
-        
-        let mut key = self.hub.auth.borrow_mut().api_key();
-        if key.is_none() {
-            key = dlg.api_key();
-        }
-        match key {
-            Some(value) => params.push(("key", value)),
-            None => {
-                dlg.finished(false);
-                return Err(Error::MissingAPIKey)
-            }
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId"), ("{folderId}", "folderId")].iter() {
@@ -8089,13 +9662,43 @@ impl<'a, C, A> AccountContainerMoveFolderUpdateCall<'a, C, A> where C: BorrowMut
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request);
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()));
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
 
                 dlg.pre_request();
                 req.send()
@@ -8136,6 +9739,15 @@ impl<'a, C, A> AccountContainerMoveFolderUpdateCall<'a, C, A> where C: BorrowMut
     }
 
 
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: Folder) -> AccountContainerMoveFolderUpdateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
     /// The GTM Account ID.
     ///
     /// Sets the *account id* path property to the given value.
@@ -8223,6 +9835,22 @@ impl<'a, C, A> AccountContainerMoveFolderUpdateCall<'a, C, A> where C: BorrowMut
         self
     }
 
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::EditContainer`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerMoveFolderUpdateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
 }
 
 
@@ -10094,7 +11722,7 @@ impl<'a, C, A> AccountContainerTriggerCreateCall<'a, C, A> where C: BorrowMut<hy
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_folders_update(req, "accountId", "containerId", "folderId")
-///              .fingerprint("labore")
+///              .fingerprint("ea")
 ///              .doit();
 /// # }
 /// ```
@@ -11095,6 +12723,297 @@ impl<'a, C, A> AccountContainerVariableDeleteCall<'a, C, A> where C: BorrowMut<h
 }
 
 
+/// Re-generates the authorization code for a GTM Environment.
+///
+/// A builder for the *containers.reauthorize_environments.update* method supported by a *account* resource.
+/// It is not used directly, but through a `AccountMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
+/// use tagmanager1::Environment;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use tagmanager1::TagManager;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = TagManager::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Environment::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.accounts().containers_reauthorize_environments_update(req, "accountId", "containerId", "environmentId")
+///              .doit();
+/// # }
+/// ```
+pub struct AccountContainerReauthorizeEnvironmentUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a TagManager<C, A>,
+    _request: Environment,
+    _account_id: String,
+    _container_id: String,
+    _environment_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for AccountContainerReauthorizeEnvironmentUpdateCall<'a, C, A> {}
+
+impl<'a, C, A> AccountContainerReauthorizeEnvironmentUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Environment)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "tagmanager.accounts.containers.reauthorize_environments.update",
+                               http_method: hyper::method::Method::Put });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        params.push(("accountId", self._account_id.to_string()));
+        params.push(("containerId", self._container_id.to_string()));
+        params.push(("environmentId", self._environment_id.to_string()));
+        for &field in ["alt", "accountId", "containerId", "environmentId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/reauthorize_environments/{environmentId}".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Publish.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId"), ("{environmentId}", "environmentId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
+            for param_name in ["environmentId", "containerId", "accountId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request);
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: Environment) -> AccountContainerReauthorizeEnvironmentUpdateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The GTM Account ID.
+    ///
+    /// Sets the *account id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerReauthorizeEnvironmentUpdateCall<'a, C, A> {
+        self._account_id = new_value.to_string();
+        self
+    }
+    /// The GTM Container ID.
+    ///
+    /// Sets the *container id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerReauthorizeEnvironmentUpdateCall<'a, C, A> {
+        self._container_id = new_value.to_string();
+        self
+    }
+    /// The GTM Environment ID.
+    ///
+    /// Sets the *environment id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn environment_id(mut self, new_value: &str) -> AccountContainerReauthorizeEnvironmentUpdateCall<'a, C, A> {
+        self._environment_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerReauthorizeEnvironmentUpdateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerReauthorizeEnvironmentUpdateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Publish`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerReauthorizeEnvironmentUpdateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
 /// Gets a GTM Account.
 ///
 /// A builder for the *get* method supported by a *account* resource.
@@ -11364,7 +13283,7 @@ impl<'a, C, A> AccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_update(req, "accountId", "containerId")
-///              .fingerprint("sit")
+///              .fingerprint("ut")
 ///              .doit();
 /// # }
 /// ```
@@ -11655,7 +13574,7 @@ impl<'a, C, A> AccountContainerUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_tags_update(req, "accountId", "containerId", "tagId")
-///              .fingerprint("sed")
+///              .fingerprint("accusam")
 ///              .doit();
 /// # }
 /// ```
@@ -11918,6 +13837,309 @@ impl<'a, C, A> AccountContainerTagUpdateCall<'a, C, A> where C: BorrowMut<hyper:
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountContainerTagUpdateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+/// Updates a GTM Environment.
+///
+/// A builder for the *containers.environments.update* method supported by a *account* resource.
+/// It is not used directly, but through a `AccountMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
+/// use tagmanager1::Environment;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use tagmanager1::TagManager;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = TagManager::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Environment::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.accounts().containers_environments_update(req, "accountId", "containerId", "environmentId")
+///              .fingerprint("est")
+///              .doit();
+/// # }
+/// ```
+pub struct AccountContainerEnvironmentUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a TagManager<C, A>,
+    _request: Environment,
+    _account_id: String,
+    _container_id: String,
+    _environment_id: String,
+    _fingerprint: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for AccountContainerEnvironmentUpdateCall<'a, C, A> {}
+
+impl<'a, C, A> AccountContainerEnvironmentUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Environment)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "tagmanager.accounts.containers.environments.update",
+                               http_method: hyper::method::Method::Put });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        params.push(("accountId", self._account_id.to_string()));
+        params.push(("containerId", self._container_id.to_string()));
+        params.push(("environmentId", self._environment_id.to_string()));
+        if let Some(value) = self._fingerprint {
+            params.push(("fingerprint", value.to_string()));
+        }
+        for &field in ["alt", "accountId", "containerId", "environmentId", "fingerprint"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/environments/{environmentId}".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId"), ("{environmentId}", "environmentId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
+            for param_name in ["environmentId", "containerId", "accountId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request);
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: Environment) -> AccountContainerEnvironmentUpdateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The GTM Account ID.
+    ///
+    /// Sets the *account id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerEnvironmentUpdateCall<'a, C, A> {
+        self._account_id = new_value.to_string();
+        self
+    }
+    /// The GTM Container ID.
+    ///
+    /// Sets the *container id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerEnvironmentUpdateCall<'a, C, A> {
+        self._container_id = new_value.to_string();
+        self
+    }
+    /// The GTM Environment ID.
+    ///
+    /// Sets the *environment id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn environment_id(mut self, new_value: &str) -> AccountContainerEnvironmentUpdateCall<'a, C, A> {
+        self._environment_id = new_value.to_string();
+        self
+    }
+    /// When provided, this fingerprint must match the fingerprint of the environment in storage.
+    ///
+    /// Sets the *fingerprint* query property to the given value.
+    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerEnvironmentUpdateCall<'a, C, A> {
+        self._fingerprint = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerEnvironmentUpdateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerEnvironmentUpdateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::EditContainer`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerEnvironmentUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -12485,7 +14707,7 @@ impl<'a, C, A> AccountContainerFolderListCall<'a, C, A> where C: BorrowMut<hyper
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_versions_update(req, "accountId", "containerId", "containerVersionId")
-///              .fingerprint("ipsum")
+///              .fingerprint("sed")
 ///              .doit();
 /// # }
 /// ```
@@ -12788,7 +15010,7 @@ impl<'a, C, A> AccountContainerVersionUpdateCall<'a, C, A> where C: BorrowMut<hy
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_variables_update(req, "accountId", "containerId", "variableId")
-///              .fingerprint("diam")
+///              .fingerprint("et")
 ///              .doit();
 /// # }
 /// ```

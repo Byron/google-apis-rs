@@ -436,22 +436,19 @@ impl Part for SavedReport {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AdClient {
-    /// ARC review mode this ad client is in. Empty if the client is not opted in to ARC. Possible values: POST_REVIEW, AUTOMATIC_PRE_REVIEW.
-    #[serde(rename="arcReviewMode")]
-    pub arc_review_mode: Option<String>,
     /// This ad client's product code, which corresponds to the PRODUCT_CODE report dimension.
     #[serde(rename="productCode")]
     pub product_code: Option<String>,
     /// Kind of resource this is, in this case adsense#adClient.
     pub kind: Option<String>,
+    /// Unique identifier of this ad client.
+    pub id: Option<String>,
     /// Whether this ad client is opted in to ARC.
     #[serde(rename="arcOptIn")]
     pub arc_opt_in: Option<bool>,
     /// Whether this ad client supports being reported on.
     #[serde(rename="supportsReporting")]
     pub supports_reporting: Option<bool>,
-    /// Unique identifier of this ad client.
-    pub id: Option<String>,
 }
 
 impl Part for AdClient {}
@@ -4879,18 +4876,14 @@ impl<'a, C, A> ReportGenerateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             params.push(("startIndex", value.to_string()));
         }
         if self._sort.len() > 0 {
-            let mut s = String::new();
             for f in self._sort.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("sort", f.to_string()));
             }
-            params.push(("sort", s));
         }
         if self._metric.len() > 0 {
-            let mut s = String::new();
             for f in self._metric.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("metric", f.to_string()));
             }
-            params.push(("metric", s));
         }
         if let Some(value) = self._max_results {
             params.push(("maxResults", value.to_string()));
@@ -4899,28 +4892,22 @@ impl<'a, C, A> ReportGenerateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             params.push(("locale", value.to_string()));
         }
         if self._filter.len() > 0 {
-            let mut s = String::new();
             for f in self._filter.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("filter", f.to_string()));
             }
-            params.push(("filter", s));
         }
         if self._dimension.len() > 0 {
-            let mut s = String::new();
             for f in self._dimension.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("dimension", f.to_string()));
             }
-            params.push(("dimension", s));
         }
         if let Some(value) = self._currency {
             params.push(("currency", value.to_string()));
         }
         if self._account_id.len() > 0 {
-            let mut s = String::new();
             for f in self._account_id.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("accountId", f.to_string()));
             }
-            params.push(("accountId", s));
         }
         for &field in ["startDate", "endDate", "useTimezoneReporting", "startIndex", "sort", "metric", "maxResults", "locale", "filter", "dimension", "currency", "accountId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -8656,18 +8643,14 @@ impl<'a, C, A> AccountReportGenerateCall<'a, C, A> where C: BorrowMut<hyper::Cli
             params.push(("startIndex", value.to_string()));
         }
         if self._sort.len() > 0 {
-            let mut s = String::new();
             for f in self._sort.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("sort", f.to_string()));
             }
-            params.push(("sort", s));
         }
         if self._metric.len() > 0 {
-            let mut s = String::new();
             for f in self._metric.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("metric", f.to_string()));
             }
-            params.push(("metric", s));
         }
         if let Some(value) = self._max_results {
             params.push(("maxResults", value.to_string()));
@@ -8676,18 +8659,14 @@ impl<'a, C, A> AccountReportGenerateCall<'a, C, A> where C: BorrowMut<hyper::Cli
             params.push(("locale", value.to_string()));
         }
         if self._filter.len() > 0 {
-            let mut s = String::new();
             for f in self._filter.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("filter", f.to_string()));
             }
-            params.push(("filter", s));
         }
         if self._dimension.len() > 0 {
-            let mut s = String::new();
             for f in self._dimension.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("dimension", f.to_string()));
             }
-            params.push(("dimension", s));
         }
         if let Some(value) = self._currency {
             params.push(("currency", value.to_string()));

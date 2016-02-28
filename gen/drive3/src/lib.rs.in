@@ -750,6 +750,9 @@ impl ResponseResult for Permission {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FileCapabilities {
+    /// Whether the current user has read access to the Revisions resource of the file.
+    #[serde(rename="canReadRevisions")]
+    pub can_read_revisions: Option<bool>,
     /// Whether the user can copy the file.
     #[serde(rename="canCopy")]
     pub can_copy: Option<bool>,
@@ -1189,7 +1192,7 @@ impl<'a, C, A> FileMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Exports a Google Doc to the requested MIME type.
+    /// Exports a Google Doc to the requested MIME type and returns the exported content.
     /// 
     /// # Arguments
     ///
@@ -3116,7 +3119,7 @@ impl<'a, C, A> FileCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 }
 
 
-/// Exports a Google Doc to the requested MIME type.
+/// Exports a Google Doc to the requested MIME type and returns the exported content.
 ///
 /// This method supports **media download**. To enable it, adjust the builder like this:
 /// `.param("alt", "media")`.

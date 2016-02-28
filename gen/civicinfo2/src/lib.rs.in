@@ -1558,18 +1558,14 @@ impl<'a, C, A> RepresentativeRepresentativeInfoByAddresCall<'a, C, A> where C: B
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         if self._roles.len() > 0 {
-            let mut s = String::new();
             for f in self._roles.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("roles", f.to_string()));
             }
-            params.push(("roles", s));
         }
         if self._levels.len() > 0 {
-            let mut s = String::new();
             for f in self._levels.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("levels", f.to_string()));
             }
-            params.push(("levels", s));
         }
         if let Some(value) = self._include_offices {
             params.push(("includeOffices", value.to_string()));
@@ -1796,21 +1792,17 @@ impl<'a, C, A> RepresentativeRepresentativeInfoByDivisionCall<'a, C, A> where C:
         let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("ocdId", self._ocd_id.to_string()));
         if self._roles.len() > 0 {
-            let mut s = String::new();
             for f in self._roles.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("roles", f.to_string()));
             }
-            params.push(("roles", s));
         }
         if let Some(value) = self._recursive {
             params.push(("recursive", value.to_string()));
         }
         if self._levels.len() > 0 {
-            let mut s = String::new();
             for f in self._levels.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("levels", f.to_string()));
             }
-            params.push(("levels", s));
         }
         for &field in ["alt", "ocdId", "roles", "recursive", "levels"].iter() {
             if self._additional_params.contains_key(field) {

@@ -909,11 +909,9 @@ impl<'a, C, A> ProjectServiceAccountKeyListCall<'a, C, A> where C: BorrowMut<hyp
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("name", self._name.to_string()));
         if self._key_types.len() > 0 {
-            let mut s = String::new();
             for f in self._key_types.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("keyTypes", f.to_string()));
             }
-            params.push(("keyTypes", s));
         }
         for &field in ["alt", "name", "keyTypes"].iter() {
             if self._additional_params.contains_key(field) {

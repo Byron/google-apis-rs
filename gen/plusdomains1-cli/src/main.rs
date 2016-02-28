@@ -2163,7 +2163,7 @@ fn main() {
     
     let mut app = App::new("plusdomains1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.3+20160127")
+           .version("0.3.3+20160223")
            .about("The Google+ API enables developers to build on top of the Google+ platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_plusdomains1_cli")
            .arg(Arg::with_name("url")

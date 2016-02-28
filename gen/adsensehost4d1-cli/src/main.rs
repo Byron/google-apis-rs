@@ -2761,7 +2761,7 @@ fn main() {
     
     let mut app = App::new("adsensehost4d1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.3+20160127")
+           .version("0.3.3+20160223")
            .about("Gives AdSense Hosts access to report generation, ad code generation, and publisher management capabilities.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_adsensehost4d1_cli")
            .arg(Arg::with_name("url")

@@ -6683,11 +6683,9 @@ impl<'a, C, A> OrgunitUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("customerId", self._customer_id.to_string()));
         if self._org_unit_path.len() > 0 {
-            let mut s = String::new();
             for f in self._org_unit_path.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("orgUnitPath", f.to_string()));
             }
-            params.push(("orgUnitPath", s));
         }
         for &field in ["alt", "customerId", "orgUnitPath"].iter() {
             if self._additional_params.contains_key(field) {
@@ -6962,11 +6960,9 @@ impl<'a, C, A> OrgunitDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
         params.push(("customerId", self._customer_id.to_string()));
         if self._org_unit_path.len() > 0 {
-            let mut s = String::new();
             for f in self._org_unit_path.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("orgUnitPath", f.to_string()));
             }
-            params.push(("orgUnitPath", s));
         }
         for &field in ["customerId", "orgUnitPath"].iter() {
             if self._additional_params.contains_key(field) {
@@ -7206,11 +7202,9 @@ impl<'a, C, A> OrgunitGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("customerId", self._customer_id.to_string()));
         if self._org_unit_path.len() > 0 {
-            let mut s = String::new();
             for f in self._org_unit_path.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("orgUnitPath", f.to_string()));
             }
-            params.push(("orgUnitPath", s));
         }
         for &field in ["alt", "customerId", "orgUnitPath"].iter() {
             if self._additional_params.contains_key(field) {
@@ -7468,11 +7462,9 @@ impl<'a, C, A> OrgunitPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("customerId", self._customer_id.to_string()));
         if self._org_unit_path.len() > 0 {
-            let mut s = String::new();
             for f in self._org_unit_path.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("orgUnitPath", f.to_string()));
             }
-            params.push(("orgUnitPath", s));
         }
         for &field in ["alt", "customerId", "orgUnitPath"].iter() {
             if self._additional_params.contains_key(field) {

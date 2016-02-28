@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *genomics* crate version *0.1.11+20160124*, where *20160124* is the exact revision of the *genomics:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
+//! This documentation was generated from *genomics* crate version *0.1.11+20160224*, where *20160224* is the exact revision of the *genomics:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/genomics1).
 //! # Features
 //! 
@@ -23,7 +23,7 @@
 //! * referencesets
 //!  * [*get*](struct.ReferencesetGetCall.html) and [*search*](struct.ReferencesetSearchCall.html)
 //! * [variants](struct.Variant.html)
-//!  * [*create*](struct.VariantCreateCall.html), [*delete*](struct.VariantDeleteCall.html), [*get*](struct.VariantGetCall.html), [*import*](struct.VariantImportCall.html), [*patch*](struct.VariantPatchCall.html), [*search*](struct.VariantSearchCall.html) and [*stream*](struct.VariantStreamCall.html)
+//!  * [*create*](struct.VariantCreateCall.html), [*delete*](struct.VariantDeleteCall.html), [*get*](struct.VariantGetCall.html), [*import*](struct.VariantImportCall.html), [*merge*](struct.VariantMergeCall.html), [*patch*](struct.VariantPatchCall.html), [*search*](struct.VariantSearchCall.html) and [*stream*](struct.VariantStreamCall.html)
 //! * variantsets
 //!  * [*create*](struct.VariantsetCreateCall.html), [*delete*](struct.VariantsetDeleteCall.html), [*export*](struct.VariantsetExportCall.html), [*get*](struct.VariantsetGetCall.html), [*patch*](struct.VariantsetPatchCall.html) and [*search*](struct.VariantsetSearchCall.html)
 //! 

@@ -257,7 +257,7 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.manifest" => Some(("update.manifest", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "manifest" => Some(("manifest", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "insert-time" => Some(("insertTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -285,7 +285,7 @@ impl<'n> Engine<'n> {
                     "operation.name" => Some(("operation.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "target.config.content" => Some(("target.config.content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["client-operation-id", "config", "content", "creation-timestamp", "description", "end-time", "fingerprint", "http-error-message", "http-error-status-code", "id", "insert-time", "kind", "manifest", "name", "operation", "operation-type", "progress", "region", "self-link", "start-time", "status", "status-message", "target", "target-id", "target-link", "update", "user", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -436,7 +436,7 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.manifest" => Some(("update.manifest", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "manifest" => Some(("manifest", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "insert-time" => Some(("insertTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -464,7 +464,7 @@ impl<'n> Engine<'n> {
                     "operation.name" => Some(("operation.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "target.config.content" => Some(("target.config.content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["client-operation-id", "config", "content", "creation-timestamp", "description", "end-time", "fingerprint", "http-error-message", "http-error-status-code", "id", "insert-time", "kind", "manifest", "name", "operation", "operation-type", "progress", "region", "self-link", "start-time", "status", "status-message", "target", "target-id", "target-link", "update", "user", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -644,7 +644,7 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.manifest" => Some(("update.manifest", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "manifest" => Some(("manifest", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "insert-time" => Some(("insertTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -672,7 +672,7 @@ impl<'n> Engine<'n> {
                     "operation.name" => Some(("operation.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "target.config.content" => Some(("target.config.content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["client-operation-id", "config", "content", "creation-timestamp", "description", "end-time", "fingerprint", "http-error-message", "http-error-status-code", "id", "insert-time", "kind", "manifest", "name", "operation", "operation-type", "progress", "region", "self-link", "start-time", "status", "status-message", "target", "target-id", "target-link", "update", "user", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1777,7 +1777,7 @@ fn main() {
     
     let mut app = App::new("deploymentmanager2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.3+20160125")
+           .version("0.3.3+20160201")
            .about("The Deployment Manager API allows users to declaratively configure, deploy and run complex solutions on the Google Cloud Platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_deploymentmanager2_cli")
            .arg(Arg::with_name("url")

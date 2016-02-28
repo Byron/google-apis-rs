@@ -3916,7 +3916,7 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "display-ads-title" => Some(("displayAdsTitle", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "adult" => Some(("adult", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "color" => Some(("color", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "additional-image-links" => Some(("additionalImageLinks", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "adwords-labels" => Some(("adwordsLabels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -3945,9 +3945,7 @@ impl<'n> Engine<'n> {
                     "price.currency" => Some(("price.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "price.value" => Some(("price.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "channel" => Some(("channel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "loyalty-points.ratio" => Some(("loyaltyPoints.ratio", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "loyalty-points.name" => Some(("loyaltyPoints.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "loyalty-points.points-value" => Some(("loyaltyPoints.pointsValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "promotion-ids" => Some(("promotionIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "shipping-height.value" => Some(("shippingHeight.value", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "shipping-height.unit" => Some(("shippingHeight.unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-language" => Some(("contentLanguage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3960,7 +3958,7 @@ impl<'n> Engine<'n> {
                     "shipping-length.unit" => Some(("shippingLength.unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "sell-on-google-quantity" => Some(("sellOnGoogleQuantity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "link" => Some(("link", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "adult" => Some(("adult", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "adwords-redirect" => Some(("adwordsRedirect", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-ads-link" => Some(("displayAdsLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "energy-efficiency-class" => Some(("energyEfficiencyClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "size-system" => Some(("sizeSystem", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3987,12 +3985,15 @@ impl<'n> Engine<'n> {
                     "sale-price.currency" => Some(("salePrice.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "sale-price.value" => Some(("salePrice.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "product-type" => Some(("productType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "loyalty-points.ratio" => Some(("loyaltyPoints.ratio", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "loyalty-points.name" => Some(("loyaltyPoints.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "loyalty-points.points-value" => Some(("loyaltyPoints.pointsValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-ads-similar-ids" => Some(("displayAdsSimilarIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "custom-label1" => Some(("customLabel1", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "age-group" => Some(("ageGroup", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "adwords-redirect" => Some(("adwordsRedirect", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-ads-title" => Some(("displayAdsTitle", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-image-links", "adult", "adwords-grouping", "adwords-labels", "adwords-redirect", "age-group", "amount", "availability", "availability-date", "brand", "channel", "color", "condition", "content-language", "currency", "custom-label0", "custom-label1", "custom-label2", "custom-label3", "custom-label4", "description", "display-ads-id", "display-ads-link", "display-ads-similar-ids", "display-ads-title", "display-ads-value", "energy-efficiency-class", "expiration-date", "gender", "google-product-category", "gtin", "id", "identifier-exists", "image-link", "installment", "is-bundle", "item-group-id", "kind", "link", "loyalty-points", "material", "mobile-link", "months", "mpn", "multipack", "name", "offer-id", "online-only", "pattern", "points-value", "price", "product-type", "ratio", "sale-price", "sale-price-effective-date", "sell-on-google-quantity", "shipping-height", "shipping-label", "shipping-length", "shipping-weight", "shipping-width", "size-system", "size-type", "sizes", "target-country", "title", "unit", "unit-pricing-base-measure", "unit-pricing-measure", "validated-destinations", "value"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-image-links", "adult", "adwords-grouping", "adwords-labels", "adwords-redirect", "age-group", "amount", "availability", "availability-date", "brand", "channel", "color", "condition", "content-language", "currency", "custom-label0", "custom-label1", "custom-label2", "custom-label3", "custom-label4", "description", "display-ads-id", "display-ads-link", "display-ads-similar-ids", "display-ads-title", "display-ads-value", "energy-efficiency-class", "expiration-date", "gender", "google-product-category", "gtin", "id", "identifier-exists", "image-link", "installment", "is-bundle", "item-group-id", "kind", "link", "loyalty-points", "material", "mobile-link", "months", "mpn", "multipack", "name", "offer-id", "online-only", "pattern", "points-value", "price", "product-type", "promotion-ids", "ratio", "sale-price", "sale-price-effective-date", "sell-on-google-quantity", "shipping-height", "shipping-label", "shipping-length", "shipping-weight", "shipping-width", "size-system", "size-type", "sizes", "target-country", "title", "unit", "unit-pricing-base-measure", "unit-pricing-measure", "validated-destinations", "value"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -6217,7 +6218,7 @@ fn main() {
     
     let mut app = App::new("content2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.3+20160115")
+           .version("0.3.3+20160204")
            .about("Manage product items, inventory, and Merchant Center accounts for Google Shopping.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_content2_cli")
            .arg(Arg::with_name("url")

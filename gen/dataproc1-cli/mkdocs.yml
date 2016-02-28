@@ -1,4 +1,4 @@
-site_name: dataproc v0.3.3+20151209
+site_name: dataproc v0.3.3+20160219
 site_url: http://byron.github.io/google-apis-rs/google-dataproc1-cli
 site_description: Write integrating applications with bcore
 
@@ -11,6 +11,21 @@ pages:
 - ['index.md', 'Home']
 - ['media_download.md', 'Media', 'Download']
 - ['media_upload.md', 'Media', 'Upload']
+- ['projects_regions-clusters-create.md', 'Projects', 'Regions Clusters Create']
+- ['projects_regions-clusters-delete.md', 'Projects', 'Regions Clusters Delete']
+- ['projects_regions-clusters-diagnose.md', 'Projects', 'Regions Clusters Diagnose']
+- ['projects_regions-clusters-get.md', 'Projects', 'Regions Clusters Get']
+- ['projects_regions-clusters-list.md', 'Projects', 'Regions Clusters List']
+- ['projects_regions-clusters-patch.md', 'Projects', 'Regions Clusters Patch']
+- ['projects_regions-jobs-cancel.md', 'Projects', 'Regions Jobs Cancel']
+- ['projects_regions-jobs-delete.md', 'Projects', 'Regions Jobs Delete']
+- ['projects_regions-jobs-get.md', 'Projects', 'Regions Jobs Get']
+- ['projects_regions-jobs-list.md', 'Projects', 'Regions Jobs List']
+- ['projects_regions-jobs-submit.md', 'Projects', 'Regions Jobs Submit']
+- ['projects_regions-operations-cancel.md', 'Projects', 'Regions Operations Cancel']
+- ['projects_regions-operations-delete.md', 'Projects', 'Regions Operations Delete']
+- ['projects_regions-operations-get.md', 'Projects', 'Regions Operations Get']
+- ['projects_regions-operations-list.md', 'Projects', 'Regions Operations List']
 
 theme: readthedocs
 

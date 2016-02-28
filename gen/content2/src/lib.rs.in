@@ -242,30 +242,21 @@ pub struct ProductsCustomBatchResponseEntry {
 impl Part for ProductsCustomBatchResponseEntry {}
 
 
-/// There is no detailed description.
+/// An error returned by the API.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [refund orders](struct.OrderRefundCall.html) (request)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct OrdersRefundRequest {
-    /// The amount that is refunded.
-    pub amount: Option<Price>,
-    /// The explanation of the reason.
-    #[serde(rename="reasonText")]
-    pub reason_text: Option<String>,
-    /// The reason for the refund.
+pub struct ErrorType {
+    /// The error code.
     pub reason: Option<String>,
-    /// The ID of the operation. Unique across all operations for a given order.
-    #[serde(rename="operationId")]
-    pub operation_id: Option<String>,
+    /// A description of the error.
+    pub message: Option<String>,
+    /// The domain of the error.
+    pub domain: Option<String>,
 }
 
-impl RequestValue for OrdersRefundRequest {}
+impl Part for ErrorType {}
 
 
 /// There is no detailed description.
@@ -407,6 +398,25 @@ pub struct OrderLineItemProduct {
 }
 
 impl Part for OrderLineItemProduct {}
+
+
+/// An example occurrence for a particular error.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DatafeedStatusExample {
+    /// The ID of the example item.
+    #[serde(rename="itemId")]
+    pub item_id: Option<String>,
+    /// The problematic value.
+    pub value: Option<String>,
+    /// Line number in the data feed where the example is found.
+    #[serde(rename="lineNumber")]
+    pub line_number: Option<String>,
+}
+
+impl Part for DatafeedStatusExample {}
 
 
 /// Building block of the cost calculation decision tree.  
@@ -1904,6 +1914,31 @@ impl ResponseResult for DatafeedStatus {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct OrderPromotionBenefit {
+    /// The OfferId(s) that were purchased in this order and map to this specific benefit of the promotion.
+    #[serde(rename="offerIds")]
+    pub offer_ids: Option<Vec<String>>,
+    /// The discount in the order price when the promotion is applied.
+    pub discount: Option<Price>,
+    /// Describes whether the promotion applies to products (e.g. 20% off) or to shipping (e.g. Free Shipping).
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// The impact on tax when the promotion is applied.
+    #[serde(rename="taxImpact")]
+    pub tax_impact: Option<Price>,
+    /// Further describes the benefit of the promotion. Note that we will expand on this enumeration as we support new promotion sub-types.
+    #[serde(rename="subType")]
+    pub sub_type: Option<String>,
+}
+
+impl Part for OrderPromotionBenefit {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProductCustomGroup {
     /// The sub-attributes.
     pub attributes: Option<Vec<ProductCustomAttribute>>,
@@ -2067,21 +2102,30 @@ pub struct DatafeedstatusesCustomBatchRequest {
 impl RequestValue for DatafeedstatusesCustomBatchRequest {}
 
 
-/// An error returned by the API.
+/// There is no detailed description.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [refund orders](struct.OrderRefundCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ErrorType {
-    /// The error code.
+pub struct OrdersRefundRequest {
+    /// The amount that is refunded.
+    pub amount: Option<Price>,
+    /// The explanation of the reason.
+    #[serde(rename="reasonText")]
+    pub reason_text: Option<String>,
+    /// The reason for the refund.
     pub reason: Option<String>,
-    /// A description of the error.
-    pub message: Option<String>,
-    /// The domain of the error.
-    pub domain: Option<String>,
+    /// The ID of the operation. Unique across all operations for a given order.
+    #[serde(rename="operationId")]
+    pub operation_id: Option<String>,
 }
 
-impl Part for ErrorType {}
+impl RequestValue for OrdersRefundRequest {}
 
 
 /// A batch entry encoding a single non-batch datafeeds response.
@@ -2404,6 +2448,8 @@ impl ResponseResult for Datafeed {}
 pub struct TestOrder {
     /// The details of the customer who placed the order.
     pub customer: Option<TestOrderCustomer>,
+    /// The details of the merchant provided promotions applied to the order. More details about the program are  here.
+    pub promotions: Option<Vec<OrderPromotion>>,
     /// Identifies what kind of resource this is. Value: the fixed string "content#testOrder".
     pub kind: Option<String>,
     /// Line items that are ordered. At least one line item must be provided.
@@ -2885,23 +2931,35 @@ pub struct TestOrderLineItemProduct {
 impl Part for TestOrderLineItemProduct {}
 
 
-/// An example occurrence for a particular error.
+/// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DatafeedStatusExample {
-    /// The ID of the example item.
-    #[serde(rename="itemId")]
-    pub item_id: Option<String>,
-    /// The problematic value.
-    pub value: Option<String>,
-    /// Line number in the data feed where the example is found.
-    #[serde(rename="lineNumber")]
-    pub line_number: Option<String>,
+pub struct OrderPromotion {
+    /// The full title of the promotion.
+    #[serde(rename="longTitle")]
+    pub long_title: Option<String>,
+    /// Optional. The text code that corresponds to the promotion when applied on the retailer?s website.
+    #[serde(rename="genericRedemptionCode")]
+    pub generic_redemption_code: Option<String>,
+    /// no description provided
+    pub benefits: Option<Vec<OrderPromotionBenefit>>,
+    /// Indicates that the promotion is valid online.
+    #[serde(rename="redemptionChannel")]
+    pub redemption_channel: Option<String>,
+    /// Whether the promotion is applicable to all products or only specific products.
+    #[serde(rename="productApplicability")]
+    pub product_applicability: Option<String>,
+    /// The date and time frame when the promotion is active and ready for validation review. Note that the promotion live time may be delayed for a few hours due to the validation review.
+    /// Start date and end date are separated by a forward slash (/). The start date is specified by the format (YYYY-MM-DD), followed by the letter ?T?, the time of the day when the sale starts (in Greenwich Mean Time, GMT), followed by an expression of the time zone for the sale. The end date is in the same format.
+    #[serde(rename="effectiveDates")]
+    pub effective_dates: Option<String>,
+    /// The unique ID of the promotion.
+    pub id: Option<String>,
 }
 
-impl Part for DatafeedStatusExample {}
+impl Part for OrderPromotion {}
 
 
 /// There is no detailed description.
@@ -3066,8 +3124,6 @@ impl ResponseResult for OrdersCustomBatchResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Product {
-    /// Set to true if the item is targeted towards adults.
-    pub adult: Option<bool>,
     /// Color of the item.
     pub color: Option<String>,
     /// Similar to adwords_grouping, but only works on CPC.
@@ -3100,6 +3156,9 @@ pub struct Product {
     /// Link to a mobile-optimized version of the landing page.
     #[serde(rename="mobileLink")]
     pub mobile_link: Option<String>,
+    /// The unique ID of a promotion.
+    #[serde(rename="promotionIds")]
+    pub promotion_ids: Option<Vec<String>>,
     /// Specifies the intended aspects for the product.
     pub aspects: Option<Vec<ProductAspect>>,
     /// Height of the item for shipping.
@@ -3170,6 +3229,9 @@ pub struct Product {
     /// Target age group of the item.
     #[serde(rename="ageGroup")]
     pub age_group: Option<String>,
+    /// Title of an item for dynamic remarketing campaigns.
+    #[serde(rename="displayAdsTitle")]
+    pub display_ads_title: Option<String>,
     /// Additional URLs of images of the item.
     #[serde(rename="additionalImageLinks")]
     pub additional_image_links: Option<Vec<String>>,
@@ -3248,9 +3310,8 @@ pub struct Product {
     /// URL of an image of the item.
     #[serde(rename="imageLink")]
     pub image_link: Option<String>,
-    /// Title of an item for dynamic remarketing campaigns.
-    #[serde(rename="displayAdsTitle")]
-    pub display_ads_title: Option<String>,
+    /// Set to true if the item is targeted towards adults.
+    pub adult: Option<bool>,
 }
 
 impl RequestValue for Product {}
@@ -3368,8 +3429,8 @@ impl Part for DatafeedsCustomBatchRequestEntry {}
 pub struct Order {
     /// Shipments of the order.
     pub shipments: Option<Vec<OrderShipment>>,
-    /// The status of the order.
-    pub status: Option<String>,
+    /// The details of the customer who placed the order.
+    pub customer: Option<OrderCustomer>,
     /// The status of the payment.
     #[serde(rename="paymentStatus")]
     pub payment_status: Option<String>,
@@ -3378,8 +3439,8 @@ pub struct Order {
     pub net_amount: Option<Price>,
     /// The REST id of the order. Globally unique.
     pub id: Option<String>,
-    /// The details of the customer who placed the order.
-    pub customer: Option<OrderCustomer>,
+    /// The details of the merchant provided promotions applied to the order. More details about the program are  here.
+    pub promotions: Option<Vec<OrderPromotion>>,
     /// Identifies what kind of resource this is. Value: the fixed string "content#order".
     pub kind: Option<String>,
     /// Line items that are ordered.
@@ -3401,6 +3462,8 @@ pub struct Order {
     /// The requested shipping option.
     #[serde(rename="shippingOption")]
     pub shipping_option: Option<String>,
+    /// The status of the order.
+    pub status: Option<String>,
     /// The details for the delivery.
     #[serde(rename="deliveryDetails")]
     pub delivery_details: Option<OrderDeliveryDetails>,
@@ -16029,11 +16092,9 @@ impl<'a, C, A> OrderListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         let mut params: Vec<(&str, String)> = Vec::with_capacity((10 + self._additional_params.len()));
         params.push(("merchantId", self._merchant_id.to_string()));
         if self._statuses.len() > 0 {
-            let mut s = String::new();
             for f in self._statuses.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("statuses", f.to_string()));
             }
-            params.push(("statuses", s));
         }
         if let Some(value) = self._placed_date_start {
             params.push(("placedDateStart", value.to_string()));

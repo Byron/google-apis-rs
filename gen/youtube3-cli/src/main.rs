@@ -1294,6 +1294,14 @@ impl<'n> Engine<'n> {
                     "branding-settings.channel.featured-channels-urls" => Some(("brandingSettings.channel.featuredChannelsUrls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "branding-settings.channel.tracking-analytics-account-id" => Some(("brandingSettings.channel.trackingAnalyticsAccountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "branding-settings.channel.show-related-channels" => Some(("brandingSettings.channel.showRelatedChannels", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "snippet.description" => Some(("snippet.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.title" => Some(("snippet.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.country" => Some(("snippet.country", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.custom-url" => Some(("snippet.customUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.published-at" => Some(("snippet.publishedAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.default-language" => Some(("snippet.defaultLanguage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.localized.description" => Some(("snippet.localized.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.localized.title" => Some(("snippet.localized.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.thumbnails.default.url" => Some(("snippet.thumbnails.default.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.thumbnails.default.width" => Some(("snippet.thumbnails.default.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "snippet.thumbnails.default.height" => Some(("snippet.thumbnails.default.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -1309,13 +1317,6 @@ impl<'n> Engine<'n> {
                     "snippet.thumbnails.standard.url" => Some(("snippet.thumbnails.standard.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.thumbnails.standard.width" => Some(("snippet.thumbnails.standard.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "snippet.thumbnails.standard.height" => Some(("snippet.thumbnails.standard.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "snippet.title" => Some(("snippet.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "snippet.country" => Some(("snippet.country", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "snippet.default-language" => Some(("snippet.defaultLanguage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "snippet.published-at" => Some(("snippet.publishedAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "snippet.localized.description" => Some(("snippet.localized.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "snippet.localized.title" => Some(("snippet.localized.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "snippet.description" => Some(("snippet.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "audit-details.community-guidelines-good-standing" => Some(("auditDetails.communityGuidelinesGoodStanding", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "audit-details.content-id-claims-good-standing" => Some(("auditDetails.contentIdClaimsGoodStanding", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "audit-details.overall-good-standing" => Some(("auditDetails.overallGoodStanding", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1323,7 +1324,7 @@ impl<'n> Engine<'n> {
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["audit-details", "background-color", "background-image-url", "banner-external-url", "banner-image-url", "banner-mobile-extra-hd-image-url", "banner-mobile-hd-image-url", "banner-mobile-image-url", "banner-mobile-low-image-url", "banner-mobile-medium-hd-image-url", "banner-tablet-extra-hd-image-url", "banner-tablet-hd-image-url", "banner-tablet-image-url", "banner-tablet-low-image-url", "banner-tv-high-image-url", "banner-tv-image-url", "banner-tv-low-image-url", "banner-tv-medium-image-url", "branding-settings", "channel", "comment-count", "community-guidelines-good-standing", "content-details", "content-id-claims-good-standing", "content-owner", "content-owner-details", "copyright-strikes-good-standing", "corner-position", "country", "default", "default-language", "default-tab", "default-timing", "description", "duration-ms", "etag", "favorites", "featured-channels-title", "featured-channels-urls", "featured-playlist-id", "google-plus-user-id", "height", "hidden-subscriber-count", "high", "id", "image", "invideo-promotion", "is-linked", "keywords", "kind", "large-branded-banner-image-imap-script", "large-branded-banner-image-url", "likes", "localized", "long-uploads-status", "maxres", "medium", "moderate-comments", "offset-ms", "overall-good-standing", "position", "privacy-status", "profile-color", "published-at", "related-playlists", "show-browse-view", "show-related-channels", "small-branded-banner-image-imap-script", "small-branded-banner-image-url", "snippet", "standard", "statistics", "status", "subscriber-count", "text-color", "thumbnails", "time-linked", "title", "topic-details", "topic-ids", "tracking-analytics-account-id", "tracking-image-url", "type", "unsubscribed-trailer", "uploads", "url", "use-smart-timing", "value", "video-count", "view-count", "watch", "watch-history", "watch-icon-image-url", "watch-later", "width"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["audit-details", "background-color", "background-image-url", "banner-external-url", "banner-image-url", "banner-mobile-extra-hd-image-url", "banner-mobile-hd-image-url", "banner-mobile-image-url", "banner-mobile-low-image-url", "banner-mobile-medium-hd-image-url", "banner-tablet-extra-hd-image-url", "banner-tablet-hd-image-url", "banner-tablet-image-url", "banner-tablet-low-image-url", "banner-tv-high-image-url", "banner-tv-image-url", "banner-tv-low-image-url", "banner-tv-medium-image-url", "branding-settings", "channel", "comment-count", "community-guidelines-good-standing", "content-details", "content-id-claims-good-standing", "content-owner", "content-owner-details", "copyright-strikes-good-standing", "corner-position", "country", "custom-url", "default", "default-language", "default-tab", "default-timing", "description", "duration-ms", "etag", "favorites", "featured-channels-title", "featured-channels-urls", "featured-playlist-id", "google-plus-user-id", "height", "hidden-subscriber-count", "high", "id", "image", "invideo-promotion", "is-linked", "keywords", "kind", "large-branded-banner-image-imap-script", "large-branded-banner-image-url", "likes", "localized", "long-uploads-status", "maxres", "medium", "moderate-comments", "offset-ms", "overall-good-standing", "position", "privacy-status", "profile-color", "published-at", "related-playlists", "show-browse-view", "show-related-channels", "small-branded-banner-image-imap-script", "small-branded-banner-image-url", "snippet", "standard", "statistics", "status", "subscriber-count", "text-color", "thumbnails", "time-linked", "title", "topic-details", "topic-ids", "tracking-analytics-account-id", "tracking-image-url", "type", "unsubscribed-trailer", "uploads", "url", "use-smart-timing", "value", "video-count", "view-count", "watch", "watch-history", "watch-icon-image-url", "watch-later", "width"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1423,7 +1424,6 @@ impl<'n> Engine<'n> {
                     "snippet.top-level-comment.snippet.published-at" => Some(("snippet.topLevelComment.snippet.publishedAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.top-level-comment.snippet.like-count" => Some(("snippet.topLevelComment.snippet.likeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "snippet.top-level-comment.snippet.text-original" => Some(("snippet.topLevelComment.snippet.textOriginal", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "snippet.top-level-comment.snippet.author-channel-id.value" => Some(("snippet.topLevelComment.snippet.authorChannelId.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.top-level-comment.snippet.parent-id" => Some(("snippet.topLevelComment.snippet.parentId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.top-level-comment.snippet.moderation-status" => Some(("snippet.topLevelComment.snippet.moderationStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.top-level-comment.snippet.can-rate" => Some(("snippet.topLevelComment.snippet.canRate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1438,7 +1438,7 @@ impl<'n> Engine<'n> {
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["author-channel-id", "author-channel-url", "author-display-name", "author-googleplus-profile-url", "author-profile-image-url", "can-rate", "can-reply", "channel-id", "etag", "id", "is-public", "kind", "like-count", "moderation-status", "parent-id", "published-at", "snippet", "text-display", "text-original", "top-level-comment", "total-reply-count", "updated-at", "value", "video-id", "viewer-rating"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["author-channel-url", "author-display-name", "author-googleplus-profile-url", "author-profile-image-url", "can-rate", "can-reply", "channel-id", "etag", "id", "is-public", "kind", "like-count", "moderation-status", "parent-id", "published-at", "snippet", "text-display", "text-original", "top-level-comment", "total-reply-count", "updated-at", "video-id", "viewer-rating"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1617,7 +1617,6 @@ impl<'n> Engine<'n> {
                     "snippet.top-level-comment.snippet.published-at" => Some(("snippet.topLevelComment.snippet.publishedAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.top-level-comment.snippet.like-count" => Some(("snippet.topLevelComment.snippet.likeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "snippet.top-level-comment.snippet.text-original" => Some(("snippet.topLevelComment.snippet.textOriginal", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "snippet.top-level-comment.snippet.author-channel-id.value" => Some(("snippet.topLevelComment.snippet.authorChannelId.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.top-level-comment.snippet.parent-id" => Some(("snippet.topLevelComment.snippet.parentId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.top-level-comment.snippet.moderation-status" => Some(("snippet.topLevelComment.snippet.moderationStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.top-level-comment.snippet.can-rate" => Some(("snippet.topLevelComment.snippet.canRate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1632,7 +1631,7 @@ impl<'n> Engine<'n> {
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["author-channel-id", "author-channel-url", "author-display-name", "author-googleplus-profile-url", "author-profile-image-url", "can-rate", "can-reply", "channel-id", "etag", "id", "is-public", "kind", "like-count", "moderation-status", "parent-id", "published-at", "snippet", "text-display", "text-original", "top-level-comment", "total-reply-count", "updated-at", "value", "video-id", "viewer-rating"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["author-channel-url", "author-display-name", "author-googleplus-profile-url", "author-profile-image-url", "can-rate", "can-reply", "channel-id", "etag", "id", "is-public", "kind", "like-count", "moderation-status", "parent-id", "published-at", "snippet", "text-display", "text-original", "top-level-comment", "total-reply-count", "updated-at", "video-id", "viewer-rating"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1767,7 +1766,6 @@ impl<'n> Engine<'n> {
                     "snippet.published-at" => Some(("snippet.publishedAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.like-count" => Some(("snippet.likeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "snippet.text-original" => Some(("snippet.textOriginal", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "snippet.author-channel-id.value" => Some(("snippet.authorChannelId.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.parent-id" => Some(("snippet.parentId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.moderation-status" => Some(("snippet.moderationStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.can-rate" => Some(("snippet.canRate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1779,7 +1777,7 @@ impl<'n> Engine<'n> {
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["author-channel-id", "author-channel-url", "author-display-name", "author-googleplus-profile-url", "author-profile-image-url", "can-rate", "channel-id", "etag", "id", "kind", "like-count", "moderation-status", "parent-id", "published-at", "snippet", "text-display", "text-original", "updated-at", "value", "video-id", "viewer-rating"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["author-channel-url", "author-display-name", "author-googleplus-profile-url", "author-profile-image-url", "can-rate", "channel-id", "etag", "id", "kind", "like-count", "moderation-status", "parent-id", "published-at", "snippet", "text-display", "text-original", "updated-at", "video-id", "viewer-rating"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2030,7 +2028,6 @@ impl<'n> Engine<'n> {
                     "snippet.published-at" => Some(("snippet.publishedAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.like-count" => Some(("snippet.likeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "snippet.text-original" => Some(("snippet.textOriginal", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "snippet.author-channel-id.value" => Some(("snippet.authorChannelId.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.parent-id" => Some(("snippet.parentId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.moderation-status" => Some(("snippet.moderationStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.can-rate" => Some(("snippet.canRate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -2042,7 +2039,7 @@ impl<'n> Engine<'n> {
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["author-channel-id", "author-channel-url", "author-display-name", "author-googleplus-profile-url", "author-profile-image-url", "can-rate", "channel-id", "etag", "id", "kind", "like-count", "moderation-status", "parent-id", "published-at", "snippet", "text-display", "text-original", "updated-at", "value", "video-id", "viewer-rating"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["author-channel-url", "author-display-name", "author-googleplus-profile-url", "author-profile-image-url", "can-rate", "channel-id", "etag", "id", "kind", "like-count", "moderation-status", "parent-id", "published-at", "snippet", "text-display", "text-original", "updated-at", "video-id", "viewer-rating"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -8325,7 +8322,7 @@ fn main() {
     
     let mut app = App::new("youtube3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.3+20160111")
+           .version("0.3.3+20160222")
            .about("Programmatic access to YouTube features.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_youtube3_cli")
            .arg(Arg::with_name("url")

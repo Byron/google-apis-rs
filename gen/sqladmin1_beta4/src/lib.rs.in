@@ -713,7 +713,7 @@ pub struct User {
     pub name: Option<String>,
     /// The password for the user.
     pub password: Option<String>,
-    /// The host name from which the user can connect. For insert operations, host defaults to an empty string. For update operations, host is specified as part of the request URL. The host name is not mutable with this API.
+    /// The host name from which the user can connect. For insert operations, host defaults to an empty string. For update operations, host is specified as part of the request URL. The host name cannot be updated after insertion.
     pub host: Option<String>,
 }
 
@@ -802,15 +802,15 @@ pub struct DatabaseFlags {
 impl Part for DatabaseFlags {}
 
 
-/// The name and status of the failover replica. Only applies to Second Generation instances.
+/// The name and status of the failover replica. This property is applicable only to Second Generation instances.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DatabaseInstanceFailoverReplica {
-    /// no description provided
+    /// The availability status of the failover replica. A false status indicates that the failover replica is out of sync. The master can only failover to the falover replica when the status is true.
     pub available: Option<bool>,
-    /// no description provided
+    /// The name of the failover replica.
     pub name: Option<String>,
 }
 
@@ -888,16 +888,16 @@ pub struct Settings {
     /// The activation policy for this instance. This specifies when the instance should be activated and is applicable only when the instance state is RUNNABLE. This can be one of the following.
     /// ALWAYS: The instance should always be active.
     /// NEVER: The instance should never be activated.
-    /// ON_DEMAND: The instance is activated upon receiving requests.
+    /// ON_DEMAND: The instance is activated upon receiving requests; only applicable to First Generation instances.
     #[serde(rename="activationPolicy")]
     pub activation_policy: Option<String>,
-    /// The settings for IP Management. This allows to enable or disable the instance IP and manage which external networks can connect to the instance.
+    /// The settings for IP Management. This allows to enable or disable the instance IP and manage which external networks can connect to the instance. The IPv4 address cannot be disabled for Second Generation instances.
     #[serde(rename="ipConfiguration")]
     pub ip_configuration: Option<IpConfiguration>,
     /// Configuration specific to read replica instances. Indicates whether replication is enabled or not.
     #[serde(rename="databaseReplicationEnabled")]
     pub database_replication_enabled: Option<bool>,
-    /// The type of replication this instance uses. This can be either ASYNCHRONOUS or SYNCHRONOUS.
+    /// The type of replication this instance uses. This can be either ASYNCHRONOUS or SYNCHRONOUS. This property is only applicable to First Generation instances.
     #[serde(rename="replicationType")]
     pub replication_type: Option<String>,
     /// The tier of service for this instance, for example D1, D2. For more information, see pricing.
@@ -905,10 +905,10 @@ pub struct Settings {
     /// The version of instance settings. This is a required field for update method to make sure concurrent updates are handled properly. During update, use the most recent settingsVersion value for this instance and do not try to update this value.
     #[serde(rename="settingsVersion")]
     pub settings_version: Option<String>,
-    /// The location preference settings. This allows the instance to be located as near as possible to either an App Engine app or GCE zone for better performance.
+    /// The location preference settings. This allows the instance to be located as near as possible to either an App Engine app or GCE zone for better performance. App Engine co-location is only applicable to First Generation instances.
     #[serde(rename="locationPreference")]
     pub location_preference: Option<LocationPreference>,
-    /// The size of data disk, in GB. Only supported for 2nd Generation instances. The data disk size minimum is 10GB.
+    /// The size of data disk, in GB. The data disk size minimum is 10GB. This property is only applicable to Second Generation instances.
     #[serde(rename="dataDiskSizeGb")]
     pub data_disk_size_gb: Option<String>,
     /// The database flags passed to the instance at startup.
@@ -916,22 +916,22 @@ pub struct Settings {
     pub database_flags: Option<Vec<DatabaseFlags>>,
     /// This is always sql#settings.
     pub kind: Option<String>,
-    /// The type of data disk. Only supported for 2nd Generation instances. The default type is SSD.
+    /// The type of data disk. Only supported for Second Generation instances. The default type is PD_SSD. This property is only applicable to Second Generation instances.
     #[serde(rename="dataDiskType")]
     pub data_disk_type: Option<String>,
-    /// The App Engine app IDs that can access this instance.
+    /// The App Engine app IDs that can access this instance. This property is only applicable to First Generation instances.
     #[serde(rename="authorizedGaeApplications")]
     pub authorized_gae_applications: Option<Vec<String>>,
     /// The daily backup configuration for the instance.
     #[serde(rename="backupConfiguration")]
     pub backup_configuration: Option<BackupConfiguration>,
-    /// Configuration specific to read replica instances. Indicates whether database flags for crash-safe replication are enabled.
+    /// Configuration specific to read replica instances. Indicates whether database flags for crash-safe replication are enabled. This property is only applicable to First Generation instances.
     #[serde(rename="crashSafeReplicationEnabled")]
     pub crash_safe_replication_enabled: Option<bool>,
-    /// The pricing plan for this instance. This can be either PER_USE or PACKAGE.
+    /// The pricing plan for this instance. This can be either PER_USE or PACKAGE. Only PER_USE is supported for Second Generation instances.
     #[serde(rename="pricingPlan")]
     pub pricing_plan: Option<String>,
-    /// The maintenance window for this instance. This specifies when the instance may be restarted for maintenance purposes.
+    /// The maintenance window for this instance. This specifies when the instance may be restarted for maintenance purposes. This property is only applicable to Second Generation instances.
     #[serde(rename="maintenanceWindow")]
     pub maintenance_window: Option<MaintenanceWindow>,
 }
@@ -1134,22 +1134,27 @@ impl ResponseResult for UsersListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DatabaseInstance {
-    /// The name and status of the failover replica. Only applies to Second Generation instances.
+    /// The name and status of the failover replica. This property is applicable only to Second Generation instances.
     #[serde(rename="failoverReplica")]
     pub failover_replica: Option<DatabaseInstanceFailoverReplica>,
     /// The replicas of the instance.
     #[serde(rename="replicaNames")]
     pub replica_names: Option<Vec<String>>,
-    /// The current disk usage of the instance in bytes.
+    /// FIRST_GEN: Basic Cloud SQL instance that runs in a Google-managed container.
+    /// SECOND_GEN: A newer Cloud SQL backend that runs in a Compute Engine VM.
+    /// EXTERNAL: A MySQL server that is not managed by Google.
+    #[serde(rename="backendType")]
+    pub backend_type: Option<String>,
+    /// The current disk usage of the instance in bytes. This property has been deprecated. Users should use the "cloudsql.googleapis.com/database/disk/bytes_used" metric in Cloud Monitoring API instead. Please see https://groups.google.com/d/msg/google-cloud-sql-announce/I_7-F9EBhT0/BtvFtdFeAgAJ for details.
     #[serde(rename="currentDiskSize")]
     pub current_disk_size: Option<String>,
-    /// The service account email address assigned to the instance.
+    /// The service account email address assigned to the instance. This property is applicable only to Second Generation instances.
     #[serde(rename="serviceAccountEmailAddress")]
     pub service_account_email_address: Option<String>,
     /// The assigned IP addresses for the instance.
     #[serde(rename="ipAddresses")]
     pub ip_addresses: Option<Vec<IpMapping>>,
-    /// The database engine type and version. Can be MYSQL_5_5 or MYSQL_5_6. Defaults to MYSQL_5_5. The databaseVersion can not be changed after instance creation.
+    /// The database engine type and version. Can be MYSQL_5_5 or MYSQL_5_6. Defaults to MYSQL_5_6. The databaseVersion can not be changed after instance creation.
     #[serde(rename="databaseVersion")]
     pub database_version: Option<String>,
     /// The instance type. This can be one of the following.
@@ -1168,16 +1173,17 @@ pub struct DatabaseInstance {
     pub kind: Option<String>,
     /// Name of the Cloud SQL instance. This does not include the project ID.
     pub name: Option<String>,
-    /// The IPv6 address assigned to the instance.
+    /// The IPv6 address assigned to the instance. This property is applicable only to First Generation instances.
     #[serde(rename="ipv6Address")]
     pub ipv6_address: Option<String>,
+    /// If the instance state is SUSPENDED, the reason for the suspension.
+    #[serde(rename="suspensionReason")]
+    pub suspension_reason: Option<Vec<String>>,
+    /// The geographical region. Can be us-central (FIRST_GEN instances only), us-central1 (SECOND_GEN instances only), asia-east1 or europe-west1. Defaults to us-central or us-central1 depending on the instance type (First Generation or Second Generation). The region can not be changed after instance creation.
+    pub region: Option<String>,
     /// SSL configuration.
     #[serde(rename="serverCaCert")]
     pub server_ca_cert: Option<SslCert>,
-    /// The geographical region. Can be us-central, asia-east1 or europe-west1. Defaults to us-central. The region can not be changed after instance creation.
-    pub region: Option<String>,
-    /// The user settings.
-    pub settings: Option<Settings>,
     /// The name of the instance which will act as master in the replication setup.
     #[serde(rename="masterInstanceName")]
     pub master_instance_name: Option<String>,
@@ -1196,6 +1202,8 @@ pub struct DatabaseInstance {
     /// Configuration specific to read-replicas replicating from on-premises masters.
     #[serde(rename="replicaConfiguration")]
     pub replica_configuration: Option<ReplicaConfiguration>,
+    /// The user settings.
+    pub settings: Option<Settings>,
     /// The URI of this resource.
     #[serde(rename="selfLink")]
     pub self_link: Option<String>,
@@ -1823,7 +1831,7 @@ impl<'a, C, A> InstanceMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a Cloud SQL instance as a clone of the source instance.
+    /// Creates a Cloud SQL instance as a clone of the source instance. The API is not ready for Second Generation instances yet.
     /// 
     /// # Arguments
     ///
@@ -2136,7 +2144,7 @@ impl<'a, C, A> DatabaseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a resource containing information about a database inside a Cloud SQL instance.
+    /// Deletes a database from a Cloud SQL instance.
     /// 
     /// # Arguments
     ///
@@ -5679,7 +5687,7 @@ impl<'a, C, A> InstancePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
-/// Creates a Cloud SQL instance as a clone of the source instance.
+/// Creates a Cloud SQL instance as a clone of the source instance. The API is not ready for Second Generation instances yet.
 ///
 /// A builder for the *clone* method supported by a *instance* resource.
 /// It is not used directly, but through a `InstanceMethods` instance.
@@ -8796,7 +8804,7 @@ impl<'a, C, A> FlagListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 }
 
 
-/// Deletes a resource containing information about a database inside a Cloud SQL instance.
+/// Deletes a database from a Cloud SQL instance.
 ///
 /// A builder for the *delete* method supported by a *database* resource.
 /// It is not used directly, but through a `DatabaseMethods` instance.

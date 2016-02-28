@@ -8293,19 +8293,19 @@ fn main() {
                   vec![
                     (Some(r##"account-id"##),
                      None,
-                     Some(r##"Account ID to retrieve the goal for."##),
+                     Some(r##"Account ID to retrieve the view (profile) for."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"web-property-id"##),
                      None,
-                     Some(r##"Web property ID to retrieve the goal for."##),
+                     Some(r##"Web property ID to retrieve the view (profile) for."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"profile-id"##),
                      None,
-                     Some(r##"View (Profile) ID to retrieve the goal for."##),
+                     Some(r##"View (Profile) ID to retrieve the view (profile) for."##),
                      Some(true),
                      Some(false)),
         
@@ -9311,7 +9311,7 @@ fn main() {
     
     let mut app = App::new("analytics3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.3+20151215")
+           .version("0.3.3+20160223")
            .about("View and manage your Google Analytics data")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_analytics3_cli")
            .arg(Arg::with_name("url")

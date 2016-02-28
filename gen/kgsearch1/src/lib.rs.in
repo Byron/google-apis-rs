@@ -299,11 +299,9 @@ impl<'a, C, A> EntitySearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((9 + self._additional_params.len()));
         if self._types.len() > 0 {
-            let mut s = String::new();
             for f in self._types.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("types", f.to_string()));
             }
-            params.push(("types", s));
         }
         if let Some(value) = self._query {
             params.push(("query", value.to_string()));
@@ -315,21 +313,17 @@ impl<'a, C, A> EntitySearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             params.push(("limit", value.to_string()));
         }
         if self._languages.len() > 0 {
-            let mut s = String::new();
             for f in self._languages.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("languages", f.to_string()));
             }
-            params.push(("languages", s));
         }
         if let Some(value) = self._indent {
             params.push(("indent", value.to_string()));
         }
         if self._ids.len() > 0 {
-            let mut s = String::new();
             for f in self._ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("ids", f.to_string()));
             }
-            params.push(("ids", s));
         }
         for &field in ["alt", "types", "query", "prefix", "limit", "languages", "indent", "ids"].iter() {
             if self._additional_params.contains_key(field) {

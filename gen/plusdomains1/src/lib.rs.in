@@ -36,7 +36,7 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
 #[derive(PartialEq, Eq, Hash)]
 pub enum Scope {
-    /// Know your basic profile info and list of people in your circles.
+    /// Know the list of people in your circles, your age range, and language
     PluLogin,
 
     /// View your basic profile info
@@ -2405,18 +2405,14 @@ impl<'a, C, A> CircleRemovePeopleCall<'a, C, A> where C: BorrowMut<hyper::Client
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("circleId", self._circle_id.to_string()));
         if self._user_id.len() > 0 {
-            let mut s = String::new();
             for f in self._user_id.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("userId", f.to_string()));
             }
-            params.push(("userId", s));
         }
         if self._email.len() > 0 {
-            let mut s = String::new();
             for f in self._email.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("email", f.to_string()));
             }
-            params.push(("email", s));
         }
         for &field in ["circleId", "userId", "email"].iter() {
             if self._additional_params.contains_key(field) {
@@ -2931,18 +2927,14 @@ impl<'a, C, A> CircleAddPeopleCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("circleId", self._circle_id.to_string()));
         if self._user_id.len() > 0 {
-            let mut s = String::new();
             for f in self._user_id.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("userId", f.to_string()));
             }
-            params.push(("userId", s));
         }
         if self._email.len() > 0 {
-            let mut s = String::new();
             for f in self._email.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("email", f.to_string()));
             }
-            params.push(("email", s));
         }
         for &field in ["alt", "circleId", "userId", "email"].iter() {
             if self._additional_params.contains_key(field) {

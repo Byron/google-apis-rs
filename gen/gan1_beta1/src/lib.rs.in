@@ -2553,11 +2553,9 @@ impl<'a, C, A> LinkListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
             params.push(("relationshipStatus", value.to_string()));
         }
         if self._promotion_type.len() > 0 {
-            let mut s = String::new();
             for f in self._promotion_type.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("promotionType", f.to_string()));
             }
-            params.push(("promotionType", s));
         }
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -2578,18 +2576,14 @@ impl<'a, C, A> LinkListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
             params.push(("authorship", value.to_string()));
         }
         if self._asset_size.len() > 0 {
-            let mut s = String::new();
             for f in self._asset_size.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("assetSize", f.to_string()));
             }
-            params.push(("assetSize", s));
         }
         if self._advertiser_id.len() > 0 {
-            let mut s = String::new();
             for f in self._advertiser_id.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("advertiserId", f.to_string()));
             }
-            params.push(("advertiserId", s));
         }
         for &field in ["alt", "role", "roleId", "startDateMin", "startDateMax", "searchText", "relationshipStatus", "promotionType", "pageToken", "maxResults", "linkType", "createDateMin", "createDateMax", "authorship", "assetSize", "advertiserId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -2944,28 +2938,22 @@ impl<'a, C, A> ReportGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             params.push(("startDate", value.to_string()));
         }
         if self._publisher_id.len() > 0 {
-            let mut s = String::new();
             for f in self._publisher_id.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("publisherId", f.to_string()));
             }
-            params.push(("publisherId", s));
         }
         if self._order_id.len() > 0 {
-            let mut s = String::new();
             for f in self._order_id.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("orderId", f.to_string()));
             }
-            params.push(("orderId", s));
         }
         if let Some(value) = self._max_results {
             params.push(("maxResults", value.to_string()));
         }
         if self._link_id.len() > 0 {
-            let mut s = String::new();
             for f in self._link_id.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("linkId", f.to_string()));
             }
-            params.push(("linkId", s));
         }
         if let Some(value) = self._event_type {
             params.push(("eventType", value.to_string()));
@@ -2977,11 +2965,9 @@ impl<'a, C, A> ReportGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             params.push(("calculateTotals", value.to_string()));
         }
         if self._advertiser_id.len() > 0 {
-            let mut s = String::new();
             for f in self._advertiser_id.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("advertiserId", f.to_string()));
             }
-            params.push(("advertiserId", s));
         }
         for &field in ["alt", "role", "roleId", "reportType", "status", "startIndex", "startDate", "publisherId", "orderId", "maxResults", "linkId", "eventType", "endDate", "calculateTotals", "advertiserId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -3305,11 +3291,9 @@ impl<'a, C, A> CcOfferListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             params.push(("projection", value.to_string()));
         }
         if self._advertiser.len() > 0 {
-            let mut s = String::new();
             for f in self._advertiser.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("advertiser", f.to_string()));
             }
-            params.push(("advertiser", s));
         }
         for &field in ["alt", "publisher", "projection", "advertiser"].iter() {
             if self._additional_params.contains_key(field) {

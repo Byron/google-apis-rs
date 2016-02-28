@@ -1,4 +1,4 @@
-site_name: Tag Manager v0.3.3+20151112
+site_name: Tag Manager v0.3.3+20160209
 site_url: http://byron.github.io/google-apis-rs/google-tagmanager1-cli
 site_description: Write integrating applications with bcore
 
@@ -11,6 +11,12 @@ pages:
 - ['index.md', 'Home']
 - ['accounts_containers-create.md', 'Accounts', 'Containers Create']
 - ['accounts_containers-delete.md', 'Accounts', 'Containers Delete']
+- ['accounts_containers-environments-create.md', 'Accounts', 'Containers Environments Create']
+- ['accounts_containers-environments-delete.md', 'Accounts', 'Containers Environments Delete']
+- ['accounts_containers-environments-get.md', 'Accounts', 'Containers Environments Get']
+- ['accounts_containers-environments-list.md', 'Accounts', 'Containers Environments List']
+- ['accounts_containers-environments-patch.md', 'Accounts', 'Containers Environments Patch']
+- ['accounts_containers-environments-update.md', 'Accounts', 'Containers Environments Update']
 - ['accounts_containers-folders-create.md', 'Accounts', 'Containers Folders Create']
 - ['accounts_containers-folders-delete.md', 'Accounts', 'Containers Folders Delete']
 - ['accounts_containers-folders-entities-list.md', 'Accounts', 'Containers Folders Entities List']
@@ -20,6 +26,7 @@ pages:
 - ['accounts_containers-get.md', 'Accounts', 'Containers Get']
 - ['accounts_containers-list.md', 'Accounts', 'Containers List']
 - ['accounts_containers-move-folders-update.md', 'Accounts', 'Containers Move Folders Update']
+- ['accounts_containers-reauthorize-environments-update.md', 'Accounts', 'Containers Reauthorize Environments Update']
 - ['accounts_containers-tags-create.md', 'Accounts', 'Containers Tags Create']
 - ['accounts_containers-tags-delete.md', 'Accounts', 'Containers Tags Delete']
 - ['accounts_containers-tags-get.md', 'Accounts', 'Containers Tags Get']

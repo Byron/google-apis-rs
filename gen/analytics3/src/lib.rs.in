@@ -3135,9 +3135,9 @@ impl<'a, C, A> ManagementMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `accountId` - Account ID to retrieve the goal for.
-    /// * `webPropertyId` - Web property ID to retrieve the goal for.
-    /// * `profileId` - View (Profile) ID to retrieve the goal for.
+    /// * `accountId` - Account ID to retrieve the view (profile) for.
+    /// * `webPropertyId` - Web property ID to retrieve the view (profile) for.
+    /// * `profileId` - View (Profile) ID to retrieve the view (profile) for.
     pub fn profiles_get(&self, account_id: &str, web_property_id: &str, profile_id: &str) -> ManagementProfileGetCall<'a, C, A> {
         ManagementProfileGetCall {
             hub: self.hub,
@@ -5410,7 +5410,7 @@ impl<'a, C, A> ManagementProfileGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
-    /// Account ID to retrieve the goal for.
+    /// Account ID to retrieve the view (profile) for.
     ///
     /// Sets the *account id* path property to the given value.
     ///
@@ -5420,7 +5420,7 @@ impl<'a, C, A> ManagementProfileGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._account_id = new_value.to_string();
         self
     }
-    /// Web property ID to retrieve the goal for.
+    /// Web property ID to retrieve the view (profile) for.
     ///
     /// Sets the *web property id* path property to the given value.
     ///
@@ -5430,7 +5430,7 @@ impl<'a, C, A> ManagementProfileGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._web_property_id = new_value.to_string();
         self
     }
-    /// View (Profile) ID to retrieve the goal for.
+    /// View (Profile) ID to retrieve the view (profile) for.
     ///
     /// Sets the *profile id* path property to the given value.
     ///

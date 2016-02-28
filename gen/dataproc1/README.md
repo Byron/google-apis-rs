@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-dataproc1` library allows access to all features of the *Google dataproc* service.
 
-This documentation was generated from *dataproc* crate version *0.1.11+20151209*, where *20151209* is the exact revision of the *dataproc:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
+This documentation was generated from *dataproc* crate version *0.1.11+20160219*, where *20160219* is the exact revision of the *dataproc:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
 
 Everything else about the *dataproc* *v1* API can be found at the
 [official documentation site](https://cloud.google.com/dataproc/).
@@ -15,6 +15,8 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
 
 * [media](http://byron.github.io/google-apis-rs/google_dataproc1/struct.Media.html)
  * [*download*](http://byron.github.io/google-apis-rs/google_dataproc1/struct.MediaDownloadCall.html) and [*upload*](http://byron.github.io/google-apis-rs/google_dataproc1/struct.MediaUploadCall.html)
+* projects
+ * [*regions clusters create*](http://byron.github.io/google-apis-rs/google_dataproc1/struct.ProjectRegionClusterCreateCall.html), [*regions clusters delete*](http://byron.github.io/google-apis-rs/google_dataproc1/struct.ProjectRegionClusterDeleteCall.html), [*regions clusters diagnose*](http://byron.github.io/google-apis-rs/google_dataproc1/struct.ProjectRegionClusterDiagnoseCall.html), [*regions clusters get*](http://byron.github.io/google-apis-rs/google_dataproc1/struct.ProjectRegionClusterGetCall.html), [*regions clusters list*](http://byron.github.io/google-apis-rs/google_dataproc1/struct.ProjectRegionClusterListCall.html), [*regions clusters patch*](http://byron.github.io/google-apis-rs/google_dataproc1/struct.ProjectRegionClusterPatchCall.html), [*regions jobs cancel*](http://byron.github.io/google-apis-rs/google_dataproc1/struct.ProjectRegionJobCancelCall.html), [*regions jobs delete*](http://byron.github.io/google-apis-rs/google_dataproc1/struct.ProjectRegionJobDeleteCall.html), [*regions jobs get*](http://byron.github.io/google-apis-rs/google_dataproc1/struct.ProjectRegionJobGetCall.html), [*regions jobs list*](http://byron.github.io/google-apis-rs/google_dataproc1/struct.ProjectRegionJobListCall.html), [*regions jobs submit*](http://byron.github.io/google-apis-rs/google_dataproc1/struct.ProjectRegionJobSubmitCall.html), [*regions operations cancel*](http://byron.github.io/google-apis-rs/google_dataproc1/struct.ProjectRegionOperationCancelCall.html), [*regions operations delete*](http://byron.github.io/google-apis-rs/google_dataproc1/struct.ProjectRegionOperationDeleteCall.html), [*regions operations get*](http://byron.github.io/google-apis-rs/google_dataproc1/struct.ProjectRegionOperationGetCall.html) and [*regions operations list*](http://byron.github.io/google-apis-rs/google_dataproc1/struct.ProjectRegionOperationListCall.html)
 
 
 Upload supported by ...
@@ -55,8 +57,11 @@ let r = hub.resource().activity(...).doit()
 Or specifically ...
 
 ```ignore
-let r = hub.media().upload(...).doit()
-let r = hub.media().download(...).doit()
+let r = hub.projects().regions_clusters_patch(...).doit()
+let r = hub.projects().regions_clusters_create(...).doit()
+let r = hub.projects().regions_operations_get(...).doit()
+let r = hub.projects().regions_clusters_delete(...).doit()
+let r = hub.projects().regions_clusters_diagnose(...).doit()
 ```
 
 The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -81,9 +86,8 @@ google-dataproc1 = "*"
 extern crate hyper;
 extern crate yup_oauth2 as oauth2;
 extern crate google_dataproc1 as dataproc1;
-use dataproc1::Media;
+use dataproc1::Cluster;
 use dataproc1::{Result, Error};
-use std::fs;
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 use dataproc1::Dataproc;
@@ -103,13 +107,14 @@ let mut hub = Dataproc::new(hyper::Client::new(), auth);
 // As the method needs a request, you would usually fill it with the desired information
 // into the respective structure. Some of the parts shown here might not be applicable !
 // Values shown here are possibly random and not representative !
-let mut req = Media::default();
+let mut req = Cluster::default();
 
 // You can configure optional parameters by calling the respective setters at will, and
-// execute the final call using `upload(...)`.
+// execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
-let result = hub.media().upload(req, "resourceName")
-             .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
+let result = hub.projects().regions_clusters_patch(req, "projectId", "region", "clusterName")
+             .update_mask("sed")
+             .doit();
 
 match result {
     Err(e) => match e {

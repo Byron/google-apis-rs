@@ -597,11 +597,9 @@ impl<'a, C, A> PagespeedapiRunpagespeedCall<'a, C, A> where C: BorrowMut<hyper::
             params.push(("screenshot", value.to_string()));
         }
         if self._rule.len() > 0 {
-            let mut s = String::new();
             for f in self._rule.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("rule", f.to_string()));
             }
-            params.push(("rule", s));
         }
         if let Some(value) = self._locale {
             params.push(("locale", value.to_string()));

@@ -401,11 +401,9 @@ impl<'a, C, A> MethodReconcileCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
         if self._prop.len() > 0 {
-            let mut s = String::new();
             for f in self._prop.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("prop", f.to_string()));
             }
-            params.push(("prop", s));
         }
         if let Some(value) = self._name {
             params.push(("name", value.to_string()));
@@ -414,18 +412,14 @@ impl<'a, C, A> MethodReconcileCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             params.push(("limit", value.to_string()));
         }
         if self._lang.len() > 0 {
-            let mut s = String::new();
             for f in self._lang.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("lang", f.to_string()));
             }
-            params.push(("lang", s));
         }
         if self._kind.len() > 0 {
-            let mut s = String::new();
             for f in self._kind.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("kind", f.to_string()));
             }
-            params.push(("kind", s));
         }
         if let Some(value) = self._confidence {
             params.push(("confidence", value.to_string()));
@@ -706,25 +700,19 @@ impl<'a, C, A> MethodSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((24 + self._additional_params.len()));
         if self._without.len() > 0 {
-            let mut s = String::new();
             for f in self._without.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("without", f.to_string()));
             }
-            params.push(("without", s));
         }
         if self._with.len() > 0 {
-            let mut s = String::new();
             for f in self._with.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("with", f.to_string()));
             }
-            params.push(("with", s));
         }
         if self._type_.len() > 0 {
-            let mut s = String::new();
             for f in self._type_.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("type", f.to_string()));
             }
-            params.push(("type", s));
         }
         if let Some(value) = self._stemmed {
             params.push(("stemmed", value.to_string()));
@@ -748,21 +736,17 @@ impl<'a, C, A> MethodSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             params.push(("mql_output", value.to_string()));
         }
         if self._mid.len() > 0 {
-            let mut s = String::new();
             for f in self._mid.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("mid", f.to_string()));
             }
-            params.push(("mid", s));
         }
         if let Some(value) = self._limit {
             params.push(("limit", value.to_string()));
         }
         if self._lang.len() > 0 {
-            let mut s = String::new();
             for f in self._lang.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("lang", f.to_string()));
             }
-            params.push(("lang", s));
         }
         if let Some(value) = self._indent {
             params.push(("indent", value.to_string()));
@@ -774,11 +758,9 @@ impl<'a, C, A> MethodSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             params.push(("format", value.to_string()));
         }
         if self._filter.len() > 0 {
-            let mut s = String::new();
             for f in self._filter.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("filter", f.to_string()));
             }
-            params.push(("filter", s));
         }
         if let Some(value) = self._exact {
             params.push(("exact", value.to_string()));
@@ -787,11 +769,9 @@ impl<'a, C, A> MethodSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             params.push(("encode", value.to_string()));
         }
         if self._domain.len() > 0 {
-            let mut s = String::new();
             for f in self._domain.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("domain", f.to_string()));
             }
-            params.push(("domain", s));
         }
         if let Some(value) = self._cursor {
             params.push(("cursor", value.to_string()));

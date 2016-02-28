@@ -332,7 +332,7 @@ pub struct ReferenceBound {
     /// An upper bound (inclusive) on the starting coordinate of any variant in the reference sequence.
     #[serde(rename="upperBound")]
     pub upper_bound: Option<String>,
-    /// The name of the reference associated with this ReferenceBound.
+    /// The name of the reference associated with this reference bound.
     #[serde(rename="referenceName")]
     pub reference_name: Option<String>,
 }
@@ -407,7 +407,7 @@ pub struct Position {
 impl Part for Position {}
 
 
-/// Defines an Identity and Access Management (IAM) policy. It is used to specify access control policies for Cloud Platform resources. A `Policy` consists of a list of `bindings`. A `Binding` binds a list of `members` to a `role`, where the members can be user accounts, Google groups, Google domains, and service accounts. A `role` is a named list of permissions defined by IAM. **Example** { "bindings": [ { "role": "roles/owner", "members": [ "user:mike@example.com", "group:admins@example.com", "domain:google.com", "serviceAccount:my-other-app@appspot.gserviceaccount.com"] }, { "role": "roles/viewer", "members": ["user:sean@example.com"] } ] } For a description of IAM and its features, see the [IAM developer's guide](https://cloud.google.com/iam).
+/// Defines an Identity and Access Management (IAM) policy. It is used to specify access control policies for Cloud Platform resources. A `Policy` consists of a list of `bindings`. A `Binding` binds a list of `members` to a `role`, where the members can be user accounts, Google groups, Google domains, and service accounts. A `role` is a named list of permissions defined by IAM. **Example** { "bindings": [ { "role": "roles/owner", "members": [ "user:mike@example.com", "group:admins@example.com", "domain:google.com", "serviceAccount:my-other-app@appspot.gserviceaccount.com", ] }, { "role": "roles/viewer", "members": ["user:sean@example.com"] } ] } For a description of IAM and its features, see the [IAM developer's guide](https://cloud.google.com/iam).
 /// 
 /// # Activities
 /// 
@@ -470,6 +470,7 @@ impl RequestValue for ImportVariantsRequest {}
 /// * [delete callsets](struct.CallsetDeleteCall.html) (response)
 /// * [delete variantsets](struct.VariantsetDeleteCall.html) (response)
 /// * [delete variants](struct.VariantDeleteCall.html) (response)
+/// * [merge variants](struct.VariantMergeCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Empty;
@@ -625,11 +626,12 @@ impl Resource for Read {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [import variants](struct.VariantImportCall.html) (none)
+/// * [patch variants](struct.VariantPatchCall.html) (request|response)
 /// * [delete variants](struct.VariantDeleteCall.html) (none)
 /// * [create variants](struct.VariantCreateCall.html) (request|response)
 /// * [get variants](struct.VariantGetCall.html) (response)
-/// * [patch variants](struct.VariantPatchCall.html) (request|response)
+/// * [import variants](struct.VariantImportCall.html) (none)
+/// * [merge variants](struct.VariantMergeCall.html) (none)
 /// * [search variants](struct.VariantSearchCall.html) (none)
 /// * [stream variants](struct.VariantStreamCall.html) (none)
 /// 
@@ -700,34 +702,25 @@ pub struct ImportReadGroupSetsRequest {
 impl RequestValue for ImportReadGroupSetsRequest {}
 
 
-/// The variant data export request.
+/// The variant search response.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [export variantsets](struct.VariantsetExportCall.html) (request)
+/// * [search variants](struct.VariantSearchCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ExportVariantSetRequest {
-    /// Required. The Google Cloud project ID that owns the destination BigQuery dataset. The caller must have WRITE access to this project. This project will also own the resulting export job.
-    #[serde(rename="projectId")]
-    pub project_id: Option<String>,
-    /// The format for the exported data.
-    pub format: Option<String>,
-    /// Required. The BigQuery dataset to export data to. This dataset must already exist. Note that this is distinct from the Genomics concept of "dataset".
-    #[serde(rename="bigqueryDataset")]
-    pub bigquery_dataset: Option<String>,
-    /// If provided, only variant call information from the specified call sets will be exported. By default all variant calls are exported.
-    #[serde(rename="callSetIds")]
-    pub call_set_ids: Option<Vec<String>>,
-    /// Required. The BigQuery table to export data to. If the table doesn't exist, it will be created. If it already exists, it will be overwritten.
-    #[serde(rename="bigqueryTable")]
-    pub bigquery_table: Option<String>,
+pub struct SearchVariantsResponse {
+    /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The list of matching Variants.
+    pub variants: Option<Vec<Variant>>,
 }
 
-impl RequestValue for ExportVariantSetRequest {}
+impl ResponseResult for SearchVariantsResponse {}
 
 
 /// There is no detailed description.
@@ -865,25 +858,25 @@ impl Resource for VariantSet {}
 impl ResponseResult for VariantSet {}
 
 
-/// The variant search response.
+/// There is no detailed description.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [search variants](struct.VariantSearchCall.html) (response)
+/// * [merge variants](struct.VariantMergeCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SearchVariantsResponse {
-    /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The list of matching Variants.
+pub struct MergeVariantsRequest {
+    /// The destination variant set.
+    #[serde(rename="variantSetId")]
+    pub variant_set_id: Option<String>,
+    /// The variants to be merged with existing variants.
     pub variants: Option<Vec<Variant>>,
 }
 
-impl ResponseResult for SearchVariantsResponse {}
+impl RequestValue for MergeVariantsRequest {}
 
 
 /// A single CIGAR operation.
@@ -1220,19 +1213,24 @@ impl ResponseResult for ReadGroupSet {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct StreamReadsRequest {
-    /// The Google Developers Console project ID or number which will be billed for this access. The caller must have WRITE access to this project. Required.
-    #[serde(rename="projectId")]
-    pub project_id: Option<String>,
-    /// The reference sequence name, for example `chr1`, `1`, or `chrX`. If set to *, only unmapped reads are returned.
-    #[serde(rename="referenceName")]
-    pub reference_name: Option<String>,
+    /// The start position of the range on the reference, 0-based inclusive. If specified, `referenceName` must also be specified.
+    pub start: Option<String>,
     /// The end position of the range on the reference, 0-based exclusive. If specified, `referenceName` must also be specified.
     pub end: Option<String>,
+    /// Specifying `totalShards` causes a disjoint subset of the normal response payload to be returned for each query with a unique `shard` parameter specified. A best effort is made to yield equally sized shards. Sharding can be used to distribute processing amongst workers, where each worker is assigned a unique `shard` number and all workers specify the same `totalShards` number. The union of reads returned for all sharded queries `[0, totalShards)` is equal to those returned by a single unsharded query. Queries for different values of `totalShards` with common divisors will share shard boundaries. For example, streaming `shard` 2 of 5 `totalShards` yields the same results as streaming `shard`s 4 and 5 of 10 `totalShards`. This property can be leveraged for adaptive retries.
+    #[serde(rename="totalShards")]
+    pub total_shards: Option<i32>,
     /// The ID of the read group set from which to stream reads.
     #[serde(rename="readGroupSetId")]
     pub read_group_set_id: Option<String>,
-    /// The start position of the range on the reference, 0-based inclusive. If specified, `referenceName` must also be specified.
-    pub start: Option<String>,
+    /// The reference sequence name, for example `chr1`, `1`, or `chrX`. If set to *, only unmapped reads are returned.
+    #[serde(rename="referenceName")]
+    pub reference_name: Option<String>,
+    /// The Google Developers Console project ID or number which will be billed for this access. The caller must have WRITE access to this project. Required.
+    #[serde(rename="projectId")]
+    pub project_id: Option<String>,
+    /// Restricts results to a shard containing approximately `1/totalShards` of the normal response payload for this query. Results from a sharded request are disjoint from those returned by all queries which differ only in their shard parameter. A shard may yield 0 results; this is especially likely for large values of `totalShards`. Valid values are `[0, totalShards)`.
+    pub shard: Option<i32>,
 }
 
 impl RequestValue for StreamReadsRequest {}
@@ -1311,6 +1309,36 @@ pub struct LinearAlignment {
 }
 
 impl Part for LinearAlignment {}
+
+
+/// The variant data export request.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [export variantsets](struct.VariantsetExportCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ExportVariantSetRequest {
+    /// Required. The Google Cloud project ID that owns the destination BigQuery dataset. The caller must have WRITE access to this project. This project will also own the resulting export job.
+    #[serde(rename="projectId")]
+    pub project_id: Option<String>,
+    /// The format for the exported data.
+    pub format: Option<String>,
+    /// Required. The BigQuery dataset to export data to. This dataset must already exist. Note that this is distinct from the Genomics concept of "dataset".
+    #[serde(rename="bigqueryDataset")]
+    pub bigquery_dataset: Option<String>,
+    /// If provided, only variant call information from the specified call sets will be exported. By default all variant calls are exported.
+    #[serde(rename="callSetIds")]
+    pub call_set_ids: Option<Vec<String>>,
+    /// Required. The BigQuery table to export data to. If the table doesn't exist, it will be created. If it already exists, it will be overwritten.
+    #[serde(rename="bigqueryTable")]
+    pub bigquery_table: Option<String>,
+}
+
+impl RequestValue for ExportVariantSetRequest {}
 
 
 /// A call represents the determination of genotype with respect to a particular variant. It may include associated information such as quality and phasing. For example, a call might assign a probability of 0.32 to the occurrence of a SNP named rs1234 in a call set with the name NA12345.
@@ -1549,7 +1577,7 @@ pub struct SearchVariantsRequest {
     /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of `nextPageToken` from the previous response.
     #[serde(rename="pageToken")]
     pub page_token: Option<String>,
-    /// The maximum number of calls to return in a single page. Note that this limit may be exceeded; at least one variant is always returned per page, even if it has more calls than this limit. If unspecified, defaults to 5000. The maximum value is 10000.
+    /// The maximum number of calls to return in a single page. Note that this limit may be exceeded in the event that a matching variant contains more calls than the requested maximum. If unspecified, defaults to 5000. The maximum value is 10000.
     #[serde(rename="maxCalls")]
     pub max_calls: Option<i32>,
     /// The beginning of the window (0-based, inclusive) for which overlapping variants should be returned. If unspecified, defaults to 0.
@@ -2511,7 +2539,7 @@ impl<'a, C, A> ReferenceMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Genomics::new(hyper::Client::new(), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `create(...)`, `delete(...)`, `get(...)`, `import(...)`, `patch(...)`, `search(...)` and `stream(...)`
+/// // like `create(...)`, `delete(...)`, `get(...)`, `import(...)`, `merge(...)`, `patch(...)`, `search(...)` and `stream(...)`
 /// // to build up your call.
 /// let rb = hub.variants();
 /// # }
@@ -2579,13 +2607,13 @@ impl<'a, C, A> VariantMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new variant. For the definitions of variants and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
+    /// Merges the given variants with existing variants. For the definitions of variants and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics) Each variant will be merged with an existing variant that matches its reference sequence, start, end, reference bases, and alternative bases. If no such variant exists, a new one will be created. When variants are merged, the call information from the new variant is added to the existing variant, and other fields (such as key/value pairs) are discarded.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: Variant) -> VariantCreateCall<'a, C, A> {
-        VariantCreateCall {
+    pub fn merge(&self, request: MergeVariantsRequest) -> VariantMergeCall<'a, C, A> {
+        VariantMergeCall {
             hub: self.hub,
             _request: request,
             _delegate: Default::default(),
@@ -2603,6 +2631,23 @@ impl<'a, C, A> VariantMethods<'a, C, A> {
     /// * `request` - No description provided.
     pub fn import(&self, request: ImportVariantsRequest) -> VariantImportCall<'a, C, A> {
         VariantImportCall {
+            hub: self.hub,
+            _request: request,
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Creates a new variant. For the definitions of variants and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    pub fn create(&self, request: Variant) -> VariantCreateCall<'a, C, A> {
+        VariantCreateCall {
             hub: self.hub,
             _request: request,
             _delegate: Default::default(),
@@ -2708,7 +2753,7 @@ impl<'a, C, A> VariantsetMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes the contents of a variant set. The variant set object is not deleted. For the definitions of variant sets and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
+    /// Deletes a variant set including all variants, call sets, and calls within. This is not reversible. For the definitions of variant sets and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
     /// 
     /// # Arguments
     ///
@@ -11511,9 +11556,9 @@ impl<'a, C, A> VariantGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 }
 
 
-/// Creates a new variant. For the definitions of variants and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
+/// Merges the given variants with existing variants. For the definitions of variants and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics) Each variant will be merged with an existing variant that matches its reference sequence, start, end, reference bases, and alternative bases. If no such variant exists, a new one will be created. When variants are merged, the call information from the new variant is added to the existing variant, and other fields (such as key/value pairs) are discarded.
 ///
-/// A builder for the *create* method supported by a *variant* resource.
+/// A builder for the *merge* method supported by a *variant* resource.
 /// It is not used directly, but through a `VariantMethods` instance.
 ///
 /// # Example
@@ -11524,7 +11569,7 @@ impl<'a, C, A> VariantGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// # extern crate hyper;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_genomics1 as genomics1;
-/// use genomics1::Variant;
+/// use genomics1::MergeVariantsRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -11538,32 +11583,32 @@ impl<'a, C, A> VariantGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = Variant::default();
+/// let mut req = MergeVariantsRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.variants().create(req)
+/// let result = hub.variants().merge(req)
 ///              .doit();
 /// # }
 /// ```
-pub struct VariantCreateCall<'a, C, A>
+pub struct VariantMergeCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Genomics<C, A>,
-    _request: Variant,
+    _request: MergeVariantsRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for VariantCreateCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for VariantMergeCall<'a, C, A> {}
 
-impl<'a, C, A> VariantCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> VariantMergeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Variant)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -11571,7 +11616,7 @@ impl<'a, C, A> VariantCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "genomics.variants.create",
+        dlg.begin(MethodInfo { id: "genomics.variants.merge",
                                http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
         for &field in ["alt"].iter() {
@@ -11586,7 +11631,7 @@ impl<'a, C, A> VariantCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/variants".to_string();
+        let mut url = "https://genomics.googleapis.com/v1/variants:merge".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -11689,7 +11734,7 @@ impl<'a, C, A> VariantCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Variant) -> VariantCreateCall<'a, C, A> {
+    pub fn request(mut self, new_value: MergeVariantsRequest) -> VariantMergeCall<'a, C, A> {
         self._request = new_value;
         self
     }
@@ -11699,7 +11744,7 @@ impl<'a, C, A> VariantCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VariantCreateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VariantMergeCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11726,7 +11771,7 @@ impl<'a, C, A> VariantCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> VariantCreateCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> VariantMergeCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11743,7 +11788,7 @@ impl<'a, C, A> VariantCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> VariantCreateCall<'a, C, A>
+    pub fn add_scope<T>(mut self, scope: T) -> VariantMergeCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11984,6 +12029,246 @@ impl<'a, C, A> VariantImportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> VariantImportCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+/// Creates a new variant. For the definitions of variants and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
+///
+/// A builder for the *create* method supported by a *variant* resource.
+/// It is not used directly, but through a `VariantMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_genomics1 as genomics1;
+/// use genomics1::Variant;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use genomics1::Genomics;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Genomics::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Variant::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.variants().create(req)
+///              .doit();
+/// # }
+/// ```
+pub struct VariantCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Genomics<C, A>,
+    _request: Variant,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for VariantCreateCall<'a, C, A> {}
+
+impl<'a, C, A> VariantCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Variant)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "genomics.variants.create",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        for &field in ["alt"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://genomics.googleapis.com/v1/variants".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request);
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: Variant) -> VariantCreateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VariantCreateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> VariantCreateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> VariantCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -12756,7 +13041,7 @@ impl<'a, C, A> VariantsetCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 }
 
 
-/// Deletes the contents of a variant set. The variant set object is not deleted. For the definitions of variant sets and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
+/// Deletes a variant set including all variants, call sets, and calls within. This is not reversible. For the definitions of variant sets and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
 ///
 /// A builder for the *delete* method supported by a *variantset* resource.
 /// It is not used directly, but through a `VariantsetMethods` instance.

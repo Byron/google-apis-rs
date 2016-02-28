@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *bigquery* API at revision *20160127*. The CLI is at version *0.3.3*.
+This documentation was generated from the *bigquery* API at revision *20160222*. The CLI is at version *0.3.3*.
 
 ```bash
 bigquery2 [options]

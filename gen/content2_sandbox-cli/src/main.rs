@@ -1818,7 +1818,7 @@ fn main() {
     
     let mut app = App::new("content2-sandbox")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.3+20160115")
+           .version("0.3.3+20160204")
            .about("Manage product items, inventory, and Merchant Center accounts for Google Shopping.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_content2_sandbox_cli")
            .arg(Arg::with_name("url")

@@ -248,6 +248,9 @@ pub struct QueryRequest {
     /// [Optional] Specifies the default datasetId and projectId to assume for any unqualified table names in the query. If not set, all table names in the query string must be qualified in the format 'datasetId.tableId'.
     #[serde(rename="defaultDataset")]
     pub default_dataset: Option<DatasetReference>,
+    /// [Experimental] Specifies whether to use BigQuery's legacy SQL dialect for this query. The default value is true. If set to false, the query will use BigQuery's updated SQL dialect with improved standards compliance. When using BigQuery's updated SQL, the values of allowLargeResults and flattenResults are ignored. Queries with useLegacySql set to false will be run as if allowLargeResults is true and flattenResults is false.
+    #[serde(rename="useLegacySql")]
+    pub use_legacy_sql: Option<bool>,
     /// [Optional] The maximum number of rows of data to return per page of results. Setting this flag to a small value such as 1000 and then paging through results might improve reliability when the query result set is large. In addition to this limit, responses are also limited to 10 MB. By default, there is no maximum row count, and only the byte limit applies.
     #[serde(rename="maxResults")]
     pub max_results: Option<u32>,
@@ -270,15 +273,18 @@ pub struct JobStatistics2 {
     /// [Output-only] Whether the query result was fetched from the query cache.
     #[serde(rename="cacheHit")]
     pub cache_hit: Option<bool>,
+    /// [Output-only, Experimental] Describes execution plan for the query as a list of stages.
+    #[serde(rename="queryPlan")]
+    pub query_plan: Option<Vec<ExplainQueryStage>>,
+    /// [Output-only, Experimental] Referenced tables for the job. Queries that reference more than 50 tables will not have a complete list.
+    #[serde(rename="referencedTables")]
+    pub referenced_tables: Option<Vec<TableReference>>,
     /// [Output-only] Billing tier for the job.
     #[serde(rename="billingTier")]
     pub billing_tier: Option<i32>,
     /// [Output-only] Total bytes billed for the job.
     #[serde(rename="totalBytesBilled")]
     pub total_bytes_billed: Option<String>,
-    /// [Output-only, Experimental] Describes execution plan for the query as a list of stages.
-    #[serde(rename="queryPlan")]
-    pub query_plan: Option<Vec<ExplainQueryStage>>,
     /// [Output-only] Total bytes processed for the job.
     #[serde(rename="totalBytesProcessed")]
     pub total_bytes_processed: Option<String>,
@@ -937,24 +943,26 @@ impl Part for CsvOptions {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExternalDataConfiguration {
-    /// [Optional] Indicates if BigQuery should allow extra values that are not represented in the table schema. If true, the extra values are ignored. If false, records with extra columns are treated as bad records, and if there are too many bad records, an invalid error is returned in the job result. The default value is false. The sourceFormat property determines what BigQuery treats as an extra value: CSV: Trailing columns JSON: Named values that don't match any column names Google Cloud Datastore backups: This setting is ignored.
+    /// [Optional] The compression type of the data source. Possible values include GZIP and NONE. The default value is NONE. This setting is ignored for Google Cloud Datastore backups and Avro.
+    pub compression: Option<String>,
+    /// Additional properties to set if sourceFormat is set to CSV.
+    #[serde(rename="csvOptions")]
+    pub csv_options: Option<CsvOptions>,
+    /// [Experimental] Try to detect schema and format options automatically. Any option specified explicitly will be honored.
+    pub autodetect: Option<bool>,
+    /// [Optional] The maximum number of bad records that BigQuery can ignore when reading data. If the number of bad records exceeds this value, an invalid error is returned in the job result. The default value is 0, which requires that all records are valid. This setting is ignored for Google Cloud Datastore backups and Avro.
+    #[serde(rename="maxBadRecords")]
+    pub max_bad_records: Option<i32>,
+    /// [Optional] Indicates if BigQuery should allow extra values that are not represented in the table schema. If true, the extra values are ignored. If false, records with extra columns are treated as bad records, and if there are too many bad records, an invalid error is returned in the job result. The default value is false. The sourceFormat property determines what BigQuery treats as an extra value: CSV: Trailing columns JSON: Named values that don't match any column names Google Cloud Datastore backups: This setting is ignored. Avro: This setting is ignored.
     #[serde(rename="ignoreUnknownValues")]
     pub ignore_unknown_values: Option<bool>,
     /// [Required] The fully-qualified URIs that point to your data in Google Cloud Storage. Each URI can contain one '*' wildcard character and it must come after the 'bucket' name. Size limits related to load jobs apply to external data sources, plus an additional limit of 10 GB maximum size across all URIs. For Google Cloud Datastore backups, exactly one URI can be specified, and it must end with '.backup_info'. Also, the '*' wildcard character is not allowed.
     #[serde(rename="sourceUris")]
     pub source_uris: Option<Vec<String>>,
-    /// [Optional] The compression type of the data source. Possible values include GZIP and NONE. The default value is NONE. This setting is ignored for Google Cloud Datastore backups.
-    pub compression: Option<String>,
-    /// Additional properties to set if sourceFormat is set to CSV.
-    #[serde(rename="csvOptions")]
-    pub csv_options: Option<CsvOptions>,
-    /// [Required] The data format. For CSV files, specify "CSV". For newline-delimited JSON, specify "NEWLINE_DELIMITED_JSON". For Google Cloud Datastore backups, specify "DATASTORE_BACKUP".
+    /// [Required] The data format. For CSV files, specify "CSV". For newline-delimited JSON, specify "NEWLINE_DELIMITED_JSON". For Google Cloud Datastore backups, specify "DATASTORE_BACKUP". For Avro files, specify "AVRO".
     #[serde(rename="sourceFormat")]
     pub source_format: Option<String>,
-    /// [Optional] The maximum number of bad records that BigQuery can ignore when reading data. If the number of bad records exceeds this value, an invalid error is returned in the job result. The default value is 0, which requires that all records are valid. This setting is ignored for Google Cloud Datastore backups.
-    #[serde(rename="maxBadRecords")]
-    pub max_bad_records: Option<i32>,
-    /// [Optional] The schema for the data. Schema is required for CSV and JSON formats. Schema is disallowed for Google Cloud Datastore backups.
+    /// [Optional] The schema for the data. Schema is required for CSV and JSON formats. Schema is disallowed for Google Cloud Datastore backups and Avro.
     pub schema: Option<TableSchema>,
 }
 
@@ -1109,7 +1117,7 @@ pub struct TableDataInsertAllRequest {
     /// [Optional] Insert all valid rows of a request, even if invalid rows exist. The default value is false, which causes the entire request to fail if any invalid rows exist.
     #[serde(rename="skipInvalidRows")]
     pub skip_invalid_rows: Option<bool>,
-    /// [Optional] If specified, treats the destination table as a base template, and inserts the rows into an instance table named "{destination}{templateSuffix}". BigQuery will manage creation of the instance table, using the schema of the base template table. See https://cloud.google.com/bigquery/streaming-data-into-bigquery#template-tables for considerations when working with templates tables.
+    /// [Experimental] If specified, treats the destination table as a base template, and inserts the rows into an instance table named "{destination}{templateSuffix}". BigQuery will manage creation of the instance table, using the schema of the base template table. See https://cloud.google.com/bigquery/streaming-data-into-bigquery#template-tables for considerations when working with templates tables.
     #[serde(rename="templateSuffix")]
     pub template_suffix: Option<String>,
 }
@@ -1189,6 +1197,9 @@ pub struct JobConfigurationQuery {
     /// [Optional] Specifies the default dataset to use for unqualified table names in the query.
     #[serde(rename="defaultDataset")]
     pub default_dataset: Option<DatasetReference>,
+    /// [Experimental] Specifies whether to use BigQuery's legacy SQL dialect for this query. The default value is true. If set to false, the query will use BigQuery's updated SQL dialect with improved standards compliance. When using BigQuery's updated SQL, the values of allowLargeResults and flattenResults are ignored. Queries with useLegacySql set to false will be run as if allowLargeResults is true and flattenResults is false.
+    #[serde(rename="useLegacySql")]
+    pub use_legacy_sql: Option<bool>,
     /// [Optional] Describes the table where the query results should be stored. If not present, a new table will be created to store the results.
     #[serde(rename="destinationTable")]
     pub destination_table: Option<TableReference>,
@@ -6259,11 +6270,9 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
         let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
         params.push(("projectId", self._project_id.to_string()));
         if self._state_filter.len() > 0 {
-            let mut s = String::new();
             for f in self._state_filter.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("stateFilter", f.to_string()));
             }
-            params.push(("stateFilter", s));
         }
         if let Some(value) = self._projection {
             params.push(("projection", value.to_string()));

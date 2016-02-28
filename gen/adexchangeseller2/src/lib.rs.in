@@ -1559,18 +1559,14 @@ impl<'a, C, A> AccountReportGenerateCall<'a, C, A> where C: BorrowMut<hyper::Cli
             params.push(("startIndex", value.to_string()));
         }
         if self._sort.len() > 0 {
-            let mut s = String::new();
             for f in self._sort.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("sort", f.to_string()));
             }
-            params.push(("sort", s));
         }
         if self._metric.len() > 0 {
-            let mut s = String::new();
             for f in self._metric.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("metric", f.to_string()));
             }
-            params.push(("metric", s));
         }
         if let Some(value) = self._max_results {
             params.push(("maxResults", value.to_string()));
@@ -1579,18 +1575,14 @@ impl<'a, C, A> AccountReportGenerateCall<'a, C, A> where C: BorrowMut<hyper::Cli
             params.push(("locale", value.to_string()));
         }
         if self._filter.len() > 0 {
-            let mut s = String::new();
             for f in self._filter.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("filter", f.to_string()));
             }
-            params.push(("filter", s));
         }
         if self._dimension.len() > 0 {
-            let mut s = String::new();
             for f in self._dimension.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("dimension", f.to_string()));
             }
-            params.push(("dimension", s));
         }
         for &field in ["accountId", "startDate", "endDate", "startIndex", "sort", "metric", "maxResults", "locale", "filter", "dimension"].iter() {
             if self._additional_params.contains_key(field) {

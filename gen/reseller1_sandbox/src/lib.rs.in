@@ -436,14 +436,11 @@ impl Part for Address {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Subscription {
-    /// Renewal settings of the subscription.
-    #[serde(rename="renewalSettings")]
-    pub renewal_settings: Option<RenewalSettings>,
+    /// Status of the subscription.
+    pub status: Option<String>,
     /// Name of the sku for which this subscription is purchased.
     #[serde(rename="skuId")]
     pub sku_id: Option<String>,
-    /// Identifies the resource as a Subscription.
-    pub kind: Option<String>,
     /// Trial Settings of the subscription.
     #[serde(rename="trialSettings")]
     pub trial_settings: Option<SubscriptionTrialSettings>,
@@ -458,27 +455,33 @@ pub struct Subscription {
     /// Ui url for subscription resource.
     #[serde(rename="resourceUiUrl")]
     pub resource_ui_url: Option<String>,
-    /// Purchase order id for your order tracking purposes.
-    #[serde(rename="purchaseOrderId")]
-    pub purchase_order_id: Option<String>,
-    /// Creation time of this subscription in milliseconds since Unix epoch.
-    #[serde(rename="creationTime")]
-    pub creation_time: Option<String>,
-    /// Transfer related information for the subscription.
-    #[serde(rename="transferInfo")]
-    pub transfer_info: Option<SubscriptionTransferInfo>,
-    /// Status of the subscription.
-    pub status: Option<String>,
+    /// Primary domain name of the customer
+    #[serde(rename="customerDomain")]
+    pub customer_domain: Option<String>,
     /// Plan details of the subscription
     pub plan: Option<SubscriptionPlan>,
     /// Number/Limit of seats in the new plan.
     pub seats: Option<Seats>,
-    /// The id of the subscription.
-    #[serde(rename="subscriptionId")]
-    pub subscription_id: Option<String>,
     /// Billing method of this subscription.
     #[serde(rename="billingMethod")]
     pub billing_method: Option<String>,
+    /// Renewal settings of the subscription.
+    #[serde(rename="renewalSettings")]
+    pub renewal_settings: Option<RenewalSettings>,
+    /// Transfer related information for the subscription.
+    #[serde(rename="transferInfo")]
+    pub transfer_info: Option<SubscriptionTransferInfo>,
+    /// Identifies the resource as a Subscription.
+    pub kind: Option<String>,
+    /// Creation time of this subscription in milliseconds since Unix epoch.
+    #[serde(rename="creationTime")]
+    pub creation_time: Option<String>,
+    /// Purchase order id for your order tracking purposes.
+    #[serde(rename="purchaseOrderId")]
+    pub purchase_order_id: Option<String>,
+    /// The id of the subscription.
+    #[serde(rename="subscriptionId")]
+    pub subscription_id: Option<String>,
     /// The id of the customer to whom the subscription belongs.
     #[serde(rename="customerId")]
     pub customer_id: Option<String>,
@@ -1306,7 +1309,7 @@ impl<'a, C, A> CustomerInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._request = new_value;
         self
     }
-    /// An auth token needed for inserting a customer for which domain already exists. Can be generated at https://www.google.com/a/cpanel//TransferToken. Optional.
+    /// An auth token needed for inserting a customer for which domain already exists. Can be generated at https://admin.google.com/TransferToken. Optional.
     ///
     /// Sets the *customer auth token* query property to the given value.
     pub fn customer_auth_token(mut self, new_value: &str) -> CustomerInsertCall<'a, C, A> {

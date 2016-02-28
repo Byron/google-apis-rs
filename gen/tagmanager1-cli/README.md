@@ -24,13 +24,19 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Tag Manager* API at revision *20151112*. The CLI is at version *0.3.3*.
+This documentation was generated from the *Tag Manager* API at revision *20160209*. The CLI is at version *0.3.3*.
 
 ```bash
 tagmanager1 [options]
         accounts
                 containers-create <account-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 containers-delete <account-id> <container-id> [-p <v>]...
+                containers-environments-create <account-id> <container-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                containers-environments-delete <account-id> <container-id> <environment-id> [-p <v>]...
+                containers-environments-get <account-id> <container-id> <environment-id> [-p <v>]... [-o <out>]
+                containers-environments-list <account-id> <container-id> [-p <v>]... [-o <out>]
+                containers-environments-patch <account-id> <container-id> <environment-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                containers-environments-update <account-id> <container-id> <environment-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 containers-folders-create <account-id> <container-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 containers-folders-delete <account-id> <container-id> <folder-id> [-p <v>]...
                 containers-folders-entities-list <account-id> <container-id> <folder-id> [-p <v>]... [-o <out>]
@@ -39,7 +45,8 @@ tagmanager1 [options]
                 containers-folders-update <account-id> <container-id> <folder-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 containers-get <account-id> <container-id> [-p <v>]... [-o <out>]
                 containers-list <account-id> [-p <v>]... [-o <out>]
-                containers-move-folders-update <account-id> <container-id> <folder-id> [-p <v>]...
+                containers-move-folders-update <account-id> <container-id> <folder-id> (-r <kv>)... [-p <v>]...
+                containers-reauthorize-environments-update <account-id> <container-id> <environment-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 containers-tags-create <account-id> <container-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 containers-tags-delete <account-id> <container-id> <tag-id> [-p <v>]...
                 containers-tags-get <account-id> <container-id> <tag-id> [-p <v>]... [-o <out>]

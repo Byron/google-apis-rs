@@ -1092,7 +1092,15 @@ pub struct Account {
     /// - "36" for GTQ 
     /// - "37" for PLN 
     /// - "39" for INR 
-    /// - "40" for THB
+    /// - "40" for THB 
+    /// - "41" for IDR 
+    /// - "42" for CZK 
+    /// - "43" for RON 
+    /// - "44" for HUF 
+    /// - "45" for RUB 
+    /// - "46" for AED 
+    /// - "47" for BGN 
+    /// - "48" for HRK
     #[serde(rename="currencyId")]
     pub currency_id: Option<String>,
     /// Reporting configuration of this account.
@@ -2985,7 +2993,15 @@ pub struct DirectorySite {
     /// - "36" for GTQ 
     /// - "37" for PLN 
     /// - "39" for INR 
-    /// - "40" for THB
+    /// - "40" for THB 
+    /// - "41" for IDR 
+    /// - "42" for CZK 
+    /// - "43" for RON 
+    /// - "44" for HUF 
+    /// - "45" for RUB 
+    /// - "46" for AED 
+    /// - "47" for BGN 
+    /// - "48" for HRK
     #[serde(rename="currencyId")]
     pub currency_id: Option<String>,
     /// Tag types for regular placements.
@@ -15249,11 +15265,9 @@ impl<'a, C, A> CreativeFieldValueListCall<'a, C, A> where C: BorrowMut<hyper::Cl
             params.push(("maxResults", value.to_string()));
         }
         if self._ids.len() > 0 {
-            let mut s = String::new();
             for f in self._ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("ids", f.to_string()));
             }
-            params.push(("ids", s));
         }
         for &field in ["alt", "profileId", "creativeFieldId", "sortOrder", "sortField", "searchString", "pageToken", "maxResults", "ids"].iter() {
             if self._additional_params.contains_key(field) {
@@ -15841,18 +15855,14 @@ impl<'a, C, A> CreativeFieldListCall<'a, C, A> where C: BorrowMut<hyper::Client>
             params.push(("maxResults", value.to_string()));
         }
         if self._ids.len() > 0 {
-            let mut s = String::new();
             for f in self._ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("ids", f.to_string()));
             }
-            params.push(("ids", s));
         }
         if self._advertiser_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._advertiser_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("advertiserIds", f.to_string()));
             }
-            params.push(("advertiserIds", s));
         }
         for &field in ["alt", "profileId", "sortOrder", "sortField", "searchString", "pageToken", "maxResults", "ids", "advertiserIds"].iter() {
             if self._additional_params.contains_key(field) {
@@ -18505,11 +18515,9 @@ impl<'a, C, A> UserRoleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             params.push(("maxResults", value.to_string()));
         }
         if self._ids.len() > 0 {
-            let mut s = String::new();
             for f in self._ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("ids", f.to_string()));
             }
-            params.push(("ids", s));
         }
         if let Some(value) = self._account_user_role_only {
             params.push(("accountUserRoleOnly", value.to_string()));
@@ -21009,8 +21017,8 @@ impl<'a, C, A> CreativeAssetInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
                             mp_reader.reserve_exact(2);
                             let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
-                        if size > 104857600 {
-                        	return Err(Error::UploadSizeLimitExceeded(size, 104857600))
+                        if size > 1073741824 {
+                        	return Err(Error::UploadSizeLimitExceeded(size, 1073741824))
                         }
                             mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
                                      .add_part(&mut reader, size, reader_mime_type.clone());
@@ -21063,8 +21071,8 @@ impl<'a, C, A> CreativeAssetInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
                     if protocol == "resumable" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
-                        if size > 104857600 {
-                        	return Err(Error::UploadSizeLimitExceeded(size, 104857600))
+                        if size > 1073741824 {
+                        	return Err(Error::UploadSizeLimitExceeded(size, 1073741824))
                         }
                         let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
@@ -21127,7 +21135,7 @@ impl<'a, C, A> CreativeAssetInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// Upload media all at once.
     /// If the upload fails for whichever reason, all progress is lost.
     ///
-    /// * *max size*: 100MB
+    /// * *max size*: 1024MB
     /// * *multipart*: yes
     /// * *valid mime types*: '*/*'
     pub fn upload<RS>(self, stream: RS, mime_type: mime::Mime) -> Result<(hyper::client::Response, CreativeAssetMetadata)>
@@ -21143,7 +21151,7 @@ impl<'a, C, A> CreativeAssetInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
     /// `cancel_chunk_upload(...)`.
     ///
-    /// * *max size*: 100MB
+    /// * *max size*: 1024MB
     /// * *multipart*: yes
     /// * *valid mime types*: '*/*'
     pub fn upload_resumable<RS>(self, resumeable_stream: RS, mime_type: mime::Mime) -> Result<(hyper::client::Response, CreativeAssetMetadata)>
@@ -21874,11 +21882,9 @@ impl<'a, C, A> ChangeLogListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         let mut params: Vec<(&str, String)> = Vec::with_capacity((13 + self._additional_params.len()));
         params.push(("profileId", self._profile_id.to_string()));
         if self._user_profile_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._user_profile_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("userProfileIds", f.to_string()));
             }
-            params.push(("userProfileIds", s));
         }
         if let Some(value) = self._search_string {
             params.push(("searchString", value.to_string()));
@@ -21890,11 +21896,9 @@ impl<'a, C, A> ChangeLogListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             params.push(("objectType", value.to_string()));
         }
         if self._object_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._object_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("objectIds", f.to_string()));
             }
-            params.push(("objectIds", s));
         }
         if let Some(value) = self._min_change_time {
             params.push(("minChangeTime", value.to_string()));
@@ -21906,11 +21910,9 @@ impl<'a, C, A> ChangeLogListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             params.push(("maxChangeTime", value.to_string()));
         }
         if self._ids.len() > 0 {
-            let mut s = String::new();
             for f in self._ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("ids", f.to_string()));
             }
-            params.push(("ids", s));
         }
         if let Some(value) = self._action {
             params.push(("action", value.to_string()));
@@ -26574,25 +26576,19 @@ impl<'a, C, A> AdvertiserListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             params.push(("includeAdvertisersWithoutGroupsOnly", value.to_string()));
         }
         if self._ids.len() > 0 {
-            let mut s = String::new();
             for f in self._ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("ids", f.to_string()));
             }
-            params.push(("ids", s));
         }
         if self._floodlight_configuration_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._floodlight_configuration_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("floodlightConfigurationIds", f.to_string()));
             }
-            params.push(("floodlightConfigurationIds", s));
         }
         if self._advertiser_group_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._advertiser_group_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("advertiserGroupIds", f.to_string()));
             }
-            params.push(("advertiserGroupIds", s));
         }
         for &field in ["alt", "profileId", "subaccountId", "status", "sortOrder", "sortField", "searchString", "pageToken", "onlyParent", "maxResults", "includeAdvertisersWithoutGroupsOnly", "ids", "floodlightConfigurationIds", "advertiserGroupIds"].iter() {
             if self._additional_params.contains_key(field) {
@@ -28524,11 +28520,9 @@ impl<'a, C, A> FloodlightActivityGroupListCall<'a, C, A> where C: BorrowMut<hype
             params.push(("maxResults", value.to_string()));
         }
         if self._ids.len() > 0 {
-            let mut s = String::new();
             for f in self._ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("ids", f.to_string()));
             }
-            params.push(("ids", s));
         }
         if let Some(value) = self._floodlight_configuration_id {
             params.push(("floodlightConfigurationId", value.to_string()));
@@ -29629,11 +29623,9 @@ impl<'a, C, A> OrderListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             params.push(("sortField", value.to_string()));
         }
         if self._site_id.len() > 0 {
-            let mut s = String::new();
             for f in self._site_id.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("siteId", f.to_string()));
             }
-            params.push(("siteId", s));
         }
         if let Some(value) = self._search_string {
             params.push(("searchString", value.to_string()));
@@ -29645,11 +29637,9 @@ impl<'a, C, A> OrderListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             params.push(("maxResults", value.to_string()));
         }
         if self._ids.len() > 0 {
-            let mut s = String::new();
             for f in self._ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("ids", f.to_string()));
             }
-            params.push(("ids", s));
         }
         for &field in ["alt", "profileId", "projectId", "sortOrder", "sortField", "siteId", "searchString", "pageToken", "maxResults", "ids"].iter() {
             if self._additional_params.contains_key(field) {
@@ -30486,18 +30476,14 @@ impl<'a, C, A> DirectorySiteContactListCall<'a, C, A> where C: BorrowMut<hyper::
             params.push(("maxResults", value.to_string()));
         }
         if self._ids.len() > 0 {
-            let mut s = String::new();
             for f in self._ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("ids", f.to_string()));
             }
-            params.push(("ids", s));
         }
         if self._directory_site_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._directory_site_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("directorySiteIds", f.to_string()));
             }
-            params.push(("directorySiteIds", s));
         }
         for &field in ["alt", "profileId", "sortOrder", "sortField", "searchString", "pageToken", "maxResults", "ids", "directorySiteIds"].iter() {
             if self._additional_params.contains_key(field) {
@@ -31820,11 +31806,9 @@ impl<'a, C, A> AdListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
         let mut params: Vec<(&str, String)> = Vec::with_capacity((27 + self._additional_params.len()));
         params.push(("profileId", self._profile_id.to_string()));
         if self._type_.len() > 0 {
-            let mut s = String::new();
             for f in self._type_.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("type", f.to_string()));
             }
-            params.push(("type", s));
         }
         if let Some(value) = self._ssl_required {
             params.push(("sslRequired", value.to_string()));
@@ -31839,28 +31823,22 @@ impl<'a, C, A> AdListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
             params.push(("sortField", value.to_string()));
         }
         if self._size_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._size_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("sizeIds", f.to_string()));
             }
-            params.push(("sizeIds", s));
         }
         if let Some(value) = self._search_string {
             params.push(("searchString", value.to_string()));
         }
         if self._remarketing_list_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._remarketing_list_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("remarketingListIds", f.to_string()));
             }
-            params.push(("remarketingListIds", s));
         }
         if self._placement_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._placement_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("placementIds", f.to_string()));
             }
-            params.push(("placementIds", s));
         }
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -31872,18 +31850,14 @@ impl<'a, C, A> AdListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
             params.push(("maxResults", value.to_string()));
         }
         if self._landing_page_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._landing_page_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("landingPageIds", f.to_string()));
             }
-            params.push(("landingPageIds", s));
         }
         if self._ids.len() > 0 {
-            let mut s = String::new();
             for f in self._ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("ids", f.to_string()));
             }
-            params.push(("ids", s));
         }
         if let Some(value) = self._dynamic_click_tracker {
             params.push(("dynamicClickTracker", value.to_string()));
@@ -31892,35 +31866,27 @@ impl<'a, C, A> AdListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
             params.push(("creativeType", value.to_string()));
         }
         if self._creative_optimization_configuration_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._creative_optimization_configuration_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("creativeOptimizationConfigurationIds", f.to_string()));
             }
-            params.push(("creativeOptimizationConfigurationIds", s));
         }
         if self._creative_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._creative_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("creativeIds", f.to_string()));
             }
-            params.push(("creativeIds", s));
         }
         if let Some(value) = self._compatibility {
             params.push(("compatibility", value.to_string()));
         }
         if self._campaign_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._campaign_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("campaignIds", f.to_string()));
             }
-            params.push(("campaignIds", s));
         }
         if self._audience_segment_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._audience_segment_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("audienceSegmentIds", f.to_string()));
             }
-            params.push(("audienceSegmentIds", s));
         }
         if let Some(value) = self._archived {
             params.push(("archived", value.to_string()));
@@ -34104,11 +34070,9 @@ impl<'a, C, A> AdvertiserGroupListCall<'a, C, A> where C: BorrowMut<hyper::Clien
             params.push(("maxResults", value.to_string()));
         }
         if self._ids.len() > 0 {
-            let mut s = String::new();
             for f in self._ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("ids", f.to_string()));
             }
-            params.push(("ids", s));
         }
         for &field in ["alt", "profileId", "sortOrder", "sortField", "searchString", "pageToken", "maxResults", "ids"].iter() {
             if self._additional_params.contains_key(field) {
@@ -36006,25 +35970,19 @@ impl<'a, C, A> SiteListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
             params.push(("maxResults", value.to_string()));
         }
         if self._ids.len() > 0 {
-            let mut s = String::new();
             for f in self._ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("ids", f.to_string()));
             }
-            params.push(("ids", s));
         }
         if self._directory_site_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._directory_site_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("directorySiteIds", f.to_string()));
             }
-            params.push(("directorySiteIds", s));
         }
         if self._campaign_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._campaign_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("campaignIds", f.to_string()));
             }
-            params.push(("campaignIds", s));
         }
         if let Some(value) = self._approved {
             params.push(("approved", value.to_string()));
@@ -37224,11 +37182,9 @@ impl<'a, C, A> FloodlightActivityListCall<'a, C, A> where C: BorrowMut<hyper::Cl
             params.push(("maxResults", value.to_string()));
         }
         if self._ids.len() > 0 {
-            let mut s = String::new();
             for f in self._ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("ids", f.to_string()));
             }
-            params.push(("ids", s));
         }
         if let Some(value) = self._floodlight_configuration_id {
             params.push(("floodlightConfigurationId", value.to_string()));
@@ -37243,11 +37199,9 @@ impl<'a, C, A> FloodlightActivityListCall<'a, C, A> where C: BorrowMut<hyper::Cl
             params.push(("floodlightActivityGroupName", value.to_string()));
         }
         if self._floodlight_activity_group_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._floodlight_activity_group_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("floodlightActivityGroupIds", f.to_string()));
             }
-            params.push(("floodlightActivityGroupIds", s));
         }
         if let Some(value) = self._advertiser_id {
             params.push(("advertiserId", value.to_string()));
@@ -39929,21 +39883,17 @@ impl<'a, C, A> CreativeGroupListCall<'a, C, A> where C: BorrowMut<hyper::Client>
             params.push(("maxResults", value.to_string()));
         }
         if self._ids.len() > 0 {
-            let mut s = String::new();
             for f in self._ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("ids", f.to_string()));
             }
-            params.push(("ids", s));
         }
         if let Some(value) = self._group_number {
             params.push(("groupNumber", value.to_string()));
         }
         if self._advertiser_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._advertiser_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("advertiserIds", f.to_string()));
             }
-            params.push(("advertiserIds", s));
         }
         for &field in ["alt", "profileId", "sortOrder", "sortField", "searchString", "pageToken", "maxResults", "ids", "groupNumber", "advertiserIds"].iter() {
             if self._additional_params.contains_key(field) {
@@ -41660,11 +41610,9 @@ impl<'a, C, A> SubaccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             params.push(("maxResults", value.to_string()));
         }
         if self._ids.len() > 0 {
-            let mut s = String::new();
             for f in self._ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("ids", f.to_string()));
             }
-            params.push(("ids", s));
         }
         for &field in ["alt", "profileId", "sortOrder", "sortField", "searchString", "pageToken", "maxResults", "ids"].iter() {
             if self._additional_params.contains_key(field) {
@@ -43741,11 +43689,9 @@ impl<'a, C, A> FloodlightConfigurationListCall<'a, C, A> where C: BorrowMut<hype
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("profileId", self._profile_id.to_string()));
         if self._ids.len() > 0 {
-            let mut s = String::new();
             for f in self._ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("ids", f.to_string()));
             }
-            params.push(("ids", s));
         }
         for &field in ["alt", "profileId", "ids"].iter() {
             if self._additional_params.contains_key(field) {
@@ -45077,28 +45023,22 @@ impl<'a, C, A> PlacementGroupListCall<'a, C, A> where C: BorrowMut<hyper::Client
             params.push(("sortField", value.to_string()));
         }
         if self._site_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._site_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("siteIds", f.to_string()));
             }
-            params.push(("siteIds", s));
         }
         if let Some(value) = self._search_string {
             params.push(("searchString", value.to_string()));
         }
         if self._pricing_types.len() > 0 {
-            let mut s = String::new();
             for f in self._pricing_types.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("pricingTypes", f.to_string()));
             }
-            params.push(("pricingTypes", s));
         }
         if self._placement_strategy_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._placement_strategy_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("placementStrategyIds", f.to_string()));
             }
-            params.push(("placementStrategyIds", s));
         }
         if let Some(value) = self._placement_group_type {
             params.push(("placementGroupType", value.to_string()));
@@ -45110,42 +45050,32 @@ impl<'a, C, A> PlacementGroupListCall<'a, C, A> where C: BorrowMut<hyper::Client
             params.push(("maxResults", value.to_string()));
         }
         if self._ids.len() > 0 {
-            let mut s = String::new();
             for f in self._ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("ids", f.to_string()));
             }
-            params.push(("ids", s));
         }
         if self._directory_site_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._directory_site_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("directorySiteIds", f.to_string()));
             }
-            params.push(("directorySiteIds", s));
         }
         if self._content_category_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._content_category_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("contentCategoryIds", f.to_string()));
             }
-            params.push(("contentCategoryIds", s));
         }
         if self._campaign_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._campaign_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("campaignIds", f.to_string()));
             }
-            params.push(("campaignIds", s));
         }
         if let Some(value) = self._archived {
             params.push(("archived", value.to_string()));
         }
         if self._advertiser_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._advertiser_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("advertiserIds", f.to_string()));
             }
-            params.push(("advertiserIds", s));
         }
         for &field in ["alt", "profileId", "sortOrder", "sortField", "siteIds", "searchString", "pricingTypes", "placementStrategyIds", "placementGroupType", "pageToken", "maxResults", "ids", "directorySiteIds", "contentCategoryIds", "campaignIds", "archived", "advertiserIds"].iter() {
             if self._additional_params.contains_key(field) {
@@ -46582,21 +46512,17 @@ impl<'a, C, A> InventoryItemListCall<'a, C, A> where C: BorrowMut<hyper::Client>
             params.push(("sortField", value.to_string()));
         }
         if self._site_id.len() > 0 {
-            let mut s = String::new();
             for f in self._site_id.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("siteId", f.to_string()));
             }
-            params.push(("siteId", s));
         }
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
         }
         if self._order_id.len() > 0 {
-            let mut s = String::new();
             for f in self._order_id.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("orderId", f.to_string()));
             }
-            params.push(("orderId", s));
         }
         if let Some(value) = self._max_results {
             params.push(("maxResults", value.to_string()));
@@ -46605,11 +46531,9 @@ impl<'a, C, A> InventoryItemListCall<'a, C, A> where C: BorrowMut<hyper::Client>
             params.push(("inPlan", value.to_string()));
         }
         if self._ids.len() > 0 {
-            let mut s = String::new();
             for f in self._ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("ids", f.to_string()));
             }
-            params.push(("ids", s));
         }
         for &field in ["alt", "profileId", "projectId", "sortOrder", "sortField", "siteId", "pageToken", "orderId", "maxResults", "inPlan", "ids"].iter() {
             if self._additional_params.contains_key(field) {
@@ -47427,11 +47351,9 @@ impl<'a, C, A> UserRolePermissionListCall<'a, C, A> where C: BorrowMut<hyper::Cl
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("profileId", self._profile_id.to_string()));
         if self._ids.len() > 0 {
-            let mut s = String::new();
             for f in self._ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("ids", f.to_string()));
             }
-            params.push(("ids", s));
         }
         for &field in ["alt", "profileId", "ids"].iter() {
             if self._additional_params.contains_key(field) {
@@ -48189,11 +48111,9 @@ impl<'a, C, A> ContentCategoryListCall<'a, C, A> where C: BorrowMut<hyper::Clien
             params.push(("maxResults", value.to_string()));
         }
         if self._ids.len() > 0 {
-            let mut s = String::new();
             for f in self._ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("ids", f.to_string()));
             }
-            params.push(("ids", s));
         }
         for &field in ["alt", "profileId", "sortOrder", "sortField", "searchString", "pageToken", "maxResults", "ids"].iter() {
             if self._additional_params.contains_key(field) {
@@ -50587,11 +50507,9 @@ impl<'a, C, A> CreativeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         let mut params: Vec<(&str, String)> = Vec::with_capacity((19 + self._additional_params.len()));
         params.push(("profileId", self._profile_id.to_string()));
         if self._types.len() > 0 {
-            let mut s = String::new();
             for f in self._types.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("types", f.to_string()));
             }
-            params.push(("types", s));
         }
         if let Some(value) = self._studio_creative_id {
             params.push(("studioCreativeId", value.to_string()));
@@ -50603,21 +50521,17 @@ impl<'a, C, A> CreativeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             params.push(("sortField", value.to_string()));
         }
         if self._size_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._size_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("sizeIds", f.to_string()));
             }
-            params.push(("sizeIds", s));
         }
         if let Some(value) = self._search_string {
             params.push(("searchString", value.to_string()));
         }
         if self._rendering_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._rendering_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("renderingIds", f.to_string()));
             }
-            params.push(("renderingIds", s));
         }
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -50626,25 +50540,19 @@ impl<'a, C, A> CreativeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             params.push(("maxResults", value.to_string()));
         }
         if self._ids.len() > 0 {
-            let mut s = String::new();
             for f in self._ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("ids", f.to_string()));
             }
-            params.push(("ids", s));
         }
         if self._creative_field_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._creative_field_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("creativeFieldIds", f.to_string()));
             }
-            params.push(("creativeFieldIds", s));
         }
         if self._companion_creative_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._companion_creative_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("companionCreativeIds", f.to_string()));
             }
-            params.push(("companionCreativeIds", s));
         }
         if let Some(value) = self._campaign_id {
             params.push(("campaignId", value.to_string()));
@@ -52424,18 +52332,14 @@ impl<'a, C, A> CampaignListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             params.push(("maxResults", value.to_string()));
         }
         if self._ids.len() > 0 {
-            let mut s = String::new();
             for f in self._ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("ids", f.to_string()));
             }
-            params.push(("ids", s));
         }
         if self._excluded_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._excluded_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("excludedIds", f.to_string()));
             }
-            params.push(("excludedIds", s));
         }
         if let Some(value) = self._at_least_one_optimization_activity {
             params.push(("atLeastOneOptimizationActivity", value.to_string()));
@@ -52444,18 +52348,14 @@ impl<'a, C, A> CampaignListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             params.push(("archived", value.to_string()));
         }
         if self._advertiser_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._advertiser_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("advertiserIds", f.to_string()));
             }
-            params.push(("advertiserIds", s));
         }
         if self._advertiser_group_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._advertiser_group_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("advertiserGroupIds", f.to_string()));
             }
-            params.push(("advertiserGroupIds", s));
         }
         for &field in ["alt", "profileId", "subaccountId", "sortOrder", "sortField", "searchString", "pageToken", "overriddenEventTagId", "maxResults", "ids", "excludedIds", "atLeastOneOptimizationActivity", "archived", "advertiserIds", "advertiserGroupIds"].iter() {
             if self._additional_params.contains_key(field) {
@@ -53055,18 +52955,14 @@ impl<'a, C, A> EventTagListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             params.push(("searchString", value.to_string()));
         }
         if self._ids.len() > 0 {
-            let mut s = String::new();
             for f in self._ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("ids", f.to_string()));
             }
-            params.push(("ids", s));
         }
         if self._event_tag_types.len() > 0 {
-            let mut s = String::new();
             for f in self._event_tag_types.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("eventTagTypes", f.to_string()));
             }
-            params.push(("eventTagTypes", s));
         }
         if let Some(value) = self._enabled {
             params.push(("enabled", value.to_string()));
@@ -55854,28 +55750,22 @@ impl<'a, C, A> CityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
         params.push(("profileId", self._profile_id.to_string()));
         if self._region_dart_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._region_dart_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("regionDartIds", f.to_string()));
             }
-            params.push(("regionDartIds", s));
         }
         if let Some(value) = self._name_prefix {
             params.push(("namePrefix", value.to_string()));
         }
         if self._dart_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._dart_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("dartIds", f.to_string()));
             }
-            params.push(("dartIds", s));
         }
         if self._country_dart_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._country_dart_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("countryDartIds", f.to_string()));
             }
-            params.push(("countryDartIds", s));
         }
         for &field in ["alt", "profileId", "regionDartIds", "namePrefix", "dartIds", "countryDartIds"].iter() {
             if self._additional_params.contains_key(field) {
@@ -56687,11 +56577,9 @@ impl<'a, C, A> PlacementStrategyListCall<'a, C, A> where C: BorrowMut<hyper::Cli
             params.push(("maxResults", value.to_string()));
         }
         if self._ids.len() > 0 {
-            let mut s = String::new();
             for f in self._ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("ids", f.to_string()));
             }
-            params.push(("ids", s));
         }
         for &field in ["alt", "profileId", "sortOrder", "sortField", "searchString", "pageToken", "maxResults", "ids"].iter() {
             if self._additional_params.contains_key(field) {
@@ -57785,18 +57673,14 @@ impl<'a, C, A> ProjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             params.push(("maxResults", value.to_string()));
         }
         if self._ids.len() > 0 {
-            let mut s = String::new();
             for f in self._ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("ids", f.to_string()));
             }
-            params.push(("ids", s));
         }
         if self._advertiser_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._advertiser_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("advertiserIds", f.to_string()));
             }
-            params.push(("advertiserIds", s));
         }
         for &field in ["alt", "profileId", "sortOrder", "sortField", "searchString", "pageToken", "maxResults", "ids", "advertiserIds"].iter() {
             if self._additional_params.contains_key(field) {
@@ -58645,11 +58529,9 @@ impl<'a, C, A> DirectorySiteListCall<'a, C, A> where C: BorrowMut<hyper::Client>
             params.push(("maxResults", value.to_string()));
         }
         if self._ids.len() > 0 {
-            let mut s = String::new();
             for f in self._ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("ids", f.to_string()));
             }
-            params.push(("ids", s));
         }
         if let Some(value) = self._dfp_network_code {
             params.push(("dfp_network_code", value.to_string()));
@@ -59524,11 +59406,9 @@ impl<'a, C, A> SizeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
             params.push(("width", value.to_string()));
         }
         if self._ids.len() > 0 {
-            let mut s = String::new();
             for f in self._ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("ids", f.to_string()));
             }
-            params.push(("ids", s));
         }
         if let Some(value) = self._iab_standard {
             params.push(("iabStandard", value.to_string()));
@@ -60604,11 +60484,9 @@ impl<'a, C, A> AccountUserProfileListCall<'a, C, A> where C: BorrowMut<hyper::Cl
             params.push(("maxResults", value.to_string()));
         }
         if self._ids.len() > 0 {
-            let mut s = String::new();
             for f in self._ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("ids", f.to_string()));
             }
-            params.push(("ids", s));
         }
         if let Some(value) = self._active {
             params.push(("active", value.to_string()));
@@ -62478,11 +62356,9 @@ impl<'a, C, A> OrderDocumentListCall<'a, C, A> where C: BorrowMut<hyper::Client>
             params.push(("sortField", value.to_string()));
         }
         if self._site_id.len() > 0 {
-            let mut s = String::new();
             for f in self._site_id.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("siteId", f.to_string()));
             }
-            params.push(("siteId", s));
         }
         if let Some(value) = self._search_string {
             params.push(("searchString", value.to_string()));
@@ -62491,21 +62367,17 @@ impl<'a, C, A> OrderDocumentListCall<'a, C, A> where C: BorrowMut<hyper::Client>
             params.push(("pageToken", value.to_string()));
         }
         if self._order_id.len() > 0 {
-            let mut s = String::new();
             for f in self._order_id.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("orderId", f.to_string()));
             }
-            params.push(("orderId", s));
         }
         if let Some(value) = self._max_results {
             params.push(("maxResults", value.to_string()));
         }
         if self._ids.len() > 0 {
-            let mut s = String::new();
             for f in self._ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("ids", f.to_string()));
             }
-            params.push(("ids", s));
         }
         if let Some(value) = self._approved {
             params.push(("approved", value.to_string()));
@@ -63820,11 +63692,9 @@ impl<'a, C, A> AccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             params.push(("maxResults", value.to_string()));
         }
         if self._ids.len() > 0 {
-            let mut s = String::new();
             for f in self._ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("ids", f.to_string()));
             }
-            params.push(("ids", s));
         }
         if let Some(value) = self._active {
             params.push(("active", value.to_string()));
@@ -64983,35 +64853,27 @@ impl<'a, C, A> PlacementListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             params.push(("sortField", value.to_string()));
         }
         if self._size_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._size_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("sizeIds", f.to_string()));
             }
-            params.push(("sizeIds", s));
         }
         if self._site_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._site_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("siteIds", f.to_string()));
             }
-            params.push(("siteIds", s));
         }
         if let Some(value) = self._search_string {
             params.push(("searchString", value.to_string()));
         }
         if self._pricing_types.len() > 0 {
-            let mut s = String::new();
             for f in self._pricing_types.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("pricingTypes", f.to_string()));
             }
-            params.push(("pricingTypes", s));
         }
         if self._placement_strategy_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._placement_strategy_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("placementStrategyIds", f.to_string()));
             }
-            params.push(("placementStrategyIds", s));
         }
         if let Some(value) = self._payment_source {
             params.push(("paymentSource", value.to_string()));
@@ -65023,56 +64885,42 @@ impl<'a, C, A> PlacementListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             params.push(("maxResults", value.to_string()));
         }
         if self._ids.len() > 0 {
-            let mut s = String::new();
             for f in self._ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("ids", f.to_string()));
             }
-            params.push(("ids", s));
         }
         if self._group_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._group_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("groupIds", f.to_string()));
             }
-            params.push(("groupIds", s));
         }
         if self._directory_site_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._directory_site_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("directorySiteIds", f.to_string()));
             }
-            params.push(("directorySiteIds", s));
         }
         if self._content_category_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._content_category_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("contentCategoryIds", f.to_string()));
             }
-            params.push(("contentCategoryIds", s));
         }
         if self._compatibilities.len() > 0 {
-            let mut s = String::new();
             for f in self._compatibilities.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("compatibilities", f.to_string()));
             }
-            params.push(("compatibilities", s));
         }
         if self._campaign_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._campaign_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("campaignIds", f.to_string()));
             }
-            params.push(("campaignIds", s));
         }
         if let Some(value) = self._archived {
             params.push(("archived", value.to_string()));
         }
         if self._advertiser_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._advertiser_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("advertiserIds", f.to_string()));
             }
-            params.push(("advertiserIds", s));
         }
         for &field in ["alt", "profileId", "sortOrder", "sortField", "sizeIds", "siteIds", "searchString", "pricingTypes", "placementStrategyIds", "paymentSource", "pageToken", "maxResults", "ids", "groupIds", "directorySiteIds", "contentCategoryIds", "compatibilities", "campaignIds", "archived", "advertiserIds"].iter() {
             if self._additional_params.contains_key(field) {
@@ -65988,18 +65836,14 @@ impl<'a, C, A> PlacementGeneratetagCall<'a, C, A> where C: BorrowMut<hyper::Clie
         let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("profileId", self._profile_id.to_string()));
         if self._tag_formats.len() > 0 {
-            let mut s = String::new();
             for f in self._tag_formats.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("tagFormats", f.to_string()));
             }
-            params.push(("tagFormats", s));
         }
         if self._placement_ids.len() > 0 {
-            let mut s = String::new();
             for f in self._placement_ids.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("placementIds", f.to_string()));
             }
-            params.push(("placementIds", s));
         }
         if let Some(value) = self._campaign_id {
             params.push(("campaignId", value.to_string()));

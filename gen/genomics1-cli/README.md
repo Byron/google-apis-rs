@@ -21,7 +21,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *genomics* API at revision *20160124*. The CLI is at version *0.3.3*.
+This documentation was generated from the *genomics* API at revision *20160224*. The CLI is at version *0.3.3*.
 
 ```bash
 genomics1 [options]
@@ -68,6 +68,7 @@ genomics1 [options]
                 delete <variant-id> [-p <v>]... [-o <out>]
                 get <variant-id> [-p <v>]... [-o <out>]
                 import (-r <kv>)... [-p <v>]... [-o <out>]
+                merge (-r <kv>)... [-p <v>]... [-o <out>]
                 patch <variant-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 search (-r <kv>)... [-p <v>]... [-o <out>]
                 stream (-r <kv>)... [-p <v>]... [-o <out>]

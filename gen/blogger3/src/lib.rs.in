@@ -2125,11 +2125,9 @@ impl<'a, C, A> PageViewGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("blogId", self._blog_id.to_string()));
         if self._range.len() > 0 {
-            let mut s = String::new();
             for f in self._range.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("range", f.to_string()));
             }
-            params.push(("range", s));
         }
         for &field in ["alt", "blogId", "range"].iter() {
             if self._additional_params.contains_key(field) {
@@ -2622,18 +2620,14 @@ impl<'a, C, A> BlogListByUserCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             params.push(("view", value.to_string()));
         }
         if self._status.len() > 0 {
-            let mut s = String::new();
             for f in self._status.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("status", f.to_string()));
             }
-            params.push(("status", s));
         }
         if self._role.len() > 0 {
-            let mut s = String::new();
             for f in self._role.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("role", f.to_string()));
             }
-            params.push(("role", s));
         }
         if let Some(value) = self._fetch_user_info {
             params.push(("fetchUserInfo", value.to_string()));
@@ -5981,11 +5975,9 @@ impl<'a, C, A> PostListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
             params.push(("view", value.to_string()));
         }
         if self._status.len() > 0 {
-            let mut s = String::new();
             for f in self._status.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("status", f.to_string()));
             }
-            params.push(("status", s));
         }
         if let Some(value) = self._start_date {
             params.push(("startDate", value.to_string()));
@@ -6863,11 +6855,9 @@ impl<'a, C, A> CommentListByBlogCall<'a, C, A> where C: BorrowMut<hyper::Client>
         let mut params: Vec<(&str, String)> = Vec::with_capacity((9 + self._additional_params.len()));
         params.push(("blogId", self._blog_id.to_string()));
         if self._status.len() > 0 {
-            let mut s = String::new();
             for f in self._status.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("status", f.to_string()));
             }
-            params.push(("status", s));
         }
         if let Some(value) = self._start_date {
             params.push(("startDate", value.to_string()));
@@ -7442,11 +7432,9 @@ impl<'a, C, A> CommentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             params.push(("view", value.to_string()));
         }
         if self._status.len() > 0 {
-            let mut s = String::new();
             for f in self._status.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("status", f.to_string()));
             }
-            params.push(("status", s));
         }
         if let Some(value) = self._start_date {
             params.push(("startDate", value.to_string()));
@@ -8563,11 +8551,9 @@ impl<'a, C, A> PostUserInfoListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             params.push(("view", value.to_string()));
         }
         if self._status.len() > 0 {
-            let mut s = String::new();
             for f in self._status.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("status", f.to_string()));
             }
-            params.push(("status", s));
         }
         if let Some(value) = self._start_date {
             params.push(("startDate", value.to_string()));
@@ -9432,11 +9418,9 @@ impl<'a, C, A> PageListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
             params.push(("view", value.to_string()));
         }
         if self._status.len() > 0 {
-            let mut s = String::new();
             for f in self._status.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("status", f.to_string()));
             }
-            params.push(("status", s));
         }
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));

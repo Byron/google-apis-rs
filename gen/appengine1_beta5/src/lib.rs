@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *appengine* crate version *0.1.11+20160121*, where *20160121* is the exact revision of the *appengine:v1beta5* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
+//! This documentation was generated from *appengine* crate version *0.1.11+20160223*, where *20160223* is the exact revision of the *appengine:v1beta5* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
 //! 
 //! Everything else about the *appengine* *v1_beta5* API can be found at the
 //! [official documentation site](https://cloud.google.com/appengine/docs/admin-api/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.Appengine.html) ... 
 //! 
 //! * apps
-//!  * [*get*](struct.AppGetCall.html), [*operations get*](struct.AppOperationGetCall.html), [*operations list*](struct.AppOperationListCall.html), [*services delete*](struct.AppServiceDeleteCall.html), [*services get*](struct.AppServiceGetCall.html), [*services list*](struct.AppServiceListCall.html), [*services patch*](struct.AppServicePatchCall.html), [*services versions create*](struct.AppServiceVersionCreateCall.html), [*services versions delete*](struct.AppServiceVersionDeleteCall.html), [*services versions get*](struct.AppServiceVersionGetCall.html) and [*services versions list*](struct.AppServiceVersionListCall.html)
+//!  * [*get*](struct.AppGetCall.html), [*operations get*](struct.AppOperationGetCall.html), [*operations list*](struct.AppOperationListCall.html), [*services delete*](struct.AppServiceDeleteCall.html), [*services get*](struct.AppServiceGetCall.html), [*services list*](struct.AppServiceListCall.html), [*services patch*](struct.AppServicePatchCall.html), [*services versions create*](struct.AppServiceVersionCreateCall.html), [*services versions delete*](struct.AppServiceVersionDeleteCall.html), [*services versions get*](struct.AppServiceVersionGetCall.html), [*services versions list*](struct.AppServiceVersionListCall.html) and [*services versions patch*](struct.AppServiceVersionPatchCall.html)
 //! 
 //! 
 //! 
@@ -104,8 +104,8 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.apps().services_patch(req, "appsId", "servicesId")
-//!              .migrate_traffic(true)
-//!              .mask("invidunt")
+//!              .migrate_traffic(false)
+//!              .mask("sea")
 //!              .doit();
 //! 
 //! match result {

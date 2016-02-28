@@ -943,11 +943,9 @@ impl<'a, C, A> TimeseriesDescriptorListCall<'a, C, A> where C: BorrowMut<hyper::
             params.push(("oldest", value.to_string()));
         }
         if self._labels.len() > 0 {
-            let mut s = String::new();
             for f in self._labels.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("labels", f.to_string()));
             }
-            params.push(("labels", s));
         }
         if let Some(value) = self._count {
             params.push(("count", value.to_string()));
@@ -1606,11 +1604,9 @@ impl<'a, C, A> TimeseryListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             params.push(("oldest", value.to_string()));
         }
         if self._labels.len() > 0 {
-            let mut s = String::new();
             for f in self._labels.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("labels", f.to_string()));
             }
-            params.push(("labels", s));
         }
         if let Some(value) = self._count {
             params.push(("count", value.to_string()));

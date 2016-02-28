@@ -24,13 +24,29 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *dataproc* API at revision *20151209*. The CLI is at version *0.3.3*.
+This documentation was generated from the *dataproc* API at revision *20160219*. The CLI is at version *0.3.3*.
 
 ```bash
 dataproc1 [options]
         media
                 download <resource-name> [-p <v>]... [-o <out>]
                 upload <resource-name> (-r <kv>)... (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+        projects
+                regions-clusters-create <project-id> <region> (-r <kv>)... [-p <v>]... [-o <out>]
+                regions-clusters-delete <project-id> <region> <cluster-name> [-p <v>]... [-o <out>]
+                regions-clusters-diagnose <project-id> <region> <cluster-name> (-r <kv>)... [-p <v>]... [-o <out>]
+                regions-clusters-get <project-id> <region> <cluster-name> [-p <v>]... [-o <out>]
+                regions-clusters-list <project-id> <region> [-p <v>]... [-o <out>]
+                regions-clusters-patch <project-id> <region> <cluster-name> (-r <kv>)... [-p <v>]... [-o <out>]
+                regions-jobs-cancel <project-id> <region> <job-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                regions-jobs-delete <project-id> <region> <job-id> [-p <v>]... [-o <out>]
+                regions-jobs-get <project-id> <region> <job-id> [-p <v>]... [-o <out>]
+                regions-jobs-list <project-id> <region> [-p <v>]... [-o <out>]
+                regions-jobs-submit <project-id> <region> (-r <kv>)... [-p <v>]... [-o <out>]
+                regions-operations-cancel <name> [-p <v>]... [-o <out>]
+                regions-operations-delete <name> [-p <v>]... [-o <out>]
+                regions-operations-get <name> [-p <v>]... [-o <out>]
+                regions-operations-list <name> [-p <v>]... [-o <out>]
   dataproc1 --help
 
 Configuration:

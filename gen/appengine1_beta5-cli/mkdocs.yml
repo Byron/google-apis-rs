@@ -1,4 +1,4 @@
-site_name: appengine v0.3.3+20160121
+site_name: appengine v0.3.3+20160223
 site_url: http://byron.github.io/google-apis-rs/google-appengine1_beta5-cli
 site_description: Write integrating applications with bcore
 
@@ -20,6 +20,7 @@ pages:
 - ['apps_services-versions-delete.md', 'Apps', 'Services Versions Delete']
 - ['apps_services-versions-get.md', 'Apps', 'Services Versions Get']
 - ['apps_services-versions-list.md', 'Apps', 'Services Versions List']
+- ['apps_services-versions-patch.md', 'Apps', 'Services Versions Patch']
 
 theme: readthedocs
 

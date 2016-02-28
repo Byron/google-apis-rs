@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *fusiontables* API at revision *20150618*. The CLI is at version *0.3.3*.
+This documentation was generated from the *fusiontables* API at revision *20160212*. The CLI is at version *0.3.3*.
 
 ```bash
 fusiontables2 [options]

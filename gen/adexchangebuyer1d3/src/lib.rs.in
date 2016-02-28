@@ -461,6 +461,9 @@ pub struct DirectDeal {
     /// The currency code that applies to the fixed_cpm value. If not set then assumed to be USD.
     #[serde(rename="currencyCode")]
     pub currency_code: Option<String>,
+    /// Whether the publisher for this deal is eligible for alcohol ads.
+    #[serde(rename="allowsAlcohol")]
+    pub allows_alcohol: Option<bool>,
     /// The deal type such as programmatic reservation or fixed price and so on.
     #[serde(rename="dealTier")]
     pub deal_tier: Option<String>,
@@ -504,6 +507,13 @@ pub struct AccountBidderLocation {
     /// - US_EAST 
     /// - US_WEST
     pub region: Option<String>,
+    /// The protocol that the bidder endpoint is using. By default, OpenRTB protocols use JSON, except PROTOCOL_OPENRTB_PROTOBUF. PROTOCOL_OPENRTB_PROTOBUF uses protobuf encoding over the latest OpenRTB protocol version, which is 2.3 right now. Allowed values:  
+    /// - PROTOCOL_ADX 
+    /// - PROTOCOL_OPENRTB_2_2 
+    /// - PROTOCOL_OPENRTB_2_3 
+    /// - PROTOCOL_OPENRTB_PROTOBUF
+    #[serde(rename="bidProtocol")]
+    pub bid_protocol: Option<String>,
     /// The maximum queries per second the Ad Exchange will send.
     #[serde(rename="maximumQps")]
     pub maximum_qps: Option<i32>,
@@ -3603,18 +3613,14 @@ impl<'a, C, A> CreativeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             params.push(("maxResults", value.to_string()));
         }
         if self._buyer_creative_id.len() > 0 {
-            let mut s = String::new();
             for f in self._buyer_creative_id.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("buyerCreativeId", f.to_string()));
             }
-            params.push(("buyerCreativeId", s));
         }
         if self._account_id.len() > 0 {
-            let mut s = String::new();
             for f in self._account_id.iter() {
-                s.push_str(&("/".to_string() + &f.to_string()));
+                params.push(("accountId", f.to_string()));
             }
-            params.push(("accountId", s));
         }
         for &field in ["alt", "statusFilter", "pageToken", "maxResults", "buyerCreativeId", "accountId"].iter() {
             if self._additional_params.contains_key(field) {

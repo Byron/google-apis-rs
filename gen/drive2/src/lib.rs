@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *drive* crate version *0.1.11+20160126*, where *20160126* is the exact revision of the *drive:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
+//! This documentation was generated from *drive* crate version *0.1.11+20160222*, where *20160222* is the exact revision of the *drive:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
 //! 
 //! Everything else about the *drive* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/drive/).
@@ -24,7 +24,7 @@
 //! * [comments](struct.Comment.html)
 //!  * [*delete*](struct.CommentDeleteCall.html), [*get*](struct.CommentGetCall.html), [*insert*](struct.CommentInsertCall.html), [*list*](struct.CommentListCall.html), [*patch*](struct.CommentPatchCall.html) and [*update*](struct.CommentUpdateCall.html)
 //! * [files](struct.File.html)
-//!  * [*copy*](struct.FileCopyCall.html), [*delete*](struct.FileDeleteCall.html), [*empty trash*](struct.FileEmptyTrashCall.html), [*generate ids*](struct.FileGenerateIdCall.html), [*get*](struct.FileGetCall.html), [*insert*](struct.FileInsertCall.html), [*list*](struct.FileListCall.html), [*patch*](struct.FilePatchCall.html), [*touch*](struct.FileTouchCall.html), [*trash*](struct.FileTrashCall.html), [*untrash*](struct.FileUntrashCall.html), [*update*](struct.FileUpdateCall.html) and [*watch*](struct.FileWatchCall.html)
+//!  * [*copy*](struct.FileCopyCall.html), [*delete*](struct.FileDeleteCall.html), [*empty trash*](struct.FileEmptyTrashCall.html), [*export*](struct.FileExportCall.html), [*generate ids*](struct.FileGenerateIdCall.html), [*get*](struct.FileGetCall.html), [*insert*](struct.FileInsertCall.html), [*list*](struct.FileListCall.html), [*patch*](struct.FilePatchCall.html), [*touch*](struct.FileTouchCall.html), [*trash*](struct.FileTrashCall.html), [*untrash*](struct.FileUntrashCall.html), [*update*](struct.FileUpdateCall.html) and [*watch*](struct.FileWatchCall.html)
 //! * parents
 //!  * [*delete*](struct.ParentDeleteCall.html), [*get*](struct.ParentGetCall.html), [*insert*](struct.ParentInsertCall.html) and [*list*](struct.ParentListCall.html)
 //! * [permissions](struct.Permission.html)
@@ -49,6 +49,7 @@
 //! 
 //! * [*watch files*](struct.FileWatchCall.html)
 //! * [*get realtime*](struct.RealtimeGetCall.html)
+//! * [*export files*](struct.FileExportCall.html)
 //! * [*get files*](struct.FileGetCall.html)
 //! 
 //! Subscription supported by ...
@@ -104,6 +105,7 @@
 //! let r = hub.files().trash(...).doit()
 //! let r = hub.files().touch(...).doit()
 //! let r = hub.files().get(...).doit()
+//! let r = hub.files().export(...).doit()
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -156,19 +158,19 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.files().patch(req, "fileId")
-//!              .use_content_as_indexable_text(true)
+//!              .use_content_as_indexable_text(false)
 //!              .update_viewed_date(true)
-//!              .timed_text_track_name("Stet")
-//!              .timed_text_language("sed")
-//!              .set_modified_date(false)
-//!              .remove_parents("sanctus")
-//!              .pinned(true)
-//!              .ocr_language("Lorem")
+//!              .timed_text_track_name("dolor")
+//!              .timed_text_language("sanctus")
+//!              .set_modified_date(true)
+//!              .remove_parents("Lorem")
+//!              .pinned(false)
+//!              .ocr_language("consetetur")
 //!              .ocr(false)
 //!              .new_revision(true)
-//!              .modified_date_behavior("eirmod")
-//!              .convert(true)
-//!              .add_parents("gubergren")
+//!              .modified_date_behavior("gubergren")
+//!              .convert(false)
+//!              .add_parents("sadipscing")
 //!              .doit();
 //! 
 //! match result {

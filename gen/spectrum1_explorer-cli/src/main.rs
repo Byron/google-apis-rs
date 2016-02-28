@@ -960,7 +960,7 @@ fn main() {
     
     let mut app = App::new("spectrum1-explorer")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.3+20151209")
+           .version("0.3.3+20160206")
            .about("API for spectrum-management functions.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_spectrum1_explorer_cli")
            .arg(Arg::with_name("folder")

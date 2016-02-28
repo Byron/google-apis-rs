@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-drive2` library allows access to all features of the *Google drive* service.
 
-This documentation was generated from *drive* crate version *0.1.11+20160126*, where *20160126* is the exact revision of the *drive:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
+This documentation was generated from *drive* crate version *0.1.11+20160222*, where *20160222* is the exact revision of the *drive:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
 
 Everything else about the *drive* *v2* API can be found at the
 [official documentation site](https://developers.google.com/drive/).
@@ -26,7 +26,7 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
 * [comments](http://byron.github.io/google-apis-rs/google_drive2/struct.Comment.html)
  * [*delete*](http://byron.github.io/google-apis-rs/google_drive2/struct.CommentDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_drive2/struct.CommentGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_drive2/struct.CommentInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_drive2/struct.CommentListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_drive2/struct.CommentPatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_drive2/struct.CommentUpdateCall.html)
 * [files](http://byron.github.io/google-apis-rs/google_drive2/struct.File.html)
- * [*copy*](http://byron.github.io/google-apis-rs/google_drive2/struct.FileCopyCall.html), [*delete*](http://byron.github.io/google-apis-rs/google_drive2/struct.FileDeleteCall.html), [*empty trash*](http://byron.github.io/google-apis-rs/google_drive2/struct.FileEmptyTrashCall.html), [*generate ids*](http://byron.github.io/google-apis-rs/google_drive2/struct.FileGenerateIdCall.html), [*get*](http://byron.github.io/google-apis-rs/google_drive2/struct.FileGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_drive2/struct.FileInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_drive2/struct.FileListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_drive2/struct.FilePatchCall.html), [*touch*](http://byron.github.io/google-apis-rs/google_drive2/struct.FileTouchCall.html), [*trash*](http://byron.github.io/google-apis-rs/google_drive2/struct.FileTrashCall.html), [*untrash*](http://byron.github.io/google-apis-rs/google_drive2/struct.FileUntrashCall.html), [*update*](http://byron.github.io/google-apis-rs/google_drive2/struct.FileUpdateCall.html) and [*watch*](http://byron.github.io/google-apis-rs/google_drive2/struct.FileWatchCall.html)
+ * [*copy*](http://byron.github.io/google-apis-rs/google_drive2/struct.FileCopyCall.html), [*delete*](http://byron.github.io/google-apis-rs/google_drive2/struct.FileDeleteCall.html), [*empty trash*](http://byron.github.io/google-apis-rs/google_drive2/struct.FileEmptyTrashCall.html), [*export*](http://byron.github.io/google-apis-rs/google_drive2/struct.FileExportCall.html), [*generate ids*](http://byron.github.io/google-apis-rs/google_drive2/struct.FileGenerateIdCall.html), [*get*](http://byron.github.io/google-apis-rs/google_drive2/struct.FileGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_drive2/struct.FileInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_drive2/struct.FileListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_drive2/struct.FilePatchCall.html), [*touch*](http://byron.github.io/google-apis-rs/google_drive2/struct.FileTouchCall.html), [*trash*](http://byron.github.io/google-apis-rs/google_drive2/struct.FileTrashCall.html), [*untrash*](http://byron.github.io/google-apis-rs/google_drive2/struct.FileUntrashCall.html), [*update*](http://byron.github.io/google-apis-rs/google_drive2/struct.FileUpdateCall.html) and [*watch*](http://byron.github.io/google-apis-rs/google_drive2/struct.FileWatchCall.html)
 * parents
  * [*delete*](http://byron.github.io/google-apis-rs/google_drive2/struct.ParentDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_drive2/struct.ParentGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_drive2/struct.ParentInsertCall.html) and [*list*](http://byron.github.io/google-apis-rs/google_drive2/struct.ParentListCall.html)
 * [permissions](http://byron.github.io/google-apis-rs/google_drive2/struct.Permission.html)
@@ -51,6 +51,7 @@ Download supported by ...
 
 * [*watch files*](http://byron.github.io/google-apis-rs/google_drive2/struct.FileWatchCall.html)
 * [*get realtime*](http://byron.github.io/google-apis-rs/google_drive2/struct.RealtimeGetCall.html)
+* [*export files*](http://byron.github.io/google-apis-rs/google_drive2/struct.FileExportCall.html)
 * [*get files*](http://byron.github.io/google-apis-rs/google_drive2/struct.FileGetCall.html)
 
 Subscription supported by ...
@@ -104,6 +105,7 @@ let r = hub.files().untrash(...).doit()
 let r = hub.files().trash(...).doit()
 let r = hub.files().touch(...).doit()
 let r = hub.files().get(...).doit()
+let r = hub.files().export(...).doit()
 ```
 
 The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 

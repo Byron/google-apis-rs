@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-books1` library allows access to all features of the *Google books* service.
 
-This documentation was generated from *books* crate version *0.1.11+20151218*, where *20151218* is the exact revision of the *books:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
+This documentation was generated from *books* crate version *0.1.11+20160113*, where *20160113* is the exact revision of the *books:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
 
 Everything else about the *books* *v1* API can be found at the
 [official documentation site](https://developers.google.com/books/docs/v1/getting_started).
