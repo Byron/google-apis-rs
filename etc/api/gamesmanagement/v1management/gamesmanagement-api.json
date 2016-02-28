@@ -1,12 +1,12 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"bRFOOrZKfO9LweMbPqu0kcu6De8/ZAaGjSDatxyE_oBWtgco_gXf7hY\"",
+ "etag": "\"bRFOOrZKfO9LweMbPqu0kcu6De8/zyg1d1q0ZiPsgtBlXjvRMcBLPek\"",
  "discoveryVersion": "v1",
  "id": "gamesManagement:v1management",
  "name": "gamesManagement",
  "canonicalName": "Games Management",
  "version": "v1management",
- "revision": "20160126",
+ "revision": "20160224",
  "title": "Google Play Game Services Management API",
  "description": "The Management API for Google Play Game Services.",
  "ownerDomain": "google.com",
@@ -74,7 +74,7 @@
      "description": "Share your Google+ profile information and view and manage your game activity"
     },
     "https://www.googleapis.com/auth/plus.login": {
-     "description": "Know your basic profile info and list of people in your circles."
+     "description": "Know the list of people in your circles, your age range, and language"
     }
    }
   }

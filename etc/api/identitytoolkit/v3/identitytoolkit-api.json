@@ -1,12 +1,12 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"bRFOOrZKfO9LweMbPqu0kcu6De8/xPOEaVu3pXCyFCLJNoRrVds6kh4\"",
+ "etag": "\"bRFOOrZKfO9LweMbPqu0kcu6De8/SoW4IfHxlJosFzXZJhzy3m0A7CE\"",
  "discoveryVersion": "v1",
  "id": "identitytoolkit:v3",
  "name": "identitytoolkit",
  "canonicalName": "Identity Toolkit",
  "version": "v3",
- "revision": "20160125",
+ "revision": "20160216",
  "title": "Google Identity Toolkit API",
  "description": "Help the third party sites to implement federated login.",
  "ownerDomain": "google.com",
@@ -425,6 +425,10 @@
      "type": "string",
      "description": "The new password of the user."
     },
+    "photoUrl": {
+     "type": "string",
+     "description": "The photo url of the user."
+    },
     "provider": {
      "type": "array",
      "description": "The associated IDPs of the user.",
@@ -466,6 +470,41 @@
     "localId": {
      "type": "string",
      "description": "The local ID of the user."
+    }
+   }
+  },
+  "IdentitytoolkitRelyingpartySignupNewUserRequest": {
+   "id": "IdentitytoolkitRelyingpartySignupNewUserRequest",
+   "type": "object",
+   "description": "Request to signup new user, create anonymous user or anonymous user reauth.",
+   "properties": {
+    "captchaChallenge": {
+     "type": "string",
+     "description": "The captcha challenge."
+    },
+    "captchaResponse": {
+     "type": "string",
+     "description": "Response to the captcha."
+    },
+    "displayName": {
+     "type": "string",
+     "description": "The name of the user."
+    },
+    "email": {
+     "type": "string",
+     "description": "The email of the user."
+    },
+    "idToken": {
+     "type": "string",
+     "description": "The GITKit token of the authenticated user."
+    },
+    "instanceId": {
+     "type": "string",
+     "description": "Instance id token of the app."
+    },
+    "password": {
+     "type": "string",
+     "description": "The new password of the user."
     }
    }
   },
@@ -521,6 +560,10 @@
      "type": "string",
      "description": "GCP project number of the requesting delegated app. Currently only intended for Firebase V1 migration.",
      "format": "int64"
+    },
+    "idToken": {
+     "type": "string",
+     "description": "The GITKit token of the authenticated user."
     },
     "instanceId": {
      "type": "string",
@@ -584,6 +627,10 @@
     "email": {
      "type": "string",
      "description": "The email of the user."
+    },
+    "idToken": {
+     "type": "string",
+     "description": "The GITKit token of the authenticated user."
     },
     "instanceId": {
      "type": "string",
@@ -705,6 +752,10 @@
      "type": "string",
      "description": "The new email the user attempts to change to."
     },
+    "photoUrl": {
+     "type": "string",
+     "description": "The photo url of the user."
+    },
     "providerUserInfo": {
      "type": "array",
      "description": "The user's profiles at the associated IdPs.",
@@ -725,6 +776,30 @@
        }
       }
      }
+    }
+   }
+  },
+  "SignupNewUserResponse": {
+   "id": "SignupNewUserResponse",
+   "type": "object",
+   "description": "Response of signing up new user, creating anonymous user or anonymous user reauth.",
+   "properties": {
+    "displayName": {
+     "type": "string",
+     "description": "The name of the user."
+    },
+    "email": {
+     "type": "string",
+     "description": "The email of the user."
+    },
+    "idToken": {
+     "type": "string",
+     "description": "The Gitkit id token to login the newly sign up user."
+    },
+    "kind": {
+     "type": "string",
+     "description": "The fixed string \"identitytoolkit#SignupNewUserResponse\".",
+     "default": "identitytoolkit#SignupNewUserResponse"
     }
    }
   },
@@ -806,6 +881,10 @@
        "displayName": {
         "type": "string",
         "description": "The user's display name at the IDP."
+       },
+       "email": {
+        "type": "string",
+        "description": "User's email at IDP."
        },
        "federatedId": {
         "type": "string",
@@ -1165,6 +1244,18 @@
      },
      "response": {
       "$ref": "IdentitytoolkitRelyingpartySignOutUserResponse"
+     }
+    },
+    "signupNewUser": {
+     "id": "identitytoolkit.relyingparty.signupNewUser",
+     "path": "signupNewUser",
+     "httpMethod": "POST",
+     "description": "Signup new user.",
+     "request": {
+      "$ref": "IdentitytoolkitRelyingpartySignupNewUserRequest"
+     },
+     "response": {
+      "$ref": "SignupNewUserResponse"
      }
     },
     "uploadAccount": {

@@ -1,12 +1,12 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"bRFOOrZKfO9LweMbPqu0kcu6De8/dadzq60iAtGqkBsDw6XsI82tB8k\"",
+ "etag": "\"bRFOOrZKfO9LweMbPqu0kcu6De8/Fl2JtinGhCfVFBoiE_KkQ61uWHk\"",
  "discoveryVersion": "v1",
  "id": "games:v1",
  "name": "games",
  "canonicalName": "Games",
  "version": "v1",
- "revision": "20160126",
+ "revision": "20160224",
  "title": "Google Play Game Services API",
  "description": "The API for Google Play Game Services.",
  "ownerDomain": "google.com",
@@ -77,7 +77,7 @@
      "description": "Share your Google+ profile information and view and manage your game activity"
     },
     "https://www.googleapis.com/auth/plus.login": {
-     "description": "Know your basic profile info and list of people in your circles."
+     "description": "Know the list of people in your circles, your age range, and language"
     }
    }
   }
@@ -4141,11 +4141,13 @@
        "required": true,
        "enum": [
         "PUBLIC",
-        "SOCIAL"
+        "SOCIAL",
+        "SOCIAL_1P"
        ],
        "enumDescriptions": [
         "List all scores in the public leaderboard.",
-        "List only social scores."
+        "List only social scores.",
+        "List only social scores, not respecting the fACL."
        ],
        "location": "path"
       },
@@ -4215,11 +4217,13 @@
        "required": true,
        "enum": [
         "PUBLIC",
-        "SOCIAL"
+        "SOCIAL",
+        "SOCIAL_1P"
        ],
        "enumDescriptions": [
         "List all scores in the public leaderboard.",
-        "List only social scores."
+        "List only social scores.",
+        "List only social scores, not respecting the fACL."
        ],
        "location": "path"
       },

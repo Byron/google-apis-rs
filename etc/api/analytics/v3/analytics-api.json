@@ -1,11 +1,11 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"bRFOOrZKfO9LweMbPqu0kcu6De8/yipUxJ3MQM_fDvErB1j4hLbOCkw\"",
+ "etag": "\"bRFOOrZKfO9LweMbPqu0kcu6De8/lcxvn8OaVzfbxI4Y934R1xQ9Q74\"",
  "discoveryVersion": "v1",
  "id": "analytics:v3",
  "name": "analytics",
  "version": "v3",
- "revision": "20151215",
+ "revision": "20160223",
  "title": "Google Analytics API",
  "description": "View and manage your Google Analytics data",
  "ownerDomain": "google.com",
@@ -5492,21 +5492,21 @@
        "parameters": {
         "accountId": {
          "type": "string",
-         "description": "Account ID to retrieve the goal for.",
+         "description": "Account ID to retrieve the view (profile) for.",
          "required": true,
          "pattern": "[0-9]+",
          "location": "path"
         },
         "profileId": {
          "type": "string",
-         "description": "View (Profile) ID to retrieve the goal for.",
+         "description": "View (Profile) ID to retrieve the view (profile) for.",
          "required": true,
          "pattern": "[0-9]+",
          "location": "path"
         },
         "webPropertyId": {
          "type": "string",
-         "description": "Web property ID to retrieve the goal for.",
+         "description": "Web property ID to retrieve the view (profile) for.",
          "required": true,
          "pattern": "UA-[0-9]+-[0-9]+",
          "location": "path"

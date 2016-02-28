@@ -10,7 +10,6 @@ api:
     - v2.0
     admin:
     - directory_v1
-    - email_migration_v2
     - reports_v1
     adsense:
     - v1.4
@@ -28,8 +27,6 @@ api:
     appsactivity:
     - v1
     appstate:
-    - v1
-    audit:
     - v1
     autoscaler:
     - v1beta2
@@ -54,6 +51,7 @@ api:
     cloudmonitoring:
     - v2beta2
     cloudresourcemanager:
+    - v1
     - v1beta1
     cloudsearch:
     - v1
@@ -65,7 +63,6 @@ api:
     - v1
     container:
     - v1
-    - v1beta1
     content:
     - v2
     - v2sandbox
@@ -86,6 +83,7 @@ api:
     - v2.1
     - v2.2
     - v2.3
+    - v2.4
     discovery:
     - v1
     dns:
@@ -101,7 +99,6 @@ api:
     - v1
     freebase:
     - v1
-    - v1sandbox
     fusiontables:
     - v2
     games:
@@ -129,12 +126,9 @@ api:
     licensing:
     - v1
     logging:
-    - v1beta3
     - v2beta1
     manager:
     - v1beta2
-    mapsengine:
-    - v1
     mirror:
     - v1
     oauth2:
@@ -143,6 +137,8 @@ api:
     - v2
     partners:
     - v2
+    people:
+    - v1
     playmoviespartner:
     - v1
     plus:
@@ -166,6 +162,8 @@ api:
     - v1sandbox
     resourceviews:
     - v1beta2
+    script:
+    - v1
     serviceregistry:
     - alpha
     siteverification:

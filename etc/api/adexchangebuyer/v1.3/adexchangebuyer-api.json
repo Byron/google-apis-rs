@@ -1,12 +1,12 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"bRFOOrZKfO9LweMbPqu0kcu6De8/rEz2HiDx2Fu1wTpH2EJgUXCR4Qk\"",
+ "etag": "\"bRFOOrZKfO9LweMbPqu0kcu6De8/VXepic53Yi7a5nl5bTfBrOL42qg\"",
  "discoveryVersion": "v1",
  "id": "adexchangebuyer:v1.3",
  "name": "adexchangebuyer",
  "canonicalName": "Ad Exchange Buyer",
  "version": "v1.3",
- "revision": "20160118",
+ "revision": "20160222",
  "title": "Ad Exchange Buyer API",
  "description": "Accesses your bidding-account information, submits creatives for validation, finds available direct deals, and retrieves performance reports.",
  "ownerDomain": "google.com",
@@ -88,6 +88,10 @@
      "items": {
       "type": "object",
       "properties": {
+       "bidProtocol": {
+        "type": "string",
+        "description": "The protocol that the bidder endpoint is using. By default, OpenRTB protocols use JSON, except PROTOCOL_OPENRTB_PROTOBUF. PROTOCOL_OPENRTB_PROTOBUF uses protobuf encoding over the latest OpenRTB protocol version, which is 2.3 right now. Allowed values:  \n- PROTOCOL_ADX \n- PROTOCOL_OPENRTB_2_2 \n- PROTOCOL_OPENRTB_2_3 \n- PROTOCOL_OPENRTB_PROTOBUF"
+       },
        "maximumQps": {
         "type": "integer",
         "description": "The maximum queries per second the Ad Exchange will send.",
@@ -595,6 +599,10 @@
     "advertiser": {
      "type": "string",
      "description": "The name of the advertiser this deal is for."
+    },
+    "allowsAlcohol": {
+     "type": "boolean",
+     "description": "Whether the publisher for this deal is eligible for alcohol ads."
     },
     "currencyCode": {
      "type": "string",

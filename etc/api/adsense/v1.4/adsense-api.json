@@ -1,12 +1,12 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"bRFOOrZKfO9LweMbPqu0kcu6De8/yTXIRiKTgAsrnL4fOEOUAV3bDbY\"",
+ "etag": "\"bRFOOrZKfO9LweMbPqu0kcu6De8/Nx2iomi3ve-zx6tBzpFu3QAueM4\"",
  "discoveryVersion": "v1",
  "id": "adsense:v1.4",
  "name": "adsense",
  "canonicalName": "AdSense",
  "version": "v1.4",
- "revision": "20160127",
+ "revision": "20160223",
  "title": "AdSense Management API",
  "description": "Gives AdSense publishers access to their inventory and the ability to generate reports",
  "ownerDomain": "google.com",
@@ -153,10 +153,6 @@
     "arcOptIn": {
      "type": "boolean",
      "description": "Whether this ad client is opted in to ARC."
-    },
-    "arcReviewMode": {
-     "type": "string",
-     "description": "ARC review mode this ad client is in. Empty if the client is not opted in to ARC. Possible values: POST_REVIEW, AUTOMATIC_PRE_REVIEW."
     },
     "id": {
      "type": "string",
