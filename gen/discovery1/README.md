@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-discovery1` library allows access to all features of the *Google discovery* service.
 
-This documentation was generated from *discovery* crate version *0.1.11+00000000*, where *00000000* is the exact revision of the *discovery:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
+This documentation was generated from *discovery* crate version *0.1.12+00000000*, where *00000000* is the exact revision of the *discovery:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.12*.
 
 Everything else about the *discovery* *v1* API can be found at the
 [official documentation site](https://developers.google.com/discovery/).

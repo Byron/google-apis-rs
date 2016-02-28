@@ -4,7 +4,7 @@
 [package]
 
 name = "google-proximitybeacon1_beta1"
-version = "0.1.11+20150729"
+version = "0.1.12+20150729"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with proximitybeacon (protocol v1beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/proximitybeacon1_beta1"

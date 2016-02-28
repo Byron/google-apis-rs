@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-customsearch1` library allows access to all features of the *Google customsearch* service.
 
-This documentation was generated from *customsearch* crate version *0.1.11+20151130*, where *20151130* is the exact revision of the *customsearch:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.11*.
+This documentation was generated from *customsearch* crate version *0.1.12+20151130*, where *20151130* is the exact revision of the *customsearch:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.12*.
 
 Everything else about the *customsearch* *v1* API can be found at the
 [official documentation site](https://developers.google.com/custom-search/v1/using_rest).

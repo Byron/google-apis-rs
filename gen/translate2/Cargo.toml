@@ -4,7 +4,7 @@
 [package]
 
 name = "google-translate2"
-version = "0.1.11+20160217"
+version = "0.1.12+20160217"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with translate (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/translate2"

@@ -4,7 +4,7 @@
 [package]
 
 name = "google-clouddebugger2"
-version = "0.1.11+20151123"
+version = "0.1.12+20151123"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with clouddebugger (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/clouddebugger2"

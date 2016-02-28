@@ -4,7 +4,7 @@
 [package]
 
 name = "google-replicapool1_beta2"
-version = "0.1.11+20150708"
+version = "0.1.12+20150708"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with replicapool (protocol v1beta2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/replicapool1_beta2"

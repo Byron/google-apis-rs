@@ -4,7 +4,7 @@
 [package]
 
 name = "google-serviceregistryalpha"
-version = "0.1.11+20160225"
+version = "0.1.12+20160225"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Service Registry (protocol alpha)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/serviceregistryalpha"

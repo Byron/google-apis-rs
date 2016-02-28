@@ -134,7 +134,7 @@ impl<'a, C, A> Cloudresourcemanager<C, A>
         Cloudresourcemanager {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.11".to_string(),
+            _user_agent: "google-api-rust-client/0.1.12".to_string(),
         }
     }
 
@@ -146,7 +146,7 @@ impl<'a, C, A> Cloudresourcemanager<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.11`.
+    /// It defaults to `google-api-rust-client/0.1.12`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {

@@ -4,7 +4,7 @@
 [package]
 
 name = "google-discovery1"
-version = "0.1.11+00000000"
+version = "0.1.12+00000000"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with discovery (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/discovery1"
