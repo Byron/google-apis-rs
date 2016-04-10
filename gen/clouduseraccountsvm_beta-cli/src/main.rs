@@ -1839,8 +1839,8 @@ fn main() {
     
     let mut app = App::new("clouduseraccountsvm-beta")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.3+20150924")
-           .about("API for the Google Cloud User Accounts service.")
+           .version("0.3.4+20160316")
+           .about("Creates and manages users and groups for accessing Google Compute Engine virtual machines.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_clouduseraccountsvm_beta_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

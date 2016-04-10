@@ -68,13 +68,14 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "filter" => Some(("filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "project-ids" => Some(("projectIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "page-size" => Some(("pageSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "order-by" => Some(("orderBy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "page-size" => Some(("pageSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "partial-success" => Some(("partialSuccess", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "filter" => Some(("filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "project-ids" => Some(("projectIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["filter", "order-by", "page-size", "page-token", "project-ids"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["filter", "order-by", "page-size", "page-token", "partial-success", "project-ids"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -159,10 +160,11 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "resource.labels" => Some(("resource.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "resource.type" => Some(("resource.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "partial-success" => Some(("partialSuccess", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "log-name" => Some(("logName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["labels", "log-name", "resource", "type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["labels", "log-name", "partial-success", "resource", "type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1455,7 +1457,7 @@ fn main() {
                   vec![
                     (Some(r##"project-name"##),
                      None,
-                     Some(r##"Required. The resource name of the project containing the sinks. Example: `"projects/my-logging-project"`, `"projects/01234567890"`."##),
+                     Some(r##"Required. The resource name of the project containing the sinks. Example: `"projects/my-logging-project"`."##),
                      Some(true),
                      Some(false)),
         
@@ -1505,8 +1507,8 @@ fn main() {
     
     let mut app = App::new("logging2-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.3+20160104")
-           .about("The Google Cloud Logging API lets you write log entries and manage your logs, log sinks and logs-based metrics.")
+           .version("0.3.4+20160322")
+           .about("Writes log entries and manages your logs, log sinks, and logs-based metrics.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_logging2_beta1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

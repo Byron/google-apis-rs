@@ -366,8 +366,8 @@ fn main() {
     
     let mut app = App::new("cloudlatencytest2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.3+20150508")
-           .about("A Test API to report latency data.")
+           .version("0.3.4+20160309")
+           .about("Reports latency data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudlatencytest2_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

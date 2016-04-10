@@ -377,7 +377,7 @@ fn main() {
     
     let mut app = App::new("freebase1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.3+20150728")
+           .version("0.3.4+20150728")
            .about("Find Freebase entities using textual queries and other constraints.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_freebase1_cli")
            .arg(Arg::with_name("folder")

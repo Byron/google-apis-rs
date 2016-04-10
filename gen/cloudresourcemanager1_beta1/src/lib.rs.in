@@ -64,7 +64,7 @@ impl Default for Scope {
 // HUB ###
 // ######
 
-/// Central instance to access all Cloudresourcemanager related resource activities
+/// Central instance to access all CloudResourceManager related resource activities
 ///
 /// # Examples
 ///
@@ -78,7 +78,7 @@ impl Default for Scope {
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// use cloudresourcemanager1_beta1::Cloudresourcemanager;
+/// use cloudresourcemanager1_beta1::CloudResourceManager;
 /// 
 /// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 /// // `client_secret`, among other things.
@@ -91,7 +91,7 @@ impl Default for Scope {
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::new(),
 ///                               <MemoryStorage as Default>::default(), None);
-/// let mut hub = Cloudresourcemanager::new(hyper::Client::new(), auth);
+/// let mut hub = CloudResourceManager::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -119,22 +119,22 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Cloudresourcemanager<C, A> {
+pub struct CloudResourceManager<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
 }
 
-impl<'a, C, A> Hub for Cloudresourcemanager<C, A> {}
+impl<'a, C, A> Hub for CloudResourceManager<C, A> {}
 
-impl<'a, C, A> Cloudresourcemanager<C, A>
+impl<'a, C, A> CloudResourceManager<C, A>
     where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> Cloudresourcemanager<C, A> {
-        Cloudresourcemanager {
+    pub fn new(client: C, authenticator: A) -> CloudResourceManager<C, A> {
+        CloudResourceManager {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.12".to_string(),
+            _user_agent: "google-api-rust-client/0.1.13".to_string(),
         }
     }
 
@@ -146,7 +146,7 @@ impl<'a, C, A> Cloudresourcemanager<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.12`.
+    /// It defaults to `google-api-rust-client/0.1.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -460,7 +460,7 @@ impl Part for OrganizationOwner {}
 // #################
 
 /// A builder providing access to all methods supported on *organization* resources.
-/// It is not used directly, but through the `Cloudresourcemanager` hub.
+/// It is not used directly, but through the `CloudResourceManager` hub.
 ///
 /// # Example
 ///
@@ -474,13 +474,13 @@ impl Part for OrganizationOwner {}
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// use cloudresourcemanager1_beta1::Cloudresourcemanager;
+/// use cloudresourcemanager1_beta1::CloudResourceManager;
 /// 
 /// let secret: ApplicationSecret = Default::default();
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::new(),
 ///                               <MemoryStorage as Default>::default(), None);
-/// let mut hub = Cloudresourcemanager::new(hyper::Client::new(), auth);
+/// let mut hub = CloudResourceManager::new(hyper::Client::new(), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)`, `get_iam_policy(...)`, `list(...)`, `set_iam_policy(...)`, `test_iam_permissions(...)` and `update(...)`
 /// // to build up your call.
@@ -490,7 +490,7 @@ impl Part for OrganizationOwner {}
 pub struct OrganizationMethods<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Cloudresourcemanager<C, A>,
+    hub: &'a CloudResourceManager<C, A>,
 }
 
 impl<'a, C, A> MethodsBuilder for OrganizationMethods<'a, C, A> {}
@@ -609,7 +609,7 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
 
 
 /// A builder providing access to all methods supported on *project* resources.
-/// It is not used directly, but through the `Cloudresourcemanager` hub.
+/// It is not used directly, but through the `CloudResourceManager` hub.
 ///
 /// # Example
 ///
@@ -623,13 +623,13 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// use cloudresourcemanager1_beta1::Cloudresourcemanager;
+/// use cloudresourcemanager1_beta1::CloudResourceManager;
 /// 
 /// let secret: ApplicationSecret = Default::default();
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::new(),
 ///                               <MemoryStorage as Default>::default(), None);
-/// let mut hub = Cloudresourcemanager::new(hyper::Client::new(), auth);
+/// let mut hub = CloudResourceManager::new(hyper::Client::new(), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `create(...)`, `delete(...)`, `get(...)`, `get_iam_policy(...)`, `list(...)`, `set_iam_policy(...)`, `test_iam_permissions(...)`, `undelete(...)` and `update(...)`
 /// // to build up your call.
@@ -639,7 +639,7 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
 pub struct ProjectMethods<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Cloudresourcemanager<C, A>,
+    hub: &'a CloudResourceManager<C, A>,
 }
 
 impl<'a, C, A> MethodsBuilder for ProjectMethods<'a, C, A> {}
@@ -833,13 +833,13 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use cloudresourcemanager1_beta1::Cloudresourcemanager;
+/// # use cloudresourcemanager1_beta1::CloudResourceManager;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Cloudresourcemanager::new(hyper::Client::new(), auth);
+/// # let mut hub = CloudResourceManager::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -855,7 +855,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 pub struct OrganizationSetIamPolicyCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Cloudresourcemanager<C, A>,
+    hub: &'a CloudResourceManager<C, A>,
     _request: SetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut Delegate>,
@@ -871,7 +871,7 @@ impl<'a, C, A> OrganizationSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, Policy)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -951,8 +951,7 @@ impl<'a, C, A> OrganizationSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
                     }
                 }
             };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
+            let auth_header = Authorization(Bearer { token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -1106,13 +1105,13 @@ impl<'a, C, A> OrganizationSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use cloudresourcemanager1_beta1::Cloudresourcemanager;
+/// # use cloudresourcemanager1_beta1::CloudResourceManager;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Cloudresourcemanager::new(hyper::Client::new(), auth);
+/// # let mut hub = CloudResourceManager::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1128,7 +1127,7 @@ impl<'a, C, A> OrganizationSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
 pub struct OrganizationGetIamPolicyCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Cloudresourcemanager<C, A>,
+    hub: &'a CloudResourceManager<C, A>,
     _request: GetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut Delegate>,
@@ -1144,7 +1143,7 @@ impl<'a, C, A> OrganizationGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, Policy)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -1224,8 +1223,7 @@ impl<'a, C, A> OrganizationGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
                     }
                 }
             };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
+            let auth_header = Authorization(Bearer { token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -1379,13 +1377,13 @@ impl<'a, C, A> OrganizationGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use cloudresourcemanager1_beta1::Cloudresourcemanager;
+/// # use cloudresourcemanager1_beta1::CloudResourceManager;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Cloudresourcemanager::new(hyper::Client::new(), auth);
+/// # let mut hub = CloudResourceManager::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1401,7 +1399,7 @@ impl<'a, C, A> OrganizationGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
 pub struct OrganizationTestIamPermissionCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Cloudresourcemanager<C, A>,
+    hub: &'a CloudResourceManager<C, A>,
     _request: TestIamPermissionsRequest,
     _resource: String,
     _delegate: Option<&'a mut Delegate>,
@@ -1417,7 +1415,7 @@ impl<'a, C, A> OrganizationTestIamPermissionCall<'a, C, A> where C: BorrowMut<hy
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, TestIamPermissionsResponse)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -1497,8 +1495,7 @@ impl<'a, C, A> OrganizationTestIamPermissionCall<'a, C, A> where C: BorrowMut<hy
                     }
                 }
             };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
+            let auth_header = Authorization(Bearer { token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -1651,13 +1648,13 @@ impl<'a, C, A> OrganizationTestIamPermissionCall<'a, C, A> where C: BorrowMut<hy
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use cloudresourcemanager1_beta1::Cloudresourcemanager;
+/// # use cloudresourcemanager1_beta1::CloudResourceManager;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Cloudresourcemanager::new(hyper::Client::new(), auth);
+/// # let mut hub = CloudResourceManager::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1668,7 +1665,7 @@ impl<'a, C, A> OrganizationTestIamPermissionCall<'a, C, A> where C: BorrowMut<hy
 pub struct OrganizationGetCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Cloudresourcemanager<C, A>,
+    hub: &'a CloudResourceManager<C, A>,
     _organization_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
@@ -1683,7 +1680,7 @@ impl<'a, C, A> OrganizationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, Organization)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -1752,8 +1749,7 @@ impl<'a, C, A> OrganizationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                     }
                 }
             };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
+            let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
@@ -1894,13 +1890,13 @@ impl<'a, C, A> OrganizationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use cloudresourcemanager1_beta1::Cloudresourcemanager;
+/// # use cloudresourcemanager1_beta1::CloudResourceManager;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Cloudresourcemanager::new(hyper::Client::new(), auth);
+/// # let mut hub = CloudResourceManager::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1916,7 +1912,7 @@ impl<'a, C, A> OrganizationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 pub struct OrganizationUpdateCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Cloudresourcemanager<C, A>,
+    hub: &'a CloudResourceManager<C, A>,
     _request: Organization,
     _organization_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -1932,7 +1928,7 @@ impl<'a, C, A> OrganizationUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, Organization)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -2012,8 +2008,7 @@ impl<'a, C, A> OrganizationUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
                     }
                 }
             };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
+            let auth_header = Authorization(Bearer { token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -2166,13 +2161,13 @@ impl<'a, C, A> OrganizationUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use cloudresourcemanager1_beta1::Cloudresourcemanager;
+/// # use cloudresourcemanager1_beta1::CloudResourceManager;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Cloudresourcemanager::new(hyper::Client::new(), auth);
+/// # let mut hub = CloudResourceManager::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2186,7 +2181,7 @@ impl<'a, C, A> OrganizationUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
 pub struct OrganizationListCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Cloudresourcemanager<C, A>,
+    hub: &'a CloudResourceManager<C, A>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _filter: Option<String>,
@@ -2203,7 +2198,7 @@ impl<'a, C, A> OrganizationListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, ListOrganizationsResponse)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -2259,8 +2254,7 @@ impl<'a, C, A> OrganizationListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                     }
                 }
             };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
+            let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
@@ -2412,13 +2406,13 @@ impl<'a, C, A> OrganizationListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use cloudresourcemanager1_beta1::Cloudresourcemanager;
+/// # use cloudresourcemanager1_beta1::CloudResourceManager;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Cloudresourcemanager::new(hyper::Client::new(), auth);
+/// # let mut hub = CloudResourceManager::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2434,7 +2428,7 @@ impl<'a, C, A> OrganizationListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 pub struct ProjectTestIamPermissionCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Cloudresourcemanager<C, A>,
+    hub: &'a CloudResourceManager<C, A>,
     _request: TestIamPermissionsRequest,
     _resource: String,
     _delegate: Option<&'a mut Delegate>,
@@ -2450,7 +2444,7 @@ impl<'a, C, A> ProjectTestIamPermissionCall<'a, C, A> where C: BorrowMut<hyper::
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, TestIamPermissionsResponse)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -2530,8 +2524,7 @@ impl<'a, C, A> ProjectTestIamPermissionCall<'a, C, A> where C: BorrowMut<hyper::
                     }
                 }
             };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
+            let auth_header = Authorization(Bearer { token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -2685,13 +2678,13 @@ impl<'a, C, A> ProjectTestIamPermissionCall<'a, C, A> where C: BorrowMut<hyper::
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use cloudresourcemanager1_beta1::Cloudresourcemanager;
+/// # use cloudresourcemanager1_beta1::CloudResourceManager;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Cloudresourcemanager::new(hyper::Client::new(), auth);
+/// # let mut hub = CloudResourceManager::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2707,7 +2700,7 @@ impl<'a, C, A> ProjectTestIamPermissionCall<'a, C, A> where C: BorrowMut<hyper::
 pub struct ProjectUndeleteCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Cloudresourcemanager<C, A>,
+    hub: &'a CloudResourceManager<C, A>,
     _request: UndeleteProjectRequest,
     _project_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -2723,7 +2716,7 @@ impl<'a, C, A> ProjectUndeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -2803,8 +2796,7 @@ impl<'a, C, A> ProjectUndeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                     }
                 }
             };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
+            let auth_header = Authorization(Bearer { token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -2958,13 +2950,13 @@ impl<'a, C, A> ProjectUndeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use cloudresourcemanager1_beta1::Cloudresourcemanager;
+/// # use cloudresourcemanager1_beta1::CloudResourceManager;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Cloudresourcemanager::new(hyper::Client::new(), auth);
+/// # let mut hub = CloudResourceManager::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2980,7 +2972,7 @@ impl<'a, C, A> ProjectUndeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 pub struct ProjectCreateCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Cloudresourcemanager<C, A>,
+    hub: &'a CloudResourceManager<C, A>,
     _request: Project,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
@@ -2995,7 +2987,7 @@ impl<'a, C, A> ProjectCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, Project)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -3053,8 +3045,7 @@ impl<'a, C, A> ProjectCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                     }
                 }
             };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
+            let auth_header = Authorization(Bearer { token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -3198,13 +3189,13 @@ impl<'a, C, A> ProjectCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use cloudresourcemanager1_beta1::Cloudresourcemanager;
+/// # use cloudresourcemanager1_beta1::CloudResourceManager;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Cloudresourcemanager::new(hyper::Client::new(), auth);
+/// # let mut hub = CloudResourceManager::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3220,7 +3211,7 @@ impl<'a, C, A> ProjectCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 pub struct ProjectSetIamPolicyCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Cloudresourcemanager<C, A>,
+    hub: &'a CloudResourceManager<C, A>,
     _request: SetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut Delegate>,
@@ -3236,7 +3227,7 @@ impl<'a, C, A> ProjectSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, Policy)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -3316,8 +3307,7 @@ impl<'a, C, A> ProjectSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Clien
                     }
                 }
             };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
+            let auth_header = Authorization(Bearer { token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -3470,13 +3460,13 @@ impl<'a, C, A> ProjectSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use cloudresourcemanager1_beta1::Cloudresourcemanager;
+/// # use cloudresourcemanager1_beta1::CloudResourceManager;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Cloudresourcemanager::new(hyper::Client::new(), auth);
+/// # let mut hub = CloudResourceManager::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3487,7 +3477,7 @@ impl<'a, C, A> ProjectSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Clien
 pub struct ProjectGetCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Cloudresourcemanager<C, A>,
+    hub: &'a CloudResourceManager<C, A>,
     _project_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
@@ -3502,7 +3492,7 @@ impl<'a, C, A> ProjectGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, Project)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -3571,8 +3561,7 @@ impl<'a, C, A> ProjectGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                     }
                 }
             };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
+            let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
@@ -3713,13 +3702,13 @@ impl<'a, C, A> ProjectGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use cloudresourcemanager1_beta1::Cloudresourcemanager;
+/// # use cloudresourcemanager1_beta1::CloudResourceManager;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Cloudresourcemanager::new(hyper::Client::new(), auth);
+/// # let mut hub = CloudResourceManager::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3735,7 +3724,7 @@ impl<'a, C, A> ProjectGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 pub struct ProjectUpdateCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Cloudresourcemanager<C, A>,
+    hub: &'a CloudResourceManager<C, A>,
     _request: Project,
     _project_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -3751,7 +3740,7 @@ impl<'a, C, A> ProjectUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, Project)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -3831,8 +3820,7 @@ impl<'a, C, A> ProjectUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                     }
                 }
             };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
+            let auth_header = Authorization(Bearer { token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -3986,13 +3974,13 @@ impl<'a, C, A> ProjectUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use cloudresourcemanager1_beta1::Cloudresourcemanager;
+/// # use cloudresourcemanager1_beta1::CloudResourceManager;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Cloudresourcemanager::new(hyper::Client::new(), auth);
+/// # let mut hub = CloudResourceManager::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4008,7 +3996,7 @@ impl<'a, C, A> ProjectUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 pub struct ProjectGetIamPolicyCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Cloudresourcemanager<C, A>,
+    hub: &'a CloudResourceManager<C, A>,
     _request: GetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut Delegate>,
@@ -4024,7 +4012,7 @@ impl<'a, C, A> ProjectGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, Policy)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -4104,8 +4092,7 @@ impl<'a, C, A> ProjectGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Clien
                     }
                 }
             };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
+            let auth_header = Authorization(Bearer { token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -4258,13 +4245,13 @@ impl<'a, C, A> ProjectGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use cloudresourcemanager1_beta1::Cloudresourcemanager;
+/// # use cloudresourcemanager1_beta1::CloudResourceManager;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Cloudresourcemanager::new(hyper::Client::new(), auth);
+/// # let mut hub = CloudResourceManager::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4275,7 +4262,7 @@ impl<'a, C, A> ProjectGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Clien
 pub struct ProjectDeleteCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Cloudresourcemanager<C, A>,
+    hub: &'a CloudResourceManager<C, A>,
     _project_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
@@ -4290,7 +4277,7 @@ impl<'a, C, A> ProjectDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -4359,8 +4346,7 @@ impl<'a, C, A> ProjectDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                     }
                 }
             };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
+            let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
@@ -4500,13 +4486,13 @@ impl<'a, C, A> ProjectDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use cloudresourcemanager1_beta1::Cloudresourcemanager;
+/// # use cloudresourcemanager1_beta1::CloudResourceManager;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Cloudresourcemanager::new(hyper::Client::new(), auth);
+/// # let mut hub = CloudResourceManager::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4520,7 +4506,7 @@ impl<'a, C, A> ProjectDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 pub struct ProjectListCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Cloudresourcemanager<C, A>,
+    hub: &'a CloudResourceManager<C, A>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _filter: Option<String>,
@@ -4537,7 +4523,7 @@ impl<'a, C, A> ProjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, ListProjectsResponse)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -4593,8 +4579,7 @@ impl<'a, C, A> ProjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                     }
                 }
             };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
+            let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)

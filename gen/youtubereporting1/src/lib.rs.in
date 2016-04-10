@@ -96,10 +96,12 @@ impl Default for Scope {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.jobs().reports_list("jobId")
-///              .page_token("kasd")
-///              .page_size(-22)
-///              .on_behalf_of_content_owner("takimata")
-///              .created_after("justo")
+///              .start_time_before("takimata")
+///              .start_time_at_or_after("justo")
+///              .page_token("amet.")
+///              .page_size(-81)
+///              .on_behalf_of_content_owner("labore")
+///              .created_after("sea")
 ///              .doit();
 /// 
 /// match result {
@@ -135,7 +137,7 @@ impl<'a, C, A> YouTubeReporting<C, A>
         YouTubeReporting {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.12".to_string(),
+            _user_agent: "google-api-rust-client/0.1.13".to_string(),
         }
     }
 
@@ -150,7 +152,7 @@ impl<'a, C, A> YouTubeReporting<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.12`.
+    /// It defaults to `google-api-rust-client/0.1.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -245,9 +247,12 @@ pub struct Job {
     /// The type of reports this job creates. Corresponds to the ID of a ReportType.
     #[serde(rename="reportTypeId")]
     pub report_type_id: Option<String>,
+    /// True if this a system-managed job that cannot be modified by the user; otherwise false.
+    #[serde(rename="systemManaged")]
+    pub system_managed: Option<bool>,
     /// The server-generated ID of the job (max. 40 characters).
     pub id: Option<String>,
-    /// The name of the job (max. 100 characters). TODO(lanthaler) Clarify what this will actually be used for
+    /// The name of the job (max. 100 characters).
     pub name: Option<String>,
     /// The creation date/time of the job.
     #[serde(rename="createTime")]
@@ -291,6 +296,9 @@ impl ResponseResult for ListReportsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReportType {
+    /// True if this a system-managed report type; otherwise false. Reporting jobs for system-managed report types are created automatically and can thus not be used in the `CreateJob` method.
+    #[serde(rename="systemManaged")]
+    pub system_managed: Option<bool>,
     /// The ID of the report type (max. 100 characters).
     pub id: Option<String>,
     /// The name of the report type (max. 100 characters).
@@ -397,7 +405,7 @@ impl<'a, C, A> MediaMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `resourceName` - Name of the media that is being downloaded. See [][ByteStream.ReadRequest.resource_name].
+    /// * `resourceName` - Name of the media that is being downloaded. See ByteStream.ReadRequest.resource_name.
     pub fn download(&self, resource_name: &str) -> MediaDownloadCall<'a, C, A> {
         MediaDownloadCall {
             hub: self.hub,
@@ -458,6 +466,7 @@ impl<'a, C, A> ReportTypeMethods<'a, C, A> {
             _page_token: Default::default(),
             _page_size: Default::default(),
             _on_behalf_of_content_owner: Default::default(),
+            _include_system_managed: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -572,6 +581,8 @@ impl<'a, C, A> JobMethods<'a, C, A> {
         JobReportListCall {
             hub: self.hub,
             _job_id: job_id.to_string(),
+            _start_time_before: Default::default(),
+            _start_time_at_or_after: Default::default(),
             _page_token: Default::default(),
             _page_size: Default::default(),
             _on_behalf_of_content_owner: Default::default(),
@@ -591,6 +602,7 @@ impl<'a, C, A> JobMethods<'a, C, A> {
             _page_token: Default::default(),
             _page_size: Default::default(),
             _on_behalf_of_content_owner: Default::default(),
+            _include_system_managed: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -678,7 +690,7 @@ impl<'a, C, A> MediaDownloadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     pub fn doit(mut self) -> Result<(hyper::client::Response, Media)> {
         use url::percent_encoding::{percent_encode, FORM_URLENCODED_ENCODE_SET};
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -766,8 +778,7 @@ impl<'a, C, A> MediaDownloadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                     }
                 }
             };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
+            let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
@@ -823,7 +834,7 @@ impl<'a, C, A> MediaDownloadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
-    /// Name of the media that is being downloaded. See [][ByteStream.ReadRequest.resource_name].
+    /// Name of the media that is being downloaded. See ByteStream.ReadRequest.resource_name.
     ///
     /// Sets the *resource name* path property to the given value.
     ///
@@ -918,9 +929,10 @@ impl<'a, C, A> MediaDownloadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.report_types().list()
-///              .page_token("erat")
-///              .page_size(-35)
-///              .on_behalf_of_content_owner("sea")
+///              .page_token("dolores")
+///              .page_size(-61)
+///              .on_behalf_of_content_owner("sadipscing")
+///              .include_system_managed(true)
 ///              .doit();
 /// # }
 /// ```
@@ -931,6 +943,7 @@ pub struct ReportTypeListCall<'a, C, A>
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _on_behalf_of_content_owner: Option<String>,
+    _include_system_managed: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -944,7 +957,7 @@ impl<'a, C, A> ReportTypeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, ListReportTypesResponse)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -952,7 +965,7 @@ impl<'a, C, A> ReportTypeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         };
         dlg.begin(MethodInfo { id: "youtubereporting.reportTypes.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
         }
@@ -962,7 +975,10 @@ impl<'a, C, A> ReportTypeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         if let Some(value) = self._on_behalf_of_content_owner {
             params.push(("onBehalfOfContentOwner", value.to_string()));
         }
-        for &field in ["alt", "pageToken", "pageSize", "onBehalfOfContentOwner"].iter() {
+        if let Some(value) = self._include_system_managed {
+            params.push(("includeSystemManaged", value.to_string()));
+        }
+        for &field in ["alt", "pageToken", "pageSize", "onBehalfOfContentOwner", "includeSystemManaged"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -1000,8 +1016,7 @@ impl<'a, C, A> ReportTypeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
                     }
                 }
             };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
+            let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
@@ -1076,6 +1091,13 @@ impl<'a, C, A> ReportTypeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ReportTypeListCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
+        self
+    }
+    /// If set to true, also system-managed report types will be returned; otherwise only the report types that can be used to create new reporting jobs will be returned.
+    ///
+    /// Sets the *include system managed* query property to the given value.
+    pub fn include_system_managed(mut self, new_value: bool) -> ReportTypeListCall<'a, C, A> {
+        self._include_system_managed = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -1163,7 +1185,7 @@ impl<'a, C, A> ReportTypeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.jobs().delete("jobId")
-///              .on_behalf_of_content_owner("dolores")
+///              .on_behalf_of_content_owner("no")
 ///              .doit();
 /// # }
 /// ```
@@ -1186,7 +1208,7 @@ impl<'a, C, A> JobDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -1258,8 +1280,7 @@ impl<'a, C, A> JobDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                     }
                 }
             };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
+            let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
@@ -1417,7 +1438,7 @@ impl<'a, C, A> JobDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.jobs().reports_get("jobId", "reportId")
-///              .on_behalf_of_content_owner("aliquyam")
+///              .on_behalf_of_content_owner("et")
 ///              .doit();
 /// # }
 /// ```
@@ -1441,7 +1462,7 @@ impl<'a, C, A> JobReportGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, Report)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -1514,8 +1535,7 @@ impl<'a, C, A> JobReportGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
                     }
                 }
             };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
+            let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
@@ -1683,7 +1703,7 @@ impl<'a, C, A> JobReportGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.jobs().get("jobId")
-///              .on_behalf_of_content_owner("no")
+///              .on_behalf_of_content_owner("diam")
 ///              .doit();
 /// # }
 /// ```
@@ -1706,7 +1726,7 @@ impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, Job)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -1778,8 +1798,7 @@ impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
                     }
                 }
             };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
+            let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
@@ -1937,10 +1956,12 @@ impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.jobs().reports_list("jobId")
-///              .page_token("justo")
-///              .page_size(-34)
-///              .on_behalf_of_content_owner("et")
-///              .created_after("diam")
+///              .start_time_before("Lorem")
+///              .start_time_at_or_after("et")
+///              .page_token("duo")
+///              .page_size(-32)
+///              .on_behalf_of_content_owner("sea")
+///              .created_after("Lorem")
 ///              .doit();
 /// # }
 /// ```
@@ -1949,6 +1970,8 @@ pub struct JobReportListCall<'a, C, A>
 
     hub: &'a YouTubeReporting<C, A>,
     _job_id: String,
+    _start_time_before: Option<String>,
+    _start_time_at_or_after: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _on_behalf_of_content_owner: Option<String>,
@@ -1966,7 +1989,7 @@ impl<'a, C, A> JobReportListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, ListReportsResponse)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -1974,8 +1997,14 @@ impl<'a, C, A> JobReportListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "youtubereporting.jobs.reports.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((9 + self._additional_params.len()));
         params.push(("jobId", self._job_id.to_string()));
+        if let Some(value) = self._start_time_before {
+            params.push(("startTimeBefore", value.to_string()));
+        }
+        if let Some(value) = self._start_time_at_or_after {
+            params.push(("startTimeAtOrAfter", value.to_string()));
+        }
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
         }
@@ -1988,7 +2017,7 @@ impl<'a, C, A> JobReportListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         if let Some(value) = self._created_after {
             params.push(("createdAfter", value.to_string()));
         }
-        for &field in ["alt", "jobId", "pageToken", "pageSize", "onBehalfOfContentOwner", "createdAfter"].iter() {
+        for &field in ["alt", "jobId", "startTimeBefore", "startTimeAtOrAfter", "pageToken", "pageSize", "onBehalfOfContentOwner", "createdAfter"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -2047,8 +2076,7 @@ impl<'a, C, A> JobReportListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                     }
                 }
             };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
+            let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
@@ -2112,6 +2140,20 @@ impl<'a, C, A> JobReportListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// we provide this method for API completeness.
     pub fn job_id(mut self, new_value: &str) -> JobReportListCall<'a, C, A> {
         self._job_id = new_value.to_string();
+        self
+    }
+    /// If set, only reports whose start time is smaller than the specified date/time are returned.
+    ///
+    /// Sets the *start time before* query property to the given value.
+    pub fn start_time_before(mut self, new_value: &str) -> JobReportListCall<'a, C, A> {
+        self._start_time_before = Some(new_value.to_string());
+        self
+    }
+    /// If set, only reports whose start time is greater than or equal the specified date/time are returned.
+    ///
+    /// Sets the *start time at or after* query property to the given value.
+    pub fn start_time_at_or_after(mut self, new_value: &str) -> JobReportListCall<'a, C, A> {
+        self._start_time_at_or_after = Some(new_value.to_string());
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of ListReportsResponse.next_page_token returned in response to the previous call to the `ListReports` method.
@@ -2227,9 +2269,10 @@ impl<'a, C, A> JobReportListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.jobs().list()
-///              .page_token("ipsum")
-///              .page_size(-5)
-///              .on_behalf_of_content_owner("et")
+///              .page_token("eos")
+///              .page_size(-81)
+///              .on_behalf_of_content_owner("sadipscing")
+///              .include_system_managed(true)
 ///              .doit();
 /// # }
 /// ```
@@ -2240,6 +2283,7 @@ pub struct JobListCall<'a, C, A>
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _on_behalf_of_content_owner: Option<String>,
+    _include_system_managed: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -2253,7 +2297,7 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, ListJobsResponse)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -2261,7 +2305,7 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
         };
         dlg.begin(MethodInfo { id: "youtubereporting.jobs.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
         }
@@ -2271,7 +2315,10 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
         if let Some(value) = self._on_behalf_of_content_owner {
             params.push(("onBehalfOfContentOwner", value.to_string()));
         }
-        for &field in ["alt", "pageToken", "pageSize", "onBehalfOfContentOwner"].iter() {
+        if let Some(value) = self._include_system_managed {
+            params.push(("includeSystemManaged", value.to_string()));
+        }
+        for &field in ["alt", "pageToken", "pageSize", "onBehalfOfContentOwner", "includeSystemManaged"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -2309,8 +2356,7 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
                     }
                 }
             };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
+            let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
@@ -2385,6 +2431,13 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> JobListCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
+        self
+    }
+    /// If set to true, also system-managed jobs will be returned; otherwise only user-created jobs will be returned. System-managed jobs can neither be modified nor deleted.
+    ///
+    /// Sets the *include system managed* query property to the given value.
+    pub fn include_system_managed(mut self, new_value: bool) -> JobListCall<'a, C, A> {
+        self._include_system_managed = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -2478,7 +2531,7 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.jobs().create(req)
-///              .on_behalf_of_content_owner("duo")
+///              .on_behalf_of_content_owner("eirmod")
 ///              .doit();
 /// # }
 /// ```
@@ -2501,7 +2554,7 @@ impl<'a, C, A> JobCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, Job)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -2562,8 +2615,7 @@ impl<'a, C, A> JobCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                     }
                 }
             };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
+            let auth_header = Authorization(Bearer { token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();

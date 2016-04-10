@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-freebase1` library allows access to all features of the *Google freebase* service.
 
-This documentation was generated from *freebase* crate version *0.1.12+20150728*, where *20150728* is the exact revision of the *freebase:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.12*.
+This documentation was generated from *freebase* crate version *0.1.13+20150728*, where *20150728* is the exact revision of the *freebase:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.13*.
 
 Everything else about the *freebase* *v1* API can be found at the
 [official documentation site](https://developers.google.com/freebase/).

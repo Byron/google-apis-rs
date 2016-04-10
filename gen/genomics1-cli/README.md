@@ -10,21 +10,37 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *genomics* API can be found at the
+[official documentation site](https://cloud.google.com/genomics/).
+
 # Downloads
 
 You can download the pre-compiled 64bit binaries for the following platforms:
 
-* ![icon](http://megaicons.net/static/img/icons_sizes/6/140/16/ubuntu-icon.png) [ubuntu](http://dl.byronimo.de/google.rs/cli/0.3.3/ubuntu/genomics1.tar.gz)
-* ![icon](http://hydra-media.cursecdn.com/wow.gamepedia.com/a/a2/Apple-icon-16x16.png?version=25ddd67ac3dd3b634478e3978b76cb74) [osx](http://dl.byronimo.de/google.rs/cli/0.3.3/osx/genomics1.tar.gz)
+* ![icon](http://megaicons.net/static/img/icons_sizes/6/140/16/ubuntu-icon.png) [ubuntu](http://dl.byronimo.de/google.rs/cli/0.3.4/ubuntu/genomics1.tar.gz)
+* ![icon](http://hydra-media.cursecdn.com/wow.gamepedia.com/a/a2/Apple-icon-16x16.png?version=25ddd67ac3dd3b634478e3978b76cb74) [osx](http://dl.byronimo.de/google.rs/cli/0.3.4/osx/genomics1.tar.gz)
 
 Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/genomics1-cli).
 
 # Usage
 
-This documentation was generated from the *genomics* API at revision *20160224*. The CLI is at version *0.3.3*.
+This documentation was generated from the *genomics* API at revision *20160407*. The CLI is at version *0.3.4*.
 
 ```bash
 genomics1 [options]
+        annotations
+                batch-create (-r <kv>)... [-p <v>]... [-o <out>]
+                create (-r <kv>)... [-p <v>]... [-o <out>]
+                delete <annotation-id> [-p <v>]... [-o <out>]
+                get <annotation-id> [-p <v>]... [-o <out>]
+                search (-r <kv>)... [-p <v>]... [-o <out>]
+                update <annotation-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        annotationsets
+                create (-r <kv>)... [-p <v>]... [-o <out>]
+                delete <annotation-set-id> [-p <v>]... [-o <out>]
+                get <annotation-set-id> [-p <v>]... [-o <out>]
+                search (-r <kv>)... [-p <v>]... [-o <out>]
+                update <annotation-set-id> (-r <kv>)... [-p <v>]... [-o <out>]
         callsets
                 create (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <call-set-id> [-p <v>]... [-o <out>]

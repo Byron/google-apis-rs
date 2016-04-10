@@ -1478,6 +1478,93 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _marketplaceprivateauction_updateproposal(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "note.kind" => Some(("note.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "note.proposal-revision-number" => Some(("note.proposalRevisionNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "note.deal-id" => Some(("note.dealId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "note.note" => Some(("note.note", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "note.proposal-id" => Some(("note.proposalId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "note.creator-role" => Some(("note.creatorRole", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "note.note-id" => Some(("note.noteId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "note.timestamp-ms" => Some(("note.timestampMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "external-deal-id" => Some(("externalDealId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "proposal-revision-number" => Some(("proposalRevisionNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-action" => Some(("updateAction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creator-role", "deal-id", "external-deal-id", "kind", "note", "note-id", "proposal-id", "proposal-revision-number", "timestamp-ms", "update-action"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::UpdatePrivateAuctionProposalRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.marketplaceprivateauction().updateproposal(request, opt.value_of("private-auction-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok(mut response) => {
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _performance_report_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.performance_report().list(opt.value_of("account-id").unwrap_or(""), opt.value_of("end-date-time").unwrap_or(""), opt.value_of("start-date-time").unwrap_or(""));
@@ -2720,6 +2807,17 @@ impl<'n> Engine<'n> {
                     }
                 }
             },
+            ("marketplaceprivateauction", Some(opt)) => {
+                match opt.subcommand() {
+                    ("updateproposal", Some(opt)) => {
+                        call_result = self._marketplaceprivateauction_updateproposal(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("marketplaceprivateauction".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
             ("performance-report", Some(opt)) => {
                 match opt.subcommand() {
                     ("list", Some(opt)) => {
@@ -3414,6 +3512,31 @@ fn main() {
                   ]),
             ]),
         
+        ("marketplaceprivateauction", "methods: 'updateproposal'", vec![
+            ("updateproposal",
+                    Some(r##"Update a given private auction proposal"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adexchangebuyer1d4_cli/marketplaceprivateauction_updateproposal",
+                  vec![
+                    (Some(r##"private-auction-id"##),
+                     None,
+                     Some(r##"The private auction id to be updated."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                  ]),
+            ]),
+        
         ("performance-report", "methods: 'list'", vec![
             ("list",
                     Some(r##"Retrieves the authenticated user's list of performance metrics."##),
@@ -3851,7 +3974,7 @@ fn main() {
     
     let mut app = App::new("adexchangebuyer1d4")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.3+20160222")
+           .version("0.3.4+20160405")
            .about("Accesses your bidding-account information, submits creatives for validation, finds available direct deals, and retrieves performance reports.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_adexchangebuyer1d4_cli")
            .arg(Arg::with_name("url")

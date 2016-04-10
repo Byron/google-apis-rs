@@ -149,7 +149,7 @@ impl<'a, C, A> Logging<C, A>
         Logging {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.12".to_string(),
+            _user_agent: "google-api-rust-client/0.1.13".to_string(),
         }
     }
 
@@ -164,7 +164,7 @@ impl<'a, C, A> Logging<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.12`.
+    /// It defaults to `google-api-rust-client/0.1.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -189,9 +189,12 @@ impl<'a, C, A> Logging<C, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListLogEntriesResponse {
-    /// If there are more results than were returned, then `nextPageToken` is given a value in the response. To get the next batch of results, call this method again using the value of `nextPageToken` as `pageToken`.
+    /// If there are more results than were returned, then `nextPageToken` is included in the response. To get the next set of results, call this method again using the value of `nextPageToken` as `pageToken`.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
+    /// If partial_success is true, contains the project ids that had errors and the associated errors.
+    #[serde(rename="projectIdErrors")]
+    pub project_id_errors: Option<HashMap<String, Status>>,
     /// A list of log entries.
     pub entries: Option<Vec<LogEntry>>,
 }
@@ -212,7 +215,7 @@ impl ResponseResult for ListLogEntriesResponse {}
 pub struct ListLogMetricsResponse {
     /// A list of logs-based metrics.
     pub metrics: Option<Vec<LogMetric>>,
-    /// If there are more results than were returned, then `nextPageToken` is given a value in the response. To get the next batch of results, call this method again using the value of `nextPageToken` as `pageToken`.
+    /// If there are more results than were returned, then `nextPageToken` is included in the response. To get the next set of results, call this method again using the value of `nextPageToken` as `pageToken`.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
 }
@@ -220,15 +223,15 @@ pub struct ListLogMetricsResponse {
 impl ResponseResult for ListLogMetricsResponse {}
 
 
-/// A specific monitored resource or a group of monitored resources.
+/// An object representing a resource that can be used for monitoring, logging, billing, or other purposes. Examples include virtual machine instances, databases, and storage devices such as disks. The `type` field identifies a MonitoredResourceDescriptor object that describes the resource's schema. Information in the `labels` field identifies the actual resource and its attributes according to the schema. For example, a particular Compute Engine VM instance could be represented by the following object, because the MonitoredResourceDescriptor for `"gce_instance"` has labels `"instance_id"` and `"zone"`: { "type": "gce_instance", "labels": { "instance_id": "my-instance", "zone": "us-central1-a" }}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MonitoredResource {
-    /// Values for some or all of the labels listed in the associated monitored resource descriptor. For example, specify a specific Cloud SQL database by supplying values for both the `"database_id"` and `"zone"` labels. Specify the set of all Cloud SQL databases in a particular location by supplying a value for only the `"zone"` label.
+    /// Required. Values for all of the labels listed in the associated monitored resource descriptor. For example, Cloud SQL databases use the labels `"database_id"` and `"zone"`.
     pub labels: Option<HashMap<String, String>>,
-    /// The type of monitored resource. This field must match the value of the `type` field in a MonitoredResourceDescriptor object. For example, `"cloudsql_database"` represents Cloud SQL databases.
+    /// Required. The monitored resource type. This field must match the `type` field of a MonitoredResourceDescriptor object. For example, the type of a Cloud SQL database is `"cloudsql_database"`.
     #[serde(rename="type")]
     pub type_: Option<String>,
 }
@@ -263,12 +266,21 @@ impl Part for LogEntryOperation {}
 pub struct HttpRequest {
     /// The response code indicating the status of response. Examples: 200, 404.
     pub status: Option<i32>,
+    /// Whether or not the response was validated with the origin server before being served from cache. This field is only meaningful if `cache_hit` is True.
+    #[serde(rename="cacheValidatedWithOriginServer")]
+    pub cache_validated_with_origin_server: Option<bool>,
     /// The request method. Examples: `"GET"`, `"HEAD"`, `"PUT"`, `"POST"`.
     #[serde(rename="requestMethod")]
     pub request_method: Option<String>,
+    /// The number of HTTP response bytes inserted into cache. Set only when a cache fill was attempted.
+    #[serde(rename="cacheFillBytes")]
+    pub cache_fill_bytes: Option<String>,
     /// The scheme (http, https), the host name, the path and the query portion of the URL that was requested. Example: `"http://example.com/some/info?color=red"`.
     #[serde(rename="requestUrl")]
     pub request_url: Option<String>,
+    /// Whether or not a cache lookup was attempted.
+    #[serde(rename="cacheLookup")]
+    pub cache_lookup: Option<bool>,
     /// Whether or not an entity was served from cache (with or without validation).
     #[serde(rename="cacheHit")]
     pub cache_hit: Option<bool>,
@@ -280,9 +292,6 @@ pub struct HttpRequest {
     /// The user agent sent by the client. Example: `"Mozilla/4.0 (compatible; MSIE 6.0; Windows 98; Q312461; .NET CLR 1.0.3705)"`.
     #[serde(rename="userAgent")]
     pub user_agent: Option<String>,
-    /// Whether or not the response was validated with the origin server before being served from cache. This field is only meaningful if `cache_hit` is True.
-    #[serde(rename="validatedWithOriginServer")]
-    pub validated_with_origin_server: Option<bool>,
     /// The size of the HTTP request message in bytes, including the request headers and the request body.
     #[serde(rename="requestSize")]
     pub request_size: Option<String>,
@@ -307,19 +316,52 @@ impl Part for HttpRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LogSink {
-    /// An [advanced logs filter](/logging/docs/view/advanced_filters) that defines the log entries to be exported. The filter must be consistent with the log entry format designed by the `outputVersionFormat` parameter, regardless of the format of the log entry that was originally written to Cloud Logging. Example: `"logName:syslog AND severity>=ERROR"`.
+    /// An [advanced logs filter](/logging/docs/view/advanced_filters). Only log entries matching that filter are exported. The filter must be consistent with the log entry format specified by the `outputVersionFormat` parameter, regardless of the format of the log entry that was originally written to Cloud Logging. Example (V2 format): `"logName=projects/my-projectid/logs/syslog AND severity>=ERROR"`.
     pub filter: Option<String>,
     /// The export destination. See [Exporting Logs With Sinks](/logging/docs/api/tasks/exporting-logs). Examples: `"storage.googleapis.com/a-bucket"`, `"bigquery.googleapis.com/projects/a-project-id/datasets/a-dataset"`.
     pub destination: Option<String>,
     /// Required. The client-assigned sink identifier. Example: `"my-severe-errors-to-pubsub"`. Sink identifiers are limited to 1000 characters and can include only the following characters: `A-Z`, `a-z`, `0-9`, and the special characters `_-.`.
     pub name: Option<String>,
-    /// The log entry version used when exporting log entries from this sink. This version does not have to correspond to the version of the log entry when it was written to Cloud Logging.
+    /// The log entry version to use for this sink's exported log entries. This version does not have to correspond to the version of the log entry when it was written to Cloud Logging.
     #[serde(rename="outputVersionFormat")]
     pub output_version_format: Option<String>,
 }
 
 impl RequestValue for LogSink {}
 impl ResponseResult for LogSink {}
+
+
+/// The parameters to `ListLogEntries`.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list entries](struct.EntryListCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListLogEntriesRequest {
+    /// Optional. How the results should be sorted. Presently, the only permitted values are `"timestamp asc"` (default) and `"timestamp desc"`. The first option returns entries in order of increasing values of `LogEntry.timestamp` (oldest first), and the second option returns entries in order of decreasing timestamps (newest first). Entries with equal timestamps are returned in order of `LogEntry.insertId`.
+    #[serde(rename="orderBy")]
+    pub order_by: Option<String>,
+    /// Optional. An [advanced logs filter](/logging/docs/view/advanced_filters). The filter is compared against all log entries in the projects specified by `projectIds`. Only entries that match the filter are retrieved. An empty filter matches all log entries.
+    pub filter: Option<String>,
+    /// Optional. The maximum number of results to return from this request. You must check for presence of `nextPageToken` to determine if additional results are available, which you can retrieve by passing the `nextPageToken` value as the `pageToken` parameter in the next request.
+    #[serde(rename="pageSize")]
+    pub page_size: Option<i32>,
+    /// Optional. If the `pageToken` parameter is supplied, then the next page of results is retrieved. The `pageToken` parameter must be set to the value of the `nextPageToken` from the previous response. The values of `projectIds`, `filter`, and `orderBy` must be the same as in the previous request.
+    #[serde(rename="pageToken")]
+    pub page_token: Option<String>,
+    /// Required. One or more project IDs or project numbers from which to retrieve log entries. Examples of a project ID: `"my-project-1A"`, `"1234567890"`.
+    #[serde(rename="projectIds")]
+    pub project_ids: Option<Vec<String>>,
+    /// Optional. If true, read access to all projects is not required and results will be returned for the subset of projects for which read access is permitted (empty subset is permitted).
+    #[serde(rename="partialSuccess")]
+    pub partial_success: Option<bool>,
+}
+
+impl RequestValue for ListLogEntriesRequest {}
 
 
 /// A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); } The JSON representation for `Empty` is empty JSON object `{}`.
@@ -339,34 +381,21 @@ pub struct Empty;
 impl ResponseResult for Empty {}
 
 
-/// The parameters to `ListLogEntries`.
+/// The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). The error model is designed to be: - Simple to use and understand for most users - Flexible enough to meet unexpected needs # Overview The `Status` message contains three pieces of data: error code, error message, and error details. The error code should be an enum value of google.rpc.Code, but it may accept additional error codes if needed. The error message should be a developer-facing English message that helps developers *understand* and *resolve* the error. If a localized user-facing error message is needed, put the localized message in the error details or localize it in the client. The optional error details may contain arbitrary information about the error. There is a predefined set of error detail types in the package `google.rpc` which can be used for common error conditions. # Language mapping The `Status` message is the logical representation of the error model, but it is not necessarily the actual wire format. When the `Status` message is exposed in different client libraries and different wire protocols, it can be mapped differently. For example, it will likely be mapped to some exceptions in Java, but more likely mapped to some error codes in C. # Other uses The error model and the `Status` message can be used in a variety of environments, either with or without APIs, to provide a consistent developer experience across different environments. Example uses of this error model include: - Partial errors. If a service needs to return partial errors to the client, it may embed the `Status` in the normal response to indicate the partial errors. - Workflow errors. A typical workflow has multiple steps. Each step may have a `Status` message for error reporting purpose. - Batch operations. If a client uses batch request and batch response, the `Status` message should be used directly inside batch response, one for each error sub-response. - Asynchronous operations. If an API call embeds asynchronous operation results in its response, the status of those operations should be represented directly using the `Status` message. - Logging. If some API errors are stored in logs, the message `Status` could be used directly after any stripping needed for security/privacy reasons.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list entries](struct.EntryListCall.html) (request)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListLogEntriesRequest {
-    /// Optional. An [advanced logs filter](/logging/docs/view/advanced_filters). The filter is compared against all log entries in the projects specified by `projectIds`. Only entries that match the filter are retrieved. An empty filter matches all log entries.
-    pub filter: Option<String>,
-    /// Required. One or more project IDs or project numbers from which to retrieve log entries. Examples of a project ID: `"my-project-1A"`, `"1234567890"`.
-    #[serde(rename="projectIds")]
-    pub project_ids: Option<Vec<String>>,
-    /// Optional. How the results should be sorted. Presently, the only permitted values are `"timestamp"` (default) and `"timestamp desc"`. The first option returns entries in order of increasing values of `LogEntry.timestamp` (oldest first), and the second option returns entries in order of decreasing timestamps (newest first). Entries with equal timestamps are returned in order of `LogEntry.insertId`.
-    #[serde(rename="orderBy")]
-    pub order_by: Option<String>,
-    /// Optional. The maximum number of results to return from this request. Fewer results might be returned. You must check for the `nextPageToken` result to determine if additional results are available, which you can retrieve by passing the `nextPageToken` value in the `pageToken` parameter to the next request.
-    #[serde(rename="pageSize")]
-    pub page_size: Option<i32>,
-    /// Optional. If the `pageToken` request parameter is supplied, then the next page of results in the set are retrieved. The `pageToken` parameter must be set with the value of the `nextPageToken` result parameter from the previous request. The values of `projectIds`, `filter`, and `orderBy` must be the same as in the previous request.
-    #[serde(rename="pageToken")]
-    pub page_token: Option<String>,
+pub struct Status {
+    /// A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the google.rpc.Status.details field, or localized by the client.
+    pub message: Option<String>,
+    /// The status code, which should be an enum value of google.rpc.Code.
+    pub code: Option<i32>,
+    /// A list of messages that carry the error details. There will be a common set of message types for APIs to use.
+    pub details: Option<Vec<HashMap<String, String>>>,
 }
 
-impl RequestValue for ListLogEntriesRequest {}
+impl Part for Status {}
 
 
 /// Result returned from ListMonitoredResourceDescriptors.
@@ -380,7 +409,7 @@ impl RequestValue for ListLogEntriesRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListMonitoredResourceDescriptorsResponse {
-    /// If there are more results than were returned, then `nextPageToken` is returned in the response. To get the next batch of results, call this method again using the value of `nextPageToken` as `pageToken`.
+    /// If there are more results than were returned, then `nextPageToken` is included in the response. To get the next set of results, call this method again using the value of `nextPageToken` as `pageToken`.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
     /// A list of resource descriptors.
@@ -402,7 +431,7 @@ impl ResponseResult for ListMonitoredResourceDescriptorsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListSinksResponse {
-    /// If there are more results than were returned, then `nextPageToken` is given a value in the response. To get the next batch of results, call this method again using the value of `nextPageToken` as `pageToken`.
+    /// If there are more results than were returned, then `nextPageToken` is included in the response. To get the next set of results, call this method again using the value of `nextPageToken` as `pageToken`.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
     /// A list of sinks.
@@ -441,6 +470,9 @@ pub struct WriteLogEntriesRequest {
     /// Optional. A default log resource name for those log entries in `entries` that do not specify their own `logName`. Example: `"projects/my-project/logs/syslog"`. See LogEntry.
     #[serde(rename="logName")]
     pub log_name: Option<String>,
+    /// Optional. Whether valid entries should be written even if some other entries fail due to INVALID_ARGUMENT or PERMISSION_DENIED errors. If any entry is not written, the response status will be the error associated with one of the failed entries and include error details in the form of WriteLogEntriesPartialErrors.
+    #[serde(rename="partialSuccess")]
+    pub partial_success: Option<bool>,
     /// Optional. User-defined `key:value` items that are added to the `labels` field of each log entry in `entries`, except when a log entry specifies its own `key:value` item with the same key. Example: `{ "size": "large", "color":"red" }`
     pub labels: Option<HashMap<String, String>>,
     /// Optional. A default monitored resource for those log entries in `entries` that do not specify their own `resource`.
@@ -496,7 +528,8 @@ pub struct LogEntry {
     /// The log entry payload, represented as a structure that is expressed as a JSON object.
     #[serde(rename="jsonPayload")]
     pub json_payload: Option<HashMap<String, String>>,
-    /// Required. The resource name of the log to which this log entry belongs. The format of the name is `projects/<project-id>/logs/<log-id%gt;`. Examples: `"projects/my-projectid/logs/syslog"`, `"projects/1234567890/logs/library.googleapis.com%2Fbook_log"`. The log ID part of resource name must be less than 512 characters long and can only include the following characters: upper and lower case alphanumeric characters: [A-Za-z0-9]; and punctuation characters: forward-slash, underscore, hyphen, and period. Forward-slash (`/`) characters in the log ID must be URL-encoded.
+    /// Required. The resource name of the log to which this log entry belongs. The format of the name is `"projects/
+    /// /logs/"`. Examples: `"projects/my-projectid/logs/syslog"`, `"projects/1234567890/logs/library.googleapis.com%2Fbook_log"`. The log ID part of resource name must be less than 512 characters long and can only include the following characters: upper and lower case alphanumeric characters: [A-Za-z0-9]; and punctuation characters: forward-slash, underscore, hyphen, and period. Forward-slash (`/`) characters in the log ID must be URL-encoded.
     #[serde(rename="logName")]
     pub log_name: Option<String>,
     /// Optional. A unique ID for the log entry. If you provide this field, the logging service considers other log entries in the same log with the same ID as duplicates which can be removed. If omitted, Cloud Logging will generate a unique ID for this log entry.
@@ -534,7 +567,7 @@ impl RequestValue for LogMetric {}
 impl ResponseResult for LogMetric {}
 
 
-/// A description of a type of monitored resource.
+/// An object that describes the schema of a MonitoredResource object using a type name and a set of labels. For example, the monitored resource descriptor for Google Compute Engine VM instances has a type of `"gce_instance"` and specifies the use of the labels `"instance_id"` and `"zone"` to identify particular VM instances. Different APIs can support different monitored resource types. APIs generally provide a `list` method that returns the monitored resource descriptors used by the API.
 /// 
 /// # Activities
 /// 
@@ -545,15 +578,17 @@ impl ResponseResult for LogMetric {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MonitoredResourceDescriptor {
-    /// The monitored resource type. For example, the type `"cloudsql_database"` represents databases in Google Cloud SQL.
+    /// Required. The monitored resource type. For example, the type `"cloudsql_database"` represents databases in Google Cloud SQL.
     #[serde(rename="type")]
     pub type_: Option<String>,
-    /// A set of labels that can be used to describe instances of this monitored resource type. For example, Cloud SQL databases can be labeled with their `"database_id"` and their `"zone"`.
+    /// Required. A set of labels used to describe instances of this monitored resource type. For example, an individual Google Cloud SQL database is identified by values for the labels `"database_id"` and `"zone"`.
     pub labels: Option<Vec<LabelDescriptor>>,
-    /// A concise name for the monitored resource type, which is displayed in user interfaces. For example, `"Cloud SQL Database"`.
+    /// Optional. A concise name for the monitored resource type that might be displayed in user interfaces. For example, `"Google Cloud SQL Database"`.
     #[serde(rename="displayName")]
     pub display_name: Option<String>,
-    /// A detailed description of the monitored resource type, which is used in documentation.
+    /// Optional. The resource name of the monitored resource descriptor: `"projects/{project_id}/monitoredResourceDescriptors/{type}"` where {type} is the value of the `type` field in this object and {project_id} is a project ID that provides API-specific context for accessing the type. APIs that do not use project information can use the resource name format `"monitoredResourceDescriptors/{type}"`.
+    pub name: Option<String>,
+    /// Optional. A detailed description of the monitored resource type that might be used in documentation.
     pub description: Option<String>,
 }
 
@@ -664,7 +699,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `projectName` - Required. The resource name of the project containing the sinks. Example: `"projects/my-logging-project"`, `"projects/01234567890"`.
+    /// * `projectName` - Required. The resource name of the project containing the sinks. Example: `"projects/my-logging-project"`.
     pub fn sinks_list(&self, project_name: &str) -> ProjectSinkListCall<'a, C, A> {
         ProjectSinkListCall {
             hub: self.hub,
@@ -992,7 +1027,7 @@ impl<'a, C, A> MonitoredResourceDescriptorListCall<'a, C, A> where C: BorrowMut<
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, ListMonitoredResourceDescriptorsResponse)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -1045,8 +1080,7 @@ impl<'a, C, A> MonitoredResourceDescriptorListCall<'a, C, A> where C: BorrowMut<
                     }
                 }
             };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
+            let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
@@ -1102,14 +1136,14 @@ impl<'a, C, A> MonitoredResourceDescriptorListCall<'a, C, A> where C: BorrowMut<
     }
 
 
-    /// Optional. If the `pageToken` request parameter is supplied, then the next page of results in the set are retrieved. The `pageToken` parameter must be set with the value of the `nextPageToken` result parameter from the previous request.
+    /// Optional. If the `pageToken` parameter is supplied, then the next page of results is retrieved. The `pageToken` parameter must be set to the value of the `nextPageToken` from the previous response.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> MonitoredResourceDescriptorListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Optional. The maximum number of results to return from this request. Fewer results might be returned. You must check for the `nextPageToken` result to determine if additional results are available, which you can retrieve by passing the `nextPageToken` value in the `pageToken` parameter to the next request.
+    /// Optional. The maximum number of results to return from this request. You must check for presence of `nextPageToken` to determine if additional results are available, which you can retrieve by passing the `nextPageToken` value as the `pageToken` parameter in the next request.
     ///
     /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> MonitoredResourceDescriptorListCall<'a, C, A> {
@@ -1227,7 +1261,7 @@ impl<'a, C, A> ProjectSinkListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     pub fn doit(mut self) -> Result<(hyper::client::Response, ListSinksResponse)> {
         use url::percent_encoding::{percent_encode, FORM_URLENCODED_ENCODE_SET};
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -1305,8 +1339,7 @@ impl<'a, C, A> ProjectSinkListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                     }
                 }
             };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
+            let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
@@ -1362,7 +1395,7 @@ impl<'a, C, A> ProjectSinkListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
-    /// Required. The resource name of the project containing the sinks. Example: `"projects/my-logging-project"`, `"projects/01234567890"`.
+    /// Required. The resource name of the project containing the sinks. Example: `"projects/my-logging-project"`.
     ///
     /// Sets the *project name* path property to the given value.
     ///
@@ -1372,14 +1405,14 @@ impl<'a, C, A> ProjectSinkListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._project_name = new_value.to_string();
         self
     }
-    /// Optional. If the `pageToken` request parameter is supplied, then the next page of results in the set are retrieved. The `pageToken` parameter must be set with the value of the `nextPageToken` result parameter from the previous request. The value of `projectName` must be the same as in the previous request.
+    /// Optional. If the `pageToken` parameter is supplied, then the next page of results is retrieved. The `pageToken` parameter must be set to the value of the `nextPageToken` from the previous response. The value of `projectName` must be the same as in the previous request.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ProjectSinkListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Optional. The maximum number of results to return from this request. Fewer results might be returned. You must check for the `nextPageToken` result to determine if additional results are available, which you can retrieve by passing the `nextPageToken` value in the `pageToken` parameter to the next request.
+    /// Optional. The maximum number of results to return from this request. You must check for presence of `nextPageToken` to determine if additional results are available, which you can retrieve by passing the `nextPageToken` value as the `pageToken` parameter in the next request.
     ///
     /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> ProjectSinkListCall<'a, C, A> {
@@ -1493,7 +1526,7 @@ impl<'a, C, A> ProjectLogDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
         use url::percent_encoding::{percent_encode, FORM_URLENCODED_ENCODE_SET};
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -1565,8 +1598,7 @@ impl<'a, C, A> ProjectLogDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                     }
                 }
             };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
+            let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
@@ -1739,7 +1771,7 @@ impl<'a, C, A> ProjectSinkGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     pub fn doit(mut self) -> Result<(hyper::client::Response, LogSink)> {
         use url::percent_encoding::{percent_encode, FORM_URLENCODED_ENCODE_SET};
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -1811,8 +1843,7 @@ impl<'a, C, A> ProjectSinkGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
                     }
                 }
             };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
+            let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
@@ -1985,7 +2016,7 @@ impl<'a, C, A> ProjectMetricGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     pub fn doit(mut self) -> Result<(hyper::client::Response, LogMetric)> {
         use url::percent_encoding::{percent_encode, FORM_URLENCODED_ENCODE_SET};
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -2057,8 +2088,7 @@ impl<'a, C, A> ProjectMetricGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                     }
                 }
             };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
+            let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
@@ -2238,7 +2268,7 @@ impl<'a, C, A> ProjectSinkUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
     pub fn doit(mut self) -> Result<(hyper::client::Response, LogSink)> {
         use url::percent_encoding::{percent_encode, FORM_URLENCODED_ENCODE_SET};
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -2321,8 +2351,7 @@ impl<'a, C, A> ProjectSinkUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
                     }
                 }
             };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
+            let auth_header = Authorization(Bearer { token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -2508,7 +2537,7 @@ impl<'a, C, A> ProjectMetricDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
     pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
         use url::percent_encoding::{percent_encode, FORM_URLENCODED_ENCODE_SET};
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -2580,8 +2609,7 @@ impl<'a, C, A> ProjectMetricDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
                     }
                 }
             };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
+            let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
@@ -2761,7 +2789,7 @@ impl<'a, C, A> ProjectSinkCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
     pub fn doit(mut self) -> Result<(hyper::client::Response, LogSink)> {
         use url::percent_encoding::{percent_encode, FORM_URLENCODED_ENCODE_SET};
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -2844,8 +2872,7 @@ impl<'a, C, A> ProjectSinkCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
                     }
                 }
             };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
+            let auth_header = Authorization(Bearer { token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -3038,7 +3065,7 @@ impl<'a, C, A> ProjectMetricCreateCall<'a, C, A> where C: BorrowMut<hyper::Clien
     pub fn doit(mut self) -> Result<(hyper::client::Response, LogMetric)> {
         use url::percent_encoding::{percent_encode, FORM_URLENCODED_ENCODE_SET};
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -3121,8 +3148,7 @@ impl<'a, C, A> ProjectMetricCreateCall<'a, C, A> where C: BorrowMut<hyper::Clien
                     }
                 }
             };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
+            let auth_header = Authorization(Bearer { token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -3308,7 +3334,7 @@ impl<'a, C, A> ProjectSinkDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
     pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
         use url::percent_encoding::{percent_encode, FORM_URLENCODED_ENCODE_SET};
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -3380,8 +3406,7 @@ impl<'a, C, A> ProjectSinkDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
                     }
                 }
             };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
+            let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
@@ -3558,7 +3583,7 @@ impl<'a, C, A> ProjectMetricListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     pub fn doit(mut self) -> Result<(hyper::client::Response, ListLogMetricsResponse)> {
         use url::percent_encoding::{percent_encode, FORM_URLENCODED_ENCODE_SET};
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -3636,8 +3661,7 @@ impl<'a, C, A> ProjectMetricListCall<'a, C, A> where C: BorrowMut<hyper::Client>
                     }
                 }
             };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
+            let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
@@ -3703,14 +3727,14 @@ impl<'a, C, A> ProjectMetricListCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._project_name = new_value.to_string();
         self
     }
-    /// Optional. If the `pageToken` request parameter is supplied, then the next page of results in the set are retrieved. The `pageToken` parameter must be set with the value of the `nextPageToken` result parameter from the previous request. The value of `projectName` must be the same as in the previous request.
+    /// Optional. If the `pageToken` parameter is supplied, then the next page of results is retrieved. The `pageToken` parameter must be set to the value of the `nextPageToken` from the previous response. The value of `projectName` must be the same as in the previous request.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ProjectMetricListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Optional. The maximum number of results to return from this request. Fewer results might be returned. You must check for the `nextPageToken` result to determine if additional results are available, which you can retrieve by passing the `nextPageToken` value in the `pageToken` parameter to the next request.
+    /// Optional. The maximum number of results to return from this request. You must check for presence of `nextPageToken` to determine if additional results are available, which you can retrieve by passing the `nextPageToken` value as the `pageToken` parameter in the next request.
     ///
     /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> ProjectMetricListCall<'a, C, A> {
@@ -3831,7 +3855,7 @@ impl<'a, C, A> ProjectMetricUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
     pub fn doit(mut self) -> Result<(hyper::client::Response, LogMetric)> {
         use url::percent_encoding::{percent_encode, FORM_URLENCODED_ENCODE_SET};
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -3914,8 +3938,7 @@ impl<'a, C, A> ProjectMetricUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
                     }
                 }
             };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
+            let auth_header = Authorization(Bearer { token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -4106,7 +4129,7 @@ impl<'a, C, A> EntryListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, ListLogEntriesResponse)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -4164,8 +4187,7 @@ impl<'a, C, A> EntryListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                     }
                 }
             };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
+            let auth_header = Authorization(Bearer { token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -4346,7 +4368,7 @@ impl<'a, C, A> EntryWriteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, WriteLogEntriesResponse)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -4404,8 +4426,7 @@ impl<'a, C, A> EntryWriteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                     }
                 }
             };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
+            let auth_header = Authorization(Bearer { token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();

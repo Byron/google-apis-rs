@@ -17,14 +17,14 @@ Everything else about the *taskqueue* API can be found at the
 
 You can download the pre-compiled 64bit binaries for the following platforms:
 
-* ![icon](http://megaicons.net/static/img/icons_sizes/6/140/16/ubuntu-icon.png) [ubuntu](http://dl.byronimo.de/google.rs/cli/0.3.3/ubuntu/taskqueue1-beta2.tar.gz)
-* ![icon](http://hydra-media.cursecdn.com/wow.gamepedia.com/a/a2/Apple-icon-16x16.png?version=25ddd67ac3dd3b634478e3978b76cb74) [osx](http://dl.byronimo.de/google.rs/cli/0.3.3/osx/taskqueue1-beta2.tar.gz)
+* ![icon](http://megaicons.net/static/img/icons_sizes/6/140/16/ubuntu-icon.png) [ubuntu](http://dl.byronimo.de/google.rs/cli/0.3.4/ubuntu/taskqueue1-beta2.tar.gz)
+* ![icon](http://hydra-media.cursecdn.com/wow.gamepedia.com/a/a2/Apple-icon-16x16.png?version=25ddd67ac3dd3b634478e3978b76cb74) [osx](http://dl.byronimo.de/google.rs/cli/0.3.4/osx/taskqueue1-beta2.tar.gz)
 
 Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/taskqueue1_beta2-cli).
 
 # Usage
 
-This documentation was generated from the *taskqueue* API at revision *20141111*. The CLI is at version *0.3.3*.
+This documentation was generated from the *taskqueue* API at revision *20141111*. The CLI is at version *0.3.4*.
 
 ```bash
 taskqueue1-beta2 [options]

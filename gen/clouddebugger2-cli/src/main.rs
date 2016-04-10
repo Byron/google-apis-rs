@@ -132,19 +132,20 @@ impl<'n> Engine<'n> {
                     "breakpoint.status.description.parameters" => Some(("breakpoint.status.description.parameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "breakpoint.status.description.format" => Some(("breakpoint.status.description.format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "breakpoint.user-email" => Some(("breakpoint.userEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "breakpoint.log-level" => Some(("breakpoint.logLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "breakpoint.log-message-format" => Some(("breakpoint.logMessageFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "breakpoint.log-level" => Some(("breakpoint.logLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "breakpoint.labels" => Some(("breakpoint.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "breakpoint.final-time" => Some(("breakpoint.finalTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "breakpoint.create-time" => Some(("breakpoint.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "breakpoint.location.path" => Some(("breakpoint.location.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "breakpoint.location.line" => Some(("breakpoint.location.line", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "breakpoint.final-time" => Some(("breakpoint.finalTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "breakpoint.action" => Some(("breakpoint.action", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "breakpoint.expressions" => Some(("breakpoint.expressions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "breakpoint.is-final-state" => Some(("breakpoint.isFinalState", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "breakpoint.id" => Some(("breakpoint.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "breakpoint.condition" => Some(("breakpoint.condition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["action", "breakpoint", "condition", "create-time", "description", "expressions", "final-time", "format", "id", "is-error", "is-final-state", "line", "location", "log-level", "log-message-format", "parameters", "path", "refers-to", "status", "user-email"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["action", "breakpoint", "condition", "create-time", "description", "expressions", "final-time", "format", "id", "is-error", "is-final-state", "labels", "line", "location", "log-level", "log-message-format", "parameters", "path", "refers-to", "status", "user-email"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -306,6 +307,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "client-version" => {
+                    call = call.client_version(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -319,6 +323,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["client-version"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -358,6 +363,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "client-version" => {
+                    call = call.client_version(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -371,6 +379,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["client-version"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -422,6 +431,9 @@ impl<'n> Engine<'n> {
                 "include-all-users" => {
                     call = call.include_all_users(arg_from_str(value.unwrap_or("false"), err, "include-all-users", "boolean"));
                 },
+                "client-version" => {
+                    call = call.client_version(value.unwrap_or(""));
+                },
                 "action-value" => {
                     call = call.action_value(value.unwrap_or(""));
                 },
@@ -438,7 +450,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["strip-results", "include-inactive", "action-value", "wait-token", "include-all-users"].iter().map(|v|*v));
+                                                                           v.extend(["strip-results", "include-all-users", "client-version", "include-inactive", "wait-token", "action-value"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -500,19 +512,20 @@ impl<'n> Engine<'n> {
                     "status.description.parameters" => Some(("status.description.parameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "status.description.format" => Some(("status.description.format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-email" => Some(("userEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "log-level" => Some(("logLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "log-message-format" => Some(("logMessageFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "log-level" => Some(("logLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "final-time" => Some(("finalTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location.path" => Some(("location.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location.line" => Some(("location.line", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "final-time" => Some(("finalTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "action" => Some(("action", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "expressions" => Some(("expressions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "is-final-state" => Some(("isFinalState", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "condition" => Some(("condition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["action", "condition", "create-time", "description", "expressions", "final-time", "format", "id", "is-error", "is-final-state", "line", "location", "log-level", "log-message-format", "parameters", "path", "refers-to", "status", "user-email"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["action", "condition", "create-time", "description", "expressions", "final-time", "format", "id", "is-error", "is-final-state", "labels", "line", "location", "log-level", "log-message-format", "parameters", "path", "refers-to", "status", "user-email"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -526,6 +539,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "client-version" => {
+                    call = call.client_version(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -539,6 +555,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["client-version"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -584,6 +601,9 @@ impl<'n> Engine<'n> {
                 "include-inactive" => {
                     call = call.include_inactive(arg_from_str(value.unwrap_or("false"), err, "include-inactive", "boolean"));
                 },
+                "client-version" => {
+                    call = call.client_version(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -597,7 +617,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["project", "include-inactive"].iter().map(|v|*v));
+                                                                           v.extend(["project", "include-inactive", "client-version"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -972,8 +992,8 @@ fn main() {
     
     let mut app = App::new("clouddebugger2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.3+20151123")
-           .about("Lets you examine the stack and variables of your running application without stopping or slowing it down.")
+           .version("0.3.4+20160309")
+           .about("Examines the call stack and variables of a running application without stopping or slowing it down.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_clouddebugger2_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

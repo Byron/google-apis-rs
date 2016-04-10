@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-plusdomains1` library allows access to all features of the *Google plusDomains* service.
 
-This documentation was generated from *plusDomains* crate version *0.1.12+20160223*, where *20160223* is the exact revision of the *plusDomains:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.12*.
+This documentation was generated from *plusDomains* crate version *0.1.13+20160406*, where *20160406* is the exact revision of the *plusDomains:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.13*.
 
 Everything else about the *plusDomains* *v1* API can be found at the
 [official documentation site](https://developers.google.com/+/domains/).

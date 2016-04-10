@@ -5194,7 +5194,7 @@ fn main() {
         
                     (Some(r##"entitlement-id"##),
                      None,
-                     Some(r##"The ID of the entitlement, e.g. "app:com.google.android.gm"."##),
+                     Some(r##"The ID of the entitlement (a product ID), e.g. "app:com.google.android.gm"."##),
                      Some(true),
                      Some(false)),
         
@@ -5222,7 +5222,7 @@ fn main() {
         
                     (Some(r##"entitlement-id"##),
                      None,
-                     Some(r##"The ID of the entitlement, e.g. "app:com.google.android.gm"."##),
+                     Some(r##"The ID of the entitlement (a product ID), e.g. "app:com.google.android.gm"."##),
                      Some(true),
                      Some(false)),
         
@@ -5284,7 +5284,7 @@ fn main() {
         
                     (Some(r##"entitlement-id"##),
                      None,
-                     Some(r##"The ID of the entitlement, e.g. "app:com.google.android.gm"."##),
+                     Some(r##"The ID of the entitlement (a product ID), e.g. "app:com.google.android.gm"."##),
                      Some(true),
                      Some(false)),
         
@@ -5324,7 +5324,7 @@ fn main() {
         
                     (Some(r##"entitlement-id"##),
                      None,
-                     Some(r##"The ID of the entitlement, e.g. "app:com.google.android.gm"."##),
+                     Some(r##"The ID of the entitlement (a product ID), e.g. "app:com.google.android.gm"."##),
                      Some(true),
                      Some(false)),
         
@@ -6396,8 +6396,8 @@ fn main() {
     
     let mut app = App::new("androidenterprise1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.3+20160212")
-           .about("Allows MDMs/EMMs and enterprises to manage the deployment of apps to Android for Work users.")
+           .version("0.3.4+20160331")
+           .about("Manages the deployment of apps to Android for Work users.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

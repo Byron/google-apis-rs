@@ -3,28 +3,28 @@ DO NOT EDIT !
 This file was generated automatically from 'src/mako/cli/README.md.mako'
 DO NOT EDIT !
 -->
-The `cloudresourcemanager1-beta1` command-line interface *(CLI)* allows to use most features of the *Google cloudresourcemanager* service from the comfort of your terminal.
+The `cloudresourcemanager1-beta1` command-line interface *(CLI)* allows to use most features of the *Google Cloud Resource Manager* service from the comfort of your terminal.
 
 By default all output is printed to standard out, but flags can be set to direct it into a file independent of your shell's
 capabilities. Errors will be printed to standard error, and cause the program's exit code to be non-zero.
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
-Everything else about the *cloudresourcemanager* API can be found at the
+Everything else about the *Cloud Resource Manager* API can be found at the
 [official documentation site](https://cloud.google.com/resource-manager).
 
 # Downloads
 
 You can download the pre-compiled 64bit binaries for the following platforms:
 
-* ![icon](http://megaicons.net/static/img/icons_sizes/6/140/16/ubuntu-icon.png) [ubuntu](http://dl.byronimo.de/google.rs/cli/0.3.3/ubuntu/cloudresourcemanager1-beta1.tar.gz)
-* ![icon](http://hydra-media.cursecdn.com/wow.gamepedia.com/a/a2/Apple-icon-16x16.png?version=25ddd67ac3dd3b634478e3978b76cb74) [osx](http://dl.byronimo.de/google.rs/cli/0.3.3/osx/cloudresourcemanager1-beta1.tar.gz)
+* ![icon](http://megaicons.net/static/img/icons_sizes/6/140/16/ubuntu-icon.png) [ubuntu](http://dl.byronimo.de/google.rs/cli/0.3.4/ubuntu/cloudresourcemanager1-beta1.tar.gz)
+* ![icon](http://hydra-media.cursecdn.com/wow.gamepedia.com/a/a2/Apple-icon-16x16.png?version=25ddd67ac3dd3b634478e3978b76cb74) [osx](http://dl.byronimo.de/google.rs/cli/0.3.4/osx/cloudresourcemanager1-beta1.tar.gz)
 
 Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/cloudresourcemanager1_beta1-cli).
 
 # Usage
 
-This documentation was generated from the *cloudresourcemanager* API at revision *20160225*. The CLI is at version *0.3.3*.
+This documentation was generated from the *Cloud Resource Manager* API at revision *20160316*. The CLI is at version *0.3.4*.
 
 ```bash
 cloudresourcemanager1-beta1 [options]

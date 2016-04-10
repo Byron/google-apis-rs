@@ -17,14 +17,14 @@ Everything else about the *compute* API can be found at the
 
 You can download the pre-compiled 64bit binaries for the following platforms:
 
-* ![icon](http://megaicons.net/static/img/icons_sizes/6/140/16/ubuntu-icon.png) [ubuntu](http://dl.byronimo.de/google.rs/cli/0.3.3/ubuntu/compute1.tar.gz)
-* ![icon](http://hydra-media.cursecdn.com/wow.gamepedia.com/a/a2/Apple-icon-16x16.png?version=25ddd67ac3dd3b634478e3978b76cb74) [osx](http://dl.byronimo.de/google.rs/cli/0.3.3/osx/compute1.tar.gz)
+* ![icon](http://megaicons.net/static/img/icons_sizes/6/140/16/ubuntu-icon.png) [ubuntu](http://dl.byronimo.de/google.rs/cli/0.3.4/ubuntu/compute1.tar.gz)
+* ![icon](http://hydra-media.cursecdn.com/wow.gamepedia.com/a/a2/Apple-icon-16x16.png?version=25ddd67ac3dd3b634478e3978b76cb74) [osx](http://dl.byronimo.de/google.rs/cli/0.3.4/osx/compute1.tar.gz)
 
 Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/compute1-cli).
 
 # Usage
 
-This documentation was generated from the *compute* API at revision *20160224*. The CLI is at version *0.3.3*.
+This documentation was generated from the *compute* API at revision *20160328*. The CLI is at version *0.3.4*.
 
 ```bash
 compute1 [options]
@@ -61,6 +61,7 @@ compute1 [options]
                 get <project> <zone> <disk> [-p <v>]... [-o <out>]
                 insert <project> <zone> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <project> <zone> [-p <v>]... [-o <out>]
+                resize <project> <zone> <disk> (-r <kv>)... [-p <v>]... [-o <out>]
         firewalls
                 delete <project> <firewall> [-p <v>]... [-o <out>]
                 get <project> <firewall> [-p <v>]... [-o <out>]

@@ -4,9 +4,9 @@
 [package]
 
 name = "google-cloudresourcemanager1_beta1-cli"
-version = "0.3.3+20160225"
+version = "0.3.4+20160316"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
-description = "A complete library to interact with cloudresourcemanager (protocol v1beta1)"
+description = "A complete library to interact with Cloud Resource Manager (protocol v1beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/cloudresourcemanager1_beta1-cli"
 homepage = "https://cloud.google.com/resource-manager"
 documentation = "http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1_cli"
@@ -17,18 +17,18 @@ keywords = ["cloudresourcemanager", "google", "cli"]
 name = "cloudresourcemanager1-beta1"
 
 [dependencies]
-hyper = "0.7"
-mime = "0.1.0"
-serde = ">= 0.7.0"
-serde_json = ">= 0.7.0"
-yup-oauth2 = ">= 0.5.4"
+hyper = "0.8"
+mime = "0.2.0"
+serde = "0.6.0"
+serde_json = "0.6.0"
+yup-oauth2 = ">= 0.5.6"
 strsim = "0.4"
 yup-hyper-mock = "1.0"
 clap = "2.0"
 
 [build-dependencies]
-syntex = { version = ">= 0.23" }
-serde_codegen = { version = ">= 0.6" }
+syntex = { version = "= 0.28" }
+serde_codegen = { version = "= 0.6.13" }
 
 
 [dependencies.google-cloudresourcemanager1_beta1]

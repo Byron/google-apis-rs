@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-appengine1_beta5` library allows access to all features of the *Google appengine* service.
 
-This documentation was generated from *appengine* crate version *0.1.12+20160223*, where *20160223* is the exact revision of the *appengine:v1beta5* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.12*.
+This documentation was generated from *appengine* crate version *0.1.13+20160314*, where *20160314* is the exact revision of the *appengine:v1beta5* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.13*.
 
 Everything else about the *appengine* *v1_beta5* API can be found at the
 [official documentation site](https://cloud.google.com/appengine/docs/admin-api/).
@@ -47,11 +47,12 @@ let r = hub.resource().activity(...).doit()
 Or specifically ...
 
 ```ignore
-let r = hub.apps().services_versions_delete(...).doit()
-let r = hub.apps().operations_get(...).doit()
-let r = hub.apps().services_delete(...).doit()
 let r = hub.apps().services_versions_create(...).doit()
+let r = hub.apps().services_versions_patch(...).doit()
+let r = hub.apps().operations_get(...).doit()
+let r = hub.apps().services_versions_delete(...).doit()
 let r = hub.apps().services_patch(...).doit()
+let r = hub.apps().services_delete(...).doit()
 ```
 
 The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -76,7 +77,7 @@ google-appengine1_beta5 = "*"
 extern crate hyper;
 extern crate yup_oauth2 as oauth2;
 extern crate google_appengine1_beta5 as appengine1_beta5;
-use appengine1_beta5::Service;
+use appengine1_beta5::Version;
 use appengine1_beta5::{Result, Error};
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -97,13 +98,12 @@ let mut hub = Appengine::new(hyper::Client::new(), auth);
 // As the method needs a request, you would usually fill it with the desired information
 // into the respective structure. Some of the parts shown here might not be applicable !
 // Values shown here are possibly random and not representative !
-let mut req = Service::default();
+let mut req = Version::default();
 
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
-let result = hub.apps().services_patch(req, "appsId", "servicesId")
-             .migrate_traffic(false)
+let result = hub.apps().services_versions_patch(req, "appsId", "servicesId", "versionsId")
              .mask("sed")
              .doit();
 

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *books* crate version *0.1.12+20160113*, where *20160113* is the exact revision of the *books:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.12*.
+//! This documentation was generated from *books* crate version *0.1.13+20160226*, where *20160226* is the exact revision of the *books:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.13*.
 //! 
 //! Everything else about the *books* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/books/docs/v1/getting_started).
@@ -123,18 +123,18 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.volumes().list("q")
-//!              .start_index(15)
-//!              .source("diam")
-//!              .show_preorders(true)
-//!              .projection("sed")
-//!              .print_type("diam")
-//!              .partner("magna")
-//!              .order_by("dolor")
-//!              .max_results(96)
-//!              .library_restrict("dolor")
-//!              .lang_restrict("vero")
-//!              .filter("nonumy")
-//!              .download("takimata")
+//!              .start_index(22)
+//!              .source("nonumy")
+//!              .show_preorders(false)
+//!              .projection("diam")
+//!              .print_type("magna")
+//!              .partner("dolor")
+//!              .order_by("Lorem")
+//!              .max_results(52)
+//!              .library_restrict("vero")
+//!              .lang_restrict("nonumy")
+//!              .filter("takimata")
+//!              .download("dolores")
 //!              .doit();
 //! 
 //! match result {

@@ -150,7 +150,7 @@ impl<'a, C, A> Appsactivity<C, A>
         Appsactivity {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.12".to_string(),
+            _user_agent: "google-api-rust-client/0.1.13".to_string(),
         }
     }
 
@@ -159,7 +159,7 @@ impl<'a, C, A> Appsactivity<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.12`.
+    /// It defaults to `google-api-rust-client/0.1.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -328,8 +328,14 @@ impl ResponseResult for ListActivitiesResponse {}
 pub struct User {
     /// The profile photo of the user. Not present if the user has no profile photo.
     pub photo: Option<Photo>,
+    /// The permission ID associated with this user. Equivalent to the Drive API's permission ID for this user, returned as part of the Drive Permissions resource.
+    #[serde(rename="permissionId")]
+    pub permission_id: Option<String>,
     /// The displayable name of the user.
     pub name: Option<String>,
+    /// A boolean which indicates whether the specified User was deleted. If true, name, photo and permission_id will be omitted.
+    #[serde(rename="isDeleted")]
+    pub is_deleted: Option<bool>,
 }
 
 impl Part for User {}
@@ -519,7 +525,7 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, ListActivitiesResponse)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -587,8 +593,7 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
                     }
                 }
             };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
+            let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)

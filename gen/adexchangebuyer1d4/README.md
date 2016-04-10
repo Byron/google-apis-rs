@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-adexchangebuyer1d4` library allows access to all features of the *Google Ad Exchange Buyer* service.
 
-This documentation was generated from *Ad Exchange Buyer* crate version *0.1.12+20160222*, where *20160222* is the exact revision of the *adexchangebuyer:v1.4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.12*.
+This documentation was generated from *Ad Exchange Buyer* crate version *0.1.13+20160405*, where *20160405* is the exact revision of the *adexchangebuyer:v1.4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.13*.
 
 Everything else about the *Ad Exchange Buyer* *v1d4* API can be found at the
 [official documentation site](https://developers.google.com/ad-exchange/buyer-rest).
@@ -25,6 +25,8 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
  * [*delete*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d4/struct.MarketplacedealDeleteCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d4/struct.MarketplacedealInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d4/struct.MarketplacedealListCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d4/struct.MarketplacedealUpdateCall.html)
 * marketplacenotes
  * [*insert*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d4/struct.MarketplacenoteInsertCall.html) and [*list*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d4/struct.MarketplacenoteListCall.html)
+* marketplaceprivateauction
+ * [*updateproposal*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d4/struct.MarketplaceprivateauctionUpdateproposalCall.html)
 * [performance report](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d4/struct.PerformanceReport.html)
  * [*list*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d4/struct.PerformanceReportListCall.html)
 * [pretargeting config](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d4/struct.PretargetingConfig.html)

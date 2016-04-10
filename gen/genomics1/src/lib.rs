@@ -2,12 +2,19 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *genomics* crate version *0.1.12+20160224*, where *20160224* is the exact revision of the *genomics:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.12*.
+//! This documentation was generated from *genomics* crate version *0.1.13+20160407*, where *20160407* is the exact revision of the *genomics:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.13*.
+//! 
+//! Everything else about the *genomics* *v1* API can be found at the
+//! [official documentation site](https://cloud.google.com/genomics/).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/genomics1).
 //! # Features
 //! 
 //! Handle the following *Resources* with ease from the central [hub](struct.Genomics.html) ... 
 //! 
+//! * [annotations](struct.Annotation.html)
+//!  * [*batch create*](struct.AnnotationBatchCreateCall.html), [*create*](struct.AnnotationCreateCall.html), [*delete*](struct.AnnotationDeleteCall.html), [*get*](struct.AnnotationGetCall.html), [*search*](struct.AnnotationSearchCall.html) and [*update*](struct.AnnotationUpdateCall.html)
+//! * annotationsets
+//!  * [*create*](struct.AnnotationsetCreateCall.html), [*delete*](struct.AnnotationsetDeleteCall.html), [*get*](struct.AnnotationsetGetCall.html), [*search*](struct.AnnotationsetSearchCall.html) and [*update*](struct.AnnotationsetUpdateCall.html)
 //! * callsets
 //!  * [*create*](struct.CallsetCreateCall.html), [*delete*](struct.CallsetDeleteCall.html), [*get*](struct.CallsetGetCall.html), [*patch*](struct.CallsetPatchCall.html) and [*search*](struct.CallsetSearchCall.html)
 //! * [datasets](struct.Dataset.html)
@@ -121,7 +128,7 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.datasets().patch(req, "datasetId")
-//!              .update_mask("et")
+//!              .update_mask("dolor")
 //!              .doit();
 //! 
 //! match result {

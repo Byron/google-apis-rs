@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-compute1` library allows access to all features of the *Google compute* service.
 
-This documentation was generated from *compute* crate version *0.1.12+20160224*, where *20160224* is the exact revision of the *compute:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.12*.
+This documentation was generated from *compute* crate version *0.1.13+20160328*, where *20160328* is the exact revision of the *compute:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.13*.
 
 Everything else about the *compute* *v1* API can be found at the
 [official documentation site](https://developers.google.com/compute/docs/reference/latest/).
@@ -22,7 +22,7 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
 * [disk types](http://byron.github.io/google-apis-rs/google_compute1/struct.DiskType.html)
  * [*aggregated list*](http://byron.github.io/google-apis-rs/google_compute1/struct.DiskTypeAggregatedListCall.html), [*get*](http://byron.github.io/google-apis-rs/google_compute1/struct.DiskTypeGetCall.html) and [*list*](http://byron.github.io/google-apis-rs/google_compute1/struct.DiskTypeListCall.html)
 * [disks](http://byron.github.io/google-apis-rs/google_compute1/struct.Disk.html)
- * [*aggregated list*](http://byron.github.io/google-apis-rs/google_compute1/struct.DiskAggregatedListCall.html), [*create snapshot*](http://byron.github.io/google-apis-rs/google_compute1/struct.DiskCreateSnapshotCall.html), [*delete*](http://byron.github.io/google-apis-rs/google_compute1/struct.DiskDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_compute1/struct.DiskGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_compute1/struct.DiskInsertCall.html) and [*list*](http://byron.github.io/google-apis-rs/google_compute1/struct.DiskListCall.html)
+ * [*aggregated list*](http://byron.github.io/google-apis-rs/google_compute1/struct.DiskAggregatedListCall.html), [*create snapshot*](http://byron.github.io/google-apis-rs/google_compute1/struct.DiskCreateSnapshotCall.html), [*delete*](http://byron.github.io/google-apis-rs/google_compute1/struct.DiskDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_compute1/struct.DiskGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_compute1/struct.DiskInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_compute1/struct.DiskListCall.html) and [*resize*](http://byron.github.io/google-apis-rs/google_compute1/struct.DiskResizeCall.html)
 * [firewalls](http://byron.github.io/google-apis-rs/google_compute1/struct.Firewall.html)
  * [*delete*](http://byron.github.io/google-apis-rs/google_compute1/struct.FirewallDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_compute1/struct.FirewallGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_compute1/struct.FirewallInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_compute1/struct.FirewallListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_compute1/struct.FirewallPatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_compute1/struct.FirewallUpdateCall.html)
 * [forwarding rules](http://byron.github.io/google-apis-rs/google_compute1/struct.ForwardingRule.html)
@@ -142,6 +142,7 @@ let r = hub.instance_groups().insert(...).doit()
 let r = hub.instances().set_tags(...).doit()
 let r = hub.instance_group_managers().delete_instances(...).doit()
 let r = hub.instance_group_managers().set_instance_template(...).doit()
+let r = hub.disks().resize(...).doit()
 let r = hub.target_pools().insert(...).doit()
 let r = hub.instances().set_disk_auto_delete(...).doit()
 let r = hub.instance_group_managers().set_target_pools(...).doit()

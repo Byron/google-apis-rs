@@ -269,7 +269,7 @@ fn main() {
     
     let mut app = App::new("script1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.3+20150922")
+           .version("0.3.4+20150922")
            .about("An API for executing Google Apps Script projects.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_script1_cli")
            .arg(Arg::with_name("url")

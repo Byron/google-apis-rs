@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *compute* crate version *0.1.12+20160224*, where *20160224* is the exact revision of the *compute:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.12*.
+//! This documentation was generated from *compute* crate version *0.1.13+20160328*, where *20160328* is the exact revision of the *compute:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.13*.
 //! 
 //! Everything else about the *compute* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/compute/docs/reference/latest/).
@@ -20,7 +20,7 @@
 //! * [disk types](struct.DiskType.html)
 //!  * [*aggregated list*](struct.DiskTypeAggregatedListCall.html), [*get*](struct.DiskTypeGetCall.html) and [*list*](struct.DiskTypeListCall.html)
 //! * [disks](struct.Disk.html)
-//!  * [*aggregated list*](struct.DiskAggregatedListCall.html), [*create snapshot*](struct.DiskCreateSnapshotCall.html), [*delete*](struct.DiskDeleteCall.html), [*get*](struct.DiskGetCall.html), [*insert*](struct.DiskInsertCall.html) and [*list*](struct.DiskListCall.html)
+//!  * [*aggregated list*](struct.DiskAggregatedListCall.html), [*create snapshot*](struct.DiskCreateSnapshotCall.html), [*delete*](struct.DiskDeleteCall.html), [*get*](struct.DiskGetCall.html), [*insert*](struct.DiskInsertCall.html), [*list*](struct.DiskListCall.html) and [*resize*](struct.DiskResizeCall.html)
 //! * [firewalls](struct.Firewall.html)
 //!  * [*delete*](struct.FirewallDeleteCall.html), [*get*](struct.FirewallGetCall.html), [*insert*](struct.FirewallInsertCall.html), [*list*](struct.FirewallListCall.html), [*patch*](struct.FirewallPatchCall.html) and [*update*](struct.FirewallUpdateCall.html)
 //! * [forwarding rules](struct.ForwardingRule.html)
@@ -142,6 +142,7 @@
 //! let r = hub.instances().set_tags(...).doit()
 //! let r = hub.instance_group_managers().delete_instances(...).doit()
 //! let r = hub.instance_group_managers().set_instance_template(...).doit()
+//! let r = hub.disks().resize(...).doit()
 //! let r = hub.target_pools().insert(...).doit()
 //! let r = hub.instances().set_disk_auto_delete(...).doit()
 //! let r = hub.instance_group_managers().set_target_pools(...).doit()
@@ -267,7 +268,7 @@
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.instances().set_disk_auto_delete("project", "zone", "instance", true, "deviceName")
+//! let result = hub.instances().set_disk_auto_delete("project", "zone", "instance", false, "deviceName")
 //!              .doit();
 //! 
 //! match result {

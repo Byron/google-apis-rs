@@ -4476,8 +4476,8 @@ fn main() {
     
     let mut app = App::new("storage1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.3+20160210")
-           .about("Lets you store and retrieve potentially-large, immutable data objects.")
+           .version("0.3.4+20160330")
+           .about("Stores and retrieves potentially large, immutable data objects.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_storage1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

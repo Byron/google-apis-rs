@@ -2,14 +2,14 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *cloudresourcemanager* crate version *0.1.12+20160225*, where *20160225* is the exact revision of the *cloudresourcemanager:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.12*.
+//! This documentation was generated from *Cloud Resource Manager* crate version *0.1.13+20160316*, where *20160316* is the exact revision of the *cloudresourcemanager:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.13*.
 //! 
-//! Everything else about the *cloudresourcemanager* *v1_beta1* API can be found at the
+//! Everything else about the *Cloud Resource Manager* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/resource-manager).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/cloudresourcemanager1_beta1).
 //! # Features
 //! 
-//! Handle the following *Resources* with ease from the central [hub](struct.Cloudresourcemanager.html) ... 
+//! Handle the following *Resources* with ease from the central [hub](struct.CloudResourceManager.html) ... 
 //! 
 //! * [organizations](struct.Organization.html)
 //!  * [*get*](struct.OrganizationGetCall.html), [*get iam policy*](struct.OrganizationGetIamPolicyCall.html), [*list*](struct.OrganizationListCall.html), [*set iam policy*](struct.OrganizationSetIamPolicyCall.html), [*test iam permissions*](struct.OrganizationTestIamPermissionCall.html) and [*update*](struct.OrganizationUpdateCall.html)
@@ -25,7 +25,7 @@
 //! 
 //! The API is structured into the following primary items:
 //! 
-//! * **[Hub](struct.Cloudresourcemanager.html)**
+//! * **[Hub](struct.CloudResourceManager.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
 //!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
 //!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
@@ -86,7 +86,7 @@
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-//! use cloudresourcemanager1_beta1::Cloudresourcemanager;
+//! use cloudresourcemanager1_beta1::CloudResourceManager;
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -99,7 +99,7 @@
 //! let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 //!                               hyper::Client::new(),
 //!                               <MemoryStorage as Default>::default(), None);
-//! let mut hub = Cloudresourcemanager::new(hyper::Client::new(), auth);
+//! let mut hub = CloudResourceManager::new(hyper::Client::new(), auth);
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !

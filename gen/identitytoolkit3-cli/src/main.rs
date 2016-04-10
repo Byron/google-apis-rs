@@ -159,10 +159,11 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "id-token" => Some(("idToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "delegated-project-number" => Some(("delegatedProjectNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "local-id" => Some(("localId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["delegated-project-number", "local-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["delegated-project-number", "id-token", "local-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -327,10 +328,11 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "id-token" => Some(("idToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "delegated-project-number" => Some(("delegatedProjectNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "email" => Some(("email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "local-id" => Some(("localId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["email", "id-token", "local-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["delegated-project-number", "email", "id-token", "local-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -482,6 +484,12 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "project-number" => {
+                    call = call.project_number(value.unwrap_or(""));
+                },
+                "delegated-project-number" => {
+                    call = call.delegated_project_number(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -495,6 +503,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["delegated-project-number", "project-number"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -731,6 +740,7 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "provider" => Some(("provider", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "delegated-project-number" => Some(("delegatedProjectNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "oob-code" => Some(("oobCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "local-id" => Some(("localId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -738,17 +748,19 @@ impl<'n> Engine<'n> {
                     "photo-url" => Some(("photoUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "instance-id" => Some(("instanceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id-token" => Some(("idToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "delete-attribute" => Some(("deleteAttribute", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "upgrade-to-federated-login" => Some(("upgradeToFederatedLogin", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "provider" => Some(("provider", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "disable-user" => Some(("disableUser", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "email" => Some(("email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "delete-provider" => Some(("deleteProvider", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "captcha-challenge" => Some(("captchaChallenge", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "captcha-response" => Some(("captchaResponse", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "email-verified" => Some(("emailVerified", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "return-secure-token" => Some(("returnSecureToken", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "password" => Some(("password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "captcha-challenge" => Some(("captchaChallenge", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["captcha-challenge", "captcha-response", "delegated-project-number", "disable-user", "display-name", "email", "email-verified", "id-token", "instance-id", "local-id", "oob-code", "password", "photo-url", "provider", "upgrade-to-federated-login", "valid-since"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["captcha-challenge", "captcha-response", "delegated-project-number", "delete-attribute", "delete-provider", "disable-user", "display-name", "email", "email-verified", "id-token", "instance-id", "local-id", "oob-code", "password", "photo-url", "provider", "return-secure-token", "upgrade-to-federated-login", "valid-since"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -759,6 +771,116 @@ impl<'n> Engine<'n> {
         }
         let mut request: api::IdentitytoolkitRelyingpartySetAccountInfoRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.relyingparty().set_account_info(request);
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _relyingparty_set_project_config(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "api-key" => Some(("apiKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "use-email-sending" => Some(("useEmailSending", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "verify-email-template.body" => Some(("verifyEmailTemplate.body", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "verify-email-template.from-display-name" => Some(("verifyEmailTemplate.fromDisplayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "verify-email-template.from" => Some(("verifyEmailTemplate.from", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "verify-email-template.format" => Some(("verifyEmailTemplate.format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "verify-email-template.reply-to" => Some(("verifyEmailTemplate.replyTo", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "verify-email-template.subject" => Some(("verifyEmailTemplate.subject", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "enable-anonymous-user" => Some(("enableAnonymousUser", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "reset-password-template.body" => Some(("resetPasswordTemplate.body", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "reset-password-template.from-display-name" => Some(("resetPasswordTemplate.fromDisplayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "reset-password-template.from" => Some(("resetPasswordTemplate.from", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "reset-password-template.format" => Some(("resetPasswordTemplate.format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "reset-password-template.reply-to" => Some(("resetPasswordTemplate.replyTo", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "reset-password-template.subject" => Some(("resetPasswordTemplate.subject", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "legacy-reset-password-template.body" => Some(("legacyResetPasswordTemplate.body", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "legacy-reset-password-template.from-display-name" => Some(("legacyResetPasswordTemplate.fromDisplayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "legacy-reset-password-template.from" => Some(("legacyResetPasswordTemplate.from", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "legacy-reset-password-template.format" => Some(("legacyResetPasswordTemplate.format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "legacy-reset-password-template.reply-to" => Some(("legacyResetPasswordTemplate.replyTo", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "legacy-reset-password-template.subject" => Some(("legacyResetPasswordTemplate.subject", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "delegated-project-number" => Some(("delegatedProjectNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "allow-password-user" => Some(("allowPasswordUser", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "change-email-template.body" => Some(("changeEmailTemplate.body", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "change-email-template.from-display-name" => Some(("changeEmailTemplate.fromDisplayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "change-email-template.from" => Some(("changeEmailTemplate.from", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "change-email-template.format" => Some(("changeEmailTemplate.format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "change-email-template.reply-to" => Some(("changeEmailTemplate.replyTo", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "change-email-template.subject" => Some(("changeEmailTemplate.subject", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-password-user", "api-key", "body", "change-email-template", "delegated-project-number", "enable-anonymous-user", "format", "from", "from-display-name", "legacy-reset-password-template", "reply-to", "reset-password-template", "subject", "use-email-sending", "verify-email-template"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::IdentitytoolkitRelyingpartySetProjectConfigRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.relyingparty().set_project_config(request);
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -911,15 +1033,16 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "instance-id" => Some(("instanceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "captcha-response" => Some(("captchaResponse", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id-token" => Some(("idToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "captcha-challenge" => Some(("captchaChallenge", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-id" => Some(("instanceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id-token" => Some(("idToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "captcha-response" => Some(("captchaResponse", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "return-secure-token" => Some(("returnSecureToken", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "password" => Some(("password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "email" => Some(("email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["captcha-challenge", "captcha-response", "display-name", "email", "id-token", "instance-id", "password"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["captcha-challenge", "captcha-response", "display-name", "email", "id-token", "instance-id", "password", "return-secure-token"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1093,9 +1216,10 @@ impl<'n> Engine<'n> {
                     "pending-id-token" => Some(("pendingIdToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "session-id" => Some(("sessionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "request-uri" => Some(("requestUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "return-secure-token" => Some(("returnSecureToken", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "return-refresh-token" => Some(("returnRefreshToken", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["delegated-project-number", "id-token", "instance-id", "pending-id-token", "post-body", "request-uri", "return-refresh-token", "session-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["delegated-project-number", "id-token", "instance-id", "pending-id-token", "post-body", "request-uri", "return-refresh-token", "return-secure-token", "session-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1176,9 +1300,10 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "instance-id" => Some(("instanceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "return-secure-token" => Some(("returnSecureToken", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "token" => Some(("token", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["instance-id", "token"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["instance-id", "return-secure-token", "token"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1264,10 +1389,11 @@ impl<'n> Engine<'n> {
                     "id-token" => Some(("idToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "pending-id-token" => Some(("pendingIdToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "captcha-response" => Some(("captchaResponse", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "return-secure-token" => Some(("returnSecureToken", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "password" => Some(("password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "email" => Some(("email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["captcha-challenge", "captcha-response", "delegated-project-number", "email", "id-token", "instance-id", "password", "pending-id-token"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["captcha-challenge", "captcha-response", "delegated-project-number", "email", "id-token", "instance-id", "password", "pending-id-token", "return-secure-token"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1360,6 +1486,9 @@ impl<'n> Engine<'n> {
                     },
                     ("set-account-info", Some(opt)) => {
                         call_result = self._relyingparty_set_account_info(opt, dry_run, &mut err);
+                    },
+                    ("set-project-config", Some(opt)) => {
+                        call_result = self._relyingparty_set_project_config(opt, dry_run, &mut err);
                     },
                     ("sign-out-user", Some(opt)) => {
                         call_result = self._relyingparty_sign_out_user(opt, dry_run, &mut err);
@@ -1467,7 +1596,7 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("relyingparty", "methods: 'create-auth-uri', 'delete-account', 'download-account', 'get-account-info', 'get-oob-confirmation-code', 'get-project-config', 'get-public-keys', 'get-recaptcha-param', 'reset-password', 'set-account-info', 'sign-out-user', 'signup-new-user', 'upload-account', 'verify-assertion', 'verify-custom-token' and 'verify-password'", vec![
+        ("relyingparty", "methods: 'create-auth-uri', 'delete-account', 'download-account', 'get-account-info', 'get-oob-confirmation-code', 'get-project-config', 'get-public-keys', 'get-recaptcha-param', 'reset-password', 'set-account-info', 'set-project-config', 'sign-out-user', 'signup-new-user', 'upload-account', 'verify-assertion', 'verify-custom-token' and 'verify-password'", vec![
             ("create-auth-uri",
                     Some(r##"Creates the URI used by the IdP to authenticate the user."##),
                     "Details at http://byron.github.io/google-apis-rs/google_identitytoolkit3_cli/relyingparty_create-auth-uri",
@@ -1670,6 +1799,28 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("set-project-config",
+                    Some(r##"Set project configuration."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_identitytoolkit3_cli/relyingparty_set-project-config",
+                  vec![
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("sign-out-user",
                     Some(r##"Sign out user."##),
                     "Details at http://byron.github.io/google-apis-rs/google_identitytoolkit3_cli/relyingparty_sign-out-user",
@@ -1808,7 +1959,7 @@ fn main() {
     
     let mut app = App::new("identitytoolkit3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.3+20160216")
+           .version("0.3.4+20160324")
            .about("Help the third party sites to implement federated login.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_identitytoolkit3_cli")
            .arg(Arg::with_name("folder")

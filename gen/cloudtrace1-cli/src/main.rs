@@ -448,7 +448,7 @@ fn main() {
     
     let mut app = App::new("cloudtrace1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.3+20151207")
+           .version("0.3.4+20151207")
            .about("The Cloud Trace API allows you to send traces to and retrieve traces from Google Cloud Trace.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudtrace1_cli")
            .arg(Arg::with_name("url")

@@ -1,4 +1,4 @@
-site_name: Ad Exchange Buyer v0.3.3+20160222
+site_name: Ad Exchange Buyer v0.3.4+20160405
 site_url: http://byron.github.io/google-apis-rs/google-adexchangebuyer1d4-cli
 site_description: Write integrating applications with bcore
 
@@ -29,6 +29,7 @@ pages:
 - ['marketplacedeals_update.md', 'Marketplacedeals', 'Update']
 - ['marketplacenotes_insert.md', 'Marketplacenotes', 'Insert']
 - ['marketplacenotes_list.md', 'Marketplacenotes', 'List']
+- ['marketplaceprivateauction_updateproposal.md', 'Marketplaceprivateauction', 'Updateproposal']
 - ['performance-report_list.md', 'Performance Report', 'List']
 - ['pretargeting-config_delete.md', 'Pretargeting Config', 'Delete']
 - ['pretargeting-config_get.md', 'Pretargeting Config', 'Get']

@@ -4,7 +4,7 @@
 [package]
 
 name = "google-tagmanager1-cli"
-version = "0.3.3+20160209"
+version = "0.3.4+20160310"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Tag Manager (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/tagmanager1-cli"
@@ -17,18 +17,18 @@ keywords = ["tagmanager", "google", "cli"]
 name = "tagmanager1"
 
 [dependencies]
-hyper = "0.7"
-mime = "0.1.0"
-serde = ">= 0.7.0"
-serde_json = ">= 0.7.0"
-yup-oauth2 = ">= 0.5.4"
+hyper = "0.8"
+mime = "0.2.0"
+serde = "0.6.0"
+serde_json = "0.6.0"
+yup-oauth2 = ">= 0.5.6"
 strsim = "0.4"
 yup-hyper-mock = "1.0"
 clap = "2.0"
 
 [build-dependencies]
-syntex = { version = ">= 0.23" }
-serde_codegen = { version = ">= 0.6" }
+syntex = { version = "= 0.28" }
+serde_codegen = { version = "= 0.6.13" }
 
 
 [dependencies.google-tagmanager1]

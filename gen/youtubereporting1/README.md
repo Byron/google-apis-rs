@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-youtubereporting1` library allows access to all features of the *Google YouTube Reporting* service.
 
-This documentation was generated from *YouTube Reporting* crate version *0.1.12+20151026*, where *20151026* is the exact revision of the *youtubereporting:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.12*.
+This documentation was generated from *YouTube Reporting* crate version *0.1.13+20160315*, where *20160315* is the exact revision of the *youtubereporting:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.13*.
 
 Everything else about the *YouTube Reporting* *v1* API can be found at the
 [official documentation site](https://developers.google.com/youtube/reporting/v1/reports/).
@@ -106,10 +106,12 @@ let mut hub = YouTubeReporting::new(hyper::Client::new(), auth);
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
 let result = hub.jobs().reports_list("jobId")
-             .page_token("sit")
-             .page_size(-65)
-             .on_behalf_of_content_owner("sed")
-             .created_after("et")
+             .start_time_before("sit")
+             .start_time_at_or_after("Stet")
+             .page_token("sed")
+             .page_size(-85)
+             .on_behalf_of_content_owner("dolores")
+             .created_after("kasd")
              .doit();
 
 match result {

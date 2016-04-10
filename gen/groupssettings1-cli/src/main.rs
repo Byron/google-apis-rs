@@ -139,6 +139,7 @@ impl<'n> Engine<'n> {
                     "who-can-contact-owner" => Some(("whoCanContactOwner", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "message-display-font" => Some(("messageDisplayFont", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "who-can-leave-group" => Some(("whoCanLeaveGroup", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "who-can-add" => Some(("whoCanAdd", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "who-can-join" => Some(("whoCanJoin", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "who-can-invite" => Some(("whoCanInvite", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -149,7 +150,7 @@ impl<'n> Engine<'n> {
                     "max-message-bytes" => Some(("maxMessageBytes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "allow-google-communication" => Some(("allowGoogleCommunication", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-external-members", "allow-google-communication", "allow-web-posting", "archive-only", "custom-reply-to", "default-message-deny-notification-text", "description", "email", "include-in-global-address-list", "is-archived", "kind", "max-message-bytes", "members-can-post-as-the-group", "message-display-font", "message-moderation-level", "name", "primary-language", "reply-to", "send-message-deny-notification", "show-in-group-directory", "spam-moderation-level", "who-can-contact-owner", "who-can-invite", "who-can-join", "who-can-leave-group", "who-can-post-message", "who-can-view-group", "who-can-view-membership"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-external-members", "allow-google-communication", "allow-web-posting", "archive-only", "custom-reply-to", "default-message-deny-notification-text", "description", "email", "include-in-global-address-list", "is-archived", "kind", "max-message-bytes", "members-can-post-as-the-group", "message-display-font", "message-moderation-level", "name", "primary-language", "reply-to", "send-message-deny-notification", "show-in-group-directory", "spam-moderation-level", "who-can-add", "who-can-contact-owner", "who-can-invite", "who-can-join", "who-can-leave-group", "who-can-post-message", "who-can-view-group", "who-can-view-membership"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -251,6 +252,7 @@ impl<'n> Engine<'n> {
                     "who-can-contact-owner" => Some(("whoCanContactOwner", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "message-display-font" => Some(("messageDisplayFont", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "who-can-leave-group" => Some(("whoCanLeaveGroup", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "who-can-add" => Some(("whoCanAdd", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "who-can-join" => Some(("whoCanJoin", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "who-can-invite" => Some(("whoCanInvite", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -261,7 +263,7 @@ impl<'n> Engine<'n> {
                     "max-message-bytes" => Some(("maxMessageBytes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "allow-google-communication" => Some(("allowGoogleCommunication", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-external-members", "allow-google-communication", "allow-web-posting", "archive-only", "custom-reply-to", "default-message-deny-notification-text", "description", "email", "include-in-global-address-list", "is-archived", "kind", "max-message-bytes", "members-can-post-as-the-group", "message-display-font", "message-moderation-level", "name", "primary-language", "reply-to", "send-message-deny-notification", "show-in-group-directory", "spam-moderation-level", "who-can-contact-owner", "who-can-invite", "who-can-join", "who-can-leave-group", "who-can-post-message", "who-can-view-group", "who-can-view-membership"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-external-members", "allow-google-communication", "allow-web-posting", "archive-only", "custom-reply-to", "default-message-deny-notification-text", "description", "email", "include-in-global-address-list", "is-archived", "kind", "max-message-bytes", "members-can-post-as-the-group", "message-display-font", "message-moderation-level", "name", "primary-language", "reply-to", "send-message-deny-notification", "show-in-group-directory", "spam-moderation-level", "who-can-add", "who-can-contact-owner", "who-can-invite", "who-can-join", "who-can-leave-group", "who-can-post-message", "who-can-view-group", "who-can-view-membership"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -510,7 +512,7 @@ fn main() {
     
     let mut app = App::new("groupssettings1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.3+20140428")
+           .version("0.3.4+20160323")
            .about("Lets you manage permission levels and related settings of a group.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_groupssettings1_cli")
            .arg(Arg::with_name("url")

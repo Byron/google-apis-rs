@@ -3972,6 +3972,8 @@ impl<'n> Engine<'n> {
                     "child-link.href" => Some(("childLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "child-link.type" => Some(("childLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "enhanced-e-commerce-tracking" => Some(("enhancedECommerceTracking", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "permissions.effective" => Some(("permissions.effective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "default-page" => Some(("defaultPage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3980,11 +3982,10 @@ impl<'n> Engine<'n> {
                     "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "site-search-query-parameters" => Some(("siteSearchQueryParameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "website-url" => Some(("websiteUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "starred" => Some(("starred", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "bot-filtering-enabled", "child-link", "created", "currency", "default-page", "e-commerce-tracking", "effective", "enhanced-e-commerce-tracking", "exclude-query-parameters", "href", "id", "internal-web-property-id", "kind", "name", "parent-link", "permissions", "self-link", "site-search-category-parameters", "site-search-query-parameters", "strip-site-search-category-parameters", "strip-site-search-query-parameters", "timezone", "type", "updated", "web-property-id", "website-url"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "bot-filtering-enabled", "child-link", "created", "currency", "default-page", "e-commerce-tracking", "effective", "enhanced-e-commerce-tracking", "exclude-query-parameters", "href", "id", "internal-web-property-id", "kind", "name", "parent-link", "permissions", "self-link", "site-search-category-parameters", "site-search-query-parameters", "starred", "strip-site-search-category-parameters", "strip-site-search-query-parameters", "timezone", "type", "updated", "web-property-id", "website-url"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4142,6 +4143,8 @@ impl<'n> Engine<'n> {
                     "child-link.href" => Some(("childLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "child-link.type" => Some(("childLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "enhanced-e-commerce-tracking" => Some(("enhancedECommerceTracking", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "permissions.effective" => Some(("permissions.effective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "default-page" => Some(("defaultPage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -4150,11 +4153,10 @@ impl<'n> Engine<'n> {
                     "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "site-search-query-parameters" => Some(("siteSearchQueryParameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "website-url" => Some(("websiteUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "starred" => Some(("starred", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "bot-filtering-enabled", "child-link", "created", "currency", "default-page", "e-commerce-tracking", "effective", "enhanced-e-commerce-tracking", "exclude-query-parameters", "href", "id", "internal-web-property-id", "kind", "name", "parent-link", "permissions", "self-link", "site-search-category-parameters", "site-search-query-parameters", "strip-site-search-category-parameters", "strip-site-search-query-parameters", "timezone", "type", "updated", "web-property-id", "website-url"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "bot-filtering-enabled", "child-link", "created", "currency", "default-page", "e-commerce-tracking", "effective", "enhanced-e-commerce-tracking", "exclude-query-parameters", "href", "id", "internal-web-property-id", "kind", "name", "parent-link", "permissions", "self-link", "site-search-category-parameters", "site-search-query-parameters", "starred", "strip-site-search-category-parameters", "strip-site-search-query-parameters", "timezone", "type", "updated", "web-property-id", "website-url"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4253,6 +4255,8 @@ impl<'n> Engine<'n> {
                     "child-link.href" => Some(("childLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "child-link.type" => Some(("childLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "enhanced-e-commerce-tracking" => Some(("enhancedECommerceTracking", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "permissions.effective" => Some(("permissions.effective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "default-page" => Some(("defaultPage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -4261,11 +4265,10 @@ impl<'n> Engine<'n> {
                     "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "site-search-query-parameters" => Some(("siteSearchQueryParameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "website-url" => Some(("websiteUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "starred" => Some(("starred", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "bot-filtering-enabled", "child-link", "created", "currency", "default-page", "e-commerce-tracking", "effective", "enhanced-e-commerce-tracking", "exclude-query-parameters", "href", "id", "internal-web-property-id", "kind", "name", "parent-link", "permissions", "self-link", "site-search-category-parameters", "site-search-query-parameters", "strip-site-search-category-parameters", "strip-site-search-query-parameters", "timezone", "type", "updated", "web-property-id", "website-url"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "bot-filtering-enabled", "child-link", "created", "currency", "default-page", "e-commerce-tracking", "effective", "enhanced-e-commerce-tracking", "exclude-query-parameters", "href", "id", "internal-web-property-id", "kind", "name", "parent-link", "permissions", "self-link", "site-search-category-parameters", "site-search-query-parameters", "starred", "strip-site-search-category-parameters", "strip-site-search-query-parameters", "timezone", "type", "updated", "web-property-id", "website-url"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -5414,6 +5417,7 @@ impl<'n> Engine<'n> {
                     "child-link.href" => Some(("childLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "child-link.type" => Some(("childLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "industry-vertical" => Some(("industryVertical", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "starred" => Some(("starred", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "permissions.effective" => Some(("permissions.effective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -5421,7 +5425,7 @@ impl<'n> Engine<'n> {
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "child-link", "created", "default-profile-id", "effective", "href", "id", "industry-vertical", "internal-web-property-id", "kind", "level", "name", "parent-link", "permissions", "profile-count", "self-link", "type", "updated", "website-url"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "child-link", "created", "default-profile-id", "effective", "href", "id", "industry-vertical", "internal-web-property-id", "kind", "level", "name", "parent-link", "permissions", "profile-count", "self-link", "starred", "type", "updated", "website-url"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -5575,6 +5579,7 @@ impl<'n> Engine<'n> {
                     "child-link.href" => Some(("childLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "child-link.type" => Some(("childLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "industry-vertical" => Some(("industryVertical", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "starred" => Some(("starred", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "permissions.effective" => Some(("permissions.effective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -5582,7 +5587,7 @@ impl<'n> Engine<'n> {
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "child-link", "created", "default-profile-id", "effective", "href", "id", "industry-vertical", "internal-web-property-id", "kind", "level", "name", "parent-link", "permissions", "profile-count", "self-link", "type", "updated", "website-url"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "child-link", "created", "default-profile-id", "effective", "href", "id", "industry-vertical", "internal-web-property-id", "kind", "level", "name", "parent-link", "permissions", "profile-count", "self-link", "starred", "type", "updated", "website-url"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -5677,6 +5682,7 @@ impl<'n> Engine<'n> {
                     "child-link.href" => Some(("childLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "child-link.type" => Some(("childLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "industry-vertical" => Some(("industryVertical", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "starred" => Some(("starred", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "permissions.effective" => Some(("permissions.effective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -5684,7 +5690,7 @@ impl<'n> Engine<'n> {
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "child-link", "created", "default-profile-id", "effective", "href", "id", "industry-vertical", "internal-web-property-id", "kind", "level", "name", "parent-link", "permissions", "profile-count", "self-link", "type", "updated", "website-url"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "child-link", "created", "default-profile-id", "effective", "href", "id", "industry-vertical", "internal-web-property-id", "kind", "level", "name", "parent-link", "permissions", "profile-count", "self-link", "starred", "type", "updated", "website-url"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -6156,6 +6162,8 @@ impl<'n> Engine<'n> {
                     "profile.child-link.href" => Some(("profile.childLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "profile.child-link.type" => Some(("profile.childLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "profile.enhanced-e-commerce-tracking" => Some(("profile.enhancedECommerceTracking", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "profile.parent-link.href" => Some(("profile.parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile.parent-link.type" => Some(("profile.parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "profile.permissions.effective" => Some(("profile.permissions.effective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "profile.default-page" => Some(("profile.defaultPage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "profile.kind" => Some(("profile.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -6164,8 +6172,7 @@ impl<'n> Engine<'n> {
                     "profile.created" => Some(("profile.created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "profile.site-search-query-parameters" => Some(("profile.siteSearchQueryParameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "profile.website-url" => Some(("profile.websiteUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "profile.parent-link.href" => Some(("profile.parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "profile.parent-link.type" => Some(("profile.parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile.starred" => Some(("profile.starred", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "profile.self-link" => Some(("profile.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "account.kind" => Some(("account.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "account.name" => Some(("account.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -6173,6 +6180,7 @@ impl<'n> Engine<'n> {
                     "account.updated" => Some(("account.updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "account.child-link.href" => Some(("account.childLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "account.child-link.type" => Some(("account.childLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account.starred" => Some(("account.starred", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "account.id" => Some(("account.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "account.self-link" => Some(("account.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "account.permissions.effective" => Some(("account.permissions.effective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -6188,6 +6196,7 @@ impl<'n> Engine<'n> {
                     "webproperty.child-link.href" => Some(("webproperty.childLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "webproperty.child-link.type" => Some(("webproperty.childLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "webproperty.industry-vertical" => Some(("webproperty.industryVertical", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "webproperty.starred" => Some(("webproperty.starred", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "webproperty.parent-link.href" => Some(("webproperty.parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "webproperty.parent-link.type" => Some(("webproperty.parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "webproperty.permissions.effective" => Some(("webproperty.permissions.effective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -6198,7 +6207,7 @@ impl<'n> Engine<'n> {
                     "redirect-uri" => Some(("redirectUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account", "account-id", "bot-filtering-enabled", "child-link", "created", "currency", "default-page", "default-profile-id", "e-commerce-tracking", "effective", "enhanced-e-commerce-tracking", "exclude-query-parameters", "href", "id", "industry-vertical", "internal-web-property-id", "kind", "level", "name", "parent-link", "permissions", "profile", "profile-count", "redirect-uri", "self-link", "site-search-category-parameters", "site-search-query-parameters", "strip-site-search-category-parameters", "strip-site-search-query-parameters", "timezone", "type", "updated", "web-property-id", "webproperty", "website-url"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account", "account-id", "bot-filtering-enabled", "child-link", "created", "currency", "default-page", "default-profile-id", "e-commerce-tracking", "effective", "enhanced-e-commerce-tracking", "exclude-query-parameters", "href", "id", "industry-vertical", "internal-web-property-id", "kind", "level", "name", "parent-link", "permissions", "profile", "profile-count", "redirect-uri", "self-link", "site-search-category-parameters", "site-search-query-parameters", "starred", "strip-site-search-category-parameters", "strip-site-search-query-parameters", "timezone", "type", "updated", "web-property-id", "webproperty", "website-url"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -7774,7 +7783,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("goals-patch",
-                    Some(r##"Updates an existing view (profile). This method supports patch semantics."##),
+                    Some(r##"Updates an existing goal. This method supports patch semantics."##),
                     "Details at http://byron.github.io/google-apis-rs/google_analytics3_cli/management_goals-patch",
                   vec![
                     (Some(r##"account-id"##),
@@ -7820,7 +7829,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("goals-update",
-                    Some(r##"Updates an existing view (profile)."##),
+                    Some(r##"Updates an existing goal."##),
                     "Details at http://byron.github.io/google-apis-rs/google_analytics3_cli/management_goals-update",
                   vec![
                     (Some(r##"account-id"##),
@@ -9311,8 +9320,8 @@ fn main() {
     
     let mut app = App::new("analytics3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.3+20160223")
-           .about("View and manage your Google Analytics data")
+           .version("0.3.4+20160308")
+           .about("Views and manages your Google Analytics data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_analytics3_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

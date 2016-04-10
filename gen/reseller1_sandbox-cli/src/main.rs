@@ -480,6 +480,7 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "plan-name" => Some(("planName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "deal-code" => Some(("dealCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "seats.kind" => Some(("seats.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "seats.number-of-seats" => Some(("seats.numberOfSeats", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -487,7 +488,7 @@ impl<'n> Engine<'n> {
                     "seats.licensed-number-of-seats" => Some(("seats.licensedNumberOfSeats", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "purchase-order-id" => Some(("purchaseOrderId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["kind", "licensed-number-of-seats", "maximum-number-of-seats", "number-of-seats", "plan-name", "purchase-order-id", "seats"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["deal-code", "kind", "licensed-number-of-seats", "maximum-number-of-seats", "number-of-seats", "plan-name", "purchase-order-id", "seats"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -843,11 +844,12 @@ impl<'n> Engine<'n> {
                     "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "sku-id" => Some(("skuId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "customer-domain" => Some(("customerDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "purchase-order-id" => Some(("purchaseOrderId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trial-settings.trial-end-time" => Some(("trialSettings.trialEndTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trial-settings.is-in-trial" => Some(("trialSettings.isInTrial", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "suspension-reasons" => Some(("suspensionReasons", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "deal-code" => Some(("dealCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "resource-ui-url" => Some(("resourceUiUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "purchase-order-id" => Some(("purchaseOrderId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "suspension-reasons" => Some(("suspensionReasons", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "renewal-settings.kind" => Some(("renewalSettings.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "renewal-settings.renewal-type" => Some(("renewalSettings.renewalType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -866,7 +868,7 @@ impl<'n> Engine<'n> {
                     "billing-method" => Some(("billingMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["billing-method", "commitment-interval", "creation-time", "customer-domain", "customer-id", "end-time", "is-commitment-plan", "is-in-trial", "kind", "licensed-number-of-seats", "maximum-number-of-seats", "minimum-transferable-seats", "number-of-seats", "plan", "plan-name", "purchase-order-id", "renewal-settings", "renewal-type", "resource-ui-url", "seats", "sku-id", "start-time", "status", "subscription-id", "suspension-reasons", "transfer-info", "transferability-expiration-time", "trial-end-time", "trial-settings"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["billing-method", "commitment-interval", "creation-time", "customer-domain", "customer-id", "deal-code", "end-time", "is-commitment-plan", "is-in-trial", "kind", "licensed-number-of-seats", "maximum-number-of-seats", "minimum-transferable-seats", "number-of-seats", "plan", "plan-name", "purchase-order-id", "renewal-settings", "renewal-type", "resource-ui-url", "seats", "sku-id", "start-time", "status", "subscription-id", "suspension-reasons", "transfer-info", "transferability-expiration-time", "trial-end-time", "trial-settings"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1643,8 +1645,8 @@ fn main() {
     
     let mut app = App::new("reseller1-sandbox")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.3+20160218")
-           .about("Lets you create and manage your customers and their subscriptions.")
+           .version("0.3.4+20160329")
+           .about("Creates and manages your customers and their subscriptions.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_reseller1_sandbox_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

@@ -814,7 +814,7 @@ fn main() {
     
     let mut app = App::new("playmoviespartner1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.3+20150812")
+           .version("0.3.4+20150812")
            .about("Lets Google Play Movies Partners get the delivery status of their titles.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_playmoviespartner1_cli")
            .arg(Arg::with_name("url")

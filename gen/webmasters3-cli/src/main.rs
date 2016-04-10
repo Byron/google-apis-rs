@@ -72,10 +72,11 @@ impl<'n> Engine<'n> {
                     "end-date" => Some(("endDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dimensions" => Some(("dimensions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "search-type" => Some(("searchType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "start-row" => Some(("startRow", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "row-limit" => Some(("rowLimit", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "aggregation-type" => Some(("aggregationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["aggregation-type", "dimensions", "end-date", "row-limit", "search-type", "start-date"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["aggregation-type", "dimensions", "end-date", "row-limit", "search-type", "start-date", "start-row"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1242,8 +1243,8 @@ fn main() {
     
     let mut app = App::new("webmasters3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.3+20151229")
-           .about("Lets you view Google Search Console data for your verified sites.")
+           .version("0.3.4+20160317")
+           .about("View Google Search Console data for your verified sites.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_webmasters3_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

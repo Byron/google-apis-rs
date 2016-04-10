@@ -3,15 +3,15 @@ DO NOT EDIT !
 This file was generated automatically from 'src/mako/api/README.md.mako'
 DO NOT EDIT !
 -->
-The `google-cloudresourcemanager1_beta1` library allows access to all features of the *Google cloudresourcemanager* service.
+The `google-cloudresourcemanager1_beta1` library allows access to all features of the *Google Cloud Resource Manager* service.
 
-This documentation was generated from *cloudresourcemanager* crate version *0.1.12+20160225*, where *20160225* is the exact revision of the *cloudresourcemanager:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.12*.
+This documentation was generated from *Cloud Resource Manager* crate version *0.1.13+20160316*, where *20160316* is the exact revision of the *cloudresourcemanager:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.13*.
 
-Everything else about the *cloudresourcemanager* *v1_beta1* API can be found at the
+Everything else about the *Cloud Resource Manager* *v1_beta1* API can be found at the
 [official documentation site](https://cloud.google.com/resource-manager).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1/struct.Cloudresourcemanager.html) ... 
+Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1/struct.CloudResourceManager.html) ... 
 
 * [organizations](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1/struct.Organization.html)
  * [*get*](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1/struct.OrganizationGetCall.html), [*get iam policy*](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1/struct.OrganizationGetIamPolicyCall.html), [*list*](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1/struct.OrganizationListCall.html), [*set iam policy*](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1/struct.OrganizationSetIamPolicyCall.html), [*test iam permissions*](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1/struct.OrganizationTestIamPermissionCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1/struct.OrganizationUpdateCall.html)
@@ -25,7 +25,7 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
 
 The API is structured into the following primary items:
 
-* **[Hub](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1/struct.Cloudresourcemanager.html)**
+* **[Hub](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1/struct.CloudResourceManager.html)**
     * a central object to maintain state and allow accessing all *Activities*
     * creates [*Method Builders*](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1/trait.MethodsBuilder.html) which in turn
       allow access to individual [*Call Builders*](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1/trait.CallBuilder.html)
@@ -85,7 +85,7 @@ extern crate google_cloudresourcemanager1_beta1 as cloudresourcemanager1_beta1;
 use cloudresourcemanager1_beta1::{Result, Error};
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-use cloudresourcemanager1_beta1::Cloudresourcemanager;
+use cloudresourcemanager1_beta1::CloudResourceManager;
 
 // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 // `client_secret`, among other things.
@@ -98,7 +98,7 @@ let secret: ApplicationSecret = Default::default();
 let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
                               hyper::Client::new(),
                               <MemoryStorage as Default>::default(), None);
-let mut hub = Cloudresourcemanager::new(hyper::Client::new(), auth);
+let mut hub = CloudResourceManager::new(hyper::Client::new(), auth);
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !

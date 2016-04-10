@@ -68,35 +68,40 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "cluster.status" => Some(("cluster.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-ipv4-cidr-size" => Some(("cluster.nodeIpv4CidrSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "cluster.status-message" => Some(("cluster.statusMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "cluster.endpoint" => Some(("cluster.endpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "cluster.description" => Some(("cluster.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.addons-config.http-load-balancing.disabled" => Some(("cluster.addonsConfig.httpLoadBalancing.disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.addons-config.horizontal-pod-autoscaling.disabled" => Some(("cluster.addonsConfig.horizontalPodAutoscaling.disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.network" => Some(("cluster.network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.logging-service" => Some(("cluster.loggingService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "cluster.current-node-version" => Some(("cluster.currentNodeVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.instance-group-urls" => Some(("cluster.instanceGroupUrls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "cluster.current-master-version" => Some(("cluster.currentMasterVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.status-message" => Some(("cluster.statusMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.services-ipv4-cidr" => Some(("cluster.servicesIpv4Cidr", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.status" => Some(("cluster.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.description" => Some(("cluster.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.current-node-version" => Some(("cluster.currentNodeVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.current-master-version" => Some(("cluster.currentMasterVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.master-auth.username" => Some(("cluster.masterAuth.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.master-auth.password" => Some(("cluster.masterAuth.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.master-auth.client-key" => Some(("cluster.masterAuth.clientKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.master-auth.client-certificate" => Some(("cluster.masterAuth.clientCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.master-auth.cluster-ca-certificate" => Some(("cluster.masterAuth.clusterCaCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.initial-node-count" => Some(("cluster.initialNodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cluster.monitoring-service" => Some(("cluster.monitoringService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.create-time" => Some(("cluster.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.name" => Some(("cluster.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.endpoint" => Some(("cluster.endpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.current-node-count" => Some(("cluster.currentNodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cluster.zone" => Some(("cluster.zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.initial-cluster-version" => Some(("cluster.initialClusterVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.disk-size-gb" => Some(("cluster.nodeConfig.diskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "cluster.node-config.machine-type" => Some(("cluster.nodeConfig.machineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.oauth-scopes" => Some(("cluster.nodeConfig.oauthScopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "cluster.initial-node-count" => Some(("cluster.initialNodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cluster.node-config.metadata" => Some(("cluster.nodeConfig.metadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "cluster.cluster-ipv4-cidr" => Some(("cluster.clusterIpv4Cidr", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "cluster.monitoring-service" => Some(("cluster.monitoringService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "cluster.zone" => Some(("cluster.zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "cluster.create-time" => Some(("cluster.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.subnetwork" => Some(("cluster.subnetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.self-link" => Some(("cluster.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "cluster.network" => Some(("cluster.network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["client-certificate", "client-key", "cluster", "cluster-ca-certificate", "cluster-ipv4-cidr", "create-time", "current-master-version", "current-node-version", "description", "disk-size-gb", "endpoint", "initial-cluster-version", "initial-node-count", "instance-group-urls", "logging-service", "machine-type", "master-auth", "monitoring-service", "name", "network", "node-config", "node-ipv4-cidr-size", "oauth-scopes", "password", "self-link", "services-ipv4-cidr", "status", "status-message", "username", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["addons-config", "client-certificate", "client-key", "cluster", "cluster-ca-certificate", "cluster-ipv4-cidr", "create-time", "current-master-version", "current-node-count", "current-node-version", "description", "disabled", "disk-size-gb", "endpoint", "horizontal-pod-autoscaling", "http-load-balancing", "initial-cluster-version", "initial-node-count", "instance-group-urls", "logging-service", "machine-type", "master-auth", "metadata", "monitoring-service", "name", "network", "node-config", "node-ipv4-cidr-size", "oauth-scopes", "password", "self-link", "services-ipv4-cidr", "status", "status-message", "subnetwork", "username", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -335,9 +340,13 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "update.desired-master-version" => Some(("update.desiredMasterVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-node-version" => Some(("update.desiredNodeVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-monitoring-service" => Some(("update.desiredMonitoringService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-addons-config.http-load-balancing.disabled" => Some(("update.desiredAddonsConfig.httpLoadBalancing.disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-addons-config.horizontal-pod-autoscaling.disabled" => Some(("update.desiredAddonsConfig.horizontalPodAutoscaling.disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["desired-node-version", "update"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["desired-addons-config", "desired-master-version", "desired-monitoring-service", "desired-node-version", "disabled", "horizontal-pod-autoscaling", "http-load-balancing", "update"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -678,12 +687,12 @@ fn main() {
     let arg_data = [
         ("projects", "methods: 'zones-clusters-create', 'zones-clusters-delete', 'zones-clusters-get', 'zones-clusters-list', 'zones-clusters-update', 'zones-get-serverconfig', 'zones-operations-get' and 'zones-operations-list'", vec![
             ("zones-clusters-create",
-                    Some(r##"Creates a cluster, consisting of the specified number and type of Google Compute Engine instances, plus a Kubernetes master endpoint. By default, the cluster is created in the project's [default network](/compute/docs/networking#networks_1). One firewall is added for the cluster. After cluster creation, the cluster creates routes for each node to allow the containers on that node to communicate with all other instances in the cluster. Finally, an entry is added to the project's global metadata indicating which CIDR range is being used by the cluster."##),
+                    Some(r##"Creates a cluster, consisting of the specified number and type of Google Compute Engine instances. By default, the cluster is created in the project's [default network](/compute/docs/networks-and-firewalls#networks). One firewall is added for the cluster. After cluster creation, the cluster creates routes for each node to allow the containers on that node to communicate with all other instances in the cluster. Finally, an entry is added to the project's global metadata indicating which CIDR range is being used by the cluster."##),
                     "Details at http://byron.github.io/google-apis-rs/google_container1_cli/projects_zones-clusters-create",
                   vec![
                     (Some(r##"project-id"##),
                      None,
-                     Some(r##"The Google Developers Console [project ID or project number](https://developers.google.com/console/help/new/#projectnumber)."##),
+                     Some(r##"The Google Developers Console [project ID or project number](https://support.google.com/cloud/answer/6158840)."##),
                      Some(true),
                      Some(false)),
         
@@ -712,12 +721,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("zones-clusters-delete",
-                    Some(r##"Deletes the cluster, including the Kubernetes endpoint and all worker nodes. Firewalls and routes that were configured during cluster creation are also deleted."##),
+                    Some(r##"Deletes the cluster, including the Kubernetes endpoint and all worker nodes. Firewalls and routes that were configured during cluster creation are also deleted. Other Google Compute Engine resources that might be in use by the cluster (e.g. load balancer resources) will not be deleted if they weren't present at the initial create time."##),
                     "Details at http://byron.github.io/google-apis-rs/google_container1_cli/projects_zones-clusters-delete",
                   vec![
                     (Some(r##"project-id"##),
                      None,
-                     Some(r##"The Google Developers Console [project ID or project number](https://developers.google.com/console/help/new/#projectnumber)."##),
+                     Some(r##"The Google Developers Console [project ID or project number](https://support.google.com/cloud/answer/6158840)."##),
                      Some(true),
                      Some(false)),
         
@@ -746,12 +755,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("zones-clusters-get",
-                    Some(r##"Gets a specific cluster."##),
+                    Some(r##"Gets the details of a specific cluster."##),
                     "Details at http://byron.github.io/google-apis-rs/google_container1_cli/projects_zones-clusters-get",
                   vec![
                     (Some(r##"project-id"##),
                      None,
-                     Some(r##"The Google Developers Console [project ID or project number](https://developers.google.com/console/help/new/#projectnumber)."##),
+                     Some(r##"The Google Developers Console [project ID or project number](https://support.google.com/cloud/answer/6158840)."##),
                      Some(true),
                      Some(false)),
         
@@ -785,7 +794,7 @@ fn main() {
                   vec![
                     (Some(r##"project-id"##),
                      None,
-                     Some(r##"The Google Developers Console [project ID or project number](https://developers.google.com/console/help/new/#projectnumber)."##),
+                     Some(r##"The Google Developers Console [project ID or project number](https://support.google.com/cloud/answer/6158840)."##),
                      Some(true),
                      Some(false)),
         
@@ -808,12 +817,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("zones-clusters-update",
-                    Some(r##"Update settings of a specific cluster."##),
+                    Some(r##"Updates the settings of a specific cluster."##),
                     "Details at http://byron.github.io/google-apis-rs/google_container1_cli/projects_zones-clusters-update",
                   vec![
                     (Some(r##"project-id"##),
                      None,
-                     Some(r##"The Google Developers Console [project ID or project number](https://developers.google.com/console/help/new/#projectnumber)."##),
+                     Some(r##"The Google Developers Console [project ID or project number](https://support.google.com/cloud/answer/6158840)."##),
                      Some(true),
                      Some(false)),
         
@@ -853,13 +862,13 @@ fn main() {
                   vec![
                     (Some(r##"project-id"##),
                      None,
-                     Some(r##"The Google Developers Console [project ID or project number](https://developers.google.com/console/help/new/#projectnumber)."##),
+                     Some(r##"The Google Developers Console [project ID or project number](https://support.google.com/cloud/answer/6158840)."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"zone"##),
                      None,
-                     Some(r##"The name of the Google Compute Engine [zone](/compute/docs/zones#available) to return operations for, or "-" for all zones."##),
+                     Some(r##"The name of the Google Compute Engine [zone](/compute/docs/zones#available) to return operations for."##),
                      Some(true),
                      Some(false)),
         
@@ -881,7 +890,7 @@ fn main() {
                   vec![
                     (Some(r##"project-id"##),
                      None,
-                     Some(r##"The Google Developers Console [project ID or project number](https://developers.google.com/console/help/new/#projectnumber)."##),
+                     Some(r##"The Google Developers Console [project ID or project number](https://support.google.com/cloud/answer/6158840)."##),
                      Some(true),
                      Some(false)),
         
@@ -915,13 +924,13 @@ fn main() {
                   vec![
                     (Some(r##"project-id"##),
                      None,
-                     Some(r##"The Google Developers Console [project ID or project number](https://developers.google.com/console/help/new/#projectnumber)."##),
+                     Some(r##"The Google Developers Console [project ID or project number](https://support.google.com/cloud/answer/6158840)."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"zone"##),
                      None,
-                     Some(r##"The name of the Google Compute Engine [zone](/compute/docs/zones#available) to return operations for, or "-" for all zones."##),
+                     Some(r##"The name of the Google Compute Engine [zone](/compute/docs/zones#available) to return operations for, or `-` for all zones."##),
                      Some(true),
                      Some(false)),
         
@@ -943,8 +952,8 @@ fn main() {
     
     let mut app = App::new("container1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.3+20150603")
-           .about("The Google Container Engine API is used for building and managing container based applications, powered by the open source Kubernetes technology.")
+           .version("0.3.4+20160321")
+           .about("Builds and manages clusters that run container-based applications, powered by open source Kubernetes technology.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_container1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

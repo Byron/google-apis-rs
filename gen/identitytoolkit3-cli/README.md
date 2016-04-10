@@ -17,14 +17,14 @@ Everything else about the *Identity Toolkit* API can be found at the
 
 You can download the pre-compiled 64bit binaries for the following platforms:
 
-* ![icon](http://megaicons.net/static/img/icons_sizes/6/140/16/ubuntu-icon.png) [ubuntu](http://dl.byronimo.de/google.rs/cli/0.3.3/ubuntu/identitytoolkit3.tar.gz)
-* ![icon](http://hydra-media.cursecdn.com/wow.gamepedia.com/a/a2/Apple-icon-16x16.png?version=25ddd67ac3dd3b634478e3978b76cb74) [osx](http://dl.byronimo.de/google.rs/cli/0.3.3/osx/identitytoolkit3.tar.gz)
+* ![icon](http://megaicons.net/static/img/icons_sizes/6/140/16/ubuntu-icon.png) [ubuntu](http://dl.byronimo.de/google.rs/cli/0.3.4/ubuntu/identitytoolkit3.tar.gz)
+* ![icon](http://hydra-media.cursecdn.com/wow.gamepedia.com/a/a2/Apple-icon-16x16.png?version=25ddd67ac3dd3b634478e3978b76cb74) [osx](http://dl.byronimo.de/google.rs/cli/0.3.4/osx/identitytoolkit3.tar.gz)
 
 Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/identitytoolkit3-cli).
 
 # Usage
 
-This documentation was generated from the *Identity Toolkit* API at revision *20160216*. The CLI is at version *0.3.3*.
+This documentation was generated from the *Identity Toolkit* API at revision *20160324*. The CLI is at version *0.3.4*.
 
 ```bash
 identitytoolkit3 [options]
@@ -39,6 +39,7 @@ identitytoolkit3 [options]
                 get-recaptcha-param [-p <v>]... [-o <out>]
                 reset-password (-r <kv>)... [-p <v>]... [-o <out>]
                 set-account-info (-r <kv>)... [-p <v>]... [-o <out>]
+                set-project-config (-r <kv>)... [-p <v>]... [-o <out>]
                 sign-out-user (-r <kv>)... [-p <v>]... [-o <out>]
                 signup-new-user (-r <kv>)... [-p <v>]... [-o <out>]
                 upload-account (-r <kv>)... [-p <v>]... [-o <out>]

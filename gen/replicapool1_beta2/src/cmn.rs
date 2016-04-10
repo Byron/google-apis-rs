@@ -12,7 +12,7 @@ use mime::{Mime, TopLevel, SubLevel, Attr, Value};
 use oauth2::{TokenType, Retry, self};
 use hyper;
 use hyper::header::{ContentType, ContentLength, Headers, UserAgent, Authorization, Header,
-                    HeaderFormat};
+                    HeaderFormat, Bearer};
 use hyper::http::h1::LINE_ENDING;
 use hyper::method::Method;
 use hyper::status::StatusCode;
@@ -634,7 +634,7 @@ pub struct ResumableUploadHelper<'a, A: 'a> {
     pub start_at: Option<u64>,
     pub auth: &'a mut A,
     pub user_agent: &'a str,
-    pub auth_header: Authorization<oauth2::Scheme>,
+    pub auth_header: Authorization<Bearer>,
     pub url: &'a str,
     pub reader: &'a mut ReadSeek,
     pub media_type: Mime,

@@ -1,4 +1,4 @@
-site_name: genomics v0.3.3+20160224
+site_name: genomics v0.3.4+20160407
 site_url: http://byron.github.io/google-apis-rs/google-genomics1-cli
 site_description: Write integrating applications with bcore
 
@@ -9,6 +9,17 @@ site_dir: build_html
 
 pages:
 - ['index.md', 'Home']
+- ['annotations_batch-create.md', 'Annotations', 'Batch Create']
+- ['annotations_create.md', 'Annotations', 'Create']
+- ['annotations_delete.md', 'Annotations', 'Delete']
+- ['annotations_get.md', 'Annotations', 'Get']
+- ['annotations_search.md', 'Annotations', 'Search']
+- ['annotations_update.md', 'Annotations', 'Update']
+- ['annotationsets_create.md', 'Annotationsets', 'Create']
+- ['annotationsets_delete.md', 'Annotationsets', 'Delete']
+- ['annotationsets_get.md', 'Annotationsets', 'Get']
+- ['annotationsets_search.md', 'Annotationsets', 'Search']
+- ['annotationsets_update.md', 'Annotationsets', 'Update']
 - ['callsets_create.md', 'Callsets', 'Create']
 - ['callsets_delete.md', 'Callsets', 'Delete']
 - ['callsets_get.md', 'Callsets', 'Get']

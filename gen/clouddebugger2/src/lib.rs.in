@@ -106,6 +106,7 @@ impl Default for Scope {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.debugger().debuggees_breakpoints_set(req, "debuggeeId")
+///              .client_version("sed")
 ///              .doit();
 /// 
 /// match result {
@@ -141,7 +142,7 @@ impl<'a, C, A> Clouddebugger<C, A>
         Clouddebugger {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.12".to_string(),
+            _user_agent: "google-api-rust-client/0.1.13".to_string(),
         }
     }
 
@@ -153,7 +154,7 @@ impl<'a, C, A> Clouddebugger<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.12`.
+    /// It defaults to `google-api-rust-client/0.1.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -596,7 +597,7 @@ impl Part for CloudWorkspaceId {}
 pub struct Breakpoint {
     /// Breakpoint status. The status includes an error flag and a human readable message. This field is usually unset. The message can be either informational or an error message. Regardless, clients should always display the text message back to the user. Error status indicates complete failure of the breakpoint. Example (non-final state): `Still loading symbols...` Examples (final state): * `Invalid line number` referring to location * `Field f not found in class C` referring to condition
     pub status: Option<StatusMessage>,
-    /// The `variable_table` exists to aid with computation, memory and network traffic optimization. It enables storing a variable once and reference it from multiple variables, including variables stored in the `variable_table` itself. For example, the same `this` object, which may appear at many levels of the stack, can have all of its data stored once in this table. The stack frame variables then would hold only a reference to it. The variable `var_table_index` field is an index into this repeated field. The stored objects are nameless and get their name from the referencing variable. The effective variable is a merge of the referencing veariable and the referenced variable.
+    /// The `variable_table` exists to aid with computation, memory and network traffic optimization. It enables storing a variable once and reference it from multiple variables, including variables stored in the `variable_table` itself. For example, the same `this` object, which may appear at many levels of the stack, can have all of its data stored once in this table. The stack frame variables then would hold only a reference to it. The variable `var_table_index` field is an index into this repeated field. The stored objects are nameless and get their name from the referencing variable. The effective variable is a merge of the referencing variable and the referenced variable.
     #[serde(rename="variableTable")]
     pub variable_table: Option<Vec<Variable>>,
     /// E-mail address of the user that created this breakpoint
@@ -605,34 +606,36 @@ pub struct Breakpoint {
     /// Indicates the severity of the log. Only relevant when action is `LOG`.
     #[serde(rename="logLevel")]
     pub log_level: Option<String>,
-    /// Breakpoint identifier, unique in the scope of the debuggee.
-    pub id: Option<String>,
-    /// Only relevant when action is `LOG`. Defines the message to log when the breakpoint hits. The message may include parameter placeholders `$0`, `$1`, etc. These placeholders are replaced with the evaluated value of the appropriate expression. Expressions not referenced in `log_message_format` are not logged. Example: `Message received, id = $0, count = $1` with `expressions` = `[ message.id, message.count ]`.
-    #[serde(rename="logMessageFormat")]
-    pub log_message_format: Option<String>,
-    /// The stack at breakpoint time.
-    #[serde(rename="stackFrames")]
-    pub stack_frames: Option<Vec<StackFrame>>,
-    /// Breakpoint source location.
-    pub location: Option<SourceLocation>,
+    /// A set of custom breakpoint properties, populated by the agent, to be displayed to the user.
+    pub labels: Option<HashMap<String, String>>,
     /// Time this breakpoint was finalized as seen by the server in seconds resolution.
     #[serde(rename="finalTime")]
     pub final_time: Option<String>,
-    /// Action that the agent should perform when the code at the breakpoint location is hit.
-    pub action: Option<String>,
+    /// The stack at breakpoint time.
+    #[serde(rename="stackFrames")]
+    pub stack_frames: Option<Vec<StackFrame>>,
     /// List of read-only expressions to evaluate at the breakpoint location. The expressions are composed using expressions in the programming language at the source location. If the breakpoint action is `LOG`, the evaluated expressions are included in log statements.
     pub expressions: Option<Vec<String>>,
-    /// When true, indicates that this is a final result and the breakpoint state will not change from here on.
-    #[serde(rename="isFinalState")]
-    pub is_final_state: Option<bool>,
     /// Values of evaluated expressions at breakpoint time. The evaluated expressions appear in exactly the same order they are listed in the `expressions` field. The `name` field holds the original expression text, the `value` or `members` field holds the result of the evaluated expression. If the expression cannot be evaluated, the `status` inside the `Variable` will indicate an error and contain the error text.
     #[serde(rename="evaluatedExpressions")]
     pub evaluated_expressions: Option<Vec<Variable>>,
+    /// Breakpoint identifier, unique in the scope of the debuggee.
+    pub id: Option<String>,
+    /// Condition that triggers the breakpoint. The condition is a compound boolean expression composed using expressions in a programming language at the source location.
+    pub condition: Option<String>,
+    /// Only relevant when action is `LOG`. Defines the message to log when the breakpoint hits. The message may include parameter placeholders `$0`, `$1`, etc. These placeholders are replaced with the evaluated value of the appropriate expression. Expressions not referenced in `log_message_format` are not logged. Example: `Message received, id = $0, count = $1` with `expressions` = `[ message.id, message.count ]`.
+    #[serde(rename="logMessageFormat")]
+    pub log_message_format: Option<String>,
     /// Time this breakpoint was created by the server in seconds resolution.
     #[serde(rename="createTime")]
     pub create_time: Option<String>,
-    /// Condition that triggers the breakpoint. The condition is a compound boolean expression composed using expressions in a programming language at the source location.
-    pub condition: Option<String>,
+    /// Breakpoint source location.
+    pub location: Option<SourceLocation>,
+    /// Action that the agent should perform when the code at the breakpoint location is hit.
+    pub action: Option<String>,
+    /// When true, indicates that this is a final result and the breakpoint state will not change from here on.
+    #[serde(rename="isFinalState")]
+    pub is_final_state: Option<bool>,
 }
 
 impl RequestValue for Breakpoint {}
@@ -873,6 +876,7 @@ impl<'a, C, A> DebuggerMethods<'a, C, A> {
             hub: self.hub,
             _debuggee_id: debuggee_id.to_string(),
             _breakpoint_id: breakpoint_id.to_string(),
+            _client_version: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -892,6 +896,7 @@ impl<'a, C, A> DebuggerMethods<'a, C, A> {
             hub: self.hub,
             _debuggee_id: debuggee_id.to_string(),
             _breakpoint_id: breakpoint_id.to_string(),
+            _client_version: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -906,6 +911,7 @@ impl<'a, C, A> DebuggerMethods<'a, C, A> {
             hub: self.hub,
             _project: Default::default(),
             _include_inactive: Default::default(),
+            _client_version: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -925,6 +931,7 @@ impl<'a, C, A> DebuggerMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _debuggee_id: debuggee_id.to_string(),
+            _client_version: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -946,6 +953,7 @@ impl<'a, C, A> DebuggerMethods<'a, C, A> {
             _strip_results: Default::default(),
             _include_inactive: Default::default(),
             _include_all_users: Default::default(),
+            _client_version: Default::default(),
             _action_value: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -1018,7 +1026,7 @@ impl<'a, C, A> ControllerDebuggeeBreakpointUpdateCall<'a, C, A> where C: BorrowM
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, UpdateActiveBreakpointResponse)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -1099,8 +1107,7 @@ impl<'a, C, A> ControllerDebuggeeBreakpointUpdateCall<'a, C, A> where C: BorrowM
                     }
                 }
             };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
+            let auth_header = Authorization(Bearer { token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -1301,7 +1308,7 @@ impl<'a, C, A> ControllerDebuggeeRegisterCall<'a, C, A> where C: BorrowMut<hyper
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, RegisterDebuggeeResponse)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -1359,8 +1366,7 @@ impl<'a, C, A> ControllerDebuggeeRegisterCall<'a, C, A> where C: BorrowMut<hyper
                     }
                 }
             };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
+            let auth_header = Authorization(Bearer { token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -1514,8 +1520,8 @@ impl<'a, C, A> ControllerDebuggeeRegisterCall<'a, C, A> where C: BorrowMut<hyper
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.controller().debuggees_breakpoints_list("debuggeeId")
-///              .wait_token("dolores")
-///              .success_on_timeout(false)
+///              .wait_token("accusam")
+///              .success_on_timeout(true)
 ///              .doit();
 /// # }
 /// ```
@@ -1539,7 +1545,7 @@ impl<'a, C, A> ControllerDebuggeeBreakpointListCall<'a, C, A> where C: BorrowMut
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, ListActiveBreakpointsResponse)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -1614,8 +1620,7 @@ impl<'a, C, A> ControllerDebuggeeBreakpointListCall<'a, C, A> where C: BorrowMut
                     }
                 }
             };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
+            let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
@@ -1780,6 +1785,7 @@ impl<'a, C, A> ControllerDebuggeeBreakpointListCall<'a, C, A> where C: BorrowMut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.debugger().debuggees_breakpoints_get("debuggeeId", "breakpointId")
+///              .client_version("erat")
 ///              .doit();
 /// # }
 /// ```
@@ -1789,6 +1795,7 @@ pub struct DebuggerDebuggeeBreakpointGetCall<'a, C, A>
     hub: &'a Clouddebugger<C, A>,
     _debuggee_id: String,
     _breakpoint_id: String,
+    _client_version: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -1802,7 +1809,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointGetCall<'a, C, A> where C: BorrowMut<hy
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, GetBreakpointResponse)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -1810,10 +1817,13 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointGetCall<'a, C, A> where C: BorrowMut<hy
         };
         dlg.begin(MethodInfo { id: "clouddebugger.debugger.debuggees.breakpoints.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("debuggeeId", self._debuggee_id.to_string()));
         params.push(("breakpointId", self._breakpoint_id.to_string()));
-        for &field in ["alt", "debuggeeId", "breakpointId"].iter() {
+        if let Some(value) = self._client_version {
+            params.push(("clientVersion", value.to_string()));
+        }
+        for &field in ["alt", "debuggeeId", "breakpointId", "clientVersion"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -1872,8 +1882,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointGetCall<'a, C, A> where C: BorrowMut<hy
                     }
                 }
             };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
+            let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
@@ -1947,6 +1956,13 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointGetCall<'a, C, A> where C: BorrowMut<hy
     /// we provide this method for API completeness.
     pub fn breakpoint_id(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointGetCall<'a, C, A> {
         self._breakpoint_id = new_value.to_string();
+        self
+    }
+    /// The client version making the call. Following: `domain/type/version` (e.g., `google.com/intellij/v1`).
+    ///
+    /// Sets the *client version* query property to the given value.
+    pub fn client_version(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointGetCall<'a, C, A> {
+        self._client_version = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -2034,6 +2050,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointGetCall<'a, C, A> where C: BorrowMut<hy
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.debugger().debuggees_breakpoints_delete("debuggeeId", "breakpointId")
+///              .client_version("nonumy")
 ///              .doit();
 /// # }
 /// ```
@@ -2043,6 +2060,7 @@ pub struct DebuggerDebuggeeBreakpointDeleteCall<'a, C, A>
     hub: &'a Clouddebugger<C, A>,
     _debuggee_id: String,
     _breakpoint_id: String,
+    _client_version: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -2056,7 +2074,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointDeleteCall<'a, C, A> where C: BorrowMut
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -2064,10 +2082,13 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointDeleteCall<'a, C, A> where C: BorrowMut
         };
         dlg.begin(MethodInfo { id: "clouddebugger.debugger.debuggees.breakpoints.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("debuggeeId", self._debuggee_id.to_string()));
         params.push(("breakpointId", self._breakpoint_id.to_string()));
-        for &field in ["alt", "debuggeeId", "breakpointId"].iter() {
+        if let Some(value) = self._client_version {
+            params.push(("clientVersion", value.to_string()));
+        }
+        for &field in ["alt", "debuggeeId", "breakpointId", "clientVersion"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -2126,8 +2147,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointDeleteCall<'a, C, A> where C: BorrowMut
                     }
                 }
             };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
+            let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
@@ -2201,6 +2221,13 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointDeleteCall<'a, C, A> where C: BorrowMut
     /// we provide this method for API completeness.
     pub fn breakpoint_id(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointDeleteCall<'a, C, A> {
         self._breakpoint_id = new_value.to_string();
+        self
+    }
+    /// The client version making the call. Following: `domain/type/version` (e.g., `google.com/intellij/v1`).
+    ///
+    /// Sets the *client version* query property to the given value.
+    pub fn client_version(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointDeleteCall<'a, C, A> {
+        self._client_version = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -2288,8 +2315,9 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointDeleteCall<'a, C, A> where C: BorrowMut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.debugger().debuggees_list()
-///              .project("erat")
-///              .include_inactive(true)
+///              .project("dolores")
+///              .include_inactive(false)
+///              .client_version("sadipscing")
 ///              .doit();
 /// # }
 /// ```
@@ -2299,6 +2327,7 @@ pub struct DebuggerDebuggeeListCall<'a, C, A>
     hub: &'a Clouddebugger<C, A>,
     _project: Option<String>,
     _include_inactive: Option<bool>,
+    _client_version: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -2312,7 +2341,7 @@ impl<'a, C, A> DebuggerDebuggeeListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, ListDebuggeesResponse)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -2320,14 +2349,17 @@ impl<'a, C, A> DebuggerDebuggeeListCall<'a, C, A> where C: BorrowMut<hyper::Clie
         };
         dlg.begin(MethodInfo { id: "clouddebugger.debugger.debuggees.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         if let Some(value) = self._project {
             params.push(("project", value.to_string()));
         }
         if let Some(value) = self._include_inactive {
             params.push(("includeInactive", value.to_string()));
         }
-        for &field in ["alt", "project", "includeInactive"].iter() {
+        if let Some(value) = self._client_version {
+            params.push(("clientVersion", value.to_string()));
+        }
+        for &field in ["alt", "project", "includeInactive", "clientVersion"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -2365,8 +2397,7 @@ impl<'a, C, A> DebuggerDebuggeeListCall<'a, C, A> where C: BorrowMut<hyper::Clie
                     }
                 }
             };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
+            let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
@@ -2434,6 +2465,13 @@ impl<'a, C, A> DebuggerDebuggeeListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// Sets the *include inactive* query property to the given value.
     pub fn include_inactive(mut self, new_value: bool) -> DebuggerDebuggeeListCall<'a, C, A> {
         self._include_inactive = Some(new_value);
+        self
+    }
+    /// The client version making the call. Following: `domain/type/version` (e.g., `google.com/intellij/v1`).
+    ///
+    /// Sets the *client version* query property to the given value.
+    pub fn client_version(mut self, new_value: &str) -> DebuggerDebuggeeListCall<'a, C, A> {
+        self._client_version = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -2527,6 +2565,7 @@ impl<'a, C, A> DebuggerDebuggeeListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.debugger().debuggees_breakpoints_set(req, "debuggeeId")
+///              .client_version("ea")
 ///              .doit();
 /// # }
 /// ```
@@ -2536,6 +2575,7 @@ pub struct DebuggerDebuggeeBreakpointSetCall<'a, C, A>
     hub: &'a Clouddebugger<C, A>,
     _request: Breakpoint,
     _debuggee_id: String,
+    _client_version: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -2549,7 +2589,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointSetCall<'a, C, A> where C: BorrowMut<hy
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, SetBreakpointResponse)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -2557,9 +2597,12 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointSetCall<'a, C, A> where C: BorrowMut<hy
         };
         dlg.begin(MethodInfo { id: "clouddebugger.debugger.debuggees.breakpoints.set",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("debuggeeId", self._debuggee_id.to_string()));
-        for &field in ["alt", "debuggeeId"].iter() {
+        if let Some(value) = self._client_version {
+            params.push(("clientVersion", value.to_string()));
+        }
+        for &field in ["alt", "debuggeeId", "clientVersion"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -2629,8 +2672,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointSetCall<'a, C, A> where C: BorrowMut<hy
                     }
                 }
             };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
+            let auth_header = Authorization(Bearer { token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -2707,6 +2749,13 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointSetCall<'a, C, A> where C: BorrowMut<hy
     /// we provide this method for API completeness.
     pub fn debuggee_id(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointSetCall<'a, C, A> {
         self._debuggee_id = new_value.to_string();
+        self
+    }
+    /// The client version making the call. Following: `domain/type/version` (e.g., `google.com/intellij/v1`).
+    ///
+    /// Sets the *client version* query property to the given value.
+    pub fn client_version(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointSetCall<'a, C, A> {
+        self._client_version = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -2794,11 +2843,12 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointSetCall<'a, C, A> where C: BorrowMut<hy
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.debugger().debuggees_breakpoints_list("debuggeeId")
-///              .wait_token("dolores")
-///              .strip_results(false)
-///              .include_inactive(false)
+///              .wait_token("justo")
+///              .strip_results(true)
+///              .include_inactive(true)
 ///              .include_all_users(true)
-///              .action_value("ea")
+///              .client_version("diam")
+///              .action_value("ipsum")
 ///              .doit();
 /// # }
 /// ```
@@ -2811,6 +2861,7 @@ pub struct DebuggerDebuggeeBreakpointListCall<'a, C, A>
     _strip_results: Option<bool>,
     _include_inactive: Option<bool>,
     _include_all_users: Option<bool>,
+    _client_version: Option<String>,
     _action_value: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
@@ -2825,7 +2876,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointListCall<'a, C, A> where C: BorrowMut<h
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, ListBreakpointsResponse)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -2833,7 +2884,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointListCall<'a, C, A> where C: BorrowMut<h
         };
         dlg.begin(MethodInfo { id: "clouddebugger.debugger.debuggees.breakpoints.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((9 + self._additional_params.len()));
         params.push(("debuggeeId", self._debuggee_id.to_string()));
         if let Some(value) = self._wait_token {
             params.push(("waitToken", value.to_string()));
@@ -2847,10 +2898,13 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointListCall<'a, C, A> where C: BorrowMut<h
         if let Some(value) = self._include_all_users {
             params.push(("includeAllUsers", value.to_string()));
         }
+        if let Some(value) = self._client_version {
+            params.push(("clientVersion", value.to_string()));
+        }
         if let Some(value) = self._action_value {
             params.push(("action.value", value.to_string()));
         }
-        for &field in ["alt", "debuggeeId", "waitToken", "stripResults", "includeInactive", "includeAllUsers", "action.value"].iter() {
+        for &field in ["alt", "debuggeeId", "waitToken", "stripResults", "includeInactive", "includeAllUsers", "clientVersion", "action.value"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -2909,8 +2963,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointListCall<'a, C, A> where C: BorrowMut<h
                     }
                 }
             };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
+            let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
@@ -3002,6 +3055,13 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointListCall<'a, C, A> where C: BorrowMut<h
     /// Sets the *include all users* query property to the given value.
     pub fn include_all_users(mut self, new_value: bool) -> DebuggerDebuggeeBreakpointListCall<'a, C, A> {
         self._include_all_users = Some(new_value);
+        self
+    }
+    /// The client version making the call. Following: `domain/type/version` (e.g., `google.com/intellij/v1`).
+    ///
+    /// Sets the *client version* query property to the given value.
+    pub fn client_version(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointListCall<'a, C, A> {
+        self._client_version = Some(new_value.to_string());
         self
     }
     /// Only breakpoints with the specified action will pass the filter.

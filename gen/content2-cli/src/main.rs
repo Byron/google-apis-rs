@@ -1806,6 +1806,7 @@ impl<'n> Engine<'n> {
                     "fetch-schedule.weekday" => Some(("fetchSchedule.weekday", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "fetch-schedule.time-zone" => Some(("fetchSchedule.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "fetch-schedule.password" => Some(("fetchSchedule.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "fetch-schedule.minute-of-hour" => Some(("fetchSchedule.minuteOfHour", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "fetch-schedule.day-of-month" => Some(("fetchSchedule.dayOfMonth", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "target-country" => Some(("targetCountry", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "file-name" => Some(("fileName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1813,7 +1814,7 @@ impl<'n> Engine<'n> {
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "attribute-language" => Some(("attributeLanguage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attribute-language", "column-delimiter", "content-language", "content-type", "day-of-month", "fetch-schedule", "fetch-url", "file-encoding", "file-name", "format", "hour", "id", "intended-destinations", "kind", "name", "password", "quoting-mode", "target-country", "time-zone", "username", "weekday"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attribute-language", "column-delimiter", "content-language", "content-type", "day-of-month", "fetch-schedule", "fetch-url", "file-encoding", "file-name", "format", "hour", "id", "intended-destinations", "kind", "minute-of-hour", "name", "password", "quoting-mode", "target-country", "time-zone", "username", "weekday"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1972,6 +1973,7 @@ impl<'n> Engine<'n> {
                     "fetch-schedule.weekday" => Some(("fetchSchedule.weekday", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "fetch-schedule.time-zone" => Some(("fetchSchedule.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "fetch-schedule.password" => Some(("fetchSchedule.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "fetch-schedule.minute-of-hour" => Some(("fetchSchedule.minuteOfHour", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "fetch-schedule.day-of-month" => Some(("fetchSchedule.dayOfMonth", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "target-country" => Some(("targetCountry", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "file-name" => Some(("fileName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1979,7 +1981,7 @@ impl<'n> Engine<'n> {
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "attribute-language" => Some(("attributeLanguage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attribute-language", "column-delimiter", "content-language", "content-type", "day-of-month", "fetch-schedule", "fetch-url", "file-encoding", "file-name", "format", "hour", "id", "intended-destinations", "kind", "name", "password", "quoting-mode", "target-country", "time-zone", "username", "weekday"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attribute-language", "column-delimiter", "content-language", "content-type", "day-of-month", "fetch-schedule", "fetch-url", "file-encoding", "file-name", "format", "hour", "id", "intended-destinations", "kind", "minute-of-hour", "name", "password", "quoting-mode", "target-country", "time-zone", "username", "weekday"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2079,6 +2081,7 @@ impl<'n> Engine<'n> {
                     "fetch-schedule.weekday" => Some(("fetchSchedule.weekday", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "fetch-schedule.time-zone" => Some(("fetchSchedule.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "fetch-schedule.password" => Some(("fetchSchedule.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "fetch-schedule.minute-of-hour" => Some(("fetchSchedule.minuteOfHour", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "fetch-schedule.day-of-month" => Some(("fetchSchedule.dayOfMonth", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "target-country" => Some(("targetCountry", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "file-name" => Some(("fileName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2086,7 +2089,7 @@ impl<'n> Engine<'n> {
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "attribute-language" => Some(("attributeLanguage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attribute-language", "column-delimiter", "content-language", "content-type", "day-of-month", "fetch-schedule", "fetch-url", "file-encoding", "file-name", "format", "hour", "id", "intended-destinations", "kind", "name", "password", "quoting-mode", "target-country", "time-zone", "username", "weekday"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attribute-language", "column-delimiter", "content-language", "content-type", "day-of-month", "fetch-schedule", "fetch-url", "file-encoding", "file-name", "format", "hour", "id", "intended-destinations", "kind", "minute-of-hour", "name", "password", "quoting-mode", "target-country", "time-zone", "username", "weekday"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -6218,8 +6221,8 @@ fn main() {
     
     let mut app = App::new("content2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.3+20160204")
-           .about("Manage product items, inventory, and Merchant Center accounts for Google Shopping.")
+           .version("0.3.4+20160331")
+           .about("Manages product items, inventory, and Merchant Center accounts for Google Shopping.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_content2_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

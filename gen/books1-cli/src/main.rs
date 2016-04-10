@@ -2999,6 +2999,9 @@ impl<'n> Engine<'n> {
                 "locale" => {
                     call = call.locale(value.unwrap_or(""));
                 },
+                "country" => {
+                    call = call.country(value.unwrap_or(""));
+                },
                 "acquire-method" => {
                     call = call.add_acquire_method(value.unwrap_or(""));
                 },
@@ -3015,7 +3018,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["locale", "acquire-method", "max-results", "source", "start-index", "processing-state"].iter().map(|v|*v));
+                                                                           v.extend(["locale", "country", "acquire-method", "max-results", "source", "start-index", "processing-state"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -4694,7 +4697,7 @@ fn main() {
     
     let mut app = App::new("books1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.3+20160113")
+           .version("0.3.4+20160226")
            .about("Lets you search for books and manage your Google Books library.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_books1_cli")
            .arg(Arg::with_name("url")

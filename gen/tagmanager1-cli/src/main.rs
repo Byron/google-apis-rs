@@ -5338,8 +5338,8 @@ fn main() {
     
     let mut app = App::new("tagmanager1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.3+20160209")
-           .about("API for accessing Tag Manager accounts and containers.")
+           .version("0.3.4+20160310")
+           .about("Accesses Tag Manager accounts and containers.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_tagmanager1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

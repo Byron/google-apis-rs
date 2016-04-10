@@ -111,7 +111,7 @@ impl<'a, C, A> IdentityToolkit<C, A>
         IdentityToolkit {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.12".to_string(),
+            _user_agent: "google-api-rust-client/0.1.13".to_string(),
         }
     }
 
@@ -120,7 +120,7 @@ impl<'a, C, A> IdentityToolkit<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.12`.
+    /// It defaults to `google-api-rust-client/0.1.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -134,63 +134,6 @@ impl<'a, C, A> IdentityToolkit<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// Respone of uploading accounts in batch.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [upload account relyingparty](struct.RelyingpartyUploadAccountCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct UploadAccountResponse {
-    /// The fixed string "identitytoolkit#UploadAccountResponse".
-    pub kind: Option<String>,
-    /// The error encountered while processing the account info.
-    pub error: Option<Vec<UploadAccountResponseError>>,
-}
-
-impl ResponseResult for UploadAccountResponse {}
-
-
-/// Request of getting a code for user confirmation (reset password, change email etc.)
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [get oob confirmation code relyingparty](struct.RelyingpartyGetOobConfirmationCodeCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Relyingparty {
-    /// The fixed string "identitytoolkit#relyingparty".
-    pub kind: Option<String>,
-    /// The request type.
-    #[serde(rename="requestType")]
-    pub request_type: Option<String>,
-    /// The user's Gitkit login token for email change.
-    #[serde(rename="idToken")]
-    pub id_token: Option<String>,
-    /// The recaptcha challenge presented to the user.
-    pub challenge: Option<String>,
-    /// The new email if the code is for email change.
-    #[serde(rename="newEmail")]
-    pub new_email: Option<String>,
-    /// The IP address of the user.
-    #[serde(rename="userIp")]
-    pub user_ip: Option<String>,
-    /// The email of the user.
-    pub email: Option<String>,
-    /// The recaptcha response from the user.
-    #[serde(rename="captchaResp")]
-    pub captcha_resp: Option<String>,
-}
-
-impl RequestValue for Relyingparty {}
-
-
 /// Response of creating the IDP authentication URL.
 /// 
 /// # Activities
@@ -229,46 +172,23 @@ pub struct CreateAuthUriResponse {
 impl ResponseResult for CreateAuthUriResponse {}
 
 
-/// Response of resetting the password.
+/// Response of setting the project configuration.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [reset password relyingparty](struct.RelyingpartyResetPasswordCall.html) (response)
+/// * [set project config relyingparty](struct.RelyingpartySetProjectConfigCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ResetPasswordResponse {
-    /// The fixed string "identitytoolkit#ResetPasswordResponse".
-    pub kind: Option<String>,
-    /// The user's email.
-    pub email: Option<String>,
+pub struct IdentitytoolkitRelyingpartySetProjectConfigResponse {
+    /// Project ID of the relying party.
+    #[serde(rename="projectId")]
+    pub project_id: Option<String>,
 }
 
-impl ResponseResult for ResetPasswordResponse {}
-
-
-/// Request to delete account.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [delete account relyingparty](struct.RelyingpartyDeleteAccountCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct IdentitytoolkitRelyingpartyDeleteAccountRequest {
-    /// GCP project number of the requesting delegated app. Currently only intended for Firebase V1 migration.
-    #[serde(rename="delegatedProjectNumber")]
-    pub delegated_project_number: Option<String>,
-    /// The local ID of the user.
-    #[serde(rename="localId")]
-    pub local_id: Option<String>,
-}
-
-impl RequestValue for IdentitytoolkitRelyingpartyDeleteAccountRequest {}
+impl ResponseResult for IdentitytoolkitRelyingpartySetProjectConfigResponse {}
 
 
 /// Response of getting the project configuration.
@@ -282,44 +202,42 @@ impl RequestValue for IdentitytoolkitRelyingpartyDeleteAccountRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IdentitytoolkitRelyingpartyGetProjectConfigResponse {
-    /// Project ID of the relying party.
-    #[serde(rename="projectId")]
-    pub project_id: Option<String>,
-    /// Browser API key, needed when making http request to Apiary.
-    #[serde(rename="apiKey")]
-    pub api_key: Option<String>,
     /// Whether to allow password user sign in or sign up.
     #[serde(rename="allowPasswordUser")]
     pub allow_password_user: Option<bool>,
+    /// Browser API key, needed when making http request to Apiary.
+    #[serde(rename="apiKey")]
+    pub api_key: Option<String>,
+    /// Whether to use email sending provided by Firebear.
+    #[serde(rename="useEmailSending")]
+    pub use_email_sending: Option<bool>,
+    /// Project ID of the relying party.
+    #[serde(rename="projectId")]
+    pub project_id: Option<String>,
+    /// Whether anonymous user is enabled.
+    #[serde(rename="enableAnonymousUser")]
+    pub enable_anonymous_user: Option<bool>,
+    /// Authorized domains.
+    #[serde(rename="authorizedDomains")]
+    pub authorized_domains: Option<Vec<String>>,
+    /// Change email template.
+    #[serde(rename="changeEmailTemplate")]
+    pub change_email_template: Option<EmailTemplate>,
+    /// Legacy reset password email template.
+    #[serde(rename="legacyResetPasswordTemplate")]
+    pub legacy_reset_password_template: Option<EmailTemplate>,
+    /// Verify email template.
+    #[serde(rename="verifyEmailTemplate")]
+    pub verify_email_template: Option<EmailTemplate>,
+    /// Reset password email template.
+    #[serde(rename="resetPasswordTemplate")]
+    pub reset_password_template: Option<EmailTemplate>,
     /// OAuth2 provider configuration.
     #[serde(rename="idpConfig")]
     pub idp_config: Option<Vec<IdpConfig>>,
 }
 
 impl ResponseResult for IdentitytoolkitRelyingpartyGetProjectConfigResponse {}
-
-
-/// Response of getting a code for user confirmation (reset password, change email etc.).
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [get oob confirmation code relyingparty](struct.RelyingpartyGetOobConfirmationCodeCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GetOobConfirmationCodeResponse {
-    /// The fixed string "identitytoolkit#GetOobConfirmationCodeResponse".
-    pub kind: Option<String>,
-    /// The code to be send to the user.
-    #[serde(rename="oobCode")]
-    pub oob_code: Option<String>,
-    /// The email address that the email is sent to.
-    pub email: Option<String>,
-}
-
-impl ResponseResult for GetOobConfirmationCodeResponse {}
 
 
 /// Request to get the account information.
@@ -336,6 +254,9 @@ pub struct IdentitytoolkitRelyingpartyGetAccountInfoRequest {
     /// The GITKit token of the authenticated user.
     #[serde(rename="idToken")]
     pub id_token: Option<String>,
+    /// GCP project number of the requesting delegated app. Currently only intended for Firebase V1 migration.
+    #[serde(rename="delegatedProjectNumber")]
+    pub delegated_project_number: Option<String>,
     /// The list of emails of the users to inquiry.
     pub email: Option<Vec<String>>,
     /// The list of local ID's of the users to inquiry.
@@ -426,217 +347,61 @@ impl ResponseResult for GetRecaptchaParamResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VerifyCustomTokenResponse {
+    /// If idToken is STS id token, then this field will be expiration time of STS id token in seconds.
+    #[serde(rename="expiresIn")]
+    pub expires_in: Option<String>,
     /// The GITKit token for authenticated user.
     #[serde(rename="idToken")]
     pub id_token: Option<String>,
     /// The fixed string "identitytoolkit#VerifyCustomTokenResponse".
     pub kind: Option<String>,
+    /// If idToken is STS id token, then this field will be refresh token.
+    #[serde(rename="refreshToken")]
+    pub refresh_token: Option<String>,
 }
 
 impl ResponseResult for VerifyCustomTokenResponse {}
 
 
-/// Response of verifying the IDP assertion.
+/// Request to verify the password.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [verify assertion relyingparty](struct.RelyingpartyVerifyAssertionCall.html) (response)
+/// * [verify password relyingparty](struct.RelyingpartyVerifyPasswordCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct VerifyAssertionResponse {
-    /// The unique ID identifies the IdP account.
-    #[serde(rename="federatedId")]
-    pub federated_id: Option<String>,
-    /// The RP local ID if it's already been mapped to the IdP account identified by the federated ID.
-    #[serde(rename="localId")]
-    pub local_id: Option<String>,
-    /// The URI of the public accessible profiel picture.
-    #[serde(rename="photoUrl")]
-    pub photo_url: Option<String>,
-    /// The original email stored in the mapping storage. It's returned when the federated ID is associated to a different email.
-    #[serde(rename="originalEmail")]
-    pub original_email: Option<String>,
-    /// It's the identifier param in the createAuthUri request if the identifier is an email. It can be used to check whether the user input email is different from the asserted email.
-    #[serde(rename="inputEmail")]
-    pub input_email: Option<String>,
-    /// The scope for the OpenID OAuth extension.
-    #[serde(rename="oauthScope")]
-    pub oauth_scope: Option<String>,
-    /// The language preference of the user.
-    pub language: Option<String>,
-    /// Whether the assertion is from a non-trusted IDP and need account linking confirmation.
-    #[serde(rename="needConfirmation")]
-    pub need_confirmation: Option<bool>,
-    /// The custom scheme used by mobile app.
-    #[serde(rename="appScheme")]
-    pub app_scheme: Option<String>,
-    /// The full name of the user.
-    #[serde(rename="fullName")]
-    pub full_name: Option<String>,
-    /// URL for OTA app installation.
-    #[serde(rename="appInstallationUrl")]
-    pub app_installation_url: Option<String>,
-    /// The fixed string "identitytoolkit#VerifyAssertionResponse".
-    pub kind: Option<String>,
-    /// The display name of the user.
-    #[serde(rename="displayName")]
-    pub display_name: Option<String>,
-    /// The OAuth2 access token.
-    #[serde(rename="oauthAccessToken")]
-    pub oauth_access_token: Option<String>,
-    /// The first name of the user.
-    #[serde(rename="firstName")]
-    pub first_name: Option<String>,
-    /// The OAuth2 authorization code.
-    #[serde(rename="oauthAuthorizationCode")]
-    pub oauth_authorization_code: Option<String>,
-    /// The lifetime in seconds of the OAuth2 access token.
-    #[serde(rename="oauthExpireIn")]
-    pub oauth_expire_in: Option<i32>,
-    /// The ID token.
-    #[serde(rename="idToken")]
-    pub id_token: Option<String>,
-    /// When action is 'map', contains the idps which can be used for confirmation.
-    #[serde(rename="verifiedProvider")]
-    pub verified_provider: Option<Vec<String>>,
-    /// Whether need client to supply email to complete the federated login flow.
-    #[serde(rename="needEmail")]
-    pub need_email: Option<bool>,
-    /// The user approved request token for the OpenID OAuth extension.
-    #[serde(rename="oauthRequestToken")]
-    pub oauth_request_token: Option<String>,
-    /// The birth date of the IdP account.
-    #[serde(rename="dateOfBirth")]
-    pub date_of_birth: Option<String>,
-    /// The IdP ID. For white listed IdPs it's a short domain name e.g. google.com, aol.com, live.net and yahoo.com. If the "providerId" param is set to OpenID OP identifer other than the whilte listed IdPs the OP identifier is returned. If the "identifier" param is federated ID in the createAuthUri request. The domain part of the federated ID is returned.
-    #[serde(rename="providerId")]
-    pub provider_id: Option<String>,
-    /// The opaque value used by the client to maintain context info between the authentication request and the IDP callback.
-    pub context: Option<String>,
-    /// The last name of the user.
-    #[serde(rename="lastName")]
-    pub last_name: Option<String>,
-    /// The action code.
-    pub action: Option<String>,
-    /// The timezone of the user.
-    #[serde(rename="timeZone")]
-    pub time_zone: Option<String>,
-    /// The value is true if the IDP is also the email provider. It means the user owns the email.
-    #[serde(rename="emailVerified")]
-    pub email_verified: Option<bool>,
-    /// The nick name of the user.
-    #[serde(rename="nickName")]
-    pub nick_name: Option<String>,
-    /// The email returned by the IdP. NOTE: The federated login user may not own the email.
-    pub email: Option<String>,
-    /// It's true if the email is recycled.
-    #[serde(rename="emailRecycled")]
-    pub email_recycled: Option<bool>,
-}
-
-impl ResponseResult for VerifyAssertionResponse {}
-
-
-/// Template for a single idp configuration.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct IdpConfig {
-    /// Percent of users who will be prompted/redirected federated login for this IDP.
-    #[serde(rename="experimentPercent")]
-    pub experiment_percent: Option<i32>,
-    /// Whether this IDP is enabled.
-    pub enabled: Option<bool>,
-    /// OAuth2 client ID.
-    #[serde(rename="clientId")]
-    pub client_id: Option<String>,
-    /// OAuth2 provider.
-    pub provider: Option<String>,
-}
-
-impl Part for IdpConfig {}
-
-
-/// The error encountered while processing the account info.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct UploadAccountResponseError {
-    /// The index of the malformed account, starting from 0.
-    pub index: Option<i32>,
-    /// Detailed error message for the account info.
-    pub message: Option<String>,
-}
-
-impl NestedType for UploadAccountResponseError {}
-impl Part for UploadAccountResponseError {}
-
-
-/// Request to reset the password.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [reset password relyingparty](struct.RelyingpartyResetPasswordCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct IdentitytoolkitRelyingpartyResetPasswordRequest {
-    /// The new password inputted by the user.
-    #[serde(rename="newPassword")]
-    pub new_password: Option<String>,
-    /// The old password inputted by the user.
-    #[serde(rename="oldPassword")]
-    pub old_password: Option<String>,
-    /// The confirmation code.
-    #[serde(rename="oobCode")]
-    pub oob_code: Option<String>,
-    /// The email address of the user.
-    pub email: Option<String>,
-}
-
-impl RequestValue for IdentitytoolkitRelyingpartyResetPasswordRequest {}
-
-
-/// Request to upload user account in batch.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [upload account relyingparty](struct.RelyingpartyUploadAccountCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct IdentitytoolkitRelyingpartyUploadAccountRequest {
-    /// The password hash algorithm.
-    #[serde(rename="hashAlgorithm")]
-    pub hash_algorithm: Option<String>,
+pub struct IdentitytoolkitRelyingpartyVerifyPasswordRequest {
     /// GCP project number of the requesting delegated app. Currently only intended for Firebase V1 migration.
     #[serde(rename="delegatedProjectNumber")]
     pub delegated_project_number: Option<String>,
-    /// Memory cost for hash calculation. Used by scrypt similar algorithms.
-    #[serde(rename="memoryCost")]
-    pub memory_cost: Option<i32>,
-    /// The account info to be stored.
-    pub users: Option<Vec<UserInfo>>,
-    /// The salt separator.
-    #[serde(rename="saltSeparator")]
-    pub salt_separator: Option<String>,
-    /// The key for to hash the password.
-    #[serde(rename="signerKey")]
-    pub signer_key: Option<String>,
-    /// Rounds for hash calculation. Used by scrypt and similar algorithms.
-    pub rounds: Option<i32>,
+    /// Instance id token of the app.
+    #[serde(rename="instanceId")]
+    pub instance_id: Option<String>,
+    /// The GITKit token of the authenticated user.
+    #[serde(rename="idToken")]
+    pub id_token: Option<String>,
+    /// The GITKit token for the non-trusted IDP, which is to be confirmed by the user.
+    #[serde(rename="pendingIdToken")]
+    pub pending_id_token: Option<String>,
+    /// The captcha challenge.
+    #[serde(rename="captchaChallenge")]
+    pub captcha_challenge: Option<String>,
+    /// Response to the captcha.
+    #[serde(rename="captchaResponse")]
+    pub captcha_response: Option<String>,
+    /// Whether return sts id token and refresh token instead of gitkit token.
+    #[serde(rename="returnSecureToken")]
+    pub return_secure_token: Option<bool>,
+    /// The password inputed by the user.
+    pub password: Option<String>,
+    /// The email of the user.
+    pub email: Option<String>,
 }
 
-impl RequestValue for IdentitytoolkitRelyingpartyUploadAccountRequest {}
+impl RequestValue for IdentitytoolkitRelyingpartyVerifyPasswordRequest {}
 
 
 /// Request of verifying the password.
@@ -650,6 +415,9 @@ impl RequestValue for IdentitytoolkitRelyingpartyUploadAccountRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VerifyPasswordResponse {
+    /// If idToken is STS id token, then this field will be expiration time of STS id token in seconds.
+    #[serde(rename="expiresIn")]
+    pub expires_in: Option<String>,
     /// The fixed string "identitytoolkit#VerifyPasswordResponse".
     pub kind: Option<String>,
     /// The name of the user.
@@ -675,6 +443,9 @@ pub struct VerifyPasswordResponse {
     /// The OAuth2 authorization code.
     #[serde(rename="oauthAuthorizationCode")]
     pub oauth_authorization_code: Option<String>,
+    /// If idToken is STS id token, then this field will be refresh token.
+    #[serde(rename="refreshToken")]
+    pub refresh_token: Option<String>,
     /// The email returned by the IdP. NOTE: The federated login user may not own the email.
     pub email: Option<String>,
 }
@@ -682,83 +453,24 @@ pub struct VerifyPasswordResponse {
 impl ResponseResult for VerifyPasswordResponse {}
 
 
-/// Request to set the account information.
+/// Response of resetting the password.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [set account info relyingparty](struct.RelyingpartySetAccountInfoCall.html) (request)
+/// * [reset password relyingparty](struct.RelyingpartyResetPasswordCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct IdentitytoolkitRelyingpartySetAccountInfoRequest {
-    /// GCP project number of the requesting delegated app. Currently only intended for Firebase V1 migration.
-    #[serde(rename="delegatedProjectNumber")]
-    pub delegated_project_number: Option<String>,
-    /// The out-of-band code of the change email request.
-    #[serde(rename="oobCode")]
-    pub oob_code: Option<String>,
-    /// The local ID of the user.
-    #[serde(rename="localId")]
-    pub local_id: Option<String>,
-    /// Timestamp in seconds for valid login token.
-    #[serde(rename="validSince")]
-    pub valid_since: Option<String>,
-    /// The photo url of the user.
-    #[serde(rename="photoUrl")]
-    pub photo_url: Option<String>,
-    /// Instance id token of the app.
-    #[serde(rename="instanceId")]
-    pub instance_id: Option<String>,
-    /// Whether to disable the user.
-    #[serde(rename="disableUser")]
-    pub disable_user: Option<bool>,
-    /// The new password of the user.
-    pub password: Option<String>,
-    /// The name of the user.
-    #[serde(rename="displayName")]
-    pub display_name: Option<String>,
-    /// Mark the user to upgrade to federated login.
-    #[serde(rename="upgradeToFederatedLogin")]
-    pub upgrade_to_federated_login: Option<bool>,
-    /// The GITKit token of the authenticated user.
-    #[serde(rename="idToken")]
-    pub id_token: Option<String>,
-    /// Mark the email as verified or not.
-    #[serde(rename="emailVerified")]
-    pub email_verified: Option<bool>,
-    /// Response to the captcha.
-    #[serde(rename="captchaResponse")]
-    pub captcha_response: Option<String>,
-    /// The associated IDPs of the user.
-    pub provider: Option<Vec<String>>,
-    /// The captcha challenge.
-    #[serde(rename="captchaChallenge")]
-    pub captcha_challenge: Option<String>,
-    /// The email of the user.
+pub struct ResetPasswordResponse {
+    /// The fixed string "identitytoolkit#ResetPasswordResponse".
+    pub kind: Option<String>,
+    /// The user's email.
     pub email: Option<String>,
 }
 
-impl RequestValue for IdentitytoolkitRelyingpartySetAccountInfoRequest {}
-
-
-/// Respone of deleting account.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [delete account relyingparty](struct.RelyingpartyDeleteAccountCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DeleteAccountResponse {
-    /// The fixed string "identitytoolkit#DeleteAccountResponse".
-    pub kind: Option<String>,
-}
-
-impl ResponseResult for DeleteAccountResponse {}
+impl ResponseResult for ResetPasswordResponse {}
 
 
 /// Response of signing out user.
@@ -835,21 +547,24 @@ impl RequestValue for IdentitytoolkitRelyingpartyCreateAuthUriRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IdentitytoolkitRelyingpartySignupNewUserRequest {
-    /// Response to the captcha.
-    #[serde(rename="captchaResponse")]
-    pub captcha_response: Option<String>,
     /// The name of the user.
     #[serde(rename="displayName")]
     pub display_name: Option<String>,
-    /// The captcha challenge.
-    #[serde(rename="captchaChallenge")]
-    pub captcha_challenge: Option<String>,
     /// Instance id token of the app.
     #[serde(rename="instanceId")]
     pub instance_id: Option<String>,
     /// The GITKit token of the authenticated user.
     #[serde(rename="idToken")]
     pub id_token: Option<String>,
+    /// The captcha challenge.
+    #[serde(rename="captchaChallenge")]
+    pub captcha_challenge: Option<String>,
+    /// Response to the captcha.
+    #[serde(rename="captchaResponse")]
+    pub captcha_response: Option<String>,
+    /// Whether return sts id token and refresh token instead of gitkit token.
+    #[serde(rename="returnSecureToken")]
+    pub return_secure_token: Option<bool>,
     /// The new password of the user.
     pub password: Option<String>,
     /// The email of the user.
@@ -857,75 +572,6 @@ pub struct IdentitytoolkitRelyingpartySignupNewUserRequest {
 }
 
 impl RequestValue for IdentitytoolkitRelyingpartySignupNewUserRequest {}
-
-
-/// Template for an individual account info.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct UserInfo {
-    /// The name of the user.
-    #[serde(rename="displayName")]
-    pub display_name: Option<String>,
-    /// The local ID of the user.
-    #[serde(rename="localId")]
-    pub local_id: Option<String>,
-    /// Timestamp in seconds for valid login token.
-    #[serde(rename="validSince")]
-    pub valid_since: Option<String>,
-    /// The URL of the user profile photo.
-    #[serde(rename="photoUrl")]
-    pub photo_url: Option<String>,
-    /// Whether the email has been verified.
-    #[serde(rename="emailVerified")]
-    pub email_verified: Option<bool>,
-    /// The user's hashed password.
-    #[serde(rename="passwordHash")]
-    pub password_hash: Option<String>,
-    /// Whether the user is disabled.
-    pub disabled: Option<bool>,
-    /// Version of the user's password.
-    pub version: Option<i32>,
-    /// The IDP of the user.
-    #[serde(rename="providerUserInfo")]
-    pub provider_user_info: Option<Vec<UserInfoProviderUserInfo>>,
-    /// The timestamp when the password was last updated.
-    #[serde(rename="passwordUpdatedAt")]
-    pub password_updated_at: Option<f64>,
-    /// The user's password salt.
-    pub salt: Option<String>,
-    /// The email of the user.
-    pub email: Option<String>,
-}
-
-impl Part for UserInfo {}
-
-
-/// The IDP of the user.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct UserInfoProviderUserInfo {
-    /// User's identifier at IDP.
-    #[serde(rename="federatedId")]
-    pub federated_id: Option<String>,
-    /// The IdP ID. For white listed IdPs it's a short domain name, e.g., google.com, aol.com, live.net and yahoo.com. For other OpenID IdPs it's the OP identifier.
-    #[serde(rename="providerId")]
-    pub provider_id: Option<String>,
-    /// The user's display name at the IDP.
-    #[serde(rename="displayName")]
-    pub display_name: Option<String>,
-    /// User's email at IDP.
-    pub email: Option<String>,
-    /// The user's photo url at the IDP.
-    #[serde(rename="photoUrl")]
-    pub photo_url: Option<String>,
-}
-
-impl NestedType for UserInfoProviderUserInfo {}
-impl Part for UserInfoProviderUserInfo {}
 
 
 /// Respone of getting public keys.
@@ -941,27 +587,6 @@ impl Part for UserInfoProviderUserInfo {}
 pub struct IdentitytoolkitRelyingpartyGetPublicKeysResponse(Option<HashMap<String, String>>);
 
 impl ResponseResult for IdentitytoolkitRelyingpartyGetPublicKeysResponse {}
-
-
-/// Request to verify a custom token
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [verify custom token relyingparty](struct.RelyingpartyVerifyCustomTokenCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct IdentitytoolkitRelyingpartyVerifyCustomTokenRequest {
-    /// Instance id token of the app.
-    #[serde(rename="instanceId")]
-    pub instance_id: Option<String>,
-    /// The custom token to verify
-    pub token: Option<String>,
-}
-
-impl RequestValue for IdentitytoolkitRelyingpartyVerifyCustomTokenRequest {}
 
 
 /// Request to download user account in batch.
@@ -1010,6 +635,91 @@ impl NestedType for SetAccountInfoResponseProviderUserInfo {}
 impl Part for SetAccountInfoResponseProviderUserInfo {}
 
 
+/// Request to verify a custom token
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [verify custom token relyingparty](struct.RelyingpartyVerifyCustomTokenCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct IdentitytoolkitRelyingpartyVerifyCustomTokenRequest {
+    /// Instance id token of the app.
+    #[serde(rename="instanceId")]
+    pub instance_id: Option<String>,
+    /// Whether return sts id token and refresh token instead of gitkit token.
+    #[serde(rename="returnSecureToken")]
+    pub return_secure_token: Option<bool>,
+    /// The custom token to verify
+    pub token: Option<String>,
+}
+
+impl RequestValue for IdentitytoolkitRelyingpartyVerifyCustomTokenRequest {}
+
+
+/// Response of getting account information.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [get account info relyingparty](struct.RelyingpartyGetAccountInfoCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GetAccountInfoResponse {
+    /// The fixed string "identitytoolkit#GetAccountInfoResponse".
+    pub kind: Option<String>,
+    /// The info of the users.
+    pub users: Option<Vec<UserInfo>>,
+}
+
+impl ResponseResult for GetAccountInfoResponse {}
+
+
+/// Respone of setting the account information.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [set account info relyingparty](struct.RelyingpartySetAccountInfoCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SetAccountInfoResponse {
+    /// If idToken is STS id token, then this field will be expiration time of STS id token in seconds.
+    #[serde(rename="expiresIn")]
+    pub expires_in: Option<String>,
+    /// The fixed string "identitytoolkit#SetAccountInfoResponse".
+    pub kind: Option<String>,
+    /// The name of the user.
+    #[serde(rename="displayName")]
+    pub display_name: Option<String>,
+    /// The new email the user attempts to change to.
+    #[serde(rename="newEmail")]
+    pub new_email: Option<String>,
+    /// The photo url of the user.
+    #[serde(rename="photoUrl")]
+    pub photo_url: Option<String>,
+    /// The Gitkit id token to login the newly sign up user.
+    #[serde(rename="idToken")]
+    pub id_token: Option<String>,
+    /// The user's profiles at the associated IdPs.
+    #[serde(rename="providerUserInfo")]
+    pub provider_user_info: Option<Vec<SetAccountInfoResponseProviderUserInfo>>,
+    /// If idToken is STS id token, then this field will be refresh token.
+    #[serde(rename="refreshToken")]
+    pub refresh_token: Option<String>,
+    /// The email of the user.
+    pub email: Option<String>,
+}
+
+impl ResponseResult for SetAccountInfoResponse {}
+
+
 /// Request to verify the IDP assertion.
 /// 
 /// # Activities
@@ -1042,6 +752,9 @@ pub struct IdentitytoolkitRelyingpartyVerifyAssertionRequest {
     /// The URI to which the IDP redirects the user back. It may contain federated login result params added by the IDP.
     #[serde(rename="requestUri")]
     pub request_uri: Option<String>,
+    /// Whether return sts id token and refresh token instead of gitkit token.
+    #[serde(rename="returnSecureToken")]
+    pub return_secure_token: Option<bool>,
     /// Whether to return refresh tokens.
     #[serde(rename="returnRefreshToken")]
     pub return_refresh_token: Option<bool>,
@@ -1050,24 +763,536 @@ pub struct IdentitytoolkitRelyingpartyVerifyAssertionRequest {
 impl RequestValue for IdentitytoolkitRelyingpartyVerifyAssertionRequest {}
 
 
-/// Response of getting account information.
+/// Request of getting a code for user confirmation (reset password, change email etc.)
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [get account info relyingparty](struct.RelyingpartyGetAccountInfoCall.html) (response)
+/// * [get oob confirmation code relyingparty](struct.RelyingpartyGetOobConfirmationCodeCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GetAccountInfoResponse {
-    /// The fixed string "identitytoolkit#GetAccountInfoResponse".
+pub struct Relyingparty {
+    /// The fixed string "identitytoolkit#relyingparty".
     pub kind: Option<String>,
-    /// The info of the users.
-    pub users: Option<Vec<UserInfo>>,
+    /// The request type.
+    #[serde(rename="requestType")]
+    pub request_type: Option<String>,
+    /// The user's Gitkit login token for email change.
+    #[serde(rename="idToken")]
+    pub id_token: Option<String>,
+    /// The recaptcha challenge presented to the user.
+    pub challenge: Option<String>,
+    /// The new email if the code is for email change.
+    #[serde(rename="newEmail")]
+    pub new_email: Option<String>,
+    /// The IP address of the user.
+    #[serde(rename="userIp")]
+    pub user_ip: Option<String>,
+    /// The email of the user.
+    pub email: Option<String>,
+    /// The recaptcha response from the user.
+    #[serde(rename="captchaResp")]
+    pub captcha_resp: Option<String>,
 }
 
-impl ResponseResult for GetAccountInfoResponse {}
+impl RequestValue for Relyingparty {}
+
+
+/// Request to reset the password.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [reset password relyingparty](struct.RelyingpartyResetPasswordCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct IdentitytoolkitRelyingpartyResetPasswordRequest {
+    /// The new password inputted by the user.
+    #[serde(rename="newPassword")]
+    pub new_password: Option<String>,
+    /// The old password inputted by the user.
+    #[serde(rename="oldPassword")]
+    pub old_password: Option<String>,
+    /// The confirmation code.
+    #[serde(rename="oobCode")]
+    pub oob_code: Option<String>,
+    /// The email address of the user.
+    pub email: Option<String>,
+}
+
+impl RequestValue for IdentitytoolkitRelyingpartyResetPasswordRequest {}
+
+
+/// Request to set the account information.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [set account info relyingparty](struct.RelyingpartySetAccountInfoCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct IdentitytoolkitRelyingpartySetAccountInfoRequest {
+    /// GCP project number of the requesting delegated app. Currently only intended for Firebase V1 migration.
+    #[serde(rename="delegatedProjectNumber")]
+    pub delegated_project_number: Option<String>,
+    /// The out-of-band code of the change email request.
+    #[serde(rename="oobCode")]
+    pub oob_code: Option<String>,
+    /// The local ID of the user.
+    #[serde(rename="localId")]
+    pub local_id: Option<String>,
+    /// Timestamp in seconds for valid login token.
+    #[serde(rename="validSince")]
+    pub valid_since: Option<String>,
+    /// The photo url of the user.
+    #[serde(rename="photoUrl")]
+    pub photo_url: Option<String>,
+    /// Instance id token of the app.
+    #[serde(rename="instanceId")]
+    pub instance_id: Option<String>,
+    /// Whether to disable the user.
+    #[serde(rename="disableUser")]
+    pub disable_user: Option<bool>,
+    /// Whether return sts id token and refresh token instead of gitkit token.
+    #[serde(rename="returnSecureToken")]
+    pub return_secure_token: Option<bool>,
+    /// The new password of the user.
+    pub password: Option<String>,
+    /// The name of the user.
+    #[serde(rename="displayName")]
+    pub display_name: Option<String>,
+    /// The attributes users request to delete.
+    #[serde(rename="deleteAttribute")]
+    pub delete_attribute: Option<Vec<String>>,
+    /// Mark the user to upgrade to federated login.
+    #[serde(rename="upgradeToFederatedLogin")]
+    pub upgrade_to_federated_login: Option<bool>,
+    /// The GITKit token of the authenticated user.
+    #[serde(rename="idToken")]
+    pub id_token: Option<String>,
+    /// Mark the email as verified or not.
+    #[serde(rename="emailVerified")]
+    pub email_verified: Option<bool>,
+    /// The IDPs the user request to delete.
+    #[serde(rename="deleteProvider")]
+    pub delete_provider: Option<Vec<String>>,
+    /// The captcha challenge.
+    #[serde(rename="captchaChallenge")]
+    pub captcha_challenge: Option<String>,
+    /// Response to the captcha.
+    #[serde(rename="captchaResponse")]
+    pub captcha_response: Option<String>,
+    /// The associated IDPs of the user.
+    pub provider: Option<Vec<String>>,
+    /// The email of the user.
+    pub email: Option<String>,
+}
+
+impl RequestValue for IdentitytoolkitRelyingpartySetAccountInfoRequest {}
+
+
+/// Request to delete account.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [delete account relyingparty](struct.RelyingpartyDeleteAccountCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct IdentitytoolkitRelyingpartyDeleteAccountRequest {
+    /// The GITKit token or STS id token of the authenticated user.
+    #[serde(rename="idToken")]
+    pub id_token: Option<String>,
+    /// GCP project number of the requesting delegated app. Currently only intended for Firebase V1 migration.
+    #[serde(rename="delegatedProjectNumber")]
+    pub delegated_project_number: Option<String>,
+    /// The local ID of the user.
+    #[serde(rename="localId")]
+    pub local_id: Option<String>,
+}
+
+impl RequestValue for IdentitytoolkitRelyingpartyDeleteAccountRequest {}
+
+
+/// Template for an email template.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct EmailTemplate {
+    /// Email body.
+    pub body: Option<String>,
+    /// From display name.
+    #[serde(rename="fromDisplayName")]
+    pub from_display_name: Option<String>,
+    /// From address of the email.
+    pub from: Option<String>,
+    /// Email body format.
+    pub format: Option<String>,
+    /// Reply-to address.
+    #[serde(rename="replyTo")]
+    pub reply_to: Option<String>,
+    /// Subject of the email.
+    pub subject: Option<String>,
+}
+
+impl Part for EmailTemplate {}
+
+
+/// The IDP of the user.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UserInfoProviderUserInfo {
+    /// User's identifier at IDP.
+    #[serde(rename="federatedId")]
+    pub federated_id: Option<String>,
+    /// The IdP ID. For white listed IdPs it's a short domain name, e.g., google.com, aol.com, live.net and yahoo.com. For other OpenID IdPs it's the OP identifier.
+    #[serde(rename="providerId")]
+    pub provider_id: Option<String>,
+    /// The user's display name at the IDP.
+    #[serde(rename="displayName")]
+    pub display_name: Option<String>,
+    /// The user's photo url at the IDP.
+    #[serde(rename="photoUrl")]
+    pub photo_url: Option<String>,
+    /// User's raw identifier directly returned from IDP.
+    #[serde(rename="rawId")]
+    pub raw_id: Option<String>,
+    /// User's email at IDP.
+    pub email: Option<String>,
+}
+
+impl NestedType for UserInfoProviderUserInfo {}
+impl Part for UserInfoProviderUserInfo {}
+
+
+/// Request to set the project configuration.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [set project config relyingparty](struct.RelyingpartySetProjectConfigCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct IdentitytoolkitRelyingpartySetProjectConfigRequest {
+    /// Browser API key, needed when making http request to Apiary.
+    #[serde(rename="apiKey")]
+    pub api_key: Option<String>,
+    /// Whether to use email sending provided by Firebear.
+    #[serde(rename="useEmailSending")]
+    pub use_email_sending: Option<bool>,
+    /// Whether to allow password user sign in or sign up.
+    #[serde(rename="allowPasswordUser")]
+    pub allow_password_user: Option<bool>,
+    /// Whether to enable anonymous user.
+    #[serde(rename="enableAnonymousUser")]
+    pub enable_anonymous_user: Option<bool>,
+    /// Change email template.
+    #[serde(rename="changeEmailTemplate")]
+    pub change_email_template: Option<EmailTemplate>,
+    /// Legacy reset password email template.
+    #[serde(rename="legacyResetPasswordTemplate")]
+    pub legacy_reset_password_template: Option<EmailTemplate>,
+    /// GCP project number of the requesting delegated app. Currently only intended for Firebase V1 migration.
+    #[serde(rename="delegatedProjectNumber")]
+    pub delegated_project_number: Option<String>,
+    /// Verify email template.
+    #[serde(rename="verifyEmailTemplate")]
+    pub verify_email_template: Option<EmailTemplate>,
+    /// Reset password email template.
+    #[serde(rename="resetPasswordTemplate")]
+    pub reset_password_template: Option<EmailTemplate>,
+    /// Oauth2 provider configuration.
+    #[serde(rename="idpConfig")]
+    pub idp_config: Option<Vec<IdpConfig>>,
+}
+
+impl RequestValue for IdentitytoolkitRelyingpartySetProjectConfigRequest {}
+
+
+/// Response of verifying the IDP assertion.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [verify assertion relyingparty](struct.RelyingpartyVerifyAssertionCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct VerifyAssertionResponse {
+    /// The unique ID identifies the IdP account.
+    #[serde(rename="federatedId")]
+    pub federated_id: Option<String>,
+    /// The RP local ID if it's already been mapped to the IdP account identified by the federated ID.
+    #[serde(rename="localId")]
+    pub local_id: Option<String>,
+    /// The URI of the public accessible profiel picture.
+    #[serde(rename="photoUrl")]
+    pub photo_url: Option<String>,
+    /// It's the identifier param in the createAuthUri request if the identifier is an email. It can be used to check whether the user input email is different from the asserted email.
+    #[serde(rename="inputEmail")]
+    pub input_email: Option<String>,
+    /// The custom scheme used by mobile app.
+    #[serde(rename="appScheme")]
+    pub app_scheme: Option<String>,
+    /// If idToken is STS id token, then this field will be expiration time of STS id token in seconds.
+    #[serde(rename="expiresIn")]
+    pub expires_in: Option<String>,
+    /// When action is 'map', contains the idps which can be used for confirmation.
+    #[serde(rename="verifiedProvider")]
+    pub verified_provider: Option<Vec<String>>,
+    /// Whether need client to supply email to complete the federated login flow.
+    #[serde(rename="needEmail")]
+    pub need_email: Option<bool>,
+    /// The birth date of the IdP account.
+    #[serde(rename="dateOfBirth")]
+    pub date_of_birth: Option<String>,
+    /// The first name of the user.
+    #[serde(rename="firstName")]
+    pub first_name: Option<String>,
+    /// The nick name of the user.
+    #[serde(rename="nickName")]
+    pub nick_name: Option<String>,
+    /// The email returned by the IdP. NOTE: The federated login user may not own the email.
+    pub email: Option<String>,
+    /// The OAuth1 access token secret.
+    #[serde(rename="oauthTokenSecret")]
+    pub oauth_token_secret: Option<String>,
+    /// The language preference of the user.
+    pub language: Option<String>,
+    /// Whether the assertion is from a non-trusted IDP and need account linking confirmation.
+    #[serde(rename="needConfirmation")]
+    pub need_confirmation: Option<bool>,
+    /// The display name of the user.
+    #[serde(rename="displayName")]
+    pub display_name: Option<String>,
+    /// The full name of the user.
+    #[serde(rename="fullName")]
+    pub full_name: Option<String>,
+    /// The fixed string "identitytoolkit#VerifyAssertionResponse".
+    pub kind: Option<String>,
+    /// If idToken is STS id token, then this field will be refresh token.
+    #[serde(rename="refreshToken")]
+    pub refresh_token: Option<String>,
+    /// URL for OTA app installation.
+    #[serde(rename="appInstallationUrl")]
+    pub app_installation_url: Option<String>,
+    /// The OAuth2 access token.
+    #[serde(rename="oauthAccessToken")]
+    pub oauth_access_token: Option<String>,
+    /// The lifetime in seconds of the OAuth2 access token.
+    #[serde(rename="oauthExpireIn")]
+    pub oauth_expire_in: Option<i32>,
+    /// The value is true if the IDP is also the email provider. It means the user owns the email.
+    #[serde(rename="emailVerified")]
+    pub email_verified: Option<bool>,
+    /// The last name of the user.
+    #[serde(rename="lastName")]
+    pub last_name: Option<String>,
+    /// The scope for the OpenID OAuth extension.
+    #[serde(rename="oauthScope")]
+    pub oauth_scope: Option<String>,
+    /// The user approved request token for the OpenID OAuth extension.
+    #[serde(rename="oauthRequestToken")]
+    pub oauth_request_token: Option<String>,
+    /// The OAuth2 authorization code.
+    #[serde(rename="oauthAuthorizationCode")]
+    pub oauth_authorization_code: Option<String>,
+    /// The original email stored in the mapping storage. It's returned when the federated ID is associated to a different email.
+    #[serde(rename="originalEmail")]
+    pub original_email: Option<String>,
+    /// The IdP ID. For white listed IdPs it's a short domain name e.g. google.com, aol.com, live.net and yahoo.com. If the "providerId" param is set to OpenID OP identifer other than the whilte listed IdPs the OP identifier is returned. If the "identifier" param is federated ID in the createAuthUri request. The domain part of the federated ID is returned.
+    #[serde(rename="providerId")]
+    pub provider_id: Option<String>,
+    /// The opaque value used by the client to maintain context info between the authentication request and the IDP callback.
+    pub context: Option<String>,
+    /// The ID token.
+    #[serde(rename="idToken")]
+    pub id_token: Option<String>,
+    /// The action code.
+    pub action: Option<String>,
+    /// The timezone of the user.
+    #[serde(rename="timeZone")]
+    pub time_zone: Option<String>,
+    /// It's true if the email is recycled.
+    #[serde(rename="emailRecycled")]
+    pub email_recycled: Option<bool>,
+}
+
+impl ResponseResult for VerifyAssertionResponse {}
+
+
+/// Template for a single idp configuration.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct IdpConfig {
+    /// Percent of users who will be prompted/redirected federated login for this IDP.
+    #[serde(rename="experimentPercent")]
+    pub experiment_percent: Option<i32>,
+    /// OAuth2 client secret.
+    pub secret: Option<String>,
+    /// Whether this IDP is enabled.
+    pub enabled: Option<bool>,
+    /// OAuth2 client ID.
+    #[serde(rename="clientId")]
+    pub client_id: Option<String>,
+    /// OAuth2 provider.
+    pub provider: Option<String>,
+}
+
+impl Part for IdpConfig {}
+
+
+/// The error encountered while processing the account info.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UploadAccountResponseError {
+    /// The index of the malformed account, starting from 0.
+    pub index: Option<i32>,
+    /// Detailed error message for the account info.
+    pub message: Option<String>,
+}
+
+impl NestedType for UploadAccountResponseError {}
+impl Part for UploadAccountResponseError {}
+
+
+/// Respone of uploading accounts in batch.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [upload account relyingparty](struct.RelyingpartyUploadAccountCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UploadAccountResponse {
+    /// The fixed string "identitytoolkit#UploadAccountResponse".
+    pub kind: Option<String>,
+    /// The error encountered while processing the account info.
+    pub error: Option<Vec<UploadAccountResponseError>>,
+}
+
+impl ResponseResult for UploadAccountResponse {}
+
+
+/// Request to upload user account in batch.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [upload account relyingparty](struct.RelyingpartyUploadAccountCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct IdentitytoolkitRelyingpartyUploadAccountRequest {
+    /// The password hash algorithm.
+    #[serde(rename="hashAlgorithm")]
+    pub hash_algorithm: Option<String>,
+    /// GCP project number of the requesting delegated app. Currently only intended for Firebase V1 migration.
+    #[serde(rename="delegatedProjectNumber")]
+    pub delegated_project_number: Option<String>,
+    /// Memory cost for hash calculation. Used by scrypt similar algorithms.
+    #[serde(rename="memoryCost")]
+    pub memory_cost: Option<i32>,
+    /// The account info to be stored.
+    pub users: Option<Vec<UserInfo>>,
+    /// The salt separator.
+    #[serde(rename="saltSeparator")]
+    pub salt_separator: Option<String>,
+    /// The key for to hash the password.
+    #[serde(rename="signerKey")]
+    pub signer_key: Option<String>,
+    /// Rounds for hash calculation. Used by scrypt and similar algorithms.
+    pub rounds: Option<i32>,
+}
+
+impl RequestValue for IdentitytoolkitRelyingpartyUploadAccountRequest {}
+
+
+/// Template for an individual account info.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UserInfo {
+    /// The name of the user.
+    #[serde(rename="displayName")]
+    pub display_name: Option<String>,
+    /// The local ID of the user.
+    #[serde(rename="localId")]
+    pub local_id: Option<String>,
+    /// Timestamp in seconds for valid login token.
+    #[serde(rename="validSince")]
+    pub valid_since: Option<String>,
+    /// The URL of the user profile photo.
+    #[serde(rename="photoUrl")]
+    pub photo_url: Option<String>,
+    /// Whether the email has been verified.
+    #[serde(rename="emailVerified")]
+    pub email_verified: Option<bool>,
+    /// The user's hashed password.
+    #[serde(rename="passwordHash")]
+    pub password_hash: Option<String>,
+    /// Whether the user is disabled.
+    pub disabled: Option<bool>,
+    /// Version of the user's password.
+    pub version: Option<i32>,
+    /// The IDP of the user.
+    #[serde(rename="providerUserInfo")]
+    pub provider_user_info: Option<Vec<UserInfoProviderUserInfo>>,
+    /// The timestamp when the password was last updated.
+    #[serde(rename="passwordUpdatedAt")]
+    pub password_updated_at: Option<f64>,
+    /// The user's password salt.
+    pub salt: Option<String>,
+    /// The email of the user.
+    pub email: Option<String>,
+}
+
+impl Part for UserInfo {}
+
+
+/// Response of getting a code for user confirmation (reset password, change email etc.).
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [get oob confirmation code relyingparty](struct.RelyingpartyGetOobConfirmationCodeCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GetOobConfirmationCodeResponse {
+    /// The fixed string "identitytoolkit#GetOobConfirmationCodeResponse".
+    pub kind: Option<String>,
+    /// The code to be send to the user.
+    #[serde(rename="oobCode")]
+    pub oob_code: Option<String>,
+    /// The email address that the email is sent to.
+    pub email: Option<String>,
+}
+
+impl ResponseResult for GetOobConfirmationCodeResponse {}
 
 
 /// Response of signing up new user, creating anonymous user or anonymous user reauth.
@@ -1081,14 +1306,23 @@ impl ResponseResult for GetAccountInfoResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SignupNewUserResponse {
-    /// The Gitkit id token to login the newly sign up user.
-    #[serde(rename="idToken")]
-    pub id_token: Option<String>,
+    /// If idToken is STS id token, then this field will be expiration time of STS id token in seconds.
+    #[serde(rename="expiresIn")]
+    pub expires_in: Option<String>,
     /// The fixed string "identitytoolkit#SignupNewUserResponse".
     pub kind: Option<String>,
     /// The name of the user.
     #[serde(rename="displayName")]
     pub display_name: Option<String>,
+    /// The RP local ID of the user.
+    #[serde(rename="localId")]
+    pub local_id: Option<String>,
+    /// The Gitkit id token to login the newly sign up user.
+    #[serde(rename="idToken")]
+    pub id_token: Option<String>,
+    /// If idToken is STS id token, then this field will be refresh token.
+    #[serde(rename="refreshToken")]
+    pub refresh_token: Option<String>,
     /// The email of the user.
     pub email: Option<String>,
 }
@@ -1096,77 +1330,22 @@ pub struct SignupNewUserResponse {
 impl ResponseResult for SignupNewUserResponse {}
 
 
-/// Respone of setting the account information.
+/// Respone of deleting account.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [set account info relyingparty](struct.RelyingpartySetAccountInfoCall.html) (response)
+/// * [delete account relyingparty](struct.RelyingpartyDeleteAccountCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SetAccountInfoResponse {
-    /// The fixed string "identitytoolkit#SetAccountInfoResponse".
+pub struct DeleteAccountResponse {
+    /// The fixed string "identitytoolkit#DeleteAccountResponse".
     pub kind: Option<String>,
-    /// The name of the user.
-    #[serde(rename="displayName")]
-    pub display_name: Option<String>,
-    /// The user's profiles at the associated IdPs.
-    #[serde(rename="providerUserInfo")]
-    pub provider_user_info: Option<Vec<SetAccountInfoResponseProviderUserInfo>>,
-    /// The new email the user attempts to change to.
-    #[serde(rename="newEmail")]
-    pub new_email: Option<String>,
-    /// The photo url of the user.
-    #[serde(rename="photoUrl")]
-    pub photo_url: Option<String>,
-    /// The Gitkit id token to login the newly sign up user.
-    #[serde(rename="idToken")]
-    pub id_token: Option<String>,
-    /// The email of the user.
-    pub email: Option<String>,
 }
 
-impl ResponseResult for SetAccountInfoResponse {}
-
-
-/// Request to verify the password.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [verify password relyingparty](struct.RelyingpartyVerifyPasswordCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct IdentitytoolkitRelyingpartyVerifyPasswordRequest {
-    /// GCP project number of the requesting delegated app. Currently only intended for Firebase V1 migration.
-    #[serde(rename="delegatedProjectNumber")]
-    pub delegated_project_number: Option<String>,
-    /// Instance id token of the app.
-    #[serde(rename="instanceId")]
-    pub instance_id: Option<String>,
-    /// The GITKit token of the authenticated user.
-    #[serde(rename="idToken")]
-    pub id_token: Option<String>,
-    /// The GITKit token for the non-trusted IDP, which is to be confirmed by the user.
-    #[serde(rename="pendingIdToken")]
-    pub pending_id_token: Option<String>,
-    /// The captcha challenge.
-    #[serde(rename="captchaChallenge")]
-    pub captcha_challenge: Option<String>,
-    /// Response to the captcha.
-    #[serde(rename="captchaResponse")]
-    pub captcha_response: Option<String>,
-    /// The password inputed by the user.
-    pub password: Option<String>,
-    /// The email of the user.
-    pub email: Option<String>,
-}
-
-impl RequestValue for IdentitytoolkitRelyingpartyVerifyPasswordRequest {}
+impl ResponseResult for DeleteAccountResponse {}
 
 
 
@@ -1197,7 +1376,7 @@ impl RequestValue for IdentitytoolkitRelyingpartyVerifyPasswordRequest {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = IdentityToolkit::new(hyper::Client::new(), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `create_auth_uri(...)`, `delete_account(...)`, `download_account(...)`, `get_account_info(...)`, `get_oob_confirmation_code(...)`, `get_project_config(...)`, `get_public_keys(...)`, `get_recaptcha_param(...)`, `reset_password(...)`, `set_account_info(...)`, `sign_out_user(...)`, `signup_new_user(...)`, `upload_account(...)`, `verify_assertion(...)`, `verify_custom_token(...)` and `verify_password(...)`
+/// // like `create_auth_uri(...)`, `delete_account(...)`, `download_account(...)`, `get_account_info(...)`, `get_oob_confirmation_code(...)`, `get_project_config(...)`, `get_public_keys(...)`, `get_recaptcha_param(...)`, `reset_password(...)`, `set_account_info(...)`, `set_project_config(...)`, `sign_out_user(...)`, `signup_new_user(...)`, `upload_account(...)`, `verify_assertion(...)`, `verify_custom_token(...)` and `verify_password(...)`
 /// // to build up your call.
 /// let rb = hub.relyingparty();
 /// # }
@@ -1444,10 +1623,28 @@ impl<'a, C, A> RelyingpartyMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Set project configuration.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    pub fn set_project_config(&self, request: IdentitytoolkitRelyingpartySetProjectConfigRequest) -> RelyingpartySetProjectConfigCall<'a, C, A> {
+        RelyingpartySetProjectConfigCall {
+            hub: self.hub,
+            _request: request,
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Get project configuration.
     pub fn get_project_config(&self) -> RelyingpartyGetProjectConfigCall<'a, C, A> {
         RelyingpartyGetProjectConfigCall {
             hub: self.hub,
+            _project_number: Default::default(),
+            _delegated_project_number: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
         }
@@ -1515,7 +1712,7 @@ impl<'a, C, A> RelyingpartyGetOobConfirmationCodeCall<'a, C, A> where C: BorrowM
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, GetOobConfirmationCodeResponse)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -1726,7 +1923,7 @@ impl<'a, C, A> RelyingpartySignupNewUserCall<'a, C, A> where C: BorrowMut<hyper:
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, SignupNewUserResponse)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -1937,7 +2134,7 @@ impl<'a, C, A> RelyingpartyCreateAuthUriCall<'a, C, A> where C: BorrowMut<hyper:
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, CreateAuthUriResponse)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -2148,7 +2345,7 @@ impl<'a, C, A> RelyingpartySignOutUserCall<'a, C, A> where C: BorrowMut<hyper::C
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, IdentitytoolkitRelyingpartySignOutUserResponse)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -2359,7 +2556,7 @@ impl<'a, C, A> RelyingpartyVerifyAssertionCall<'a, C, A> where C: BorrowMut<hype
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, VerifyAssertionResponse)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -2570,7 +2767,7 @@ impl<'a, C, A> RelyingpartyUploadAccountCall<'a, C, A> where C: BorrowMut<hyper:
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, UploadAccountResponse)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -2781,7 +2978,7 @@ impl<'a, C, A> RelyingpartyGetAccountInfoCall<'a, C, A> where C: BorrowMut<hyper
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, GetAccountInfoResponse)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -2992,7 +3189,7 @@ impl<'a, C, A> RelyingpartyVerifyCustomTokenCall<'a, C, A> where C: BorrowMut<hy
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, VerifyCustomTokenResponse)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -3203,7 +3400,7 @@ impl<'a, C, A> RelyingpartyResetPasswordCall<'a, C, A> where C: BorrowMut<hyper:
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, ResetPasswordResponse)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -3414,7 +3611,7 @@ impl<'a, C, A> RelyingpartyDownloadAccountCall<'a, C, A> where C: BorrowMut<hype
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, DownloadAccountResponse)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -3625,7 +3822,7 @@ impl<'a, C, A> RelyingpartySetAccountInfoCall<'a, C, A> where C: BorrowMut<hyper
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, SetAccountInfoResponse)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -3836,7 +4033,7 @@ impl<'a, C, A> RelyingpartyDeleteAccountCall<'a, C, A> where C: BorrowMut<hyper:
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, DeleteAccountResponse)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -4040,7 +4237,7 @@ impl<'a, C, A> RelyingpartyGetPublicKeyCall<'a, C, A> where C: BorrowMut<hyper::
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, IdentitytoolkitRelyingpartyGetPublicKeysResponse)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -4220,7 +4417,7 @@ impl<'a, C, A> RelyingpartyGetRecaptchaParamCall<'a, C, A> where C: BorrowMut<hy
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, GetRecaptchaParamResponse)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -4407,7 +4604,7 @@ impl<'a, C, A> RelyingpartyVerifyPasswordCall<'a, C, A> where C: BorrowMut<hyper
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, VerifyPasswordResponse)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -4565,6 +4762,217 @@ impl<'a, C, A> RelyingpartyVerifyPasswordCall<'a, C, A> where C: BorrowMut<hyper
 }
 
 
+/// Set project configuration.
+///
+/// A builder for the *setProjectConfig* method supported by a *relyingparty* resource.
+/// It is not used directly, but through a `RelyingpartyMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_identitytoolkit3 as identitytoolkit3;
+/// use identitytoolkit3::IdentitytoolkitRelyingpartySetProjectConfigRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use identitytoolkit3::IdentityToolkit;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = IdentityToolkit::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = IdentitytoolkitRelyingpartySetProjectConfigRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.relyingparty().set_project_config(req)
+///              .doit();
+/// # }
+/// ```
+pub struct RelyingpartySetProjectConfigCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a IdentityToolkit<C, A>,
+    _request: IdentitytoolkitRelyingpartySetProjectConfigRequest,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+}
+
+impl<'a, C, A> CallBuilder for RelyingpartySetProjectConfigCall<'a, C, A> {}
+
+impl<'a, C, A> RelyingpartySetProjectConfigCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, IdentitytoolkitRelyingpartySetProjectConfigResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "identitytoolkit.relyingparty.setProjectConfig",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        for &field in ["alt"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/setProjectConfig".to_string();
+        
+        let mut key = self.hub.auth.borrow_mut().api_key();
+        if key.is_none() {
+            key = dlg.api_key();
+        }
+        match key {
+            Some(value) => params.push(("key", value)),
+            None => {
+                dlg.finished(false);
+                return Err(Error::MissingAPIKey)
+            }
+        }
+
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request);
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: IdentitytoolkitRelyingpartySetProjectConfigRequest) -> RelyingpartySetProjectConfigCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartySetProjectConfigCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartySetProjectConfigCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+}
+
+
 /// Get project configuration.
 ///
 /// A builder for the *getProjectConfig* method supported by a *relyingparty* resource.
@@ -4592,6 +5000,8 @@ impl<'a, C, A> RelyingpartyVerifyPasswordCall<'a, C, A> where C: BorrowMut<hyper
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.relyingparty().get_project_config()
+///              .project_number("eirmod")
+///              .delegated_project_number("sit")
 ///              .doit();
 /// # }
 /// ```
@@ -4599,6 +5009,8 @@ pub struct RelyingpartyGetProjectConfigCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a IdentityToolkit<C, A>,
+    _project_number: Option<String>,
+    _delegated_project_number: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
 }
@@ -4611,7 +5023,7 @@ impl<'a, C, A> RelyingpartyGetProjectConfigCall<'a, C, A> where C: BorrowMut<hyp
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, IdentitytoolkitRelyingpartyGetProjectConfigResponse)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -4619,8 +5031,14 @@ impl<'a, C, A> RelyingpartyGetProjectConfigCall<'a, C, A> where C: BorrowMut<hyp
         };
         dlg.begin(MethodInfo { id: "identitytoolkit.relyingparty.getProjectConfig",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((2 + self._additional_params.len()));
-        for &field in ["alt"].iter() {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        if let Some(value) = self._project_number {
+            params.push(("projectNumber", value.to_string()));
+        }
+        if let Some(value) = self._delegated_project_number {
+            params.push(("delegatedProjectNumber", value.to_string()));
+        }
+        for &field in ["alt", "projectNumber", "delegatedProjectNumber"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -4709,6 +5127,20 @@ impl<'a, C, A> RelyingpartyGetProjectConfigCall<'a, C, A> where C: BorrowMut<hyp
     }
 
 
+    /// GCP project number of the request.
+    ///
+    /// Sets the *project number* query property to the given value.
+    pub fn project_number(mut self, new_value: &str) -> RelyingpartyGetProjectConfigCall<'a, C, A> {
+        self._project_number = Some(new_value.to_string());
+        self
+    }
+    /// Delegated GCP project number of the request.
+    ///
+    /// Sets the *delegated project number* query property to the given value.
+    pub fn delegated_project_number(mut self, new_value: &str) -> RelyingpartyGetProjectConfigCall<'a, C, A> {
+        self._delegated_project_number = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 

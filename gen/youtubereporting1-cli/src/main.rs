@@ -69,11 +69,12 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "report-type-id" => Some(("reportTypeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "system-managed" => Some(("systemManaged", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "id", "name", "report-type-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "id", "name", "report-type-id", "system-managed"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -264,6 +265,9 @@ impl<'n> Engine<'n> {
                 "on-behalf-of-content-owner" => {
                     call = call.on_behalf_of_content_owner(value.unwrap_or(""));
                 },
+                "include-system-managed" => {
+                    call = call.include_system_managed(arg_from_str(value.unwrap_or("false"), err, "include-system-managed", "boolean"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -277,7 +281,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "on-behalf-of-content-owner", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-token", "on-behalf-of-content-owner", "include-system-managed", "page-size"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -373,6 +377,12 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "start-time-before" => {
+                    call = call.start_time_before(value.unwrap_or(""));
+                },
+                "start-time-at-or-after" => {
+                    call = call.start_time_at_or_after(value.unwrap_or(""));
+                },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
@@ -398,7 +408,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "on-behalf-of-content-owner", "created-after", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["created-after", "page-size", "start-time-at-or-after", "on-behalf-of-content-owner", "page-token", "start-time-before"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -508,6 +518,9 @@ impl<'n> Engine<'n> {
                 "on-behalf-of-content-owner" => {
                     call = call.on_behalf_of_content_owner(value.unwrap_or(""));
                 },
+                "include-system-managed" => {
+                    call = call.include_system_managed(arg_from_str(value.unwrap_or("false"), err, "include-system-managed", "boolean"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -521,7 +534,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "on-behalf-of-content-owner", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-token", "on-behalf-of-content-owner", "include-system-managed", "page-size"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -836,7 +849,7 @@ fn main() {
                   vec![
                     (Some(r##"resource-name"##),
                      None,
-                     Some(r##"Name of the media that is being downloaded. See [][ByteStream.ReadRequest.resource_name]."##),
+                     Some(r##"Name of the media that is being downloaded. See ByteStream.ReadRequest.resource_name."##),
                      Some(true),
                      Some(false)),
         
@@ -877,8 +890,8 @@ fn main() {
     
     let mut app = App::new("youtubereporting1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.3+20151026")
-           .about("An API to schedule reporting jobs and download the resulting bulk data reports about YouTube channels, videos etc. in the form of CSV files.")
+           .version("0.3.4+20160315")
+           .about("Schedules reporting jobs and downloads the resulting bulk data reports about YouTube channels, videos, etc. in the form of CSV files.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_youtubereporting1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

@@ -302,7 +302,7 @@ fn main() {
     
     let mut app = App::new("discovery1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.3+00000000")
+           .version("0.3.4+00000000")
            .about("Lets you discover information about other Google APIs, such as what APIs are available, the resource and method details for each API.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_discovery1_cli")
            .arg(Arg::with_name("folder")

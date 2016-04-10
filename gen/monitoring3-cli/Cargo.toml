@@ -1,0 +1,35 @@
+# DO NOT EDIT !
+# This file was generated automatically from 'src/mako/Cargo.toml.mako'
+# DO NOT EDIT !
+[package]
+
+name = "google-monitoring3-cli"
+version = "0.3.4+20160321"
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
+description = "A complete library to interact with monitoring (protocol v3)"
+repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/monitoring3-cli"
+homepage = "https://cloud.google.com/monitoring/api/"
+documentation = "http://byron.github.io/google-apis-rs/google_monitoring3_cli"
+license = "MIT"
+keywords = ["monitoring", "google", "cli"]
+
+[[bin]]
+name = "monitoring3"
+
+[dependencies]
+hyper = "0.8"
+mime = "0.2.0"
+serde = "0.6.0"
+serde_json = "0.6.0"
+yup-oauth2 = ">= 0.5.6"
+strsim = "0.4"
+yup-hyper-mock = "1.0"
+clap = "2.0"
+
+[build-dependencies]
+syntex = { version = "= 0.28" }
+serde_codegen = { version = "= 0.6.13" }
+
+
+[dependencies.google-monitoring3]
+path = "../monitoring3"

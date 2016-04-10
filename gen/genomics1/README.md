@@ -5,11 +5,18 @@ DO NOT EDIT !
 -->
 The `google-genomics1` library allows access to all features of the *Google genomics* service.
 
-This documentation was generated from *genomics* crate version *0.1.12+20160224*, where *20160224* is the exact revision of the *genomics:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.12*.
+This documentation was generated from *genomics* crate version *0.1.13+20160407*, where *20160407* is the exact revision of the *genomics:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.13*.
+
+Everything else about the *genomics* *v1* API can be found at the
+[official documentation site](https://cloud.google.com/genomics/).
 # Features
 
 Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google_genomics1/struct.Genomics.html) ... 
 
+* [annotations](http://byron.github.io/google-apis-rs/google_genomics1/struct.Annotation.html)
+ * [*batch create*](http://byron.github.io/google-apis-rs/google_genomics1/struct.AnnotationBatchCreateCall.html), [*create*](http://byron.github.io/google-apis-rs/google_genomics1/struct.AnnotationCreateCall.html), [*delete*](http://byron.github.io/google-apis-rs/google_genomics1/struct.AnnotationDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_genomics1/struct.AnnotationGetCall.html), [*search*](http://byron.github.io/google-apis-rs/google_genomics1/struct.AnnotationSearchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_genomics1/struct.AnnotationUpdateCall.html)
+* annotationsets
+ * [*create*](http://byron.github.io/google-apis-rs/google_genomics1/struct.AnnotationsetCreateCall.html), [*delete*](http://byron.github.io/google-apis-rs/google_genomics1/struct.AnnotationsetDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_genomics1/struct.AnnotationsetGetCall.html), [*search*](http://byron.github.io/google-apis-rs/google_genomics1/struct.AnnotationsetSearchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_genomics1/struct.AnnotationsetUpdateCall.html)
 * callsets
  * [*create*](http://byron.github.io/google-apis-rs/google_genomics1/struct.CallsetCreateCall.html), [*delete*](http://byron.github.io/google-apis-rs/google_genomics1/struct.CallsetDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_genomics1/struct.CallsetGetCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_genomics1/struct.CallsetPatchCall.html) and [*search*](http://byron.github.io/google-apis-rs/google_genomics1/struct.CallsetSearchCall.html)
 * [datasets](http://byron.github.io/google-apis-rs/google_genomics1/struct.Dataset.html)
