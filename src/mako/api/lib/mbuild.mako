@@ -484,7 +484,7 @@ match result {
         use url::percent_encoding::{percent_encode, FORM_URLENCODED_ENCODE_SET};
         % endif
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match ${delegate} {
             Some(d) => d,
@@ -690,8 +690,7 @@ else {
                     }
                 }
             };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
+            let auth_header = Authorization(Bearer { token: token.access_token });
             % endif
             % if request_value:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
