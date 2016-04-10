@@ -1,14 +1,14 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"bRFOOrZKfO9LweMbPqu0kcu6De8/E9Q3WkKQIctkqTCGftuDi6_-ikQ\"",
+ "etag": "\"bRFOOrZKfO9LweMbPqu0kcu6De8/Dz8RaMyeGwYEG1L5shQuF50_EkE\"",
  "discoveryVersion": "v1",
  "id": "content:v2sandbox",
  "name": "content",
  "canonicalName": "Shopping Content",
  "version": "v2sandbox",
- "revision": "20160204",
+ "revision": "20160331",
  "title": "Content API for Shopping",
- "description": "Manage product items, inventory, and Merchant Center accounts for Google Shopping.",
+ "description": "Manages product items, inventory, and Merchant Center accounts for Google Shopping.",
  "ownerDomain": "google.com",
  "ownerName": "Google",
  "icons": {

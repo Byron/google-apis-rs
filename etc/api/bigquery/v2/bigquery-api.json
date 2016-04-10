@@ -1,11 +1,11 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"bRFOOrZKfO9LweMbPqu0kcu6De8/yOlQD0XV-M95o1thz-ymKpLxG7I\"",
+ "etag": "\"bRFOOrZKfO9LweMbPqu0kcu6De8/sNb4igYg4wCeulufFNSiGUjvhBU\"",
  "discoveryVersion": "v1",
  "id": "bigquery:v2",
  "name": "bigquery",
  "version": "v2",
- "revision": "20160222",
+ "revision": "20160408",
  "title": "BigQuery API",
  "description": "A data platform for customers to create, manage, share and query data.",
  "ownerDomain": "google.com",
@@ -96,6 +96,82 @@
   }
  },
  "schemas": {
+  "BigtableColumn": {
+   "id": "BigtableColumn",
+   "type": "object",
+   "properties": {
+    "encoding": {
+     "type": "string",
+     "description": "[Optional] The encoding of the values when the type is not STRING. Acceptable encoding values are: TEXT - indicates values are alphanumeric text strings. BINARY - indicates values are encoded using HBase Bytes.toBytes family of functions. 'encoding' can also be set at the column family level. However, the setting at this level takes precedence if 'encoding' is set at both levels."
+    },
+    "fieldName": {
+     "type": "string",
+     "description": "[Optional] If the qualifier is not a valid BigQuery field identifier i.e. does not match [a-zA-Z][a-zA-Z0-9_]*, a valid identifier must be provided as the column field name and is used as field name in queries."
+    },
+    "onlyReadLatest": {
+     "type": "boolean",
+     "description": "[Optional] If this is set, only the latest version of value in this column are exposed. 'onlyReadLatest' can also be set at the column family level. However, the setting at this level takes precedence if 'onlyReadLatest' is set at both levels."
+    },
+    "qualifierEncoded": {
+     "type": "string",
+     "description": "[Required] Qualifier of the column. Columns in the parent column family that has this exact qualifier are exposed as . field. If the qualifier is valid UTF-8 string, it can be specified in the qualifier_string field. Otherwise, a base-64 encoded value must be set to qualifier_encoded. The column field name is the same as the column qualifier. However, if the qualifier is not a valid BigQuery field identifier i.e. does not match [a-zA-Z][a-zA-Z0-9_]*, a valid identifier must be provided as field_name.",
+     "format": "byte"
+    },
+    "qualifierString": {
+     "type": "string"
+    },
+    "type": {
+     "type": "string",
+     "description": "[Optional] The type to convert the value in cells of this column. The values are expected to be encoded using HBase Bytes.toBytes function when using the BINARY encoding value. Following BigQuery types are allowed (case-sensitive) - BYTES STRING INTEGER FLOAT BOOLEAN Defaut type is BYTES. 'type' can also be set at the column family level. However, the setting at this level takes precedence if 'type' is set at both levels."
+    }
+   }
+  },
+  "BigtableColumnFamily": {
+   "id": "BigtableColumnFamily",
+   "type": "object",
+   "properties": {
+    "columns": {
+     "type": "array",
+     "description": "[Optional] Lists of columns that should be exposed as individual fields as opposed to a list of (column name, value) pairs. All columns whose qualifier matches a qualifier in this list can be accessed as .. Other columns can be accessed as a list through .Column field.",
+     "items": {
+      "$ref": "BigtableColumn"
+     }
+    },
+    "encoding": {
+     "type": "string",
+     "description": "[Optional] The encoding of the values when the type is not STRING. Acceptable encoding values are: TEXT - indicates values are alphanumeric text strings. BINARY - indicates values are encoded using HBase Bytes.toBytes family of functions. This can be overridden for a specific column by listing that column in 'columns' and specifying an encoding for it."
+    },
+    "familyId": {
+     "type": "string",
+     "description": "Identifier of the column family."
+    },
+    "onlyReadLatest": {
+     "type": "boolean",
+     "description": "[Optional] If this is set only the latest version of value are exposed for all columns in this column family. This can be overridden for a specific column by listing that column in 'columns' and specifying a different setting for that column."
+    },
+    "type": {
+     "type": "string",
+     "description": "[Optional] The type to convert the value in cells of this column family. The values are expected to be encoded using HBase Bytes.toBytes function when using the BINARY encoding value. Following BigQuery types are allowed (case-sensitive) - BYTES STRING INTEGER FLOAT BOOLEAN Defaut type is BYTES. This can be overridden for a specific column by listing that column in 'columns' and specifying a type for it."
+    }
+   }
+  },
+  "BigtableOptions": {
+   "id": "BigtableOptions",
+   "type": "object",
+   "properties": {
+    "columnFamilies": {
+     "type": "array",
+     "description": "[Optional] List of column families to expose in the table schema along with their types. This list restricts the column families that can be referenced in queries and specifies their value types. You can use this list to do type conversions - see the 'type' field for more details. If you leave this list empty, all column families are present in the table schema and their values are read as BYTES. During a query only the column families referenced in that query are read from Bigtable.",
+     "items": {
+      "$ref": "BigtableColumnFamily"
+     }
+    },
+    "ignoreUnspecifiedColumnFamilies": {
+     "type": "boolean",
+     "description": "[Optional] If field is true, then the column families that are not specified in columnFamilies list are not exposed in the table schema. Otherwise, they are read with BYTES type values. The default value is false."
+    }
+   }
+  },
   "CsvOptions": {
    "id": "CsvOptions",
    "type": "object",
@@ -177,7 +253,7 @@
     },
     "defaultTableExpirationMs": {
      "type": "string",
-     "description": "[Experimental] The default lifetime of all tables in the dataset, in milliseconds. The minimum value is 3600000 milliseconds (one hour). Once this property is set, all newly-created tables in the dataset will have an expirationTime property set to the creation time plus the value in this property, and changing the value will only affect new tables, not existing ones. When the expirationTime for a given table is reached, that table will be deleted automatically. If a table's expirationTime is modified or removed before the table expires, or if you provide an explicit expirationTime when creating a table, that value takes precedence over the default expiration time indicated by this property.",
+     "description": "[Optional] The default lifetime of all tables in the dataset, in milliseconds. The minimum value is 3600000 milliseconds (one hour). Once this property is set, all newly-created tables in the dataset will have an expirationTime property set to the creation time plus the value in this property, and changing the value will only affect new tables, not existing ones. When the expirationTime for a given table is reached, that table will be deleted automatically. If a table's expirationTime is modified or removed before the table expires, or if you provide an explicit expirationTime when creating a table, that value takes precedence over the default expiration time indicated by this property.",
      "format": "int64"
     },
     "description": {
@@ -404,9 +480,13 @@
      "type": "boolean",
      "description": "[Experimental] Try to detect schema and format options automatically. Any option specified explicitly will be honored."
     },
+    "bigtableOptions": {
+     "$ref": "BigtableOptions",
+     "description": "[Optional] Additional options if sourceFormat is set to BIGTABLE."
+    },
     "compression": {
      "type": "string",
-     "description": "[Optional] The compression type of the data source. Possible values include GZIP and NONE. The default value is NONE. This setting is ignored for Google Cloud Datastore backups and Avro."
+     "description": "[Optional] The compression type of the data source. Possible values include GZIP and NONE. The default value is NONE. This setting is ignored for Google Cloud Bigtable, Google Cloud Datastore backups and Avro formats."
     },
     "csvOptions": {
      "$ref": "CsvOptions",
@@ -414,24 +494,24 @@
     },
     "ignoreUnknownValues": {
      "type": "boolean",
-     "description": "[Optional] Indicates if BigQuery should allow extra values that are not represented in the table schema. If true, the extra values are ignored. If false, records with extra columns are treated as bad records, and if there are too many bad records, an invalid error is returned in the job result. The default value is false. The sourceFormat property determines what BigQuery treats as an extra value: CSV: Trailing columns JSON: Named values that don't match any column names Google Cloud Datastore backups: This setting is ignored. Avro: This setting is ignored."
+     "description": "[Optional] Indicates if BigQuery should allow extra values that are not represented in the table schema. If true, the extra values are ignored. If false, records with extra columns are treated as bad records, and if there are too many bad records, an invalid error is returned in the job result. The default value is false. The sourceFormat property determines what BigQuery treats as an extra value: CSV: Trailing columns JSON: Named values that don't match any column names Google Cloud Bigtable: This setting is ignored. Google Cloud Datastore backups: This setting is ignored. Avro: This setting is ignored."
     },
     "maxBadRecords": {
      "type": "integer",
-     "description": "[Optional] The maximum number of bad records that BigQuery can ignore when reading data. If the number of bad records exceeds this value, an invalid error is returned in the job result. The default value is 0, which requires that all records are valid. This setting is ignored for Google Cloud Datastore backups and Avro.",
+     "description": "[Optional] The maximum number of bad records that BigQuery can ignore when reading data. If the number of bad records exceeds this value, an invalid error is returned in the job result. The default value is 0, which requires that all records are valid. This setting is ignored for Google Cloud Bigtable, Google Cloud Datastore backups and Avro formats.",
      "format": "int32"
     },
     "schema": {
      "$ref": "TableSchema",
-     "description": "[Optional] The schema for the data. Schema is required for CSV and JSON formats. Schema is disallowed for Google Cloud Datastore backups and Avro."
+     "description": "[Optional] The schema for the data. Schema is required for CSV and JSON formats. Schema is disallowed for Google Cloud Bigtable, Cloud Datastore backups, and Avro formats."
     },
     "sourceFormat": {
      "type": "string",
-     "description": "[Required] The data format. For CSV files, specify \"CSV\". For newline-delimited JSON, specify \"NEWLINE_DELIMITED_JSON\". For Google Cloud Datastore backups, specify \"DATASTORE_BACKUP\". For Avro files, specify \"AVRO\"."
+     "description": "[Required] The data format. For CSV files, specify \"CSV\". For newline-delimited JSON, specify \"NEWLINE_DELIMITED_JSON\". For Avro files, specify \"AVRO\". For Google Cloud Datastore backups, specify \"DATASTORE_BACKUP\". [Experimental] For Google Cloud Bigtable, specify \"BIGTABLE\". Please note that reading from Google Cloud Bigtable is experimental and has to be enabled for your project. Please contact Google Cloud Support to enable this for your project."
     },
     "sourceUris": {
      "type": "array",
-     "description": "[Required] The fully-qualified URIs that point to your data in Google Cloud Storage. Each URI can contain one '*' wildcard character and it must come after the 'bucket' name. Size limits related to load jobs apply to external data sources, plus an additional limit of 10 GB maximum size across all URIs. For Google Cloud Datastore backups, exactly one URI can be specified, and it must end with '.backup_info'. Also, the '*' wildcard character is not allowed.",
+     "description": "[Required] The fully-qualified URIs that point to your data in Google Cloud. For Google Cloud Storage URIs: Each URI can contain one '*' wildcard character and it must come after the 'bucket' name. Size limits related to load jobs apply to external data sources, plus an additional limit of 10 GB maximum size across all URIs. For Google Cloud Bigtable URIs: Exactly one URI can be specified and it has be a fully specified and valid HTTPS URL for a Google Cloud Bigtable table. For Google Cloud Datastore backups, exactly one URI can be specified, and it must end with '.backup_info'. Also, the '*' wildcard character is not allowed.",
      "items": {
       "type": "string"
      }
@@ -494,6 +574,19 @@
      "type": "string",
      "description": "The total number of rows in the complete query result set, which can be more than the number of rows in this single page of results. Present only when the query completes successfully.",
      "format": "uint64"
+    }
+   }
+  },
+  "IntervalPartitionConfiguration": {
+   "id": "IntervalPartitionConfiguration",
+   "type": "object",
+   "properties": {
+    "expirationMs": {
+     "type": "string",
+     "format": "int64"
+    },
+    "type": {
+     "type": "string"
     }
    }
   },
@@ -688,7 +781,7 @@
     },
     "sourceFormat": {
      "type": "string",
-     "description": "[Optional] The format of the data files. For CSV files, specify \"CSV\". For datastore backups, specify \"DATASTORE_BACKUP\". For newline-delimited JSON, specify \"NEWLINE_DELIMITED_JSON\". The default value is CSV."
+     "description": "[Optional] The format of the data files. For CSV files, specify \"CSV\". For datastore backups, specify \"DATASTORE_BACKUP\". For newline-delimited JSON, specify \"NEWLINE_DELIMITED_JSON\". For Avro, specify \"AVRO\". The default value is CSV."
     },
     "sourceUris": {
      "type": "array",
@@ -1293,6 +1386,13 @@
      "description": "[Output-only] The number of rows of data in this table, excluding any data in the streaming buffer.",
      "format": "uint64"
     },
+    "partitionConfigurations": {
+     "type": "array",
+     "description": "[Experimental] List of partition configurations for this table. Currently only one configuration can be specified and it can only be an interval partition with type daily.",
+     "items": {
+      "$ref": "TablePartitionConfiguration"
+     }
+    },
     "schema": {
      "$ref": "TableSchema",
      "description": "[Optional] Describes the schema of this table."
@@ -1456,7 +1556,7 @@
     },
     "type": {
      "type": "string",
-     "description": "[Required] The field data type. Possible values include STRING, INTEGER, FLOAT, BOOLEAN, TIMESTAMP or RECORD (where RECORD indicates that the field contains a nested schema)."
+     "description": "[Required] The field data type. Possible values include STRING, BYTES, INTEGER, FLOAT, BOOLEAN, TIMESTAMP or RECORD (where RECORD indicates that the field contains a nested schema)."
     }
    }
   },
@@ -1511,6 +1611,17 @@
      "type": "integer",
      "description": "The total number of tables in the dataset.",
      "format": "int32"
+    }
+   }
+  },
+  "TablePartitionConfiguration": {
+   "id": "TablePartitionConfiguration",
+   "type": "object",
+   "description": "[Required] A partition configuration. Only one type of partition should be configured.",
+   "properties": {
+    "interval": {
+     "$ref": "IntervalPartitionConfiguration",
+     "description": "[Pick one] Configures an interval partition."
     }
    }
   },

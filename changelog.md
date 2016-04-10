@@ -1,3 +1,15 @@
+<a name="api-v0.1.13:cli-v0.3.4"></a>
+## api-v0.1.13:cli-v0.3.4 (2016-04-10)
+
+
+#### Bug Fixes
+
+* **cargo:**  choose serde-version which works ([33f28136](https://github.com/Byron/google-apis-rs/commit/33f281360a0a5dfa93cd7e6f4f345689e86bcc3f))
+* **cli:**  compatibility with serde 0.6 ([9e8a047e](https://github.com/Byron/google-apis-rs/commit/9e8a047ebfddd7a94226b8d559b03325abf7ab54))
+* **lib:**  use hyper Bearer header style ([065cfdd2](https://github.com/Byron/google-apis-rs/commit/065cfdd22f974afe9d8071e0227929464c1df796))
+
+
+
 <a name="api-v0.1.12"></a>
 ## api-v0.1.12 (2016-02-28)
 

@@ -61,6 +61,8 @@ api:
     - vm_beta
     compute:
     - v1
+    consumersurveys:
+    - v2
     container:
     - v1
     content:
@@ -131,6 +133,8 @@ api:
     - v1beta2
     mirror:
     - v1
+    monitoring:
+    - v3
     oauth2:
     - v2
     pagespeedonline:
@@ -182,6 +186,8 @@ api:
     - v1beta2
     tasks:
     - v1
+    toolresults:
+    - v1beta3
     translate:
     - v2
     urlshortener:
