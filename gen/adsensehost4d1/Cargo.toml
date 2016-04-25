@@ -21,7 +21,7 @@ mime = "0.2.0"
 serde = "0.6.0"
 serde_json = "0.6.0"
 yup-oauth2 = ">= 0.5.6"
-url = ">= 0.5"
+url = "= 0.5"
 
 [build-dependencies]
 syntex = { version = "= 0.28" }
