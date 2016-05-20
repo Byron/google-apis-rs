@@ -38,7 +38,7 @@ use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_
 use std::default::Default;
 use std::str::FromStr;
 
-use oauth2::{Authenticator, DefaultAuthenticatorDelegate};
+use oauth2::{Authenticator, DefaultAuthenticatorDelegate, FlowType};
 use serde_json as json;
 use clap::ArgMatches;
 
@@ -122,7 +122,7 @@ impl<'n> Engine<'n> {
                                         JsonTokenStorage {
                                           program_name: "${util.program_name()}",
                                           db_dir: config_dir.clone(),
-                                        }, None);
+                                        }, Some(FlowType::InstalledInteractive));
 
         let client =
             ${self._debug_client(DEBUG_FLAG) | indent_all_but_first_by(3)};
