@@ -27,7 +27,7 @@ use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_
 use std::default::Default;
 use std::str::FromStr;
 
-use oauth2::{Authenticator, DefaultAuthenticatorDelegate};
+use oauth2::{Authenticator, DefaultAuthenticatorDelegate, FlowType};
 use serde_json as json;
 use clap::ArgMatches;
 
@@ -2947,7 +2947,7 @@ impl<'n> Engine<'n> {
                                         JsonTokenStorage {
                                           program_name: "drive3",
                                           db_dir: config_dir.clone(),
-                                        }, None);
+                                        }, Some(FlowType::InstalledInteractive));
 
         let client =
             if opt.is_present("debug") {
