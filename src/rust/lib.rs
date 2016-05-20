@@ -30,7 +30,7 @@ mod test_api {
     use hyper;
     use std::str::FromStr;
 
-    use serde::json;
+    use serde_json as json;
 
     const EXPECTED: &'static str = 
 "\r\n--MDuXWGyeE33QFXGchb2VFWc4Z7945d\r\n\
