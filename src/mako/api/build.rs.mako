@@ -1,5 +1,5 @@
 <%namespace name="util" file="../lib/util.mako"/>\
-#[cfg(feature = "with_syntex")]
+#[cfg(feature = "with-syntex")]
 mod inner {
     extern crate syntex;
     extern crate serde_codegen;
@@ -19,7 +19,7 @@ mod inner {
     }
 }
 
-#[cfg(not(feature = "with_syntex"))]
+#[cfg(not(feature = "with-syntex"))]
 mod inner {
     pub fn main() {}
 }

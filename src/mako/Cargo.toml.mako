@@ -31,15 +31,16 @@ hyper = "^ 0.9"
 mime = "^ 0.2.0"
 serde = "^ 0.7.5"
 serde_json = "^ 0.7.0"
+yup-oauth2 = { version = "^ 0.6.0", optional = true, default-features = false }
 serde_macros = { version = "0.7.5", optional = true }
 % for dep in cargo.get('dependencies', list()):
 ${dep}
 % endfor
 
 [features]
-default = ["with_syntex"]
-nightly = ["serde_macros"]
-with_syntex = ["serde_codegen", "syntex"]
+default = ["with-syntex"]
+nightly = ["serde_macros", "yup-oauth2/nightly"]
+with-syntex = ["serde_codegen", "syntex", "yup-oauth2/with-syntex"]
 
 [build-dependencies]
 syntex = { version = "= 0.32", optional = true }
