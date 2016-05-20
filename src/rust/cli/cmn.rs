@@ -346,7 +346,7 @@ pub fn input_file_from_opts(file_path: &str, err: &mut InvalidOptionsError) -> O
     match fs::File::open(file_path) {
         Ok(f) => Some(f),
         Err(io_err) => {
-            err.issues.push(CLIError::Input(InputError::IOError((file_path.to_string(), io_err))));
+            err.issues.push(CLIError::Input(InputError::Io((file_path.to_string(), io_err))));
             None
         }
     }
@@ -412,7 +412,7 @@ impl TokenStorage for JsonTokenStorage {
                     Err(err) =>
                         match err.kind() {
                             io::ErrorKind::NotFound => Ok(()),
-                            _ => Err(json::Error::IoError(err))
+                            _ => Err(json::Error::Io(err))
                         },
                     Ok(_) => Ok(()),
                 }
@@ -425,7 +425,7 @@ impl TokenStorage for JsonTokenStorage {
                             Err(serde_err) => Err(serde_err),
                         }
                     },
-                    Err(io_err) => Err(json::Error::IoError(io_err))
+                    Err(io_err) => Err(json::Error::Io(io_err))
                 }
             }
         }
@@ -442,7 +442,7 @@ impl TokenStorage for JsonTokenStorage {
             Err(io_err) => {
                 match io_err.kind() {
                     io::ErrorKind::NotFound => Ok(None),
-                    _ => Err(json::Error::IoError(io_err))
+                    _ => Err(json::Error::Io(io_err))
                 }
             }
         }
@@ -475,7 +475,7 @@ pub enum ConfigurationError {
     DirectoryUnset,
     HomeExpansionFailed(String),
     Secret(ApplicationSecretError),
-    IOError((String, io::Error)),
+    Io((String, io::Error)),
 }
 
 impl fmt::Display for ConfigurationError {
@@ -489,7 +489,7 @@ impl fmt::Display for ConfigurationError {
                 => writeln!(f, "Couldn't find HOME directory of current user, failed to expand '{}'.", dir),
             ConfigurationError::Secret(ref err)
                 => writeln!(f, "Secret -> {}", err),
-            ConfigurationError::IOError((ref path, ref err))
+            ConfigurationError::Io((ref path, ref err))
                 => writeln!(f, "IO operation failed on path '{}' with error: {}.", path, err),
         }
     }
@@ -497,14 +497,14 @@ impl fmt::Display for ConfigurationError {
 
 #[derive(Debug)]
 pub enum InputError {
-    IOError((String, io::Error)),
+    Io((String, io::Error)),
     Mime(String),
 }
 
 impl fmt::Display for InputError {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
         match *self {
-            InputError::IOError((ref file_path, ref io_err))
+            InputError::Io((ref file_path, ref io_err))
                 => writeln!(f, "Failed to open '{}' for reading with error: {}.", file_path, io_err),
             InputError::Mime(ref mime)
                 => writeln!(f, "'{}' is not a known mime-type.", mime),
@@ -662,7 +662,7 @@ pub fn application_secret_from_directory(dir: &str,
     let secret_path = Path::new(dir).join(secret_basename);
     let secret_str = || secret_path.as_path().to_str().unwrap().to_string();
     let secret_io_error = |io_err: io::Error| {
-            Err(CLIError::Configuration(ConfigurationError::IOError(
+            Err(CLIError::Configuration(ConfigurationError::Io(
                 (secret_str(), io_err)
             )))
     };
@@ -681,7 +681,7 @@ pub fn application_secret_from_directory(dir: &str,
                                             = json::from_str(json_console_secret).unwrap();
                             match json::to_writer_pretty(&mut f, &console_secret) {
                                 Err(serde_err) => match serde_err {
-                                    json::Error::IoError(err) => err,
+                                    json::Error::Io(err) => err,
                                     _ => panic!("Unexpected serde error: {:#?}", serde_err)
                                 },
                                 Ok(_) => continue,
@@ -694,7 +694,7 @@ pub fn application_secret_from_directory(dir: &str,
             },
             Ok(f) => {
                 match json::de::from_reader::<_, ConsoleApplicationSecret>(f) {
-                    Err(json::Error::IoError(err)) =>
+                    Err(json::Error::Io(err)) =>
                         return secret_io_error(err),
                     Err(json_err) =>
                         return Err(CLIError::Configuration(

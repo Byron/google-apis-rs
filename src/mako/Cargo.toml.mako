@@ -1,4 +1,4 @@
-<%! from util import (estr, hash_comment, library_to_crate_name, to_extern_crate_name) %>\
+<%! from util import (estr, enclose_in, hash_comment, library_to_crate_name, to_extern_crate_name) %>\
 <%namespace name="util" file="lib/util.mako"/>\
 <%block filter="hash_comment">\
 <%util:gen_info source="${self.uri}" />\
@@ -38,9 +38,21 @@ ${dep}
 % endfor
 
 [features]
+<%
+  api_name = util.library_name()
+  crate_name_we_depend_on = None
+  
+  nightly_features = ["serde_macros", "yup-oauth2/nightly"]
+  default_features = ["serde_codegen", "syntex", "yup-oauth2/with-syntex"]
+  
+  if make.depends_on_suffix is not None:
+    crate_name_we_depend_on = library_to_crate_name(api_name, suffix=make.depends_on_suffix)
+    nightly_features.append(crate_name_we_depend_on + '/nightly')
+    default_features.append(crate_name_we_depend_on + '/with-syntex')
+%>\
 default = ["with-syntex"]
-nightly = ["serde_macros", "yup-oauth2/nightly"]
-with-syntex = ["serde_codegen", "syntex", "yup-oauth2/with-syntex"]
+nightly = [${','.join(enclose_in('"', nightly_features))}]
+with-syntex = [${','.join(enclose_in('"', default_features))}]
 
 [build-dependencies]
 syntex = { version = "= 0.32", optional = true }
@@ -48,7 +60,8 @@ serde_codegen = { version = "= 0.7.5", optional = true }
 
 % if make.depends_on_suffix is not None:
 
-<% api_name = util.library_name() %>\
-[dependencies.${library_to_crate_name(api_name, suffix=make.depends_on_suffix)}]
+[dependencies.${crate_name_we_depend_on}]
 path = "../${api_name}"
+optional = true
+default-features = false
 % endif
