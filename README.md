@@ -74,6 +74,10 @@ make: Nothing to be done for `help'.
 
 You can easily build the documentation index using `make docs-all` and individual API documentation using `make <api-name>-doc`. Run doctests on all apis with `make cargo-api ARGS=test` or on individual ones using `make <api-name>-cargo ARGS=test`. To see which API targets exist, run `make help-api`.
 
+If you are using the nightly compiler, you can use compiler plugins, which simplifies and speeds up
+the compilation process as it doesn't neeed intermediate code generation by `syntex`. To do that,
+use something like `make cargo-api ARGS="build --no-default-features --features=nightly"`.
+
 The same goes for commandline programs, just ust `-cli` instead of `-api`, and have a look at `help-cli` for individual targets.
 
 ## Make and parallel job execution
