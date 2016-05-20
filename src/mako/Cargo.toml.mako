@@ -26,19 +26,24 @@ name = "${util.program_name()}"
 % endif
 
 [dependencies]
-hyper = "0.8"
+hyper = "^ 0.9"
 ## Must match the one hyper uses, otherwise there are duplicate similarly named `Mime` structs
-mime = "0.2.0"
-serde = "0.6.0"
-serde_json = "0.6.0"
-yup-oauth2 = ">= 0.5.6"
+mime = "^ 0.2.0"
+serde = "^ 0.7.5"
+serde_json = "^ 0.7.0"
+serde_macros = { version = "0.7.5", optional = true }
 % for dep in cargo.get('dependencies', list()):
 ${dep}
 % endfor
 
+[features]
+default = ["with_syntex"]
+nightly = ["serde_macros"]
+with_syntex = ["serde_codegen", "syntex"]
+
 [build-dependencies]
-syntex = { version = "= 0.28" }
-serde_codegen = { version = "= 0.6.13" }
+syntex = { version = "= 0.32", optional = true }
+serde_codegen = { version = "= 0.7.5", optional = true }
 
 % if make.depends_on_suffix is not None:
 
