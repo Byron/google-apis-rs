@@ -17,19 +17,27 @@ keywords = ["mirror", "google", "cli"]
 name = "mirror1"
 
 [dependencies]
-hyper = "0.8"
-mime = "0.2.0"
-serde = "0.6.0"
-serde_json = "0.6.0"
-yup-oauth2 = ">= 0.5.6"
-strsim = "0.4"
-yup-hyper-mock = "1.0"
-clap = "2.0"
+hyper = "^ 0.9"
+mime = "^ 0.2.0"
+serde = "^ 0.7.5"
+serde_json = "^ 0.7.0"
+yup-oauth2 = { version = "^ 0.6.0", optional = true, default-features = false }
+serde_macros = { version = "0.7.5", optional = true }
+strsim = "^0.4"
+yup-hyper-mock = "^1.0"
+clap = "^2.0"
+
+[features]
+default = ["with-syntex"]
+nightly = ["serde_macros","yup-oauth2/nightly","google-mirror1/nightly"]
+with-syntex = ["serde_codegen","syntex","yup-oauth2/with-syntex","google-mirror1/with-syntex"]
 
 [build-dependencies]
-syntex = { version = "= 0.28" }
-serde_codegen = { version = "= 0.6.13" }
+syntex = { version = "= 0.32", optional = true }
+serde_codegen = { version = "= 0.7.5", optional = true }
 
 
 [dependencies.google-mirror1]
 path = "../mirror1"
+optional = true
+default-features = false
