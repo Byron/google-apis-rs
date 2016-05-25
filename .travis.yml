@@ -6,18 +6,17 @@ rust:
   - stable
   - nightly
 matrix:
-  include:
+  exclude:
     - rust: stable
-      env: FEATURE=with-syntex
-    - rust: nightly
       env: FEATURE=nightly
   allow_failures:
     - os: osx
 script:
   - make docs-all gen-all-cli cargo-api ARGS="test --no-default-features --features=$FEATURE"
-  - if [[ $TRAVIS_RUST_VERSION = nightly ]]; then cargo test; fi
+  - "[[ $TRAVIS_RUST_VERSION = nightly ]] && cargo test"
 env:
   global:
     secure: Plj5DqAQX/4+KPM+nOAZ2sCbGIsoSrHo1YggfesQnU7paR734XO/4IayWnsNO/3q6bDi4GIcn56RUZAD3xBJJBNLia2CYIickIIYORRqLWbLdbzQaxBbD670ahtzEuUSFJTRKURPwFteAnsWYgNMNzwXOVNwLS5IUBqWTcS+N0g=
   matrix:
     - FEATURE=with-syntex
+    - FEATURE=nightly
