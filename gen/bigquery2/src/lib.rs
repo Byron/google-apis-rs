@@ -195,6 +195,12 @@
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
 // Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
 // unused imports in fully featured APIs. Same with unused_mut ... .
+#![cfg_attr(feature = "nightly", feature(custom_derive, custom_attribute, plugin))]
+#![cfg_attr(feature = "nightly", plugin(serde_macros))]
 #![allow(unused_imports, unused_mut, dead_code)]
 
+#[cfg(feature = "nightly")]
+include!("lib.rs.in");
+
+#[cfg(feature = "with-syntex")]
 include!(concat!(env!("OUT_DIR"), "/lib.rs"));
