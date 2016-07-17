@@ -478,23 +478,6 @@ impl<'a> Read for MultiPartReader<'a> {
     }
 }
 
-// The following macro invocation needs to be expanded, as `include!`
-// doens't support external macros
-// header!{
-//     #[doc="The `X-Upload-Content-Type` header."]
-//     (XUploadContentType, "X-Upload-Content-Type") => [Mime]
-
-//     xupload_content_type {
-//         test_header!(
-//             test1,
-//             vec![b"text/plain"],
-//             Some(HeaderField(
-//                 vec![Mime(TopLevel::Text, SubLevel::Plain, Vec::new())]
-//                 )));
-
-//     }
-// }
-
 /// The `X-Upload-Content-Type` header.
 ///
 /// Generated via rustc --pretty expanded -Z unstable-options, and manually
@@ -709,7 +692,6 @@ impl<'a, A> ResumableUploadHelper<'a, A>
             if self.delegate.cancel_chunk_upload(&range_header) {
                 return None
             }
-            // workaround https://github.com/rust-lang/rust/issues/22252
             let res = self.client.post(self.url)
                                  .header(range_header)
                                  .header(ContentType(self.media_type.clone()))
