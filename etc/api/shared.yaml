@@ -6,6 +6,10 @@ api:
     # in beta, there is not a single method !
     - dataflow
     - cloudsearch
+    - toolresults
+    - datastore
+    - consumersurveys
+    - script
   terms:
     # how to actually do something with the API
     action: doit
