@@ -25,7 +25,7 @@ make:
     - source: build.rs
       output_dir: src
 cargo:
-  build_version: "0.1.13"
+  build_version: "0.1.14"
   build_script: src/build.rs
   keywords: [protocol, web, api]
   dependencies:
