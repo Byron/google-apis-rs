@@ -32,7 +32,7 @@ mime = "^ 0.2.0"
 serde = "^ 0.7.5"
 serde_json = "^ 0.7.0"
 yup-oauth2 = { version = "^ 0.6.0", optional = true, default-features = false }
-serde_macros = { version = "0.7.5", optional = true }
+serde_macros = { version = "^ 0.7.5", optional = true }
 % for dep in cargo.get('dependencies', list()):
 ${dep}
 % endfor
@@ -43,20 +43,19 @@ ${dep}
   crate_name_we_depend_on = None
   
   nightly_features = ["serde_macros", "yup-oauth2/nightly"]
-  default_features = ["serde_codegen", "syntex", "yup-oauth2/with-syntex"]
+  default_features = ["serde_codegen", "yup-oauth2/with-serde-codegen"]
   
   if make.depends_on_suffix is not None:
     crate_name_we_depend_on = library_to_crate_name(api_name, suffix=make.depends_on_suffix)
     nightly_features.append(crate_name_we_depend_on + '/nightly')
-    default_features.append(crate_name_we_depend_on + '/with-syntex')
+    default_features.append(crate_name_we_depend_on + '/with-serde-codegen')
 %>\
-default = ["with-syntex"]
+default = ["with-serde-codegen"]
 nightly = [${','.join(enclose_in('"', nightly_features))}]
-with-syntex = [${','.join(enclose_in('"', default_features))}]
+with-serde-codegen = [${','.join(enclose_in('"', default_features))}]
 
 [build-dependencies]
-syntex = { version = "= 0.32", optional = true }
-serde_codegen = { version = "= 0.7.5", optional = true }
+serde_codegen = { version = "^ 0.7.14", optional = true }
 
 % if make.depends_on_suffix is not None:
 
