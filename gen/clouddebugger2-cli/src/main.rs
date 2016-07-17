@@ -738,7 +738,7 @@ impl<'n> Engine<'n> {
                                         JsonTokenStorage {
                                           program_name: "clouddebugger2",
                                           db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledInteractive));
+                                        }, Some(FlowType::InstalledRedirect(54324)));
 
         let client =
             if opt.is_present("debug") {
@@ -992,7 +992,7 @@ fn main() {
     
     let mut app = App::new("clouddebugger2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.5+20160309")
+           .version("0.3.6+20160309")
            .about("Examines the call stack and variables of a running application without stopping or slowing it down.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_clouddebugger2_cli")
            .arg(Arg::with_name("url")

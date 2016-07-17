@@ -3407,7 +3407,7 @@ impl<'n> Engine<'n> {
                                         JsonTokenStorage {
                                           program_name: "calendar3",
                                           db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledInteractive));
+                                        }, Some(FlowType::InstalledRedirect(54324)));
 
         let client =
             if opt.is_present("debug") {
@@ -4385,7 +4385,7 @@ fn main() {
     
     let mut app = App::new("calendar3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.5+20160405")
+           .version("0.3.6+20160405")
            .about("Manipulates events and other calendar data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_calendar3_cli")
            .arg(Arg::with_name("url")

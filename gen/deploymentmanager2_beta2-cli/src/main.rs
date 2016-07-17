@@ -1049,7 +1049,7 @@ impl<'n> Engine<'n> {
                                         JsonTokenStorage {
                                           program_name: "deploymentmanager2-beta2",
                                           db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledInteractive));
+                                        }, Some(FlowType::InstalledRedirect(54324)));
 
         let client =
             if opt.is_present("debug") {
@@ -1478,7 +1478,7 @@ fn main() {
     
     let mut app = App::new("deploymentmanager2-beta2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.5+20160201")
+           .version("0.3.6+20160201")
            .about("The Deployment Manager API allows users to declaratively configure, deploy and run complex solutions on the Google Cloud Platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_deploymentmanager2_beta2_cli")
            .arg(Arg::with_name("url")

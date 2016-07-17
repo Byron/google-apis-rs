@@ -1209,7 +1209,7 @@ impl<'n> Engine<'n> {
                                         JsonTokenStorage {
                                           program_name: "reseller1-sandbox",
                                           db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledInteractive));
+                                        }, Some(FlowType::InstalledRedirect(54324)));
 
         let client =
             if opt.is_present("debug") {
@@ -1645,7 +1645,7 @@ fn main() {
     
     let mut app = App::new("reseller1-sandbox")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.5+20160329")
+           .version("0.3.6+20160329")
            .about("Creates and manages your customers and their subscriptions.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_reseller1_sandbox_cli")
            .arg(Arg::with_name("url")

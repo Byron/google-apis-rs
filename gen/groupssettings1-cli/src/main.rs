@@ -387,7 +387,7 @@ impl<'n> Engine<'n> {
                                         JsonTokenStorage {
                                           program_name: "groupssettings1",
                                           db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledInteractive));
+                                        }, Some(FlowType::InstalledRedirect(54324)));
 
         let client =
             if opt.is_present("debug") {
@@ -512,7 +512,7 @@ fn main() {
     
     let mut app = App::new("groupssettings1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.5+20160323")
+           .version("0.3.6+20160323")
            .about("Lets you manage permission levels and related settings of a group.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_groupssettings1_cli")
            .arg(Arg::with_name("url")

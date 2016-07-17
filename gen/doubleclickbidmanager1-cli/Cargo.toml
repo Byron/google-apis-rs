@@ -4,7 +4,7 @@
 [package]
 
 name = "google-doubleclickbidmanager1-cli"
-version = "0.3.5+20160225"
+version = "0.3.6+20160225"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with DoubleClick Bid Manager (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/doubleclickbidmanager1-cli"

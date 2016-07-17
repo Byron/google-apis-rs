@@ -194,7 +194,7 @@ impl<'n> Engine<'n> {
                                         JsonTokenStorage {
                                           program_name: "qpxexpress1",
                                           db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledInteractive));
+                                        }, Some(FlowType::InstalledRedirect(54324)));
 
         let client =
             if opt.is_present("debug") {
@@ -263,7 +263,7 @@ fn main() {
     
     let mut app = App::new("qpxexpress1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.5+20160307")
+           .version("0.3.6+20160307")
            .about("Finds the least expensive flights between an origin and a destination.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_qpxexpress1_cli")
            .arg(Arg::with_name("folder")

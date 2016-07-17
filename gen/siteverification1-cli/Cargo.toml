@@ -4,7 +4,7 @@
 [package]
 
 name = "google-siteverification1-cli"
-version = "0.3.5+20160228"
+version = "0.3.6+20160228"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with siteVerification (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/siteverification1-cli"

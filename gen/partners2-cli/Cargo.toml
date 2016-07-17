@@ -4,7 +4,7 @@
 [package]
 
 name = "google-partners2-cli"
-version = "0.3.5+20151009"
+version = "0.3.6+20151009"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with partners (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/partners2-cli"

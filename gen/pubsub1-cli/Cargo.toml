@@ -4,7 +4,7 @@
 [package]
 
 name = "google-pubsub1-cli"
-version = "0.3.5+20160317"
+version = "0.3.6+20160317"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with pubsub (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/pubsub1-cli"

@@ -7171,7 +7171,7 @@ impl<'n> Engine<'n> {
                                         JsonTokenStorage {
                                           program_name: "admin1-directory",
                                           db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledInteractive));
+                                        }, Some(FlowType::InstalledRedirect(54324)));
 
         let client =
             if opt.is_present("debug") {
@@ -9680,7 +9680,7 @@ fn main() {
     
     let mut app = App::new("admin1-directory")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.5+20160323")
+           .version("0.3.6+20160323")
            .about("The Admin SDK Directory API lets you view and manage enterprise resources such as users and groups, administrative notifications, security features, and more.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_admin1_directory_cli")
            .arg(Arg::with_name("url")

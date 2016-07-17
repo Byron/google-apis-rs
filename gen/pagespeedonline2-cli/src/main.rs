@@ -168,7 +168,7 @@ impl<'n> Engine<'n> {
                                         JsonTokenStorage {
                                           program_name: "pagespeedonline2",
                                           db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledInteractive));
+                                        }, Some(FlowType::InstalledRedirect(54324)));
 
         let client =
             if opt.is_present("debug") {
@@ -237,7 +237,7 @@ fn main() {
     
     let mut app = App::new("pagespeedonline2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.5+20160306")
+           .version("0.3.6+20160306")
            .about("Analyzes the performance of a web page and provides tailored suggestions to make that page faster.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_pagespeedonline2_cli")
            .arg(Arg::with_name("folder")

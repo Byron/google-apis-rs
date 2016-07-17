@@ -159,7 +159,7 @@ impl<'n> Engine<'n> {
                                         JsonTokenStorage {
                                           program_name: "groupsmigration1",
                                           db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledInteractive));
+                                        }, Some(FlowType::InstalledRedirect(54324)));
 
         let client =
             if opt.is_present("debug") {
@@ -235,7 +235,7 @@ fn main() {
     
     let mut app = App::new("groupsmigration1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.5+20140416")
+           .version("0.3.6+20140416")
            .about("Groups Migration Api.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_groupsmigration1_cli")
            .arg(Arg::with_name("url")

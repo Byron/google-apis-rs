@@ -4,7 +4,7 @@
 [package]
 
 name = "google-dfareporting2d1-cli"
-version = "0.3.5+20160323"
+version = "0.3.6+20160323"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with dfareporting (protocol v2.1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/dfareporting2d1-cli"

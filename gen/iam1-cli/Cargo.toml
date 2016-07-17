@@ -4,7 +4,7 @@
 [package]
 
 name = "google-iam1-cli"
-version = "0.3.5+20160129"
+version = "0.3.6+20160129"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with iam (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/iam1-cli"

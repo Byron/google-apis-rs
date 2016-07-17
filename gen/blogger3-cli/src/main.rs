@@ -2510,7 +2510,7 @@ impl<'n> Engine<'n> {
                                         JsonTokenStorage {
                                           program_name: "blogger3",
                                           db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledInteractive));
+                                        }, Some(FlowType::InstalledRedirect(54324)));
 
         let client =
             if opt.is_present("debug") {
@@ -3496,7 +3496,7 @@ fn main() {
     
     let mut app = App::new("blogger3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.5+20150422")
+           .version("0.3.6+20150422")
            .about("API for access to the data within Blogger.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_blogger3_cli")
            .arg(Arg::with_name("url")

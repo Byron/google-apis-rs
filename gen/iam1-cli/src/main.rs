@@ -1038,7 +1038,7 @@ impl<'n> Engine<'n> {
                                         JsonTokenStorage {
                                           program_name: "iam1",
                                           db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledInteractive));
+                                        }, Some(FlowType::InstalledRedirect(54324)));
 
         let client =
             if opt.is_present("debug") {
@@ -1411,7 +1411,7 @@ fn main() {
     
     let mut app = App::new("iam1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.5+20160129")
+           .version("0.3.6+20160129")
            .about("Manages identity and access control for Google Cloud Platform resources, including the creation of service accounts, which you can use to authenticate to Google and make API calls.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_iam1_cli")
            .arg(Arg::with_name("url")

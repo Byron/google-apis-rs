@@ -4,7 +4,7 @@
 [package]
 
 name = "google-genomics1-cli"
-version = "0.3.5+20160407"
+version = "0.3.6+20160407"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with genomics (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/genomics1-cli"

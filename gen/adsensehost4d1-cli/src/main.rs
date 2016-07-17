@@ -1971,7 +1971,7 @@ impl<'n> Engine<'n> {
                                         JsonTokenStorage {
                                           program_name: "adsensehost4d1",
                                           db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledInteractive));
+                                        }, Some(FlowType::InstalledRedirect(54324)));
 
         let client =
             if opt.is_present("debug") {
@@ -2761,7 +2761,7 @@ fn main() {
     
     let mut app = App::new("adsensehost4d1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.5+20160405")
+           .version("0.3.6+20160405")
            .about("Generates performance reports, generates ad codes, and provides publisher management capabilities for AdSense Hosts.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_adsensehost4d1_cli")
            .arg(Arg::with_name("url")

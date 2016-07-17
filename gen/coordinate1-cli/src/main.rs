@@ -1148,7 +1148,7 @@ impl<'n> Engine<'n> {
                                         JsonTokenStorage {
                                           program_name: "coordinate1",
                                           db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledInteractive));
+                                        }, Some(FlowType::InstalledRedirect(54324)));
 
         let client =
             if opt.is_present("debug") {
@@ -1570,7 +1570,7 @@ fn main() {
     
     let mut app = App::new("coordinate1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.5+20150811")
+           .version("0.3.6+20150811")
            .about("Lets you view and manage jobs in a Coordinate team.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_coordinate1_cli")
            .arg(Arg::with_name("url")

@@ -410,7 +410,7 @@ impl<'n> Engine<'n> {
                                         JsonTokenStorage {
                                           program_name: "civicinfo2",
                                           db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledInteractive));
+                                        }, Some(FlowType::InstalledRedirect(54324)));
 
         let client =
             if opt.is_present("debug") {
@@ -555,7 +555,7 @@ fn main() {
     
     let mut app = App::new("civicinfo2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.5+20150820")
+           .version("0.3.6+20150820")
            .about("An API for accessing civic information.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_civicinfo2_cli")
            .arg(Arg::with_name("folder")

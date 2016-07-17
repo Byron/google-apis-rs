@@ -1175,7 +1175,7 @@ impl<'n> Engine<'n> {
                                         JsonTokenStorage {
                                           program_name: "gamesconfiguration1-configuration",
                                           db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledInteractive));
+                                        }, Some(FlowType::InstalledRedirect(54324)));
 
         let client =
             if opt.is_present("debug") {
@@ -1551,7 +1551,7 @@ fn main() {
     
     let mut app = App::new("gamesconfiguration1-configuration")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.5+20160401")
+           .version("0.3.6+20160401")
            .about("The Publishing API for Google Play Game Services.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_gamesconfiguration1_configuration_cli")
            .arg(Arg::with_name("url")

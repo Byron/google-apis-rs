@@ -298,7 +298,7 @@ impl<'n> Engine<'n> {
                                         JsonTokenStorage {
                                           program_name: "freebase1",
                                           db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledInteractive));
+                                        }, Some(FlowType::InstalledRedirect(54324)));
 
         let client =
             if opt.is_present("debug") {
@@ -377,7 +377,7 @@ fn main() {
     
     let mut app = App::new("freebase1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.5+20150728")
+           .version("0.3.6+20150728")
            .about("Find Freebase entities using textual queries and other constraints.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_freebase1_cli")
            .arg(Arg::with_name("folder")

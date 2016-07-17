@@ -4,7 +4,7 @@
 [package]
 
 name = "google-fitness1-cli"
-version = "0.3.5+20151021"
+version = "0.3.6+20151021"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with fitness (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/fitness1-cli"

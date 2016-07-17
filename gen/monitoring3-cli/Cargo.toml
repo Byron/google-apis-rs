@@ -4,7 +4,7 @@
 [package]
 
 name = "google-monitoring3-cli"
-version = "0.3.5+20160321"
+version = "0.3.6+20160321"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with monitoring (protocol v3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/monitoring3-cli"

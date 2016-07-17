@@ -620,7 +620,7 @@ impl<'n> Engine<'n> {
                                         JsonTokenStorage {
                                           program_name: "siteverification1",
                                           db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledInteractive));
+                                        }, Some(FlowType::InstalledRedirect(54324)));
 
         let client =
             if opt.is_present("debug") {
@@ -827,7 +827,7 @@ fn main() {
     
     let mut app = App::new("siteverification1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.5+20160228")
+           .version("0.3.6+20160228")
            .about("Verifies ownership of websites or domains with Google.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_siteverification1_cli")
            .arg(Arg::with_name("url")

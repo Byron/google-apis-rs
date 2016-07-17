@@ -585,7 +585,7 @@ impl<'n> Engine<'n> {
                                         JsonTokenStorage {
                                           program_name: "playmoviespartner1",
                                           db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledInteractive));
+                                        }, Some(FlowType::InstalledRedirect(54324)));
 
         let client =
             if opt.is_present("debug") {
@@ -814,7 +814,7 @@ fn main() {
     
     let mut app = App::new("playmoviespartner1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.5+20150812")
+           .version("0.3.6+20150812")
            .about("Lets Google Play Movies Partners get the delivery status of their titles.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_playmoviespartner1_cli")
            .arg(Arg::with_name("url")

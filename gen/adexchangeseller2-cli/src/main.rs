@@ -950,7 +950,7 @@ impl<'n> Engine<'n> {
                                         JsonTokenStorage {
                                           program_name: "adexchangeseller2",
                                           db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledInteractive));
+                                        }, Some(FlowType::InstalledRedirect(54324)));
 
         let client =
             if opt.is_present("debug") {
@@ -1347,7 +1347,7 @@ fn main() {
     
     let mut app = App::new("adexchangeseller2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.5+20151127")
+           .version("0.3.6+20151127")
            .about("Gives Ad Exchange seller users access to their inventory and the ability to generate reports")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_adexchangeseller2_cli")
            .arg(Arg::with_name("url")

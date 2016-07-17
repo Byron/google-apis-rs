@@ -1,3 +1,10 @@
+<a name="api-v0.1.14:cli-v0.3.6"></a>
+## api-v0.1.14:cli-v0.3.5 (2016-07-17)
+
+#### Bug Fixes
+
+* **auth:**  use redirect flow([b6f5fc6e](https://github.com/Byron/google-apis-rs/commit/b6f5fc6eb3e6be21d22fb667b541f13ee3881df1))
+
 <a name="api-v0.1.14:cli-v0.3.5"></a>
 ## api-v0.1.14:cli-v0.3.5 (2016-07-17)
 

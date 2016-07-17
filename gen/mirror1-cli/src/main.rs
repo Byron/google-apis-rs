@@ -1940,7 +1940,7 @@ impl<'n> Engine<'n> {
                                         JsonTokenStorage {
                                           program_name: "mirror1",
                                           db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledInteractive));
+                                        }, Some(FlowType::InstalledRedirect(54324)));
 
         let client =
             if opt.is_present("debug") {
@@ -2563,7 +2563,7 @@ fn main() {
     
     let mut app = App::new("mirror1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.5+20151206")
+           .version("0.3.6+20151206")
            .about("API for interacting with Glass users via the timeline.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_mirror1_cli")
            .arg(Arg::with_name("url")

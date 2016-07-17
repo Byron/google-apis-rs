@@ -323,7 +323,7 @@ impl<'n> Engine<'n> {
                                         JsonTokenStorage {
                                           program_name: "urlshortener1",
                                           db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledInteractive));
+                                        }, Some(FlowType::InstalledRedirect(54324)));
 
         let client =
             if opt.is_present("debug") {
@@ -430,7 +430,7 @@ fn main() {
     
     let mut app = App::new("urlshortener1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.5+20150519")
+           .version("0.3.6+20150519")
            .about("Lets you create, inspect, and manage goo.gl short URLs")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_urlshortener1_cli")
            .arg(Arg::with_name("url")

@@ -675,7 +675,7 @@ impl<'n> Engine<'n> {
                                         JsonTokenStorage {
                                           program_name: "taskqueue1-beta2",
                                           db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledInteractive));
+                                        }, Some(FlowType::InstalledRedirect(54324)));
 
         let client =
             if opt.is_present("debug") {
@@ -1009,7 +1009,7 @@ fn main() {
     
     let mut app = App::new("taskqueue1-beta2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.5+20141111")
+           .version("0.3.6+20141111")
            .about("Lets you access a Google App Engine Pull Task Queue over REST.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_taskqueue1_beta2_cli")
            .arg(Arg::with_name("url")

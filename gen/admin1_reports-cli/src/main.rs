@@ -551,7 +551,7 @@ impl<'n> Engine<'n> {
                                         JsonTokenStorage {
                                           program_name: "admin1-reports",
                                           db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledInteractive));
+                                        }, Some(FlowType::InstalledRedirect(54324)));
 
         let client =
             if opt.is_present("debug") {
@@ -735,7 +735,7 @@ fn main() {
     
     let mut app = App::new("admin1-reports")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.5+20151113")
+           .version("0.3.6+20151113")
            .about("Allows the administrators of Google Apps customers to fetch reports about the usage, collaboration, security and risk for their users.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_admin1_reports_cli")
            .arg(Arg::with_name("url")

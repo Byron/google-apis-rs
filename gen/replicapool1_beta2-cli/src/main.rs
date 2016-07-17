@@ -1001,7 +1001,7 @@ impl<'n> Engine<'n> {
                                         JsonTokenStorage {
                                           program_name: "replicapool1-beta2",
                                           db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledInteractive));
+                                        }, Some(FlowType::InstalledRedirect(54324)));
 
         let client =
             if opt.is_present("debug") {
@@ -1489,7 +1489,7 @@ fn main() {
     
     let mut app = App::new("replicapool1-beta2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.5+20150708")
+           .version("0.3.6+20150708")
            .about("The Google Compute Engine Instance Group Manager API provides groups of homogenous Compute Engine Instances.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_replicapool1_beta2_cli")
            .arg(Arg::with_name("url")

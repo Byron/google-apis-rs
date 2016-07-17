@@ -4,7 +4,7 @@
 [package]
 
 name = "google-groupsmigration1-cli"
-version = "0.3.5+20140416"
+version = "0.3.6+20140416"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Groups Migration (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/groupsmigration1-cli"

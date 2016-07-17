@@ -6629,7 +6629,7 @@ impl<'n> Engine<'n> {
                                         JsonTokenStorage {
                                           program_name: "youtube3",
                                           db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledInteractive));
+                                        }, Some(FlowType::InstalledRedirect(54324)));
 
         let client =
             if opt.is_present("debug") {
@@ -8322,7 +8322,7 @@ fn main() {
     
     let mut app = App::new("youtube3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.5+20160222")
+           .version("0.3.6+20160222")
            .about("Programmatic access to YouTube features.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_youtube3_cli")
            .arg(Arg::with_name("url")

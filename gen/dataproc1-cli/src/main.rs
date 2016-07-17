@@ -1419,7 +1419,7 @@ impl<'n> Engine<'n> {
                                         JsonTokenStorage {
                                           program_name: "dataproc1",
                                           db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledInteractive));
+                                        }, Some(FlowType::InstalledRedirect(54324)));
 
         let client =
             if opt.is_present("debug") {
@@ -1998,7 +1998,7 @@ fn main() {
     
     let mut app = App::new("dataproc1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.5+20160219")
+           .version("0.3.6+20160219")
            .about("An API for managing Hadoop-based clusters and jobs on Google Cloud Platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_dataproc1_cli")
            .arg(Arg::with_name("url")

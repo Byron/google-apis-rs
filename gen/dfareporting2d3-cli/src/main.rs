@@ -16755,7 +16755,7 @@ impl<'n> Engine<'n> {
                                         JsonTokenStorage {
                                           program_name: "dfareporting2d3",
                                           db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledInteractive));
+                                        }, Some(FlowType::InstalledRedirect(54324)));
 
         let client =
             if opt.is_present("debug") {
@@ -22269,7 +22269,7 @@ fn main() {
     
     let mut app = App::new("dfareporting2d3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.5+20160323")
+           .version("0.3.6+20160323")
            .about("Manages your DoubleClick Campaign Manager ad campaigns and reports.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_dfareporting2d3_cli")
            .arg(Arg::with_name("url")

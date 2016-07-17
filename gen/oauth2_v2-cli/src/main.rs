@@ -332,7 +332,7 @@ impl<'n> Engine<'n> {
                                         JsonTokenStorage {
                                           program_name: "oauth2-v2",
                                           db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledInteractive));
+                                        }, Some(FlowType::InstalledRedirect(54324)));
 
         let client =
             if opt.is_present("debug") {
@@ -446,7 +446,7 @@ fn main() {
     
     let mut app = App::new("oauth2-v2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.5+20160330")
+           .version("0.3.6+20160330")
            .about("Obtains end-user authorization grants for use with other Google APIs.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_oauth2_v2_cli")
            .arg(Arg::with_name("url")
