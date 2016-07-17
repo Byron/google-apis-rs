@@ -2947,7 +2947,7 @@ impl<'n> Engine<'n> {
                                         JsonTokenStorage {
                                           program_name: "drive3",
                                           db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledInteractive));
+                                        }, Some(FlowType::InstalledRedirect(54324)));
 
         let client =
             if opt.is_present("debug") {

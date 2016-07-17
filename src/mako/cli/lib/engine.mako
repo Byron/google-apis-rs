@@ -122,7 +122,7 @@ impl<'n> Engine<'n> {
                                         JsonTokenStorage {
                                           program_name: "${util.program_name()}",
                                           db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledInteractive));
+                                        }, Some(FlowType::InstalledRedirect(54324)));
 
         let client =
             ${self._debug_client(DEBUG_FLAG) | indent_all_but_first_by(3)};
