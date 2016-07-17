@@ -1,3 +1,22 @@
+<a name="api-v0.1.14:cli-v0.3.5"></a>
+## api-v0.1.14:cli-v0.3.5 (2016-07-17)
+
+
+#### Bug Fixes
+
+* **cargo:**
+  *  relative path for custom target dir ([dc367c34](https://github.com/Byron/google-apis-rs/commit/dc367c34751e04036e56a4d984d6b7f8f92cef4d))
+  *  remove cargo/config ([cb6679cb](https://github.com/Byron/google-apis-rs/commit/cb6679cb2b45022162a7e6a1b5de39b1fbbcf870), closes [#149](https://github.com/Byron/google-apis-rs/issues/149))
+* **dependencies:**  use working version of serde-codegen ([3921b6a5](https://github.com/Byron/google-apis-rs/commit/3921b6a5a071ec0dc9d803b0ae809a348c34f87f))
+* **test:**  work with latest serde ([bed46ba2](https://github.com/Byron/google-apis-rs/commit/bed46ba2414167fcf6563ac1766f3239765f4800))
+* **travis:**
+  *  don't fail by default on non-nightly ([e9fe17ee](https://github.com/Byron/google-apis-rs/commit/e9fe17ee3b5df32de65ed4017c65748eb8388a29))
+  *  as learned from yup-oauth ([5ca02172](https://github.com/Byron/google-apis-rs/commit/5ca021727511b8265da1abadc48eb241ca24e3c5))
+
+#### Features
+
+* **authentication:**  Use flow for installed apps ([d37bb19d](https://github.com/Byron/google-apis-rs/commit/d37bb19df2bb4b274ee69c8ed3e85056c216e8e0))
+
 <a name="api-v0.1.13:cli-v0.3.4"></a>
 ## api-v0.1.13:cli-v0.3.4 (2016-04-10)
 
