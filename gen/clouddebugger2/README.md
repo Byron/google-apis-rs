@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-clouddebugger2` library allows access to all features of the *Google clouddebugger* service.
 
-This documentation was generated from *clouddebugger* crate version *0.1.13+20160309*, where *20160309* is the exact revision of the *clouddebugger:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.13*.
+This documentation was generated from *clouddebugger* crate version *0.1.14+20160309*, where *20160309* is the exact revision of the *clouddebugger:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
 
 Everything else about the *clouddebugger* *v2* API can be found at the
 [official documentation site](https://cloud.google.com/tools/cloud-debugger).

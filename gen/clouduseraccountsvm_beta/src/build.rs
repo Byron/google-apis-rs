@@ -1,6 +1,5 @@
-#[cfg(feature = "with-syntex")]
+#[cfg(feature = "with-serde-codegen")]
 mod inner {
-    extern crate syntex;
     extern crate serde_codegen;
 
     use std::env;
@@ -12,13 +11,11 @@ mod inner {
         let src = Path::new("src/lib.rs.in");
         let dst = Path::new(&out_dir).join("lib.rs");
 
-        let mut registry = syntex::Registry::new();
-        serde_codegen::register(&mut registry);
-        registry.expand("google-clouduseraccountsvm_beta", &src, &dst).unwrap();
+        serde_codegen::expand(&src, &dst).unwrap();
     }
 }
 
-#[cfg(not(feature = "with-syntex"))]
+#[cfg(not(feature = "with-serde-codegen"))]
 mod inner {
     pub fn main() {}
 }

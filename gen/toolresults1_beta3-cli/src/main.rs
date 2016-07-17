@@ -1968,7 +1968,7 @@ fn main() {
     
     let mut app = App::new("toolresults1-beta3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.4+20160408")
+           .version("0.3.5+20160408")
            .about("Read and publish results from Cloud Test Lab.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_toolresults1_beta3_cli")
            .arg(Arg::with_name("url")

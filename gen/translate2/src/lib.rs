@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *translate* crate version *0.1.13+20160217*, where *20160217* is the exact revision of the *translate:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.13*.
+//! This documentation was generated from *translate* crate version *0.1.14+20160217*, where *20160217* is the exact revision of the *translate:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
 //! 
 //! Everything else about the *translate* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/translate/v2/using_rest).
@@ -183,5 +183,5 @@
 #[cfg(feature = "nightly")]
 include!("lib.rs.in");
 
-#[cfg(feature = "with-syntex")]
+#[cfg(feature = "with-serde-codegen")]
 include!(concat!(env!("OUT_DIR"), "/lib.rs"));

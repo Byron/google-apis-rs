@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *SQL Admin* crate version *0.1.13+20160321*, where *20160321* is the exact revision of the *sqladmin:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.13*.
+//! This documentation was generated from *SQL Admin* crate version *0.1.14+20160321*, where *20160321* is the exact revision of the *sqladmin:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
 //! 
 //! Everything else about the *SQL Admin* *v1_beta4* API can be found at the
 //! [official documentation site](https://cloud.google.com/sql/docs/reference/latest).
@@ -223,5 +223,5 @@
 #[cfg(feature = "nightly")]
 include!("lib.rs.in");
 
-#[cfg(feature = "with-syntex")]
+#[cfg(feature = "with-serde-codegen")]
 include!(concat!(env!("OUT_DIR"), "/lib.rs"));

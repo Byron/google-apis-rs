@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *cloudtrace* crate version *0.1.13+20151207*, where *20151207* is the exact revision of the *cloudtrace:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.13*.
+//! This documentation was generated from *cloudtrace* crate version *0.1.14+20151207*, where *20151207* is the exact revision of the *cloudtrace:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
 //! 
 //! Everything else about the *cloudtrace* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/tools/cloud-trace).
@@ -179,5 +179,5 @@
 #[cfg(feature = "nightly")]
 include!("lib.rs.in");
 
-#[cfg(feature = "with-syntex")]
+#[cfg(feature = "with-serde-codegen")]
 include!(concat!(env!("OUT_DIR"), "/lib.rs"));

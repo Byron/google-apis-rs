@@ -849,7 +849,7 @@ fn main() {
     
     let mut app = App::new("consumersurveys2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.4+20160405")
+           .version("0.3.5+20160405")
            .about("API for Google Consumer Surveys.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_consumersurveys2_cli")
            .arg(Arg::with_name("url")

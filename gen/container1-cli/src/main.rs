@@ -952,7 +952,7 @@ fn main() {
     
     let mut app = App::new("container1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.4+20160321")
+           .version("0.3.5+20160321")
            .about("Builds and manages clusters that run container-based applications, powered by open source Kubernetes technology.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_container1_cli")
            .arg(Arg::with_name("url")

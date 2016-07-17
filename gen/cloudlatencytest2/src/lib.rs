@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *cloudlatencytest* crate version *0.1.13+20160309*, where *20160309* is the exact revision of the *cloudlatencytest:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.13*.
+//! This documentation was generated from *cloudlatencytest* crate version *0.1.14+20160309*, where *20160309* is the exact revision of the *cloudlatencytest:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/cloudlatencytest2).
 //! # Features
 //! 
@@ -182,5 +182,5 @@
 #[cfg(feature = "nightly")]
 include!("lib.rs.in");
 
-#[cfg(feature = "with-syntex")]
+#[cfg(feature = "with-serde-codegen")]
 include!(concat!(env!("OUT_DIR"), "/lib.rs"));

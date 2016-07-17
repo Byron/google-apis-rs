@@ -1125,7 +1125,7 @@ fn main() {
     
     let mut app = App::new("youtubeanalytics1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.4+20160301")
+           .version("0.3.5+20160301")
            .about("Retrieves your YouTube Analytics reports.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_youtubeanalytics1_cli")
            .arg(Arg::with_name("url")

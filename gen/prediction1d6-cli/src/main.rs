@@ -962,7 +962,7 @@ fn main() {
     
     let mut app = App::new("prediction1d6")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.4+20160304")
+           .version("0.3.5+20160304")
            .about("Lets you access a cloud hosted machine learning service that makes it easy to build smart apps")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_prediction1d6_cli")
            .arg(Arg::with_name("url")

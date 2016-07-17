@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-gan1_beta1` library allows access to all features of the *Google gan* service.
 
-This documentation was generated from *gan* crate version *0.1.13+20130205*, where *20130205* is the exact revision of the *gan:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.13*.
+This documentation was generated from *gan* crate version *0.1.14+20130205*, where *20130205* is the exact revision of the *gan:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
 
 Everything else about the *gan* *v1_beta1* API can be found at the
 [official documentation site](https://developers.google.com/affiliate-network/).

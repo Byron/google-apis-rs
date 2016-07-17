@@ -4,7 +4,7 @@
 [package]
 
 name = "google-cloudbilling1"
-version = "0.1.13+20151222"
+version = "0.1.14+20151222"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with cloudbilling (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/cloudbilling1"
@@ -21,15 +21,14 @@ mime = "^ 0.2.0"
 serde = "^ 0.7.5"
 serde_json = "^ 0.7.0"
 yup-oauth2 = { version = "^ 0.6.0", optional = true, default-features = false }
-serde_macros = { version = "0.7.5", optional = true }
+serde_macros = { version = "^ 0.7.5", optional = true }
 url = "= 0.5"
 
 [features]
-default = ["with-syntex"]
+default = ["with-serde-codegen"]
 nightly = ["serde_macros","yup-oauth2/nightly"]
-with-syntex = ["serde_codegen","syntex","yup-oauth2/with-syntex"]
+with-serde-codegen = ["serde_codegen","yup-oauth2/with-serde-codegen"]
 
 [build-dependencies]
-syntex = { version = "= 0.32", optional = true }
-serde_codegen = { version = "= 0.7.5", optional = true }
+serde_codegen = { version = "^ 0.7.14", optional = true }
 

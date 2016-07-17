@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-androidenterprise1` library allows access to all features of the *Google Android Enterprise* service.
 
-This documentation was generated from *Android Enterprise* crate version *0.1.13+20160331*, where *20160331* is the exact revision of the *androidenterprise:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.13*.
+This documentation was generated from *Android Enterprise* crate version *0.1.14+20160331*, where *20160331* is the exact revision of the *androidenterprise:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
 
 Everything else about the *Android Enterprise* *v1* API can be found at the
 [official documentation site](https://developers.google.com/android/work/play/emm-api).

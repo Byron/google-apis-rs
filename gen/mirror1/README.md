@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-mirror1` library allows access to all features of the *Google mirror* service.
 
-This documentation was generated from *mirror* crate version *0.1.13+20151206*, where *20151206* is the exact revision of the *mirror:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.13*.
+This documentation was generated from *mirror* crate version *0.1.14+20151206*, where *20151206* is the exact revision of the *mirror:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
 
 Everything else about the *mirror* *v1* API can be found at the
 [official documentation site](https://developers.google.com/glass).

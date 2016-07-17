@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *resourceviews* crate version *0.1.13+20150708*, where *20150708* is the exact revision of the *resourceviews:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.13*.
+//! This documentation was generated from *resourceviews* crate version *0.1.14+20150708*, where *20150708* is the exact revision of the *resourceviews:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
 //! 
 //! Everything else about the *resourceviews* *v1_beta2* API can be found at the
 //! [official documentation site](https://developers.google.com/compute/).
@@ -192,5 +192,5 @@
 #[cfg(feature = "nightly")]
 include!("lib.rs.in");
 
-#[cfg(feature = "with-syntex")]
+#[cfg(feature = "with-serde-codegen")]
 include!(concat!(env!("OUT_DIR"), "/lib.rs"));

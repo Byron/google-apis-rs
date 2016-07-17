@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-toolresults1_beta3` library allows access to all features of the *Google Tool Results* service.
 
-This documentation was generated from *Tool Results* crate version *0.1.13+20160408*, where *20160408* is the exact revision of the *toolresults:v1beta3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.13*.
+This documentation was generated from *Tool Results* crate version *0.1.14+20160408*, where *20160408* is the exact revision of the *toolresults:v1beta3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
 
 Everything else about the *Tool Results* *v1_beta3* API can be found at the
 [official documentation site](https://developers.google.com/cloud-test-lab/).

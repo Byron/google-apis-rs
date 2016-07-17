@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-consumersurveys2` library allows access to all features of the *Google consumersurveys* service.
 
-This documentation was generated from *consumersurveys* crate version *0.1.13+20160405*, where *20160405* is the exact revision of the *consumersurveys:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.13*.
+This documentation was generated from *consumersurveys* crate version *0.1.14+20160405*, where *20160405* is the exact revision of the *consumersurveys:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
 # Features
 
 Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google_consumersurveys2/struct.Consumersurveys.html) ... 

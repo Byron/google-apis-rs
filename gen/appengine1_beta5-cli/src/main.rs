@@ -1427,7 +1427,7 @@ fn main() {
     
     let mut app = App::new("appengine1-beta5")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.4+20160314")
+           .version("0.3.5+20160314")
            .about("Provisions and manages App Engine applications.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_appengine1_beta5_cli")
            .arg(Arg::with_name("url")
