@@ -10,6 +10,7 @@ api:
     - datastore
     - consumersurveys
     - script
+    - oauth2
   terms:
     # how to actually do something with the API
     action: doit
