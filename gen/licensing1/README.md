@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-licensing1` library allows access to all features of the *Google licensing* service.
 
-This documentation was generated from *licensing* crate version *0.1.14+20150901*, where *20150901* is the exact revision of the *licensing:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
+This documentation was generated from *licensing* crate version *0.1.15+20150901*, where *20150901* is the exact revision of the *licensing:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.15*.
 
 Everything else about the *licensing* *v1* API can be found at the
 [official documentation site](https://developers.google.com/google-apps/licensing/).

@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-serviceregistryalpha` library allows access to all features of the *Google Service Registry* service.
 
-This documentation was generated from *Service Registry* crate version *0.1.14+20160401*, where *20160401* is the exact revision of the *serviceregistry:alpha* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
+This documentation was generated from *Service Registry* crate version *0.1.15+20160401*, where *20160401* is the exact revision of the *serviceregistry:alpha* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.15*.
 
 Everything else about the *Service Registry* *alpha* API can be found at the
 [official documentation site](https://developers.google.com/cloud-serviceregistry/).

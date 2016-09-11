@@ -4,7 +4,7 @@
 [package]
 
 name = "google-youtubeanalytics1"
-version = "0.1.14+20160513"
+version = "0.1.15+20160513"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with YouTube Analytics (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/youtubeanalytics1"

@@ -4,7 +4,7 @@
 [package]
 
 name = "google-plusdomains1"
-version = "0.1.14+20160907"
+version = "0.1.15+20160907"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with plusDomains (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/plusdomains1"

@@ -4,7 +4,7 @@
 [package]
 
 name = "google-manager1_beta2"
-version = "0.1.14+20140915"
+version = "0.1.15+20140915"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with manager (protocol v1beta2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/manager1_beta2"

@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-dataproc1` library allows access to all features of the *Google dataproc* service.
 
-This documentation was generated from *dataproc* crate version *0.1.14+20160503*, where *20160503* is the exact revision of the *dataproc:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
+This documentation was generated from *dataproc* crate version *0.1.15+20160503*, where *20160503* is the exact revision of the *dataproc:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.15*.
 
 Everything else about the *dataproc* *v1* API can be found at the
 [official documentation site](https://cloud.google.com/dataproc/).

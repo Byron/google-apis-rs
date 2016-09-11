@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-civicinfo2` library allows access to all features of the *Google Civic Info* service.
 
-This documentation was generated from *Civic Info* crate version *0.1.14+20160823*, where *20160823* is the exact revision of the *civicinfo:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
+This documentation was generated from *Civic Info* crate version *0.1.15+20160823*, where *20160823* is the exact revision of the *civicinfo:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.15*.
 
 Everything else about the *Civic Info* *v2* API can be found at the
 [official documentation site](https://developers.google.com/civic-information).

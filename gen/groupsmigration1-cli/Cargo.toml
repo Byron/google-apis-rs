@@ -23,7 +23,7 @@ serde = "^ 0.8"
 serde_json = "^ 0.8"
 yup-oauth2 = { version = "^ 0.6", optional = true, default-features = false }
 serde_macros = { version = "^ 0.8", optional = true }
-strsim = "^0.4"
+strsim = "^0.5"
 yup-hyper-mock = "^1.0"
 clap = "^2.0"
 
@@ -38,5 +38,6 @@ serde_codegen = { version = "^ 0.8", optional = true }
 
 [dependencies.google-groupsmigration1]
 path = "../groupsmigration1"
+version = "*"
 optional = true
 default-features = false

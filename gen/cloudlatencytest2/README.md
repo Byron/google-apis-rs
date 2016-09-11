@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-cloudlatencytest2` library allows access to all features of the *Google cloudlatencytest* service.
 
-This documentation was generated from *cloudlatencytest* crate version *0.1.14+20160309*, where *20160309* is the exact revision of the *cloudlatencytest:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
+This documentation was generated from *cloudlatencytest* crate version *0.1.15+20160309*, where *20160309* is the exact revision of the *cloudlatencytest:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.15*.
 # Features
 
 Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google_cloudlatencytest2/struct.Cloudlatencytest.html) ... 

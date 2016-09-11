@@ -4,7 +4,7 @@
 [package]
 
 name = "google-adexchangebuyer1d4"
-version = "0.1.14+20160831"
+version = "0.1.15+20160831"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Ad Exchange Buyer (protocol v1.4)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/adexchangebuyer1d4"

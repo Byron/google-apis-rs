@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-safebrowsing4` library allows access to all features of the *Google safebrowsing* service.
 
-This documentation was generated from *safebrowsing* crate version *0.1.14+20160520*, where *20160520* is the exact revision of the *safebrowsing:v4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
+This documentation was generated from *safebrowsing* crate version *0.1.15+20160520*, where *20160520* is the exact revision of the *safebrowsing:v4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.15*.
 
 Everything else about the *safebrowsing* *v4* API can be found at the
 [official documentation site](https://developers.google.com/safe-browsing/).

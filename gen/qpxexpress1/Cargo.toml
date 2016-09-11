@@ -4,7 +4,7 @@
 [package]
 
 name = "google-qpxexpress1"
-version = "0.1.14+20160708"
+version = "0.1.15+20160708"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with QPX Express (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/qpxexpress1"

@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-kgsearch1` library allows access to all features of the *Google kgsearch* service.
 
-This documentation was generated from *kgsearch* crate version *0.1.14+20151215*, where *20151215* is the exact revision of the *kgsearch:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
+This documentation was generated from *kgsearch* crate version *0.1.15+20151215*, where *20151215* is the exact revision of the *kgsearch:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.15*.
 
 Everything else about the *kgsearch* *v1* API can be found at the
 [official documentation site](https://developers.google.com/knowledge-graph/).

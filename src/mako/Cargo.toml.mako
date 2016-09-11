@@ -61,6 +61,7 @@ serde_codegen = { version = "^ 0.8", optional = true }
 
 [dependencies.${crate_name_we_depend_on}]
 path = "../${api_name}"
+version = "*"
 optional = true
 default-features = false
 % endif

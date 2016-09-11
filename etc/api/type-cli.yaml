@@ -26,6 +26,6 @@ cargo:
   keywords: [cli]
   is_executable: YES
   dependencies:
-    - strsim = "^0.4"
+    - strsim = "^0.5"
     - yup-hyper-mock = "^1.0"
     - clap = "^2.0"
