@@ -38,6 +38,6 @@ serde_codegen = { version = "^ 0.8", optional = true }
 
 [dependencies.google-discovery1]
 path = "../discovery1"
-version = "*"
+version = "0.1.15"
 optional = true
 default-features = false
