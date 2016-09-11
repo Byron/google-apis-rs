@@ -41,12 +41,15 @@ ${dep}
 <%
   api_name = util.library_name()
   crate_name_we_depend_on = None
+  crate_version_we_depend_on = None
   
   nightly_features = ["serde_macros", "yup-oauth2/nightly"]
   default_features = ["serde_codegen", "yup-oauth2/with-serde-codegen"]
   
   if make.depends_on_suffix is not None:
     crate_name_we_depend_on = library_to_crate_name(api_name, suffix=make.depends_on_suffix)
+    depends_on_key = 'cargo_' + make.depends_on_id
+    crate_version_we_depend_on = self.context.get(depends_on_key).get('build_version')
     nightly_features.append(crate_name_we_depend_on + '/nightly')
     default_features.append(crate_name_we_depend_on + '/with-serde-codegen')
 %>\
@@ -61,7 +64,7 @@ serde_codegen = { version = "^ 0.8", optional = true }
 
 [dependencies.${crate_name_we_depend_on}]
 path = "../${api_name}"
-version = "*"
+version = "${crate_version_we_depend_on}"
 optional = true
 default-features = false
 % endif

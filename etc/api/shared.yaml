@@ -59,7 +59,14 @@ directories:
   mako_src: src/mako
   # The subdirectory to contain documentation from all APIs and related programs
   doc_subdir: doc
+# This somewhat intricate setup allows the CLI to access certain cargo-API values,
+# without having us duplicate them.
+cargo_api: &cargo_api
+  build_version: "0.1.15"
 cargo:
+  # This means that the API must not specify the shared variables from cargo_api
+  # anymore
+  <<: *cargo_api
   repo_base_url: https://github.com/Byron/google-apis-rs
   doc_base_url: http://byron.github.io/google-apis-rs
   authors:
@@ -76,3 +83,5 @@ copyright:
   years: '2015-2016'
   authors:
     - 'Sebastian Thiel'
+    
+
