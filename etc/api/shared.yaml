@@ -5,6 +5,22 @@ api:
     # to allow looking at it at a later point.
     # in beta, there is not a single method !
     - dataflow
+    - mapsengine
+    - firebaserules
+    - runtimeconfig
+    - analyticsreporting
+    - servicecontrol
+    - servicemanagement
+    - language
+    - speech
+    - adexchangebuyer2
+    - clouderrorreporting
+    - vision
+    - freebase
+    - acceleratedmobilepageurl
+    - cloudbuild
+    - sheets
+    - audit
     - cloudsearch
     - toolresults
     - datastore

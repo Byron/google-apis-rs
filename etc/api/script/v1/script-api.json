@@ -1,20 +1,20 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"bRFOOrZKfO9LweMbPqu0kcu6De8/EU3C4gpLCUA7tQGVmbBda1n2_q0\"",
+ "etag": "\"C5oy1hgQsABtYOYIOXWcR3BgYqU/FcNWZezE05ypidUunx03uCyJR70\"",
  "discoveryVersion": "v1",
  "id": "script:v1",
  "name": "script",
  "version": "v1",
- "revision": "20150922",
+ "revision": "20160801",
  "title": "Google Apps Script Execution API",
- "description": "An API for executing Google Apps Script projects.",
+ "description": "Executes Google Apps Script projects.",
  "ownerDomain": "google.com",
  "ownerName": "Google",
  "icons": {
   "x16": "http://www.google.com/images/icons/product/search-16.gif",
   "x32": "http://www.google.com/images/icons/product/search-32.gif"
  },
- "documentationLink": "https://developers.google.com/apps-script/execution/rest/v1/run",
+ "documentationLink": "https://developers.google.com/apps-script/execution/rest/v1/scripts/run",
  "protocol": "rest",
  "baseUrl": "https://script.googleapis.com/",
  "basePath": "",
@@ -130,6 +130,9 @@
     "https://www.googleapis.com/auth/groups": {
      "description": "View and manage your Google Groups"
     },
+    "https://www.googleapis.com/auth/spreadsheets": {
+     "description": "View and manage your spreadsheets in Google Drive"
+    },
     "https://www.googleapis.com/auth/userinfo.email": {
      "description": "View your email address"
     }
@@ -177,7 +180,7 @@
      "description": "This field is not used.",
      "additionalProperties": {
       "type": "any",
-      "description": "Properties of the object. Contains field @ype with type URL."
+      "description": "Properties of the object. Contains field @type with type URL."
      }
     },
     "done": {
@@ -193,7 +196,7 @@
      "description": "If the script function returns successfully, this field will contain an `ExecutionResponse` object with the function's return value as the object's `result` field.",
      "additionalProperties": {
       "type": "any",
-      "description": "Properties of the object. Contains field @ype with type URL."
+      "description": "Properties of the object. Contains field @type with type URL."
      }
     }
    }
@@ -219,7 +222,7 @@
       "type": "object",
       "additionalProperties": {
        "type": "any",
-       "description": "Properties of the object. Contains field @ype with type URL."
+       "description": "Properties of the object. Contains field @type with type URL."
       }
      }
     }
@@ -271,6 +274,13 @@
     "result": {
      "type": "any",
      "description": "The return value of the script function. The type will match the type returned in Apps Script. Functions called through the Execution API cannot return Apps Script-specific objects (such as a `Document` or `Calendar`); they can only return primitive types such as a `string`, `number`, `array`, `object`, or `boolean`."
+    },
+    "status": {
+     "type": "string",
+     "enum": [
+      "SUCCESS",
+      "CANCELED"
+     ]
     }
    }
   }
@@ -310,6 +320,7 @@
       "https://www.googleapis.com/auth/forms",
       "https://www.googleapis.com/auth/forms.currentonly",
       "https://www.googleapis.com/auth/groups",
+      "https://www.googleapis.com/auth/spreadsheets",
       "https://www.googleapis.com/auth/userinfo.email"
      ]
     }

@@ -1,11 +1,11 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"bRFOOrZKfO9LweMbPqu0kcu6De8/MOL6g3e203UhwfxwVIGCu1WDtHU\"",
+ "etag": "\"C5oy1hgQsABtYOYIOXWcR3BgYqU/iwGg9SXMSQRZJqiKSwS3P1Y9Xjc\"",
  "discoveryVersion": "v1",
  "id": "genomics:v1beta2",
  "name": "genomics",
  "version": "v1beta2",
- "revision": "20160406",
+ "revision": "20160905",
  "title": "Genomics API",
  "description": "Provides access to Genomics data.",
  "ownerDomain": "google.com",
@@ -902,7 +902,6 @@
   "MergeVariantsRequest": {
    "id": "MergeVariantsRequest",
    "type": "object",
-   "description": "",
    "properties": {
     "variants": {
      "type": "array",
@@ -1746,7 +1745,6 @@
   "SearchReferenceSetsRequest": {
    "id": "SearchReferenceSetsRequest",
    "type": "object",
-   "description": "",
    "properties": {
     "accessions": {
      "type": "array",
@@ -1797,7 +1795,6 @@
   "SearchReferencesRequest": {
    "id": "SearchReferencesRequest",
    "type": "object",
-   "description": "",
    "properties": {
     "accessions": {
      "type": "array",
@@ -1893,7 +1890,7 @@
    "properties": {
     "callSetIds": {
      "type": "array",
-     "description": "Only return variant calls which belong to call sets with these ids. Leaving this blank returns all variant calls. If a variant has no calls belonging to any of these call sets, it won't be returned at all. Currently, variants with no calls from any call set will never be returned.",
+     "description": "Only return variant calls which belong to call sets with these ids. Leaving this blank returns all variant calls. If a variant has no calls belonging to any of these call sets, it won't be returned at all.",
      "items": {
       "type": "string"
      }
@@ -1932,7 +1929,7 @@
     },
     "variantSetIds": {
      "type": "array",
-     "description": "At most one variant set ID must be provided. Only variants from this variant set will be returned. If omitted, a call set id must be included in the request.",
+     "description": "At most one variant set ID must be provided. Only variants from this variant set will be returned. If omitted, a call set id must be included in the request. Both this and call_set_ids may be set.",
      "items": {
       "type": "string"
      }
@@ -2249,6 +2246,10 @@
      "type": "string",
      "description": "The dataset to which this variant set belongs. Immutable."
     },
+    "description": {
+     "type": "string",
+     "description": "A textual description of this variant set."
+    },
     "id": {
      "type": "string",
      "description": "The Google-generated ID of the variant set. Immutable."
@@ -2259,6 +2260,10 @@
      "items": {
       "$ref": "Metadata"
      }
+    },
+    "name": {
+     "type": "string",
+     "description": "User-specified, mutable name."
     },
     "referenceBounds": {
      "type": "array",
@@ -2637,7 +2642,7 @@
      "parameters": {
       "callSetId": {
        "type": "string",
-       "description": "The ID of the call set to be updated.",
+       "description": "Required. The ID of the call set to be updated.",
        "required": true,
        "location": "path"
       }
@@ -2681,7 +2686,7 @@
      "parameters": {
       "callSetId": {
        "type": "string",
-       "description": "The ID of the call set to be updated.",
+       "description": "Required. The ID of the call set to be updated.",
        "required": true,
        "location": "path"
       }
@@ -3405,7 +3410,7 @@
      "parameters": {
       "variantId": {
        "type": "string",
-       "description": "The ID of the variant.",
+       "description": "Required.",
        "required": true,
        "location": "path"
       }
@@ -3494,7 +3499,7 @@
      "parameters": {
       "variantSetId": {
        "type": "string",
-       "description": "The ID of the variant set to be deleted.",
+       "description": "The ID of the variant set to be deleted. Required.",
        "required": true,
        "location": "path"
       }
@@ -3515,7 +3520,7 @@
      "parameters": {
       "variantSetId": {
        "type": "string",
-       "description": "Required. The ID of the variant set that contains variant data which should be exported. The caller must have READ access to this variant set.",
+       "description": "The ID of the variant set that contains variant data which should be exported. Required. The caller must have READ access to this variant set.",
        "required": true,
        "location": "path"
       }
@@ -3543,7 +3548,7 @@
      "parameters": {
       "variantSetId": {
        "type": "string",
-       "description": "The ID of the variant set.",
+       "description": "The ID of the variant set. Required.",
        "required": true,
        "location": "path"
       }

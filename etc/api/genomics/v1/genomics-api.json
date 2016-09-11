@@ -1,13 +1,13 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"bRFOOrZKfO9LweMbPqu0kcu6De8/nyUO2UOkslUqZUL17-85iW0oVO0\"",
+ "etag": "\"C5oy1hgQsABtYOYIOXWcR3BgYqU/eElt1TJDnW0IokCJ9H0sGXTCyq0\"",
  "discoveryVersion": "v1",
  "id": "genomics:v1",
  "name": "genomics",
  "version": "v1",
- "revision": "20160407",
+ "revision": "20160905",
  "title": "Genomics API",
- "description": "Stores, processes, explores and shares genomic data. This API implements the Global Alliance for Genomics and Health (GA4GH) v0.5.1 API as well as several extensions.",
+ "description": "Stores, processes, explores and shares genomic data.",
  "ownerDomain": "google.com",
  "ownerName": "Google",
  "icons": {
@@ -443,14 +443,14 @@
     },
     "exons": {
      "type": "array",
-     "description": "The exons that compose this transcript. This field should be unset for genomes where transcript splicing does not occur, for example prokaryotes. Introns are regions of the transcript that are not included in the spliced RNA product. Though not explicitly modeled here, intron ranges can be deduced; all regions of this transcript that are not exons are introns. Exonic sequences do not necessarily code for a translational product (amino acids). Only the regions of exons bounded by the `codingSequence` correspond to coding DNA sequence. Exons are ordered by start position and may not overlap.",
+     "description": "The exons that compose this transcript. This field should be unset for genomes where transcript splicing does not occur, for example prokaryotes. Introns are regions of the transcript that are not included in the spliced RNA product. Though not explicitly modeled here, intron ranges can be deduced; all regions of this transcript that are not exons are introns. Exonic sequences do not necessarily code for a translational product (amino acids). Only the regions of exons bounded by the codingSequence correspond to coding DNA sequence. Exons are ordered by start position and may not overlap.",
      "items": {
       "$ref": "Exon"
      }
     },
     "codingSequence": {
      "$ref": "CodingSequence",
-     "description": "The range of the coding sequence for this transcript, if any. To determine the exact ranges of coding sequence, intersect this range with those of the `exons`, if any. If there are any `exons`, the `codingSequence` must start and end within them. Note that in some cases, the reference genome will not exactly match the observed mRNA transcript e.g. due to variance in the source genome from reference. In these cases, `exon.frame` will not necessarily match the expected reference reading frame and coding exon reference bases cannot necessarily be concatenated to produce the original transcript mRNA."
+     "description": "The range of the coding sequence for this transcript, if any. To determine the exact ranges of coding sequence, intersect this range with those of the exons, if any. If there are any exons, the codingSequence must start and end within them. Note that in some cases, the reference genome will not exactly match the observed mRNA transcript e.g. due to variance in the source genome from reference. In these cases, exon.frame will not necessarily match the expected reference reading frame and coding exon reference bases cannot necessarily be concatenated to produce the original transcript mRNA."
     }
    }
   },
@@ -470,7 +470,7 @@
     },
     "frame": {
      "type": "integer",
-     "description": "The frame of this exon. Contains a value of 0, 1, or 2, which indicates the offset of the first coding base of the exon within the reading frame of the coding DNA sequence, if any. This field is dependent on the strandedness of this annotation (see Annotation.reverse_strand). For forward stranded annotations, this offset is relative to the `exon.start`. For reverse strand annotations, this offset is relative to the `exon.end - 1`. Unset if this exon does not intersect the coding sequence. Upon creation of a transcript, the frame must be populated for all or none of the coding exons.",
+     "description": "The frame of this exon. Contains a value of 0, 1, or 2, which indicates the offset of the first coding base of the exon within the reading frame of the coding DNA sequence, if any. This field is dependent on the strandedness of this annotation (see Annotation.reverse_strand). For forward stranded annotations, this offset is relative to the exon.start. For reverse strand annotations, this offset is relative to the exon.end `- 1`. Unset if this exon does not intersect the coding sequence. Upon creation of a transcript, the frame must be populated for all or none of the coding exons.",
      "format": "int32"
     }
    }
@@ -501,6 +501,10 @@
      "items": {
       "$ref": "Annotation"
      }
+    },
+    "requestId": {
+     "type": "string",
+     "description": "A unique request ID which enables the server to detect duplicated requests. If provided, duplicated requests will result in the same response; if not provided, duplicated requests may result in duplicated data. For a given annotation set, callers should not reuse `request_id`s when writing different batches of annotations - behavior in this case is undefined. A common approach is to use a UUID. For batch jobs where worker crashes are a possibility, consider using some unique variant of a worker or run ID."
     }
    }
   },
@@ -552,7 +556,7 @@
       "type": "object",
       "additionalProperties": {
        "type": "any",
-       "description": "Properties of the object. Contains field @ype with type URL."
+       "description": "Properties of the object. Contains field @type with type URL."
       }
      }
     }
@@ -644,7 +648,7 @@
     },
     "projectId": {
      "type": "string",
-     "description": "The Google Developers Console project ID that this dataset belongs to."
+     "description": "The Google Cloud project ID that this dataset belongs to."
     },
     "name": {
      "type": "string",
@@ -760,7 +764,7 @@
      "description": "An OperationMetadata object. This will always be returned with the Operation.",
      "additionalProperties": {
       "type": "any",
-      "description": "Properties of the object. Contains field @ype with type URL."
+      "description": "Properties of the object. Contains field @type with type URL."
      }
     },
     "done": {
@@ -776,7 +780,7 @@
      "description": "If importing ReadGroupSets, an ImportReadGroupSetsResponse is returned. If importing Variants, an ImportVariantsResponse is returned. For exports, an empty response is returned.",
      "additionalProperties": {
       "type": "any",
-      "description": "Properties of the object. Contains field @ype with type URL."
+      "description": "Properties of the object. Contains field @type with type URL."
      }
     }
    }
@@ -842,7 +846,7 @@
    "properties": {
     "projectId": {
      "type": "string",
-     "description": "Required. The Google Developers Console project ID that owns this export. The caller must have WRITE access to this project."
+     "description": "Required. The Google Cloud project ID that owns this export. The caller must have WRITE access to this project."
     },
     "exportUri": {
      "type": "string",
@@ -1341,7 +1345,7 @@
    "properties": {
     "projectId": {
      "type": "string",
-     "description": "The Google Developers Console project ID or number which will be billed for this access. The caller must have WRITE access to this project. Required."
+     "description": "The Google Cloud project ID which will be billed for this access. The caller must have WRITE access to this project. Required."
     },
     "readGroupSetId": {
      "type": "string",
@@ -1663,6 +1667,14 @@
      "items": {
       "$ref": "VariantSetMetadata"
      }
+    },
+    "name": {
+     "type": "string",
+     "description": "User-specified, mutable name."
+    },
+    "description": {
+     "type": "string",
+     "description": "A textual description of this variant set."
     }
    }
   },
@@ -1824,7 +1836,7 @@
     },
     "callSetIds": {
      "type": "array",
-     "description": "Only return variant calls which belong to call sets with these ids. Leaving this blank returns all variant calls. If a variant has no calls belonging to any of these call sets, it won't be returned at all. Currently, variants with no calls from any call set will never be returned.",
+     "description": "Only return variant calls which belong to call sets with these ids. Leaving this blank returns all variant calls. If a variant has no calls belonging to any of these call sets, it won't be returned at all.",
      "items": {
       "type": "string"
      }
@@ -2125,7 +2137,7 @@
    "properties": {
     "projectId": {
      "type": "string",
-     "description": "The Google Developers Console project ID or number which will be billed for this access. The caller must have WRITE access to this project. Required."
+     "description": "The Google Cloud project ID which will be billed for this access. The caller must have WRITE access to this project. Required."
     },
     "variantSetId": {
      "type": "string",
@@ -2207,12 +2219,20 @@
      "type": "string",
      "description": "The time at which the job was submitted to the Genomics service."
     },
+    "startTime": {
+     "type": "string",
+     "description": "The time at which the job began to run."
+    },
+    "endTime": {
+     "type": "string",
+     "description": "The time at which the job stopped running."
+    },
     "request": {
      "type": "object",
      "description": "The original request that started the operation. Note that this will be in current version of the API. If the operation was started with v1beta2 API and a GetOperation is performed on v1 API, a v1 request will be returned.",
      "additionalProperties": {
       "type": "any",
-      "description": "Properties of the object. Contains field @ype with type URL."
+      "description": "Properties of the object. Contains field @type with type URL."
      }
     },
     "events": {
@@ -2220,6 +2240,18 @@
      "description": "Optional event messages that were generated during the job's execution. This also contains any warnings that were generated during import or export.",
      "items": {
       "$ref": "OperationEvent"
+     }
+    },
+    "clientId": {
+     "type": "string",
+     "description": "Optionally provided by the caller when submitting the request that creates the operation."
+    },
+    "runtimeMetadata": {
+     "type": "object",
+     "description": "Runtime metadata on this Operation.",
+     "additionalProperties": {
+      "type": "any",
+      "description": "Properties of the object. Contains field @type with type URL."
      }
     }
    }
@@ -2229,9 +2261,54 @@
    "type": "object",
    "description": "An event that occurred during an Operation.",
    "properties": {
+    "startTime": {
+     "type": "string",
+     "description": "Optional time of when event started."
+    },
+    "endTime": {
+     "type": "string",
+     "description": "Optional time of when event finished. An event can have a start time and no finish time. If an event has a finish time, there must be a start time."
+    },
     "description": {
      "type": "string",
      "description": "Required description of event."
+    }
+   }
+  },
+  "RuntimeMetadata": {
+   "id": "RuntimeMetadata",
+   "type": "object",
+   "description": "Runtime metadata that will be populated in the runtimeMetadata field of the Operation associated with a RunPipeline execution.",
+   "properties": {
+    "computeEngine": {
+     "$ref": "ComputeEngine",
+     "description": "Execution information specific to Google Compute Engine."
+    }
+   }
+  },
+  "ComputeEngine": {
+   "id": "ComputeEngine",
+   "type": "object",
+   "description": "Describes a Compute Engine resource that is being managed by a running pipeline.",
+   "properties": {
+    "instanceName": {
+     "type": "string",
+     "description": "The instance on which the operation is running."
+    },
+    "zone": {
+     "type": "string",
+     "description": "The availability zone in which the instance resides."
+    },
+    "machineType": {
+     "type": "string",
+     "description": "The machine type of the instance."
+    },
+    "diskNames": {
+     "type": "array",
+     "description": "The names of the disks that were created for this pipeline.",
+     "items": {
+      "type": "string"
+     }
     }
    }
   }
@@ -2361,7 +2438,7 @@
      "id": "genomics.annotations.create",
      "path": "v1/annotations",
      "httpMethod": "POST",
-     "description": "Creates a new annotation. Caller must have WRITE permission for the associated annotation set. The following fields are required: * annotationSetId * referenceName or referenceId ### Transcripts For annotations of type TRANSCRIPT, the following fields of transcript must be provided: * `exons.start` * `exons.end` All other fields may be optionally specified, unless documented as being server-generated (for example, the `id` field). The annotated range must be no longer than 100Mbp (mega base pairs). See the Annotation resource for additional restrictions on each field.",
+     "description": "Creates a new annotation. Caller must have WRITE permission for the associated annotation set. The following fields are required: * annotationSetId * referenceName or referenceId ### Transcripts For annotations of type TRANSCRIPT, the following fields of transcript must be provided: * exons.start * exons.end All other fields may be optionally specified, unless documented as being server-generated (for example, the `id` field). The annotated range must be no longer than 100Mbp (mega base pairs). See the Annotation resource for additional restrictions on each field.",
      "request": {
       "$ref": "Annotation"
      },
@@ -2499,7 +2576,7 @@
      "parameters": {
       "projectId": {
        "type": "string",
-       "description": "Required. The project to list datasets for.",
+       "description": "Required. The Google Cloud project ID to list datasets for.",
        "location": "query"
       },
       "pageSize": {
@@ -2854,7 +2931,7 @@
      "id": "genomics.readgroupsets.export",
      "path": "v1/readgroupsets/{readGroupSetId}:export",
      "httpMethod": "POST",
-     "description": "Exports a read group set to a BAM file in Google Cloud Storage. For the definitions of read group sets and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics) Note that currently there may be some differences between exported BAM files and the original BAM file at the time of import. See [ImportReadGroupSets](google.genomics.v1.ReadServiceV1.ImportReadGroupSets) for caveats.",
+     "description": "Exports a read group set to a BAM file in Google Cloud Storage. For the definitions of read group sets and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics) Note that currently there may be some differences between exported BAM files and the original BAM file at the time of import. See ImportReadGroupSets for caveats.",
      "parameters": {
       "readGroupSetId": {
        "type": "string",
@@ -3519,7 +3596,7 @@
       },
       "updateMask": {
        "type": "string",
-       "description": "An optional mask specifying which fields to update. Supported fields: * metadata. Leaving `updateMask` unset is equivalent to specifying all mutable fields.",
+       "description": "An optional mask specifying which fields to update. Supported fields: * metadata. * name. * description. Leaving `updateMask` unset is equivalent to specifying all mutable fields.",
        "location": "query"
       }
      },

@@ -1,6 +1,6 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"bRFOOrZKfO9LweMbPqu0kcu6De8/tzwJjoO4XDFgwNQjmiM8lPsFMzA\"",
+ "etag": "\"C5oy1hgQsABtYOYIOXWcR3BgYqU/tzwJjoO4XDFgwNQjmiM8lPsFMzA\"",
  "discoveryVersion": "v1",
  "id": "people:v1",
  "name": "people",

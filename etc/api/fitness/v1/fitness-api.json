@@ -1,13 +1,13 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"bRFOOrZKfO9LweMbPqu0kcu6De8/TL15SCjr77AOU2DmVX156flg8x0\"",
+ "etag": "\"C5oy1hgQsABtYOYIOXWcR3BgYqU/C_efOoRNuMwDVzh1-1r-3k_wkJo\"",
  "discoveryVersion": "v1",
  "id": "fitness:v1",
  "name": "fitness",
  "version": "v1",
- "revision": "20151021",
+ "revision": "20160801",
  "title": "Fitness",
- "description": "Google Fit API",
+ "description": "Stores and accesses user data in the fitness store from apps on any platform.",
  "ownerDomain": "google.com",
  "ownerName": "Google",
  "icons": {
@@ -86,6 +86,12 @@
     },
     "https://www.googleapis.com/auth/fitness.location.write": {
      "description": "View and store your location data in Google Fit"
+    },
+    "https://www.googleapis.com/auth/fitness.nutrition.read": {
+     "description": "View nutrition information in Google Fit"
+    },
+    "https://www.googleapis.com/auth/fitness.nutrition.write": {
+     "description": "View and store nutrition information in Google Fit"
     }
    }
   }
@@ -198,6 +204,37 @@
       ]
      }
     },
+    "filteredDataQualityStandard": {
+     "type": "array",
+     "description": "A list of acceptable data quality standards. Only data points which conform to at least one of the specified data quality standards will be returned. If the list is empty, all data points are returned.",
+     "items": {
+      "type": "string",
+      "enum": [
+       "dataQualityBloodGlucoseIso151972003",
+       "dataQualityBloodGlucoseIso151972013",
+       "dataQualityBloodPressureAami",
+       "dataQualityBloodPressureBhsAA",
+       "dataQualityBloodPressureBhsAB",
+       "dataQualityBloodPressureBhsBA",
+       "dataQualityBloodPressureBhsBB",
+       "dataQualityBloodPressureEsh2002",
+       "dataQualityBloodPressureEsh2010",
+       "dataQualityUnknown"
+      ],
+      "enumDescriptions": [
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       ""
+      ]
+     }
+    },
     "startTimeMillis": {
      "type": "string",
      "description": "The start of a window of time. Data that intersects with this time window will be aggregated. The time is in milliseconds since epoch, inclusive.",
@@ -226,7 +263,7 @@
   "Application": {
    "id": "Application",
    "type": "object",
-   "description": "See: google3/java/com/google/android/apps/heart/platform/api/Application.java",
+   "description": "",
    "properties": {
     "detailsUrl": {
      "type": "string",
@@ -287,6 +324,36 @@
      "type": "string",
      "description": "Specifies that result buckets aggregate data by exactly durationMillis time frames. Time frames that contain no data will be included in the response with an empty dataset.",
      "format": "int64"
+    },
+    "period": {
+     "$ref": "BucketByTimePeriod"
+    }
+   }
+  },
+  "BucketByTimePeriod": {
+   "id": "BucketByTimePeriod",
+   "type": "object",
+   "properties": {
+    "timeZoneId": {
+     "type": "string",
+     "description": "org.joda.timezone.DateTimeZone"
+    },
+    "type": {
+     "type": "string",
+     "enum": [
+      "day",
+      "month",
+      "week"
+     ],
+     "enumDescriptions": [
+      "",
+      "",
+      ""
+     ]
+    },
+    "value": {
+     "type": "integer",
+     "format": "int32"
     }
    }
   },
@@ -372,6 +439,37 @@
       ]
      }
     },
+    "dataQualityStandard": {
+     "type": "array",
+     "description": "",
+     "items": {
+      "type": "string",
+      "enum": [
+       "dataQualityBloodGlucoseIso151972003",
+       "dataQualityBloodGlucoseIso151972013",
+       "dataQualityBloodPressureAami",
+       "dataQualityBloodPressureBhsAA",
+       "dataQualityBloodPressureBhsAB",
+       "dataQualityBloodPressureBhsBA",
+       "dataQualityBloodPressureBhsBB",
+       "dataQualityBloodPressureEsh2002",
+       "dataQualityBloodPressureEsh2010",
+       "dataQualityUnknown"
+      ],
+      "enumDescriptions": [
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       ""
+      ]
+     }
+    },
     "dataStreamId": {
      "type": "string",
      "description": "A unique identifier for the data stream produced by this data source. The identifier includes:\n\n \n- The physical device's manufacturer, model, and serial number (UID). \n- The application's package name or name. Package name is used when the data source was created by an Android application. The developer project number is used when the data source was created by a REST client. \n- The data source's type. \n- The data source's stream name.  Note that not all attributes of the data source are used as part of the stream identifier. In particular, the version of the hardware/the application isn't used. This allows us to preserve the same stream through version updates. This also means that two DataSource objects may represent the same data stream even if they're not equal.\n\nThe exact format of the data stream ID created by an Android application is: type:dataType.name:application.packageName:device.manufacturer:device.model:device.uid:dataStreamName \n\nThe exact format of the data stream ID created by a REST client is: type:dataType.name:developer project number:device.manufacturer:device.model:device.uid:dataStreamName \n\nWhen any of the optional fields that comprise of the data stream ID are blank, they will be omitted from the data stream ID. The minnimum viable data stream ID would be: type:dataType.name:developer project number\n\nFinally, the developer project number is obfuscated when read by any REST or Android client that did not create the data source. Only the data source creator will see the developer project number in clear and normal form.",
@@ -432,7 +530,7 @@
   "DataType": {
    "id": "DataType",
    "type": "object",
-   "description": "See: google3/java/com/google/android/apps/heart/platform/api/DataType.java",
+   "description": "",
    "properties": {
     "field": {
      "type": "array",
@@ -589,6 +687,7 @@
      "description": "A constant representing the type of the device.",
      "enum": [
       "chestStrap",
+      "headMounted",
       "phone",
       "scale",
       "tablet",
@@ -596,6 +695,7 @@
       "watch"
      ],
      "enumDescriptions": [
+      "",
       "",
       "",
       "",
@@ -830,14 +930,15 @@
        "scopes": [
         "https://www.googleapis.com/auth/fitness.activity.write",
         "https://www.googleapis.com/auth/fitness.body.write",
-        "https://www.googleapis.com/auth/fitness.location.write"
+        "https://www.googleapis.com/auth/fitness.location.write",
+        "https://www.googleapis.com/auth/fitness.nutrition.write"
        ]
       },
       "delete": {
        "id": "fitness.users.dataSources.delete",
        "path": "{userId}/dataSources/{dataSourceId}",
        "httpMethod": "DELETE",
-       "description": "Delete the data source if there are no datapoints associated with it",
+       "description": "Deletes the specified data source. The request will fail if the data source contains any data points.",
        "parameters": {
         "dataSourceId": {
          "type": "string",
@@ -862,14 +963,15 @@
        "scopes": [
         "https://www.googleapis.com/auth/fitness.activity.write",
         "https://www.googleapis.com/auth/fitness.body.write",
-        "https://www.googleapis.com/auth/fitness.location.write"
+        "https://www.googleapis.com/auth/fitness.location.write",
+        "https://www.googleapis.com/auth/fitness.nutrition.write"
        ]
       },
       "get": {
        "id": "fitness.users.dataSources.get",
        "path": "{userId}/dataSources/{dataSourceId}",
        "httpMethod": "GET",
-       "description": "Returns a data source identified by a data stream ID.",
+       "description": "Returns the specified data source.",
        "parameters": {
         "dataSourceId": {
          "type": "string",
@@ -897,14 +999,16 @@
         "https://www.googleapis.com/auth/fitness.body.read",
         "https://www.googleapis.com/auth/fitness.body.write",
         "https://www.googleapis.com/auth/fitness.location.read",
-        "https://www.googleapis.com/auth/fitness.location.write"
+        "https://www.googleapis.com/auth/fitness.location.write",
+        "https://www.googleapis.com/auth/fitness.nutrition.read",
+        "https://www.googleapis.com/auth/fitness.nutrition.write"
        ]
       },
       "list": {
        "id": "fitness.users.dataSources.list",
        "path": "{userId}/dataSources",
        "httpMethod": "GET",
-       "description": "Lists all data sources that are visible to the developer, using the OAuth scopes provided. The list is not exhaustive: the user may have private data sources that are only visible to other developers or calls using other scopes.",
+       "description": "Lists all data sources that are visible to the developer, using the OAuth scopes provided. The list is not exhaustive; the user may have private data sources that are only visible to other developers, or calls using other scopes.",
        "parameters": {
         "dataTypeName": {
          "type": "string",
@@ -931,14 +1035,16 @@
         "https://www.googleapis.com/auth/fitness.body.read",
         "https://www.googleapis.com/auth/fitness.body.write",
         "https://www.googleapis.com/auth/fitness.location.read",
-        "https://www.googleapis.com/auth/fitness.location.write"
+        "https://www.googleapis.com/auth/fitness.location.write",
+        "https://www.googleapis.com/auth/fitness.nutrition.read",
+        "https://www.googleapis.com/auth/fitness.nutrition.write"
        ]
       },
       "patch": {
        "id": "fitness.users.dataSources.patch",
        "path": "{userId}/dataSources/{dataSourceId}",
        "httpMethod": "PATCH",
-       "description": "Updates a given data source. It is an error to modify the data source's data stream ID, data type, type, stream name or device information apart from the device version. Changing these fields would require a new unique data stream ID and separate data source.\n\nData sources are identified by their data stream ID. This method supports patch semantics.",
+       "description": "Updates the specified data source. The dataStreamId, dataType, type, dataStreamName, and device properties with the exception of version, cannot be modified.\n\nData sources are identified by their dataStreamId. This method supports patch semantics.",
        "parameters": {
         "dataSourceId": {
          "type": "string",
@@ -966,14 +1072,15 @@
        "scopes": [
         "https://www.googleapis.com/auth/fitness.activity.write",
         "https://www.googleapis.com/auth/fitness.body.write",
-        "https://www.googleapis.com/auth/fitness.location.write"
+        "https://www.googleapis.com/auth/fitness.location.write",
+        "https://www.googleapis.com/auth/fitness.nutrition.write"
        ]
       },
       "update": {
        "id": "fitness.users.dataSources.update",
        "path": "{userId}/dataSources/{dataSourceId}",
        "httpMethod": "PUT",
-       "description": "Updates a given data source. It is an error to modify the data source's data stream ID, data type, type, stream name or device information apart from the device version. Changing these fields would require a new unique data stream ID and separate data source.\n\nData sources are identified by their data stream ID.",
+       "description": "Updates the specified data source. The dataStreamId, dataType, type, dataStreamName, and device properties with the exception of version, cannot be modified.\n\nData sources are identified by their dataStreamId.",
        "parameters": {
         "dataSourceId": {
          "type": "string",
@@ -1001,7 +1108,8 @@
        "scopes": [
         "https://www.googleapis.com/auth/fitness.activity.write",
         "https://www.googleapis.com/auth/fitness.body.write",
-        "https://www.googleapis.com/auth/fitness.location.write"
+        "https://www.googleapis.com/auth/fitness.location.write",
+        "https://www.googleapis.com/auth/fitness.nutrition.write"
        ]
       }
      },
@@ -1053,7 +1161,8 @@
          "scopes": [
           "https://www.googleapis.com/auth/fitness.activity.write",
           "https://www.googleapis.com/auth/fitness.body.write",
-          "https://www.googleapis.com/auth/fitness.location.write"
+          "https://www.googleapis.com/auth/fitness.location.write",
+          "https://www.googleapis.com/auth/fitness.nutrition.write"
          ]
         },
         "get": {
@@ -1076,7 +1185,7 @@
           },
           "limit": {
            "type": "integer",
-           "description": "If specified, no more than this many data points will be included in the dataset. If the there are more data points in the dataset, nextPageToken will be set in the dataset response.",
+           "description": "If specified, no more than this many data points will be included in the dataset. If there are more data points in the dataset, nextPageToken will be set in the dataset response.",
            "format": "int32",
            "location": "query"
           },
@@ -1106,7 +1215,9 @@
           "https://www.googleapis.com/auth/fitness.body.read",
           "https://www.googleapis.com/auth/fitness.body.write",
           "https://www.googleapis.com/auth/fitness.location.read",
-          "https://www.googleapis.com/auth/fitness.location.write"
+          "https://www.googleapis.com/auth/fitness.location.write",
+          "https://www.googleapis.com/auth/fitness.nutrition.read",
+          "https://www.googleapis.com/auth/fitness.nutrition.write"
          ]
         },
         "patch": {
@@ -1154,7 +1265,8 @@
          "scopes": [
           "https://www.googleapis.com/auth/fitness.activity.write",
           "https://www.googleapis.com/auth/fitness.body.write",
-          "https://www.googleapis.com/auth/fitness.location.write"
+          "https://www.googleapis.com/auth/fitness.location.write",
+          "https://www.googleapis.com/auth/fitness.nutrition.write"
          ]
         }
        }
@@ -1191,7 +1303,9 @@
         "https://www.googleapis.com/auth/fitness.body.read",
         "https://www.googleapis.com/auth/fitness.body.write",
         "https://www.googleapis.com/auth/fitness.location.read",
-        "https://www.googleapis.com/auth/fitness.location.write"
+        "https://www.googleapis.com/auth/fitness.location.write",
+        "https://www.googleapis.com/auth/fitness.nutrition.read",
+        "https://www.googleapis.com/auth/fitness.nutrition.write"
        ]
       }
      }
@@ -1276,7 +1390,9 @@
         "https://www.googleapis.com/auth/fitness.body.read",
         "https://www.googleapis.com/auth/fitness.body.write",
         "https://www.googleapis.com/auth/fitness.location.read",
-        "https://www.googleapis.com/auth/fitness.location.write"
+        "https://www.googleapis.com/auth/fitness.location.write",
+        "https://www.googleapis.com/auth/fitness.nutrition.read",
+        "https://www.googleapis.com/auth/fitness.nutrition.write"
        ]
       },
       "update": {

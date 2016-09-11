@@ -3,9 +3,13 @@
 # DO NOT EDIT !!!
 api:
   list:
+    acceleratedmobilepageurl:
+    - v1
     adexchangebuyer:
     - v1.3
     - v1.4
+    adexchangebuyer2:
+    - v2beta1
     adexchangeseller:
     - v2.0
     admin:
@@ -17,16 +21,21 @@ api:
     - v4.1
     analytics:
     - v3
+    analyticsreporting:
+    - v4
     androidenterprise:
     - v1
     androidpublisher:
     - v2
     appengine:
+    - v1
     - v1beta4
     - v1beta5
     appsactivity:
     - v1
     appstate:
+    - v1
+    audit:
     - v1
     autoscaler:
     - v1beta2
@@ -44,8 +53,12 @@ api:
     - v1
     cloudbilling:
     - v1
+    cloudbuild:
+    - v1
     clouddebugger:
     - v2
+    clouderrorreporting:
+    - v1beta1
     cloudlatencytest:
     - v2
     cloudmonitoring:
@@ -77,7 +90,9 @@ api:
     dataproc:
     - v1
     datastore:
+    - v1
     - v1beta2
+    - v1beta3
     deploymentmanager:
     - v2
     - v2beta2
@@ -86,6 +101,8 @@ api:
     - v2.2
     - v2.3
     - v2.4
+    - v2.5
+    - v2.6
     discovery:
     - v1
     dns:
@@ -97,10 +114,13 @@ api:
     drive:
     - v2
     - v3
+    firebaserules:
+    - v1
     fitness:
     - v1
     freebase:
     - v1
+    - v1sandbox
     fusiontables:
     - v2
     games:
@@ -125,12 +145,16 @@ api:
     - v3
     kgsearch:
     - v1
+    language:
+    - v1beta1
     licensing:
     - v1
     logging:
     - v2beta1
     manager:
     - v1beta2
+    mapsengine:
+    - v1
     mirror:
     - v1
     monitoring:
@@ -166,14 +190,26 @@ api:
     - v1sandbox
     resourceviews:
     - v1beta2
+    runtimeconfig:
+    - v1beta1
+    safebrowsing:
+    - v4
     script:
+    - v1
+    servicecontrol:
+    - v1
+    servicemanagement:
     - v1
     serviceregistry:
     - alpha
+    sheets:
+    - v4
     siteverification:
     - v1
     spectrum:
     - v1explorer
+    speech:
+    - v1beta1
     sqladmin:
     - v1beta4
     storage:
@@ -191,6 +227,8 @@ api:
     translate:
     - v2
     urlshortener:
+    - v1
+    vision:
     - v1
     webfonts:
     - v1
