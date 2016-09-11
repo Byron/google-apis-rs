@@ -1796,10 +1796,11 @@ impl<'n> Engine<'n> {
                     "email-address" => Some(("emailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "photo-link" => Some(("photoLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "role" => Some(("role", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "expiration-time" => Some(("expirationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-file-discovery", "display-name", "domain", "email-address", "id", "kind", "photo-link", "role", "type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-file-discovery", "display-name", "domain", "email-address", "expiration-time", "id", "kind", "photo-link", "role", "type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2047,10 +2048,11 @@ impl<'n> Engine<'n> {
                     "email-address" => Some(("emailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "photo-link" => Some(("photoLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "role" => Some(("role", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "expiration-time" => Some(("expirationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-file-discovery", "display-name", "domain", "email-address", "id", "kind", "photo-link", "role", "type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-file-discovery", "display-name", "domain", "email-address", "expiration-time", "id", "kind", "photo-link", "role", "type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2067,6 +2069,9 @@ impl<'n> Engine<'n> {
                 "transfer-ownership" => {
                     call = call.transfer_ownership(arg_from_str(value.unwrap_or("false"), err, "transfer-ownership", "boolean"));
                 },
+                "remove-expiration" => {
+                    call = call.remove_expiration(arg_from_str(value.unwrap_or("false"), err, "remove-expiration", "boolean"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2080,7 +2085,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["transfer-ownership"].iter().map(|v|*v));
+                                                                           v.extend(["transfer-ownership", "remove-expiration"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3878,8 +3883,8 @@ fn main() {
     
     let mut app = App::new("drive3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.6+20160331")
-           .about("The API to interact with Drive.")
+           .version("0.3.6+20160901")
+           .about("Manages files in Drive including uploading, downloading, searching, detecting changes, and updating sharing permissions.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_drive3_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

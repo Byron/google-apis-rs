@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-androidenterprise1` library allows access to all features of the *Google Android Enterprise* service.
 
-This documentation was generated from *Android Enterprise* crate version *0.1.14+20160331*, where *20160331* is the exact revision of the *androidenterprise:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
+This documentation was generated from *Android Enterprise* crate version *0.1.14+20160831*, where *20160831* is the exact revision of the *androidenterprise:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
 
 Everything else about the *Android Enterprise* *v1* API can be found at the
 [official documentation site](https://developers.google.com/android/work/play/emm-api).
@@ -20,7 +20,7 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
 * [devices](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.Device.html)
  * [*get*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.DeviceGetCall.html), [*get state*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.DeviceGetStateCall.html), [*list*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.DeviceListCall.html) and [*set state*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.DeviceSetStateCall.html)
 * [enterprises](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.Enterprise.html)
- * [*delete*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseDeleteCall.html), [*enroll*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseEnrollCall.html), [*get*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseGetCall.html), [*get store layout*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseGetStoreLayoutCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseListCall.html), [*send test push notification*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseSendTestPushNotificationCall.html), [*set account*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseSetAccountCall.html), [*set store layout*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseSetStoreLayoutCall.html) and [*unenroll*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseUnenrollCall.html)
+ * [*acknowledge notification set*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseAcknowledgeNotificationSetCall.html), [*complete signup*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseCompleteSignupCall.html), [*delete*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseDeleteCall.html), [*enroll*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseEnrollCall.html), [*generate signup url*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseGenerateSignupUrlCall.html), [*get*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseGetCall.html), [*get service account*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseGetServiceAccountCall.html), [*get store layout*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseGetStoreLayoutCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseListCall.html), [*pull notification set*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterprisePullNotificationSetCall.html), [*send test push notification*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseSendTestPushNotificationCall.html), [*set account*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseSetAccountCall.html), [*set store layout*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseSetStoreLayoutCall.html) and [*unenroll*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseUnenrollCall.html)
 * [entitlements](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.Entitlement.html)
  * [*delete*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EntitlementDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EntitlementGetCall.html), [*list*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EntitlementListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EntitlementPatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EntitlementUpdateCall.html)
 * grouplicenses
@@ -29,16 +29,22 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
  * [*list*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.GrouplicenseuserListCall.html)
 * [installs](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.Install.html)
  * [*delete*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.InstallDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.InstallGetCall.html), [*list*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.InstallListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.InstallPatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.InstallUpdateCall.html)
+* managedconfigurationsfordevice
+ * [*delete*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.ManagedconfigurationsfordeviceDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.ManagedconfigurationsfordeviceGetCall.html), [*list*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.ManagedconfigurationsfordeviceListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.ManagedconfigurationsfordevicePatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.ManagedconfigurationsfordeviceUpdateCall.html)
+* managedconfigurationsforuser
+ * [*delete*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.ManagedconfigurationsforuserDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.ManagedconfigurationsforuserGetCall.html), [*list*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.ManagedconfigurationsforuserListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.ManagedconfigurationsforuserPatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.ManagedconfigurationsforuserUpdateCall.html)
 * [permissions](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.Permission.html)
  * [*get*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.PermissionGetCall.html)
 * [products](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.Product.html)
- * [*approve*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.ProductApproveCall.html), [*generate approval url*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.ProductGenerateApprovalUrlCall.html), [*get*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.ProductGetCall.html), [*get app restrictions schema*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.ProductGetAppRestrictionsSchemaCall.html), [*get permissions*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.ProductGetPermissionCall.html) and [*update permissions*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.ProductUpdatePermissionCall.html)
+ * [*approve*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.ProductApproveCall.html), [*generate approval url*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.ProductGenerateApprovalUrlCall.html), [*get*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.ProductGetCall.html), [*get app restrictions schema*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.ProductGetAppRestrictionsSchemaCall.html), [*get permissions*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.ProductGetPermissionCall.html), [*list*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.ProductListCall.html), [*unapprove*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.ProductUnapproveCall.html) and [*update permissions*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.ProductUpdatePermissionCall.html)
+* serviceaccountkeys
+ * [*delete*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.ServiceaccountkeyDeleteCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.ServiceaccountkeyInsertCall.html) and [*list*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.ServiceaccountkeyListCall.html)
 * storelayoutclusters
  * [*delete*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.StorelayoutclusterDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.StorelayoutclusterGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.StorelayoutclusterInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.StorelayoutclusterListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.StorelayoutclusterPatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.StorelayoutclusterUpdateCall.html)
 * storelayoutpages
  * [*delete*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.StorelayoutpageDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.StorelayoutpageGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.StorelayoutpageInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.StorelayoutpageListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.StorelayoutpagePatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.StorelayoutpageUpdateCall.html)
 * [users](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.User.html)
- * [*generate token*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.UserGenerateTokenCall.html), [*get*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.UserGetCall.html), [*get available product set*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.UserGetAvailableProductSetCall.html), [*list*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.UserListCall.html), [*revoke token*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.UserRevokeTokenCall.html) and [*set available product set*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.UserSetAvailableProductSetCall.html)
+ * [*delete*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.UserDeleteCall.html), [*generate authentication token*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.UserGenerateAuthenticationTokenCall.html), [*generate token*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.UserGenerateTokenCall.html), [*get*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.UserGetCall.html), [*get available product set*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.UserGetAvailableProductSetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.UserInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.UserListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.UserPatchCall.html), [*revoke token*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.UserRevokeTokenCall.html), [*set available product set*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.UserSetAvailableProductSetCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.UserUpdateCall.html)
 
 
 
@@ -72,15 +78,20 @@ Or specifically ...
 
 ```ignore
 let r = hub.enterprises().send_test_push_notification(...).doit()
-let r = hub.enterprises().set_store_layout(...).doit()
 let r = hub.enterprises().get_store_layout(...).doit()
+let r = hub.enterprises().get_service_account(...).doit()
+let r = hub.enterprises().acknowledge_notification_set(...).doit()
+let r = hub.enterprises().set_store_layout(...).doit()
+let r = hub.enterprises().insert(...).doit()
+let r = hub.enterprises().complete_signup(...).doit()
 let r = hub.enterprises().list(...).doit()
 let r = hub.enterprises().unenroll(...).doit()
 let r = hub.enterprises().set_account(...).doit()
-let r = hub.enterprises().delete(...).doit()
+let r = hub.enterprises().pull_notification_set(...).doit()
 let r = hub.enterprises().enroll(...).doit()
-let r = hub.enterprises().insert(...).doit()
 let r = hub.enterprises().get(...).doit()
+let r = hub.enterprises().delete(...).doit()
+let r = hub.enterprises().generate_signup_url(...).doit()
 ```
 
 The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -105,7 +116,6 @@ google-androidenterprise1 = "*"
 extern crate hyper;
 extern crate yup_oauth2 as oauth2;
 extern crate google_androidenterprise1 as androidenterprise1;
-use androidenterprise1::StoreLayout;
 use androidenterprise1::{Result, Error};
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -123,15 +133,11 @@ let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
                               hyper::Client::new(),
                               <MemoryStorage as Default>::default(), None);
 let mut hub = AndroidEnterprise::new(hyper::Client::new(), auth);
-// As the method needs a request, you would usually fill it with the desired information
-// into the respective structure. Some of the parts shown here might not be applicable !
-// Values shown here are possibly random and not representative !
-let mut req = StoreLayout::default();
-
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
-let result = hub.enterprises().set_store_layout(req, "enterpriseId")
+let result = hub.enterprises().get_service_account("enterpriseId")
+             .key_type("sit")
              .doit();
 
 match result {

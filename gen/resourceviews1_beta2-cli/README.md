@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *resourceviews* API at revision *20150708*. The CLI is at version *0.3.6*.
+This documentation was generated from the *resourceviews* API at revision *20160512*. The CLI is at version *0.3.6*.
 
 ```bash
 resourceviews1-beta2 [options]

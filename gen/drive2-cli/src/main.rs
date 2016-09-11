@@ -1386,11 +1386,12 @@ impl<'n> Engine<'n> {
                     "user-permission.auth-key" => Some(("userPermission.authKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-permission.etag" => Some(("userPermission.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-permission.email-address" => Some(("userPermission.emailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-permission.photo-link" => Some(("userPermission.photoLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-permission.expiration-date" => Some(("userPermission.expirationDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-permission.role" => Some(("userPermission.role", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-permission.type" => Some(("userPermission.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-permission.additional-roles" => Some(("userPermission.additionalRoles", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "user-permission.self-link" => Some(("userPermission.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-permission.photo-link" => Some(("userPermission.photoLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "spaces" => Some(("spaces", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "shareable" => Some(("shareable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "original-filename" => Some(("originalFilename", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1399,7 +1400,7 @@ impl<'n> Engine<'n> {
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "modified-date" => Some(("modifiedDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "alternate-link", "altitude", "aperture", "app-data-contents", "auth-key", "camera-make", "camera-model", "can-comment", "can-read-revisions", "color-space", "copyable", "created-date", "date", "default-open-with-link", "description", "display-name", "domain", "download-url", "duration-millis", "editable", "email-address", "embed-link", "etag", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "file-size", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "head-revision-id", "height", "hidden", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "is-authenticated-user", "iso-speed", "kind", "labels", "last-modifying-user", "last-modifying-user-name", "last-viewed-by-me-date", "latitude", "lens", "location", "longitude", "marked-viewed-by-me-date", "max-aperture-value", "md5-checksum", "metering-mode", "mime-type", "modified-by-me-date", "modified-date", "name", "open-with-links", "original-filename", "owned-by-me", "owner-names", "permission-id", "photo-link", "picture", "quota-bytes-used", "restricted", "role", "rotation", "self-link", "sensor", "shareable", "shared", "shared-with-me-date", "sharing-user", "spaces", "starred", "subject-distance", "text", "thumbnail", "thumbnail-link", "title", "trashed", "type", "url", "user-permission", "value", "version", "video-media-metadata", "viewed", "web-content-link", "web-view-link", "white-balance", "width", "with-link", "writers-can-share"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "alternate-link", "altitude", "aperture", "app-data-contents", "auth-key", "camera-make", "camera-model", "can-comment", "can-read-revisions", "color-space", "copyable", "created-date", "date", "default-open-with-link", "description", "display-name", "domain", "download-url", "duration-millis", "editable", "email-address", "embed-link", "etag", "expiration-date", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "file-size", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "head-revision-id", "height", "hidden", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "is-authenticated-user", "iso-speed", "kind", "labels", "last-modifying-user", "last-modifying-user-name", "last-viewed-by-me-date", "latitude", "lens", "location", "longitude", "marked-viewed-by-me-date", "max-aperture-value", "md5-checksum", "metering-mode", "mime-type", "modified-by-me-date", "modified-date", "name", "open-with-links", "original-filename", "owned-by-me", "owner-names", "permission-id", "photo-link", "picture", "quota-bytes-used", "restricted", "role", "rotation", "self-link", "sensor", "shareable", "shared", "shared-with-me-date", "sharing-user", "spaces", "starred", "subject-distance", "text", "thumbnail", "thumbnail-link", "title", "trashed", "type", "url", "user-permission", "value", "version", "video-media-metadata", "viewed", "web-content-link", "web-view-link", "white-balance", "width", "with-link", "writers-can-share"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1876,11 +1877,12 @@ impl<'n> Engine<'n> {
                     "user-permission.auth-key" => Some(("userPermission.authKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-permission.etag" => Some(("userPermission.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-permission.email-address" => Some(("userPermission.emailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-permission.photo-link" => Some(("userPermission.photoLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-permission.expiration-date" => Some(("userPermission.expirationDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-permission.role" => Some(("userPermission.role", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-permission.type" => Some(("userPermission.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-permission.additional-roles" => Some(("userPermission.additionalRoles", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "user-permission.self-link" => Some(("userPermission.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-permission.photo-link" => Some(("userPermission.photoLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "spaces" => Some(("spaces", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "shareable" => Some(("shareable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "original-filename" => Some(("originalFilename", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1889,7 +1891,7 @@ impl<'n> Engine<'n> {
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "modified-date" => Some(("modifiedDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "alternate-link", "altitude", "aperture", "app-data-contents", "auth-key", "camera-make", "camera-model", "can-comment", "can-read-revisions", "color-space", "copyable", "created-date", "date", "default-open-with-link", "description", "display-name", "domain", "download-url", "duration-millis", "editable", "email-address", "embed-link", "etag", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "file-size", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "head-revision-id", "height", "hidden", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "is-authenticated-user", "iso-speed", "kind", "labels", "last-modifying-user", "last-modifying-user-name", "last-viewed-by-me-date", "latitude", "lens", "location", "longitude", "marked-viewed-by-me-date", "max-aperture-value", "md5-checksum", "metering-mode", "mime-type", "modified-by-me-date", "modified-date", "name", "open-with-links", "original-filename", "owned-by-me", "owner-names", "permission-id", "photo-link", "picture", "quota-bytes-used", "restricted", "role", "rotation", "self-link", "sensor", "shareable", "shared", "shared-with-me-date", "sharing-user", "spaces", "starred", "subject-distance", "text", "thumbnail", "thumbnail-link", "title", "trashed", "type", "url", "user-permission", "value", "version", "video-media-metadata", "viewed", "web-content-link", "web-view-link", "white-balance", "width", "with-link", "writers-can-share"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "alternate-link", "altitude", "aperture", "app-data-contents", "auth-key", "camera-make", "camera-model", "can-comment", "can-read-revisions", "color-space", "copyable", "created-date", "date", "default-open-with-link", "description", "display-name", "domain", "download-url", "duration-millis", "editable", "email-address", "embed-link", "etag", "expiration-date", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "file-size", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "head-revision-id", "height", "hidden", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "is-authenticated-user", "iso-speed", "kind", "labels", "last-modifying-user", "last-modifying-user-name", "last-viewed-by-me-date", "latitude", "lens", "location", "longitude", "marked-viewed-by-me-date", "max-aperture-value", "md5-checksum", "metering-mode", "mime-type", "modified-by-me-date", "modified-date", "name", "open-with-links", "original-filename", "owned-by-me", "owner-names", "permission-id", "photo-link", "picture", "quota-bytes-used", "restricted", "role", "rotation", "self-link", "sensor", "shareable", "shared", "shared-with-me-date", "sharing-user", "spaces", "starred", "subject-distance", "text", "thumbnail", "thumbnail-link", "title", "trashed", "type", "url", "user-permission", "value", "version", "video-media-metadata", "viewed", "web-content-link", "web-view-link", "white-balance", "width", "with-link", "writers-can-share"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2169,11 +2171,12 @@ impl<'n> Engine<'n> {
                     "user-permission.auth-key" => Some(("userPermission.authKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-permission.etag" => Some(("userPermission.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-permission.email-address" => Some(("userPermission.emailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-permission.photo-link" => Some(("userPermission.photoLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-permission.expiration-date" => Some(("userPermission.expirationDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-permission.role" => Some(("userPermission.role", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-permission.type" => Some(("userPermission.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-permission.additional-roles" => Some(("userPermission.additionalRoles", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "user-permission.self-link" => Some(("userPermission.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-permission.photo-link" => Some(("userPermission.photoLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "spaces" => Some(("spaces", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "shareable" => Some(("shareable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "original-filename" => Some(("originalFilename", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2182,7 +2185,7 @@ impl<'n> Engine<'n> {
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "modified-date" => Some(("modifiedDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "alternate-link", "altitude", "aperture", "app-data-contents", "auth-key", "camera-make", "camera-model", "can-comment", "can-read-revisions", "color-space", "copyable", "created-date", "date", "default-open-with-link", "description", "display-name", "domain", "download-url", "duration-millis", "editable", "email-address", "embed-link", "etag", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "file-size", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "head-revision-id", "height", "hidden", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "is-authenticated-user", "iso-speed", "kind", "labels", "last-modifying-user", "last-modifying-user-name", "last-viewed-by-me-date", "latitude", "lens", "location", "longitude", "marked-viewed-by-me-date", "max-aperture-value", "md5-checksum", "metering-mode", "mime-type", "modified-by-me-date", "modified-date", "name", "open-with-links", "original-filename", "owned-by-me", "owner-names", "permission-id", "photo-link", "picture", "quota-bytes-used", "restricted", "role", "rotation", "self-link", "sensor", "shareable", "shared", "shared-with-me-date", "sharing-user", "spaces", "starred", "subject-distance", "text", "thumbnail", "thumbnail-link", "title", "trashed", "type", "url", "user-permission", "value", "version", "video-media-metadata", "viewed", "web-content-link", "web-view-link", "white-balance", "width", "with-link", "writers-can-share"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "alternate-link", "altitude", "aperture", "app-data-contents", "auth-key", "camera-make", "camera-model", "can-comment", "can-read-revisions", "color-space", "copyable", "created-date", "date", "default-open-with-link", "description", "display-name", "domain", "download-url", "duration-millis", "editable", "email-address", "embed-link", "etag", "expiration-date", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "file-size", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "head-revision-id", "height", "hidden", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "is-authenticated-user", "iso-speed", "kind", "labels", "last-modifying-user", "last-modifying-user-name", "last-viewed-by-me-date", "latitude", "lens", "location", "longitude", "marked-viewed-by-me-date", "max-aperture-value", "md5-checksum", "metering-mode", "mime-type", "modified-by-me-date", "modified-date", "name", "open-with-links", "original-filename", "owned-by-me", "owner-names", "permission-id", "photo-link", "picture", "quota-bytes-used", "restricted", "role", "rotation", "self-link", "sensor", "shareable", "shared", "shared-with-me-date", "sharing-user", "spaces", "starred", "subject-distance", "text", "thumbnail", "thumbnail-link", "title", "trashed", "type", "url", "user-permission", "value", "version", "video-media-metadata", "viewed", "web-content-link", "web-view-link", "white-balance", "width", "with-link", "writers-can-share"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2555,11 +2558,12 @@ impl<'n> Engine<'n> {
                     "user-permission.auth-key" => Some(("userPermission.authKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-permission.etag" => Some(("userPermission.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-permission.email-address" => Some(("userPermission.emailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-permission.photo-link" => Some(("userPermission.photoLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-permission.expiration-date" => Some(("userPermission.expirationDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-permission.role" => Some(("userPermission.role", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-permission.type" => Some(("userPermission.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-permission.additional-roles" => Some(("userPermission.additionalRoles", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "user-permission.self-link" => Some(("userPermission.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-permission.photo-link" => Some(("userPermission.photoLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "spaces" => Some(("spaces", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "shareable" => Some(("shareable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "original-filename" => Some(("originalFilename", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2568,7 +2572,7 @@ impl<'n> Engine<'n> {
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "modified-date" => Some(("modifiedDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "alternate-link", "altitude", "aperture", "app-data-contents", "auth-key", "camera-make", "camera-model", "can-comment", "can-read-revisions", "color-space", "copyable", "created-date", "date", "default-open-with-link", "description", "display-name", "domain", "download-url", "duration-millis", "editable", "email-address", "embed-link", "etag", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "file-size", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "head-revision-id", "height", "hidden", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "is-authenticated-user", "iso-speed", "kind", "labels", "last-modifying-user", "last-modifying-user-name", "last-viewed-by-me-date", "latitude", "lens", "location", "longitude", "marked-viewed-by-me-date", "max-aperture-value", "md5-checksum", "metering-mode", "mime-type", "modified-by-me-date", "modified-date", "name", "open-with-links", "original-filename", "owned-by-me", "owner-names", "permission-id", "photo-link", "picture", "quota-bytes-used", "restricted", "role", "rotation", "self-link", "sensor", "shareable", "shared", "shared-with-me-date", "sharing-user", "spaces", "starred", "subject-distance", "text", "thumbnail", "thumbnail-link", "title", "trashed", "type", "url", "user-permission", "value", "version", "video-media-metadata", "viewed", "web-content-link", "web-view-link", "white-balance", "width", "with-link", "writers-can-share"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "alternate-link", "altitude", "aperture", "app-data-contents", "auth-key", "camera-make", "camera-model", "can-comment", "can-read-revisions", "color-space", "copyable", "created-date", "date", "default-open-with-link", "description", "display-name", "domain", "download-url", "duration-millis", "editable", "email-address", "embed-link", "etag", "expiration-date", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "file-size", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "head-revision-id", "height", "hidden", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "is-authenticated-user", "iso-speed", "kind", "labels", "last-modifying-user", "last-modifying-user-name", "last-viewed-by-me-date", "latitude", "lens", "location", "longitude", "marked-viewed-by-me-date", "max-aperture-value", "md5-checksum", "metering-mode", "mime-type", "modified-by-me-date", "modified-date", "name", "open-with-links", "original-filename", "owned-by-me", "owner-names", "permission-id", "photo-link", "picture", "quota-bytes-used", "restricted", "role", "rotation", "self-link", "sensor", "shareable", "shared", "shared-with-me-date", "sharing-user", "spaces", "starred", "subject-distance", "text", "thumbnail", "thumbnail-link", "title", "trashed", "type", "url", "user-permission", "value", "version", "video-media-metadata", "viewed", "web-content-link", "web-view-link", "white-balance", "width", "with-link", "writers-can-share"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3205,13 +3209,14 @@ impl<'n> Engine<'n> {
                     "auth-key" => Some(("authKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "email-address" => Some(("emailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "photo-link" => Some(("photoLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "expiration-date" => Some(("expirationDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "role" => Some(("role", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "additional-roles" => Some(("additionalRoles", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "photo-link" => Some(("photoLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "auth-key", "domain", "email-address", "etag", "id", "kind", "name", "photo-link", "role", "self-link", "type", "value", "with-link"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "auth-key", "domain", "email-address", "etag", "expiration-date", "id", "kind", "name", "photo-link", "role", "self-link", "type", "value", "with-link"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3362,13 +3367,14 @@ impl<'n> Engine<'n> {
                     "auth-key" => Some(("authKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "email-address" => Some(("emailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "photo-link" => Some(("photoLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "expiration-date" => Some(("expirationDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "role" => Some(("role", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "additional-roles" => Some(("additionalRoles", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "photo-link" => Some(("photoLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "auth-key", "domain", "email-address", "etag", "id", "kind", "name", "photo-link", "role", "self-link", "type", "value", "with-link"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "auth-key", "domain", "email-address", "etag", "expiration-date", "id", "kind", "name", "photo-link", "role", "self-link", "type", "value", "with-link"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3385,6 +3391,9 @@ impl<'n> Engine<'n> {
                 "transfer-ownership" => {
                     call = call.transfer_ownership(arg_from_str(value.unwrap_or("false"), err, "transfer-ownership", "boolean"));
                 },
+                "remove-expiration" => {
+                    call = call.remove_expiration(arg_from_str(value.unwrap_or("false"), err, "remove-expiration", "boolean"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -3398,7 +3407,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["transfer-ownership"].iter().map(|v|*v));
+                                                                           v.extend(["transfer-ownership", "remove-expiration"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3464,13 +3473,14 @@ impl<'n> Engine<'n> {
                     "auth-key" => Some(("authKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "email-address" => Some(("emailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "photo-link" => Some(("photoLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "expiration-date" => Some(("expirationDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "role" => Some(("role", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "additional-roles" => Some(("additionalRoles", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "photo-link" => Some(("photoLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "auth-key", "domain", "email-address", "etag", "id", "kind", "name", "photo-link", "role", "self-link", "type", "value", "with-link"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "auth-key", "domain", "email-address", "etag", "expiration-date", "id", "kind", "name", "photo-link", "role", "self-link", "type", "value", "with-link"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3487,6 +3497,9 @@ impl<'n> Engine<'n> {
                 "transfer-ownership" => {
                     call = call.transfer_ownership(arg_from_str(value.unwrap_or("false"), err, "transfer-ownership", "boolean"));
                 },
+                "remove-expiration" => {
+                    call = call.remove_expiration(arg_from_str(value.unwrap_or("false"), err, "remove-expiration", "boolean"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -3500,7 +3513,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["transfer-ownership"].iter().map(|v|*v));
+                                                                           v.extend(["transfer-ownership", "remove-expiration"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -6881,8 +6894,8 @@ fn main() {
     
     let mut app = App::new("drive2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.6+20160331")
-           .about("The API to interact with Drive.")
+           .version("0.3.6+20160901")
+           .about("Manages files in Drive including uploading, downloading, searching, detecting changes, and updating sharing permissions.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_drive2_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

@@ -24,10 +24,12 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Resource Manager* API at revision *20160316*. The CLI is at version *0.3.6*.
+This documentation was generated from the *Cloud Resource Manager* API at revision *20160617*. The CLI is at version *0.3.6*.
 
 ```bash
 cloudresourcemanager1 [options]
+        operations
+                get <name> [-p <v>]... [-o <out>]
         projects
                 delete <project-id> [-p <v>]... [-o <out>]
                 get <project-id> [-p <v>]... [-o <out>]

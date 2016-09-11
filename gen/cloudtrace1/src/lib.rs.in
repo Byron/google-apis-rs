@@ -38,19 +38,27 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 pub enum Scope {
     /// View and manage your data across Google Cloud Platform services
     CloudPlatform,
+
+    /// Write Trace data for a project or application
+    TraceAppend,
+
+    /// Read Trace data for a project or application
+    TraceReadonly,
 }
 
 impl AsRef<str> for Scope {
     fn as_ref(&self) -> &str {
         match *self {
             Scope::CloudPlatform => "https://www.googleapis.com/auth/cloud-platform",
+            Scope::TraceAppend => "https://www.googleapis.com/auth/trace.append",
+            Scope::TraceReadonly => "https://www.googleapis.com/auth/trace.readonly",
         }
     }
 }
 
 impl Default for Scope {
     fn default() -> Scope {
-        Scope::CloudPlatform
+        Scope::TraceReadonly
     }
 }
 
@@ -60,7 +68,7 @@ impl Default for Scope {
 // HUB ###
 // ######
 
-/// Central instance to access all Cloudtrace related resource activities
+/// Central instance to access all CloudTrace related resource activities
 ///
 /// # Examples
 ///
@@ -74,7 +82,7 @@ impl Default for Scope {
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// use cloudtrace1::Cloudtrace;
+/// use cloudtrace1::CloudTrace;
 /// 
 /// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 /// // `client_secret`, among other things.
@@ -87,7 +95,7 @@ impl Default for Scope {
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::new(),
 ///                               <MemoryStorage as Default>::default(), None);
-/// let mut hub = Cloudtrace::new(hyper::Client::new(), auth);
+/// let mut hub = CloudTrace::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -112,19 +120,19 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Cloudtrace<C, A> {
+pub struct CloudTrace<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
 }
 
-impl<'a, C, A> Hub for Cloudtrace<C, A> {}
+impl<'a, C, A> Hub for CloudTrace<C, A> {}
 
-impl<'a, C, A> Cloudtrace<C, A>
+impl<'a, C, A> CloudTrace<C, A>
     where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> Cloudtrace<C, A> {
-        Cloudtrace {
+    pub fn new(client: C, authenticator: A) -> CloudTrace<C, A> {
+        CloudTrace {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/0.1.14".to_string(),
@@ -200,7 +208,7 @@ pub struct TraceSpan {
     /// ID of the parent span, if any. Optional.
     #[serde(rename="parentSpanId")]
     pub parent_span_id: Option<String>,
-    /// Name of the trace. The trace name is sanitized and displayed in the Cloud Trace tool in the Google Developers Console. The name may be a method name or some other per-call site name. For the same executable and the same call point, a best practice is to use a consistent name, which makes it easier to correlate cross-trace spans.
+    /// Name of the trace. The trace name is sanitized and displayed in the Stackdriver Trace tool in the {% dynamic print site_values.console_name %}. The name may be a method name or some other per-call site name. For the same executable and the same call point, a best practice is to use a consistent name, which makes it easier to correlate cross-trace spans.
     pub name: Option<String>,
     /// Start time of the span in nanoseconds from the UNIX epoch.
     #[serde(rename="startTime")]
@@ -263,7 +271,7 @@ impl ResponseResult for Trace {}
 // #################
 
 /// A builder providing access to all methods supported on *project* resources.
-/// It is not used directly, but through the `Cloudtrace` hub.
+/// It is not used directly, but through the `CloudTrace` hub.
 ///
 /// # Example
 ///
@@ -277,13 +285,13 @@ impl ResponseResult for Trace {}
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// use cloudtrace1::Cloudtrace;
+/// use cloudtrace1::CloudTrace;
 /// 
 /// let secret: ApplicationSecret = Default::default();
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::new(),
 ///                               <MemoryStorage as Default>::default(), None);
-/// let mut hub = Cloudtrace::new(hyper::Client::new(), auth);
+/// let mut hub = CloudTrace::new(hyper::Client::new(), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `patch_traces(...)`, `traces_get(...)` and `traces_list(...)`
 /// // to build up your call.
@@ -293,7 +301,7 @@ impl ResponseResult for Trace {}
 pub struct ProjectMethods<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Cloudtrace<C, A>,
+    hub: &'a CloudTrace<C, A>,
 }
 
 impl<'a, C, A> MethodsBuilder for ProjectMethods<'a, C, A> {}
@@ -321,7 +329,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sends new traces to Cloud Trace or updates existing traces. If the ID of a trace that you send matches that of an existing trace, any fields in the existing trace and its spans are overwritten by the provided values, and any new fields provided are merged with the existing trace data. If the ID does not match, a new trace is created.
+    /// Sends new traces to Stackdriver Trace or updates existing traces. If the ID of a trace that you send matches that of an existing trace, any fields in the existing trace and its spans are overwritten by the provided values, and any new fields provided are merged with the existing trace data. If the ID does not match, a new trace is created.
     /// 
     /// # Arguments
     ///
@@ -387,13 +395,13 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use cloudtrace1::Cloudtrace;
+/// # use cloudtrace1::CloudTrace;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Cloudtrace::new(hyper::Client::new(), auth);
+/// # let mut hub = CloudTrace::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -404,7 +412,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 pub struct ProjectTraceGetCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Cloudtrace<C, A>,
+    hub: &'a CloudTrace<C, A>,
     _project_id: String,
     _trace_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -445,7 +453,7 @@ impl<'a, C, A> ProjectTraceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         let mut url = "https://cloudtrace.googleapis.com/v1/projects/{projectId}/traces/{traceId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+            self._scopes.insert(Scope::TraceReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{projectId}", "projectId"), ("{traceId}", "traceId")].iter() {
@@ -608,7 +616,7 @@ impl<'a, C, A> ProjectTraceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
+    /// `Scope::TraceReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -624,7 +632,7 @@ impl<'a, C, A> ProjectTraceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 }
 
 
-/// Sends new traces to Cloud Trace or updates existing traces. If the ID of a trace that you send matches that of an existing trace, any fields in the existing trace and its spans are overwritten by the provided values, and any new fields provided are merged with the existing trace data. If the ID does not match, a new trace is created.
+/// Sends new traces to Stackdriver Trace or updates existing traces. If the ID of a trace that you send matches that of an existing trace, any fields in the existing trace and its spans are overwritten by the provided values, and any new fields provided are merged with the existing trace data. If the ID does not match, a new trace is created.
 ///
 /// A builder for the *patchTraces* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -641,13 +649,13 @@ impl<'a, C, A> ProjectTraceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use cloudtrace1::Cloudtrace;
+/// # use cloudtrace1::CloudTrace;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Cloudtrace::new(hyper::Client::new(), auth);
+/// # let mut hub = CloudTrace::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -663,7 +671,7 @@ impl<'a, C, A> ProjectTraceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 pub struct ProjectPatchTraceCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Cloudtrace<C, A>,
+    hub: &'a CloudTrace<C, A>,
     _request: Traces,
     _project_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -912,13 +920,13 @@ impl<'a, C, A> ProjectPatchTraceCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use cloudtrace1::Cloudtrace;
+/// # use cloudtrace1::CloudTrace;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Cloudtrace::new(hyper::Client::new(), auth);
+/// # let mut hub = CloudTrace::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -936,7 +944,7 @@ impl<'a, C, A> ProjectPatchTraceCall<'a, C, A> where C: BorrowMut<hyper::Client>
 pub struct ProjectTraceListCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Cloudtrace<C, A>,
+    hub: &'a CloudTrace<C, A>,
     _project_id: String,
     _view: Option<String>,
     _start_time: Option<String>,
@@ -1003,7 +1011,7 @@ impl<'a, C, A> ProjectTraceListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         let mut url = "https://cloudtrace.googleapis.com/v1/projects/{projectId}/traces".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+            self._scopes.insert(Scope::TraceReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{projectId}", "projectId")].iter() {
@@ -1205,7 +1213,7 @@ impl<'a, C, A> ProjectTraceListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
+    /// `Scope::TraceReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

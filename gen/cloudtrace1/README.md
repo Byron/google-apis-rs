@@ -3,15 +3,15 @@ DO NOT EDIT !
 This file was generated automatically from 'src/mako/api/README.md.mako'
 DO NOT EDIT !
 -->
-The `google-cloudtrace1` library allows access to all features of the *Google cloudtrace* service.
+The `google-cloudtrace1` library allows access to all features of the *Google Cloud Trace* service.
 
-This documentation was generated from *cloudtrace* crate version *0.1.14+20151207*, where *20151207* is the exact revision of the *cloudtrace:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
+This documentation was generated from *Cloud Trace* crate version *0.1.14+20160518*, where *20160518* is the exact revision of the *cloudtrace:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
 
-Everything else about the *cloudtrace* *v1* API can be found at the
+Everything else about the *Cloud Trace* *v1* API can be found at the
 [official documentation site](https://cloud.google.com/tools/cloud-trace).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google_cloudtrace1/struct.Cloudtrace.html) ... 
+Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google_cloudtrace1/struct.CloudTrace.html) ... 
 
 * projects
  * [*patch traces*](http://byron.github.io/google-apis-rs/google_cloudtrace1/struct.ProjectPatchTraceCall.html), [*traces get*](http://byron.github.io/google-apis-rs/google_cloudtrace1/struct.ProjectTraceGetCall.html) and [*traces list*](http://byron.github.io/google-apis-rs/google_cloudtrace1/struct.ProjectTraceListCall.html)
@@ -23,7 +23,7 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
 
 The API is structured into the following primary items:
 
-* **[Hub](http://byron.github.io/google-apis-rs/google_cloudtrace1/struct.Cloudtrace.html)**
+* **[Hub](http://byron.github.io/google-apis-rs/google_cloudtrace1/struct.CloudTrace.html)**
     * a central object to maintain state and allow accessing all *Activities*
     * creates [*Method Builders*](http://byron.github.io/google-apis-rs/google_cloudtrace1/trait.MethodsBuilder.html) which in turn
       allow access to individual [*Call Builders*](http://byron.github.io/google-apis-rs/google_cloudtrace1/trait.CallBuilder.html)
@@ -75,7 +75,7 @@ extern crate google_cloudtrace1 as cloudtrace1;
 use cloudtrace1::{Result, Error};
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-use cloudtrace1::Cloudtrace;
+use cloudtrace1::CloudTrace;
 
 // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 // `client_secret`, among other things.
@@ -88,7 +88,7 @@ let secret: ApplicationSecret = Default::default();
 let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
                               hyper::Client::new(),
                               <MemoryStorage as Default>::default(), None);
-let mut hub = Cloudtrace::new(hyper::Client::new(), auth);
+let mut hub = CloudTrace::new(hyper::Client::new(), auth);
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !

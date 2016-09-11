@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *storage* crate version *0.1.14+20160330*, where *20160330* is the exact revision of the *storage:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
+//! This documentation was generated from *storage* crate version *0.1.14+20160901*, where *20160901* is the exact revision of the *storage:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
 //! 
 //! Everything else about the *storage* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/storage/docs/json_api/).
@@ -136,19 +136,20 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.objects().rewrite(req, "sourceBucket", "sourceObject", "destinationBucket", "destinationObject")
-//!              .source_generation("accusam")
-//!              .rewrite_token("dolores")
-//!              .projection("consetetur")
-//!              .max_bytes_rewritten_per_call("dolor")
-//!              .if_source_metageneration_not_match("aliquyam")
-//!              .if_source_metageneration_match("elitr")
-//!              .if_source_generation_not_match("ea")
-//!              .if_source_generation_match("et")
-//!              .if_metageneration_not_match("Stet")
-//!              .if_metageneration_match("sed")
-//!              .if_generation_not_match("dolor")
-//!              .if_generation_match("sanctus")
-//!              .destination_predefined_acl("dolore")
+//!              .source_generation("elitr")
+//!              .rewrite_token("ea")
+//!              .projection("et")
+//!              .max_bytes_rewritten_per_call("Stet")
+//!              .if_source_metageneration_not_match("sed")
+//!              .if_source_metageneration_match("dolor")
+//!              .if_source_generation_not_match("sanctus")
+//!              .if_source_generation_match("dolore")
+//!              .if_metageneration_not_match("Lorem")
+//!              .if_metageneration_match("consetetur")
+//!              .if_generation_not_match("consetetur")
+//!              .if_generation_match("eirmod")
+//!              .destination_predefined_acl("labore")
+//!              .destination_kms_key_name("gubergren")
 //!              .doit();
 //! 
 //! match result {

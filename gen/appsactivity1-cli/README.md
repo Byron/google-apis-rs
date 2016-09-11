@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *appsactivity* API at revision *20160129*. The CLI is at version *0.3.6*.
+This documentation was generated from the *appsactivity* API at revision *20160805*. The CLI is at version *0.3.6*.
 
 ```bash
 appsactivity1 [options]

@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *QPX Express* API at revision *20160307*. The CLI is at version *0.3.6*.
+This documentation was generated from the *QPX Express* API at revision *20160708*. The CLI is at version *0.3.6*.
 
 ```bash
 qpxexpress1 [options]

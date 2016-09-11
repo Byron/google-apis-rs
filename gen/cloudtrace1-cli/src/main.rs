@@ -38,7 +38,7 @@ enum DoitError {
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::Cloudtrace<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
+    hub: api::CloudTrace<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
@@ -331,7 +331,7 @@ impl<'n> Engine<'n> {
             };
         let engine = Engine {
             opt: opt,
-            hub: api::Cloudtrace::new(client, auth),
+            hub: api::CloudTrace::new(client, auth),
             gp: vec!["$-xgafv", "access-token", "alt", "bearer-token", "callback", "fields", "key", "oauth-token", "pp", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
                     ("$-xgafv", "$.xgafv"),
@@ -365,7 +365,7 @@ fn main() {
     let arg_data = [
         ("projects", "methods: 'patch-traces', 'traces-get' and 'traces-list'", vec![
             ("patch-traces",
-                    Some(r##"Sends new traces to Cloud Trace or updates existing traces. If the ID of a trace that you send matches that of an existing trace, any fields in the existing trace and its spans are overwritten by the provided values, and any new fields provided are merged with the existing trace data. If the ID does not match, a new trace is created."##),
+                    Some(r##"Sends new traces to Stackdriver Trace or updates existing traces. If the ID of a trace that you send matches that of an existing trace, any fields in the existing trace and its spans are overwritten by the provided values, and any new fields provided are merged with the existing trace data. If the ID does not match, a new trace is created."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudtrace1_cli/projects_patch-traces",
                   vec![
                     (Some(r##"project-id"##),
@@ -448,8 +448,8 @@ fn main() {
     
     let mut app = App::new("cloudtrace1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.6+20151207")
-           .about("The Cloud Trace API allows you to send traces to and retrieve traces from Google Cloud Trace.")
+           .version("0.3.6+20160518")
+           .about("Send and retrieve trace data from Google Cloud Trace. Data is generated and available by default for all App Engine applications. Data from other applications can be written to Cloud Trace for display, reporting, and analysis.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudtrace1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

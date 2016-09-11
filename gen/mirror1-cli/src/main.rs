@@ -2563,8 +2563,8 @@ fn main() {
     
     let mut app = App::new("mirror1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.6+20151206")
-           .about("API for interacting with Glass users via the timeline.")
+           .version("0.3.6+20160616")
+           .about("Interacts with Glass users via the timeline.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_mirror1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

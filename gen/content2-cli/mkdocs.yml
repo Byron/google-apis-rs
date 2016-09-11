@@ -1,4 +1,4 @@
-site_name: Shopping Content v0.3.6+20160331
+site_name: Shopping Content v0.3.6+20160905
 site_url: http://byron.github.io/google-apis-rs/google-content2-cli
 site_description: Write integrating applications with bcore
 
@@ -65,6 +65,12 @@ pages:
 - ['productstatuses_custombatch.md', 'Productstatuses', 'Custombatch']
 - ['productstatuses_get.md', 'Productstatuses', 'Get']
 - ['productstatuses_list.md', 'Productstatuses', 'List']
+- ['shippingsettings_custombatch.md', 'Shippingsettings', 'Custombatch']
+- ['shippingsettings_get.md', 'Shippingsettings', 'Get']
+- ['shippingsettings_getsupportedcarriers.md', 'Shippingsettings', 'Getsupportedcarriers']
+- ['shippingsettings_list.md', 'Shippingsettings', 'List']
+- ['shippingsettings_patch.md', 'Shippingsettings', 'Patch']
+- ['shippingsettings_update.md', 'Shippingsettings', 'Update']
 
 theme: readthedocs
 

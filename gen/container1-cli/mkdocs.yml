@@ -1,4 +1,4 @@
-site_name: container v0.3.6+20160321
+site_name: container v0.3.6+20160421
 site_url: http://byron.github.io/google-apis-rs/google-container1-cli
 site_description: Write integrating applications with bcore
 
@@ -13,6 +13,10 @@ pages:
 - ['projects_zones-clusters-delete.md', 'Projects', 'Zones Clusters Delete']
 - ['projects_zones-clusters-get.md', 'Projects', 'Zones Clusters Get']
 - ['projects_zones-clusters-list.md', 'Projects', 'Zones Clusters List']
+- ['projects_zones-clusters-node-pools-create.md', 'Projects', 'Zones Clusters Node Pools Create']
+- ['projects_zones-clusters-node-pools-delete.md', 'Projects', 'Zones Clusters Node Pools Delete']
+- ['projects_zones-clusters-node-pools-get.md', 'Projects', 'Zones Clusters Node Pools Get']
+- ['projects_zones-clusters-node-pools-list.md', 'Projects', 'Zones Clusters Node Pools List']
 - ['projects_zones-clusters-update.md', 'Projects', 'Zones Clusters Update']
 - ['projects_zones-get-serverconfig.md', 'Projects', 'Zones Get Serverconfig']
 - ['projects_zones-operations-get.md', 'Projects', 'Zones Operations Get']

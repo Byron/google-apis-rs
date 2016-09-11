@@ -174,10 +174,10 @@ impl<'a, C, A> Monitoring<C, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TimeInterval {
-    /// (required) The end of the interval. The interval includes this time.
+    /// Required. The end of the interval. The interval includes this time.
     #[serde(rename="endTime")]
     pub end_time: Option<String>,
-    /// (optional) If omitted, the interval is a point in time, `endTime`. If `startTime` is present, it must be earlier than (less than) `endTime`. The interval begins after `startTime`—it does not include `startTime`.
+    /// If this value is omitted, the interval is a point in time, `endTime`. If `startTime` is present, it must be earlier than (less than) `endTime`. The interval begins after `startTime`—it does not include `startTime`.
     #[serde(rename="startTime")]
     pub start_time: Option<String>,
 }
@@ -776,7 +776,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a single metric descriptor.
+    /// Gets a single metric descriptor. This method does not require a Stackdriver account.
     /// 
     /// # Arguments
     ///
@@ -888,7 +888,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists monitored resource descriptors that match a filter.
+    /// Lists monitored resource descriptors that match a filter. This method does not require a Stackdriver account.
     /// 
     /// # Arguments
     ///
@@ -968,7 +968,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists metric descriptors that match a filter.
+    /// Lists metric descriptors that match a filter. This method does not require a Stackdriver account.
     /// 
     /// # Arguments
     ///
@@ -988,7 +988,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a single monitored resource descriptor.
+    /// Gets a single monitored resource descriptor. This method does not require a Stackdriver account.
     /// 
     /// # Arguments
     ///
@@ -1042,7 +1042,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists time series that match a filter.
+    /// Lists time series that match a filter. This method does not require a Stackdriver account.
     /// 
     /// # Arguments
     ///
@@ -1077,7 +1077,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 // CallBuilders   ###
 // #################
 
-/// Gets a single metric descriptor.
+/// Gets a single metric descriptor. This method does not require a Stackdriver account.
 ///
 /// A builder for the *metricDescriptors.get* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -2602,14 +2602,14 @@ impl<'a, C, A> ProjectGroupMemberListCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._page_size = Some(new_value);
         self
     }
-    /// (optional) If omitted, the interval is a point in time, `endTime`. If `startTime` is present, it must be earlier than (less than) `endTime`. The interval begins after `startTime`—it does not include `startTime`.
+    /// If this value is omitted, the interval is a point in time, `endTime`. If `startTime` is present, it must be earlier than (less than) `endTime`. The interval begins after `startTime`—it does not include `startTime`.
     ///
     /// Sets the *interval.start time* query property to the given value.
     pub fn interval_start_time(mut self, new_value: &str) -> ProjectGroupMemberListCall<'a, C, A> {
         self._interval_start_time = Some(new_value.to_string());
         self
     }
-    /// (required) The end of the interval. The interval includes this time.
+    /// Required. The end of the interval. The interval includes this time.
     ///
     /// Sets the *interval.end time* query property to the given value.
     pub fn interval_end_time(mut self, new_value: &str) -> ProjectGroupMemberListCall<'a, C, A> {
@@ -2681,7 +2681,7 @@ impl<'a, C, A> ProjectGroupMemberListCall<'a, C, A> where C: BorrowMut<hyper::Cl
 }
 
 
-/// Lists monitored resource descriptors that match a filter.
+/// Lists monitored resource descriptors that match a filter. This method does not require a Stackdriver account.
 ///
 /// A builder for the *monitoredResourceDescriptors.list* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -3819,7 +3819,7 @@ impl<'a, C, A> ProjectGroupListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 }
 
 
-/// Lists metric descriptors that match a filter.
+/// Lists metric descriptors that match a filter. This method does not require a Stackdriver account.
 ///
 /// A builder for the *metricDescriptors.list* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -4100,7 +4100,7 @@ impl<'a, C, A> ProjectMetricDescriptorListCall<'a, C, A> where C: BorrowMut<hype
 }
 
 
-/// Gets a single monitored resource descriptor.
+/// Gets a single monitored resource descriptor. This method does not require a Stackdriver account.
 ///
 /// A builder for the *monitoredResourceDescriptors.get* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -4878,7 +4878,7 @@ impl<'a, C, A> ProjectGroupDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 }
 
 
-/// Lists time series that match a filter.
+/// Lists time series that match a filter. This method does not require a Stackdriver account.
 ///
 /// A builder for the *timeSeries.list* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -5150,14 +5150,14 @@ impl<'a, C, A> ProjectTimeSeryListCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self._order_by = Some(new_value.to_string());
         self
     }
-    /// (optional) If omitted, the interval is a point in time, `endTime`. If `startTime` is present, it must be earlier than (less than) `endTime`. The interval begins after `startTime`—it does not include `startTime`.
+    /// If this value is omitted, the interval is a point in time, `endTime`. If `startTime` is present, it must be earlier than (less than) `endTime`. The interval begins after `startTime`—it does not include `startTime`.
     ///
     /// Sets the *interval.start time* query property to the given value.
     pub fn interval_start_time(mut self, new_value: &str) -> ProjectTimeSeryListCall<'a, C, A> {
         self._interval_start_time = Some(new_value.to_string());
         self
     }
-    /// (required) The end of the interval. The interval includes this time.
+    /// Required. The end of the interval. The interval includes this time.
     ///
     /// Sets the *interval.end time* query property to the given value.
     pub fn interval_end_time(mut self, new_value: &str) -> ProjectTimeSeryListCall<'a, C, A> {

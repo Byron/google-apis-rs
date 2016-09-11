@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *appengine* crate version *0.1.14+20160314*, where *20160314* is the exact revision of the *appengine:v1beta5* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
+//! This documentation was generated from *appengine* crate version *0.1.14+20160802*, where *20160802* is the exact revision of the *appengine:v1beta5* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
 //! 
 //! Everything else about the *appengine* *v1_beta5* API can be found at the
 //! [official documentation site](https://cloud.google.com/appengine/docs/admin-api/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.Appengine.html) ... 
 //! 
 //! * apps
-//!  * [*get*](struct.AppGetCall.html), [*operations get*](struct.AppOperationGetCall.html), [*operations list*](struct.AppOperationListCall.html), [*services delete*](struct.AppServiceDeleteCall.html), [*services get*](struct.AppServiceGetCall.html), [*services list*](struct.AppServiceListCall.html), [*services patch*](struct.AppServicePatchCall.html), [*services versions create*](struct.AppServiceVersionCreateCall.html), [*services versions delete*](struct.AppServiceVersionDeleteCall.html), [*services versions get*](struct.AppServiceVersionGetCall.html), [*services versions list*](struct.AppServiceVersionListCall.html) and [*services versions patch*](struct.AppServiceVersionPatchCall.html)
+//!  * [*create*](struct.AppCreateCall.html), [*get*](struct.AppGetCall.html), [*locations get*](struct.AppLocationGetCall.html), [*locations list*](struct.AppLocationListCall.html), [*operations get*](struct.AppOperationGetCall.html), [*operations list*](struct.AppOperationListCall.html), [*services delete*](struct.AppServiceDeleteCall.html), [*services get*](struct.AppServiceGetCall.html), [*services list*](struct.AppServiceListCall.html), [*services patch*](struct.AppServicePatchCall.html), [*services versions create*](struct.AppServiceVersionCreateCall.html), [*services versions delete*](struct.AppServiceVersionDeleteCall.html), [*services versions get*](struct.AppServiceVersionGetCall.html), [*services versions instances debug*](struct.AppServiceVersionInstanceDebugCall.html), [*services versions instances delete*](struct.AppServiceVersionInstanceDeleteCall.html), [*services versions instances get*](struct.AppServiceVersionInstanceGetCall.html), [*services versions instances list*](struct.AppServiceVersionInstanceListCall.html), [*services versions list*](struct.AppServiceVersionListCall.html) and [*services versions patch*](struct.AppServiceVersionPatchCall.html)
 //! 
 //! 
 //! 
@@ -48,6 +48,9 @@
 //! 
 //! ```ignore
 //! let r = hub.apps().services_versions_create(...).doit()
+//! let r = hub.apps().services_versions_instances_debug(...).doit()
+//! let r = hub.apps().create(...).doit()
+//! let r = hub.apps().services_versions_instances_delete(...).doit()
 //! let r = hub.apps().services_versions_patch(...).doit()
 //! let r = hub.apps().operations_get(...).doit()
 //! let r = hub.apps().services_versions_delete(...).doit()
@@ -77,7 +80,7 @@
 //! extern crate hyper;
 //! extern crate yup_oauth2 as oauth2;
 //! extern crate google_appengine1_beta5 as appengine1_beta5;
-//! use appengine1_beta5::Version;
+//! use appengine1_beta5::DebugInstanceRequest;
 //! use appengine1_beta5::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
@@ -99,13 +102,12 @@
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req = Version::default();
+//! let mut req = DebugInstanceRequest::default();
 //! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.apps().services_versions_patch(req, "appsId", "servicesId", "versionsId")
-//!              .mask("sea")
+//! let result = hub.apps().services_versions_instances_debug(req, "appsId", "servicesId", "versionsId", "instancesId")
 //!              .doit();
 //! 
 //! match result {

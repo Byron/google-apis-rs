@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Civic Info* crate version *0.1.14+20150820*, where *20150820* is the exact revision of the *civicinfo:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
+//! This documentation was generated from *Civic Info* crate version *0.1.14+20160823*, where *20160823* is the exact revision of the *civicinfo:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
 //! 
 //! Everything else about the *Civic Info* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/civic-information).
@@ -99,8 +99,9 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.elections().voter_info_query("address")
-//!              .official_only(false)
-//!              .election_id("no")
+//!              .return_all_available_data(true)
+//!              .official_only(true)
+//!              .election_id("et")
 //!              .doit();
 //! 
 //! match result {

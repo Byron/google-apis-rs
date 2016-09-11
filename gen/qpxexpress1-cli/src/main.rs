@@ -68,7 +68,6 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "request.refundable" => Some(("request.refundable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "request.passengers.kind" => Some(("request.passengers.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "request.passengers.infant-in-lap-count" => Some(("request.passengers.infantInLapCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "request.passengers.senior-count" => Some(("request.passengers.seniorCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -76,10 +75,12 @@ impl<'n> Engine<'n> {
                     "request.passengers.child-count" => Some(("request.passengers.childCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "request.passengers.adult-count" => Some(("request.passengers.adultCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "request.sale-country" => Some(("request.saleCountry", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "request.solutions" => Some(("request.solutions", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "request.max-price" => Some(("request.maxPrice", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "request.ticketing-country" => Some(("request.ticketingCountry", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "request.solutions" => Some(("request.solutions", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "request.refundable" => Some(("request.refundable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["adult-count", "child-count", "infant-in-lap-count", "infant-in-seat-count", "kind", "max-price", "passengers", "refundable", "request", "sale-country", "senior-count", "solutions"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["adult-count", "child-count", "infant-in-lap-count", "infant-in-seat-count", "kind", "max-price", "passengers", "refundable", "request", "sale-country", "senior-count", "solutions", "ticketing-country"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -263,7 +264,7 @@ fn main() {
     
     let mut app = App::new("qpxexpress1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.6+20160307")
+           .version("0.3.6+20160708")
            .about("Finds the least expensive flights between an origin and a destination.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_qpxexpress1_cli")
            .arg(Arg::with_name("folder")

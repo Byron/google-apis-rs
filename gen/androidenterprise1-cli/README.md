@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Android Enterprise* API at revision *20160331*. The CLI is at version *0.3.6*.
+This documentation was generated from the *Android Enterprise* API at revision *20160831*. The CLI is at version *0.3.6*.
 
 ```bash
 androidenterprise1 [options]
@@ -47,12 +47,17 @@ androidenterprise1 [options]
                 list <enterprise-id> <user-id> [-p <v>]... [-o <out>]
                 set-state <enterprise-id> <user-id> <device-id> (-r <kv>)... [-p <v>]... [-o <out>]
         enterprises
+                acknowledge-notification-set [-p <v>]...
+                complete-signup [-p <v>]... [-o <out>]
                 delete <enterprise-id> [-p <v>]...
                 enroll <token> (-r <kv>)... [-p <v>]... [-o <out>]
+                generate-signup-url [-p <v>]... [-o <out>]
                 get <enterprise-id> [-p <v>]... [-o <out>]
+                get-service-account <enterprise-id> [-p <v>]... [-o <out>]
                 get-store-layout <enterprise-id> [-p <v>]... [-o <out>]
                 insert <token> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <domain> [-p <v>]... [-o <out>]
+                pull-notification-set [-p <v>]... [-o <out>]
                 send-test-push-notification <enterprise-id> [-p <v>]... [-o <out>]
                 set-account <enterprise-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 set-store-layout <enterprise-id> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -74,6 +79,18 @@ androidenterprise1 [options]
                 list <enterprise-id> <user-id> <device-id> [-p <v>]... [-o <out>]
                 patch <enterprise-id> <user-id> <device-id> <install-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 update <enterprise-id> <user-id> <device-id> <install-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        managedconfigurationsfordevice
+                delete <enterprise-id> <user-id> <device-id> <managed-configuration-for-device-id> [-p <v>]...
+                get <enterprise-id> <user-id> <device-id> <managed-configuration-for-device-id> [-p <v>]... [-o <out>]
+                list <enterprise-id> <user-id> <device-id> [-p <v>]... [-o <out>]
+                patch <enterprise-id> <user-id> <device-id> <managed-configuration-for-device-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <enterprise-id> <user-id> <device-id> <managed-configuration-for-device-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        managedconfigurationsforuser
+                delete <enterprise-id> <user-id> <managed-configuration-for-user-id> [-p <v>]...
+                get <enterprise-id> <user-id> <managed-configuration-for-user-id> [-p <v>]... [-o <out>]
+                list <enterprise-id> <user-id> [-p <v>]... [-o <out>]
+                patch <enterprise-id> <user-id> <managed-configuration-for-user-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <enterprise-id> <user-id> <managed-configuration-for-user-id> (-r <kv>)... [-p <v>]... [-o <out>]
         permissions
                 get <permission-id> [-p <v>]... [-o <out>]
         products
@@ -82,7 +99,13 @@ androidenterprise1 [options]
                 get <enterprise-id> <product-id> [-p <v>]... [-o <out>]
                 get-app-restrictions-schema <enterprise-id> <product-id> [-p <v>]... [-o <out>]
                 get-permissions <enterprise-id> <product-id> [-p <v>]... [-o <out>]
+                list <enterprise-id> [-p <v>]... [-o <out>]
+                unapprove <enterprise-id> <product-id> [-p <v>]...
                 update-permissions <enterprise-id> <product-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        serviceaccountkeys
+                delete <enterprise-id> <key-id> [-p <v>]...
+                insert <enterprise-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <enterprise-id> [-p <v>]... [-o <out>]
         storelayoutclusters
                 delete <enterprise-id> <page-id> <cluster-id> [-p <v>]...
                 get <enterprise-id> <page-id> <cluster-id> [-p <v>]... [-o <out>]
@@ -98,12 +121,17 @@ androidenterprise1 [options]
                 patch <enterprise-id> <page-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 update <enterprise-id> <page-id> (-r <kv>)... [-p <v>]... [-o <out>]
         users
+                delete <enterprise-id> <user-id> [-p <v>]...
+                generate-authentication-token <enterprise-id> <user-id> [-p <v>]... [-o <out>]
                 generate-token <enterprise-id> <user-id> [-p <v>]... [-o <out>]
                 get <enterprise-id> <user-id> [-p <v>]... [-o <out>]
                 get-available-product-set <enterprise-id> <user-id> [-p <v>]... [-o <out>]
+                insert <enterprise-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <enterprise-id> <email> [-p <v>]... [-o <out>]
+                patch <enterprise-id> <user-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 revoke-token <enterprise-id> <user-id> [-p <v>]...
                 set-available-product-set <enterprise-id> <user-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <enterprise-id> <user-id> (-r <kv>)... [-p <v>]... [-o <out>]
   androidenterprise1 --help
 
 Configuration:

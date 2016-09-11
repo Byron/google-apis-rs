@@ -71,6 +71,7 @@ impl<'n> Engine<'n> {
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "data-stream-name" => Some(("dataStreamName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "data-type.name" => Some(("dataType.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "data-quality-standard" => Some(("dataQualityStandard", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "application.package-name" => Some(("application.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "application.version" => Some(("application.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "application.name" => Some(("application.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -83,7 +84,7 @@ impl<'n> Engine<'n> {
                     "data-stream-id" => Some(("dataStreamId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["application", "data-stream-id", "data-stream-name", "data-type", "details-url", "device", "manufacturer", "model", "name", "package-name", "type", "uid", "version"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["application", "data-quality-standard", "data-stream-id", "data-stream-name", "data-type", "details-url", "device", "manufacturer", "model", "name", "package-name", "type", "uid", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -531,6 +532,7 @@ impl<'n> Engine<'n> {
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "data-stream-name" => Some(("dataStreamName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "data-type.name" => Some(("dataType.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "data-quality-standard" => Some(("dataQualityStandard", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "application.package-name" => Some(("application.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "application.version" => Some(("application.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "application.name" => Some(("application.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -543,7 +545,7 @@ impl<'n> Engine<'n> {
                     "data-stream-id" => Some(("dataStreamId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["application", "data-stream-id", "data-stream-name", "data-type", "details-url", "device", "manufacturer", "model", "name", "package-name", "type", "uid", "version"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["application", "data-quality-standard", "data-stream-id", "data-stream-name", "data-type", "details-url", "device", "manufacturer", "model", "name", "package-name", "type", "uid", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -629,6 +631,7 @@ impl<'n> Engine<'n> {
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "data-stream-name" => Some(("dataStreamName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "data-type.name" => Some(("dataType.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "data-quality-standard" => Some(("dataQualityStandard", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "application.package-name" => Some(("application.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "application.version" => Some(("application.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "application.name" => Some(("application.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -641,7 +644,7 @@ impl<'n> Engine<'n> {
                     "data-stream-id" => Some(("dataStreamId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["application", "data-stream-id", "data-stream-name", "data-type", "details-url", "device", "manufacturer", "model", "name", "package-name", "type", "uid", "version"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["application", "data-quality-standard", "data-stream-id", "data-stream-name", "data-type", "details-url", "device", "manufacturer", "model", "name", "package-name", "type", "uid", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -731,9 +734,13 @@ impl<'n> Engine<'n> {
                     "bucket-by-activity-type.activity-data-source-id" => Some(("bucketByActivityType.activityDataSourceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "bucket-by-activity-type.min-duration-millis" => Some(("bucketByActivityType.minDurationMillis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "start-time-millis" => Some(("startTimeMillis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "filtered-data-quality-standard" => Some(("filteredDataQualityStandard", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "bucket-by-time.duration-millis" => Some(("bucketByTime.durationMillis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "bucket-by-time.period.time-zone-id" => Some(("bucketByTime.period.timeZoneId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "bucket-by-time.period.type" => Some(("bucketByTime.period.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "bucket-by-time.period.value" => Some(("bucketByTime.period.value", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activity-data-source-id", "bucket-by-activity-segment", "bucket-by-activity-type", "bucket-by-session", "bucket-by-time", "duration-millis", "end-time-millis", "min-duration-millis", "start-time-millis"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activity-data-source-id", "bucket-by-activity-segment", "bucket-by-activity-type", "bucket-by-session", "bucket-by-time", "duration-millis", "end-time-millis", "filtered-data-quality-standard", "min-duration-millis", "period", "start-time-millis", "time-zone-id", "type", "value"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1272,7 +1279,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("data-sources-delete",
-                    Some(r##"Delete the data source if there are no datapoints associated with it"##),
+                    Some(r##"Deletes the specified data source. The request will fail if the data source contains any data points."##),
                     "Details at http://byron.github.io/google-apis-rs/google_fitness1_cli/users_data-sources-delete",
                   vec![
                     (Some(r##"user-id"##),
@@ -1300,7 +1307,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("data-sources-get",
-                    Some(r##"Returns a data source identified by a data stream ID."##),
+                    Some(r##"Returns the specified data source."##),
                     "Details at http://byron.github.io/google-apis-rs/google_fitness1_cli/users_data-sources-get",
                   vec![
                     (Some(r##"user-id"##),
@@ -1328,7 +1335,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("data-sources-list",
-                    Some(r##"Lists all data sources that are visible to the developer, using the OAuth scopes provided. The list is not exhaustive: the user may have private data sources that are only visible to other developers or calls using other scopes."##),
+                    Some(r##"Lists all data sources that are visible to the developer, using the OAuth scopes provided. The list is not exhaustive; the user may have private data sources that are only visible to other developers, or calls using other scopes."##),
                     "Details at http://byron.github.io/google-apis-rs/google_fitness1_cli/users_data-sources-list",
                   vec![
                     (Some(r##"user-id"##),
@@ -1350,9 +1357,9 @@ fn main() {
                      Some(false)),
                   ]),
             ("data-sources-patch",
-                    Some(r##"Updates a given data source. It is an error to modify the data source's data stream ID, data type, type, stream name or device information apart from the device version. Changing these fields would require a new unique data stream ID and separate data source.
+                    Some(r##"Updates the specified data source. The dataStreamId, dataType, type, dataStreamName, and device properties with the exception of version, cannot be modified.
         
-        Data sources are identified by their data stream ID. This method supports patch semantics."##),
+        Data sources are identified by their dataStreamId. This method supports patch semantics."##),
                     "Details at http://byron.github.io/google-apis-rs/google_fitness1_cli/users_data-sources-patch",
                   vec![
                     (Some(r##"user-id"##),
@@ -1386,9 +1393,9 @@ fn main() {
                      Some(false)),
                   ]),
             ("data-sources-update",
-                    Some(r##"Updates a given data source. It is an error to modify the data source's data stream ID, data type, type, stream name or device information apart from the device version. Changing these fields would require a new unique data stream ID and separate data source.
+                    Some(r##"Updates the specified data source. The dataStreamId, dataType, type, dataStreamName, and device properties with the exception of version, cannot be modified.
         
-        Data sources are identified by their data stream ID."##),
+        Data sources are identified by their dataStreamId."##),
                     "Details at http://byron.github.io/google-apis-rs/google_fitness1_cli/users_data-sources-update",
                   vec![
                     (Some(r##"user-id"##),
@@ -1533,8 +1540,8 @@ fn main() {
     
     let mut app = App::new("fitness1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.6+20151021")
-           .about("Google Fit API")
+           .version("0.3.6+20160801")
+           .about("Stores and accesses user data in the fitness store from apps on any platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_fitness1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

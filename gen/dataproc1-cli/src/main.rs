@@ -45,156 +45,6 @@ struct Engine<'n> {
 
 
 impl<'n> Engine<'n> {
-    fn _media_download(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut download_mode = false;
-        let mut call = self.hub.media().download(opt.value_of("resource-name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            if key == "alt" && value.unwrap_or("unset") == "media" {
-                                download_mode = true;
-                            }
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    if !download_mode {
-                    let mut value = json::value::to_value(&output_schema);
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    } else {
-                    io::copy(&mut response, &mut ostream).unwrap();
-                    ostream.flush().unwrap();
-                    }
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _media_upload(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "resource-name" => Some(("resourceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["resource-name"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::Media = json::value::from_value(object).unwrap();
-        let mut call = self.hub.media().upload(request, opt.value_of("resource-name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let vals = opt.values_of("mode").unwrap().collect::<Vec<&str>>();
-        let protocol = calltype_from_str(vals[0], ["simple", "resumable"].iter().map(|&v| v.to_string()).collect(), err);
-        let mut input_file = input_file_from_opts(vals[1], err);
-        let mime_type = input_mime_from_opts(opt.value_of("mime").unwrap_or("application/octet-stream"), err);
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Upload(UploadProtocol::Simple) => call.upload(input_file.unwrap(), mime_type.unwrap()),
-                CallType::Upload(UploadProtocol::Resumable) => call.upload_resumable(input_file.unwrap(), mime_type.unwrap()),
-                CallType::Standard => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema);
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
     fn _projects_regions_clusters_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -1310,20 +1160,6 @@ impl<'n> Engine<'n> {
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
         match self.opt.subcommand() {
-            ("media", Some(opt)) => {
-                match opt.subcommand() {
-                    ("download", Some(opt)) => {
-                        call_result = self._media_download(opt, dry_run, &mut err);
-                    },
-                    ("upload", Some(opt)) => {
-                        call_result = self._media_upload(opt, dry_run, &mut err);
-                    },
-                    _ => {
-                        err.issues.push(CLIError::MissingMethodError("media".to_string()));
-                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
-                    }
-                }
-            },
             ("projects", Some(opt)) => {
                 match opt.subcommand() {
                     ("regions-clusters-create", Some(opt)) => {
@@ -1462,67 +1298,7 @@ impl<'n> Engine<'n> {
 
 fn main() {
     let mut exit_status = 0i32;
-    let upload_value_names = ["mode", "file"];
     let arg_data = [
-        ("media", "methods: 'download' and 'upload'", vec![
-            ("download",
-                    Some(r##"Method for media download. Download is supported on the URI `/v1/media/{+name}?alt=media`."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/media_download",
-                  vec![
-                    (Some(r##"resource-name"##),
-                     None,
-                     Some(r##"Name of the media that is being downloaded. See ByteStream.ReadRequest.resource_name."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("upload",
-                    Some(r##"Method for media upload. Upload is supported on the URI `/upload/v1/media/{+name}`."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/media_upload",
-                  vec![
-                    (Some(r##"resource-name"##),
-                     None,
-                     Some(r##"Name of the media that is being downloaded. See ByteStream.ReadRequest.resource_name."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some(r##"mode"##),
-                     Some(r##"u"##),
-                     Some(r##"Specify the upload protocol (simple|resumable) and the file to upload"##),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ]),
-        
         ("projects", "methods: 'regions-clusters-create', 'regions-clusters-delete', 'regions-clusters-diagnose', 'regions-clusters-get', 'regions-clusters-list', 'regions-clusters-patch', 'regions-jobs-cancel', 'regions-jobs-delete', 'regions-jobs-get', 'regions-jobs-list', 'regions-jobs-submit', 'regions-operations-cancel', 'regions-operations-delete', 'regions-operations-get' and 'regions-operations-list'", vec![
             ("regions-clusters-create",
                     Some(r##"Creates a cluster in a project."##),
@@ -1998,8 +1774,8 @@ fn main() {
     
     let mut app = App::new("dataproc1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.6+20160219")
-           .about("An API for managing Hadoop-based clusters and jobs on Google Cloud Platform.")
+           .version("0.3.6+20160503")
+           .about("Manages Hadoop-based clusters and jobs on Google Cloud Platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_dataproc1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")
@@ -2055,17 +1831,6 @@ fn main() {
                        }
                        if let &Some(multi) = multi {
                            arg = arg.multiple(multi);
-                       }
-                       if arg_name_str == "mode" {
-                           arg = arg.number_of_values(2);
-                           arg = arg.value_names(&upload_value_names);
-           
-                           scmd = scmd.arg(Arg::with_name("mime")
-                                               .short("m")
-                                               .requires("mode")
-                                               .required(false)
-                                               .help("The file's mime time, like 'application/octet-stream'")
-                                               .takes_value(true));
                        }
                        scmd = scmd.arg(arg);
                    }

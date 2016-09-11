@@ -68,8 +68,9 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "request-id" => Some(("requestId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["request-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3906,11 +3907,13 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "reference-set-id" => Some(("referenceSetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dataset-id" => Some(("datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["dataset-id", "id", "reference-set-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["dataset-id", "description", "id", "name", "reference-set-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4186,11 +4189,13 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "reference-set-id" => Some(("referenceSetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dataset-id" => Some(("datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["dataset-id", "id", "reference-set-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["dataset-id", "description", "id", "name", "reference-set-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4712,7 +4717,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("create",
-                    Some(r##"Creates a new annotation. Caller must have WRITE permission for the associated annotation set. The following fields are required: * annotationSetId * referenceName or referenceId ### Transcripts For annotations of type TRANSCRIPT, the following fields of transcript must be provided: * `exons.start` * `exons.end` All other fields may be optionally specified, unless documented as being server-generated (for example, the `id` field). The annotated range must be no longer than 100Mbp (mega base pairs). See the Annotation resource for additional restrictions on each field."##),
+                    Some(r##"Creates a new annotation. Caller must have WRITE permission for the associated annotation set. The following fields are required: * annotationSetId * referenceName or referenceId ### Transcripts For annotations of type TRANSCRIPT, the following fields of transcript must be provided: * exons.start * exons.end All other fields may be optionally specified, unless documented as being server-generated (for example, the `id` field). The annotated range must be no longer than 100Mbp (mega base pairs). See the Annotation resource for additional restrictions on each field."##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/annotations_create",
                   vec![
                     (Some(r##"kv"##),
@@ -5413,7 +5418,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("export",
-                    Some(r##"Exports a read group set to a BAM file in Google Cloud Storage. For the definitions of read group sets and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics) Note that currently there may be some differences between exported BAM files and the original BAM file at the time of import. See [ImportReadGroupSets](google.genomics.v1.ReadServiceV1.ImportReadGroupSets) for caveats."##),
+                    Some(r##"Exports a read group set to a BAM file in Google Cloud Storage. For the definitions of read group sets and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics) Note that currently there may be some differences between exported BAM files and the original BAM file at the time of import. See ImportReadGroupSets for caveats."##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/readgroupsets_export",
                   vec![
                     (Some(r##"read-group-set-id"##),
@@ -6035,8 +6040,8 @@ fn main() {
     
     let mut app = App::new("genomics1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.6+20160407")
-           .about("Stores, processes, explores and shares genomic data. This API implements the Global Alliance for Genomics and Health (GA4GH) v0.5.1 API as well as several extensions.")
+           .version("0.3.6+20160905")
+           .about("Stores, processes, explores and shares genomic data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_genomics1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

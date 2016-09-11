@@ -1,4 +1,4 @@
-site_name: dataproc v0.3.6+20160219
+site_name: dataproc v0.3.6+20160503
 site_url: http://byron.github.io/google-apis-rs/google-dataproc1-cli
 site_description: Write integrating applications with bcore
 
@@ -9,8 +9,6 @@ site_dir: build_html
 
 pages:
 - ['index.md', 'Home']
-- ['media_download.md', 'Media', 'Download']
-- ['media_upload.md', 'Media', 'Upload']
 - ['projects_regions-clusters-create.md', 'Projects', 'Regions Clusters Create']
 - ['projects_regions-clusters-delete.md', 'Projects', 'Regions Clusters Delete']
 - ['projects_regions-clusters-diagnose.md', 'Projects', 'Regions Clusters Diagnose']

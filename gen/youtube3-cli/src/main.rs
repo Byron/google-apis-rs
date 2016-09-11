@@ -2546,18 +2546,20 @@ impl<'n> Engine<'n> {
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "statistics.concurrent-viewers" => Some(("statistics.concurrentViewers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "statistics.total-chat-count" => Some(("statistics.totalChatCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "content-details.closed-captions-type" => Some(("contentDetails.closedCaptionsType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-details.enable-low-latency" => Some(("contentDetails.enableLowLatency", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "content-details.monitor-stream.broadcast-stream-delay-ms" => Some(("contentDetails.monitorStream.broadcastStreamDelayMs", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "content-details.monitor-stream.embed-html" => Some(("contentDetails.monitorStream.embedHtml", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.monitor-stream.enable-monitor-stream" => Some(("contentDetails.monitorStream.enableMonitorStream", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "content-details.bound-stream-id" => Some(("contentDetails.boundStreamId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-details.enable-embed" => Some(("contentDetails.enableEmbed", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "content-details.enable-closed-captions" => Some(("contentDetails.enableClosedCaptions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "content-details.start-with-slate" => Some(("contentDetails.startWithSlate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "content-details.closed-captions-type" => Some(("contentDetails.closedCaptionsType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.bound-stream-last-update-time-ms" => Some(("contentDetails.boundStreamLastUpdateTimeMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-details.enable-content-encryption" => Some(("contentDetails.enableContentEncryption", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "content-details.record-from-start" => Some(("contentDetails.recordFromStart", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "content-details.enable-dvr" => Some(("contentDetails.enableDvr", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "content-details.monitor-stream.broadcast-stream-delay-ms" => Some(("contentDetails.monitorStream.broadcastStreamDelayMs", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "content-details.monitor-stream.embed-html" => Some(("contentDetails.monitorStream.embedHtml", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.monitor-stream.enable-monitor-stream" => Some(("contentDetails.monitorStream.enableMonitorStream", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "content-details.projection" => Some(("contentDetails.projection", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.actual-end-time" => Some(("snippet.actualEndTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.description" => Some(("snippet.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.title" => Some(("snippet.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2586,7 +2588,7 @@ impl<'n> Engine<'n> {
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["actual-end-time", "actual-start-time", "bound-stream-id", "broadcast-stream-delay-ms", "channel-id", "closed-captions-type", "concurrent-viewers", "content-details", "default", "description", "embed-html", "enable-closed-captions", "enable-content-encryption", "enable-dvr", "enable-embed", "enable-low-latency", "enable-monitor-stream", "etag", "height", "high", "id", "is-default-broadcast", "kind", "life-cycle-status", "live-broadcast-priority", "live-chat-id", "maxres", "medium", "monitor-stream", "privacy-status", "published-at", "record-from-start", "recording-status", "scheduled-end-time", "scheduled-start-time", "snippet", "standard", "start-with-slate", "statistics", "status", "thumbnails", "title", "total-chat-count", "url", "width"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["actual-end-time", "actual-start-time", "bound-stream-id", "bound-stream-last-update-time-ms", "broadcast-stream-delay-ms", "channel-id", "closed-captions-type", "concurrent-viewers", "content-details", "default", "description", "embed-html", "enable-closed-captions", "enable-content-encryption", "enable-dvr", "enable-embed", "enable-low-latency", "enable-monitor-stream", "etag", "height", "high", "id", "is-default-broadcast", "kind", "life-cycle-status", "live-broadcast-priority", "live-chat-id", "maxres", "medium", "monitor-stream", "privacy-status", "projection", "published-at", "record-from-start", "recording-status", "scheduled-end-time", "scheduled-start-time", "snippet", "standard", "start-with-slate", "statistics", "status", "thumbnails", "title", "total-chat-count", "url", "width"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2819,18 +2821,20 @@ impl<'n> Engine<'n> {
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "statistics.concurrent-viewers" => Some(("statistics.concurrentViewers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "statistics.total-chat-count" => Some(("statistics.totalChatCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "content-details.closed-captions-type" => Some(("contentDetails.closedCaptionsType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-details.enable-low-latency" => Some(("contentDetails.enableLowLatency", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "content-details.monitor-stream.broadcast-stream-delay-ms" => Some(("contentDetails.monitorStream.broadcastStreamDelayMs", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "content-details.monitor-stream.embed-html" => Some(("contentDetails.monitorStream.embedHtml", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.monitor-stream.enable-monitor-stream" => Some(("contentDetails.monitorStream.enableMonitorStream", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "content-details.bound-stream-id" => Some(("contentDetails.boundStreamId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-details.enable-embed" => Some(("contentDetails.enableEmbed", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "content-details.enable-closed-captions" => Some(("contentDetails.enableClosedCaptions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "content-details.start-with-slate" => Some(("contentDetails.startWithSlate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "content-details.closed-captions-type" => Some(("contentDetails.closedCaptionsType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.bound-stream-last-update-time-ms" => Some(("contentDetails.boundStreamLastUpdateTimeMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-details.enable-content-encryption" => Some(("contentDetails.enableContentEncryption", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "content-details.record-from-start" => Some(("contentDetails.recordFromStart", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "content-details.enable-dvr" => Some(("contentDetails.enableDvr", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "content-details.monitor-stream.broadcast-stream-delay-ms" => Some(("contentDetails.monitorStream.broadcastStreamDelayMs", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "content-details.monitor-stream.embed-html" => Some(("contentDetails.monitorStream.embedHtml", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.monitor-stream.enable-monitor-stream" => Some(("contentDetails.monitorStream.enableMonitorStream", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "content-details.projection" => Some(("contentDetails.projection", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.actual-end-time" => Some(("snippet.actualEndTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.description" => Some(("snippet.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.title" => Some(("snippet.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2859,7 +2863,7 @@ impl<'n> Engine<'n> {
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["actual-end-time", "actual-start-time", "bound-stream-id", "broadcast-stream-delay-ms", "channel-id", "closed-captions-type", "concurrent-viewers", "content-details", "default", "description", "embed-html", "enable-closed-captions", "enable-content-encryption", "enable-dvr", "enable-embed", "enable-low-latency", "enable-monitor-stream", "etag", "height", "high", "id", "is-default-broadcast", "kind", "life-cycle-status", "live-broadcast-priority", "live-chat-id", "maxres", "medium", "monitor-stream", "privacy-status", "published-at", "record-from-start", "recording-status", "scheduled-end-time", "scheduled-start-time", "snippet", "standard", "start-with-slate", "statistics", "status", "thumbnails", "title", "total-chat-count", "url", "width"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["actual-end-time", "actual-start-time", "bound-stream-id", "bound-stream-last-update-time-ms", "broadcast-stream-delay-ms", "channel-id", "closed-captions-type", "concurrent-viewers", "content-details", "default", "description", "embed-html", "enable-closed-captions", "enable-content-encryption", "enable-dvr", "enable-embed", "enable-low-latency", "enable-monitor-stream", "etag", "height", "high", "id", "is-default-broadcast", "kind", "life-cycle-status", "live-broadcast-priority", "live-chat-id", "maxres", "medium", "monitor-stream", "privacy-status", "projection", "published-at", "record-from-start", "recording-status", "scheduled-end-time", "scheduled-start-time", "snippet", "standard", "start-with-slate", "statistics", "status", "thumbnails", "title", "total-chat-count", "url", "width"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3132,16 +3136,31 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "snippet.display-message" => Some(("snippet.displayMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.message-retracted-details.retracted-message-id" => Some(("snippet.messageRetractedDetails.retractedMessageId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.fan-funding-event-details.currency" => Some(("snippet.fanFundingEventDetails.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.fan-funding-event-details.amount-display-string" => Some(("snippet.fanFundingEventDetails.amountDisplayString", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.fan-funding-event-details.user-comment" => Some(("snippet.fanFundingEventDetails.userComment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.fan-funding-event-details.amount-micros" => Some(("snippet.fanFundingEventDetails.amountMicros", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.has-display-content" => Some(("snippet.hasDisplayContent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "snippet.published-at" => Some(("snippet.publishedAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.user-banned-details.ban-duration-seconds" => Some(("snippet.userBannedDetails.banDurationSeconds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.user-banned-details.banned-user-details.channel-id" => Some(("snippet.userBannedDetails.bannedUserDetails.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.user-banned-details.banned-user-details.display-name" => Some(("snippet.userBannedDetails.bannedUserDetails.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.user-banned-details.banned-user-details.profile-image-url" => Some(("snippet.userBannedDetails.bannedUserDetails.profileImageUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.user-banned-details.banned-user-details.channel-url" => Some(("snippet.userBannedDetails.bannedUserDetails.channelUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.user-banned-details.ban-type" => Some(("snippet.userBannedDetails.banType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.live-chat-id" => Some(("snippet.liveChatId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.author-channel-id" => Some(("snippet.authorChannelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.poll-edited-details.prompt" => Some(("snippet.pollEditedDetails.prompt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.poll-edited-details.id" => Some(("snippet.pollEditedDetails.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.text-message-details.message-text" => Some(("snippet.textMessageDetails.messageText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.message-deleted-details.deleted-message-id" => Some(("snippet.messageDeletedDetails.deletedMessageId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.poll-voted-details.item-id" => Some(("snippet.pollVotedDetails.itemId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.poll-voted-details.poll-id" => Some(("snippet.pollVotedDetails.pollId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.poll-opened-details.prompt" => Some(("snippet.pollOpenedDetails.prompt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.poll-opened-details.id" => Some(("snippet.pollOpenedDetails.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.type" => Some(("snippet.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.poll-closed-details.poll-id" => Some(("snippet.pollClosedDetails.pollId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "author-details.display-name" => Some(("authorDetails.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3154,7 +3173,7 @@ impl<'n> Engine<'n> {
                     "author-details.channel-url" => Some(("authorDetails.channelUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["amount-display-string", "amount-micros", "author-channel-id", "author-details", "channel-id", "channel-url", "currency", "display-message", "display-name", "etag", "fan-funding-event-details", "has-display-content", "id", "is-chat-moderator", "is-chat-owner", "is-chat-sponsor", "is-verified", "kind", "live-chat-id", "message-text", "profile-image-url", "published-at", "snippet", "text-message-details", "type", "user-comment"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["amount-display-string", "amount-micros", "author-channel-id", "author-details", "ban-duration-seconds", "ban-type", "banned-user-details", "channel-id", "channel-url", "currency", "deleted-message-id", "display-message", "display-name", "etag", "fan-funding-event-details", "has-display-content", "id", "is-chat-moderator", "is-chat-owner", "is-chat-sponsor", "is-verified", "item-id", "kind", "live-chat-id", "message-deleted-details", "message-retracted-details", "message-text", "poll-closed-details", "poll-edited-details", "poll-id", "poll-opened-details", "poll-voted-details", "profile-image-url", "prompt", "published-at", "retracted-message-id", "snippet", "text-message-details", "type", "user-banned-details", "user-comment"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3554,10 +3573,12 @@ impl<'n> Engine<'n> {
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-details.is-reusable" => Some(("contentDetails.isReusable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "content-details.closed-captions-ingestion-url" => Some(("contentDetails.closedCaptionsIngestionUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cdn.frame-rate" => Some(("cdn.frameRate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cdn.ingestion-type" => Some(("cdn.ingestionType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cdn.ingestion-info.backup-ingestion-address" => Some(("cdn.ingestionInfo.backupIngestionAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cdn.ingestion-info.stream-name" => Some(("cdn.ingestionInfo.streamName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cdn.ingestion-info.ingestion-address" => Some(("cdn.ingestionInfo.ingestionAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cdn.resolution" => Some(("cdn.resolution", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cdn.format" => Some(("cdn.format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.is-default-stream" => Some(("snippet.isDefaultStream", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "snippet.channel-id" => Some(("snippet.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3567,7 +3588,7 @@ impl<'n> Engine<'n> {
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["backup-ingestion-address", "cdn", "channel-id", "closed-captions-ingestion-url", "content-details", "description", "etag", "format", "health-status", "id", "ingestion-address", "ingestion-info", "ingestion-type", "is-default-stream", "is-reusable", "kind", "last-update-time-seconds", "published-at", "snippet", "status", "stream-name", "stream-status", "title"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["backup-ingestion-address", "cdn", "channel-id", "closed-captions-ingestion-url", "content-details", "description", "etag", "format", "frame-rate", "health-status", "id", "ingestion-address", "ingestion-info", "ingestion-type", "is-default-stream", "is-reusable", "kind", "last-update-time-seconds", "published-at", "resolution", "snippet", "status", "stream-name", "stream-status", "title"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3734,10 +3755,12 @@ impl<'n> Engine<'n> {
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-details.is-reusable" => Some(("contentDetails.isReusable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "content-details.closed-captions-ingestion-url" => Some(("contentDetails.closedCaptionsIngestionUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cdn.frame-rate" => Some(("cdn.frameRate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cdn.ingestion-type" => Some(("cdn.ingestionType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cdn.ingestion-info.backup-ingestion-address" => Some(("cdn.ingestionInfo.backupIngestionAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cdn.ingestion-info.stream-name" => Some(("cdn.ingestionInfo.streamName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cdn.ingestion-info.ingestion-address" => Some(("cdn.ingestionInfo.ingestionAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cdn.resolution" => Some(("cdn.resolution", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cdn.format" => Some(("cdn.format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.is-default-stream" => Some(("snippet.isDefaultStream", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "snippet.channel-id" => Some(("snippet.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3747,7 +3770,7 @@ impl<'n> Engine<'n> {
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["backup-ingestion-address", "cdn", "channel-id", "closed-captions-ingestion-url", "content-details", "description", "etag", "format", "health-status", "id", "ingestion-address", "ingestion-info", "ingestion-type", "is-default-stream", "is-reusable", "kind", "last-update-time-seconds", "published-at", "snippet", "status", "stream-name", "stream-status", "title"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["backup-ingestion-address", "cdn", "channel-id", "closed-captions-ingestion-url", "content-details", "description", "etag", "format", "frame-rate", "health-status", "id", "ingestion-address", "ingestion-info", "ingestion-type", "is-default-stream", "is-reusable", "kind", "last-update-time-seconds", "published-at", "resolution", "snippet", "status", "stream-name", "stream-status", "title"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4935,6 +4958,9 @@ impl<'n> Engine<'n> {
                 "my-subscribers" => {
                     call = call.my_subscribers(arg_from_str(value.unwrap_or("false"), err, "my-subscribers", "boolean"));
                 },
+                "my-recent-subscribers" => {
+                    call = call.my_recent_subscribers(arg_from_str(value.unwrap_or("false"), err, "my-recent-subscribers", "boolean"));
+                },
                 "mine" => {
                     call = call.mine(arg_from_str(value.unwrap_or("false"), err, "mine", "boolean"));
                 },
@@ -4963,7 +4989,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["on-behalf-of-content-owner", "on-behalf-of-content-owner-channel", "channel-id", "mine", "max-results", "id", "page-token", "my-subscribers", "for-channel-id", "order"].iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of-content-owner", "on-behalf-of-content-owner-channel", "channel-id", "mine", "max-results", "id", "page-token", "my-subscribers", "for-channel-id", "order", "my-recent-subscribers"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -5319,6 +5345,7 @@ impl<'n> Engine<'n> {
                     "statistics.dislike-count" => Some(("statistics.dislikeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "statistics.like-count" => Some(("statistics.likeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "content-details.definition" => Some(("contentDetails.definition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.projection" => Some(("contentDetails.projection", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-details.country-restriction.exception" => Some(("contentDetails.countryRestriction.exception", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "content-details.country-restriction.allowed" => Some(("contentDetails.countryRestriction.allowed", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "content-details.content-rating.yt-rating" => Some(("contentDetails.contentRating.ytRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -5375,6 +5402,7 @@ impl<'n> Engine<'n> {
                     "content-details.content-rating.russia-rating" => Some(("contentDetails.contentRating.russiaRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-details.content-rating.mpaa-rating" => Some(("contentDetails.contentRating.mpaaRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-details.content-rating.kfcb-rating" => Some(("contentDetails.contentRating.kfcbRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.fpb-rating-reasons" => Some(("contentDetails.contentRating.fpbRatingReasons", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "content-details.content-rating.agcom-rating" => Some(("contentDetails.contentRating.agcomRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-details.content-rating.chvrs-rating" => Some(("contentDetails.contentRating.chvrsRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-details.content-rating.cna-rating" => Some(("contentDetails.contentRating.cnaRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -5465,7 +5493,7 @@ impl<'n> Engine<'n> {
                     "recording-details.location.longitude" => Some(("recordingDetails.location.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["acb-rating", "access", "active-live-chat-id", "actual-end-time", "actual-start-time", "agcom-rating", "age-gating", "alcohol-content", "allowed", "altitude", "anatel-rating", "bbfc-rating", "bfvc-rating", "bitrate-bps", "blocked", "bmukk-rating", "caption", "category-id", "catv-rating", "catvfr-rating", "cbfc-rating", "ccc-rating", "cce-rating", "channel-id", "channel-title", "chfilm-rating", "chvrs-rating", "cicf-rating", "cna-rating", "cnc-rating", "comment-count", "concurrent-viewers", "container", "content-details", "content-rating", "country-restriction", "creation-time", "csa-rating", "cscf-rating", "czfilm-rating", "default", "default-audio-language", "default-language", "definition", "description", "dimension", "dislike-count", "djctq-rating", "djctq-rating-reasons", "duration", "duration-ms", "ecbmct-rating", "editor-suggestions", "editor-suggestions-availability", "eefilm-rating", "egfilm-rating", "eirin-rating", "embed-html", "embeddable", "etag", "exception", "failure-reason", "favorite-count", "fcbm-rating", "fco-rating", "file-details", "file-details-availability", "file-name", "file-size", "file-type", "fmoc-rating", "fpb-rating", "fsk-rating", "grfilm-rating", "height", "high", "icaa-rating", "id", "ifco-rating", "ilfilm-rating", "incaa-rating", "kfcb-rating", "kijkwijzer-rating", "kind", "kmrb-rating", "latitude", "license", "licensed-content", "like-count", "live-broadcast-content", "live-streaming-details", "localized", "location", "location-description", "longitude", "lsf-rating", "maxres", "mccaa-rating", "mccyp-rating", "mda-rating", "medietilsynet-rating", "medium", "meku-rating", "mibac-rating", "moc-rating", "moctw-rating", "monetization-details", "mpaa-rating", "mtrcb-rating", "nbc-rating", "nbcpl-rating", "nfrc-rating", "nfvcb-rating", "nkclv-rating", "oflc-rating", "parts-processed", "parts-total", "pefilm-rating", "player", "privacy-status", "processing-details", "processing-errors", "processing-failure-reason", "processing-hints", "processing-issues-availability", "processing-progress", "processing-status", "processing-warnings", "project-details", "public-stats-viewable", "publish-at", "published-at", "rcnof-rating", "recording-date", "recording-details", "recording-location", "region-restriction", "rejection-reason", "relevant-topic-ids", "resorteviolencia-rating", "restricted", "rtc-rating", "rte-rating", "russia-rating", "scheduled-end-time", "scheduled-start-time", "skfilm-rating", "smais-rating", "smsa-rating", "snippet", "standard", "statistics", "status", "suggestions", "tag-suggestions-availability", "tags", "thumbnails", "thumbnails-availability", "time-left-ms", "title", "topic-details", "topic-ids", "tvpg-rating", "upload-status", "url", "video-game-rating", "view-count", "width", "yt-rating"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["acb-rating", "access", "active-live-chat-id", "actual-end-time", "actual-start-time", "agcom-rating", "age-gating", "alcohol-content", "allowed", "altitude", "anatel-rating", "bbfc-rating", "bfvc-rating", "bitrate-bps", "blocked", "bmukk-rating", "caption", "category-id", "catv-rating", "catvfr-rating", "cbfc-rating", "ccc-rating", "cce-rating", "channel-id", "channel-title", "chfilm-rating", "chvrs-rating", "cicf-rating", "cna-rating", "cnc-rating", "comment-count", "concurrent-viewers", "container", "content-details", "content-rating", "country-restriction", "creation-time", "csa-rating", "cscf-rating", "czfilm-rating", "default", "default-audio-language", "default-language", "definition", "description", "dimension", "dislike-count", "djctq-rating", "djctq-rating-reasons", "duration", "duration-ms", "ecbmct-rating", "editor-suggestions", "editor-suggestions-availability", "eefilm-rating", "egfilm-rating", "eirin-rating", "embed-html", "embeddable", "etag", "exception", "failure-reason", "favorite-count", "fcbm-rating", "fco-rating", "file-details", "file-details-availability", "file-name", "file-size", "file-type", "fmoc-rating", "fpb-rating", "fpb-rating-reasons", "fsk-rating", "grfilm-rating", "height", "high", "icaa-rating", "id", "ifco-rating", "ilfilm-rating", "incaa-rating", "kfcb-rating", "kijkwijzer-rating", "kind", "kmrb-rating", "latitude", "license", "licensed-content", "like-count", "live-broadcast-content", "live-streaming-details", "localized", "location", "location-description", "longitude", "lsf-rating", "maxres", "mccaa-rating", "mccyp-rating", "mda-rating", "medietilsynet-rating", "medium", "meku-rating", "mibac-rating", "moc-rating", "moctw-rating", "monetization-details", "mpaa-rating", "mtrcb-rating", "nbc-rating", "nbcpl-rating", "nfrc-rating", "nfvcb-rating", "nkclv-rating", "oflc-rating", "parts-processed", "parts-total", "pefilm-rating", "player", "privacy-status", "processing-details", "processing-errors", "processing-failure-reason", "processing-hints", "processing-issues-availability", "processing-progress", "processing-status", "processing-warnings", "project-details", "projection", "public-stats-viewable", "publish-at", "published-at", "rcnof-rating", "recording-date", "recording-details", "recording-location", "region-restriction", "rejection-reason", "relevant-topic-ids", "resorteviolencia-rating", "restricted", "rtc-rating", "rte-rating", "russia-rating", "scheduled-end-time", "scheduled-start-time", "skfilm-rating", "smais-rating", "smsa-rating", "snippet", "standard", "statistics", "status", "suggestions", "tag-suggestions-availability", "tags", "thumbnails", "thumbnails-availability", "time-left-ms", "title", "topic-details", "topic-ids", "tvpg-rating", "upload-status", "url", "video-game-rating", "view-count", "width", "yt-rating"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -5797,6 +5825,7 @@ impl<'n> Engine<'n> {
                     "statistics.dislike-count" => Some(("statistics.dislikeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "statistics.like-count" => Some(("statistics.likeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "content-details.definition" => Some(("contentDetails.definition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.projection" => Some(("contentDetails.projection", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-details.country-restriction.exception" => Some(("contentDetails.countryRestriction.exception", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "content-details.country-restriction.allowed" => Some(("contentDetails.countryRestriction.allowed", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "content-details.content-rating.yt-rating" => Some(("contentDetails.contentRating.ytRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -5853,6 +5882,7 @@ impl<'n> Engine<'n> {
                     "content-details.content-rating.russia-rating" => Some(("contentDetails.contentRating.russiaRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-details.content-rating.mpaa-rating" => Some(("contentDetails.contentRating.mpaaRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-details.content-rating.kfcb-rating" => Some(("contentDetails.contentRating.kfcbRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.fpb-rating-reasons" => Some(("contentDetails.contentRating.fpbRatingReasons", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "content-details.content-rating.agcom-rating" => Some(("contentDetails.contentRating.agcomRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-details.content-rating.chvrs-rating" => Some(("contentDetails.contentRating.chvrsRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-details.content-rating.cna-rating" => Some(("contentDetails.contentRating.cnaRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -5943,7 +5973,7 @@ impl<'n> Engine<'n> {
                     "recording-details.location.longitude" => Some(("recordingDetails.location.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["acb-rating", "access", "active-live-chat-id", "actual-end-time", "actual-start-time", "agcom-rating", "age-gating", "alcohol-content", "allowed", "altitude", "anatel-rating", "bbfc-rating", "bfvc-rating", "bitrate-bps", "blocked", "bmukk-rating", "caption", "category-id", "catv-rating", "catvfr-rating", "cbfc-rating", "ccc-rating", "cce-rating", "channel-id", "channel-title", "chfilm-rating", "chvrs-rating", "cicf-rating", "cna-rating", "cnc-rating", "comment-count", "concurrent-viewers", "container", "content-details", "content-rating", "country-restriction", "creation-time", "csa-rating", "cscf-rating", "czfilm-rating", "default", "default-audio-language", "default-language", "definition", "description", "dimension", "dislike-count", "djctq-rating", "djctq-rating-reasons", "duration", "duration-ms", "ecbmct-rating", "editor-suggestions", "editor-suggestions-availability", "eefilm-rating", "egfilm-rating", "eirin-rating", "embed-html", "embeddable", "etag", "exception", "failure-reason", "favorite-count", "fcbm-rating", "fco-rating", "file-details", "file-details-availability", "file-name", "file-size", "file-type", "fmoc-rating", "fpb-rating", "fsk-rating", "grfilm-rating", "height", "high", "icaa-rating", "id", "ifco-rating", "ilfilm-rating", "incaa-rating", "kfcb-rating", "kijkwijzer-rating", "kind", "kmrb-rating", "latitude", "license", "licensed-content", "like-count", "live-broadcast-content", "live-streaming-details", "localized", "location", "location-description", "longitude", "lsf-rating", "maxres", "mccaa-rating", "mccyp-rating", "mda-rating", "medietilsynet-rating", "medium", "meku-rating", "mibac-rating", "moc-rating", "moctw-rating", "monetization-details", "mpaa-rating", "mtrcb-rating", "nbc-rating", "nbcpl-rating", "nfrc-rating", "nfvcb-rating", "nkclv-rating", "oflc-rating", "parts-processed", "parts-total", "pefilm-rating", "player", "privacy-status", "processing-details", "processing-errors", "processing-failure-reason", "processing-hints", "processing-issues-availability", "processing-progress", "processing-status", "processing-warnings", "project-details", "public-stats-viewable", "publish-at", "published-at", "rcnof-rating", "recording-date", "recording-details", "recording-location", "region-restriction", "rejection-reason", "relevant-topic-ids", "resorteviolencia-rating", "restricted", "rtc-rating", "rte-rating", "russia-rating", "scheduled-end-time", "scheduled-start-time", "skfilm-rating", "smais-rating", "smsa-rating", "snippet", "standard", "statistics", "status", "suggestions", "tag-suggestions-availability", "tags", "thumbnails", "thumbnails-availability", "time-left-ms", "title", "topic-details", "topic-ids", "tvpg-rating", "upload-status", "url", "video-game-rating", "view-count", "width", "yt-rating"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["acb-rating", "access", "active-live-chat-id", "actual-end-time", "actual-start-time", "agcom-rating", "age-gating", "alcohol-content", "allowed", "altitude", "anatel-rating", "bbfc-rating", "bfvc-rating", "bitrate-bps", "blocked", "bmukk-rating", "caption", "category-id", "catv-rating", "catvfr-rating", "cbfc-rating", "ccc-rating", "cce-rating", "channel-id", "channel-title", "chfilm-rating", "chvrs-rating", "cicf-rating", "cna-rating", "cnc-rating", "comment-count", "concurrent-viewers", "container", "content-details", "content-rating", "country-restriction", "creation-time", "csa-rating", "cscf-rating", "czfilm-rating", "default", "default-audio-language", "default-language", "definition", "description", "dimension", "dislike-count", "djctq-rating", "djctq-rating-reasons", "duration", "duration-ms", "ecbmct-rating", "editor-suggestions", "editor-suggestions-availability", "eefilm-rating", "egfilm-rating", "eirin-rating", "embed-html", "embeddable", "etag", "exception", "failure-reason", "favorite-count", "fcbm-rating", "fco-rating", "file-details", "file-details-availability", "file-name", "file-size", "file-type", "fmoc-rating", "fpb-rating", "fpb-rating-reasons", "fsk-rating", "grfilm-rating", "height", "high", "icaa-rating", "id", "ifco-rating", "ilfilm-rating", "incaa-rating", "kfcb-rating", "kijkwijzer-rating", "kind", "kmrb-rating", "latitude", "license", "licensed-content", "like-count", "live-broadcast-content", "live-streaming-details", "localized", "location", "location-description", "longitude", "lsf-rating", "maxres", "mccaa-rating", "mccyp-rating", "mda-rating", "medietilsynet-rating", "medium", "meku-rating", "mibac-rating", "moc-rating", "moctw-rating", "monetization-details", "mpaa-rating", "mtrcb-rating", "nbc-rating", "nbcpl-rating", "nfrc-rating", "nfvcb-rating", "nkclv-rating", "oflc-rating", "parts-processed", "parts-total", "pefilm-rating", "player", "privacy-status", "processing-details", "processing-errors", "processing-failure-reason", "processing-hints", "processing-issues-availability", "processing-progress", "processing-status", "processing-warnings", "project-details", "projection", "public-stats-viewable", "publish-at", "published-at", "rcnof-rating", "recording-date", "recording-details", "recording-location", "region-restriction", "rejection-reason", "relevant-topic-ids", "resorteviolencia-rating", "restricted", "rtc-rating", "rte-rating", "russia-rating", "scheduled-end-time", "scheduled-start-time", "skfilm-rating", "smais-rating", "smsa-rating", "snippet", "standard", "statistics", "status", "suggestions", "tag-suggestions-availability", "tags", "thumbnails", "thumbnails-availability", "time-left-ms", "title", "topic-details", "topic-ids", "tvpg-rating", "upload-status", "url", "video-game-rating", "view-count", "width", "yt-rating"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -8322,8 +8352,8 @@ fn main() {
     
     let mut app = App::new("youtube3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.6+20160222")
-           .about("Programmatic access to YouTube features.")
+           .version("0.3.6+20160805")
+           .about("Supports core YouTube features, such as uploading videos, creating and managing playlists, searching for content, and much more.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_youtube3_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

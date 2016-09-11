@@ -196,6 +196,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "confirm-unsafe-account-change" => {
+                    call = call.confirm_unsafe_account_change(arg_from_str(value.unwrap_or("false"), err, "confirm-unsafe-account-change", "boolean"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -209,6 +212,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["confirm-unsafe-account-change"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -288,6 +292,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "confirm-unsafe-account-change" => {
+                    call = call.confirm_unsafe_account_change(arg_from_str(value.unwrap_or("false"), err, "confirm-unsafe-account-change", "boolean"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -301,6 +308,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["confirm-unsafe-account-change"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -798,10 +806,12 @@ impl<'n> Engine<'n> {
                     "html-snippet" => Some(("HTMLSnippet", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "open-auction-status" => Some(("openAuctionStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "buyer-creative-id" => Some(("buyerCreativeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ad-choices-destination-url" => Some(("adChoicesDestinationUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "impression-tracking-url" => Some(("impressionTrackingUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "video-url" => Some(("videoURL", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "click-through-url" => Some(("clickThroughUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "languages" => Some(("languages", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "width" => Some(("width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "native-ad.body" => Some(("nativeAd.body", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "native-ad.advertiser" => Some(("nativeAd.advertiser", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -827,13 +837,14 @@ impl<'n> Engine<'n> {
                     "sensitive-categories" => Some(("sensitiveCategories", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Vec })),
                     "product-categories" => Some(("productCategories", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Vec })),
                     "agency-id" => Some(("agencyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "detected-domains" => Some(("detectedDomains", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "deals-status" => Some(("dealsStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "advertiser-id" => Some(("advertiserId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "restricted-categories" => Some(("restrictedCategories", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Vec })),
                     "filtering-reasons.date" => Some(("filteringReasons.date", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["html-snippet", "account-id", "advertiser", "advertiser-id", "advertiser-name", "agency-id", "api-upload-timestamp", "app-icon", "attribute", "body", "buyer-creative-id", "call-to-action", "click-through-url", "click-tracking-url", "date", "deals-status", "filtering-reasons", "headline", "height", "image", "impression-tracking-url", "kind", "logo", "native-ad", "open-auction-status", "price", "product-categories", "restricted-categories", "sensitive-categories", "star-rating", "store", "url", "vendor-type", "version", "video-url", "width"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["html-snippet", "account-id", "ad-choices-destination-url", "advertiser", "advertiser-id", "advertiser-name", "agency-id", "api-upload-timestamp", "app-icon", "attribute", "body", "buyer-creative-id", "call-to-action", "click-through-url", "click-tracking-url", "date", "deals-status", "detected-domains", "filtering-reasons", "headline", "height", "image", "impression-tracking-url", "kind", "languages", "logo", "native-ad", "open-auction-status", "price", "product-categories", "restricted-categories", "sensitive-categories", "star-rating", "store", "url", "vendor-type", "version", "video-url", "width"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1188,6 +1199,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "pql-query" => {
+                    call = call.pql_query(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1201,6 +1215,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["pql-query"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1262,7 +1277,6 @@ impl<'n> Engine<'n> {
                     "proposal.name" => Some(("proposal.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "proposal.revision-time-ms" => Some(("proposal.revisionTimeMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "proposal.private-auction-id" => Some(("proposal.privateAuctionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "proposal.buyer.account-id" => Some(("proposal.buyer.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "proposal.buyer-private-data.reference-id" => Some(("proposal.buyerPrivateData.referenceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "proposal.buyer-private-data.reference-payload" => Some(("proposal.buyerPrivateData.referencePayload", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "proposal.billed-buyer.account-id" => Some(("proposal.billedBuyer.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1275,14 +1289,14 @@ impl<'n> Engine<'n> {
                     "proposal.last-updater-or-commentor-role" => Some(("proposal.lastUpdaterOrCommentorRole", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "proposal.has-seller-signed-off" => Some(("proposal.hasSellerSignedOff", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "proposal.is-renegotiating" => Some(("proposal.isRenegotiating", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "proposal.last-updater-role" => Some(("proposal.lastUpdaterRole", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "proposal.buyer.account-id" => Some(("proposal.buyer.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "proposal.has-buyer-signed-off" => Some(("proposal.hasBuyerSignedOff", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "proposal.is-setup-complete" => Some(("proposal.isSetupComplete", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "proposal.revision-number" => Some(("proposal.revisionNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "proposal-revision-number" => Some(("proposalRevisionNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-action" => Some(("updateAction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "billed-buyer", "buyer", "buyer-private-data", "has-buyer-signed-off", "has-seller-signed-off", "inventory-source", "is-renegotiating", "is-setup-complete", "kind", "last-updater-or-commentor-role", "last-updater-role", "name", "negotiation-id", "originator-role", "private-auction-id", "proposal", "proposal-id", "proposal-revision-number", "proposal-state", "reference-id", "reference-payload", "revision-number", "revision-time-ms", "seller", "sub-account-id", "update-action"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "billed-buyer", "buyer", "buyer-private-data", "has-buyer-signed-off", "has-seller-signed-off", "inventory-source", "is-renegotiating", "is-setup-complete", "kind", "last-updater-or-commentor-role", "name", "negotiation-id", "originator-role", "private-auction-id", "proposal", "proposal-id", "proposal-revision-number", "proposal-state", "reference-id", "reference-payload", "revision-number", "revision-time-ms", "seller", "sub-account-id", "update-action"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1432,6 +1446,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "pql-query" => {
+                    call = call.pql_query(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1445,6 +1462,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["pql-query"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2357,7 +2375,6 @@ impl<'n> Engine<'n> {
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "revision-time-ms" => Some(("revisionTimeMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "private-auction-id" => Some(("privateAuctionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "buyer.account-id" => Some(("buyer.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "buyer-private-data.reference-id" => Some(("buyerPrivateData.referenceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "buyer-private-data.reference-payload" => Some(("buyerPrivateData.referencePayload", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "billed-buyer.account-id" => Some(("billedBuyer.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2370,12 +2387,12 @@ impl<'n> Engine<'n> {
                     "last-updater-or-commentor-role" => Some(("lastUpdaterOrCommentorRole", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "has-seller-signed-off" => Some(("hasSellerSignedOff", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "is-renegotiating" => Some(("isRenegotiating", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "last-updater-role" => Some(("lastUpdaterRole", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "buyer.account-id" => Some(("buyer.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "has-buyer-signed-off" => Some(("hasBuyerSignedOff", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "is-setup-complete" => Some(("isSetupComplete", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "revision-number" => Some(("revisionNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "billed-buyer", "buyer", "buyer-private-data", "has-buyer-signed-off", "has-seller-signed-off", "inventory-source", "is-renegotiating", "is-setup-complete", "kind", "last-updater-or-commentor-role", "last-updater-role", "name", "negotiation-id", "originator-role", "private-auction-id", "proposal-id", "proposal-state", "reference-id", "reference-payload", "revision-number", "revision-time-ms", "seller", "sub-account-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "billed-buyer", "buyer", "buyer-private-data", "has-buyer-signed-off", "has-seller-signed-off", "inventory-source", "is-renegotiating", "is-setup-complete", "kind", "last-updater-or-commentor-role", "name", "negotiation-id", "originator-role", "private-auction-id", "proposal-id", "proposal-state", "reference-id", "reference-payload", "revision-number", "revision-time-ms", "seller", "sub-account-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2563,7 +2580,6 @@ impl<'n> Engine<'n> {
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "revision-time-ms" => Some(("revisionTimeMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "private-auction-id" => Some(("privateAuctionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "buyer.account-id" => Some(("buyer.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "buyer-private-data.reference-id" => Some(("buyerPrivateData.referenceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "buyer-private-data.reference-payload" => Some(("buyerPrivateData.referencePayload", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "billed-buyer.account-id" => Some(("billedBuyer.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2576,12 +2592,12 @@ impl<'n> Engine<'n> {
                     "last-updater-or-commentor-role" => Some(("lastUpdaterOrCommentorRole", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "has-seller-signed-off" => Some(("hasSellerSignedOff", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "is-renegotiating" => Some(("isRenegotiating", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "last-updater-role" => Some(("lastUpdaterRole", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "buyer.account-id" => Some(("buyer.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "has-buyer-signed-off" => Some(("hasBuyerSignedOff", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "is-setup-complete" => Some(("isSetupComplete", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "revision-number" => Some(("revisionNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "billed-buyer", "buyer", "buyer-private-data", "has-buyer-signed-off", "has-seller-signed-off", "inventory-source", "is-renegotiating", "is-setup-complete", "kind", "last-updater-or-commentor-role", "last-updater-role", "name", "negotiation-id", "originator-role", "private-auction-id", "proposal-id", "proposal-state", "reference-id", "reference-payload", "revision-number", "revision-time-ms", "seller", "sub-account-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "billed-buyer", "buyer", "buyer-private-data", "has-buyer-signed-off", "has-seller-signed-off", "inventory-source", "is-renegotiating", "is-setup-complete", "kind", "last-updater-or-commentor-role", "name", "negotiation-id", "originator-role", "private-auction-id", "proposal-id", "proposal-state", "reference-id", "reference-payload", "revision-number", "revision-time-ms", "seller", "sub-account-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3413,7 +3429,7 @@ fn main() {
                   vec![
                     (Some(r##"proposal-id"##),
                      None,
-                     Some(r##"The proposalId to get deals for."##),
+                     Some(r##"The proposalId to get deals for. To search across all proposals specify order_id = '-' as part of the URL."##),
                      Some(true),
                      Some(false)),
         
@@ -3494,7 +3510,7 @@ fn main() {
                   vec![
                     (Some(r##"proposal-id"##),
                      None,
-                     Some(r##"The proposalId to get notes for."##),
+                     Some(r##"The proposalId to get notes for. To search across all proposals specify order_id = '-' as part of the URL."##),
                      Some(true),
                      Some(false)),
         
@@ -3849,7 +3865,7 @@ fn main() {
         
                     (Some(r##"update-action"##),
                      None,
-                     Some(r##"The proposed action to take on the proposal."##),
+                     Some(r##"The proposed action to take on the proposal. This field is required and it must be set when updating a proposal."##),
                      Some(true),
                      Some(false)),
         
@@ -3921,7 +3937,7 @@ fn main() {
         
                     (Some(r##"update-action"##),
                      None,
-                     Some(r##"The proposed action to take on the proposal."##),
+                     Some(r##"The proposed action to take on the proposal. This field is required and it must be set when updating a proposal."##),
                      Some(true),
                      Some(false)),
         
@@ -3974,7 +3990,7 @@ fn main() {
     
     let mut app = App::new("adexchangebuyer1d4")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.6+20160405")
+           .version("0.3.6+20160831")
            .about("Accesses your bidding-account information, submits creatives for validation, finds available direct deals, and retrieves performance reports.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_adexchangebuyer1d4_cli")
            .arg(Arg::with_name("url")

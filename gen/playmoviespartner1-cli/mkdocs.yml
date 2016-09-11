@@ -1,4 +1,4 @@
-site_name: playmoviespartner v0.3.6+20150812
+site_name: Play Movies v0.3.6+20160518
 site_url: http://byron.github.io/google-apis-rs/google-playmoviespartner1-cli
 site_description: Write integrating applications with bcore
 
@@ -9,7 +9,10 @@ site_dir: build_html
 
 pages:
 - ['index.md', 'Home']
+- ['accounts_avails-get.md', 'Accounts', 'Avails Get']
 - ['accounts_avails-list.md', 'Accounts', 'Avails List']
+- ['accounts_components-list.md', 'Accounts', 'Components List']
+- ['accounts_components-type-get.md', 'Accounts', 'Components Type Get']
 - ['accounts_experience-locales-get.md', 'Accounts', 'Experience Locales Get']
 - ['accounts_experience-locales-list.md', 'Accounts', 'Experience Locales List']
 - ['accounts_orders-get.md', 'Accounts', 'Orders Get']

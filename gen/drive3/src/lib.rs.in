@@ -228,7 +228,7 @@ impl<'a, C, A> Drive<C, A>
 pub struct Comment {
     /// Whether the comment has been resolved by one of its replies.
     pub resolved: Option<bool>,
-    /// This is always drive#comment.
+    /// Identifies what kind of resource this is. Value: the fixed string "drive#comment".
     pub kind: Option<String>,
     /// The last time the comment or any of its replies was modified (RFC 3339 date-time).
     #[serde(rename="modifiedTime")]
@@ -272,7 +272,7 @@ impl ResponseResult for Comment {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct About {
-    /// This is always drive#about.
+    /// Identifies what kind of resource this is. Value: the fixed string "drive#about".
     pub kind: Option<String>,
     /// A map of source MIME type to possible targets for all supported exports.
     #[serde(rename="exportFormats")]
@@ -333,7 +333,7 @@ pub struct ChangeList {
     /// The page token for the next page of changes. This will be absent if the end of the current changes list has been reached.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
-    /// This is always drive#changeList.
+    /// Identifies what kind of resource this is. Value: the fixed string "drive#changeList".
     pub kind: Option<String>,
     /// The page of changes.
     pub changes: Option<Vec<Change>>,
@@ -359,7 +359,7 @@ pub struct ReplyList {
     /// The page token for the next page of replies. This will be absent if the end of the replies list has been reached.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
-    /// This is always drive#replyList.
+    /// Identifies what kind of resource this is. Value: the fixed string "drive#replyList".
     pub kind: Option<String>,
     /// The page of replies.
     pub replies: Option<Vec<Reply>>,
@@ -463,7 +463,7 @@ impl Part for FileImageMediaMetadata {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RevisionList {
-    /// This is always drive#revisionList.
+    /// Identifies what kind of resource this is. Value: the fixed string "drive#revisionList".
     pub kind: Option<String>,
     /// The full list of revisions.
     pub revisions: Option<Vec<Revision>>,
@@ -485,7 +485,7 @@ impl ResponseResult for RevisionList {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Reply {
-    /// This is always drive#reply.
+    /// Identifies what kind of resource this is. Value: the fixed string "drive#reply".
     pub kind: Option<String>,
     /// The last time the reply was modified (RFC 3339 date-time).
     #[serde(rename="modifiedTime")]
@@ -525,7 +525,7 @@ impl ResponseResult for Reply {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GeneratedIds {
-    /// This is always drive#generatedIds
+    /// Identifies what kind of resource this is. Value: the fixed string "drive#generatedIds".
     pub kind: Option<String>,
     /// The IDs generated for the requesting user in the specified space.
     pub ids: Option<Vec<String>>,
@@ -613,7 +613,7 @@ pub struct Revision {
     /// The MIME type of the revision.
     #[serde(rename="mimeType")]
     pub mime_type: Option<String>,
-    /// This is always drive#revision.
+    /// Identifies what kind of resource this is. Value: the fixed string "drive#revision".
     pub kind: Option<String>,
     /// The last time the revision was modified (RFC 3339 date-time).
     #[serde(rename="modifiedTime")]
@@ -664,7 +664,7 @@ pub struct CommentList {
     /// The page token for the next page of comments. This will be absent if the end of the comments list has been reached.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
-    /// This is always drive#commentList.
+    /// Identifies what kind of resource this is. Value: the fixed string "drive#commentList".
     pub kind: Option<String>,
     /// The page of comments.
     pub comments: Option<Vec<Comment>>,
@@ -714,7 +714,7 @@ pub struct Permission {
     /// Whether the permission allows the file to be discovered through search. This is only applicable for permissions of type domain or anyone.
     #[serde(rename="allowFileDiscovery")]
     pub allow_file_discovery: Option<bool>,
-    /// This is always drive#permission.
+    /// Identifies what kind of resource this is. Value: the fixed string "drive#permission".
     pub kind: Option<String>,
     /// The email address of the user or group to which this permission refers.
     #[serde(rename="emailAddress")]
@@ -728,6 +728,9 @@ pub struct Permission {
     /// - commenter 
     /// - reader
     pub role: Option<String>,
+    /// The time at which this permission will expire (RFC 3339 date-time).
+    #[serde(rename="expirationTime")]
+    pub expiration_time: Option<String>,
     /// The type of the grantee. Valid values are:  
     /// - user 
     /// - group 
@@ -809,7 +812,7 @@ pub struct FileList {
     /// The page token for the next page of files. This will be absent if the end of the files list has been reached.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
-    /// This is always drive#fileList.
+    /// Identifies what kind of resource this is. Value: the fixed string "drive#fileList".
     pub kind: Option<String>,
 }
 
@@ -824,7 +827,7 @@ impl ResponseResult for FileList {}
 pub struct User {
     /// Whether this user is the requesting user.
     pub me: Option<bool>,
-    /// This is always drive#user.
+    /// Identifies what kind of resource this is. Value: the fixed string "drive#user".
     pub kind: Option<String>,
     /// A plain text displayable name for this user.
     #[serde(rename="displayName")]
@@ -947,7 +950,7 @@ pub struct File {
     /// Whether the file has been viewed by this user.
     #[serde(rename="viewedByMe")]
     pub viewed_by_me: Option<bool>,
-    /// This is always drive#file.
+    /// Identifies what kind of resource this is. Value: the fixed string "drive#file".
     pub kind: Option<String>,
     /// The time at which the file was created (RFC 3339 date-time).
     #[serde(rename="createdTime")]
@@ -1006,7 +1009,7 @@ impl ResponseResult for File {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PermissionList {
-    /// This is always drive#permissionList.
+    /// Identifies what kind of resource this is. Value: the fixed string "drive#permissionList".
     pub kind: Option<String>,
     /// The full list of permissions.
     pub permissions: Option<Vec<Permission>>,
@@ -1045,7 +1048,7 @@ impl Part for FileVideoMediaMetadata {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct StartPageToken {
-    /// This is always drive#startPageToken.
+    /// Identifies what kind of resource this is. Value: the fixed string "drive#startPageToken".
     pub kind: Option<String>,
     /// The starting page token for listing changes.
     #[serde(rename="startPageToken")]
@@ -1068,7 +1071,7 @@ impl ResponseResult for StartPageToken {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Change {
-    /// This is always drive#change.
+    /// Identifies what kind of resource this is. Value: the fixed string "drive#change".
     pub kind: Option<String>,
     /// Whether the file has been removed from the view of the changes list, for example by deletion or lost access.
     pub removed: Option<bool>,
@@ -2022,6 +2025,7 @@ impl<'a, C, A> PermissionMethods<'a, C, A> {
             _file_id: file_id.to_string(),
             _permission_id: permission_id.to_string(),
             _transfer_ownership: Default::default(),
+            _remove_expiration: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -10343,6 +10347,7 @@ impl<'a, C, A> PermissionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.permissions().update(req, "fileId", "permissionId")
 ///              .transfer_ownership(false)
+///              .remove_expiration(true)
 ///              .doit();
 /// # }
 /// ```
@@ -10354,6 +10359,7 @@ pub struct PermissionUpdateCall<'a, C, A>
     _file_id: String,
     _permission_id: String,
     _transfer_ownership: Option<bool>,
+    _remove_expiration: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -10375,13 +10381,16 @@ impl<'a, C, A> PermissionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         };
         dlg.begin(MethodInfo { id: "drive.permissions.update",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
         params.push(("fileId", self._file_id.to_string()));
         params.push(("permissionId", self._permission_id.to_string()));
         if let Some(value) = self._transfer_ownership {
             params.push(("transferOwnership", value.to_string()));
         }
-        for &field in ["alt", "fileId", "permissionId", "transferOwnership"].iter() {
+        if let Some(value) = self._remove_expiration {
+            params.push(("removeExpiration", value.to_string()));
+        }
+        for &field in ["alt", "fileId", "permissionId", "transferOwnership", "removeExpiration"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -10545,6 +10554,13 @@ impl<'a, C, A> PermissionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// Sets the *transfer ownership* query property to the given value.
     pub fn transfer_ownership(mut self, new_value: bool) -> PermissionUpdateCall<'a, C, A> {
         self._transfer_ownership = Some(new_value);
+        self
+    }
+    /// Whether to remove the expiration date.
+    ///
+    /// Sets the *remove expiration* query property to the given value.
+    pub fn remove_expiration(mut self, new_value: bool) -> PermissionUpdateCall<'a, C, A> {
+        self._remove_expiration = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -10879,9 +10895,9 @@ impl<'a, C, A> PermissionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.permissions().create(req, "fileId")
-///              .transfer_ownership(false)
+///              .transfer_ownership(true)
 ///              .send_notification_email(true)
-///              .email_message("nonumy")
+///              .email_message("sed")
 ///              .doit();
 /// # }
 /// ```

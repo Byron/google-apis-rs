@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *appengine* crate version *0.1.14+20160314*, where *20160314* is the exact revision of the *appengine:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
+//! This documentation was generated from *appengine* crate version *0.1.14+20160802*, where *20160802* is the exact revision of the *appengine:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
 //! 
 //! Everything else about the *appengine* *v1_beta4* API can be found at the
 //! [official documentation site](https://cloud.google.com/appengine/docs/admin-api/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.Appengine.html) ... 
 //! 
 //! * apps
-//!  * [*get*](struct.AppGetCall.html), [*modules delete*](struct.AppModuleDeleteCall.html), [*modules get*](struct.AppModuleGetCall.html), [*modules list*](struct.AppModuleListCall.html), [*modules patch*](struct.AppModulePatchCall.html), [*modules versions create*](struct.AppModuleVersionCreateCall.html), [*modules versions delete*](struct.AppModuleVersionDeleteCall.html), [*modules versions get*](struct.AppModuleVersionGetCall.html), [*modules versions list*](struct.AppModuleVersionListCall.html), [*modules versions patch*](struct.AppModuleVersionPatchCall.html), [*operations get*](struct.AppOperationGetCall.html) and [*operations list*](struct.AppOperationListCall.html)
+//!  * [*create*](struct.AppCreateCall.html), [*get*](struct.AppGetCall.html), [*locations get*](struct.AppLocationGetCall.html), [*locations list*](struct.AppLocationListCall.html), [*modules delete*](struct.AppModuleDeleteCall.html), [*modules get*](struct.AppModuleGetCall.html), [*modules list*](struct.AppModuleListCall.html), [*modules patch*](struct.AppModulePatchCall.html), [*modules versions create*](struct.AppModuleVersionCreateCall.html), [*modules versions delete*](struct.AppModuleVersionDeleteCall.html), [*modules versions get*](struct.AppModuleVersionGetCall.html), [*modules versions instances debug*](struct.AppModuleVersionInstanceDebugCall.html), [*modules versions instances delete*](struct.AppModuleVersionInstanceDeleteCall.html), [*modules versions instances get*](struct.AppModuleVersionInstanceGetCall.html), [*modules versions instances list*](struct.AppModuleVersionInstanceListCall.html), [*modules versions list*](struct.AppModuleVersionListCall.html), [*modules versions patch*](struct.AppModuleVersionPatchCall.html), [*operations get*](struct.AppOperationGetCall.html) and [*operations list*](struct.AppOperationListCall.html)
 //! 
 //! 
 //! 
@@ -48,6 +48,9 @@
 //! 
 //! ```ignore
 //! let r = hub.apps().modules_patch(...).doit()
+//! let r = hub.apps().create(...).doit()
+//! let r = hub.apps().modules_versions_instances_delete(...).doit()
+//! let r = hub.apps().modules_versions_instances_debug(...).doit()
 //! let r = hub.apps().modules_delete(...).doit()
 //! let r = hub.apps().operations_get(...).doit()
 //! let r = hub.apps().modules_versions_patch(...).doit()
@@ -105,8 +108,8 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.apps().modules_patch(req, "appsId", "modulesId")
-//!              .migrate_traffic(false)
-//!              .mask("sea")
+//!              .migrate_traffic(true)
+//!              .mask("sit")
 //!              .doit();
 //! 
 //! match result {

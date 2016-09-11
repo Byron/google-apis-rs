@@ -2,14 +2,14 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *cloudtrace* crate version *0.1.14+20151207*, where *20151207* is the exact revision of the *cloudtrace:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
+//! This documentation was generated from *Cloud Trace* crate version *0.1.14+20160518*, where *20160518* is the exact revision of the *cloudtrace:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
 //! 
-//! Everything else about the *cloudtrace* *v1* API can be found at the
+//! Everything else about the *Cloud Trace* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/tools/cloud-trace).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/cloudtrace1).
 //! # Features
 //! 
-//! Handle the following *Resources* with ease from the central [hub](struct.Cloudtrace.html) ... 
+//! Handle the following *Resources* with ease from the central [hub](struct.CloudTrace.html) ... 
 //! 
 //! * projects
 //!  * [*patch traces*](struct.ProjectPatchTraceCall.html), [*traces get*](struct.ProjectTraceGetCall.html) and [*traces list*](struct.ProjectTraceListCall.html)
@@ -23,7 +23,7 @@
 //! 
 //! The API is structured into the following primary items:
 //! 
-//! * **[Hub](struct.Cloudtrace.html)**
+//! * **[Hub](struct.CloudTrace.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
 //!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
 //!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
@@ -76,7 +76,7 @@
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-//! use cloudtrace1::Cloudtrace;
+//! use cloudtrace1::CloudTrace;
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -89,7 +89,7 @@
 //! let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 //!                               hyper::Client::new(),
 //!                               <MemoryStorage as Default>::default(), None);
-//! let mut hub = Cloudtrace::new(hyper::Client::new(), auth);
+//! let mut hub = CloudTrace::new(hyper::Client::new(), auth);
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !

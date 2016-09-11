@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-content2` library allows access to all features of the *Google Shopping Content* service.
 
-This documentation was generated from *Shopping Content* crate version *0.1.14+20160331*, where *20160331* is the exact revision of the *content:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
+This documentation was generated from *Shopping Content* crate version *0.1.14+20160905*, where *20160905* is the exact revision of the *content:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
 
 Everything else about the *Shopping Content* *v2* API can be found at the
 [official documentation site](https://developers.google.com/shopping-content).
@@ -33,6 +33,8 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
  * [*custombatch*](http://byron.github.io/google-apis-rs/google_content2/struct.ProductCustombatchCall.html), [*delete*](http://byron.github.io/google-apis-rs/google_content2/struct.ProductDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_content2/struct.ProductGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_content2/struct.ProductInsertCall.html) and [*list*](http://byron.github.io/google-apis-rs/google_content2/struct.ProductListCall.html)
 * productstatuses
  * [*custombatch*](http://byron.github.io/google-apis-rs/google_content2/struct.ProductstatuseCustombatchCall.html), [*get*](http://byron.github.io/google-apis-rs/google_content2/struct.ProductstatuseGetCall.html) and [*list*](http://byron.github.io/google-apis-rs/google_content2/struct.ProductstatuseListCall.html)
+* shippingsettings
+ * [*custombatch*](http://byron.github.io/google-apis-rs/google_content2/struct.ShippingsettingCustombatchCall.html), [*get*](http://byron.github.io/google-apis-rs/google_content2/struct.ShippingsettingGetCall.html), [*getsupportedcarriers*](http://byron.github.io/google-apis-rs/google_content2/struct.ShippingsettingGetsupportedcarrierCall.html), [*list*](http://byron.github.io/google-apis-rs/google_content2/struct.ShippingsettingListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_content2/struct.ShippingsettingPatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_content2/struct.ShippingsettingUpdateCall.html)
 
 
 

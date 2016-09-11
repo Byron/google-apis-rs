@@ -99,9 +99,10 @@ impl Default for Scope {
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.turn_based_matches().leave_turn("matchId", -18)
-///              .pending_participant_id("kasd")
-///              .language("accusam")
+/// let result = hub.turn_based_matches().leave_turn("matchId", -63)
+///              .pending_participant_id("accusam")
+///              .language("takimata")
+///              .consistency_token("justo")
 ///              .doit();
 /// 
 /// match result {
@@ -218,6 +219,33 @@ pub struct Category {
 }
 
 impl Part for Category {}
+
+
+/// This is a JSON template for an event period update resource.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [record events](struct.EventRecordCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct EventRecordRequest {
+    /// A list of the time period updates being made in this request.
+    #[serde(rename="timePeriods")]
+    pub time_periods: Option<Vec<EventPeriodUpdate>>,
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#eventRecordRequest.
+    pub kind: Option<String>,
+    /// The request ID used to identify this attempt to record events.
+    #[serde(rename="requestId")]
+    pub request_id: Option<String>,
+    /// The current time when this update was sent, in milliseconds, since 1970 UTC (Unix Epoch).
+    #[serde(rename="currentTimeMillis")]
+    pub current_time_millis: Option<String>,
+}
+
+impl RequestValue for EventRecordRequest {}
 
 
 /// This is a JSON template for a third party player list response.
@@ -1812,28 +1840,6 @@ pub struct LeaderboardEntry {
 impl Part for LeaderboardEntry {}
 
 
-/// This is a JSON template for an turn-based auto-match criteria object.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TurnBasedAutoMatchingCriteria {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#turnBasedAutoMatchingCriteria.
-    pub kind: Option<String>,
-    /// The minimum number of players that should be added to the match by auto-matching.
-    #[serde(rename="minAutoMatchingPlayers")]
-    pub min_auto_matching_players: Option<i32>,
-    /// A bitmask indicating when auto-matches are valid. When ANDed with other exclusive bitmasks, the result must be zero. Can be used to support exclusive roles within a game.
-    #[serde(rename="exclusiveBitmask")]
-    pub exclusive_bitmask: Option<String>,
-    /// The maximum number of players that should be added to the match by auto-matching.
-    #[serde(rename="maxAutoMatchingPlayers")]
-    pub max_auto_matching_players: Option<i32>,
-}
-
-impl Part for TurnBasedAutoMatchingCriteria {}
-
-
 /// This is a JSON template for a room creation request.
 /// 
 /// # Activities
@@ -1894,6 +1900,22 @@ pub struct PeerSessionDiagnostics {
 }
 
 impl Part for PeerSessionDiagnostics {}
+
+
+/// This is a JSON template for profile settings
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ProfileSettings {
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#profileSettings.
+    pub kind: Option<String>,
+    /// The player's current profile visibility. This field is visible to both 1P and 3P APIs.
+    #[serde(rename="profileVisible")]
+    pub profile_visible: Option<bool>,
+}
+
+impl Part for ProfileSettings {}
 
 
 /// This is a JSON template for a list of quest objects.
@@ -2663,31 +2685,26 @@ pub struct TurnBasedMatch {
 impl ResponseResult for TurnBasedMatch {}
 
 
-/// This is a JSON template for an event period update resource.
+/// This is a JSON template for an turn-based auto-match criteria object.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [record events](struct.EventRecordCall.html) (request)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct EventRecordRequest {
-    /// A list of the time period updates being made in this request.
-    #[serde(rename="timePeriods")]
-    pub time_periods: Option<Vec<EventPeriodUpdate>>,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#eventRecordRequest.
+pub struct TurnBasedAutoMatchingCriteria {
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#turnBasedAutoMatchingCriteria.
     pub kind: Option<String>,
-    /// The request ID used to identify this attempt to record events.
-    #[serde(rename="requestId")]
-    pub request_id: Option<String>,
-    /// The current time when this update was sent, in milliseconds, since 1970 UTC (Unix Epoch).
-    #[serde(rename="currentTimeMillis")]
-    pub current_time_millis: Option<String>,
+    /// The minimum number of players that should be added to the match by auto-matching.
+    #[serde(rename="minAutoMatchingPlayers")]
+    pub min_auto_matching_players: Option<i32>,
+    /// A bitmask indicating when auto-matches are valid. When ANDed with other exclusive bitmasks, the result must be zero. Can be used to support exclusive roles within a game.
+    #[serde(rename="exclusiveBitmask")]
+    pub exclusive_bitmask: Option<String>,
+    /// The maximum number of players that should be added to the match by auto-matching.
+    #[serde(rename="maxAutoMatchingPlayers")]
+    pub max_auto_matching_players: Option<i32>,
 }
 
-impl RequestValue for EventRecordRequest {}
+impl Part for TurnBasedAutoMatchingCriteria {}
 
 
 /// This is a JSON template for the Web details resource.
@@ -2787,14 +2804,17 @@ pub struct Player {
     /// The url to the portrait mode player banner image.
     #[serde(rename="bannerUrlPortrait")]
     pub banner_url_portrait: Option<String>,
-    /// The player's title rewarded for their game activities.
-    pub title: Option<String>,
+    /// The player's profile settings. Controls whether or not the player's profile is visible to other players.
+    #[serde(rename="profileSettings")]
+    pub profile_settings: Option<ProfileSettings>,
     /// An object to represent Play Game experience information for the player.
     #[serde(rename="experienceInfo")]
     pub experience_info: Option<PlayerExperienceInfo>,
     /// The url to the landscape mode player banner image.
     #[serde(rename="bannerUrlLandscape")]
     pub banner_url_landscape: Option<String>,
+    /// The player's title rewarded for their game activities.
+    pub title: Option<String>,
     /// The base URL for the image that represents the player.
     #[serde(rename="avatarImageUrl")]
     pub avatar_image_url: Option<String>,
@@ -2985,6 +3005,7 @@ impl<'a, C, A> AchievementMethods<'a, C, A> {
             _page_token: Default::default(),
             _max_results: Default::default(),
             _language: Default::default(),
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3005,6 +3026,7 @@ impl<'a, C, A> AchievementMethods<'a, C, A> {
             _achievement_id: achievement_id.to_string(),
             _steps_to_increment: steps_to_increment,
             _request_id: Default::default(),
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3024,6 +3046,7 @@ impl<'a, C, A> AchievementMethods<'a, C, A> {
             hub: self.hub,
             _achievement_id: achievement_id.to_string(),
             _steps: steps,
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3041,6 +3064,7 @@ impl<'a, C, A> AchievementMethods<'a, C, A> {
         AchievementUpdateMultipleCall {
             hub: self.hub,
             _request: request,
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3058,6 +3082,7 @@ impl<'a, C, A> AchievementMethods<'a, C, A> {
         AchievementRevealCall {
             hub: self.hub,
             _achievement_id: achievement_id.to_string(),
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3075,6 +3100,7 @@ impl<'a, C, A> AchievementMethods<'a, C, A> {
         AchievementUnlockCall {
             hub: self.hub,
             _achievement_id: achievement_id.to_string(),
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3134,6 +3160,7 @@ impl<'a, C, A> LeaderboardMethods<'a, C, A> {
             hub: self.hub,
             _leaderboard_id: leaderboard_id.to_string(),
             _language: Default::default(),
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3149,6 +3176,7 @@ impl<'a, C, A> LeaderboardMethods<'a, C, A> {
             _page_token: Default::default(),
             _max_results: Default::default(),
             _language: Default::default(),
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3212,6 +3240,7 @@ impl<'a, C, A> MetagameMethods<'a, C, A> {
             _page_token: Default::default(),
             _max_results: Default::default(),
             _language: Default::default(),
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3224,6 +3253,7 @@ impl<'a, C, A> MetagameMethods<'a, C, A> {
     pub fn get_metagame_config(&self) -> MetagameGetMetagameConfigCall<'a, C, A> {
         MetagameGetMetagameConfigCall {
             hub: self.hub,
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3285,6 +3315,7 @@ impl<'a, C, A> PlayerMethods<'a, C, A> {
             _page_token: Default::default(),
             _max_results: Default::default(),
             _language: Default::default(),
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3303,6 +3334,7 @@ impl<'a, C, A> PlayerMethods<'a, C, A> {
             hub: self.hub,
             _player_id: player_id.to_string(),
             _language: Default::default(),
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3362,6 +3394,7 @@ impl<'a, C, A> QuestMethods<'a, C, A> {
             hub: self.hub,
             _quest_id: quest_id.to_string(),
             _language: Default::default(),
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3382,6 +3415,7 @@ impl<'a, C, A> QuestMethods<'a, C, A> {
             _page_token: Default::default(),
             _max_results: Default::default(),
             _language: Default::default(),
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3441,6 +3475,7 @@ impl<'a, C, A> SnapshotMethods<'a, C, A> {
             hub: self.hub,
             _snapshot_id: snapshot_id.to_string(),
             _language: Default::default(),
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3461,6 +3496,7 @@ impl<'a, C, A> SnapshotMethods<'a, C, A> {
             _page_token: Default::default(),
             _max_results: Default::default(),
             _language: Default::default(),
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3519,6 +3555,7 @@ impl<'a, C, A> TurnBasedMatcheMethods<'a, C, A> {
         TurnBasedMatcheDismisCall {
             hub: self.hub,
             _match_id: match_id.to_string(),
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3536,6 +3573,7 @@ impl<'a, C, A> TurnBasedMatcheMethods<'a, C, A> {
             _max_completed_matches: Default::default(),
             _language: Default::default(),
             _include_match_data: Default::default(),
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3554,6 +3592,7 @@ impl<'a, C, A> TurnBasedMatcheMethods<'a, C, A> {
             hub: self.hub,
             _match_id: match_id.to_string(),
             _language: Default::default(),
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3573,6 +3612,7 @@ impl<'a, C, A> TurnBasedMatcheMethods<'a, C, A> {
             _match_id: match_id.to_string(),
             _language: Default::default(),
             _include_match_data: Default::default(),
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3591,6 +3631,7 @@ impl<'a, C, A> TurnBasedMatcheMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _language: Default::default(),
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3609,6 +3650,7 @@ impl<'a, C, A> TurnBasedMatcheMethods<'a, C, A> {
             hub: self.hub,
             _match_id: match_id.to_string(),
             _language: Default::default(),
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3630,6 +3672,7 @@ impl<'a, C, A> TurnBasedMatcheMethods<'a, C, A> {
             _match_version: match_version,
             _pending_participant_id: Default::default(),
             _language: Default::default(),
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3647,6 +3690,7 @@ impl<'a, C, A> TurnBasedMatcheMethods<'a, C, A> {
         TurnBasedMatcheCancelCall {
             hub: self.hub,
             _match_id: match_id.to_string(),
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3667,6 +3711,7 @@ impl<'a, C, A> TurnBasedMatcheMethods<'a, C, A> {
             _request: request,
             _match_id: match_id.to_string(),
             _language: Default::default(),
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3685,6 +3730,7 @@ impl<'a, C, A> TurnBasedMatcheMethods<'a, C, A> {
             hub: self.hub,
             _match_id: match_id.to_string(),
             _language: Default::default(),
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3702,6 +3748,7 @@ impl<'a, C, A> TurnBasedMatcheMethods<'a, C, A> {
             _max_completed_matches: Default::default(),
             _language: Default::default(),
             _include_match_data: Default::default(),
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3722,6 +3769,7 @@ impl<'a, C, A> TurnBasedMatcheMethods<'a, C, A> {
             _request: request,
             _match_id: match_id.to_string(),
             _language: Default::default(),
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3741,6 +3789,7 @@ impl<'a, C, A> TurnBasedMatcheMethods<'a, C, A> {
             _match_id: match_id.to_string(),
             _request_id: Default::default(),
             _language: Default::default(),
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3799,6 +3848,7 @@ impl<'a, C, A> ApplicationMethods<'a, C, A> {
         ApplicationVerifyCall {
             hub: self.hub,
             _application_id: application_id.to_string(),
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3818,6 +3868,7 @@ impl<'a, C, A> ApplicationMethods<'a, C, A> {
             _application_id: application_id.to_string(),
             _platform_type: Default::default(),
             _language: Default::default(),
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3830,6 +3881,7 @@ impl<'a, C, A> ApplicationMethods<'a, C, A> {
     pub fn played(&self) -> ApplicationPlayedCall<'a, C, A> {
         ApplicationPlayedCall {
             hub: self.hub,
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3889,6 +3941,7 @@ impl<'a, C, A> RoomMethods<'a, C, A> {
             hub: self.hub,
             _room_id: room_id.to_string(),
             _language: Default::default(),
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3909,6 +3962,7 @@ impl<'a, C, A> RoomMethods<'a, C, A> {
             _request: request,
             _room_id: room_id.to_string(),
             _language: Default::default(),
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3924,6 +3978,7 @@ impl<'a, C, A> RoomMethods<'a, C, A> {
             _page_token: Default::default(),
             _max_results: Default::default(),
             _language: Default::default(),
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3944,6 +3999,7 @@ impl<'a, C, A> RoomMethods<'a, C, A> {
             _request: request,
             _room_id: room_id.to_string(),
             _language: Default::default(),
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3962,6 +4018,7 @@ impl<'a, C, A> RoomMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _language: Default::default(),
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3980,6 +4037,7 @@ impl<'a, C, A> RoomMethods<'a, C, A> {
             hub: self.hub,
             _room_id: room_id.to_string(),
             _language: Default::default(),
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3997,6 +4055,7 @@ impl<'a, C, A> RoomMethods<'a, C, A> {
         RoomDismisCall {
             hub: self.hub,
             _room_id: room_id.to_string(),
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4017,6 +4076,7 @@ impl<'a, C, A> RoomMethods<'a, C, A> {
             _request: request,
             _room_id: room_id.to_string(),
             _language: Default::default(),
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4079,6 +4139,7 @@ impl<'a, C, A> ScoreMethods<'a, C, A> {
             _score: score.to_string(),
             _score_tag: Default::default(),
             _language: Default::default(),
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4103,6 +4164,7 @@ impl<'a, C, A> ScoreMethods<'a, C, A> {
             _page_token: Default::default(),
             _max_results: Default::default(),
             _language: Default::default(),
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4129,6 +4191,7 @@ impl<'a, C, A> ScoreMethods<'a, C, A> {
             _max_results: Default::default(),
             _language: Default::default(),
             _include_rank_type: Default::default(),
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4147,6 +4210,7 @@ impl<'a, C, A> ScoreMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _language: Default::default(),
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4173,6 +4237,7 @@ impl<'a, C, A> ScoreMethods<'a, C, A> {
             _page_token: Default::default(),
             _max_results: Default::default(),
             _language: Default::default(),
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4231,6 +4296,7 @@ impl<'a, C, A> PushtokenMethods<'a, C, A> {
         PushtokenRemoveCall {
             hub: self.hub,
             _request: request,
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4248,6 +4314,7 @@ impl<'a, C, A> PushtokenMethods<'a, C, A> {
         PushtokenUpdateCall {
             hub: self.hub,
             _request: request,
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4311,6 +4378,7 @@ impl<'a, C, A> RevisionMethods<'a, C, A> {
         RevisionCheckCall {
             hub: self.hub,
             _client_revision: client_revision.to_string(),
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4367,6 +4435,7 @@ impl<'a, C, A> EventMethods<'a, C, A> {
             _page_token: Default::default(),
             _max_results: Default::default(),
             _language: Default::default(),
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4385,6 +4454,7 @@ impl<'a, C, A> EventMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _language: Default::default(),
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4400,6 +4470,7 @@ impl<'a, C, A> EventMethods<'a, C, A> {
             _page_token: Default::default(),
             _max_results: Default::default(),
             _language: Default::default(),
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4462,6 +4533,7 @@ impl<'a, C, A> QuestMilestoneMethods<'a, C, A> {
             _quest_id: quest_id.to_string(),
             _milestone_id: milestone_id.to_string(),
             _request_id: request_id.to_string(),
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4518,6 +4590,7 @@ impl<'a, C, A> AchievementDefinitionMethods<'a, C, A> {
             _page_token: Default::default(),
             _max_results: Default::default(),
             _language: Default::default(),
+            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4560,10 +4633,11 @@ impl<'a, C, A> AchievementDefinitionMethods<'a, C, A> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.achievements().list("playerId")
-///              .state("justo")
-///              .page_token("amet.")
-///              .max_results(-81)
-///              .language("labore")
+///              .state("erat")
+///              .page_token("labore")
+///              .max_results(-9)
+///              .language("nonumy")
+///              .consistency_token("dolores")
 ///              .doit();
 /// # }
 /// ```
@@ -4576,6 +4650,7 @@ pub struct AchievementListCall<'a, C, A>
     _page_token: Option<String>,
     _max_results: Option<i32>,
     _language: Option<String>,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -4597,7 +4672,7 @@ impl<'a, C, A> AchievementListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "games.achievements.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
         params.push(("playerId", self._player_id.to_string()));
         if let Some(value) = self._state {
             params.push(("state", value.to_string()));
@@ -4611,7 +4686,10 @@ impl<'a, C, A> AchievementListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        for &field in ["alt", "playerId", "state", "pageToken", "maxResults", "language"].iter() {
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["alt", "playerId", "state", "pageToken", "maxResults", "language", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -4764,6 +4842,13 @@ impl<'a, C, A> AchievementListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._language = Some(new_value.to_string());
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> AchievementListCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -4842,8 +4927,9 @@ impl<'a, C, A> AchievementListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.achievements().increment("achievementId", -90)
-///              .request_id("dolores")
+/// let result = hub.achievements().increment("achievementId", -95)
+///              .request_id("aliquyam")
+///              .consistency_token("ea")
 ///              .doit();
 /// # }
 /// ```
@@ -4854,6 +4940,7 @@ pub struct AchievementIncrementCall<'a, C, A>
     _achievement_id: String,
     _steps_to_increment: i32,
     _request_id: Option<String>,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -4875,13 +4962,16 @@ impl<'a, C, A> AchievementIncrementCall<'a, C, A> where C: BorrowMut<hyper::Clie
         };
         dlg.begin(MethodInfo { id: "games.achievements.increment",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("achievementId", self._achievement_id.to_string()));
         params.push(("stepsToIncrement", self._steps_to_increment.to_string()));
         if let Some(value) = self._request_id {
             params.push(("requestId", value.to_string()));
         }
-        for &field in ["alt", "achievementId", "stepsToIncrement", "requestId"].iter() {
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["alt", "achievementId", "stepsToIncrement", "requestId", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -5023,6 +5113,13 @@ impl<'a, C, A> AchievementIncrementCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._request_id = Some(new_value.to_string());
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> AchievementIncrementCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -5101,7 +5198,8 @@ impl<'a, C, A> AchievementIncrementCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.achievements().set_steps_at_least("achievementId", -95)
+/// let result = hub.achievements().set_steps_at_least("achievementId", -21)
+///              .consistency_token("justo")
 ///              .doit();
 /// # }
 /// ```
@@ -5111,6 +5209,7 @@ pub struct AchievementSetStepsAtLeastCall<'a, C, A>
     hub: &'a Games<C, A>,
     _achievement_id: String,
     _steps: i32,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -5132,10 +5231,13 @@ impl<'a, C, A> AchievementSetStepsAtLeastCall<'a, C, A> where C: BorrowMut<hyper
         };
         dlg.begin(MethodInfo { id: "games.achievements.setStepsAtLeast",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("achievementId", self._achievement_id.to_string()));
         params.push(("steps", self._steps.to_string()));
-        for &field in ["alt", "achievementId", "steps"].iter() {
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["alt", "achievementId", "steps", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -5270,6 +5372,13 @@ impl<'a, C, A> AchievementSetStepsAtLeastCall<'a, C, A> where C: BorrowMut<hyper
         self._steps = new_value;
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> AchievementSetStepsAtLeastCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -5355,6 +5464,7 @@ impl<'a, C, A> AchievementSetStepsAtLeastCall<'a, C, A> where C: BorrowMut<hyper
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.achievements().update_multiple(req)
+///              .consistency_token("et")
 ///              .doit();
 /// # }
 /// ```
@@ -5363,6 +5473,7 @@ pub struct AchievementUpdateMultipleCall<'a, C, A>
 
     hub: &'a Games<C, A>,
     _request: AchievementUpdateMultipleRequest,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -5384,8 +5495,11 @@ impl<'a, C, A> AchievementUpdateMultipleCall<'a, C, A> where C: BorrowMut<hyper:
         };
         dlg.begin(MethodInfo { id: "games.achievements.updateMultiple",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
-        for &field in ["alt"].iter() {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["alt", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -5503,6 +5617,13 @@ impl<'a, C, A> AchievementUpdateMultipleCall<'a, C, A> where C: BorrowMut<hyper:
         self._request = new_value;
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> AchievementUpdateMultipleCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -5582,6 +5703,7 @@ impl<'a, C, A> AchievementUpdateMultipleCall<'a, C, A> where C: BorrowMut<hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.achievements().reveal("achievementId")
+///              .consistency_token("diam")
 ///              .doit();
 /// # }
 /// ```
@@ -5590,6 +5712,7 @@ pub struct AchievementRevealCall<'a, C, A>
 
     hub: &'a Games<C, A>,
     _achievement_id: String,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -5611,9 +5734,12 @@ impl<'a, C, A> AchievementRevealCall<'a, C, A> where C: BorrowMut<hyper::Client>
         };
         dlg.begin(MethodInfo { id: "games.achievements.reveal",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("achievementId", self._achievement_id.to_string()));
-        for &field in ["alt", "achievementId"].iter() {
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["alt", "achievementId", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -5738,6 +5864,13 @@ impl<'a, C, A> AchievementRevealCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._achievement_id = new_value.to_string();
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> AchievementRevealCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -5817,6 +5950,7 @@ impl<'a, C, A> AchievementRevealCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.achievements().unlock("achievementId")
+///              .consistency_token("Lorem")
 ///              .doit();
 /// # }
 /// ```
@@ -5825,6 +5959,7 @@ pub struct AchievementUnlockCall<'a, C, A>
 
     hub: &'a Games<C, A>,
     _achievement_id: String,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -5846,9 +5981,12 @@ impl<'a, C, A> AchievementUnlockCall<'a, C, A> where C: BorrowMut<hyper::Client>
         };
         dlg.begin(MethodInfo { id: "games.achievements.unlock",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("achievementId", self._achievement_id.to_string()));
-        for &field in ["alt", "achievementId"].iter() {
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["alt", "achievementId", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -5973,6 +6111,13 @@ impl<'a, C, A> AchievementUnlockCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._achievement_id = new_value.to_string();
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> AchievementUnlockCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -6052,7 +6197,8 @@ impl<'a, C, A> AchievementUnlockCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.leaderboards().get("leaderboardId")
-///              .language("justo")
+///              .language("duo")
+///              .consistency_token("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -6062,6 +6208,7 @@ pub struct LeaderboardGetCall<'a, C, A>
     hub: &'a Games<C, A>,
     _leaderboard_id: String,
     _language: Option<String>,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -6083,12 +6230,15 @@ impl<'a, C, A> LeaderboardGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         };
         dlg.begin(MethodInfo { id: "games.leaderboards.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("leaderboardId", self._leaderboard_id.to_string()));
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        for &field in ["alt", "leaderboardId", "language"].iter() {
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["alt", "leaderboardId", "language", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -6220,6 +6370,13 @@ impl<'a, C, A> LeaderboardGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._language = Some(new_value.to_string());
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> LeaderboardGetCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -6299,9 +6456,10 @@ impl<'a, C, A> LeaderboardGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.leaderboards().list()
-///              .page_token("justo")
-///              .max_results(-34)
-///              .language("et")
+///              .page_token("sea")
+///              .max_results(-55)
+///              .language("eos")
+///              .consistency_token("erat")
 ///              .doit();
 /// # }
 /// ```
@@ -6312,6 +6470,7 @@ pub struct LeaderboardListCall<'a, C, A>
     _page_token: Option<String>,
     _max_results: Option<i32>,
     _language: Option<String>,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -6333,7 +6492,7 @@ impl<'a, C, A> LeaderboardListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "games.leaderboards.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
         }
@@ -6343,7 +6502,10 @@ impl<'a, C, A> LeaderboardListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        for &field in ["alt", "pageToken", "maxResults", "language"].iter() {
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["alt", "pageToken", "maxResults", "language", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -6458,6 +6620,13 @@ impl<'a, C, A> LeaderboardListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._language = Some(new_value.to_string());
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> LeaderboardListCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -6537,9 +6706,10 @@ impl<'a, C, A> LeaderboardListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.metagame().list_categories_by_player("playerId", "collection")
-///              .page_token("Lorem")
-///              .max_results(-21)
-///              .language("duo")
+///              .page_token("eirmod")
+///              .max_results(-43)
+///              .language("amet")
+///              .consistency_token("no")
 ///              .doit();
 /// # }
 /// ```
@@ -6552,6 +6722,7 @@ pub struct MetagameListCategoriesByPlayerCall<'a, C, A>
     _page_token: Option<String>,
     _max_results: Option<i32>,
     _language: Option<String>,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -6573,7 +6744,7 @@ impl<'a, C, A> MetagameListCategoriesByPlayerCall<'a, C, A> where C: BorrowMut<h
         };
         dlg.begin(MethodInfo { id: "games.metagame.listCategoriesByPlayer",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
         params.push(("playerId", self._player_id.to_string()));
         params.push(("collection", self._collection.to_string()));
         if let Some(value) = self._page_token {
@@ -6585,7 +6756,10 @@ impl<'a, C, A> MetagameListCategoriesByPlayerCall<'a, C, A> where C: BorrowMut<h
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        for &field in ["alt", "playerId", "collection", "pageToken", "maxResults", "language"].iter() {
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["alt", "playerId", "collection", "pageToken", "maxResults", "language", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -6741,6 +6915,13 @@ impl<'a, C, A> MetagameListCategoriesByPlayerCall<'a, C, A> where C: BorrowMut<h
         self._language = Some(new_value.to_string());
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> MetagameListCategoriesByPlayerCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -6820,6 +7001,7 @@ impl<'a, C, A> MetagameListCategoriesByPlayerCall<'a, C, A> where C: BorrowMut<h
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.metagame().get_metagame_config()
+///              .consistency_token("labore")
 ///              .doit();
 /// # }
 /// ```
@@ -6827,6 +7009,7 @@ pub struct MetagameGetMetagameConfigCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Games<C, A>,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -6848,8 +7031,11 @@ impl<'a, C, A> MetagameGetMetagameConfigCall<'a, C, A> where C: BorrowMut<hyper:
         };
         dlg.begin(MethodInfo { id: "games.metagame.getMetagameConfig",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((2 + self._additional_params.len()));
-        for &field in ["alt"].iter() {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["alt", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -6943,6 +7129,13 @@ impl<'a, C, A> MetagameGetMetagameConfigCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> MetagameGetMetagameConfigCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -7022,9 +7215,10 @@ impl<'a, C, A> MetagameGetMetagameConfigCall<'a, C, A> where C: BorrowMut<hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.players().list("collection")
-///              .page_token("sea")
-///              .max_results(-55)
-///              .language("eos")
+///              .page_token("dolore")
+///              .max_results(-37)
+///              .language("aliquyam")
+///              .consistency_token("accusam")
 ///              .doit();
 /// # }
 /// ```
@@ -7036,6 +7230,7 @@ pub struct PlayerListCall<'a, C, A>
     _page_token: Option<String>,
     _max_results: Option<i32>,
     _language: Option<String>,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -7057,7 +7252,7 @@ impl<'a, C, A> PlayerListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         };
         dlg.begin(MethodInfo { id: "games.players.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
         params.push(("collection", self._collection.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -7068,7 +7263,10 @@ impl<'a, C, A> PlayerListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        for &field in ["alt", "collection", "pageToken", "maxResults", "language"].iter() {
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["alt", "collection", "pageToken", "maxResults", "language", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -7214,6 +7412,13 @@ impl<'a, C, A> PlayerListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._language = Some(new_value.to_string());
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> PlayerListCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -7293,7 +7498,8 @@ impl<'a, C, A> PlayerListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.players().get("playerId")
-///              .language("sadipscing")
+///              .language("sea")
+///              .consistency_token("et")
 ///              .doit();
 /// # }
 /// ```
@@ -7303,6 +7509,7 @@ pub struct PlayerGetCall<'a, C, A>
     hub: &'a Games<C, A>,
     _player_id: String,
     _language: Option<String>,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -7324,12 +7531,15 @@ impl<'a, C, A> PlayerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         };
         dlg.begin(MethodInfo { id: "games.players.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("playerId", self._player_id.to_string()));
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        for &field in ["alt", "playerId", "language"].iter() {
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["alt", "playerId", "language", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -7461,6 +7671,13 @@ impl<'a, C, A> PlayerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._language = Some(new_value.to_string());
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> PlayerGetCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -7540,7 +7757,8 @@ impl<'a, C, A> PlayerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.quests().accept("questId")
-///              .language("eirmod")
+///              .language("et")
+///              .consistency_token("eirmod")
 ///              .doit();
 /// # }
 /// ```
@@ -7550,6 +7768,7 @@ pub struct QuestAcceptCall<'a, C, A>
     hub: &'a Games<C, A>,
     _quest_id: String,
     _language: Option<String>,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -7571,12 +7790,15 @@ impl<'a, C, A> QuestAcceptCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         };
         dlg.begin(MethodInfo { id: "games.quests.accept",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("questId", self._quest_id.to_string()));
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        for &field in ["alt", "questId", "language"].iter() {
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["alt", "questId", "language", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -7708,6 +7930,13 @@ impl<'a, C, A> QuestAcceptCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._language = Some(new_value.to_string());
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> QuestAcceptCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -7787,9 +8016,10 @@ impl<'a, C, A> QuestAcceptCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.quests().list("playerId")
-///              .page_token("amet")
-///              .max_results(-60)
-///              .language("labore")
+///              .page_token("et")
+///              .max_results(-46)
+///              .language("et")
+///              .consistency_token("consetetur")
 ///              .doit();
 /// # }
 /// ```
@@ -7801,6 +8031,7 @@ pub struct QuestListCall<'a, C, A>
     _page_token: Option<String>,
     _max_results: Option<i32>,
     _language: Option<String>,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -7822,7 +8053,7 @@ impl<'a, C, A> QuestListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         };
         dlg.begin(MethodInfo { id: "games.quests.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
         params.push(("playerId", self._player_id.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -7833,7 +8064,10 @@ impl<'a, C, A> QuestListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        for &field in ["alt", "playerId", "pageToken", "maxResults", "language"].iter() {
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["alt", "playerId", "pageToken", "maxResults", "language", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -7979,6 +8213,13 @@ impl<'a, C, A> QuestListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._language = Some(new_value.to_string());
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> QuestListCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -8058,7 +8299,8 @@ impl<'a, C, A> QuestListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.snapshots().get("snapshotId")
-///              .language("dolore")
+///              .language("ea")
+///              .consistency_token("sed")
 ///              .doit();
 /// # }
 /// ```
@@ -8068,6 +8310,7 @@ pub struct SnapshotGetCall<'a, C, A>
     hub: &'a Games<C, A>,
     _snapshot_id: String,
     _language: Option<String>,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -8089,12 +8332,15 @@ impl<'a, C, A> SnapshotGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         };
         dlg.begin(MethodInfo { id: "games.snapshots.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("snapshotId", self._snapshot_id.to_string()));
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        for &field in ["alt", "snapshotId", "language"].iter() {
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["alt", "snapshotId", "language", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -8226,6 +8472,13 @@ impl<'a, C, A> SnapshotGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._language = Some(new_value.to_string());
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> SnapshotGetCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -8305,9 +8558,10 @@ impl<'a, C, A> SnapshotGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.snapshots().list("playerId")
-///              .page_token("aliquyam")
-///              .max_results(-73)
-///              .language("Lorem")
+///              .page_token("dolor")
+///              .max_results(-48)
+///              .language("et")
+///              .consistency_token("consetetur")
 ///              .doit();
 /// # }
 /// ```
@@ -8319,6 +8573,7 @@ pub struct SnapshotListCall<'a, C, A>
     _page_token: Option<String>,
     _max_results: Option<i32>,
     _language: Option<String>,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -8340,7 +8595,7 @@ impl<'a, C, A> SnapshotListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         };
         dlg.begin(MethodInfo { id: "games.snapshots.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
         params.push(("playerId", self._player_id.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -8351,7 +8606,10 @@ impl<'a, C, A> SnapshotListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        for &field in ["alt", "playerId", "pageToken", "maxResults", "language"].iter() {
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["alt", "playerId", "pageToken", "maxResults", "language", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -8497,6 +8755,13 @@ impl<'a, C, A> SnapshotListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._language = Some(new_value.to_string());
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> SnapshotListCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -8576,6 +8841,7 @@ impl<'a, C, A> SnapshotListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.turn_based_matches().dismiss("matchId")
+///              .consistency_token("voluptua.")
 ///              .doit();
 /// # }
 /// ```
@@ -8584,6 +8850,7 @@ pub struct TurnBasedMatcheDismisCall<'a, C, A>
 
     hub: &'a Games<C, A>,
     _match_id: String,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -8605,9 +8872,12 @@ impl<'a, C, A> TurnBasedMatcheDismisCall<'a, C, A> where C: BorrowMut<hyper::Cli
         };
         dlg.begin(MethodInfo { id: "games.turnBasedMatches.dismiss",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((2 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
         params.push(("matchId", self._match_id.to_string()));
-        for &field in ["matchId"].iter() {
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["matchId", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -8721,6 +8991,13 @@ impl<'a, C, A> TurnBasedMatcheDismisCall<'a, C, A> where C: BorrowMut<hyper::Cli
         self._match_id = new_value.to_string();
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> TurnBasedMatcheDismisCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -8800,11 +9077,12 @@ impl<'a, C, A> TurnBasedMatcheDismisCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.turn_based_matches().sync()
-///              .page_token("et")
-///              .max_results(-70)
-///              .max_completed_matches(-21)
-///              .language("eirmod")
-///              .include_match_data(false)
+///              .page_token("Lorem")
+///              .max_results(-11)
+///              .max_completed_matches(-20)
+///              .language("sit")
+///              .include_match_data(true)
+///              .consistency_token("diam")
 ///              .doit();
 /// # }
 /// ```
@@ -8817,6 +9095,7 @@ pub struct TurnBasedMatcheSyncCall<'a, C, A>
     _max_completed_matches: Option<i32>,
     _language: Option<String>,
     _include_match_data: Option<bool>,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -8838,7 +9117,7 @@ impl<'a, C, A> TurnBasedMatcheSyncCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "games.turnBasedMatches.sync",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
         }
@@ -8854,7 +9133,10 @@ impl<'a, C, A> TurnBasedMatcheSyncCall<'a, C, A> where C: BorrowMut<hyper::Clien
         if let Some(value) = self._include_match_data {
             params.push(("includeMatchData", value.to_string()));
         }
-        for &field in ["alt", "pageToken", "maxResults", "maxCompletedMatches", "language", "includeMatchData"].iter() {
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["alt", "pageToken", "maxResults", "maxCompletedMatches", "language", "includeMatchData", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -8983,6 +9265,13 @@ impl<'a, C, A> TurnBasedMatcheSyncCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self._include_match_data = Some(new_value);
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> TurnBasedMatcheSyncCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -9062,7 +9351,8 @@ impl<'a, C, A> TurnBasedMatcheSyncCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.turn_based_matches().decline("matchId")
-///              .language("amet")
+///              .language("consetetur")
+///              .consistency_token("sadipscing")
 ///              .doit();
 /// # }
 /// ```
@@ -9072,6 +9362,7 @@ pub struct TurnBasedMatcheDeclineCall<'a, C, A>
     hub: &'a Games<C, A>,
     _match_id: String,
     _language: Option<String>,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -9093,12 +9384,15 @@ impl<'a, C, A> TurnBasedMatcheDeclineCall<'a, C, A> where C: BorrowMut<hyper::Cl
         };
         dlg.begin(MethodInfo { id: "games.turnBasedMatches.decline",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("matchId", self._match_id.to_string()));
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        for &field in ["alt", "matchId", "language"].iter() {
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["alt", "matchId", "language", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -9230,6 +9524,13 @@ impl<'a, C, A> TurnBasedMatcheDeclineCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._language = Some(new_value.to_string());
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> TurnBasedMatcheDeclineCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -9309,8 +9610,9 @@ impl<'a, C, A> TurnBasedMatcheDeclineCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.turn_based_matches().get("matchId")
-///              .language("consetetur")
-///              .include_match_data(true)
+///              .language("sadipscing")
+///              .include_match_data(false)
+///              .consistency_token("consetetur")
 ///              .doit();
 /// # }
 /// ```
@@ -9321,6 +9623,7 @@ pub struct TurnBasedMatcheGetCall<'a, C, A>
     _match_id: String,
     _language: Option<String>,
     _include_match_data: Option<bool>,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -9342,7 +9645,7 @@ impl<'a, C, A> TurnBasedMatcheGetCall<'a, C, A> where C: BorrowMut<hyper::Client
         };
         dlg.begin(MethodInfo { id: "games.turnBasedMatches.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("matchId", self._match_id.to_string()));
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
@@ -9350,7 +9653,10 @@ impl<'a, C, A> TurnBasedMatcheGetCall<'a, C, A> where C: BorrowMut<hyper::Client
         if let Some(value) = self._include_match_data {
             params.push(("includeMatchData", value.to_string()));
         }
-        for &field in ["alt", "matchId", "language", "includeMatchData"].iter() {
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["alt", "matchId", "language", "includeMatchData", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -9489,6 +9795,13 @@ impl<'a, C, A> TurnBasedMatcheGetCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._include_match_data = Some(new_value);
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> TurnBasedMatcheGetCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -9574,7 +9887,8 @@ impl<'a, C, A> TurnBasedMatcheGetCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.turn_based_matches().create(req)
-///              .language("ea")
+///              .language("dolore")
+///              .consistency_token("duo")
 ///              .doit();
 /// # }
 /// ```
@@ -9584,6 +9898,7 @@ pub struct TurnBasedMatcheCreateCall<'a, C, A>
     hub: &'a Games<C, A>,
     _request: TurnBasedMatchCreateRequest,
     _language: Option<String>,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -9605,11 +9920,14 @@ impl<'a, C, A> TurnBasedMatcheCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
         };
         dlg.begin(MethodInfo { id: "games.turnBasedMatches.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        for &field in ["alt", "language"].iter() {
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["alt", "language", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -9734,6 +10052,13 @@ impl<'a, C, A> TurnBasedMatcheCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
         self._language = Some(new_value.to_string());
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> TurnBasedMatcheCreateCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -9813,7 +10138,8 @@ impl<'a, C, A> TurnBasedMatcheCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.turn_based_matches().join("matchId")
-///              .language("dolor")
+///              .language("Lorem")
+///              .consistency_token("et")
 ///              .doit();
 /// # }
 /// ```
@@ -9823,6 +10149,7 @@ pub struct TurnBasedMatcheJoinCall<'a, C, A>
     hub: &'a Games<C, A>,
     _match_id: String,
     _language: Option<String>,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -9844,12 +10171,15 @@ impl<'a, C, A> TurnBasedMatcheJoinCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "games.turnBasedMatches.join",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("matchId", self._match_id.to_string()));
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        for &field in ["alt", "matchId", "language"].iter() {
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["alt", "matchId", "language", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -9981,6 +10311,13 @@ impl<'a, C, A> TurnBasedMatcheJoinCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self._language = Some(new_value.to_string());
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> TurnBasedMatcheJoinCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -10059,9 +10396,10 @@ impl<'a, C, A> TurnBasedMatcheJoinCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.turn_based_matches().leave_turn("matchId", -48)
-///              .pending_participant_id("et")
-///              .language("consetetur")
+/// let result = hub.turn_based_matches().leave_turn("matchId", -45)
+///              .pending_participant_id("takimata")
+///              .language("nonumy")
+///              .consistency_token("kasd")
 ///              .doit();
 /// # }
 /// ```
@@ -10073,6 +10411,7 @@ pub struct TurnBasedMatcheLeaveTurnCall<'a, C, A>
     _match_version: i32,
     _pending_participant_id: Option<String>,
     _language: Option<String>,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -10094,7 +10433,7 @@ impl<'a, C, A> TurnBasedMatcheLeaveTurnCall<'a, C, A> where C: BorrowMut<hyper::
         };
         dlg.begin(MethodInfo { id: "games.turnBasedMatches.leaveTurn",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
         params.push(("matchId", self._match_id.to_string()));
         params.push(("matchVersion", self._match_version.to_string()));
         if let Some(value) = self._pending_participant_id {
@@ -10103,7 +10442,10 @@ impl<'a, C, A> TurnBasedMatcheLeaveTurnCall<'a, C, A> where C: BorrowMut<hyper::
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        for &field in ["alt", "matchId", "matchVersion", "pendingParticipantId", "language"].iter() {
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["alt", "matchId", "matchVersion", "pendingParticipantId", "language", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -10252,6 +10594,13 @@ impl<'a, C, A> TurnBasedMatcheLeaveTurnCall<'a, C, A> where C: BorrowMut<hyper::
         self._language = Some(new_value.to_string());
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> TurnBasedMatcheLeaveTurnCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -10331,6 +10680,7 @@ impl<'a, C, A> TurnBasedMatcheLeaveTurnCall<'a, C, A> where C: BorrowMut<hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.turn_based_matches().cancel("matchId")
+///              .consistency_token("takimata")
 ///              .doit();
 /// # }
 /// ```
@@ -10339,6 +10689,7 @@ pub struct TurnBasedMatcheCancelCall<'a, C, A>
 
     hub: &'a Games<C, A>,
     _match_id: String,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -10360,9 +10711,12 @@ impl<'a, C, A> TurnBasedMatcheCancelCall<'a, C, A> where C: BorrowMut<hyper::Cli
         };
         dlg.begin(MethodInfo { id: "games.turnBasedMatches.cancel",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((2 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
         params.push(("matchId", self._match_id.to_string()));
-        for &field in ["matchId"].iter() {
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["matchId", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -10476,6 +10830,13 @@ impl<'a, C, A> TurnBasedMatcheCancelCall<'a, C, A> where C: BorrowMut<hyper::Cli
         self._match_id = new_value.to_string();
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> TurnBasedMatcheCancelCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -10561,7 +10922,8 @@ impl<'a, C, A> TurnBasedMatcheCancelCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.turn_based_matches().finish(req, "matchId")
-///              .language("Lorem")
+///              .language("labore")
+///              .consistency_token("invidunt")
 ///              .doit();
 /// # }
 /// ```
@@ -10572,6 +10934,7 @@ pub struct TurnBasedMatcheFinishCall<'a, C, A>
     _request: TurnBasedMatchResults,
     _match_id: String,
     _language: Option<String>,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -10593,12 +10956,15 @@ impl<'a, C, A> TurnBasedMatcheFinishCall<'a, C, A> where C: BorrowMut<hyper::Cli
         };
         dlg.begin(MethodInfo { id: "games.turnBasedMatches.finish",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("matchId", self._match_id.to_string()));
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        for &field in ["alt", "matchId", "language"].iter() {
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["alt", "matchId", "language", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -10754,6 +11120,13 @@ impl<'a, C, A> TurnBasedMatcheFinishCall<'a, C, A> where C: BorrowMut<hyper::Cli
         self._language = Some(new_value.to_string());
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> TurnBasedMatcheFinishCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -10833,7 +11206,8 @@ impl<'a, C, A> TurnBasedMatcheFinishCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.turn_based_matches().leave("matchId")
-///              .language("justo")
+///              .language("sadipscing")
+///              .consistency_token("rebum.")
 ///              .doit();
 /// # }
 /// ```
@@ -10843,6 +11217,7 @@ pub struct TurnBasedMatcheLeaveCall<'a, C, A>
     hub: &'a Games<C, A>,
     _match_id: String,
     _language: Option<String>,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -10864,12 +11239,15 @@ impl<'a, C, A> TurnBasedMatcheLeaveCall<'a, C, A> where C: BorrowMut<hyper::Clie
         };
         dlg.begin(MethodInfo { id: "games.turnBasedMatches.leave",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("matchId", self._match_id.to_string()));
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        for &field in ["alt", "matchId", "language"].iter() {
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["alt", "matchId", "language", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -11001,6 +11379,13 @@ impl<'a, C, A> TurnBasedMatcheLeaveCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._language = Some(new_value.to_string());
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> TurnBasedMatcheLeaveCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -11080,11 +11465,12 @@ impl<'a, C, A> TurnBasedMatcheLeaveCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.turn_based_matches().list()
-///              .page_token("sit")
-///              .max_results(-26)
-///              .max_completed_matches(-28)
-///              .language("rebum.")
-///              .include_match_data(true)
+///              .page_token("dolore")
+///              .max_results(-41)
+///              .max_completed_matches(-29)
+///              .language("aliquyam")
+///              .include_match_data(false)
+///              .consistency_token("eirmod")
 ///              .doit();
 /// # }
 /// ```
@@ -11097,6 +11483,7 @@ pub struct TurnBasedMatcheListCall<'a, C, A>
     _max_completed_matches: Option<i32>,
     _language: Option<String>,
     _include_match_data: Option<bool>,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -11118,7 +11505,7 @@ impl<'a, C, A> TurnBasedMatcheListCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "games.turnBasedMatches.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
         }
@@ -11134,7 +11521,10 @@ impl<'a, C, A> TurnBasedMatcheListCall<'a, C, A> where C: BorrowMut<hyper::Clien
         if let Some(value) = self._include_match_data {
             params.push(("includeMatchData", value.to_string()));
         }
-        for &field in ["alt", "pageToken", "maxResults", "maxCompletedMatches", "language", "includeMatchData"].iter() {
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["alt", "pageToken", "maxResults", "maxCompletedMatches", "language", "includeMatchData", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -11263,6 +11653,13 @@ impl<'a, C, A> TurnBasedMatcheListCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self._include_match_data = Some(new_value);
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> TurnBasedMatcheListCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -11348,7 +11745,8 @@ impl<'a, C, A> TurnBasedMatcheListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.turn_based_matches().take_turn(req, "matchId")
-///              .language("vero")
+///              .language("labore")
+///              .consistency_token("sed")
 ///              .doit();
 /// # }
 /// ```
@@ -11359,6 +11757,7 @@ pub struct TurnBasedMatcheTakeTurnCall<'a, C, A>
     _request: TurnBasedMatchTurn,
     _match_id: String,
     _language: Option<String>,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -11380,12 +11779,15 @@ impl<'a, C, A> TurnBasedMatcheTakeTurnCall<'a, C, A> where C: BorrowMut<hyper::C
         };
         dlg.begin(MethodInfo { id: "games.turnBasedMatches.takeTurn",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("matchId", self._match_id.to_string()));
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        for &field in ["alt", "matchId", "language"].iter() {
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["alt", "matchId", "language", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -11541,6 +11943,13 @@ impl<'a, C, A> TurnBasedMatcheTakeTurnCall<'a, C, A> where C: BorrowMut<hyper::C
         self._language = Some(new_value.to_string());
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> TurnBasedMatcheTakeTurnCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -11620,8 +12029,9 @@ impl<'a, C, A> TurnBasedMatcheTakeTurnCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.turn_based_matches().rematch("matchId")
-///              .request_id("invidunt")
-///              .language("consetetur")
+///              .request_id("gubergren")
+///              .language("aliquyam")
+///              .consistency_token("eos")
 ///              .doit();
 /// # }
 /// ```
@@ -11632,6 +12042,7 @@ pub struct TurnBasedMatcheRematchCall<'a, C, A>
     _match_id: String,
     _request_id: Option<String>,
     _language: Option<String>,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -11653,7 +12064,7 @@ impl<'a, C, A> TurnBasedMatcheRematchCall<'a, C, A> where C: BorrowMut<hyper::Cl
         };
         dlg.begin(MethodInfo { id: "games.turnBasedMatches.rematch",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("matchId", self._match_id.to_string()));
         if let Some(value) = self._request_id {
             params.push(("requestId", value.to_string()));
@@ -11661,7 +12072,10 @@ impl<'a, C, A> TurnBasedMatcheRematchCall<'a, C, A> where C: BorrowMut<hyper::Cl
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        for &field in ["alt", "matchId", "requestId", "language"].iter() {
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["alt", "matchId", "requestId", "language", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -11800,6 +12214,13 @@ impl<'a, C, A> TurnBasedMatcheRematchCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._language = Some(new_value.to_string());
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> TurnBasedMatcheRematchCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -11879,6 +12300,7 @@ impl<'a, C, A> TurnBasedMatcheRematchCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.applications().verify("applicationId")
+///              .consistency_token("sea")
 ///              .doit();
 /// # }
 /// ```
@@ -11887,6 +12309,7 @@ pub struct ApplicationVerifyCall<'a, C, A>
 
     hub: &'a Games<C, A>,
     _application_id: String,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -11908,9 +12331,12 @@ impl<'a, C, A> ApplicationVerifyCall<'a, C, A> where C: BorrowMut<hyper::Client>
         };
         dlg.begin(MethodInfo { id: "games.applications.verify",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("applicationId", self._application_id.to_string()));
-        for &field in ["alt", "applicationId"].iter() {
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["alt", "applicationId", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -12035,6 +12461,13 @@ impl<'a, C, A> ApplicationVerifyCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._application_id = new_value.to_string();
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> ApplicationVerifyCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -12114,8 +12547,9 @@ impl<'a, C, A> ApplicationVerifyCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.applications().get("applicationId")
-///              .platform_type("aliquyam")
-///              .language("Lorem")
+///              .platform_type("ipsum")
+///              .language("aliquyam")
+///              .consistency_token("dolores")
 ///              .doit();
 /// # }
 /// ```
@@ -12126,6 +12560,7 @@ pub struct ApplicationGetCall<'a, C, A>
     _application_id: String,
     _platform_type: Option<String>,
     _language: Option<String>,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -12147,7 +12582,7 @@ impl<'a, C, A> ApplicationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         };
         dlg.begin(MethodInfo { id: "games.applications.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("applicationId", self._application_id.to_string()));
         if let Some(value) = self._platform_type {
             params.push(("platformType", value.to_string()));
@@ -12155,7 +12590,10 @@ impl<'a, C, A> ApplicationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        for &field in ["alt", "applicationId", "platformType", "language"].iter() {
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["alt", "applicationId", "platformType", "language", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -12294,6 +12732,13 @@ impl<'a, C, A> ApplicationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._language = Some(new_value.to_string());
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> ApplicationGetCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -12373,6 +12818,7 @@ impl<'a, C, A> ApplicationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.applications().played()
+///              .consistency_token("sit")
 ///              .doit();
 /// # }
 /// ```
@@ -12380,6 +12826,7 @@ pub struct ApplicationPlayedCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Games<C, A>,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -12401,8 +12848,11 @@ impl<'a, C, A> ApplicationPlayedCall<'a, C, A> where C: BorrowMut<hyper::Client>
         };
         dlg.begin(MethodInfo { id: "games.applications.played",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((1 + self._additional_params.len()));
-        for &field in [].iter() {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((2 + self._additional_params.len()));
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -12485,6 +12935,13 @@ impl<'a, C, A> ApplicationPlayedCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> ApplicationPlayedCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -12564,7 +13021,8 @@ impl<'a, C, A> ApplicationPlayedCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.rooms().get("roomId")
-///              .language("clita")
+///              .language("ut")
+///              .consistency_token("justo")
 ///              .doit();
 /// # }
 /// ```
@@ -12574,6 +13032,7 @@ pub struct RoomGetCall<'a, C, A>
     hub: &'a Games<C, A>,
     _room_id: String,
     _language: Option<String>,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -12595,12 +13054,15 @@ impl<'a, C, A> RoomGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
         };
         dlg.begin(MethodInfo { id: "games.rooms.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("roomId", self._room_id.to_string()));
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        for &field in ["alt", "roomId", "language"].iter() {
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["alt", "roomId", "language", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -12732,6 +13194,13 @@ impl<'a, C, A> RoomGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
         self._language = Some(new_value.to_string());
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> RoomGetCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -12817,7 +13286,8 @@ impl<'a, C, A> RoomGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.rooms().leave(req, "roomId")
-///              .language("takimata")
+///              .language("amet")
+///              .consistency_token("accusam")
 ///              .doit();
 /// # }
 /// ```
@@ -12828,6 +13298,7 @@ pub struct RoomLeaveCall<'a, C, A>
     _request: RoomLeaveRequest,
     _room_id: String,
     _language: Option<String>,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -12849,12 +13320,15 @@ impl<'a, C, A> RoomLeaveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         };
         dlg.begin(MethodInfo { id: "games.rooms.leave",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("roomId", self._room_id.to_string()));
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        for &field in ["alt", "roomId", "language"].iter() {
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["alt", "roomId", "language", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -13010,6 +13484,13 @@ impl<'a, C, A> RoomLeaveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._language = Some(new_value.to_string());
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> RoomLeaveCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -13089,9 +13570,10 @@ impl<'a, C, A> RoomLeaveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.rooms().list()
-///              .page_token("nonumy")
-///              .max_results(-13)
-///              .language("sanctus")
+///              .page_token("clita")
+///              .max_results(-79)
+///              .language("justo")
+///              .consistency_token("est")
 ///              .doit();
 /// # }
 /// ```
@@ -13102,6 +13584,7 @@ pub struct RoomListCall<'a, C, A>
     _page_token: Option<String>,
     _max_results: Option<i32>,
     _language: Option<String>,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -13123,7 +13606,7 @@ impl<'a, C, A> RoomListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         };
         dlg.begin(MethodInfo { id: "games.rooms.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
         }
@@ -13133,7 +13616,10 @@ impl<'a, C, A> RoomListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        for &field in ["alt", "pageToken", "maxResults", "language"].iter() {
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["alt", "pageToken", "maxResults", "language", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -13248,6 +13734,13 @@ impl<'a, C, A> RoomListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         self._language = Some(new_value.to_string());
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> RoomListCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -13333,7 +13826,8 @@ impl<'a, C, A> RoomListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.rooms().report_status(req, "roomId")
-///              .language("At")
+///              .language("invidunt")
+///              .consistency_token("ut")
 ///              .doit();
 /// # }
 /// ```
@@ -13344,6 +13838,7 @@ pub struct RoomReportStatuCall<'a, C, A>
     _request: RoomP2PStatuses,
     _room_id: String,
     _language: Option<String>,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -13365,12 +13860,15 @@ impl<'a, C, A> RoomReportStatuCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "games.rooms.reportStatus",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("roomId", self._room_id.to_string()));
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        for &field in ["alt", "roomId", "language"].iter() {
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["alt", "roomId", "language", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -13526,6 +14024,13 @@ impl<'a, C, A> RoomReportStatuCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._language = Some(new_value.to_string());
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> RoomReportStatuCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -13611,7 +14116,8 @@ impl<'a, C, A> RoomReportStatuCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.rooms().create(req)
-///              .language("labore")
+///              .language("dolores")
+///              .consistency_token("eos")
 ///              .doit();
 /// # }
 /// ```
@@ -13621,6 +14127,7 @@ pub struct RoomCreateCall<'a, C, A>
     hub: &'a Games<C, A>,
     _request: RoomCreateRequest,
     _language: Option<String>,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -13642,11 +14149,14 @@ impl<'a, C, A> RoomCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         };
         dlg.begin(MethodInfo { id: "games.rooms.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        for &field in ["alt", "language"].iter() {
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["alt", "language", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -13771,6 +14281,13 @@ impl<'a, C, A> RoomCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._language = Some(new_value.to_string());
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> RoomCreateCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -13850,7 +14367,8 @@ impl<'a, C, A> RoomCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.rooms().decline("roomId")
-///              .language("ea")
+///              .language("duo")
+///              .consistency_token("sed")
 ///              .doit();
 /// # }
 /// ```
@@ -13860,6 +14378,7 @@ pub struct RoomDeclineCall<'a, C, A>
     hub: &'a Games<C, A>,
     _room_id: String,
     _language: Option<String>,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -13881,12 +14400,15 @@ impl<'a, C, A> RoomDeclineCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         };
         dlg.begin(MethodInfo { id: "games.rooms.decline",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("roomId", self._room_id.to_string()));
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        for &field in ["alt", "roomId", "language"].iter() {
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["alt", "roomId", "language", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -14018,6 +14540,13 @@ impl<'a, C, A> RoomDeclineCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._language = Some(new_value.to_string());
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> RoomDeclineCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -14097,6 +14626,7 @@ impl<'a, C, A> RoomDeclineCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.rooms().dismiss("roomId")
+///              .consistency_token("ea")
 ///              .doit();
 /// # }
 /// ```
@@ -14105,6 +14635,7 @@ pub struct RoomDismisCall<'a, C, A>
 
     hub: &'a Games<C, A>,
     _room_id: String,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -14126,9 +14657,12 @@ impl<'a, C, A> RoomDismisCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         };
         dlg.begin(MethodInfo { id: "games.rooms.dismiss",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((2 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
         params.push(("roomId", self._room_id.to_string()));
-        for &field in ["roomId"].iter() {
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["roomId", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -14242,6 +14776,13 @@ impl<'a, C, A> RoomDismisCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._room_id = new_value.to_string();
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> RoomDismisCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -14327,7 +14868,8 @@ impl<'a, C, A> RoomDismisCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.rooms().join(req, "roomId")
-///              .language("dolore")
+///              .language("et")
+///              .consistency_token("dolor")
 ///              .doit();
 /// # }
 /// ```
@@ -14338,6 +14880,7 @@ pub struct RoomJoinCall<'a, C, A>
     _request: RoomJoinRequest,
     _room_id: String,
     _language: Option<String>,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -14359,12 +14902,15 @@ impl<'a, C, A> RoomJoinCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         };
         dlg.begin(MethodInfo { id: "games.rooms.join",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("roomId", self._room_id.to_string()));
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        for &field in ["alt", "roomId", "language"].iter() {
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["alt", "roomId", "language", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -14520,6 +15066,13 @@ impl<'a, C, A> RoomJoinCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         self._language = Some(new_value.to_string());
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> RoomJoinCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -14599,8 +15152,9 @@ impl<'a, C, A> RoomJoinCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.scores().submit("leaderboardId", "score")
-///              .score_tag("aliquyam")
-///              .language("sit")
+///              .score_tag("invidunt")
+///              .language("rebum.")
+///              .consistency_token("Lorem")
 ///              .doit();
 /// # }
 /// ```
@@ -14612,6 +15166,7 @@ pub struct ScoreSubmitCall<'a, C, A>
     _score: String,
     _score_tag: Option<String>,
     _language: Option<String>,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -14633,7 +15188,7 @@ impl<'a, C, A> ScoreSubmitCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         };
         dlg.begin(MethodInfo { id: "games.scores.submit",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
         params.push(("leaderboardId", self._leaderboard_id.to_string()));
         params.push(("score", self._score.to_string()));
         if let Some(value) = self._score_tag {
@@ -14642,7 +15197,10 @@ impl<'a, C, A> ScoreSubmitCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        for &field in ["alt", "leaderboardId", "score", "scoreTag", "language"].iter() {
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["alt", "leaderboardId", "score", "scoreTag", "language", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -14791,6 +15349,13 @@ impl<'a, C, A> ScoreSubmitCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._language = Some(new_value.to_string());
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> ScoreSubmitCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -14870,9 +15435,10 @@ impl<'a, C, A> ScoreSubmitCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.scores().list("leaderboardId", "collection", "timeSpan")
-///              .page_token("sed")
-///              .max_results(-16)
-///              .language("gubergren")
+///              .page_token("At")
+///              .max_results(-96)
+///              .language("et")
+///              .consistency_token("sed")
 ///              .doit();
 /// # }
 /// ```
@@ -14886,6 +15452,7 @@ pub struct ScoreListCall<'a, C, A>
     _page_token: Option<String>,
     _max_results: Option<i32>,
     _language: Option<String>,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -14907,7 +15474,7 @@ impl<'a, C, A> ScoreListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         };
         dlg.begin(MethodInfo { id: "games.scores.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((9 + self._additional_params.len()));
         params.push(("leaderboardId", self._leaderboard_id.to_string()));
         params.push(("collection", self._collection.to_string()));
         params.push(("timeSpan", self._time_span.to_string()));
@@ -14920,7 +15487,10 @@ impl<'a, C, A> ScoreListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        for &field in ["alt", "leaderboardId", "collection", "timeSpan", "pageToken", "maxResults", "language"].iter() {
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["alt", "leaderboardId", "collection", "timeSpan", "pageToken", "maxResults", "language", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -15086,6 +15656,13 @@ impl<'a, C, A> ScoreListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._language = Some(new_value.to_string());
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> ScoreListCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -15166,10 +15743,11 @@ impl<'a, C, A> ScoreListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.scores().get("playerId", "leaderboardId", "timeSpan")
-///              .page_token("sea")
-///              .max_results(-85)
-///              .language("ipsum")
-///              .include_rank_type("aliquyam")
+///              .page_token("nonumy")
+///              .max_results(-15)
+///              .language("Lorem")
+///              .include_rank_type("Lorem")
+///              .consistency_token("diam")
 ///              .doit();
 /// # }
 /// ```
@@ -15184,6 +15762,7 @@ pub struct ScoreGetCall<'a, C, A>
     _max_results: Option<i32>,
     _language: Option<String>,
     _include_rank_type: Option<String>,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -15205,7 +15784,7 @@ impl<'a, C, A> ScoreGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         };
         dlg.begin(MethodInfo { id: "games.scores.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((9 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((10 + self._additional_params.len()));
         params.push(("playerId", self._player_id.to_string()));
         params.push(("leaderboardId", self._leaderboard_id.to_string()));
         params.push(("timeSpan", self._time_span.to_string()));
@@ -15221,7 +15800,10 @@ impl<'a, C, A> ScoreGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         if let Some(value) = self._include_rank_type {
             params.push(("includeRankType", value.to_string()));
         }
-        for &field in ["alt", "playerId", "leaderboardId", "timeSpan", "pageToken", "maxResults", "language", "includeRankType"].iter() {
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["alt", "playerId", "leaderboardId", "timeSpan", "pageToken", "maxResults", "language", "includeRankType", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -15394,6 +15976,13 @@ impl<'a, C, A> ScoreGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         self._include_rank_type = Some(new_value.to_string());
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> ScoreGetCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -15479,7 +16068,8 @@ impl<'a, C, A> ScoreGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.scores().submit_multiple(req)
-///              .language("dolores")
+///              .language("ut")
+///              .consistency_token("ut")
 ///              .doit();
 /// # }
 /// ```
@@ -15489,6 +16079,7 @@ pub struct ScoreSubmitMultipleCall<'a, C, A>
     hub: &'a Games<C, A>,
     _request: PlayerScoreSubmissionList,
     _language: Option<String>,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -15510,11 +16101,14 @@ impl<'a, C, A> ScoreSubmitMultipleCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "games.scores.submitMultiple",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        for &field in ["alt", "language"].iter() {
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["alt", "language", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -15639,6 +16233,13 @@ impl<'a, C, A> ScoreSubmitMultipleCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self._language = Some(new_value.to_string());
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> ScoreSubmitMultipleCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -15718,11 +16319,12 @@ impl<'a, C, A> ScoreSubmitMultipleCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.scores().list_window("leaderboardId", "collection", "timeSpan")
-///              .return_top_if_absent(false)
-///              .results_above(-6)
-///              .page_token("amet")
-///              .max_results(-23)
-///              .language("clita")
+///              .return_top_if_absent(true)
+///              .results_above(-9)
+///              .page_token("ut")
+///              .max_results(-39)
+///              .language("sanctus")
+///              .consistency_token("voluptua.")
 ///              .doit();
 /// # }
 /// ```
@@ -15738,6 +16340,7 @@ pub struct ScoreListWindowCall<'a, C, A>
     _page_token: Option<String>,
     _max_results: Option<i32>,
     _language: Option<String>,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -15759,7 +16362,7 @@ impl<'a, C, A> ScoreListWindowCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "games.scores.listWindow",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((10 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((11 + self._additional_params.len()));
         params.push(("leaderboardId", self._leaderboard_id.to_string()));
         params.push(("collection", self._collection.to_string()));
         params.push(("timeSpan", self._time_span.to_string()));
@@ -15778,7 +16381,10 @@ impl<'a, C, A> ScoreListWindowCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        for &field in ["alt", "leaderboardId", "collection", "timeSpan", "returnTopIfAbsent", "resultsAbove", "pageToken", "maxResults", "language"].iter() {
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["alt", "leaderboardId", "collection", "timeSpan", "returnTopIfAbsent", "resultsAbove", "pageToken", "maxResults", "language", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -15958,6 +16564,13 @@ impl<'a, C, A> ScoreListWindowCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._language = Some(new_value.to_string());
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> ScoreListWindowCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -16043,6 +16656,7 @@ impl<'a, C, A> ScoreListWindowCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.pushtokens().remove(req)
+///              .consistency_token("dolor")
 ///              .doit();
 /// # }
 /// ```
@@ -16051,6 +16665,7 @@ pub struct PushtokenRemoveCall<'a, C, A>
 
     hub: &'a Games<C, A>,
     _request: PushTokenId,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -16072,8 +16687,11 @@ impl<'a, C, A> PushtokenRemoveCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "games.pushtokens.remove",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((2 + self._additional_params.len()));
-        for &field in [].iter() {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -16180,6 +16798,13 @@ impl<'a, C, A> PushtokenRemoveCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._request = new_value;
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> PushtokenRemoveCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -16265,6 +16890,7 @@ impl<'a, C, A> PushtokenRemoveCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.pushtokens().update(req)
+///              .consistency_token("et")
 ///              .doit();
 /// # }
 /// ```
@@ -16273,6 +16899,7 @@ pub struct PushtokenUpdateCall<'a, C, A>
 
     hub: &'a Games<C, A>,
     _request: PushToken,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -16294,8 +16921,11 @@ impl<'a, C, A> PushtokenUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "games.pushtokens.update",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((2 + self._additional_params.len()));
-        for &field in [].iter() {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -16402,6 +17032,13 @@ impl<'a, C, A> PushtokenUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._request = new_value;
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> PushtokenUpdateCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -16481,6 +17118,7 @@ impl<'a, C, A> PushtokenUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.revisions().check("clientRevision")
+///              .consistency_token("vero")
 ///              .doit();
 /// # }
 /// ```
@@ -16489,6 +17127,7 @@ pub struct RevisionCheckCall<'a, C, A>
 
     hub: &'a Games<C, A>,
     _client_revision: String,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -16510,9 +17149,12 @@ impl<'a, C, A> RevisionCheckCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "games.revisions.check",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("clientRevision", self._client_revision.to_string()));
-        for &field in ["alt", "clientRevision"].iter() {
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["alt", "clientRevision", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -16621,6 +17263,13 @@ impl<'a, C, A> RevisionCheckCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._client_revision = new_value.to_string();
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> RevisionCheckCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -16700,9 +17349,10 @@ impl<'a, C, A> RevisionCheckCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().list_definitions()
-///              .page_token("justo")
-///              .max_results(-57)
-///              .language("clita")
+///              .page_token("ut")
+///              .max_results(-30)
+///              .language("et")
+///              .consistency_token("ipsum")
 ///              .doit();
 /// # }
 /// ```
@@ -16713,6 +17363,7 @@ pub struct EventListDefinitionCall<'a, C, A>
     _page_token: Option<String>,
     _max_results: Option<i32>,
     _language: Option<String>,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -16734,7 +17385,7 @@ impl<'a, C, A> EventListDefinitionCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "games.events.listDefinitions",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
         }
@@ -16744,7 +17395,10 @@ impl<'a, C, A> EventListDefinitionCall<'a, C, A> where C: BorrowMut<hyper::Clien
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        for &field in ["alt", "pageToken", "maxResults", "language"].iter() {
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["alt", "pageToken", "maxResults", "language", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -16859,6 +17513,13 @@ impl<'a, C, A> EventListDefinitionCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self._language = Some(new_value.to_string());
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> EventListDefinitionCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -16944,7 +17605,8 @@ impl<'a, C, A> EventListDefinitionCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().record(req)
-///              .language("invidunt")
+///              .language("justo")
+///              .consistency_token("dolore")
 ///              .doit();
 /// # }
 /// ```
@@ -16954,6 +17616,7 @@ pub struct EventRecordCall<'a, C, A>
     hub: &'a Games<C, A>,
     _request: EventRecordRequest,
     _language: Option<String>,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -16975,11 +17638,14 @@ impl<'a, C, A> EventRecordCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         };
         dlg.begin(MethodInfo { id: "games.events.record",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        for &field in ["alt", "language"].iter() {
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["alt", "language", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -17104,6 +17770,13 @@ impl<'a, C, A> EventRecordCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._language = Some(new_value.to_string());
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> EventRecordCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -17183,9 +17856,10 @@ impl<'a, C, A> EventRecordCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().list_by_player()
-///              .page_token("ut")
-///              .max_results(-19)
-///              .language("eos")
+///              .page_token("vero")
+///              .max_results(-99)
+///              .language("takimata")
+///              .consistency_token("et")
 ///              .doit();
 /// # }
 /// ```
@@ -17196,6 +17870,7 @@ pub struct EventListByPlayerCall<'a, C, A>
     _page_token: Option<String>,
     _max_results: Option<i32>,
     _language: Option<String>,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -17217,7 +17892,7 @@ impl<'a, C, A> EventListByPlayerCall<'a, C, A> where C: BorrowMut<hyper::Client>
         };
         dlg.begin(MethodInfo { id: "games.events.listByPlayer",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
         }
@@ -17227,7 +17902,10 @@ impl<'a, C, A> EventListByPlayerCall<'a, C, A> where C: BorrowMut<hyper::Client>
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        for &field in ["alt", "pageToken", "maxResults", "language"].iter() {
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["alt", "pageToken", "maxResults", "language", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -17342,6 +18020,13 @@ impl<'a, C, A> EventListByPlayerCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._language = Some(new_value.to_string());
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> EventListByPlayerCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -17421,6 +18106,7 @@ impl<'a, C, A> EventListByPlayerCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.quest_milestones().claim("questId", "milestoneId", "requestId")
+///              .consistency_token("no")
 ///              .doit();
 /// # }
 /// ```
@@ -17431,6 +18117,7 @@ pub struct QuestMilestoneClaimCall<'a, C, A>
     _quest_id: String,
     _milestone_id: String,
     _request_id: String,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -17452,11 +18139,14 @@ impl<'a, C, A> QuestMilestoneClaimCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "games.questMilestones.claim",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("questId", self._quest_id.to_string()));
         params.push(("milestoneId", self._milestone_id.to_string()));
         params.push(("requestId", self._request_id.to_string()));
-        for &field in ["questId", "milestoneId", "requestId"].iter() {
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["questId", "milestoneId", "requestId", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -17590,6 +18280,13 @@ impl<'a, C, A> QuestMilestoneClaimCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self._request_id = new_value.to_string();
         self
     }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> QuestMilestoneClaimCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -17669,9 +18366,10 @@ impl<'a, C, A> QuestMilestoneClaimCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.achievement_definitions().list()
-///              .page_token("aliquyam")
-///              .max_results(-67)
-///              .language("ea")
+///              .page_token("invidunt")
+///              .max_results(-15)
+///              .language("labore")
+///              .consistency_token("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -17682,6 +18380,7 @@ pub struct AchievementDefinitionListCall<'a, C, A>
     _page_token: Option<String>,
     _max_results: Option<i32>,
     _language: Option<String>,
+    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -17703,7 +18402,7 @@ impl<'a, C, A> AchievementDefinitionListCall<'a, C, A> where C: BorrowMut<hyper:
         };
         dlg.begin(MethodInfo { id: "games.achievementDefinitions.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
         }
@@ -17713,7 +18412,10 @@ impl<'a, C, A> AchievementDefinitionListCall<'a, C, A> where C: BorrowMut<hyper:
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        for &field in ["alt", "pageToken", "maxResults", "language"].iter() {
+        if let Some(value) = self._consistency_token {
+            params.push(("consistencyToken", value.to_string()));
+        }
+        for &field in ["alt", "pageToken", "maxResults", "language", "consistencyToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -17826,6 +18528,13 @@ impl<'a, C, A> AchievementDefinitionListCall<'a, C, A> where C: BorrowMut<hyper:
     /// Sets the *language* query property to the given value.
     pub fn language(mut self, new_value: &str) -> AchievementDefinitionListCall<'a, C, A> {
         self._language = Some(new_value.to_string());
+        self
+    }
+    /// The last-seen mutation timestamp.
+    ///
+    /// Sets the *consistency token* query property to the given value.
+    pub fn consistency_token(mut self, new_value: &str) -> AchievementDefinitionListCall<'a, C, A> {
+        self._consistency_token = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong

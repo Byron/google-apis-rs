@@ -505,9 +505,12 @@ pub struct Order {
     pub shipments: Option<Vec<OrderShipment>>,
     /// The details of the customer who placed the order.
     pub customer: Option<OrderCustomer>,
-    /// The status of the payment.
-    #[serde(rename="paymentStatus")]
-    pub payment_status: Option<String>,
+    /// The total cost of shipping for all items.
+    #[serde(rename="shippingCost")]
+    pub shipping_cost: Option<Price>,
+    /// The channel type of the order: "purchaseOnGoogle" or "googleExpress".
+    #[serde(rename="channelType")]
+    pub channel_type: Option<String>,
     /// The net amount for the order. For example, if an order was originally for a grand total of $100 and a refund was issued for $20, the net amount will be $80.
     #[serde(rename="netAmount")]
     pub net_amount: Option<Price>,
@@ -524,9 +527,9 @@ pub struct Order {
     pub refunds: Option<Vec<OrderRefund>>,
     /// Whether the order was acknowledged.
     pub acknowledged: Option<bool>,
-    /// The total cost of shipping for all items.
-    #[serde(rename="shippingCost")]
-    pub shipping_cost: Option<Price>,
+    /// The status of the payment.
+    #[serde(rename="paymentStatus")]
+    pub payment_status: Option<String>,
     /// no description provided
     #[serde(rename="merchantId")]
     pub merchant_id: Option<String>,
@@ -699,7 +702,7 @@ impl ResponseResult for OrdersCancelLineItemResponse {}
 pub struct OrderCancellation {
     /// The quantity that was canceled.
     pub quantity: Option<u32>,
-    /// The reason for the cancellation.
+    /// The reason for the cancellation. Orders that are cancelled with a noInventory reason will lead to the removal of the product from POG until you make an update to that product. This will not affect your Shopping ads.
     pub reason: Option<String>,
     /// Date on which the cancellation has been created, in ISO 8601 format.
     #[serde(rename="creationDate")]
@@ -974,7 +977,7 @@ impl ResponseResult for OrdersCustomBatchResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OrderCustomer {
-    /// If set, this indicates the user had a choice to opt in or out of providing marketing rights to the merchant. If unset, this indicates the user has already made this choice in a previous purchase, and was thus not shown the marketing right opt in/out checkbox during the Purchases on Google checkout flow.
+    /// If set, this indicates the user explicitly chose to opt in or out of providing marketing rights to the merchant. If unset, this indicates the user has already made this choice in a previous purchase, and was thus not shown the marketing right opt in/out checkbox during the Purchases on Google checkout flow.
     #[serde(rename="explicitMarketingPreference")]
     pub explicit_marketing_preference: Option<bool>,
     /// Full name of the customer.
@@ -1123,7 +1126,7 @@ impl RequestValue for OrdersRefundRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TestOrderCustomer {
-    /// If set, this indicates the user had a choice to opt in or out of providing marketing rights to the merchant. If unset, this indicates the user has already made this choice in a previous purchase, and was thus not shown the marketing right opt in/out checkbox during the Purchases on Google checkout flow. Optional.
+    /// If set, this indicates the user explicitly chose to opt in or out of providing marketing rights to the merchant. If unset, this indicates the user has already made this choice in a previous purchase, and was thus not shown the marketing right opt in/out checkbox during the Purchases on Google checkout flow. Optional.
     #[serde(rename="explicitMarketingPreference")]
     pub explicit_marketing_preference: Option<bool>,
     /// Full name of the customer.

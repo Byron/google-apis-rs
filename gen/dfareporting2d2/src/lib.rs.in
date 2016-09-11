@@ -2626,7 +2626,7 @@ pub struct CreativeAsset {
     /// Size of an asset when collapsed. This is a read-only field. Applicable to the following creative types: all RICH_MEDIA and all VPAID. Additionally, applicable to assets whose displayType is ASSET_DISPLAY_TYPE_EXPANDING or ASSET_DISPLAY_TYPE_PEEL_DOWN.
     #[serde(rename="collapsedSize")]
     pub collapsed_size: Option<Size>,
-    /// Flash version of the asset. This is a read-only field. Applicable to the following creative types: FLASH_INPAGE, ENHANCED_BANNER, all RICH_MEDIA, and all VPAID.
+    /// Flash version of the asset. This is a read-only field. Applicable to the following creative types: FLASH_INPAGE, all RICH_MEDIA, and all VPAID. Applicable to ENHANCED_BANNER when the primary asset type is not HTML_IMAGE.
     #[serde(rename="flashVersion")]
     pub flash_version: Option<i32>,
     /// Whether the asset pushes down other content. Applicable to the following creative types: all RICH_MEDIA. Additionally, only applicable when the asset offsets are 0, the collapsedSize.width matches size.width, and the collapsedSize.height is less than size.height.
@@ -2646,7 +2646,7 @@ pub struct CreativeAsset {
     pub id: Option<String>,
     /// Possible alignments for an asset. This is a read-only field. Applicable to the following creative types: RICH_MEDIA_MULTI_FLOATING.
     pub alignment: Option<String>,
-    /// Size associated with this creative asset. This is a required field when applicable; however for IMAGE and FLASH_INPAGE creatives, if left blank, this field will be automatically set using the actual size of the associated image asset. Applicable to the following creative types: ENHANCED_BANNER, ENHANCED_IMAGE, FLASH_INPAGE, HTML5_BANNER, IMAGE, and all RICH_MEDIA.
+    /// Size associated with this creative asset. This is a required field when applicable; however for IMAGE and FLASH_INPAGE creatives, if left blank, this field will be automatically set using the actual size of the associated image asset. Applicable to the following creative types: ENHANCED_IMAGE, FLASH_INPAGE, HTML5_BANNER, IMAGE, and all RICH_MEDIA. Applicable to ENHANCED_BANNER when the primary asset type is not HTML_IMAGE.
     pub size: Option<Size>,
     /// Whether the asset is horizontally locked. This is a read-only field. Applicable to the following creative types: all RICH_MEDIA.
     #[serde(rename="horizontallyLocked")]
@@ -2670,7 +2670,7 @@ pub struct CreativeAsset {
     /// OTHER refers to assets from sources other than DCM, such as Studio uploaded assets, applicable to all RICH_MEDIA and all VPAID creatives.
     /// PARENT_VIDEO refers to videos uploaded by the user in DCM and is applicable to INSTREAM_VIDEO and VPAID_LINEAR creatives.
     /// TRANSCODED_VIDEO refers to videos transcoded by DCM from PARENT_VIDEO assets and is applicable to INSTREAM_VIDEO and VPAID_LINEAR creatives.
-    /// ALTERNATE_VIDEO refers to the DCM representation of child asset videos from Studio, and is applicable to VPAID_LINEAR creatives. These cannot be added or removed within DCM.
+    /// ALTERNATE_VIDEO refers to the DCM representation of child asset videos from Studio, and is applicable to VPAID_LINEAR_VIDEO creatives. These cannot be added or removed within DCM.
     /// For VPAID_LINEAR creatives, PARENT_VIDEO, TRANSCODED_VIDEO and ALTERNATE_VIDEO assets that are marked active serve as backup in case the VPAID creative cannot be served. Only PARENT_VIDEO assets can be added or removed for an INSTREAM_VIDEO or VPAID_LINEAR creative.
     pub role: Option<String>,
     /// Size of zip file. This is a read-only field. Applicable to the following creative types: HTML5_BANNER.
@@ -2716,7 +2716,7 @@ pub struct CreativeAsset {
     /// Exit event configured for the backup image. Applicable to the following creative types: all RICH_MEDIA.
     #[serde(rename="backupImageExit")]
     pub backup_image_exit: Option<CreativeCustomEvent>,
-    /// Whether ActionScript3 is enabled for the flash asset. This is a read-only field. Applicable to the following creative types: FLASH_INPAGE and ENHANCED_BANNER.
+    /// Whether ActionScript3 is enabled for the flash asset. This is a read-only field. Applicable to the following creative type: FLASH_INPAGE. Applicable to ENHANCED_BANNER when the primary asset type is not HTML_IMAGE.
     #[serde(rename="actionScript3")]
     pub action_script3: Option<bool>,
     /// Pushdown duration in seconds for an asset. Must be between 0 and 9.99. Applicable to the following creative types: all RICH_MEDIA.Additionally, only applicable when the asset pushdown field is true, the offsets are 0, the collapsedSize.width matches size.width, and the collapsedSize.height is less than size.height.
@@ -2830,7 +2830,7 @@ impl ResponseResult for UserRolePermissionGroup {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ClickTag {
-    /// Advertiser event name associated with the click tag. This field is used by ENHANCED_BANNER, ENHANCED_IMAGE, and HTML5_BANNER creatives.
+    /// Advertiser event name associated with the click tag. This field is used by ENHANCED_IMAGE, and HTML5_BANNER creatives. Applicable to ENHANCED_BANNER when the primary asset type is not HTML_IMAGE
     #[serde(rename="eventName")]
     pub event_name: Option<String>,
     /// Parameter name for the specified click tag. For ENHANCED_IMAGE creative assets, this field must match the value of the creative asset's creativeAssetId.name field.
@@ -3464,7 +3464,7 @@ pub struct Creative {
     pub advertiser_id: Option<String>,
     /// Whether the creative is active. Applicable to all creative types.
     pub active: Option<bool>,
-    /// List of timer events configured for the creative. For ENHANCED_IMAGE creatives, these are read-only and auto-generated from clickTags. Applicable to the following creative types: ENHANCED_IMAGE, all RICH_MEDIA, and all VPAID.
+    /// List of timer events configured for the creative. For ENHANCED_IMAGE creatives, these are read-only and auto-generated from clickTags. Applicable to the following creative types: ENHANCED_IMAGE, all RICH_MEDIA, and all VPAID. Applicable to ENHANCED_BANNER when the primary asset is not HTML_IMAGE.
     #[serde(rename="timerCustomEvents")]
     pub timer_custom_events: Option<Vec<CreativeCustomEvent>>,
     /// Dimension value for the rendering ID of this creative. This is a read-only field. Applicable to all creative types.
@@ -3489,10 +3489,10 @@ pub struct Creative {
     /// Whether script access is allowed for this creative. This is a read-only and deprecated field which will automatically be set to true on update. Applicable to the following creative types: FLASH_INPAGE.
     #[serde(rename="allowScriptAccess")]
     pub allow_script_access: Option<bool>,
-    /// The internal Flash version for this creative as calculated by DoubleClick Studio. This is a read-only field. Applicable to the following creative types: FLASH_INPAGE, ENHANCED_BANNER, all RICH_MEDIA, and all VPAID.
+    /// The internal Flash version for this creative as calculated by DoubleClick Studio. This is a read-only field. Applicable to the following creative types: FLASH_INPAGE, all RICH_MEDIA, and all VPAID. Applicable to ENHANCED_BANNER when the primary asset type is not HTML_IMAGE.
     #[serde(rename="requiredFlashVersion")]
     pub required_flash_version: Option<i32>,
-    /// List of exit events configured for the creative. For ENHANCED_BANNER and ENHANCED_IMAGE creatives, these are read-only and auto-generated from clickTags, For ENHANCED_BANNER, an event is also created from the backupImageReportingLabel. Applicable to the following creative types: ENHANCED_BANNER, ENHANCED_IMAGE, all RICH_MEDIA, and all VPAID.
+    /// List of exit events configured for the creative. For ENHANCED_BANNER and ENHANCED_IMAGE creatives, these are read-only and auto-generated from clickTags, For ENHANCED_BANNER, an event is also created from the backupImageReportingLabel. Applicable to the following creative types: ENHANCED_IMAGE, all RICH_MEDIA, and all VPAID. Applicable to ENHANCED_BANNER when the primary asset is not HTML_IMAGE.
     #[serde(rename="exitCustomEvents")]
     pub exit_custom_events: Option<Vec<CreativeCustomEvent>>,
     /// ID of current rendering version. This is a read-only field. Applicable to all creative types.
@@ -3501,7 +3501,7 @@ pub struct Creative {
     /// Description of the video ad. Applicable to the following creative types: all INSTREAM_VIDEO and all VPAID.
     #[serde(rename="videoDescription")]
     pub video_description: Option<String>,
-    /// Third-party URL used to record backup image impressions. Applicable to the following creative types: all RICH_MEDIA
+    /// Third-party URL used to record backup image impressions. Applicable to the following creative types: all RICH_MEDIA.
     #[serde(rename="thirdPartyBackupImageImpressionsUrl")]
     pub third_party_backup_image_impressions_url: Option<String>,
     /// The version number helps you keep track of multiple versions of your creative in your reports. The version number will always be auto-generated during insert operations to start at 1. For tracking creatives the version cannot be incremented and will always remain at 1. For all other creative types the version can be incremented only by 1 during update operations. In addition, the version will be automatically incremented by 1 when undergoing Rich Media creative merging. Applicable to all creative types.
@@ -3520,7 +3520,7 @@ pub struct Creative {
     pub id_dimension_value: Option<DimensionValue>,
     /// Whether images are automatically advanced for enhanced image creatives. Applicable to the following creative types: ENHANCED_IMAGE.
     pub auto_advance_images: Option<bool>,
-    /// Size associated with this creative. When inserting or updating a creative either the size ID field or size width and height fields can be used. This is a required field when applicable; however for IMAGE and FLASH_INPAGE creatives, if left blank, this field will be automatically set using the actual size of the associated image assets. Applicable to the following creative types: ENHANCED_BANNER, ENHANCED_IMAGE, FLASH_INPAGE, HTML5_BANNER, IMAGE, and all RICH_MEDIA.
+    /// Size associated with this creative. When inserting or updating a creative either the size ID field or size width and height fields can be used. This is a required field when applicable; however for IMAGE and FLASH_INPAGE creatives, and for ENHANCED_BANNER creatives with a primary asset of type HTML_IMAGE, if left blank, this field will be automatically set using the actual size of the associated image assets. Applicable to the following creative types: ENHANCED_BANNER, ENHANCED_IMAGE, FLASH_INPAGE, HTML5_BANNER, IMAGE, and all RICH_MEDIA.
     pub size: Option<Size>,
     /// Type of this creative.This is a required field. Applicable to all creative types.
     #[serde(rename="type")]
@@ -3528,7 +3528,7 @@ pub struct Creative {
     /// Combined size of all creative assets. This is a read-only field. Applicable to the following creative types: all RICH_MEDIA, and all VPAID.
     #[serde(rename="totalFileSize")]
     pub total_file_size: Option<String>,
-    /// Third-party URL used to record rich media impressions. Applicable to the following creative types: all RICH_MEDIA
+    /// Third-party URL used to record rich media impressions. Applicable to the following creative types: all RICH_MEDIA.
     #[serde(rename="thirdPartyRichMediaImpressionsUrl")]
     pub third_party_rich_media_impressions_url: Option<String>,
     /// Studio advertiser ID associated with rich media and VPAID creatives. This is a read-only field. Applicable to the following creative types: all RICH_MEDIA, and all VPAID.
@@ -3537,7 +3537,7 @@ pub struct Creative {
     /// Assets associated with a creative. Applicable to all but the following creative types: INTERNAL_REDIRECT, INTERSTITIAL_INTERNAL_REDIRECT, and REDIRECT
     #[serde(rename="creativeAssets")]
     pub creative_assets: Option<Vec<CreativeAsset>>,
-    /// List of feature dependencies that will cause a backup image to be served if the browser that serves the ad does not support them. Feature dependencies are features that a browser must be able to support in order to render your HTML5 creative asset correctly. This field is initially auto-generated to contain all features detected by DCM for all the assets of this creative and can then be modified by the client. To reset this field, copy over all the creativeAssets' detected features. Applicable to the following creative types: ENHANCED_BANNER and HTML5_BANNER.
+    /// List of feature dependencies that will cause a backup image to be served if the browser that serves the ad does not support them. Feature dependencies are features that a browser must be able to support in order to render your HTML5 creative asset correctly. This field is initially auto-generated to contain all features detected by DCM for all the assets of this creative and can then be modified by the client. To reset this field, copy over all the creativeAssets' detected features. Applicable to the following creative types: HTML5_BANNER. Applicable to ENHANCED_BANNER when the primary asset is not HTML_IMAGE.
     #[serde(rename="backupImageFeatures")]
     pub backup_image_features: Option<Vec<String>>,
     /// Creative video duration in seconds. This is a read-only field. Applicable to the following creative types: INSTREAM_VIDEO, all RICH_MEDIA, and all VPAID.
@@ -3546,16 +3546,16 @@ pub struct Creative {
     /// URL of hosted image or hosted video or another ad tag. For INSTREAM_VIDEO_REDIRECT creatives this is the in-stream video redirect URL. The standard for a VAST (Video Ad Serving Template) ad response allows for a redirect link to another VAST 2.0 or 3.0 call. This is a required field when applicable. Applicable to the following creative types: INTERNAL_REDIRECT, INTERSTITIAL_INTERNAL_REDIRECT, REDIRECT, and INSTREAM_VIDEO_REDIRECT
     #[serde(rename="redirectUrl")]
     pub redirect_url: Option<String>,
-    /// Click tags of the creative. For ENHANCED_BANNER, FLASH_INPAGE, and HTML5_BANNER creatives, this is a subset of detected click tags for the assets associated with this creative. After creating a flash asset, detected click tags will be returned in the creativeAssetMetadata. When inserting the creative, populate the creative clickTags field using the creativeAssetMetadata.clickTags field. For ENHANCED_IMAGE creatives, there should be exactly one entry in this list for each image creative asset. A click tag is matched with a corresponding creative asset by matching the clickTag.name field with the creativeAsset.assetIdentifier.name field. Applicable to the following creative types: ENHANCED_BANNER, ENHANCED_IMAGE, FLASH_INPAGE, HTML5_BANNER.
+    /// Click tags of the creative. For ENHANCED_BANNER, FLASH_INPAGE, and HTML5_BANNER creatives, this is a subset of detected click tags for the assets associated with this creative. After creating a flash asset, detected click tags will be returned in the creativeAssetMetadata. When inserting the creative, populate the creative clickTags field using the creativeAssetMetadata.clickTags field. For ENHANCED_IMAGE creatives, there should be exactly one entry in this list for each image creative asset. A click tag is matched with a corresponding creative asset by matching the clickTag.name field with the creativeAsset.assetIdentifier.name field. Applicable to the following creative types: ENHANCED_IMAGE, FLASH_INPAGE HTML5_BANNER. Applicable to ENHANCED_BANNER when the primary asset type is not HTML_IMAGE.
     #[serde(rename="clickTags")]
     pub click_tags: Option<Vec<ClickTag>>,
-    /// Target window for backup image. Applicable to the following creative types: ENHANCED_BANNER, FLASH_INPAGE, and HTML5_BANNER.
+    /// Target window for backup image. Applicable to the following creative types: FLASH_INPAGE, and HTML5_BANNER. Applicable to ENHANCED_BANNER when the primary asset type is not HTML_IMAGE.
     #[serde(rename="backupImageTargetWindow")]
     pub backup_image_target_window: Option<TargetWindow>,
     /// The minimum required Flash plugin version for this creative. For example, 11.2.202.235. This is a read-only field. Applicable to the following creative types: all RICH_MEDIA, and all VPAID.
     #[serde(rename="requiredFlashPluginVersion")]
     pub required_flash_plugin_version: Option<String>,
-    /// Reporting label used for HTML5 banner backup image. Applicable to the following creative types: ENHANCED_BANNER.
+    /// Reporting label used for HTML5 banner backup image. Applicable to ENHANCED_BANNER when the primary asset type is not HTML_IMAGE.
     #[serde(rename="backupImageReportingLabel")]
     pub backup_image_reporting_label: Option<String>,
     /// Compatibilities associated with this creative. This is a read-only field. WEB and WEB_INTERSTITIAL refer to rendering either on desktop or on mobile devices for regular or interstitial ads, respectively. APP and APP_INTERSTITIAL are for rendering in mobile apps. IN_STREAM_VIDEO refers to rendering in in-stream video ads developed with the VAST standard. Applicable to all creative types.
@@ -3583,7 +3583,7 @@ pub struct Creative {
     /// Keywords for a Rich Media creative. Keywords let you customize the creative settings of a Rich Media ad running on your site without having to contact the advertiser. You can use keywords to dynamically change the look or functionality of a creative. Applicable to the following creative types: all RICH_MEDIA, and all VPAID.
     #[serde(rename="adTagKeys")]
     pub ad_tag_keys: Option<Vec<String>>,
-    /// Whether Flash assets associated with the creative need to be automatically converted to HTML5. This flag is enabled by default and users can choose to disable it if they don't want the system to generate and use HTML5 asset for this creative. Applicable to the following creative types: ENHANCED_BANNER and FLASH_INPAGE.
+    /// Whether Flash assets associated with the creative need to be automatically converted to HTML5. This flag is enabled by default and users can choose to disable it if they don't want the system to generate and use HTML5 asset for this creative. Applicable to the following creative type: FLASH_INPAGE. Applicable to ENHANCED_BANNER when the primary asset type is not HTML_IMAGE.
     #[serde(rename="convertFlashToHtml5")]
     pub convert_flash_to_html5: Option<bool>,
     /// Whether creative should be treated as SSL compliant even if the system scan shows it's not. Applicable to all creative types.
@@ -3592,7 +3592,7 @@ pub struct Creative {
     /// Creative last modification information. This is a read-only field. Applicable to all creative types.
     #[serde(rename="lastModifiedInfo")]
     pub last_modified_info: Option<LastModifiedInfo>,
-    /// Click-through URL for backup image. Applicable to the following creative types: ENHANCED_BANNER, FLASH_INPAGE, and HTML5_BANNER.
+    /// Click-through URL for backup image. Applicable to the following creative types: FLASH_INPAGE, and HTML5_BANNER. Applicable to ENHANCED_BANNER when the primary asset type is not HTML_IMAGE.
     #[serde(rename="backupImageClickThroughUrl")]
     pub backup_image_click_through_url: Option<String>,
     /// Studio creative ID associated with rich media and VPAID creatives. This is a read-only field. Applicable to the following creative types: all RICH_MEDIA, and all VPAID.
@@ -4084,7 +4084,7 @@ impl Part for ReportPathToConversionCriteriaReportProperties {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TechnologyTargeting {
-    /// Browsers that this ad targets. For each browser either set browserVersionId or dartId along with the version numbers. If both are specified, only browserVersionId will be used.The other fields are populated automatically when the ad is inserted or updated.
+    /// Browsers that this ad targets. For each browser either set browserVersionId or dartId along with the version numbers. If both are specified, only browserVersionId will be used. The other fields are populated automatically when the ad is inserted or updated.
     pub browsers: Option<Vec<Browser>>,
     /// Operating systems that this ad targets. To target specific versions, use operatingSystemVersions. For each operating system only dartId is required. The other fields are populated automatically when the ad is inserted or updated. If targeting an operating system, do not set targeting for operating system versions for the same operating system.
     #[serde(rename="operatingSystems")]
@@ -4092,7 +4092,7 @@ pub struct TechnologyTargeting {
     /// Mobile carriers that this ad targets. For each mobile carrier only id is required, and the other fields are populated automatically when the ad is inserted or updated. If targeting a mobile carrier, do not set targeting for any zip codes.
     #[serde(rename="mobileCarriers")]
     pub mobile_carriers: Option<Vec<MobileCarrier>>,
-    /// Connection types that this ad targets. For each connection type only id is required.The other fields are populated automatically when the ad is inserted or updated.
+    /// Connection types that this ad targets. For each connection type only id is required. The other fields are populated automatically when the ad is inserted or updated.
     #[serde(rename="connectionTypes")]
     pub connection_types: Option<Vec<ConnectionType>>,
     /// Platform types that this ad targets. For example, desktop, mobile, or tablet. For each platform type, only id is required, and the other fields are populated automatically when the ad is inserted or updated.
@@ -4158,27 +4158,30 @@ pub struct CreativeAssetMetadata {
     /// Rules validated during code generation that generated a warning. This is a read-only, auto-generated field.
     /// 
     /// Possible values are:
-    /// - "CLICK_TAG_NON_TOP_LEVEL"
+    /// - "ADMOB_REFERENCED"
+    /// - "ASSET_FORMAT_UNSUPPORTED_DCM"
+    /// - "ASSET_INVALID"
+    /// - "CLICK_TAG_HARD_CODED"
+    /// - "CLICK_TAG_INVALID"
+    /// - "CLICK_TAG_IN_GWD"
     /// - "CLICK_TAG_MISSING"
     /// - "CLICK_TAG_MORE_THAN_ONE"
-    /// - "CLICK_TAG_INVALID"
-    /// - "ORPHANED_ASSET"
-    /// - "PRIMARY_HTML_MISSING"
+    /// - "CLICK_TAG_NON_TOP_LEVEL"
+    /// - "COMPONENT_UNSUPPORTED_DCM"
+    /// - "ENABLER_UNSUPPORTED_METHOD_DCM"
     /// - "EXTERNAL_FILE_REFERENCED"
-    /// - "MRAID_REFERENCED"
-    /// - "ADMOB_REFERENCED"
+    /// - "FILE_DETAIL_EMPTY"
     /// - "FILE_TYPE_INVALID"
-    /// - "ZIP_INVALID"
+    /// - "GWD_PROPERTIES_INVALID"
+    /// - "HTML5_FEATURE_UNSUPPORTED"
     /// - "LINKED_FILE_NOT_FOUND"
     /// - "MAX_FLASH_VERSION_11"
+    /// - "MRAID_REFERENCED"
     /// - "NOT_SSL_COMPLIANT"
-    /// - "FILE_DETAIL_EMPTY"
-    /// - "ASSET_INVALID"
-    /// - "GWD_PROPERTIES_INVALID"
-    /// - "ENABLER_UNSUPPORTED_METHOD_DCM"
-    /// - "ASSET_FORMAT_UNSUPPORTED_DCM"
-    /// - "COMPONENT_UNSUPPORTED_DCM"
-    /// - "HTML5_FEATURE_UNSUPPORTED' "
+    /// - "ORPHANED_ASSET"
+    /// - "PRIMARY_HTML_MISSING"
+    /// - "SVG_INVALID"
+    /// - "ZIP_INVALID"
     #[serde(rename="warnedValidationRules")]
     pub warned_validation_rules: Option<Vec<String>>,
     /// List of feature dependencies for the creative asset that are detected by DCM. Feature dependencies are features that a browser must be able to support in order to render your HTML5 creative correctly. This is a read-only, auto-generated field.
@@ -6102,7 +6105,7 @@ pub struct Ad {
     /// Advertiser ID of this ad. This is a required field on insertion.
     #[serde(rename="advertiserId")]
     pub advertiser_id: Option<String>,
-    /// Geographical targeting information for this ad.Applicable when type is AD_SERVING_STANDARD_AD.
+    /// Geographical targeting information for this ad. This field must be left blank if the ad is using a targeting template. Applicable when type is AD_SERVING_STANDARD_AD.
     #[serde(rename="geoTargeting")]
     pub geo_targeting: Option<GeoTargeting>,
     /// Comments for this ad.
@@ -6122,7 +6125,7 @@ pub struct Ad {
     pub size: Option<Size>,
     /// Whether this ad is archived.
     pub archived: Option<bool>,
-    /// Technology platform targeting information for this ad. Applicable when type is AD_SERVING_STANDARD_AD.
+    /// Technology platform targeting information for this ad. This field must be left blank if the ad is using a targeting template. Applicable when type is AD_SERVING_STANDARD_AD.
     #[serde(rename="technologyTargeting")]
     pub technology_targeting: Option<TechnologyTargeting>,
     /// Creative rotation for this ad. Applicable when type is AD_SERVING_DEFAULT_AD, AD_SERVING_STANDARD_AD, or AD_SERVING_TRACKING. When type is AD_SERVING_DEFAULT_AD, this field should have exactly one creativeAssignment.
@@ -6134,7 +6137,7 @@ pub struct Ad {
     /// Creative group assignments for this ad. Applicable when type is AD_SERVING_CLICK_TRACKER. Only one assignment per creative group number is allowed for a maximum of two assignments.
     #[serde(rename="creativeGroupAssignments")]
     pub creative_group_assignments: Option<Vec<CreativeGroupAssignment>>,
-    /// Applicable when type is AD_SERVING_STANDARD_AD. Remarketing list targeting expression for this ad.
+    /// Remarketing list targeting expression for this ad. This field must be left blank if the ad is using a targeting template. Applicable when type is AD_SERVING_STANDARD_AD.
     #[serde(rename="remarketingListExpression")]
     pub remarketing_list_expression: Option<ListTargetingExpression>,
     /// Dimension value for the ID of this ad. This is a read-only, auto-generated field.
@@ -6152,7 +6155,7 @@ pub struct Ad {
     /// Audience segment ID that is being targeted for this ad. Applicable when type is AD_SERVING_STANDARD_AD.
     #[serde(rename="audienceSegmentId")]
     pub audience_segment_id: Option<String>,
-    /// Key-value targeting information for this ad. Applicable when type is AD_SERVING_STANDARD_AD.
+    /// Key-value targeting information for this ad. This field must be left blank if the ad is using a targeting template. Applicable when type is AD_SERVING_STANDARD_AD.
     #[serde(rename="keyValueTargetingExpression")]
     pub key_value_targeting_expression: Option<KeyValueTargetingExpression>,
     /// Dimension value for the ID of the campaign. This is a read-only, auto-generated field.
@@ -6161,7 +6164,7 @@ pub struct Ad {
     /// Default click-through event tag properties for this ad.
     #[serde(rename="defaultClickThroughEventTagProperties")]
     pub default_click_through_event_tag_properties: Option<DefaultClickThroughEventTagProperties>,
-    /// Information about the creation of this ad.This is a read-only field.
+    /// Information about the creation of this ad. This is a read-only field.
     #[serde(rename="createInfo")]
     pub create_info: Option<LastModifiedInfo>,
     /// Date and time that this ad should start serving. If creating an ad, this field must be a time in the future. This is a required field on insertion.
@@ -6178,7 +6181,7 @@ pub struct Ad {
     pub subaccount_id: Option<String>,
     /// Name of this ad. This is a required field and must be less than 256 characters long.
     pub name: Option<String>,
-    /// Time and day targeting information for this ad. Applicable when type is AD_SERVING_STANDARD_AD.
+    /// Time and day targeting information for this ad. This field must be left blank if the ad is using a targeting template. Applicable when type is AD_SERVING_STANDARD_AD.
     #[serde(rename="dayPartTargeting")]
     pub day_part_targeting: Option<DayPartTargeting>,
     /// Information about the most recent modification of this ad. This is a read-only field.

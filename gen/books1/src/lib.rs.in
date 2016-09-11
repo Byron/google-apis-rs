@@ -92,18 +92,19 @@ impl Default for Scope {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.volumes().list("q")
-///              .start_index(11)
-///              .source("dolores")
+///              .start_index(82)
+///              .source("gubergren")
 ///              .show_preorders(false)
-///              .projection("sadipscing")
-///              .print_type("aliquyam")
-///              .partner("ea")
-///              .order_by("no")
+///              .projection("aliquyam")
+///              .print_type("ea")
+///              .partner("no")
+///              .order_by("justo")
 ///              .max_results(80)
-///              .library_restrict("justo")
-///              .lang_restrict("et")
-///              .filter("et")
-///              .download("diam")
+///              .max_allowed_maturity_rating("et")
+///              .library_restrict("et")
+///              .lang_restrict("diam")
+///              .filter("ipsum")
+///              .download("Lorem")
 ///              .doit();
 /// 
 /// match result {
@@ -387,6 +388,8 @@ pub struct VolumeSaleInfoOffers {
     /// Offer retail (=discounted) price in Micros
     #[serde(rename="retailPrice")]
     pub retail_price: Option<VolumeSaleInfoOffersRetailPrice>,
+    /// Indicates whether the offer is giftable.
+    pub giftable: Option<bool>,
     /// Offer list (=undiscounted) price in Micros.
     #[serde(rename="listPrice")]
     pub list_price: Option<VolumeSaleInfoOffersListPrice>,
@@ -442,18 +445,25 @@ pub struct Discoveryclusters {
 impl ResponseResult for Discoveryclusters {}
 
 
-/// Recommendation related information for this volume.
+/// Information on the ability to share with the family.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct VolumeRecommendedInfo {
-    /// A text explaining why this volume is recommended.
-    pub explanation: Option<String>,
+pub struct VolumeUserInfoFamilySharing {
+    /// Whether or not sharing this volume is temporarily disabled due to issues with the Family Wallet.
+    #[serde(rename="isSharingDisabledByFop")]
+    pub is_sharing_disabled_by_fop: Option<bool>,
+    /// The role of the user in the family.
+    #[serde(rename="familyRole")]
+    pub family_role: Option<String>,
+    /// Whether or not this volume can be shared with the family by the user. This includes sharing eligibility of both the volume and the user. If the value is true, the user can initiate a family sharing action.
+    #[serde(rename="isSharingAllowed")]
+    pub is_sharing_allowed: Option<bool>,
 }
 
-impl NestedType for VolumeRecommendedInfo {}
-impl Part for VolumeRecommendedInfo {}
+impl NestedType for VolumeUserInfoFamilySharing {}
+impl Part for VolumeUserInfoFamilySharing {}
 
 
 /// There is no detailed description.
@@ -492,10 +502,15 @@ impl Part for VolumeseriesinfoVolumeSeries {}
 pub struct Notification {
     /// no description provided
     pub body: Option<String>,
+    /// no description provided
+    pub doc_type: Option<String>,
     /// Resource type.
     pub kind: Option<String>,
     /// no description provided
     pub title: Option<String>,
+    /// The list of crm experiment ids.
+    #[serde(rename="crmExperimentIds")]
+    pub crm_experiment_ids: Option<Vec<String>>,
     /// no description provided
     pub dont_show_notification: Option<bool>,
     /// no description provided
@@ -512,6 +527,8 @@ pub struct Notification {
     pub notification_type: Option<String>,
     /// no description provided
     pub pcampaign_id: Option<String>,
+    /// no description provided
+    pub doc_id: Option<String>,
 }
 
 impl ResponseResult for Notification {}
@@ -1329,6 +1346,20 @@ pub struct Review {
 impl Part for Review {}
 
 
+/// Recommendation related information for this volume.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct VolumeRecommendedInfo {
+    /// A text explaining why this volume is recommended.
+    pub explanation: Option<String>,
+}
+
+impl NestedType for VolumeRecommendedInfo {}
+impl Part for VolumeRecommendedInfo {}
+
+
 /// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1379,6 +1410,20 @@ pub struct Usersettings {
 
 impl RequestValue for Usersettings {}
 impl ResponseResult for Usersettings {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UsersettingsNotificationMoreFromSeries {
+    /// no description provided
+    pub opted_state: Option<String>,
+}
+
+impl NestedType for UsersettingsNotificationMoreFromSeries {}
+impl Part for UsersettingsNotificationMoreFromSeries {}
 
 
 /// There is no detailed description.
@@ -1577,6 +1622,9 @@ pub struct VolumeVolumeInfo {
     /// The main category to which this volume belongs. It will be the category from the categories list returned below that has the highest weight.
     #[serde(rename="mainCategory")]
     pub main_category: Option<String>,
+    /// A top-level summary of the panelization info in this volume.
+    #[serde(rename="panelizationSummary")]
+    pub panelization_summary: Option<VolumeVolumeInfoPanelizationSummary>,
     /// The names of the authors and/or editors for this volume. (In LITE projection)
     pub authors: Option<Vec<String>>,
     /// A list of subject categories, such as "Fiction", "Suspense", etc.
@@ -1832,6 +1880,9 @@ impl Part for VolumeVolumeInfoIndustryIdentifiers {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UsersettingsNotification {
     /// no description provided
+    #[serde(rename="moreFromSeries")]
+    pub more_from_series: Option<UsersettingsNotificationMoreFromSeries>,
+    /// no description provided
     #[serde(rename="moreFromAuthors")]
     pub more_from_authors: Option<UsersettingsNotificationMoreFromAuthors>,
 }
@@ -1936,6 +1987,9 @@ pub struct VolumeUserInfo {
     pub is_preordered: Option<bool>,
     /// Copy/Paste accounting information.
     pub copy: Option<VolumeUserInfoCopy>,
+    /// Deprecated: Replaced by familySharing.
+    #[serde(rename="isFamilySharingDisabledByFop")]
+    pub is_family_sharing_disabled_by_fop: Option<bool>,
     /// Whether or not this volume was user uploaded.
     #[serde(rename="isUploaded")]
     pub is_uploaded: Option<bool>,
@@ -1948,10 +2002,13 @@ pub struct VolumeUserInfo {
     /// no description provided
     #[serde(rename="userUploadedVolumeInfo")]
     pub user_uploaded_volume_info: Option<VolumeUserInfoUserUploadedVolumeInfo>,
+    /// Information on the ability to share with the family.
+    #[serde(rename="familySharing")]
+    pub family_sharing: Option<VolumeUserInfoFamilySharing>,
     /// Whether this book is an active or an expired rental.
     #[serde(rename="rentalState")]
     pub rental_state: Option<String>,
-    /// Whether or not this volume can be shared with the family by the user. This includes sharing eligibility of both the volume and the user. If the value is true, the user can initiate a family sharing action.
+    /// Deprecated: Replaced by familySharing.
     #[serde(rename="isFamilySharingAllowed")]
     pub is_family_sharing_allowed: Option<bool>,
     /// The user's current reading position in the volume, if one is available. (In LITE projection.)
@@ -2110,6 +2167,30 @@ pub struct Series {
 }
 
 impl ResponseResult for Series {}
+
+
+/// A top-level summary of the panelization info in this volume.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct VolumeVolumeInfoPanelizationSummary {
+    /// no description provided
+    #[serde(rename="containsEpubBubbles")]
+    pub contains_epub_bubbles: Option<bool>,
+    /// no description provided
+    #[serde(rename="containsImageBubbles")]
+    pub contains_image_bubbles: Option<bool>,
+    /// no description provided
+    #[serde(rename="epubBubbleVersion")]
+    pub epub_bubble_version: Option<String>,
+    /// no description provided
+    #[serde(rename="imageBubbleVersion")]
+    pub image_bubble_version: Option<String>,
+}
+
+impl NestedType for VolumeVolumeInfoPanelizationSummary {}
+impl Part for VolumeVolumeInfoPanelizationSummary {}
 
 
 /// There is no detailed description.
@@ -2462,6 +2543,7 @@ impl<'a, C, A> VolumeMethods<'a, C, A> {
             _partner: Default::default(),
             _order_by: Default::default(),
             _max_results: Default::default(),
+            _max_allowed_maturity_rating: Default::default(),
             _library_restrict: Default::default(),
             _lang_restrict: Default::default(),
             _filter: Default::default(),
@@ -3638,12 +3720,12 @@ impl<'a, C, A> CloudloadingMethods<'a, C, A> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.layers().annotation_data_get("volumeId", "layerId", "annotationDataId", "contentVersion")
-///              .w(-32)
-///              .source("sea")
-///              .scale(-55)
-///              .locale("eos")
-///              .h(-81)
-///              .allow_web_definitions(false)
+///              .w(-55)
+///              .source("eos")
+///              .scale(-81)
+///              .locale("sadipscing")
+///              .h(-48)
+///              .allow_web_definitions(true)
 ///              .doit();
 /// # }
 /// ```
@@ -3981,8 +4063,8 @@ impl<'a, C, A> LayerAnnotationDataGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.layers().volume_annotations_get("volumeId", "layerId", "annotationId")
-///              .source("amet")
-///              .locale("no")
+///              .source("labore")
+///              .locale("eirmod")
 ///              .doit();
 /// # }
 /// ```
@@ -4264,10 +4346,10 @@ impl<'a, C, A> LayerVolumeAnnotationGetCall<'a, C, A> where C: BorrowMut<hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.layers().list("volumeId")
-///              .source("eirmod")
-///              .page_token("dolore")
-///              .max_results(64)
-///              .content_version("aliquyam")
+///              .source("invidunt")
+///              .page_token("aliquyam")
+///              .max_results(28)
+///              .content_version("Lorem")
 ///              .doit();
 /// # }
 /// ```
@@ -4547,7 +4629,7 @@ impl<'a, C, A> LayerListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.layers().get("volumeId", "summaryId")
-///              .source("sea")
+///              .source("duo")
 ///              .content_version("et")
 ///              .doit();
 /// # }
@@ -4818,18 +4900,18 @@ impl<'a, C, A> LayerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.layers().volume_annotations_list("volumeId", "layerId", "contentVersion")
-///              .volume_annotations_version("sanctus")
+///              .volume_annotations_version("amet")
 ///              .updated_min("et")
-///              .updated_max("amet")
-///              .start_position("et")
-///              .start_offset("consetetur")
-///              .source("ut")
+///              .updated_max("consetetur")
+///              .start_position("ut")
+///              .start_offset("ea")
+///              .source("sed")
 ///              .show_deleted(true)
-///              .page_token("sed")
-///              .max_results(98)
-///              .locale("dolor")
-///              .end_position("dolor")
-///              .end_offset("et")
+///              .page_token("dolor")
+///              .max_results(53)
+///              .locale("et")
+///              .end_position("consetetur")
+///              .end_offset("amet.")
 ///              .doit();
 /// # }
 /// ```
@@ -5221,16 +5303,16 @@ impl<'a, C, A> LayerVolumeAnnotationListCall<'a, C, A> where C: BorrowMut<hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.layers().annotation_data_list("volumeId", "layerId", "contentVersion")
-///              .w(-56)
-///              .updated_min("gubergren")
-///              .updated_max("justo")
-///              .source("sit")
-///              .scale(-26)
-///              .page_token("diam")
-///              .max_results(35)
-///              .locale("consetetur")
-///              .h(-44)
-///              .add_annotation_data_id("vero")
+///              .w(-20)
+///              .updated_min("sit")
+///              .updated_max("vero")
+///              .source("diam")
+///              .scale(-66)
+///              .page_token("consetetur")
+///              .max_results(57)
+///              .locale("vero")
+///              .h(-95)
+///              .add_annotation_data_id("invidunt")
 ///              .doit();
 /// # }
 /// ```
@@ -5603,8 +5685,8 @@ impl<'a, C, A> LayerAnnotationDataListCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.volumes().recommended_rate("rating", "volumeId")
-///              .source("consetetur")
-///              .locale("dolore")
+///              .source("duo")
+///              .locale("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -5853,12 +5935,12 @@ impl<'a, C, A> VolumeRecommendedRateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.volumes().get("volumeId")
-///              .user_library_consistent_read(false)
-///              .source("Lorem")
-///              .projection("et")
-///              .partner("clita")
+///              .user_library_consistent_read(true)
+///              .source("clita")
+///              .projection("consetetur")
+///              .partner("takimata")
 ///              .include_non_comics_series(true)
-///              .country("takimata")
+///              .country("kasd")
 ///              .doit();
 /// # }
 /// ```
@@ -6159,13 +6241,13 @@ impl<'a, C, A> VolumeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.volumes().mybooks_list()
-///              .start_index(61)
-///              .source("kasd")
-///              .add_processing_state("sanctus")
-///              .max_results(43)
-///              .locale("At")
-///              .country("labore")
-///              .add_acquire_method("invidunt")
+///              .start_index(94)
+///              .source("takimata")
+///              .add_processing_state("At")
+///              .max_results(15)
+///              .locale("invidunt")
+///              .country("ea")
+///              .add_acquire_method("sadipscing")
 ///              .doit();
 /// # }
 /// ```
@@ -6364,7 +6446,7 @@ impl<'a, C, A> VolumeMybookListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._country = Some(new_value.to_string());
         self
     }
-    /// How the book was aquired
+    /// How the book was acquired
     ///
     /// Append the given value to the *acquire method* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
@@ -6451,18 +6533,19 @@ impl<'a, C, A> VolumeMybookListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.volumes().list("q")
-///              .start_index(6)
-///              .source("rebum.")
+///              .start_index(68)
+///              .source("nonumy")
 ///              .show_preorders(true)
-///              .projection("nonumy")
-///              .print_type("sed")
-///              .partner("aliquyam")
-///              .order_by("sit")
-///              .max_results(61)
-///              .library_restrict("consetetur")
-///              .lang_restrict("labore")
-///              .filter("sed")
-///              .download("ea")
+///              .projection("aliquyam")
+///              .print_type("sit")
+///              .partner("eirmod")
+///              .order_by("consetetur")
+///              .max_results(16)
+///              .max_allowed_maturity_rating("sed")
+///              .library_restrict("ea")
+///              .lang_restrict("gubergren")
+///              .filter("aliquyam")
+///              .download("eos")
 ///              .doit();
 /// # }
 /// ```
@@ -6479,6 +6562,7 @@ pub struct VolumeListCall<'a, C, A>
     _partner: Option<String>,
     _order_by: Option<String>,
     _max_results: Option<u32>,
+    _max_allowed_maturity_rating: Option<String>,
     _library_restrict: Option<String>,
     _lang_restrict: Option<String>,
     _filter: Option<String>,
@@ -6504,7 +6588,7 @@ impl<'a, C, A> VolumeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         };
         dlg.begin(MethodInfo { id: "books.volumes.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((15 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((16 + self._additional_params.len()));
         params.push(("q", self._q.to_string()));
         if let Some(value) = self._start_index {
             params.push(("startIndex", value.to_string()));
@@ -6530,6 +6614,9 @@ impl<'a, C, A> VolumeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         if let Some(value) = self._max_results {
             params.push(("maxResults", value.to_string()));
         }
+        if let Some(value) = self._max_allowed_maturity_rating {
+            params.push(("maxAllowedMaturityRating", value.to_string()));
+        }
         if let Some(value) = self._library_restrict {
             params.push(("libraryRestrict", value.to_string()));
         }
@@ -6542,7 +6629,7 @@ impl<'a, C, A> VolumeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         if let Some(value) = self._download {
             params.push(("download", value.to_string()));
         }
-        for &field in ["alt", "q", "startIndex", "source", "showPreorders", "projection", "printType", "partner", "orderBy", "maxResults", "libraryRestrict", "langRestrict", "filter", "download"].iter() {
+        for &field in ["alt", "q", "startIndex", "source", "showPreorders", "projection", "printType", "partner", "orderBy", "maxResults", "maxAllowedMaturityRating", "libraryRestrict", "langRestrict", "filter", "download"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -6702,6 +6789,13 @@ impl<'a, C, A> VolumeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._max_results = Some(new_value);
         self
     }
+    /// The maximum allowed maturity rating of returned recommendations. Books with a higher maturity rating are filtered out.
+    ///
+    /// Sets the *max allowed maturity rating* query property to the given value.
+    pub fn max_allowed_maturity_rating(mut self, new_value: &str) -> VolumeListCall<'a, C, A> {
+        self._max_allowed_maturity_rating = Some(new_value.to_string());
+        self
+    }
     /// Restrict search to this user's library.
     ///
     /// Sets the *library restrict* query property to the given value.
@@ -6809,12 +6903,12 @@ impl<'a, C, A> VolumeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.volumes().useruploaded_list()
-///              .add_volume_id("gubergren")
-///              .start_index(19)
-///              .source("eos")
-///              .add_processing_state("tempor")
-///              .max_results(42)
-///              .locale("labore")
+///              .add_volume_id("tempor")
+///              .start_index(42)
+///              .source("labore")
+///              .add_processing_state("ipsum")
+///              .max_results(70)
+///              .locale("dolores")
 ///              .doit();
 /// # }
 /// ```
@@ -7089,10 +7183,10 @@ impl<'a, C, A> VolumeUseruploadedListCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.volumes().associated_list("volumeId")
-///              .source("aliquyam")
-///              .max_allowed_maturity_rating("dolores")
-///              .locale("sit")
-///              .association("diam")
+///              .source("diam")
+///              .max_allowed_maturity_rating("ut")
+///              .locale("justo")
+///              .association("est")
 ///              .doit();
 /// # }
 /// ```
@@ -7372,9 +7466,9 @@ impl<'a, C, A> VolumeAssociatedListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.volumes().recommended_list()
-///              .source("ut")
-///              .max_allowed_maturity_rating("justo")
-///              .locale("est")
+///              .source("amet")
+///              .max_allowed_maturity_rating("accusam")
+///              .locale("clita")
 ///              .doit();
 /// # }
 /// ```
@@ -8043,8 +8137,8 @@ impl<'a, C, A> SeryGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.series().membership_get("series_id")
-///              .page_token("diam")
-///              .page_size(30)
+///              .page_token("clita")
+///              .page_size(64)
 ///              .doit();
 /// # }
 /// ```
@@ -8281,10 +8375,10 @@ impl<'a, C, A> SeryMembershipGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bookshelves().volumes_list("userId", "shelf")
-///              .start_index(64)
-///              .source("ut")
+///              .start_index(77)
+///              .source("voluptua.")
 ///              .show_preorders(true)
-///              .max_results(77)
+///              .max_results(8)
 ///              .doit();
 /// # }
 /// ```
@@ -8576,7 +8670,7 @@ impl<'a, C, A> BookshelveVolumeListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bookshelves().list("userId")
-///              .source("duo")
+///              .source("ea")
 ///              .doit();
 /// # }
 /// ```
@@ -8823,7 +8917,7 @@ impl<'a, C, A> BookshelveListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bookshelves().get("userId", "shelf")
-///              .source("ea")
+///              .source("dolor")
 ///              .doit();
 /// # }
 /// ```
@@ -9082,14 +9176,14 @@ impl<'a, C, A> BookshelveGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.promooffer().accept()
-///              .volume_id("ea")
-///              .serial("et")
-///              .product("dolor")
-///              .offer_id("diam")
-///              .model("kasd")
-///              .manufacturer("invidunt")
-///              .device("rebum.")
-///              .android_id("Lorem")
+///              .volume_id("diam")
+///              .serial("kasd")
+///              .product("invidunt")
+///              .offer_id("rebum.")
+///              .model("Lorem")
+///              .manufacturer("clita")
+///              .device("invidunt")
+///              .android_id("eirmod")
 ///              .doit();
 /// # }
 /// ```
@@ -9368,13 +9462,13 @@ impl<'a, C, A> PromoofferAcceptCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.promooffer().dismiss()
-///              .serial("clita")
-///              .product("invidunt")
-///              .offer_id("eirmod")
-///              .model("At")
-///              .manufacturer("consetetur")
-///              .device("et")
-///              .android_id("sed")
+///              .serial("At")
+///              .product("consetetur")
+///              .offer_id("et")
+///              .model("sed")
+///              .manufacturer("sit")
+///              .device("takimata")
+///              .android_id("elitr")
 ///              .doit();
 /// # }
 /// ```
@@ -9643,12 +9737,12 @@ impl<'a, C, A> PromoofferDismisCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.promooffer().get()
-///              .serial("sit")
-///              .product("takimata")
-///              .model("elitr")
-///              .manufacturer("nonumy")
-///              .device("rebum.")
-///              .android_id("Lorem")
+///              .serial("nonumy")
+///              .product("rebum.")
+///              .model("Lorem")
+///              .manufacturer("Lorem")
+///              .device("diam")
+///              .android_id("ut")
 ///              .doit();
 /// # }
 /// ```
@@ -9917,9 +10011,9 @@ impl<'a, C, A> PromoofferGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.personalizedstream().get()
-///              .source("Lorem")
-///              .max_allowed_maturity_rating("diam")
-///              .locale("ut")
+///              .source("ut")
+///              .max_allowed_maturity_rating("amet.")
+///              .locale("ipsum")
 ///              .doit();
 /// # }
 /// ```
@@ -10369,11 +10463,11 @@ impl<'a, C, A> OnboardingListCategoryCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.onboarding().list_category_volumes()
-///              .page_token("amet.")
-///              .page_size(1)
+///              .page_token("dolor")
+///              .page_size(92)
 ///              .max_allowed_maturity_rating("ut")
-///              .locale("dolor")
-///              .add_category_id("sea")
+///              .locale("eirmod")
+///              .add_category_id("sanctus")
 ///              .doit();
 /// # }
 /// ```
@@ -10634,8 +10728,8 @@ impl<'a, C, A> OnboardingListCategoryVolumeCall<'a, C, A> where C: BorrowMut<hyp
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.myconfig().request_access("source", "volumeId", "nonce", "cpksver")
-///              .locale("dolor")
-///              .license_types("et")
+///              .locale("vero")
+///              .license_types("ut")
 ///              .doit();
 /// # }
 /// ```
@@ -10908,8 +11002,8 @@ impl<'a, C, A> MyconfigRequestAccesCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.myconfig().release_download_access("volumeIds", "cpksver")
-///              .source("ut")
-///              .locale("sed")
+///              .source("ipsum")
+///              .locale("justo")
 ///              .doit();
 /// # }
 /// ```
@@ -11163,11 +11257,11 @@ impl<'a, C, A> MyconfigReleaseDownloadAccesCall<'a, C, A> where C: BorrowMut<hyp
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.myconfig().sync_volume_licenses("source", "nonce", "cpksver")
-///              .add_volume_ids("dolore")
+///              .add_volume_ids("takimata")
 ///              .show_preorders(true)
-///              .locale("dolor")
+///              .locale("nonumy")
 ///              .include_non_comics_series(false)
-///              .add_features("et")
+///              .add_features("sed")
 ///              .doit();
 /// # }
 /// ```
@@ -11902,7 +11996,7 @@ impl<'a, C, A> MyconfigUpdateUserSettingCall<'a, C, A> where C: BorrowMut<hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().bookshelves_clear_volumes("shelf")
-///              .source("et")
+///              .source("invidunt")
 ///              .doit();
 /// # }
 /// ```
@@ -12137,8 +12231,8 @@ impl<'a, C, A> MylibraryBookshelveClearVolumeCall<'a, C, A> where C: BorrowMut<h
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.mylibrary().bookshelves_move_volume("shelf", "volumeId", -38)
-///              .source("rebum.")
+/// let result = hub.mylibrary().bookshelves_move_volume("shelf", "volumeId", -82)
+///              .source("elitr")
 ///              .doit();
 /// # }
 /// ```
@@ -12398,13 +12492,13 @@ impl<'a, C, A> MylibraryBookshelveMoveVolumeCall<'a, C, A> where C: BorrowMut<hy
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().bookshelves_volumes_list("shelf")
-///              .start_index(19)
+///              .start_index(92)
 ///              .source("elitr")
-///              .show_preorders(true)
+///              .show_preorders(false)
 ///              .q("sea")
-///              .projection("elitr")
-///              .max_results(24)
-///              .country("sea")
+///              .projection("consetetur")
+///              .max_results(22)
+///              .country("accusam")
 ///              .doit();
 /// # }
 /// ```
@@ -12948,7 +13042,7 @@ impl<'a, C, A> MylibraryAnnotationSummaryCall<'a, C, A> where C: BorrowMut<hyper
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().annotations_delete("annotationId")
-///              .source("dolores")
+///              .source("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -13184,8 +13278,8 @@ impl<'a, C, A> MylibraryAnnotationDeleteCall<'a, C, A> where C: BorrowMut<hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().bookshelves_add_volume("shelf", "volumeId")
-///              .source("aliquyam")
-///              .reason("elitr")
+///              .source("et")
+///              .reason("Stet")
 ///              .doit();
 /// # }
 /// ```
@@ -13450,9 +13544,9 @@ impl<'a, C, A> MylibraryBookshelveAddVolumeCall<'a, C, A> where C: BorrowMut<hyp
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().annotations_insert(req)
-///              .source("ea")
-///              .show_only_summary_in_response(true)
-///              .country("Stet")
+///              .source("sed")
+///              .show_only_summary_in_response(false)
+///              .country("sanctus")
 ///              .doit();
 /// # }
 /// ```
@@ -13713,8 +13807,8 @@ impl<'a, C, A> MylibraryAnnotationInsertCall<'a, C, A> where C: BorrowMut<hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().bookshelves_remove_volume("shelf", "volumeId")
-///              .source("sanctus")
-///              .reason("dolore")
+///              .source("consetetur")
+///              .reason("consetetur")
 ///              .doit();
 /// # }
 /// ```
@@ -13973,16 +14067,16 @@ impl<'a, C, A> MylibraryBookshelveRemoveVolumeCall<'a, C, A> where C: BorrowMut<
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().annotations_list()
-///              .volume_id("Lorem")
-///              .updated_min("consetetur")
-///              .updated_max("consetetur")
-///              .source("eirmod")
+///              .volume_id("eirmod")
+///              .updated_min("labore")
+///              .updated_max("gubergren")
+///              .source("et")
 ///              .show_deleted(true)
-///              .page_token("gubergren")
-///              .max_results(28)
-///              .add_layer_ids("sadipscing")
-///              .layer_id("accusam")
-///              .content_version("magna")
+///              .page_token("accusam")
+///              .max_results(69)
+///              .add_layer_ids("Lorem")
+///              .layer_id("rebum.")
+///              .content_version("et")
 ///              .doit();
 /// # }
 /// ```
@@ -14304,7 +14398,7 @@ impl<'a, C, A> MylibraryAnnotationListCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().annotations_update(req, "annotationId")
-///              .source("rebum.")
+///              .source("eos")
 ///              .doit();
 /// # }
 /// ```
@@ -14576,10 +14670,10 @@ impl<'a, C, A> MylibraryAnnotationUpdateCall<'a, C, A> where C: BorrowMut<hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().readingpositions_set_position("volumeId", "timestamp", "position")
-///              .source("dolores")
-///              .device_cookie("vero")
-///              .content_version("consetetur")
-///              .action("vero")
+///              .source("vero")
+///              .device_cookie("consetetur")
+///              .content_version("eos")
+///              .action("justo")
 ///              .doit();
 /// # }
 /// ```
@@ -14872,7 +14966,7 @@ impl<'a, C, A> MylibraryReadingpositionSetPositionCall<'a, C, A> where C: Borrow
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().bookshelves_get("shelf")
-///              .source("eos")
+///              .source("gubergren")
 ///              .doit();
 /// # }
 /// ```
@@ -15119,7 +15213,7 @@ impl<'a, C, A> MylibraryBookshelveGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().bookshelves_list()
-///              .source("justo")
+///              .source("dolore")
 ///              .doit();
 /// # }
 /// ```
@@ -15333,8 +15427,8 @@ impl<'a, C, A> MylibraryBookshelveListCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().readingpositions_get("volumeId")
-///              .source("gubergren")
-///              .content_version("dolore")
+///              .source("dolore")
+///              .content_version("magna")
 ///              .doit();
 /// # }
 /// ```
@@ -15592,8 +15686,8 @@ impl<'a, C, A> MylibraryReadingpositionGetCall<'a, C, A> where C: BorrowMut<hype
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.notification().get("notification_id")
-///              .source("dolore")
-///              .locale("magna")
+///              .source("magna")
+///              .locale("ipsum")
 ///              .doit();
 /// # }
 /// ```
@@ -15830,10 +15924,10 @@ impl<'a, C, A> NotificationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.cloudloading().add_book()
-///              .upload_client_token("elitr")
-///              .name("magna")
-///              .mime_type("ipsum")
-///              .drive_document_id("invidunt")
+///              .upload_client_token("invidunt")
+///              .name("accusam")
+///              .mime_type("labore")
+///              .drive_document_id("diam")
 ///              .doit();
 /// # }
 /// ```

@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-proximitybeacon1_beta1` library allows access to all features of the *Google proximitybeacon* service.
 
-This documentation was generated from *proximitybeacon* crate version *0.1.14+20150729*, where *20150729* is the exact revision of the *proximitybeacon:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
+This documentation was generated from *proximitybeacon* crate version *0.1.14+20160429*, where *20160429* is the exact revision of the *proximitybeacon:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
 
 Everything else about the *proximitybeacon* *v1_beta1* API can be found at the
 [official documentation site](https://developers.google.com/beacons/proximity/).
@@ -18,8 +18,11 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
 * [beacons](http://byron.github.io/google-apis-rs/google_proximitybeacon1_beta1/struct.Beacon.html)
  * [*activate*](http://byron.github.io/google-apis-rs/google_proximitybeacon1_beta1/struct.BeaconActivateCall.html), [*attachments batch delete*](http://byron.github.io/google-apis-rs/google_proximitybeacon1_beta1/struct.BeaconAttachmentBatchDeleteCall.html), [*attachments create*](http://byron.github.io/google-apis-rs/google_proximitybeacon1_beta1/struct.BeaconAttachmentCreateCall.html), [*attachments delete*](http://byron.github.io/google-apis-rs/google_proximitybeacon1_beta1/struct.BeaconAttachmentDeleteCall.html), [*attachments list*](http://byron.github.io/google-apis-rs/google_proximitybeacon1_beta1/struct.BeaconAttachmentListCall.html), [*deactivate*](http://byron.github.io/google-apis-rs/google_proximitybeacon1_beta1/struct.BeaconDeactivateCall.html), [*decommission*](http://byron.github.io/google-apis-rs/google_proximitybeacon1_beta1/struct.BeaconDecommissionCall.html), [*diagnostics list*](http://byron.github.io/google-apis-rs/google_proximitybeacon1_beta1/struct.BeaconDiagnosticListCall.html), [*get*](http://byron.github.io/google-apis-rs/google_proximitybeacon1_beta1/struct.BeaconGetCall.html), [*list*](http://byron.github.io/google-apis-rs/google_proximitybeacon1_beta1/struct.BeaconListCall.html), [*register*](http://byron.github.io/google-apis-rs/google_proximitybeacon1_beta1/struct.BeaconRegisterCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_proximitybeacon1_beta1/struct.BeaconUpdateCall.html)
 * [namespaces](http://byron.github.io/google-apis-rs/google_proximitybeacon1_beta1/struct.Namespace.html)
- * [*list*](http://byron.github.io/google-apis-rs/google_proximitybeacon1_beta1/struct.NamespaceListCall.html)
+ * [*list*](http://byron.github.io/google-apis-rs/google_proximitybeacon1_beta1/struct.NamespaceListCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_proximitybeacon1_beta1/struct.NamespaceUpdateCall.html)
 
+Other activities are ...
+
+* [get eidparams](http://byron.github.io/google-apis-rs/google_proximitybeacon1_beta1/struct.MethodGetEidparamCall.html)
 
 
 
@@ -108,9 +111,10 @@ let mut hub = Proximitybeacon::new(hyper::Client::new(), auth);
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
 let result = hub.beacons().diagnostics_list("beaconName")
-             .page_token("sit")
-             .page_size(-65)
-             .alert_filter("sed")
+             .project_id("sit")
+             .page_token("Stet")
+             .page_size(-42)
+             .alert_filter("et")
              .doit();
 
 match result {

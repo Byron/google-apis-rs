@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *taskqueue* API at revision *20141111*. The CLI is at version *0.3.6*.
+This documentation was generated from the *taskqueue* API at revision *20160428*. The CLI is at version *0.3.6*.
 
 ```bash
 taskqueue1-beta2 [options]

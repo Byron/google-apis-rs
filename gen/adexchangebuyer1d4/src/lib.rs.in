@@ -189,6 +189,29 @@ impl<'a, C, A> AdExchangeBuyer<C, A>
 // ############
 // SCHEMAS ###
 // ##########
+/// All known serving contexts containing serving status information.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CreativeCorrectionsContexts {
+    /// Only set when contextType=PLATFORM. Represents the platforms this correction applies to.
+    pub platform: Option<Vec<String>>,
+    /// The type of context (e.g., location, platform, auction type, SSL-ness).
+    #[serde(rename="contextType")]
+    pub context_type: Option<String>,
+    /// Only set when contextType=AUCTION_TYPE. Represents the auction types this correction applies to.
+    #[serde(rename="auctionType")]
+    pub auction_type: Option<Vec<String>>,
+    /// Only set when contextType=LOCATION. Represents the geo criterias this correction applies to.
+    #[serde(rename="geoCriteriaId")]
+    pub geo_criteria_id: Option<Vec<i32>>,
+}
+
+impl NestedType for CreativeCorrectionsContexts {}
+impl Part for CreativeCorrectionsContexts {}
+
+
 /// There is no detailed description.
 /// 
 /// # Activities
@@ -315,6 +338,9 @@ pub struct Creative {
     /// All restricted categories for the ads that may be shown from this snippet.
     #[serde(rename="restrictedCategories")]
     pub restricted_categories: Option<Vec<i32>>,
+    /// Detected domains for this creative. Read-only. This field should not be set in requests.
+    #[serde(rename="detectedDomains")]
+    pub detected_domains: Option<Vec<String>>,
     /// Ad height.
     pub height: Option<i32>,
     /// Detected advertiser id, if any. Read-only. This field should not be set in requests.
@@ -332,6 +358,9 @@ pub struct Creative {
     /// Top-level deals status. Read-only. This field should not be set in requests. If disapproved, an entry for auctionType=DIRECT_DEALS (or ALL) in servingRestrictions will also exist. Note that this may be nuanced with other contextual restrictions, in which case it may be preferable to read from servingRestrictions directly.
     #[serde(rename="dealsStatus")]
     pub deals_status: Option<String>,
+    /// The link to the Ad Preferences page. This is only supported for native ads.
+    #[serde(rename="adChoicesDestinationUrl")]
+    pub ad_choices_destination_url: Option<String>,
     /// The set of urls to be called to record an impression.
     #[serde(rename="impressionTrackingUrl")]
     pub impression_tracking_url: Option<Vec<String>>,
@@ -354,6 +383,8 @@ pub struct Creative {
     pub serving_restrictions: Option<Vec<CreativeServingRestrictions>>,
     /// Shows any corrections that were applied to this creative. Read-only. This field should not be set in requests.
     pub corrections: Option<Vec<CreativeCorrections>>,
+    /// Detected languages for this creative. Read-only. This field should not be set in requests.
+    pub languages: Option<Vec<String>>,
     /// Ad width.
     pub width: Option<i32>,
     /// If nativeAd is set, HTMLSnippet and videoURL should not be set.
@@ -394,7 +425,7 @@ pub struct DeleteOrderDealsRequest {
     /// The last known proposal revision number.
     #[serde(rename="proposalRevisionNumber")]
     pub proposal_revision_number: Option<String>,
-    /// no description provided
+    /// Indicates an optional action to take on the proposal
     #[serde(rename="updateAction")]
     pub update_action: Option<String>,
     /// List of deals to delete for a given proposal
@@ -405,7 +436,7 @@ pub struct DeleteOrderDealsRequest {
 impl RequestValue for DeleteOrderDealsRequest {}
 
 
-/// Tracks which parties (if any) have paused a deal. The deal is considered paused if has_buyer_paused || has_seller_paused.
+/// Tracks which parties (if any) have paused a deal. The deal is considered paused if has_buyer_paused || has_seller_paused. Each of the has_buyer_paused or the has_seller_paused bits can be set independently.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -415,8 +446,17 @@ pub struct DealServingMetadataDealPauseStatus {
     #[serde(rename="hasSellerPaused")]
     pub has_seller_paused: Option<bool>,
     /// no description provided
+    #[serde(rename="buyerPauseReason")]
+    pub buyer_pause_reason: Option<String>,
+    /// no description provided
+    #[serde(rename="sellerPauseReason")]
+    pub seller_pause_reason: Option<String>,
+    /// no description provided
     #[serde(rename="hasBuyerPaused")]
     pub has_buyer_paused: Option<bool>,
+    /// If the deal is paused, records which party paused the deal first.
+    #[serde(rename="firstPausedBy")]
+    pub first_paused_by: Option<String>,
 }
 
 impl Part for DealServingMetadataDealPauseStatus {}
@@ -531,7 +571,7 @@ pub struct Proposal {
     /// Indicates whether the buyer/seller created the proposal.(readonly)
     #[serde(rename="originatorRole")]
     pub originator_role: Option<String>,
-    /// Optional contact information for the seller (buyer-readonly).
+    /// Optional contact information of the seller (buyer-readonly).
     #[serde(rename="sellerContacts")]
     pub seller_contacts: Option<Vec<ContactInformation>>,
     /// Optional negotiation id if this proposal is a preferred deal proposal.
@@ -543,10 +583,9 @@ pub struct Proposal {
     /// When an proposal is in an accepted state, indicates whether the buyer has signed off Once both sides have signed off on a deal, the proposal can be finalized by the seller. (buyer-readonly)
     #[serde(rename="hasSellerSignedOff")]
     pub has_seller_signed_off: Option<bool>,
-    /// no description provided
-    #[serde(rename="lastUpdaterRole")]
-    pub last_updater_role: Option<String>,
-    /// When an proposal is in an accepted state, indicates whether the buyer has signed off Once both sides have signed off on a deal, the proposal can be finalized by the seller. (seller-readonly)
+    /// Reference to the buyer on the proposal. (readonly, except on create)
+    pub buyer: Option<Buyer>,
+    /// When an proposal is in an accepted state, indicates whether the buyer has signed off. Once both sides have signed off on a deal, the proposal can be finalized by the seller. (seller-readonly)
     #[serde(rename="hasBuyerSignedOff")]
     pub has_buyer_signed_off: Option<bool>,
     /// The revision number for the proposal (readonly).
@@ -576,15 +615,13 @@ pub struct Proposal {
     /// True if the proposal is being renegotiated (readonly).
     #[serde(rename="isRenegotiating")]
     pub is_renegotiating: Option<bool>,
-    /// Reference to the buyer on the proposal. (readonly, except on create)
-    pub buyer: Option<Buyer>,
     /// True, if the buyside inventory setup is complete for this proposal. (readonly, except via OrderSetupCompleted action)
     #[serde(rename="isSetupComplete")]
     pub is_setup_complete: Option<bool>,
     /// The role of the last user that either updated the proposal or left a comment. (readonly)
     #[serde(rename="lastUpdaterOrCommentorRole")]
     pub last_updater_or_commentor_role: Option<String>,
-    /// Optional contact information fort the buyer. (seller-readonly)
+    /// Optional contact information of the buyer. (seller-readonly)
     #[serde(rename="buyerContacts")]
     pub buyer_contacts: Option<Vec<ContactInformation>>,
 }
@@ -637,9 +674,9 @@ pub struct Product {
     pub shared_targetings: Option<Vec<SharedTargeting>>,
     /// The negotiable terms of the deal (buyer-readonly)
     pub terms: Option<DealTerms>,
-    /// Optional private auction id if this offer is a private auction offer.
-    #[serde(rename="privateAuctionId")]
-    pub private_auction_id: Option<String>,
+    /// Publisher self-provided forecast information.
+    #[serde(rename="publisherProvidedForecast")]
+    pub publisher_provided_forecast: Option<PublisherProvidedForecast>,
     /// The proposed end time for the deal (ms since epoch) (buyer-readonly)
     #[serde(rename="flightEndTimeMs")]
     pub flight_end_time_ms: Option<String>,
@@ -667,6 +704,9 @@ pub struct Product {
     /// The syndication product associated with the deal. (readonly, except on create)
     #[serde(rename="syndicationProduct")]
     pub syndication_product: Option<String>,
+    /// Optional private auction id if this offer is a private auction offer.
+    #[serde(rename="privateAuctionId")]
+    pub private_auction_id: Option<String>,
     /// Information about the seller that created this product (readonly, except on create)
     pub seller: Option<Seller>,
     /// The web property code for the seller. This field is meant to be copied over as is when creating deals.
@@ -703,7 +743,7 @@ impl ResponseResult for Product {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GetOrderNotesResponse {
-    /// The list of matching notes.
+    /// The list of matching notes. The notes for a proposal are ordered from oldest to newest. If the notes span multiple proposals, they will be grouped by proposal, with the notes for the most recently modified proposal appearing first.
     pub notes: Option<Vec<MarketplaceNote>>,
 }
 
@@ -828,6 +868,9 @@ pub struct Price {
     /// The currency code for the price.
     #[serde(rename="currencyCode")]
     pub currency_code: Option<String>,
+    /// In case of CPD deals, the expected CPM in micros.
+    #[serde(rename="expectedCpmMicros")]
+    pub expected_cpm_micros: Option<f64>,
     /// The price value in micros.
     #[serde(rename="amountMicros")]
     pub amount_micros: Option<f64>,
@@ -882,23 +925,24 @@ impl ResponseResult for EditAllOrderDealsResponse {}
 
 /// There is no detailed description.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [insert proposals](struct.ProposalInsertCall.html) (request)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CreateOrdersRequest {
-    /// no description provided
-    #[serde(rename="webPropertyCode")]
-    pub web_property_code: Option<String>,
-    /// The list of proposals to create.
-    pub proposals: Option<Vec<Proposal>>,
+pub struct DealTermsGuaranteedFixedPriceTermsBillingInfo {
+    /// The original reservation price for the deal, if the currency code is different from the one used in negotiation.
+    pub price: Option<Price>,
+    /// The DFP line item id associated with this deal. For features like CPD, buyers can retrieve the DFP line item for billing reconciliation.
+    #[serde(rename="dfpLineItemId")]
+    pub dfp_line_item_id: Option<String>,
+    /// The original contracted quantity (# impressions) for this deal. To ensure delivery, sometimes the publisher will book the deal with a impression buffer, such that guaranteed_looks is greater than the contracted quantity. However clients are billed using the original contracted quantity.
+    #[serde(rename="originalContractedQuantity")]
+    pub original_contracted_quantity: Option<String>,
+    /// The timestamp (in ms since epoch) when the original reservation price for the deal was first converted to DFP currency. This is used to convert the contracted price into advertiser's currency without discrepancy.
+    #[serde(rename="currencyConversionTimeMs")]
+    pub currency_conversion_time_ms: Option<String>,
 }
 
-impl RequestValue for CreateOrdersRequest {}
+impl Part for DealTermsGuaranteedFixedPriceTermsBillingInfo {}
 
 
 /// There is no detailed description.
@@ -1055,9 +1099,11 @@ impl ResponseResult for GetPublisherProfilesByAccountIdResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DimensionDimensionValue {
+    /// Percent of total impressions for a dimension type. e.g. {dimension_type: 'GENDER', [{dimension_value: {id: 1, name: 'MALE', percentage: 60}}]} Gender MALE is 60% of all impressions which have gender.
+    pub percentage: Option<i32>,
     /// Id of the dimension.
     pub id: Option<i32>,
-    /// Name of the dimension mainly for debugging purposes.
+    /// Name of the dimension mainly for debugging purposes, except for the case of CREATIVE_SIZE. For CREATIVE_SIZE, strings are used instead of ids.
     pub name: Option<String>,
 }
 
@@ -1427,7 +1473,7 @@ pub struct PublisherProfileApiProto {
     pub kind: Option<String>,
     /// Programmatic contact for the publisher profile.
     #[serde(rename="programmaticContact")]
-    pub programmatic_contact: Option<ContactInformation>,
+    pub programmatic_contact: Option<String>,
     /// The list of domains represented in this publisher profile. Empty if this is a parent profile.
     #[serde(rename="publisherDomains")]
     pub publisher_domains: Option<Vec<String>>,
@@ -1443,7 +1489,7 @@ pub struct PublisherProfileApiProto {
     pub seller: Option<Seller>,
     /// Direct contact for the publisher profile.
     #[serde(rename="directContact")]
-    pub direct_contact: Option<ContactInformation>,
+    pub direct_contact: Option<String>,
     /// Link for a sample content page.
     #[serde(rename="samplePageLink")]
     pub sample_page_link: Option<String>,
@@ -1552,7 +1598,7 @@ pub struct MarketplaceDeal {
     /// The shared targeting visible to buyers and sellers. Each shared targeting entity is AND'd together. (updatable)
     #[serde(rename="sharedTargetings")]
     pub shared_targetings: Option<Vec<SharedTargeting>>,
-    /// A unique deal=id for the deal (readonly).
+    /// A unique deal-id for the deal (readonly).
     #[serde(rename="dealId")]
     pub deal_id: Option<String>,
     /// Specifies the creative source for programmatic deals, PUBLISHER means creative is provided by seller and ADVERTISR means creative is provided by buyer. (buyer-readonly)
@@ -1735,21 +1781,25 @@ impl RequestValue for PretargetingConfig {}
 impl ResponseResult for PretargetingConfig {}
 
 
-/// This message carries publisher provided breakdown. E.g. {dimension_type: 'COUNTRY', [{dimension_value: {id: 1, name: 'US'}}, {dimension_value: {id: 2, name: 'UK'}}]}
+/// There is no detailed description.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [insert proposals](struct.ProposalInsertCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Dimension {
-    /// no description provided
-    #[serde(rename="dimensionType")]
-    pub dimension_type: Option<String>,
-    /// no description provided
-    #[serde(rename="dimensionValues")]
-    pub dimension_values: Option<Vec<DimensionDimensionValue>>,
+pub struct CreateOrdersRequest {
+    /// Web property id of the seller creating these orders
+    #[serde(rename="webPropertyCode")]
+    pub web_property_code: Option<String>,
+    /// The list of proposals to create.
+    pub proposals: Option<Vec<Proposal>>,
 }
 
-impl Part for Dimension {}
+impl RequestValue for CreateOrdersRequest {}
 
 
 /// There is no detailed description.
@@ -1809,12 +1859,39 @@ impl NestedType for PretargetingConfigDimensions {}
 impl Part for PretargetingConfigDimensions {}
 
 
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [insert marketplacedeals](struct.MarketplacedealInsertCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AddOrderDealsRequest {
+    /// The list of deals to add
+    pub deals: Option<Vec<MarketplaceDeal>>,
+    /// The last known proposal revision number.
+    #[serde(rename="proposalRevisionNumber")]
+    pub proposal_revision_number: Option<String>,
+    /// Indicates an optional action to take on the proposal
+    #[serde(rename="updateAction")]
+    pub update_action: Option<String>,
+}
+
+impl RequestValue for AddOrderDealsRequest {}
+
+
 /// Used to specify pricing rules for buyers/advertisers. Each PricePerBuyer in an product can become [0,1] deals. To check if there is a PricePerBuyer for a particular buyer or buyer/advertiser pair, we look for the most specific matching rule - we first look for a rule matching the buyer and advertiser, next a rule with the buyer but an empty advertiser list, and otherwise look for a matching rule where no buyer is set.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PricePerBuyer {
+    /// Optional access type for this buyer.
+    #[serde(rename="auctionTier")]
+    pub auction_tier: Option<String>,
     /// The buyer who will pay this price. If unset, all buyers can pay this price (if the advertisers match, and there's no more specific rule matching the buyer).
     pub buyer: Option<Buyer>,
     /// The specified price
@@ -1895,9 +1972,15 @@ pub struct DealTermsGuaranteedFixedPriceTerms {
     /// Fixed price for the specified buyer.
     #[serde(rename="fixedPrices")]
     pub fixed_prices: Option<Vec<PricePerBuyer>>,
-    /// Count of guaranteed looks. Required for deal, optional for product.
+    /// Count of minimum daily looks for a CPD deal. For CPD deals, buyer should negotiate on this field instead of guaranteed_looks.
+    #[serde(rename="minimumDailyLooks")]
+    pub minimum_daily_looks: Option<String>,
+    /// Count of guaranteed looks. Required for deal, optional for product. For CPD deals, buyer changes to guaranteed_looks will be ignored.
     #[serde(rename="guaranteedLooks")]
     pub guaranteed_looks: Option<String>,
+    /// External billing info for this Deal. This field is relevant when external billing info such as price has a different currency code than DFP/AdX.
+    #[serde(rename="billingInfo")]
+    pub billing_info: Option<DealTermsGuaranteedFixedPriceTermsBillingInfo>,
 }
 
 impl Part for DealTermsGuaranteedFixedPriceTerms {}
@@ -1935,6 +2018,23 @@ pub struct CreativeServingRestrictionsDisapprovalReasons {
 
 impl NestedType for CreativeServingRestrictionsDisapprovalReasons {}
 impl Part for CreativeServingRestrictionsDisapprovalReasons {}
+
+
+/// This message carries publisher provided breakdown. E.g. {dimension_type: 'COUNTRY', [{dimension_value: {id: 1, name: 'US'}}, {dimension_value: {id: 2, name: 'UK'}}]}
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Dimension {
+    /// no description provided
+    #[serde(rename="dimensionType")]
+    pub dimension_type: Option<String>,
+    /// no description provided
+    #[serde(rename="dimensionValues")]
+    pub dimension_values: Option<Vec<DimensionDimensionValue>>,
+}
+
+impl Part for Dimension {}
 
 
 /// If nativeAd is set, HTMLSnippet and videoURL should not be set.
@@ -1984,6 +2084,8 @@ impl Part for CreativeNativeAd {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreativeCorrections {
+    /// All known serving contexts containing serving status information.
+    pub contexts: Option<Vec<CreativeCorrectionsContexts>>,
     /// The type of correction that was applied to the creative.
     pub reason: Option<String>,
     /// Additional details about the correction.
@@ -2000,14 +2102,17 @@ impl Part for CreativeCorrections {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TargetingValueCreativeSize {
+    /// For regular or video creative size type, specifies the size of the creative.
+    pub size: Option<TargetingValueSize>,
     /// The Creative size type.
     #[serde(rename="creativeSizeType")]
     pub creative_size_type: Option<String>,
     /// For video size type, the list of companion sizes.
     #[serde(rename="companionSizes")]
     pub companion_sizes: Option<Vec<TargetingValueSize>>,
-    /// For regular or video creative size type, specifies the size of the creative.
-    pub size: Option<TargetingValueSize>,
+    /// The skippable ad type for video size.
+    #[serde(rename="skippableAdType")]
+    pub skippable_ad_type: Option<String>,
 }
 
 impl Part for TargetingValueCreativeSize {}
@@ -2015,26 +2120,19 @@ impl Part for TargetingValueCreativeSize {}
 
 /// There is no detailed description.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [insert marketplacedeals](struct.MarketplacedealInsertCall.html) (request)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AddOrderDealsRequest {
-    /// The list of deals to add
-    pub deals: Option<Vec<MarketplaceDeal>>,
-    /// The last known proposal revision number.
-    #[serde(rename="proposalRevisionNumber")]
-    pub proposal_revision_number: Option<String>,
-    /// Indicates an optional action to take on the proposal
-    #[serde(rename="updateAction")]
-    pub update_action: Option<String>,
+pub struct DealTermsRubiconNonGuaranteedTerms {
+    /// Optional price for Rubicon priority access in the auction.
+    #[serde(rename="priorityPrice")]
+    pub priority_price: Option<Price>,
+    /// Optional price for Rubicon standard access in the auction.
+    #[serde(rename="standardPrice")]
+    pub standard_price: Option<Price>,
 }
 
-impl RequestValue for AddOrderDealsRequest {}
+impl Part for DealTermsRubiconNonGuaranteedTerms {}
 
 
 /// There is no detailed description.
@@ -2069,9 +2167,12 @@ pub struct DealTerms {
     /// Visibilty of the URL in bid requests.
     #[serde(rename="brandingType")]
     pub branding_type: Option<String>,
-    /// Non-binding estimate of the estimated gross spend for this deal Can be set by buyer or seller.
-    #[serde(rename="estimatedGrossSpend")]
-    pub estimated_gross_spend: Option<Price>,
+    /// Indicates that this ExternalDealId exists under at least two different AdxInventoryDeals. Currently, the only case that the same ExternalDealId will exist is programmatic cross sell case.
+    #[serde(rename="crossListedExternalDealIdType")]
+    pub cross_listed_external_deal_id_type: Option<String>,
+    /// The terms for guaranteed fixed price deals.
+    #[serde(rename="guaranteedFixedPriceTerms")]
+    pub guaranteed_fixed_price_terms: Option<DealTermsGuaranteedFixedPriceTerms>,
     /// For deals with Cost Per Day billing, defines the timezone used to mark the boundaries of a day (buyer-readonly)
     #[serde(rename="sellerTimeZone")]
     pub seller_time_zone: Option<String>,
@@ -2081,9 +2182,12 @@ pub struct DealTerms {
     /// The terms for non-guaranteed fixed price deals.
     #[serde(rename="nonGuaranteedFixedPriceTerms")]
     pub non_guaranteed_fixed_price_terms: Option<DealTermsNonGuaranteedFixedPriceTerms>,
-    /// The terms for guaranteed fixed price deals.
-    #[serde(rename="guaranteedFixedPriceTerms")]
-    pub guaranteed_fixed_price_terms: Option<DealTermsGuaranteedFixedPriceTerms>,
+    /// Non-binding estimate of the estimated gross spend for this deal Can be set by buyer or seller.
+    #[serde(rename="estimatedGrossSpend")]
+    pub estimated_gross_spend: Option<Price>,
+    /// The terms for rubicon non-guaranteed deals.
+    #[serde(rename="rubiconNonGuaranteedTerms")]
+    pub rubicon_non_guaranteed_terms: Option<DealTermsRubiconNonGuaranteedTerms>,
     /// The terms for non-guaranteed auction deals.
     #[serde(rename="nonGuaranteedAuctionTerms")]
     pub non_guaranteed_auction_terms: Option<DealTermsNonGuaranteedAuctionTerms>,
@@ -2328,11 +2432,12 @@ impl<'a, C, A> MarketplacedealMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `proposalId` - The proposalId to get deals for.
+    /// * `proposalId` - The proposalId to get deals for. To search across all proposals specify order_id = '-' as part of the URL.
     pub fn list(&self, proposal_id: &str) -> MarketplacedealListCall<'a, C, A> {
         MarketplacedealListCall {
             hub: self.hub,
             _proposal_id: proposal_id.to_string(),
+            _pql_query: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2479,7 +2584,7 @@ impl<'a, C, A> ProposalMethods<'a, C, A> {
     /// * `request` - No description provided.
     /// * `proposalId` - The proposal id to update.
     /// * `revisionNumber` - The last known revision number to update. If the head revision in the marketplace database has since changed, an error will be thrown. The caller should then fetch the latest proposal at head revision and retry the update at that revision.
-    /// * `updateAction` - The proposed action to take on the proposal.
+    /// * `updateAction` - The proposed action to take on the proposal. This field is required and it must be set when updating a proposal.
     pub fn update(&self, request: Proposal, proposal_id: &str, revision_number: &str, update_action: &str) -> ProposalUpdateCall<'a, C, A> {
         ProposalUpdateCall {
             hub: self.hub,
@@ -2519,7 +2624,7 @@ impl<'a, C, A> ProposalMethods<'a, C, A> {
     /// * `request` - No description provided.
     /// * `proposalId` - The proposal id to update.
     /// * `revisionNumber` - The last known revision number to update. If the head revision in the marketplace database has since changed, an error will be thrown. The caller should then fetch the latest proposal at head revision and retry the update at that revision.
-    /// * `updateAction` - The proposed action to take on the proposal.
+    /// * `updateAction` - The proposed action to take on the proposal. This field is required and it must be set when updating a proposal.
     pub fn patch(&self, request: Proposal, proposal_id: &str, revision_number: &str, update_action: &str) -> ProposalPatchCall<'a, C, A> {
         ProposalPatchCall {
             hub: self.hub,
@@ -2834,11 +2939,12 @@ impl<'a, C, A> MarketplacenoteMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `proposalId` - The proposalId to get notes for.
+    /// * `proposalId` - The proposalId to get notes for. To search across all proposals specify order_id = '-' as part of the URL.
     pub fn list(&self, proposal_id: &str) -> MarketplacenoteListCall<'a, C, A> {
         MarketplacenoteListCall {
             hub: self.hub,
             _proposal_id: proposal_id.to_string(),
+            _pql_query: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2918,6 +3024,7 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _id: id,
+            _confirm_unsafe_account_change: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2966,6 +3073,7 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _id: id,
+            _confirm_unsafe_account_change: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4772,6 +4880,7 @@ impl<'a, C, A> MarketplacedealUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.marketplacedeals().list("proposalId")
+///              .pql_query("labore")
 ///              .doit();
 /// # }
 /// ```
@@ -4780,6 +4889,7 @@ pub struct MarketplacedealListCall<'a, C, A>
 
     hub: &'a AdExchangeBuyer<C, A>,
     _proposal_id: String,
+    _pql_query: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -4801,9 +4911,12 @@ impl<'a, C, A> MarketplacedealListCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "adexchangebuyer.marketplacedeals.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("proposalId", self._proposal_id.to_string()));
-        for &field in ["alt", "proposalId"].iter() {
+        if let Some(value) = self._pql_query {
+            params.push(("pqlQuery", value.to_string()));
+        }
+        for &field in ["alt", "proposalId", "pqlQuery"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -4918,7 +5031,7 @@ impl<'a, C, A> MarketplacedealListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
-    /// The proposalId to get deals for.
+    /// The proposalId to get deals for. To search across all proposals specify order_id = '-' as part of the URL.
     ///
     /// Sets the *proposal id* path property to the given value.
     ///
@@ -4926,6 +5039,13 @@ impl<'a, C, A> MarketplacedealListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// we provide this method for API completeness.
     pub fn proposal_id(mut self, new_value: &str) -> MarketplacedealListCall<'a, C, A> {
         self._proposal_id = new_value.to_string();
+        self
+    }
+    /// Query string to retrieve specific deals.
+    ///
+    /// Sets the *pql query* query property to the given value.
+    pub fn pql_query(mut self, new_value: &str) -> MarketplacedealListCall<'a, C, A> {
+        self._pql_query = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -5262,7 +5382,7 @@ impl<'a, C, A> MarketplaceprivateauctionUpdateproposalCall<'a, C, A> where C: Bo
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.proposals().search()
-///              .pql_query("sea")
+///              .pql_query("nonumy")
 ///              .doit();
 /// # }
 /// ```
@@ -5910,7 +6030,7 @@ impl<'a, C, A> ProposalUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._revision_number = new_value.to_string();
         self
     }
-    /// The proposed action to take on the proposal.
+    /// The proposed action to take on the proposal. This field is required and it must be set when updating a proposal.
     ///
     /// Sets the *update action* path property to the given value.
     ///
@@ -6424,7 +6544,7 @@ impl<'a, C, A> ProposalPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._revision_number = new_value.to_string();
         self
     }
-    /// The proposed action to take on the proposal.
+    /// The proposed action to take on the proposal. This field is required and it must be set when updating a proposal.
     ///
     /// Sets the *update action* path property to the given value.
     ///
@@ -7551,8 +7671,8 @@ impl<'a, C, A> BudgetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.performance_report().list("accountId", "endDateTime", "startDateTime")
-///              .page_token("sea")
-///              .max_results(46)
+///              .page_token("Lorem")
+///              .max_results(26)
 ///              .doit();
 /// # }
 /// ```
@@ -7813,7 +7933,7 @@ impl<'a, C, A> PerformanceReportListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.products().search()
-///              .pql_query("eos")
+///              .pql_query("erat")
 ///              .doit();
 /// # }
 /// ```
@@ -8262,6 +8382,7 @@ impl<'a, C, A> ProductGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.marketplacenotes().list("proposalId")
+///              .pql_query("eirmod")
 ///              .doit();
 /// # }
 /// ```
@@ -8270,6 +8391,7 @@ pub struct MarketplacenoteListCall<'a, C, A>
 
     hub: &'a AdExchangeBuyer<C, A>,
     _proposal_id: String,
+    _pql_query: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -8291,9 +8413,12 @@ impl<'a, C, A> MarketplacenoteListCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "adexchangebuyer.marketplacenotes.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("proposalId", self._proposal_id.to_string()));
-        for &field in ["alt", "proposalId"].iter() {
+        if let Some(value) = self._pql_query {
+            params.push(("pqlQuery", value.to_string()));
+        }
+        for &field in ["alt", "proposalId", "pqlQuery"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -8408,7 +8533,7 @@ impl<'a, C, A> MarketplacenoteListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
-    /// The proposalId to get notes for.
+    /// The proposalId to get notes for. To search across all proposals specify order_id = '-' as part of the URL.
     ///
     /// Sets the *proposal id* path property to the given value.
     ///
@@ -8416,6 +8541,13 @@ impl<'a, C, A> MarketplacenoteListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// we provide this method for API completeness.
     pub fn proposal_id(mut self, new_value: &str) -> MarketplacenoteListCall<'a, C, A> {
         self._proposal_id = new_value.to_string();
+        self
+    }
+    /// Query string to retrieve specific notes. To search the text contents of notes, please use syntax like "WHERE note.note = "foo" or "WHERE note.note LIKE "%bar%"
+    ///
+    /// Sets the *pql query* query property to the given value.
+    pub fn pql_query(mut self, new_value: &str) -> MarketplacenoteListCall<'a, C, A> {
+        self._pql_query = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -8768,7 +8900,8 @@ impl<'a, C, A> MarketplacenoteInsertCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.accounts().patch(req, -39)
+/// let result = hub.accounts().patch(req, -97)
+///              .confirm_unsafe_account_change(false)
 ///              .doit();
 /// # }
 /// ```
@@ -8778,6 +8911,7 @@ pub struct AccountPatchCall<'a, C, A>
     hub: &'a AdExchangeBuyer<C, A>,
     _request: Account,
     _id: i32,
+    _confirm_unsafe_account_change: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -8799,9 +8933,12 @@ impl<'a, C, A> AccountPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         };
         dlg.begin(MethodInfo { id: "adexchangebuyer.accounts.patch",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("id", self._id.to_string()));
-        for &field in ["alt", "id"].iter() {
+        if let Some(value) = self._confirm_unsafe_account_change {
+            params.push(("confirmUnsafeAccountChange", value.to_string()));
+        }
+        for &field in ["alt", "id", "confirmUnsafeAccountChange"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -8948,6 +9085,13 @@ impl<'a, C, A> AccountPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// we provide this method for API completeness.
     pub fn id(mut self, new_value: i32) -> AccountPatchCall<'a, C, A> {
         self._id = new_value;
+        self
+    }
+    /// Confirmation for erasing bidder and cookie matching urls.
+    ///
+    /// Sets the *confirm unsafe account change* query property to the given value.
+    pub fn confirm_unsafe_account_change(mut self, new_value: bool) -> AccountPatchCall<'a, C, A> {
+        self._confirm_unsafe_account_change = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -9230,7 +9374,7 @@ impl<'a, C, A> AccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.accounts().get(-43)
+/// let result = hub.accounts().get(-36)
 ///              .doit();
 /// # }
 /// ```
@@ -9471,7 +9615,8 @@ impl<'a, C, A> AccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.accounts().update(req, -97)
+/// let result = hub.accounts().update(req, -39)
+///              .confirm_unsafe_account_change(true)
 ///              .doit();
 /// # }
 /// ```
@@ -9481,6 +9626,7 @@ pub struct AccountUpdateCall<'a, C, A>
     hub: &'a AdExchangeBuyer<C, A>,
     _request: Account,
     _id: i32,
+    _confirm_unsafe_account_change: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -9502,9 +9648,12 @@ impl<'a, C, A> AccountUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "adexchangebuyer.accounts.update",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("id", self._id.to_string()));
-        for &field in ["alt", "id"].iter() {
+        if let Some(value) = self._confirm_unsafe_account_change {
+            params.push(("confirmUnsafeAccountChange", value.to_string()));
+        }
+        for &field in ["alt", "id", "confirmUnsafeAccountChange"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -9653,6 +9802,13 @@ impl<'a, C, A> AccountUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._id = new_value;
         self
     }
+    /// Confirmation for erasing bidder and cookie matching urls.
+    ///
+    /// Sets the *confirm unsafe account change* query property to the given value.
+    pub fn confirm_unsafe_account_change(mut self, new_value: bool) -> AccountUpdateCall<'a, C, A> {
+        self._confirm_unsafe_account_change = Some(new_value);
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -9732,12 +9888,12 @@ impl<'a, C, A> AccountUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.creatives().list()
-///              .page_token("no")
-///              .open_auction_status_filter("labore")
-///              .max_results(62)
-///              .deals_status_filter("dolore")
-///              .add_buyer_creative_id("invidunt")
-///              .add_account_id(-82)
+///              .page_token("invidunt")
+///              .open_auction_status_filter("aliquyam")
+///              .max_results(28)
+///              .deals_status_filter("Lorem")
+///              .add_buyer_creative_id("sea")
+///              .add_account_id(-21)
 ///              .doit();
 /// # }
 /// ```
@@ -10011,7 +10167,7 @@ impl<'a, C, A> CreativeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.creatives().remove_deal(-73, "buyerCreativeId", "dealId")
+/// let result = hub.creatives().remove_deal(-70, "buyerCreativeId", "dealId")
 ///              .doit();
 /// # }
 /// ```
@@ -10259,7 +10415,7 @@ impl<'a, C, A> CreativeRemoveDealCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.creatives().add_deal(-21, "buyerCreativeId", "dealId")
+/// let result = hub.creatives().add_deal(-58, "buyerCreativeId", "dealId")
 ///              .doit();
 /// # }
 /// ```
@@ -10507,7 +10663,7 @@ impl<'a, C, A> CreativeAddDealCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.creatives().get(-40, "buyerCreativeId")
+/// let result = hub.creatives().get(-23, "buyerCreativeId")
 ///              .doit();
 /// # }
 /// ```

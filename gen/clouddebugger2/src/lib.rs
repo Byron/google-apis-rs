@@ -2,14 +2,14 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *clouddebugger* crate version *0.1.14+20160309*, where *20160309* is the exact revision of the *clouddebugger:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
+//! This documentation was generated from *Cloud Debugger* crate version *0.1.14+20160810*, where *20160810* is the exact revision of the *clouddebugger:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
 //! 
-//! Everything else about the *clouddebugger* *v2* API can be found at the
-//! [official documentation site](https://cloud.google.com/tools/cloud-debugger).
+//! Everything else about the *Cloud Debugger* *v2* API can be found at the
+//! [official documentation site](http://cloud.google.com/debugger).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/clouddebugger2).
 //! # Features
 //! 
-//! Handle the following *Resources* with ease from the central [hub](struct.Clouddebugger.html) ... 
+//! Handle the following *Resources* with ease from the central [hub](struct.CloudDebugger.html) ... 
 //! 
 //! * controller
 //!  * [*debuggees breakpoints list*](struct.ControllerDebuggeeBreakpointListCall.html), [*debuggees breakpoints update*](struct.ControllerDebuggeeBreakpointUpdateCall.html) and [*debuggees register*](struct.ControllerDebuggeeRegisterCall.html)
@@ -25,7 +25,7 @@
 //! 
 //! The API is structured into the following primary items:
 //! 
-//! * **[Hub](struct.Clouddebugger.html)**
+//! * **[Hub](struct.CloudDebugger.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
 //!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
 //!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
@@ -79,7 +79,7 @@
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-//! use clouddebugger2::Clouddebugger;
+//! use clouddebugger2::CloudDebugger;
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -92,7 +92,7 @@
 //! let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 //!                               hyper::Client::new(),
 //!                               <MemoryStorage as Default>::default(), None);
-//! let mut hub = Clouddebugger::new(hyper::Client::new(), auth);
+//! let mut hub = CloudDebugger::new(hyper::Client::new(), auth);
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !

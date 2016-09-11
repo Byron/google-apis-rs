@@ -150,6 +150,9 @@ impl<'a, C, A> AndroidPublisher<C, A>
     pub fn purchases(&'a self) -> PurchaseMethods<'a, C, A> {
         PurchaseMethods { hub: &self }
     }
+    pub fn reviews(&'a self) -> ReviewMethods<'a, C, A> {
+        ReviewMethods { hub: &self }
+    }
 
     /// Set the user-agent header field to use in all requests to the server.
     /// It defaults to `google-api-rust-client/0.1.14`.
@@ -166,6 +169,25 @@ impl<'a, C, A> AndroidPublisher<C, A>
 // ############
 // SCHEMAS ###
 // ##########
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [subscriptions defer purchases](struct.PurchaseSubscriptionDeferCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SubscriptionPurchasesDeferRequest {
+    /// The information about the new desired expiry time for the subscription.
+    #[serde(rename="deferralInfo")]
+    pub deferral_info: Option<SubscriptionDeferralInfo>,
+}
+
+impl RequestValue for SubscriptionPurchasesDeferRequest {}
+
+
 /// An Entitlement resource indicates a user's current entitlement to an inapp item or subscription.
 /// 
 /// # Activities
@@ -216,6 +238,33 @@ impl ResponseResult for ApksListResponse {}
 
 /// There is no detailed description.
 /// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [get reviews](struct.ReviewGetCall.html) (response)
+/// * [reply reviews](struct.ReviewReplyCall.html) (none)
+/// * [list reviews](struct.ReviewListCall.html) (none)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Review {
+    /// The name of the user who wrote the review.
+    #[serde(rename="authorName")]
+    pub author_name: Option<String>,
+    /// Unique identifier for this review.
+    #[serde(rename="reviewId")]
+    pub review_id: Option<String>,
+    /// A repeated field containing comments for the review.
+    pub comments: Option<Vec<Comment>>,
+}
+
+impl Resource for Review {}
+impl ResponseResult for Review {}
+
+
+/// There is no detailed description.
+/// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -225,6 +274,30 @@ pub struct InappproductsUpdateResponse {
 }
 
 impl Part for InappproductsUpdateResponse {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list reviews](struct.ReviewListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ReviewsListResponse {
+    /// no description provided
+    pub reviews: Option<Vec<Review>>,
+    /// no description provided
+    #[serde(rename="tokenPagination")]
+    pub token_pagination: Option<TokenPagination>,
+    /// no description provided
+    #[serde(rename="pageInfo")]
+    pub page_info: Option<PageInfo>,
+}
+
+impl ResponseResult for ReviewsListResponse {}
 
 
 /// There is no detailed description.
@@ -322,7 +395,7 @@ pub struct SubscriptionDeferralInfo {
     /// The expected expiry time for the subscription. If the current expiry time for the subscription is not the value specified here, the deferral will not occur.
     #[serde(rename="expectedExpiryTimeMillis")]
     pub expected_expiry_time_millis: Option<String>,
-    /// The desired next expiry time for the subscription in milliseconds since Epoch. The given time must be after the current expiry time for the subscription.
+    /// The desired next expiry time to assign to the subscription, in milliseconds since the Epoch. The given time must be later/greater than the current expiry time for the subscription.
     #[serde(rename="desiredExpiryTimeMillis")]
     pub desired_expiry_time_millis: Option<String>,
 }
@@ -473,48 +546,30 @@ impl ResponseResult for ImagesDeleteAllResponse {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [tracks update edits](struct.EditTrackUpdateCall.html) (request|response)
-/// * [tracks patch edits](struct.EditTrackPatchCall.html) (request|response)
-/// * [tracks get edits](struct.EditTrackGetCall.html) (response)
+/// * [reply reviews](struct.ReviewReplyCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Track {
+pub struct ReviewsReplyResponse {
     /// no description provided
-    pub track: Option<String>,
-    /// no description provided
-    #[serde(rename="userFraction")]
-    pub user_fraction: Option<f64>,
-    /// no description provided
-    #[serde(rename="versionCodes")]
-    pub version_codes: Option<Vec<i32>>,
+    pub result: Option<ReviewReplyResult>,
 }
 
-impl RequestValue for Track {}
-impl ResponseResult for Track {}
+impl ResponseResult for ReviewsReplyResponse {}
 
 
 /// There is no detailed description.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list entitlements](struct.EntitlementListCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct EntitlementsListResponse {
+pub struct Timestamp {
     /// no description provided
-    #[serde(rename="tokenPagination")]
-    pub token_pagination: Option<TokenPagination>,
+    pub nanos: Option<i32>,
     /// no description provided
-    #[serde(rename="pageInfo")]
-    pub page_info: Option<PageInfo>,
-    /// no description provided
-    pub resources: Option<Vec<Entitlement>>,
+    pub seconds: Option<String>,
 }
 
-impl ResponseResult for EntitlementsListResponse {}
+impl Part for Timestamp {}
 
 
 /// There is no detailed description.
@@ -539,16 +594,16 @@ impl Part for InAppProductListing {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [subscriptions defer purchases](struct.PurchaseSubscriptionDeferCall.html) (request)
+/// * [reply reviews](struct.ReviewReplyCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SubscriptionPurchasesDeferRequest {
-    /// The information about the new desired expiry time for the subscription.
-    #[serde(rename="deferralInfo")]
-    pub deferral_info: Option<SubscriptionDeferralInfo>,
+pub struct ReviewsReplyRequest {
+    /// The text to set as the reply. Replies of more than approximately 350 characters will be rejected. HTML tags will be stripped.
+    #[serde(rename="replyText")]
+    pub reply_text: Option<String>,
 }
 
-impl RequestValue for SubscriptionPurchasesDeferRequest {}
+impl RequestValue for ReviewsReplyRequest {}
 
 
 /// There is no detailed description.
@@ -667,6 +722,39 @@ pub struct InappproductsBatchResponseEntry {
 }
 
 impl Part for InappproductsBatchResponseEntry {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UserComment {
+    /// Integer version code of the app as installed at the time the review was written. May be absent.
+    #[serde(rename="appVersionCode")]
+    pub app_version_code: Option<i32>,
+    /// Language code for the reviewer. This is taken from the device settings so is not guaranteed to match the language the review is written in. May be absent.
+    #[serde(rename="reviewerLanguage")]
+    pub reviewer_language: Option<String>,
+    /// The last time at which this comment was updated.
+    #[serde(rename="lastModified")]
+    pub last_modified: Option<Timestamp>,
+    /// The star rating associated with the review, from 1 to 5.
+    #[serde(rename="starRating")]
+    pub star_rating: Option<i32>,
+    /// The content of the comment, i.e. review body. In some cases users have been able to write a review with separate title and body; in those cases the title and body are concatenated and separated by a tab character.
+    pub text: Option<String>,
+    /// Codename for the reviewer's device, e.g. klte, flounder. May be absent.
+    pub device: Option<String>,
+    /// Integer Android SDK version of the user's device at the time the review was written, e.g. 23 is Marshmallow. May be absent.
+    #[serde(rename="androidOsVersion")]
+    pub android_os_version: Option<i32>,
+    /// String version name of the app as installed at the time the review was written. May be absent.
+    #[serde(rename="appVersionName")]
+    pub app_version_name: Option<String>,
+}
+
+impl Part for UserComment {}
 
 
 /// Represents an edit of an app. An edit allows clients to make multiple changes before committing them in one operation.
@@ -852,6 +940,22 @@ impl ResponseResult for ApkListing {}
 
 /// There is no detailed description.
 /// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DeveloperComment {
+    /// The last time at which this comment was updated.
+    #[serde(rename="lastModified")]
+    pub last_modified: Option<Timestamp>,
+    /// The content of the comment, i.e. reply body.
+    pub text: Option<String>,
+}
+
+impl Part for DeveloperComment {}
+
+
+/// There is no detailed description.
+/// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
@@ -919,6 +1023,47 @@ pub struct ApksAddExternallyHostedResponse {
 impl ResponseResult for ApksAddExternallyHostedResponse {}
 
 
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Comment {
+    /// A comment from a developer.
+    #[serde(rename="developerComment")]
+    pub developer_comment: Option<DeveloperComment>,
+    /// A comment from a user.
+    #[serde(rename="userComment")]
+    pub user_comment: Option<UserComment>,
+}
+
+impl Part for Comment {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list entitlements](struct.EntitlementListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct EntitlementsListResponse {
+    /// no description provided
+    #[serde(rename="tokenPagination")]
+    pub token_pagination: Option<TokenPagination>,
+    /// no description provided
+    #[serde(rename="pageInfo")]
+    pub page_info: Option<PageInfo>,
+    /// no description provided
+    pub resources: Option<Vec<Entitlement>>,
+}
+
+impl ResponseResult for EntitlementsListResponse {}
+
+
 /// A SubscriptionPurchase resource indicates the status of a user's subscription purchase.
 /// 
 /// # Activities
@@ -949,18 +1094,18 @@ pub struct SubscriptionPurchase {
     /// ISO 4217 currency code for the subscription price. For example, if the price is specified in British pounds sterling, price_currency_code is "GBP".
     #[serde(rename="priceCurrencyCode")]
     pub price_currency_code: Option<String>,
-    /// Time at which the subscription will expire, in milliseconds since Epoch.
+    /// Time at which the subscription will expire, in milliseconds since the Epoch.
     #[serde(rename="expiryTimeMillis")]
     pub expiry_time_millis: Option<String>,
-    /// The cancel reason of the subscription, if the subscription is not auto renewing. Possible values are:  
+    /// The reason why a subscription was cancelled or is not auto-renewing. Possible values are:  
     /// - User cancelled the subscription 
     /// - Subscription was cancelled by the system, for example because of a billing problem
     #[serde(rename="cancelReason")]
     pub cancel_reason: Option<i32>,
-    /// Time at which the subscription was granted, in milliseconds since Epoch.
+    /// Time at which the subscription was granted, in milliseconds since the Epoch.
     #[serde(rename="startTimeMillis")]
     pub start_time_millis: Option<String>,
-    /// Price of the subscription, not including tax. Price is expressed in micro-units, where 1,000,000 micro-units equal one unit of the currency. For example, if the subscription price is €1.99, price_amount_micros is 1990000.
+    /// Price of the subscription, not including tax. Price is expressed in micro-units, where 1,000,000 micro-units represents one unit of the currency. For example, if the subscription price is €1.99, price_amount_micros is 1990000.
     #[serde(rename="priceAmountMicros")]
     pub price_amount_micros: Option<String>,
 }
@@ -1071,6 +1216,50 @@ pub struct Apk {
 }
 
 impl ResponseResult for Apk {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ReviewReplyResult {
+    /// The reply text that was applied.
+    #[serde(rename="replyText")]
+    pub reply_text: Option<String>,
+    /// The time at which the reply took effect.
+    #[serde(rename="lastEdited")]
+    pub last_edited: Option<Timestamp>,
+}
+
+impl Part for ReviewReplyResult {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [tracks update edits](struct.EditTrackUpdateCall.html) (request|response)
+/// * [tracks patch edits](struct.EditTrackPatchCall.html) (request|response)
+/// * [tracks get edits](struct.EditTrackGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Track {
+    /// no description provided
+    pub track: Option<String>,
+    /// no description provided
+    #[serde(rename="userFraction")]
+    pub user_fraction: Option<f64>,
+    /// no description provided
+    #[serde(rename="versionCodes")]
+    pub version_codes: Option<Vec<i32>>,
+}
+
+impl RequestValue for Track {}
+impl ResponseResult for Track {}
 
 
 /// There is no detailed description.
@@ -2252,6 +2441,107 @@ impl<'a, C, A> EditMethods<'a, C, A> {
             _package_name: package_name.to_string(),
             _edit_id: edit_id.to_string(),
             _apk_version_code: apk_version_code,
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+}
+
+
+
+/// A builder providing access to all methods supported on *review* resources.
+/// It is not used directly, but through the `AndroidPublisher` hub.
+///
+/// # Example
+///
+/// Instantiate a resource builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_androidpublisher2 as androidpublisher2;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// use androidpublisher2::AndroidPublisher;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = AndroidPublisher::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
+/// // like `get(...)`, `list(...)` and `reply(...)`
+/// // to build up your call.
+/// let rb = hub.reviews();
+/// # }
+/// ```
+pub struct ReviewMethods<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AndroidPublisher<C, A>,
+}
+
+impl<'a, C, A> MethodsBuilder for ReviewMethods<'a, C, A> {}
+
+impl<'a, C, A> ReviewMethods<'a, C, A> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Reply to a single review, or update an existing reply.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `packageName` - Unique identifier for the Android app for which we want reviews; for example, "com.spiffygame".
+    /// * `reviewId` - No description provided.
+    pub fn reply(&self, request: ReviewsReplyRequest, package_name: &str, review_id: &str) -> ReviewReplyCall<'a, C, A> {
+        ReviewReplyCall {
+            hub: self.hub,
+            _request: request,
+            _package_name: package_name.to_string(),
+            _review_id: review_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns a single review.
+    /// 
+    /// # Arguments
+    ///
+    /// * `packageName` - Unique identifier for the Android app for which we want reviews; for example, "com.spiffygame".
+    /// * `reviewId` - No description provided.
+    pub fn get(&self, package_name: &str, review_id: &str) -> ReviewGetCall<'a, C, A> {
+        ReviewGetCall {
+            hub: self.hub,
+            _package_name: package_name.to_string(),
+            _review_id: review_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns a list of reviews.
+    /// 
+    /// # Arguments
+    ///
+    /// * `packageName` - Unique identifier for the Android app for which we want reviews; for example, "com.spiffygame".
+    pub fn list(&self, package_name: &str) -> ReviewListCall<'a, C, A> {
+        ReviewListCall {
+            hub: self.hub,
+            _package_name: package_name.to_string(),
+            _token: Default::default(),
+            _start_index: Default::default(),
+            _max_results: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -14746,6 +15036,797 @@ impl<'a, C, A> EditApklistingListCall<'a, C, A> where C: BorrowMut<hyper::Client
 }
 
 
+/// Reply to a single review, or update an existing reply.
+///
+/// A builder for the *reply* method supported by a *review* resource.
+/// It is not used directly, but through a `ReviewMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_androidpublisher2 as androidpublisher2;
+/// use androidpublisher2::ReviewsReplyRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use androidpublisher2::AndroidPublisher;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = ReviewsReplyRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.reviews().reply(req, "packageName", "reviewId")
+///              .doit();
+/// # }
+/// ```
+pub struct ReviewReplyCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AndroidPublisher<C, A>,
+    _request: ReviewsReplyRequest,
+    _package_name: String,
+    _review_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ReviewReplyCall<'a, C, A> {}
+
+impl<'a, C, A> ReviewReplyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ReviewsReplyResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "androidpublisher.reviews.reply",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        params.push(("packageName", self._package_name.to_string()));
+        params.push(("reviewId", self._review_id.to_string()));
+        for &field in ["alt", "packageName", "reviewId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/reviews/{reviewId}:reply".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{packageName}", "packageName"), ("{reviewId}", "reviewId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["reviewId", "packageName"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request);
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: ReviewsReplyRequest) -> ReviewReplyCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Unique identifier for the Android app for which we want reviews; for example, "com.spiffygame".
+    ///
+    /// Sets the *package name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn package_name(mut self, new_value: &str) -> ReviewReplyCall<'a, C, A> {
+        self._package_name = new_value.to_string();
+        self
+    }
+    ///
+    /// Sets the *review id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn review_id(mut self, new_value: &str) -> ReviewReplyCall<'a, C, A> {
+        self._review_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReviewReplyCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> ReviewReplyCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> ReviewReplyCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+/// Returns a single review.
+///
+/// A builder for the *get* method supported by a *review* resource.
+/// It is not used directly, but through a `ReviewMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_androidpublisher2 as androidpublisher2;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use androidpublisher2::AndroidPublisher;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.reviews().get("packageName", "reviewId")
+///              .doit();
+/// # }
+/// ```
+pub struct ReviewGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AndroidPublisher<C, A>,
+    _package_name: String,
+    _review_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ReviewGetCall<'a, C, A> {}
+
+impl<'a, C, A> ReviewGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Review)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "androidpublisher.reviews.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        params.push(("packageName", self._package_name.to_string()));
+        params.push(("reviewId", self._review_id.to_string()));
+        for &field in ["alt", "packageName", "reviewId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/reviews/{reviewId}".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{packageName}", "packageName"), ("{reviewId}", "reviewId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["reviewId", "packageName"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Unique identifier for the Android app for which we want reviews; for example, "com.spiffygame".
+    ///
+    /// Sets the *package name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn package_name(mut self, new_value: &str) -> ReviewGetCall<'a, C, A> {
+        self._package_name = new_value.to_string();
+        self
+    }
+    ///
+    /// Sets the *review id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn review_id(mut self, new_value: &str) -> ReviewGetCall<'a, C, A> {
+        self._review_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReviewGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> ReviewGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> ReviewGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+/// Returns a list of reviews.
+///
+/// A builder for the *list* method supported by a *review* resource.
+/// It is not used directly, but through a `ReviewMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_androidpublisher2 as androidpublisher2;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use androidpublisher2::AndroidPublisher;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.reviews().list("packageName")
+///              .token("Lorem")
+///              .start_index(38)
+///              .max_results(64)
+///              .doit();
+/// # }
+/// ```
+pub struct ReviewListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AndroidPublisher<C, A>,
+    _package_name: String,
+    _token: Option<String>,
+    _start_index: Option<u32>,
+    _max_results: Option<u32>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ReviewListCall<'a, C, A> {}
+
+impl<'a, C, A> ReviewListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ReviewsListResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "androidpublisher.reviews.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        params.push(("packageName", self._package_name.to_string()));
+        if let Some(value) = self._token {
+            params.push(("token", value.to_string()));
+        }
+        if let Some(value) = self._start_index {
+            params.push(("startIndex", value.to_string()));
+        }
+        if let Some(value) = self._max_results {
+            params.push(("maxResults", value.to_string()));
+        }
+        for &field in ["alt", "packageName", "token", "startIndex", "maxResults"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/reviews".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{packageName}", "packageName")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["packageName"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Unique identifier for the Android app for which we want reviews; for example, "com.spiffygame".
+    ///
+    /// Sets the *package name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn package_name(mut self, new_value: &str) -> ReviewListCall<'a, C, A> {
+        self._package_name = new_value.to_string();
+        self
+    }
+    ///
+    /// Sets the *token* query property to the given value.
+    pub fn token(mut self, new_value: &str) -> ReviewListCall<'a, C, A> {
+        self._token = Some(new_value.to_string());
+        self
+    }
+    ///
+    /// Sets the *start index* query property to the given value.
+    pub fn start_index(mut self, new_value: u32) -> ReviewListCall<'a, C, A> {
+        self._start_index = Some(new_value);
+        self
+    }
+    ///
+    /// Sets the *max results* query property to the given value.
+    pub fn max_results(mut self, new_value: u32) -> ReviewListCall<'a, C, A> {
+        self._max_results = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReviewListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> ReviewListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> ReviewListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
 /// A builder for the *batch* method supported by a *inappproduct* resource.
 /// It is not used directly, but through a `InappproductMethods` instance.
 ///
@@ -15004,9 +16085,9 @@ impl<'a, C, A> InappproductBatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.inappproducts().list("packageName")
-///              .token("diam")
-///              .start_index(39)
-///              .max_results(14)
+///              .token("At")
+///              .start_index(5)
+///              .max_results(79)
 ///              .doit();
 /// # }
 /// ```
@@ -16038,7 +17119,7 @@ impl<'a, C, A> InappproductGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.inappproducts().update(req, "packageName", "sku")
-///              .auto_convert_missing_prices(false)
+///              .auto_convert_missing_prices(true)
 ///              .doit();
 /// # }
 /// ```
@@ -16328,7 +17409,7 @@ impl<'a, C, A> InappproductUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.inappproducts().patch(req, "packageName", "sku")
-///              .auto_convert_missing_prices(true)
+///              .auto_convert_missing_prices(false)
 ///              .doit();
 /// # }
 /// ```

@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-sqladmin1_beta4` library allows access to all features of the *Google SQL Admin* service.
 
-This documentation was generated from *SQL Admin* crate version *0.1.14+20160321*, where *20160321* is the exact revision of the *sqladmin:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
+This documentation was generated from *SQL Admin* crate version *0.1.14+20160907*, where *20160907* is the exact revision of the *sqladmin:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
 
 Everything else about the *SQL Admin* *v1_beta4* API can be found at the
 [official documentation site](https://cloud.google.com/sql/docs/reference/latest).
@@ -14,7 +14,7 @@ Everything else about the *SQL Admin* *v1_beta4* API can be found at the
 Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.SQLAdmin.html) ... 
 
 * [backup runs](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.BackupRun.html)
- * [*delete*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.BackupRunDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.BackupRunGetCall.html) and [*list*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.BackupRunListCall.html)
+ * [*delete*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.BackupRunDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.BackupRunGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.BackupRunInsertCall.html) and [*list*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.BackupRunListCall.html)
 * [databases](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.Database.html)
  * [*delete*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.DatabaseDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.DatabaseGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.DatabaseInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.DatabaseListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.DatabasePatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.DatabaseUpdateCall.html)
 * [flags](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.Flag.html)
@@ -82,6 +82,7 @@ let r = hub.instances().start_replica(...).doit()
 let r = hub.users().insert(...).doit()
 let r = hub.instances().insert(...).doit()
 let r = hub.instances().import(...).doit()
+let r = hub.backup_runs().insert(...).doit()
 let r = hub.instances().update(...).doit()
 let r = hub.instances().restart(...).doit()
 let r = hub.instances().export(...).doit()

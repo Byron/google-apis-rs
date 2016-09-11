@@ -1,4 +1,4 @@
-site_name: proximitybeacon v0.3.6+20150729
+site_name: proximitybeacon v0.3.6+20160429
 site_url: http://byron.github.io/google-apis-rs/google-proximitybeacon1_beta1-cli
 site_description: Write integrating applications with bcore
 
@@ -22,7 +22,9 @@ pages:
 - ['beacons_list.md', 'Beacons', 'List']
 - ['beacons_register.md', 'Beacons', 'Register']
 - ['beacons_update.md', 'Beacons', 'Update']
+- ['methods_get-eidparams.md', 'Methods', 'Get Eidparams']
 - ['namespaces_list.md', 'Namespaces', 'List']
+- ['namespaces_update.md', 'Namespaces', 'Update']
 
 theme: readthedocs
 

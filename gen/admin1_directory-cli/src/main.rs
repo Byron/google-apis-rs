@@ -2114,6 +2114,7 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2121,7 +2122,7 @@ impl<'n> Engine<'n> {
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "email" => Some(("email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["email", "etag", "id", "kind", "role", "type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["email", "etag", "id", "kind", "role", "status", "type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2266,6 +2267,7 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2273,7 +2275,7 @@ impl<'n> Engine<'n> {
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "email" => Some(("email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["email", "etag", "id", "kind", "role", "type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["email", "etag", "id", "kind", "role", "status", "type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2356,6 +2358,7 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2363,7 +2366,7 @@ impl<'n> Engine<'n> {
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "email" => Some(("email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["email", "etag", "id", "kind", "role", "type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["email", "etag", "id", "kind", "role", "status", "type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -7428,7 +7431,7 @@ fn main() {
         
         ("customers", "methods: 'get', 'patch' and 'update'", vec![
             ("get",
-                    Some(r##"Retrives a customer."##),
+                    Some(r##"Retrieves a customer."##),
                     "Details at http://byron.github.io/google-apis-rs/google_admin1_directory_cli/customers_get",
                   vec![
                     (Some(r##"customer-key"##),
@@ -7634,7 +7637,7 @@ fn main() {
                      Some(true)),
                   ]),
             ("get",
-                    Some(r##"Retrives a domain of the customer."##),
+                    Some(r##"Retrieves a domain of the customer."##),
                     "Details at http://byron.github.io/google-apis-rs/google_admin1_directory_cli/domains_get",
                   vec![
                     (Some(r##"customer"##),
@@ -9680,7 +9683,7 @@ fn main() {
     
     let mut app = App::new("admin1-directory")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.6+20160323")
+           .version("0.3.6+20160824")
            .about("The Admin SDK Directory API lets you view and manage enterprise resources such as users and groups, administrative notifications, security features, and more.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_admin1_directory_cli")
            .arg(Arg::with_name("url")

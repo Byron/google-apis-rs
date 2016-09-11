@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *classroom* API at revision *20151013*. The CLI is at version *0.3.6*.
+This documentation was generated from the *classroom* API at revision *20160816*. The CLI is at version *0.3.6*.
 
 ```bash
 classroom1 [options]
@@ -32,6 +32,16 @@ classroom1 [options]
                 aliases-create <course-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 aliases-delete <course-id> <alias> [-p <v>]... [-o <out>]
                 aliases-list <course-id> [-p <v>]... [-o <out>]
+                course-work-create <course-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                course-work-get <course-id> <id> [-p <v>]... [-o <out>]
+                course-work-list <course-id> [-p <v>]... [-o <out>]
+                course-work-student-submissions-get <course-id> <course-work-id> <id> [-p <v>]... [-o <out>]
+                course-work-student-submissions-list <course-id> <course-work-id> [-p <v>]... [-o <out>]
+                course-work-student-submissions-modify-attachments <course-id> <course-work-id> <id> (-r <kv>)... [-p <v>]... [-o <out>]
+                course-work-student-submissions-patch <course-id> <course-work-id> <id> (-r <kv>)... [-p <v>]... [-o <out>]
+                course-work-student-submissions-reclaim <course-id> <course-work-id> <id> (-r <kv>)... [-p <v>]... [-o <out>]
+                course-work-student-submissions-return <course-id> <course-work-id> <id> (-r <kv>)... [-p <v>]... [-o <out>]
+                course-work-student-submissions-turn-in <course-id> <course-work-id> <id> (-r <kv>)... [-p <v>]... [-o <out>]
                 create (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <id> [-p <v>]... [-o <out>]
                 get <id> [-p <v>]... [-o <out>]
@@ -54,6 +64,13 @@ classroom1 [options]
                 list [-p <v>]... [-o <out>]
         user-profiles
                 get <user-id> [-p <v>]... [-o <out>]
+                guardian-invitations-create <student-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                guardian-invitations-get <student-id> <invitation-id> [-p <v>]... [-o <out>]
+                guardian-invitations-list <student-id> [-p <v>]... [-o <out>]
+                guardian-invitations-patch <student-id> <invitation-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                guardians-delete <student-id> <guardian-id> [-p <v>]... [-o <out>]
+                guardians-get <student-id> <guardian-id> [-p <v>]... [-o <out>]
+                guardians-list <student-id> [-p <v>]... [-o <out>]
   classroom1 --help
 
 Configuration:

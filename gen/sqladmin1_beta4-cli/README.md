@@ -24,13 +24,14 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *SQL Admin* API at revision *20160321*. The CLI is at version *0.3.6*.
+This documentation was generated from the *SQL Admin* API at revision *20160907*. The CLI is at version *0.3.6*.
 
 ```bash
 sqladmin1-beta4 [options]
         backup-runs
                 delete <project> <instance> <id> [-p <v>]... [-o <out>]
                 get <project> <instance> <id> [-p <v>]... [-o <out>]
+                insert <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <project> <instance> [-p <v>]... [-o <out>]
         databases
                 delete <project> <instance> <database> [-p <v>]... [-o <out>]

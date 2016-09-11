@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-books1` library allows access to all features of the *Google books* service.
 
-This documentation was generated from *books* crate version *0.1.14+20160226*, where *20160226* is the exact revision of the *books:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
+This documentation was generated from *books* crate version *0.1.14+20160823*, where *20160823* is the exact revision of the *books:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
 
 Everything else about the *books* *v1* API can be found at the
 [official documentation site](https://developers.google.com/books/docs/v1/getting_started).
@@ -130,10 +130,11 @@ let result = hub.volumes().list("q")
              .partner("kasd")
              .order_by("accusam")
              .max_results(93)
-             .library_restrict("justo")
-             .lang_restrict("amet.")
-             .filter("erat")
-             .download("labore")
+             .max_allowed_maturity_rating("justo")
+             .library_restrict("amet.")
+             .lang_restrict("erat")
+             .filter("labore")
+             .download("sea")
              .doit();
 
 match result {

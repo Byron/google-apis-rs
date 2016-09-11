@@ -3,15 +3,15 @@ DO NOT EDIT !
 This file was generated automatically from 'src/mako/api/README.md.mako'
 DO NOT EDIT !
 -->
-The `google-clouddebugger2` library allows access to all features of the *Google clouddebugger* service.
+The `google-clouddebugger2` library allows access to all features of the *Google Cloud Debugger* service.
 
-This documentation was generated from *clouddebugger* crate version *0.1.14+20160309*, where *20160309* is the exact revision of the *clouddebugger:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
+This documentation was generated from *Cloud Debugger* crate version *0.1.14+20160810*, where *20160810* is the exact revision of the *clouddebugger:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
 
-Everything else about the *clouddebugger* *v2* API can be found at the
-[official documentation site](https://cloud.google.com/tools/cloud-debugger).
+Everything else about the *Cloud Debugger* *v2* API can be found at the
+[official documentation site](http://cloud.google.com/debugger).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google_clouddebugger2/struct.Clouddebugger.html) ... 
+Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google_clouddebugger2/struct.CloudDebugger.html) ... 
 
 * controller
  * [*debuggees breakpoints list*](http://byron.github.io/google-apis-rs/google_clouddebugger2/struct.ControllerDebuggeeBreakpointListCall.html), [*debuggees breakpoints update*](http://byron.github.io/google-apis-rs/google_clouddebugger2/struct.ControllerDebuggeeBreakpointUpdateCall.html) and [*debuggees register*](http://byron.github.io/google-apis-rs/google_clouddebugger2/struct.ControllerDebuggeeRegisterCall.html)
@@ -25,7 +25,7 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
 
 The API is structured into the following primary items:
 
-* **[Hub](http://byron.github.io/google-apis-rs/google_clouddebugger2/struct.Clouddebugger.html)**
+* **[Hub](http://byron.github.io/google-apis-rs/google_clouddebugger2/struct.CloudDebugger.html)**
     * a central object to maintain state and allow accessing all *Activities*
     * creates [*Method Builders*](http://byron.github.io/google-apis-rs/google_clouddebugger2/trait.MethodsBuilder.html) which in turn
       allow access to individual [*Call Builders*](http://byron.github.io/google-apis-rs/google_clouddebugger2/trait.CallBuilder.html)
@@ -78,7 +78,7 @@ use clouddebugger2::Breakpoint;
 use clouddebugger2::{Result, Error};
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-use clouddebugger2::Clouddebugger;
+use clouddebugger2::CloudDebugger;
 
 // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 // `client_secret`, among other things.
@@ -91,7 +91,7 @@ let secret: ApplicationSecret = Default::default();
 let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
                               hyper::Client::new(),
                               <MemoryStorage as Default>::default(), None);
-let mut hub = Clouddebugger::new(hyper::Client::new(), auth);
+let mut hub = CloudDebugger::new(hyper::Client::new(), auth);
 // As the method needs a request, you would usually fill it with the desired information
 // into the respective structure. Some of the parts shown here might not be applicable !
 // Values shown here are possibly random and not representative !

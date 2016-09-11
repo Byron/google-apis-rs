@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *analytics* API at revision *20160308*. The CLI is at version *0.3.6*.
+This documentation was generated from the *analytics* API at revision *20160805*. The CLI is at version *0.3.6*.
 
 ```bash
 analytics3 [options]
@@ -83,6 +83,11 @@ analytics3 [options]
                 profiles-list <account-id> <web-property-id> [-p <v>]... [-o <out>]
                 profiles-patch <account-id> <web-property-id> <profile-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 profiles-update <account-id> <web-property-id> <profile-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                remarketing-audience-get <account-id> <web-property-id> <remarketing-audience-id> [-p <v>]... [-o <out>]
+                remarketing-audience-insert <account-id> <web-property-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                remarketing-audience-list <account-id> <web-property-id> [-p <v>]... [-o <out>]
+                remarketing-audience-patch <account-id> <web-property-id> <remarketing-audience-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                remarketing-audience-update <account-id> <web-property-id> <remarketing-audience-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 segments-list [-p <v>]... [-o <out>]
                 unsampled-reports-delete <account-id> <web-property-id> <profile-id> <unsampled-report-id> [-p <v>]...
                 unsampled-reports-get <account-id> <web-property-id> <profile-id> <unsampled-report-id> [-p <v>]... [-o <out>]

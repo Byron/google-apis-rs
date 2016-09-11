@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *classroom* crate version *0.1.14+20151013*, where *20151013* is the exact revision of the *classroom:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
+//! This documentation was generated from *classroom* crate version *0.1.14+20160816*, where *20160816* is the exact revision of the *classroom:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
 //! 
 //! Everything else about the *classroom* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/classroom/).
@@ -12,11 +12,11 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.Classroom.html) ... 
 //! 
 //! * [courses](struct.Course.html)
-//!  * [*aliases create*](struct.CourseAliaseCreateCall.html), [*aliases delete*](struct.CourseAliaseDeleteCall.html), [*aliases list*](struct.CourseAliaseListCall.html), [*create*](struct.CourseCreateCall.html), [*delete*](struct.CourseDeleteCall.html), [*get*](struct.CourseGetCall.html), [*list*](struct.CourseListCall.html), [*patch*](struct.CoursePatchCall.html), [*students create*](struct.CourseStudentCreateCall.html), [*students delete*](struct.CourseStudentDeleteCall.html), [*students get*](struct.CourseStudentGetCall.html), [*students list*](struct.CourseStudentListCall.html), [*teachers create*](struct.CourseTeacherCreateCall.html), [*teachers delete*](struct.CourseTeacherDeleteCall.html), [*teachers get*](struct.CourseTeacherGetCall.html), [*teachers list*](struct.CourseTeacherListCall.html) and [*update*](struct.CourseUpdateCall.html)
+//!  * [*aliases create*](struct.CourseAliaseCreateCall.html), [*aliases delete*](struct.CourseAliaseDeleteCall.html), [*aliases list*](struct.CourseAliaseListCall.html), [*course work create*](struct.CourseCourseWorkCreateCall.html), [*course work get*](struct.CourseCourseWorkGetCall.html), [*course work list*](struct.CourseCourseWorkListCall.html), [*course work student submissions get*](struct.CourseCourseWorkStudentSubmissionGetCall.html), [*course work student submissions list*](struct.CourseCourseWorkStudentSubmissionListCall.html), [*course work student submissions modify attachments*](struct.CourseCourseWorkStudentSubmissionModifyAttachmentCall.html), [*course work student submissions patch*](struct.CourseCourseWorkStudentSubmissionPatchCall.html), [*course work student submissions reclaim*](struct.CourseCourseWorkStudentSubmissionReclaimCall.html), [*course work student submissions return*](struct.CourseCourseWorkStudentSubmissionReturnCall.html), [*course work student submissions turn in*](struct.CourseCourseWorkStudentSubmissionTurnInCall.html), [*create*](struct.CourseCreateCall.html), [*delete*](struct.CourseDeleteCall.html), [*get*](struct.CourseGetCall.html), [*list*](struct.CourseListCall.html), [*patch*](struct.CoursePatchCall.html), [*students create*](struct.CourseStudentCreateCall.html), [*students delete*](struct.CourseStudentDeleteCall.html), [*students get*](struct.CourseStudentGetCall.html), [*students list*](struct.CourseStudentListCall.html), [*teachers create*](struct.CourseTeacherCreateCall.html), [*teachers delete*](struct.CourseTeacherDeleteCall.html), [*teachers get*](struct.CourseTeacherGetCall.html), [*teachers list*](struct.CourseTeacherListCall.html) and [*update*](struct.CourseUpdateCall.html)
 //! * [invitations](struct.Invitation.html)
 //!  * [*accept*](struct.InvitationAcceptCall.html), [*create*](struct.InvitationCreateCall.html), [*delete*](struct.InvitationDeleteCall.html), [*get*](struct.InvitationGetCall.html) and [*list*](struct.InvitationListCall.html)
 //! * [user profiles](struct.UserProfile.html)
-//!  * [*get*](struct.UserProfileGetCall.html)
+//!  * [*get*](struct.UserProfileGetCall.html), [*guardian invitations create*](struct.UserProfileGuardianInvitationCreateCall.html), [*guardian invitations get*](struct.UserProfileGuardianInvitationGetCall.html), [*guardian invitations list*](struct.UserProfileGuardianInvitationListCall.html), [*guardian invitations patch*](struct.UserProfileGuardianInvitationPatchCall.html), [*guardians delete*](struct.UserProfileGuardianDeleteCall.html), [*guardians get*](struct.UserProfileGuardianGetCall.html) and [*guardians list*](struct.UserProfileGuardianListCall.html)
 //! 
 //! 
 //! 
@@ -51,23 +51,33 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.courses().update(...).doit()
-//! let r = hub.courses().list(...).doit()
-//! let r = hub.courses().teachers_list(...).doit()
+//! let r = hub.courses().course_work_student_submissions_patch(...).doit()
+//! let r = hub.courses().course_work_student_submissions_list(...).doit()
 //! let r = hub.courses().get(...).doit()
+//! let r = hub.courses().update(...).doit()
 //! let r = hub.courses().students_delete(...).doit()
-//! let r = hub.courses().patch(...).doit()
-//! let r = hub.courses().aliases_create(...).doit()
-//! let r = hub.courses().teachers_delete(...).doit()
-//! let r = hub.courses().students_create(...).doit()
-//! let r = hub.courses().students_get(...).doit()
-//! let r = hub.courses().aliases_delete(...).doit()
-//! let r = hub.courses().teachers_create(...).doit()
 //! let r = hub.courses().teachers_get(...).doit()
+//! let r = hub.courses().course_work_list(...).doit()
+//! let r = hub.courses().teachers_list(...).doit()
+//! let r = hub.courses().course_work_student_submissions_turn_in(...).doit()
+//! let r = hub.courses().course_work_student_submissions_modify_attachments(...).doit()
+//! let r = hub.courses().course_work_student_submissions_return(...).doit()
+//! let r = hub.courses().course_work_get(...).doit()
+//! let r = hub.courses().course_work_create(...).doit()
+//! let r = hub.courses().list(...).doit()
+//! let r = hub.courses().course_work_student_submissions_reclaim(...).doit()
+//! let r = hub.courses().aliases_create(...).doit()
+//! let r = hub.courses().students_create(...).doit()
+//! let r = hub.courses().aliases_delete(...).doit()
 //! let r = hub.courses().create(...).doit()
 //! let r = hub.courses().students_list(...).doit()
-//! let r = hub.courses().aliases_list(...).doit()
 //! let r = hub.courses().delete(...).doit()
+//! let r = hub.courses().patch(...).doit()
+//! let r = hub.courses().aliases_list(...).doit()
+//! let r = hub.courses().teachers_delete(...).doit()
+//! let r = hub.courses().teachers_create(...).doit()
+//! let r = hub.courses().course_work_student_submissions_get(...).doit()
+//! let r = hub.courses().students_get(...).doit()
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -113,11 +123,12 @@
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.courses().list()
-//!              .teacher_id("sea")
-//!              .student_id("et")
-//!              .page_token("duo")
-//!              .page_size(-21)
+//! let result = hub.courses().course_work_student_submissions_list("courseId", "courseWorkId")
+//!              .user_id("gubergren")
+//!              .add_states("aliquyam")
+//!              .page_token("eos")
+//!              .page_size(-38)
+//!              .late("sea")
 //!              .doit();
 //! 
 //! match result {

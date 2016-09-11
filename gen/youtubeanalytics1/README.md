@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-youtubeanalytics1` library allows access to all features of the *Google YouTube Analytics* service.
 
-This documentation was generated from *YouTube Analytics* crate version *0.1.14+20160301*, where *20160301* is the exact revision of the *youtubeAnalytics:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
+This documentation was generated from *YouTube Analytics* crate version *0.1.14+20160513*, where *20160513* is the exact revision of the *youtubeAnalytics:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
 
 Everything else about the *YouTube Analytics* *v1* API can be found at the
 [official documentation site](http://developers.google.com/youtube/analytics/).

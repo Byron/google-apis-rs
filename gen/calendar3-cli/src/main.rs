@@ -4385,7 +4385,7 @@ fn main() {
     
     let mut app = App::new("calendar3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.6+20160405")
+           .version("0.3.6+20160830")
            .about("Manipulates events and other calendar data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_calendar3_cli")
            .arg(Arg::with_name("url")

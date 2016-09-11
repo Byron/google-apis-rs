@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Ad Exchange Buyer* crate version *0.1.14+20160405*, where *20160405* is the exact revision of the *adexchangebuyer:v1.4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
+//! This documentation was generated from *Ad Exchange Buyer* crate version *0.1.14+20160831*, where *20160831* is the exact revision of the *adexchangebuyer:v1.4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
 //! 
 //! Everything else about the *Ad Exchange Buyer* *v1d4* API can be found at the
 //! [official documentation site](https://developers.google.com/ad-exchange/buyer-rest).

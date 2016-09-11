@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-genomics1` library allows access to all features of the *Google genomics* service.
 
-This documentation was generated from *genomics* crate version *0.1.14+20160407*, where *20160407* is the exact revision of the *genomics:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
+This documentation was generated from *genomics* crate version *0.1.14+20160905*, where *20160905* is the exact revision of the *genomics:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
 
 Everything else about the *genomics* *v1* API can be found at the
 [official documentation site](https://cloud.google.com/genomics/).

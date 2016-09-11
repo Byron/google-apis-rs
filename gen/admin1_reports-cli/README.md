@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *reports* API at revision *20151113*. The CLI is at version *0.3.6*.
+This documentation was generated from the *reports* API at revision *20160704*. The CLI is at version *0.3.6*.
 
 ```bash
 admin1-reports [options]

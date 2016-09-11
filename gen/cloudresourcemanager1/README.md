@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-cloudresourcemanager1` library allows access to all features of the *Google Cloud Resource Manager* service.
 
-This documentation was generated from *Cloud Resource Manager* crate version *0.1.14+20160316*, where *20160316* is the exact revision of the *cloudresourcemanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
+This documentation was generated from *Cloud Resource Manager* crate version *0.1.14+20160617*, where *20160617* is the exact revision of the *cloudresourcemanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
 
 Everything else about the *Cloud Resource Manager* *v1* API can be found at the
 [official documentation site](https://cloud.google.com/resource-manager).
@@ -13,6 +13,8 @@ Everything else about the *Cloud Resource Manager* *v1* API can be found at the
 
 Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1/struct.CloudResourceManager.html) ... 
 
+* [operations](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1/struct.Operation.html)
+ * [*get*](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1/struct.OperationGetCall.html)
 * [projects](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1/struct.Project.html)
  * [*delete*](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1/struct.ProjectDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1/struct.ProjectGetCall.html), [*get iam policy*](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1/struct.ProjectGetIamPolicyCall.html), [*list*](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1/struct.ProjectListCall.html), [*set iam policy*](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1/struct.ProjectSetIamPolicyCall.html), [*test iam permissions*](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1/struct.ProjectTestIamPermissionCall.html), [*undelete*](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1/struct.ProjectUndeleteCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1/struct.ProjectUpdateCall.html)
 

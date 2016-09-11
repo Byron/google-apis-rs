@@ -206,6 +206,22 @@ pub struct AchievementResetResponse {
 impl ResponseResult for AchievementResetResponse {}
 
 
+/// This is a JSON template for profile settings
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ProfileSettings {
+    /// Uniquely identifies the type of this resource. Value is always the fixed string gamesManagement#profileSettings.
+    pub kind: Option<String>,
+    /// The player's current profile visibility. This field is visible to both 1P and 3P APIs.
+    #[serde(rename="profileVisible")]
+    pub profile_visible: Option<bool>,
+}
+
+impl Part for ProfileSettings {}
+
+
 /// An object representation of the individual components of the player's name. For some players, these fields may not be present.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -355,14 +371,17 @@ pub struct Player {
     /// The url to the portrait mode player banner image.
     #[serde(rename="bannerUrlPortrait")]
     pub banner_url_portrait: Option<String>,
-    /// The player's title rewarded for their game activities.
-    pub title: Option<String>,
+    /// The player's profile settings. Controls whether or not the player's profile is visible to other players.
+    #[serde(rename="profileSettings")]
+    pub profile_settings: Option<ProfileSettings>,
     /// An object to represent Play Game experience information for the player.
     #[serde(rename="experienceInfo")]
     pub experience_info: Option<GamesPlayerExperienceInfoResource>,
     /// The url to the landscape mode player banner image.
     #[serde(rename="bannerUrlLandscape")]
     pub banner_url_landscape: Option<String>,
+    /// The player's title rewarded for their game activities.
+    pub title: Option<String>,
     /// The base URL for the image that represents the player.
     #[serde(rename="avatarImageUrl")]
     pub avatar_image_url: Option<String>,

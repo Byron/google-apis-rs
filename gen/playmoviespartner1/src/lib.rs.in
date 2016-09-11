@@ -60,7 +60,7 @@ impl Default for Scope {
 // HUB ###
 // ######
 
-/// Central instance to access all Playmoviespartner related resource activities
+/// Central instance to access all PlayMovies related resource activities
 ///
 /// # Examples
 ///
@@ -74,7 +74,7 @@ impl Default for Scope {
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// use playmoviespartner1::Playmoviespartner;
+/// use playmoviespartner1::PlayMovies;
 /// 
 /// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 /// // `client_secret`, among other things.
@@ -87,11 +87,11 @@ impl Default for Scope {
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::new(),
 ///                               <MemoryStorage as Default>::default(), None);
-/// let mut hub = Playmoviespartner::new(hyper::Client::new(), auth);
+/// let mut hub = PlayMovies::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.accounts().store_infos_country_get("accountId", "videoId", "country")
+/// let result = hub.accounts().avails_get("accountId", "availId")
 ///              .doit();
 /// 
 /// match result {
@@ -112,19 +112,19 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Playmoviespartner<C, A> {
+pub struct PlayMovies<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
 }
 
-impl<'a, C, A> Hub for Playmoviespartner<C, A> {}
+impl<'a, C, A> Hub for PlayMovies<C, A> {}
 
-impl<'a, C, A> Playmoviespartner<C, A>
+impl<'a, C, A> PlayMovies<C, A>
     where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> Playmoviespartner<C, A> {
-        Playmoviespartner {
+    pub fn new(client: C, authenticator: A) -> PlayMovies<C, A> {
+        PlayMovies {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/0.1.14".to_string(),
@@ -164,6 +164,9 @@ pub struct ListExperienceLocalesResponse {
     /// See _List methods rules_ for info about this field.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
+    /// See _List methods rules_ for more information about this field.
+    #[serde(rename="totalSize")]
+    pub total_size: Option<i32>,
     /// List of ExperienceLocales that match the request criteria.
     #[serde(rename="experienceLocales")]
     pub experience_locales: Option<Vec<ExperienceLocale>>,
@@ -186,6 +189,9 @@ pub struct ListOrdersResponse {
     /// See _List methods rules_ for info about this field.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
+    /// See _List methods rules_ for more information about this field.
+    #[serde(rename="totalSize")]
+    pub total_size: Option<i32>,
     /// List of Orders that match the request criteria.
     pub orders: Option<Vec<Order>>,
 }
@@ -210,14 +216,99 @@ pub struct ListStoreInfosResponse {
     /// See 'List methods rules' for info about this field.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
+    /// See _List methods rules_ for more information about this field.
+    #[serde(rename="totalSize")]
+    pub total_size: Option<i32>,
 }
 
 impl ResponseResult for ListStoreInfosResponse {}
 
 
+/// A Component is an element (audio, video, subtitle, artwork, trailer, etc...) that is used in a set of ExperienceLocales. A Component is owned by a Studio and managed either by the Studio itself or by one Post-Production House. Each Component is identified by a `component_id` and its `type`.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [components type get accounts](struct.AccountComponentTypeGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Component {
+    /// High-level status of the Component.
+    pub status: Option<String>,
+    /// List of Alternative Cut IDs, sometimes available in lieu of the main Edit-level EIDR IDs. This is not an EIDR ID, but a Partner-provided ID. Example: "206346_79838".
+    #[serde(rename="altCutIds")]
+    pub alt_cut_ids: Option<Vec<String>>,
+    /// Processing errors during XML file parsing. Example: 'Invalid input file'
+    #[serde(rename="processingErrors")]
+    pub processing_errors: Option<Vec<String>>,
+    /// Name of the studio that owns the Component.
+    #[serde(rename="studioName")]
+    pub studio_name: Option<String>,
+    /// Detailed status of the Component
+    #[serde(rename="statusDetail")]
+    pub status_detail: Option<String>,
+    /// Notes explaining why a Component has been rejected.
+    #[serde(rename="rejectionNote")]
+    pub rejection_note: Option<String>,
+    /// Timestamp when the Component was approved.
+    #[serde(rename="approvedTime")]
+    pub approved_time: Option<String>,
+    /// List of Title-level EIDR IDs. Example: "10.5240/1489-49A2-3956-4B2D-FE16-5".
+    #[serde(rename="titleLevelEidrs")]
+    pub title_level_eidrs: Option<Vec<String>>,
+    /// IDs internally generated by Google to uniquely identify the ExperienceLocales for which the Component is used. Example: 'KRZiVjY9h7t'
+    #[serde(rename="elIds")]
+    pub el_ids: Option<Vec<String>>,
+    /// Default Edit name, usually in the language of the country of origin. Example: "Googlers, The".
+    pub name: Option<String>,
+    /// Language of the component, using the "BCP 47" format. Examples: "en", "en-US", "es", "es-419".
+    pub language: Option<String>,
+    /// Type of the playable unit for which the Component is intended.
+    #[serde(rename="playableUnitType")]
+    pub playable_unit_type: Option<String>,
+    /// Detail about the type of the Component.
+    #[serde(rename="componentDetailType")]
+    pub component_detail_type: Option<String>,
+    /// Timestamp when the Component was received.
+    #[serde(rename="receivedTime")]
+    pub received_time: Option<String>,
+    /// List of custom IDs (defined by the partner) linked to the ExperienceLocale using this Component. Example: "R86241"
+    #[serde(rename="customIds")]
+    pub custom_ids: Option<Vec<String>>,
+    /// Name of the post-production house that manages the Component.
+    #[serde(rename="pphName")]
+    pub pph_name: Option<String>,
+    /// File name of the Component when delivered.
+    pub filename: Option<String>,
+    /// Component priority, as defined by Google. The higher the value, the higher the priority.
+    pub priority: Option<f64>,
+    /// List of Edit-level EIDR IDs. Example: "10.5240/1489-49A2-3956-4B2D-FE16-6".
+    #[serde(rename="editLevelEidrs")]
+    pub edit_level_eidrs: Option<Vec<String>>,
+    /// A simpler representation of the priority.
+    #[serde(rename="normalizedPriority")]
+    pub normalized_priority: Option<String>,
+    /// Type of the Component. Example: AUDIO_51
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// ID internally generated by Google to uniquely identify the Component. Example: 'wteyrc_647xc'
+    #[serde(rename="componentId")]
+    pub component_id: Option<String>,
+}
+
+impl ResponseResult for Component {}
+
+
 /// An Avail describes the Availability Window of a specific Edit in a given country, which means the period Google is allowed to sell or rent the Edit. Avails are exposed in EMA format Version 1.6b (available at http://www.movielabs.com/md/avails/) Studios can see the Avails for the Titles they own. Post-production houses cannot see any Avails.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [avails get accounts](struct.AccountAvailGetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Avail {
@@ -242,9 +333,9 @@ pub struct Avail {
     /// OPTIONAL.TV Only. Title used by involved parties to refer to this episode. Only available on TV Avails. Example: "Coding at Google".
     #[serde(rename="episodeTitleInternalAlias")]
     pub episode_title_internal_alias: Option<String>,
-    /// The number assigned to the episode within a season. Only available on TV Avails. Example: "3".
-    #[serde(rename="episodeNumber")]
-    pub episode_number: Option<String>,
+    /// ID internally generated by Google to uniquely identify an Avail. Not part of EMA Specs.
+    #[serde(rename="availId")]
+    pub avail_id: Option<String>,
     /// End of term in YYYY-MM-DD format in the timezone of the country of the Avail. "Open" if no end date is available. Example: "2019-02-17"
     pub end: Option<String>,
     /// Other identifier referring to the Edit, as defined by partner. Example: "GOOGLER_2006"
@@ -272,6 +363,9 @@ pub struct Avail {
     /// The number assigned to the season within a series. Only available on TV Avails. Example: "1".
     #[serde(rename="seasonNumber")]
     pub season_number: Option<String>,
+    /// The number assigned to the episode within a season. Only available on TV Avails. Example: "3".
+    #[serde(rename="episodeNumber")]
+    pub episode_number: Option<String>,
     /// Indicates the format profile covered by the transaction.
     #[serde(rename="formatProfile")]
     pub format_profile: Option<String>,
@@ -316,7 +410,7 @@ pub struct Avail {
     pub price_type: Option<String>,
 }
 
-impl Part for Avail {}
+impl ResponseResult for Avail {}
 
 
 /// An ExperienceLocale tracks the fulfillment of a Title in a country using a specific language, when delivered using component-based delivery. For example, a Title in Switzerland might have 3 ExperienceLocales: they both share the same country ("CH"), but each has different languages ("de", "fr", and "it"). Each ExperienceLocale is uniquely identified by an `el_id`, which is generated by Google. Externally, an ExperienceLocale can also be identified by partners using its EIDR IDs, AltCutID or `custom_id` (when provided).
@@ -500,6 +594,9 @@ pub struct ListAvailsResponse {
     /// See _List methods rules_ for info about this field.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
+    /// See _List methods rules_ for more information about this field.
+    #[serde(rename="totalSize")]
+    pub total_size: Option<i32>,
     /// List of Avails that match the request criteria.
     pub avails: Option<Vec<Avail>>,
 }
@@ -588,13 +685,37 @@ pub struct Order {
 impl ResponseResult for Order {}
 
 
+/// Response to the 'ListComponents' method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [components list accounts](struct.AccountComponentListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListComponentsResponse {
+    /// See _List methods rules_ for info about this field.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// See _List methods rules_ for more information about this field.
+    #[serde(rename="totalSize")]
+    pub total_size: Option<i32>,
+    /// List of Components that match the request criteria.
+    pub components: Option<Vec<Component>>,
+}
+
+impl ResponseResult for ListComponentsResponse {}
+
+
 
 // ###################
 // MethodBuilders ###
 // #################
 
 /// A builder providing access to all methods supported on *account* resources.
-/// It is not used directly, but through the `Playmoviespartner` hub.
+/// It is not used directly, but through the `PlayMovies` hub.
 ///
 /// # Example
 ///
@@ -608,15 +729,15 @@ impl ResponseResult for Order {}
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// use playmoviespartner1::Playmoviespartner;
+/// use playmoviespartner1::PlayMovies;
 /// 
 /// let secret: ApplicationSecret = Default::default();
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::new(),
 ///                               <MemoryStorage as Default>::default(), None);
-/// let mut hub = Playmoviespartner::new(hyper::Client::new(), auth);
+/// let mut hub = PlayMovies::new(hyper::Client::new(), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `avails_list(...)`, `experience_locales_get(...)`, `experience_locales_list(...)`, `orders_get(...)`, `orders_list(...)`, `store_infos_country_get(...)` and `store_infos_list(...)`
+/// // like `avails_get(...)`, `avails_list(...)`, `components_list(...)`, `components_type_get(...)`, `experience_locales_get(...)`, `experience_locales_list(...)`, `orders_get(...)`, `orders_list(...)`, `store_infos_country_get(...)` and `store_infos_list(...)`
 /// // to build up your call.
 /// let rb = hub.accounts();
 /// # }
@@ -624,7 +745,7 @@ impl ResponseResult for Order {}
 pub struct AccountMethods<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Playmoviespartner<C, A>,
+    hub: &'a PlayMovies<C, A>,
 }
 
 impl<'a, C, A> MethodsBuilder for AccountMethods<'a, C, A> {}
@@ -642,6 +763,7 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
         AccountOrderListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
+            _video_ids: Default::default(),
             _studio_names: Default::default(),
             _status: Default::default(),
             _pph_names: Default::default(),
@@ -697,6 +819,25 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Get an Avail given its avail group id and avail id.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - REQUIRED. See _General rules_ for more information about this field.
+    /// * `availId` - REQUIRED. Avail ID.
+    pub fn avails_get(&self, account_id: &str, avail_id: &str) -> AccountAvailGetCall<'a, C, A> {
+        AccountAvailGetCall {
+            hub: self.hub,
+            _account_id: account_id.to_string(),
+            _avail_id: avail_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// List Avails owned or managed by the partner. See _Authentication and Authorization rules_ and _List methods rules_ for more information about this method.
     /// 
     /// # Arguments
@@ -713,6 +854,7 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
             _pph_names: Default::default(),
             _page_token: Default::default(),
             _page_size: Default::default(),
+            _alt_ids: Default::default(),
             _alt_id: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -753,10 +895,12 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
             _video_ids: Default::default(),
             _video_id: Default::default(),
             _studio_names: Default::default(),
+            _season_ids: Default::default(),
             _pph_names: Default::default(),
             _page_token: Default::default(),
             _page_size: Default::default(),
             _name: Default::default(),
+            _mids: Default::default(),
             _countries: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -789,6 +933,58 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
             _additional_params: Default::default(),
         }
     }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// List Components owned or managed by the partner. See _Authentication and Authorization rules_ and _List methods rules_ for more information about this method.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - REQUIRED. See _General rules_ for more information about this field.
+    pub fn components_list(&self, account_id: &str) -> AccountComponentListCall<'a, C, A> {
+        AccountComponentListCall {
+            hub: self.hub,
+            _account_id: account_id.to_string(),
+            _title_level_eidr: Default::default(),
+            _studio_names: Default::default(),
+            _status: Default::default(),
+            _presentation_id: Default::default(),
+            _pph_names: Default::default(),
+            _playable_sequence_id: Default::default(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _inventory_id: Default::default(),
+            _filename: Default::default(),
+            _el_id: Default::default(),
+            _edit_level_eidr: Default::default(),
+            _custom_id: Default::default(),
+            _alt_cut_id: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Get a Component given its id.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - REQUIRED. See _General rules_ for more information about this field.
+    /// * `componentId` - REQUIRED. Component ID.
+    /// * `type` - REQUIRED. Component Type.
+    pub fn components_type_get(&self, account_id: &str, component_id: &str, type_: &str) -> AccountComponentTypeGetCall<'a, C, A> {
+        AccountComponentTypeGetCall {
+            hub: self.hub,
+            _account_id: account_id.to_string(),
+            _component_id: component_id.to_string(),
+            _type_: type_.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
 }
 
 
@@ -815,32 +1011,34 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use playmoviespartner1::Playmoviespartner;
+/// # use playmoviespartner1::PlayMovies;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Playmoviespartner::new(hyper::Client::new(), auth);
+/// # let mut hub = PlayMovies::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().orders_list("accountId")
-///              .add_studio_names("accusam")
-///              .add_status("takimata")
-///              .add_pph_names("justo")
-///              .page_token("amet.")
-///              .page_size(-81)
-///              .name("labore")
-///              .custom_id("sea")
+///              .add_video_ids("dolores")
+///              .add_studio_names("kasd")
+///              .add_status("accusam")
+///              .add_pph_names("takimata")
+///              .page_token("justo")
+///              .page_size(-1)
+///              .name("erat")
+///              .custom_id("labore")
 ///              .doit();
 /// # }
 /// ```
 pub struct AccountOrderListCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Playmoviespartner<C, A>,
+    hub: &'a PlayMovies<C, A>,
     _account_id: String,
+    _video_ids: Vec<String>,
     _studio_names: Vec<String>,
     _status: Vec<String>,
     _pph_names: Vec<String>,
@@ -869,8 +1067,13 @@ impl<'a, C, A> AccountOrderListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         };
         dlg.begin(MethodInfo { id: "playmoviespartner.accounts.orders.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((10 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((11 + self._additional_params.len()));
         params.push(("accountId", self._account_id.to_string()));
+        if self._video_ids.len() > 0 {
+            for f in self._video_ids.iter() {
+                params.push(("videoIds", f.to_string()));
+            }
+        }
         if self._studio_names.len() > 0 {
             for f in self._studio_names.iter() {
                 params.push(("studioNames", f.to_string()));
@@ -898,7 +1101,7 @@ impl<'a, C, A> AccountOrderListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         if let Some(value) = self._custom_id {
             params.push(("customId", value.to_string()));
         }
-        for &field in ["alt", "accountId", "studioNames", "status", "pphNames", "pageToken", "pageSize", "name", "customId"].iter() {
+        for &field in ["alt", "accountId", "videoIds", "studioNames", "status", "pphNames", "pageToken", "pageSize", "name", "customId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -1023,6 +1226,14 @@ impl<'a, C, A> AccountOrderListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._account_id = new_value.to_string();
         self
     }
+    /// Filter Orders that match any of the given `video_id`s.
+    ///
+    /// Append the given value to the *video ids* query property.
+    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
+    pub fn add_video_ids(mut self, new_value: &str) -> AccountOrderListCall<'a, C, A> {
+        self._video_ids.push(new_value.to_string());
+        self
+    }
     /// See _List methods rules_ for info about this field.
     ///
     /// Append the given value to the *studio names* query property.
@@ -1061,7 +1272,7 @@ impl<'a, C, A> AccountOrderListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._page_size = Some(new_value);
         self
     }
-    /// Filter Orders that match a title name (case-insensitive, sub-string match).
+    /// Filter that matches Orders with a `name`, `show`, `season` or `episode` that contains the given case-insensitive name.
     ///
     /// Sets the *name* query property to the given value.
     pub fn name(mut self, new_value: &str) -> AccountOrderListCall<'a, C, A> {
@@ -1149,13 +1360,13 @@ impl<'a, C, A> AccountOrderListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use playmoviespartner1::Playmoviespartner;
+/// # use playmoviespartner1::PlayMovies;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Playmoviespartner::new(hyper::Client::new(), auth);
+/// # let mut hub = PlayMovies::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1166,7 +1377,7 @@ impl<'a, C, A> AccountOrderListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 pub struct AccountStoreInfoCountryGetCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Playmoviespartner<C, A>,
+    hub: &'a PlayMovies<C, A>,
     _account_id: String,
     _video_id: String,
     _country: String,
@@ -1414,13 +1625,13 @@ impl<'a, C, A> AccountStoreInfoCountryGetCall<'a, C, A> where C: BorrowMut<hyper
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use playmoviespartner1::Playmoviespartner;
+/// # use playmoviespartner1::PlayMovies;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Playmoviespartner::new(hyper::Client::new(), auth);
+/// # let mut hub = PlayMovies::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1431,7 +1642,7 @@ impl<'a, C, A> AccountStoreInfoCountryGetCall<'a, C, A> where C: BorrowMut<hyper
 pub struct AccountOrderGetCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Playmoviespartner<C, A>,
+    hub: &'a PlayMovies<C, A>,
     _account_id: String,
     _order_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -1651,6 +1862,259 @@ impl<'a, C, A> AccountOrderGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 }
 
 
+/// Get an Avail given its avail group id and avail id.
+///
+/// A builder for the *avails.get* method supported by a *account* resource.
+/// It is not used directly, but through a `AccountMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_playmoviespartner1 as playmoviespartner1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use playmoviespartner1::PlayMovies;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = PlayMovies::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.accounts().avails_get("accountId", "availId")
+///              .doit();
+/// # }
+/// ```
+pub struct AccountAvailGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a PlayMovies<C, A>,
+    _account_id: String,
+    _avail_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for AccountAvailGetCall<'a, C, A> {}
+
+impl<'a, C, A> AccountAvailGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Avail)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "playmoviespartner.accounts.avails.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        params.push(("accountId", self._account_id.to_string()));
+        params.push(("availId", self._avail_id.to_string()));
+        for &field in ["alt", "accountId", "availId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://playmoviespartner.googleapis.com/v1/accounts/{accountId}/avails/{availId}".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::PlaymovyPartnerReadonly.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{accountId}", "accountId"), ("{availId}", "availId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["availId", "accountId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// REQUIRED. See _General rules_ for more information about this field.
+    ///
+    /// Sets the *account id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn account_id(mut self, new_value: &str) -> AccountAvailGetCall<'a, C, A> {
+        self._account_id = new_value.to_string();
+        self
+    }
+    /// REQUIRED. Avail ID.
+    ///
+    /// Sets the *avail id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn avail_id(mut self, new_value: &str) -> AccountAvailGetCall<'a, C, A> {
+        self._avail_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountAvailGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> AccountAvailGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::PlaymovyPartnerReadonly`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> AccountAvailGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
 /// List Avails owned or managed by the partner. See _Authentication and Authorization rules_ and _List methods rules_ for more information about this method.
 ///
 /// A builder for the *avails.list* method supported by a *account* resource.
@@ -1667,32 +2131,33 @@ impl<'a, C, A> AccountOrderGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use playmoviespartner1::Playmoviespartner;
+/// # use playmoviespartner1::PlayMovies;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Playmoviespartner::new(hyper::Client::new(), auth);
+/// # let mut hub = PlayMovies::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().avails_list("accountId")
-///              .add_video_ids("no")
+///              .add_video_ids("justo")
 ///              .title("justo")
-///              .add_territories("justo")
+///              .add_territories("et")
 ///              .add_studio_names("et")
-///              .add_pph_names("et")
-///              .page_token("diam")
-///              .page_size(-55)
-///              .alt_id("Lorem")
+///              .add_pph_names("diam")
+///              .page_token("ipsum")
+///              .page_size(-5)
+///              .add_alt_ids("et")
+///              .alt_id("duo")
 ///              .doit();
 /// # }
 /// ```
 pub struct AccountAvailListCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Playmoviespartner<C, A>,
+    hub: &'a PlayMovies<C, A>,
     _account_id: String,
     _video_ids: Vec<String>,
     _title: Option<String>,
@@ -1701,6 +2166,7 @@ pub struct AccountAvailListCall<'a, C, A>
     _pph_names: Vec<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
+    _alt_ids: Vec<String>,
     _alt_id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
@@ -1723,7 +2189,7 @@ impl<'a, C, A> AccountAvailListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         };
         dlg.begin(MethodInfo { id: "playmoviespartner.accounts.avails.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((11 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((12 + self._additional_params.len()));
         params.push(("accountId", self._account_id.to_string()));
         if self._video_ids.len() > 0 {
             for f in self._video_ids.iter() {
@@ -1754,10 +2220,15 @@ impl<'a, C, A> AccountAvailListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         if let Some(value) = self._page_size {
             params.push(("pageSize", value.to_string()));
         }
+        if self._alt_ids.len() > 0 {
+            for f in self._alt_ids.iter() {
+                params.push(("altIds", f.to_string()));
+            }
+        }
         if let Some(value) = self._alt_id {
             params.push(("altId", value.to_string()));
         }
-        for &field in ["alt", "accountId", "videoIds", "title", "territories", "studioNames", "pphNames", "pageToken", "pageSize", "altId"].iter() {
+        for &field in ["alt", "accountId", "videoIds", "title", "territories", "studioNames", "pphNames", "pageToken", "pageSize", "altIds", "altId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -1890,7 +2361,7 @@ impl<'a, C, A> AccountAvailListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._video_ids.push(new_value.to_string());
         self
     }
-    /// Filter Avails that match a case-insensitive substring of the default Title name.
+    /// Filter that matches Avails with a `title_internal_alias`, `series_title_internal_alias`, `season_title_internal_alias`, or `episode_title_internal_alias` that contains the given case-insensitive title.
     ///
     /// Sets the *title* query property to the given value.
     pub fn title(mut self, new_value: &str) -> AccountAvailListCall<'a, C, A> {
@@ -1935,7 +2406,15 @@ impl<'a, C, A> AccountAvailListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._page_size = Some(new_value);
         self
     }
-    /// Filter Avails that match a case-insensitive, partner-specific custom id.
+    /// Filter Avails that match (case-insensitive) any of the given partner-specific custom ids.
+    ///
+    /// Append the given value to the *alt ids* query property.
+    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
+    pub fn add_alt_ids(mut self, new_value: &str) -> AccountAvailListCall<'a, C, A> {
+        self._alt_ids.push(new_value.to_string());
+        self
+    }
+    /// Filter Avails that match a case-insensitive, partner-specific custom id. NOTE: this field is deprecated and will be removed on V2; `alt_ids` should be used instead.
     ///
     /// Sets the *alt id* query property to the given value.
     pub fn alt_id(mut self, new_value: &str) -> AccountAvailListCall<'a, C, A> {
@@ -2016,13 +2495,13 @@ impl<'a, C, A> AccountAvailListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use playmoviespartner1::Playmoviespartner;
+/// # use playmoviespartner1::PlayMovies;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Playmoviespartner::new(hyper::Client::new(), auth);
+/// # let mut hub = PlayMovies::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2033,7 +2512,7 @@ impl<'a, C, A> AccountAvailListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 pub struct AccountExperienceLocaleGetCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Playmoviespartner<C, A>,
+    hub: &'a PlayMovies<C, A>,
     _account_id: String,
     _el_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -2269,40 +2748,44 @@ impl<'a, C, A> AccountExperienceLocaleGetCall<'a, C, A> where C: BorrowMut<hyper
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use playmoviespartner1::Playmoviespartner;
+/// # use playmoviespartner1::PlayMovies;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Playmoviespartner::new(hyper::Client::new(), auth);
+/// # let mut hub = PlayMovies::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().store_infos_list("accountId")
-///              .add_video_ids("sea")
-///              .video_id("Lorem")
-///              .add_studio_names("eos")
-///              .add_pph_names("erat")
-///              .page_token("sadipscing")
-///              .page_size(-48)
-///              .name("eirmod")
-///              .add_countries("elitr")
+///              .add_video_ids("eos")
+///              .video_id("erat")
+///              .add_studio_names("sadipscing")
+///              .add_season_ids("dolor")
+///              .add_pph_names("eirmod")
+///              .page_token("elitr")
+///              .page_size(-97)
+///              .name("no")
+///              .add_mids("labore")
+///              .add_countries("eirmod")
 ///              .doit();
 /// # }
 /// ```
 pub struct AccountStoreInfoListCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Playmoviespartner<C, A>,
+    hub: &'a PlayMovies<C, A>,
     _account_id: String,
     _video_ids: Vec<String>,
     _video_id: Option<String>,
     _studio_names: Vec<String>,
+    _season_ids: Vec<String>,
     _pph_names: Vec<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _name: Option<String>,
+    _mids: Vec<String>,
     _countries: Vec<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
@@ -2325,7 +2808,7 @@ impl<'a, C, A> AccountStoreInfoListCall<'a, C, A> where C: BorrowMut<hyper::Clie
         };
         dlg.begin(MethodInfo { id: "playmoviespartner.accounts.storeInfos.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((11 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((13 + self._additional_params.len()));
         params.push(("accountId", self._account_id.to_string()));
         if self._video_ids.len() > 0 {
             for f in self._video_ids.iter() {
@@ -2338,6 +2821,11 @@ impl<'a, C, A> AccountStoreInfoListCall<'a, C, A> where C: BorrowMut<hyper::Clie
         if self._studio_names.len() > 0 {
             for f in self._studio_names.iter() {
                 params.push(("studioNames", f.to_string()));
+            }
+        }
+        if self._season_ids.len() > 0 {
+            for f in self._season_ids.iter() {
+                params.push(("seasonIds", f.to_string()));
             }
         }
         if self._pph_names.len() > 0 {
@@ -2354,12 +2842,17 @@ impl<'a, C, A> AccountStoreInfoListCall<'a, C, A> where C: BorrowMut<hyper::Clie
         if let Some(value) = self._name {
             params.push(("name", value.to_string()));
         }
+        if self._mids.len() > 0 {
+            for f in self._mids.iter() {
+                params.push(("mids", f.to_string()));
+            }
+        }
         if self._countries.len() > 0 {
             for f in self._countries.iter() {
                 params.push(("countries", f.to_string()));
             }
         }
-        for &field in ["alt", "accountId", "videoIds", "videoId", "studioNames", "pphNames", "pageToken", "pageSize", "name", "countries"].iter() {
+        for &field in ["alt", "accountId", "videoIds", "videoId", "studioNames", "seasonIds", "pphNames", "pageToken", "pageSize", "name", "mids", "countries"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -2507,6 +3000,14 @@ impl<'a, C, A> AccountStoreInfoListCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._studio_names.push(new_value.to_string());
         self
     }
+    /// Filter StoreInfos that match any of the given `season_id`s.
+    ///
+    /// Append the given value to the *season ids* query property.
+    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
+    pub fn add_season_ids(mut self, new_value: &str) -> AccountStoreInfoListCall<'a, C, A> {
+        self._season_ids.push(new_value.to_string());
+        self
+    }
     /// See _List methods rules_ for info about this field.
     ///
     /// Append the given value to the *pph names* query property.
@@ -2529,11 +3030,19 @@ impl<'a, C, A> AccountStoreInfoListCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._page_size = Some(new_value);
         self
     }
-    /// Filter StoreInfos that match a case-insensitive substring of the default name.
+    /// Filter that matches StoreInfos with a `name` or `show_name` that contains the given case-insensitive name.
     ///
     /// Sets the *name* query property to the given value.
     pub fn name(mut self, new_value: &str) -> AccountStoreInfoListCall<'a, C, A> {
         self._name = Some(new_value.to_string());
+        self
+    }
+    /// Filter StoreInfos that match any of the given `mid`s.
+    ///
+    /// Append the given value to the *mids* query property.
+    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
+    pub fn add_mids(mut self, new_value: &str) -> AccountStoreInfoListCall<'a, C, A> {
+        self._mids.push(new_value.to_string());
         self
     }
     /// Filter StoreInfos that match (case-insensitive) any of the given country codes, using the "ISO 3166-1 alpha-2" format (examples: "US", "us", "Us").
@@ -2618,33 +3127,33 @@ impl<'a, C, A> AccountStoreInfoListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use playmoviespartner1::Playmoviespartner;
+/// # use playmoviespartner1::PlayMovies;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Playmoviespartner::new(hyper::Client::new(), auth);
+/// # let mut hub = PlayMovies::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().experience_locales_list("accountId")
-///              .title_level_eidr("no")
-///              .add_studio_names("labore")
-///              .add_status("eirmod")
-///              .add_pph_names("dolore")
-///              .page_token("invidunt")
-///              .page_size(-82)
-///              .edit_level_eidr("accusam")
-///              .custom_id("Lorem")
-///              .alt_cut_id("sea")
+///              .title_level_eidr("invidunt")
+///              .add_studio_names("aliquyam")
+///              .add_status("accusam")
+///              .add_pph_names("Lorem")
+///              .page_token("sea")
+///              .page_size(-21)
+///              .edit_level_eidr("duo")
+///              .custom_id("et")
+///              .alt_cut_id("eirmod")
 ///              .doit();
 /// # }
 /// ```
 pub struct AccountExperienceLocaleListCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Playmoviespartner<C, A>,
+    hub: &'a PlayMovies<C, A>,
     _account_id: String,
     _title_level_eidr: Option<String>,
     _studio_names: Vec<String>,
@@ -2953,6 +3462,689 @@ impl<'a, C, A> AccountExperienceLocaleListCall<'a, C, A> where C: BorrowMut<hype
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountExperienceLocaleListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+/// List Components owned or managed by the partner. See _Authentication and Authorization rules_ and _List methods rules_ for more information about this method.
+///
+/// A builder for the *components.list* method supported by a *account* resource.
+/// It is not used directly, but through a `AccountMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_playmoviespartner1 as playmoviespartner1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use playmoviespartner1::PlayMovies;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = PlayMovies::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.accounts().components_list("accountId")
+///              .title_level_eidr("et")
+///              .add_studio_names("amet")
+///              .add_status("et")
+///              .presentation_id("consetetur")
+///              .add_pph_names("ut")
+///              .playable_sequence_id("ea")
+///              .page_token("sed")
+///              .page_size(-3)
+///              .inventory_id("dolor")
+///              .filename("dolor")
+///              .el_id("et")
+///              .edit_level_eidr("consetetur")
+///              .custom_id("amet.")
+///              .alt_cut_id("voluptua.")
+///              .doit();
+/// # }
+/// ```
+pub struct AccountComponentListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a PlayMovies<C, A>,
+    _account_id: String,
+    _title_level_eidr: Option<String>,
+    _studio_names: Vec<String>,
+    _status: Vec<String>,
+    _presentation_id: Option<String>,
+    _pph_names: Vec<String>,
+    _playable_sequence_id: Option<String>,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _inventory_id: Option<String>,
+    _filename: Option<String>,
+    _el_id: Option<String>,
+    _edit_level_eidr: Option<String>,
+    _custom_id: Option<String>,
+    _alt_cut_id: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for AccountComponentListCall<'a, C, A> {}
+
+impl<'a, C, A> AccountComponentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListComponentsResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "playmoviespartner.accounts.components.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((17 + self._additional_params.len()));
+        params.push(("accountId", self._account_id.to_string()));
+        if let Some(value) = self._title_level_eidr {
+            params.push(("titleLevelEidr", value.to_string()));
+        }
+        if self._studio_names.len() > 0 {
+            for f in self._studio_names.iter() {
+                params.push(("studioNames", f.to_string()));
+            }
+        }
+        if self._status.len() > 0 {
+            for f in self._status.iter() {
+                params.push(("status", f.to_string()));
+            }
+        }
+        if let Some(value) = self._presentation_id {
+            params.push(("presentationId", value.to_string()));
+        }
+        if self._pph_names.len() > 0 {
+            for f in self._pph_names.iter() {
+                params.push(("pphNames", f.to_string()));
+            }
+        }
+        if let Some(value) = self._playable_sequence_id {
+            params.push(("playableSequenceId", value.to_string()));
+        }
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        if let Some(value) = self._inventory_id {
+            params.push(("inventoryId", value.to_string()));
+        }
+        if let Some(value) = self._filename {
+            params.push(("filename", value.to_string()));
+        }
+        if let Some(value) = self._el_id {
+            params.push(("elId", value.to_string()));
+        }
+        if let Some(value) = self._edit_level_eidr {
+            params.push(("editLevelEidr", value.to_string()));
+        }
+        if let Some(value) = self._custom_id {
+            params.push(("customId", value.to_string()));
+        }
+        if let Some(value) = self._alt_cut_id {
+            params.push(("altCutId", value.to_string()));
+        }
+        for &field in ["alt", "accountId", "titleLevelEidr", "studioNames", "status", "presentationId", "pphNames", "playableSequenceId", "pageToken", "pageSize", "inventoryId", "filename", "elId", "editLevelEidr", "customId", "altCutId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://playmoviespartner.googleapis.com/v1/accounts/{accountId}/components".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::PlaymovyPartnerReadonly.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{accountId}", "accountId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["accountId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// REQUIRED. See _General rules_ for more information about this field.
+    ///
+    /// Sets the *account id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn account_id(mut self, new_value: &str) -> AccountComponentListCall<'a, C, A> {
+        self._account_id = new_value.to_string();
+        self
+    }
+    /// Filter Components that match a given title-level EIDR.
+    ///
+    /// Sets the *title level eidr* query property to the given value.
+    pub fn title_level_eidr(mut self, new_value: &str) -> AccountComponentListCall<'a, C, A> {
+        self._title_level_eidr = Some(new_value.to_string());
+        self
+    }
+    /// See _List methods rules_ for info about this field.
+    ///
+    /// Append the given value to the *studio names* query property.
+    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
+    pub fn add_studio_names(mut self, new_value: &str) -> AccountComponentListCall<'a, C, A> {
+        self._studio_names.push(new_value.to_string());
+        self
+    }
+    /// Filter Components that match one of the given status.
+    ///
+    /// Append the given value to the *status* query property.
+    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
+    pub fn add_status(mut self, new_value: &str) -> AccountComponentListCall<'a, C, A> {
+        self._status.push(new_value.to_string());
+        self
+    }
+    /// PresentationID available in Common Manifest.
+    ///
+    /// Sets the *presentation id* query property to the given value.
+    pub fn presentation_id(mut self, new_value: &str) -> AccountComponentListCall<'a, C, A> {
+        self._presentation_id = Some(new_value.to_string());
+        self
+    }
+    /// See _List methods rules_ for info about this field.
+    ///
+    /// Append the given value to the *pph names* query property.
+    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
+    pub fn add_pph_names(mut self, new_value: &str) -> AccountComponentListCall<'a, C, A> {
+        self._pph_names.push(new_value.to_string());
+        self
+    }
+    /// PlayableSequenceID available in Common Manifest.
+    ///
+    /// Sets the *playable sequence id* query property to the given value.
+    pub fn playable_sequence_id(mut self, new_value: &str) -> AccountComponentListCall<'a, C, A> {
+        self._playable_sequence_id = Some(new_value.to_string());
+        self
+    }
+    /// See _List methods rules_ for info about this field.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> AccountComponentListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// See _List methods rules_ for info about this field.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> AccountComponentListCall<'a, C, A> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// InventoryID available in Common Manifest.
+    ///
+    /// Sets the *inventory id* query property to the given value.
+    pub fn inventory_id(mut self, new_value: &str) -> AccountComponentListCall<'a, C, A> {
+        self._inventory_id = Some(new_value.to_string());
+        self
+    }
+    /// Filter Components that match a case-insensitive substring of the physical name of the delivered file.
+    ///
+    /// Sets the *filename* query property to the given value.
+    pub fn filename(mut self, new_value: &str) -> AccountComponentListCall<'a, C, A> {
+        self._filename = Some(new_value.to_string());
+        self
+    }
+    /// Experience ID, as defined by Google.
+    ///
+    /// Sets the *el id* query property to the given value.
+    pub fn el_id(mut self, new_value: &str) -> AccountComponentListCall<'a, C, A> {
+        self._el_id = Some(new_value.to_string());
+        self
+    }
+    /// Filter Components that match a given edit-level EIDR.
+    ///
+    /// Sets the *edit level eidr* query property to the given value.
+    pub fn edit_level_eidr(mut self, new_value: &str) -> AccountComponentListCall<'a, C, A> {
+        self._edit_level_eidr = Some(new_value.to_string());
+        self
+    }
+    /// Filter Components that match a case-insensitive partner-specific custom id.
+    ///
+    /// Sets the *custom id* query property to the given value.
+    pub fn custom_id(mut self, new_value: &str) -> AccountComponentListCall<'a, C, A> {
+        self._custom_id = Some(new_value.to_string());
+        self
+    }
+    /// Filter Components that match a case-insensitive, partner-specific Alternative Cut ID.
+    ///
+    /// Sets the *alt cut id* query property to the given value.
+    pub fn alt_cut_id(mut self, new_value: &str) -> AccountComponentListCall<'a, C, A> {
+        self._alt_cut_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountComponentListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> AccountComponentListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::PlaymovyPartnerReadonly`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> AccountComponentListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+/// Get a Component given its id.
+///
+/// A builder for the *components.type.get* method supported by a *account* resource.
+/// It is not used directly, but through a `AccountMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_playmoviespartner1 as playmoviespartner1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use playmoviespartner1::PlayMovies;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = PlayMovies::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.accounts().components_type_get("accountId", "componentId", "type")
+///              .doit();
+/// # }
+/// ```
+pub struct AccountComponentTypeGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a PlayMovies<C, A>,
+    _account_id: String,
+    _component_id: String,
+    _type_: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for AccountComponentTypeGetCall<'a, C, A> {}
+
+impl<'a, C, A> AccountComponentTypeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Component)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "playmoviespartner.accounts.components.type.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        params.push(("accountId", self._account_id.to_string()));
+        params.push(("componentId", self._component_id.to_string()));
+        params.push(("type", self._type_.to_string()));
+        for &field in ["alt", "accountId", "componentId", "type"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://playmoviespartner.googleapis.com/v1/accounts/{accountId}/components/{componentId}/type/{type}".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::PlaymovyPartnerReadonly.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{accountId}", "accountId"), ("{componentId}", "componentId"), ("{type}", "type")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
+            for param_name in ["type", "componentId", "accountId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// REQUIRED. See _General rules_ for more information about this field.
+    ///
+    /// Sets the *account id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn account_id(mut self, new_value: &str) -> AccountComponentTypeGetCall<'a, C, A> {
+        self._account_id = new_value.to_string();
+        self
+    }
+    /// REQUIRED. Component ID.
+    ///
+    /// Sets the *component id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn component_id(mut self, new_value: &str) -> AccountComponentTypeGetCall<'a, C, A> {
+        self._component_id = new_value.to_string();
+        self
+    }
+    /// REQUIRED. Component Type.
+    ///
+    /// Sets the *type* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn type_(mut self, new_value: &str) -> AccountComponentTypeGetCall<'a, C, A> {
+        self._type_ = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountComponentTypeGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> AccountComponentTypeGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::PlaymovyPartnerReadonly`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> AccountComponentTypeGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

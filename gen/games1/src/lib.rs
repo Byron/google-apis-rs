@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Games* crate version *0.1.14+20160401*, where *20160401* is the exact revision of the *games:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
+//! This documentation was generated from *Games* crate version *0.1.14+20160901*, where *20160901* is the exact revision of the *games:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
 //! 
 //! Everything else about the *Games* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/games/services/).
@@ -128,9 +128,10 @@
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.turn_based_matches().leave_turn("matchId", -48)
-//!              .pending_participant_id("diam")
-//!              .language("kasd")
+//! let result = hub.turn_based_matches().leave_turn("matchId", -46)
+//!              .pending_participant_id("sea")
+//!              .language("elitr")
+//!              .consistency_token("At")
 //!              .doit();
 //! 
 //! match result {

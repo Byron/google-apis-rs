@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-appengine1_beta5` library allows access to all features of the *Google appengine* service.
 
-This documentation was generated from *appengine* crate version *0.1.14+20160314*, where *20160314* is the exact revision of the *appengine:v1beta5* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
+This documentation was generated from *appengine* crate version *0.1.14+20160802*, where *20160802* is the exact revision of the *appengine:v1beta5* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
 
 Everything else about the *appengine* *v1_beta5* API can be found at the
 [official documentation site](https://cloud.google.com/appengine/docs/admin-api/).
@@ -14,7 +14,7 @@ Everything else about the *appengine* *v1_beta5* API can be found at the
 Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google_appengine1_beta5/struct.Appengine.html) ... 
 
 * apps
- * [*get*](http://byron.github.io/google-apis-rs/google_appengine1_beta5/struct.AppGetCall.html), [*operations get*](http://byron.github.io/google-apis-rs/google_appengine1_beta5/struct.AppOperationGetCall.html), [*operations list*](http://byron.github.io/google-apis-rs/google_appengine1_beta5/struct.AppOperationListCall.html), [*services delete*](http://byron.github.io/google-apis-rs/google_appengine1_beta5/struct.AppServiceDeleteCall.html), [*services get*](http://byron.github.io/google-apis-rs/google_appengine1_beta5/struct.AppServiceGetCall.html), [*services list*](http://byron.github.io/google-apis-rs/google_appengine1_beta5/struct.AppServiceListCall.html), [*services patch*](http://byron.github.io/google-apis-rs/google_appengine1_beta5/struct.AppServicePatchCall.html), [*services versions create*](http://byron.github.io/google-apis-rs/google_appengine1_beta5/struct.AppServiceVersionCreateCall.html), [*services versions delete*](http://byron.github.io/google-apis-rs/google_appengine1_beta5/struct.AppServiceVersionDeleteCall.html), [*services versions get*](http://byron.github.io/google-apis-rs/google_appengine1_beta5/struct.AppServiceVersionGetCall.html), [*services versions list*](http://byron.github.io/google-apis-rs/google_appengine1_beta5/struct.AppServiceVersionListCall.html) and [*services versions patch*](http://byron.github.io/google-apis-rs/google_appengine1_beta5/struct.AppServiceVersionPatchCall.html)
+ * [*create*](http://byron.github.io/google-apis-rs/google_appengine1_beta5/struct.AppCreateCall.html), [*get*](http://byron.github.io/google-apis-rs/google_appengine1_beta5/struct.AppGetCall.html), [*locations get*](http://byron.github.io/google-apis-rs/google_appengine1_beta5/struct.AppLocationGetCall.html), [*locations list*](http://byron.github.io/google-apis-rs/google_appengine1_beta5/struct.AppLocationListCall.html), [*operations get*](http://byron.github.io/google-apis-rs/google_appengine1_beta5/struct.AppOperationGetCall.html), [*operations list*](http://byron.github.io/google-apis-rs/google_appengine1_beta5/struct.AppOperationListCall.html), [*services delete*](http://byron.github.io/google-apis-rs/google_appengine1_beta5/struct.AppServiceDeleteCall.html), [*services get*](http://byron.github.io/google-apis-rs/google_appengine1_beta5/struct.AppServiceGetCall.html), [*services list*](http://byron.github.io/google-apis-rs/google_appengine1_beta5/struct.AppServiceListCall.html), [*services patch*](http://byron.github.io/google-apis-rs/google_appengine1_beta5/struct.AppServicePatchCall.html), [*services versions create*](http://byron.github.io/google-apis-rs/google_appengine1_beta5/struct.AppServiceVersionCreateCall.html), [*services versions delete*](http://byron.github.io/google-apis-rs/google_appengine1_beta5/struct.AppServiceVersionDeleteCall.html), [*services versions get*](http://byron.github.io/google-apis-rs/google_appengine1_beta5/struct.AppServiceVersionGetCall.html), [*services versions instances debug*](http://byron.github.io/google-apis-rs/google_appengine1_beta5/struct.AppServiceVersionInstanceDebugCall.html), [*services versions instances delete*](http://byron.github.io/google-apis-rs/google_appengine1_beta5/struct.AppServiceVersionInstanceDeleteCall.html), [*services versions instances get*](http://byron.github.io/google-apis-rs/google_appengine1_beta5/struct.AppServiceVersionInstanceGetCall.html), [*services versions instances list*](http://byron.github.io/google-apis-rs/google_appengine1_beta5/struct.AppServiceVersionInstanceListCall.html), [*services versions list*](http://byron.github.io/google-apis-rs/google_appengine1_beta5/struct.AppServiceVersionListCall.html) and [*services versions patch*](http://byron.github.io/google-apis-rs/google_appengine1_beta5/struct.AppServiceVersionPatchCall.html)
 
 
 
@@ -48,6 +48,9 @@ Or specifically ...
 
 ```ignore
 let r = hub.apps().services_versions_create(...).doit()
+let r = hub.apps().services_versions_instances_debug(...).doit()
+let r = hub.apps().create(...).doit()
+let r = hub.apps().services_versions_instances_delete(...).doit()
 let r = hub.apps().services_versions_patch(...).doit()
 let r = hub.apps().operations_get(...).doit()
 let r = hub.apps().services_versions_delete(...).doit()
@@ -77,7 +80,7 @@ google-appengine1_beta5 = "*"
 extern crate hyper;
 extern crate yup_oauth2 as oauth2;
 extern crate google_appengine1_beta5 as appengine1_beta5;
-use appengine1_beta5::Version;
+use appengine1_beta5::DebugInstanceRequest;
 use appengine1_beta5::{Result, Error};
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -98,13 +101,12 @@ let mut hub = Appengine::new(hyper::Client::new(), auth);
 // As the method needs a request, you would usually fill it with the desired information
 // into the respective structure. Some of the parts shown here might not be applicable !
 // Values shown here are possibly random and not representative !
-let mut req = Version::default();
+let mut req = DebugInstanceRequest::default();
 
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
-let result = hub.apps().services_versions_patch(req, "appsId", "servicesId", "versionsId")
-             .mask("sed")
+let result = hub.apps().services_versions_instances_debug(req, "appsId", "servicesId", "versionsId", "instancesId")
              .doit();
 
 match result {

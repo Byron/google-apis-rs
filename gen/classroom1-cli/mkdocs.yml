@@ -1,4 +1,4 @@
-site_name: classroom v0.3.6+20151013
+site_name: classroom v0.3.6+20160816
 site_url: http://byron.github.io/google-apis-rs/google-classroom1-cli
 site_description: Write integrating applications with bcore
 
@@ -12,6 +12,16 @@ pages:
 - ['courses_aliases-create.md', 'Courses', 'Aliases Create']
 - ['courses_aliases-delete.md', 'Courses', 'Aliases Delete']
 - ['courses_aliases-list.md', 'Courses', 'Aliases List']
+- ['courses_course-work-create.md', 'Courses', 'Course Work Create']
+- ['courses_course-work-get.md', 'Courses', 'Course Work Get']
+- ['courses_course-work-list.md', 'Courses', 'Course Work List']
+- ['courses_course-work-student-submissions-get.md', 'Courses', 'Course Work Student Submissions Get']
+- ['courses_course-work-student-submissions-list.md', 'Courses', 'Course Work Student Submissions List']
+- ['courses_course-work-student-submissions-modify-attachments.md', 'Courses', 'Course Work Student Submissions Modify Attachments']
+- ['courses_course-work-student-submissions-patch.md', 'Courses', 'Course Work Student Submissions Patch']
+- ['courses_course-work-student-submissions-reclaim.md', 'Courses', 'Course Work Student Submissions Reclaim']
+- ['courses_course-work-student-submissions-return.md', 'Courses', 'Course Work Student Submissions Return']
+- ['courses_course-work-student-submissions-turn-in.md', 'Courses', 'Course Work Student Submissions Turn In']
 - ['courses_create.md', 'Courses', 'Create']
 - ['courses_delete.md', 'Courses', 'Delete']
 - ['courses_get.md', 'Courses', 'Get']
@@ -32,6 +42,13 @@ pages:
 - ['invitations_get.md', 'Invitations', 'Get']
 - ['invitations_list.md', 'Invitations', 'List']
 - ['user-profiles_get.md', 'User Profiles', 'Get']
+- ['user-profiles_guardian-invitations-create.md', 'User Profiles', 'Guardian Invitations Create']
+- ['user-profiles_guardian-invitations-get.md', 'User Profiles', 'Guardian Invitations Get']
+- ['user-profiles_guardian-invitations-list.md', 'User Profiles', 'Guardian Invitations List']
+- ['user-profiles_guardian-invitations-patch.md', 'User Profiles', 'Guardian Invitations Patch']
+- ['user-profiles_guardians-delete.md', 'User Profiles', 'Guardians Delete']
+- ['user-profiles_guardians-get.md', 'User Profiles', 'Guardians Get']
+- ['user-profiles_guardians-list.md', 'User Profiles', 'Guardians List']
 
 theme: readthedocs
 

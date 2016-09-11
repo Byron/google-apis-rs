@@ -2,17 +2,17 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *playmoviespartner* crate version *0.1.14+20150812*, where *20150812* is the exact revision of the *playmoviespartner:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
+//! This documentation was generated from *Play Movies* crate version *0.1.14+20160518*, where *20160518* is the exact revision of the *playmoviespartner:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
 //! 
-//! Everything else about the *playmoviespartner* *v1* API can be found at the
+//! Everything else about the *Play Movies* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/playmoviespartner/).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/playmoviespartner1).
 //! # Features
 //! 
-//! Handle the following *Resources* with ease from the central [hub](struct.Playmoviespartner.html) ... 
+//! Handle the following *Resources* with ease from the central [hub](struct.PlayMovies.html) ... 
 //! 
 //! * accounts
-//!  * [*avails list*](struct.AccountAvailListCall.html), [*experience locales get*](struct.AccountExperienceLocaleGetCall.html), [*experience locales list*](struct.AccountExperienceLocaleListCall.html), [*orders get*](struct.AccountOrderGetCall.html), [*orders list*](struct.AccountOrderListCall.html), [*store infos country get*](struct.AccountStoreInfoCountryGetCall.html) and [*store infos list*](struct.AccountStoreInfoListCall.html)
+//!  * [*avails get*](struct.AccountAvailGetCall.html), [*avails list*](struct.AccountAvailListCall.html), [*components list*](struct.AccountComponentListCall.html), [*components type get*](struct.AccountComponentTypeGetCall.html), [*experience locales get*](struct.AccountExperienceLocaleGetCall.html), [*experience locales list*](struct.AccountExperienceLocaleListCall.html), [*orders get*](struct.AccountOrderGetCall.html), [*orders list*](struct.AccountOrderListCall.html), [*store infos country get*](struct.AccountStoreInfoCountryGetCall.html) and [*store infos list*](struct.AccountStoreInfoListCall.html)
 //! 
 //! 
 //! 
@@ -23,7 +23,7 @@
 //! 
 //! The API is structured into the following primary items:
 //! 
-//! * **[Hub](struct.Playmoviespartner.html)**
+//! * **[Hub](struct.PlayMovies.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
 //!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
 //!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
@@ -47,7 +47,7 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.accounts().store_infos_country_get(...).doit()
+//! let r = hub.accounts().avails_get(...).doit()
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -76,7 +76,7 @@
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-//! use playmoviespartner1::Playmoviespartner;
+//! use playmoviespartner1::PlayMovies;
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -89,11 +89,11 @@
 //! let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 //!                               hyper::Client::new(),
 //!                               <MemoryStorage as Default>::default(), None);
-//! let mut hub = Playmoviespartner::new(hyper::Client::new(), auth);
+//! let mut hub = PlayMovies::new(hyper::Client::new(), auth);
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.accounts().store_infos_country_get("accountId", "videoId", "country")
+//! let result = hub.accounts().avails_get("accountId", "availId")
 //!              .doit();
 //! 
 //! match result {

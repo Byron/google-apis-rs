@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Android Publisher* API at revision *20160324*. The CLI is at version *0.3.6*.
+This documentation was generated from the *Android Publisher* API at revision *20160817*. The CLI is at version *0.3.6*.
 
 ```bash
 androidpublisher2 [options]
@@ -84,6 +84,10 @@ androidpublisher2 [options]
                 subscriptions-get <package-name> <subscription-id> <token> [-p <v>]... [-o <out>]
                 subscriptions-refund <package-name> <subscription-id> <token> [-p <v>]...
                 subscriptions-revoke <package-name> <subscription-id> <token> [-p <v>]...
+        reviews
+                get <package-name> <review-id> [-p <v>]... [-o <out>]
+                list <package-name> [-p <v>]... [-o <out>]
+                reply <package-name> <review-id> (-r <kv>)... [-p <v>]... [-o <out>]
   androidpublisher2 --help
 
 Configuration:

@@ -48,11 +48,17 @@ pub enum Scope {
     /// View your stored location data in Google Fit
     LocationRead,
 
-    /// View your activity information in Google Fit
-    ActivityRead,
+    /// View and store nutrition information in Google Fit
+    NutritionWrite,
 
     /// View and store your activity information in Google Fit
     ActivityWrite,
+
+    /// View nutrition information in Google Fit
+    NutritionRead,
+
+    /// View your activity information in Google Fit
+    ActivityRead,
 }
 
 impl AsRef<str> for Scope {
@@ -62,8 +68,10 @@ impl AsRef<str> for Scope {
             Scope::BodyWrite => "https://www.googleapis.com/auth/fitness.body.write",
             Scope::LocationWrite => "https://www.googleapis.com/auth/fitness.location.write",
             Scope::LocationRead => "https://www.googleapis.com/auth/fitness.location.read",
-            Scope::ActivityRead => "https://www.googleapis.com/auth/fitness.activity.read",
+            Scope::NutritionWrite => "https://www.googleapis.com/auth/fitness.nutrition.write",
             Scope::ActivityWrite => "https://www.googleapis.com/auth/fitness.activity.write",
+            Scope::NutritionRead => "https://www.googleapis.com/auth/fitness.nutrition.read",
+            Scope::ActivityRead => "https://www.googleapis.com/auth/fitness.activity.read",
         }
     }
 }
@@ -252,7 +260,7 @@ pub struct ListDataSourcesResponse {
 impl ResponseResult for ListDataSourcesResponse {}
 
 
-/// See: google3/java/com/google/android/apps/heart/platform/api/Application.java
+/// 
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -409,6 +417,9 @@ pub struct AggregateRequest {
     /// The start of a window of time. Data that intersects with this time window will be aggregated. The time is in milliseconds since epoch, inclusive.
     #[serde(rename="startTimeMillis")]
     pub start_time_millis: Option<String>,
+    /// A list of acceptable data quality standards. Only data points which conform to at least one of the specified data quality standards will be returned. If the list is empty, all data points are returned.
+    #[serde(rename="filteredDataQualityStandard")]
+    pub filtered_data_quality_standard: Option<Vec<String>>,
     /// Specifies that data be aggregated by a single time interval. Mutually exclusive of other bucketing specifications.
     #[serde(rename="bucketByTime")]
     pub bucket_by_time: Option<BucketByTime>,
@@ -417,7 +428,7 @@ pub struct AggregateRequest {
 impl RequestValue for AggregateRequest {}
 
 
-/// See: google3/java/com/google/android/apps/heart/platform/api/DataType.java
+/// 
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -552,6 +563,25 @@ pub struct MapValue {
 impl Part for MapValue {}
 
 
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BucketByTimePeriod {
+    /// org.joda.timezone.DateTimeZone
+    #[serde(rename="timeZoneId")]
+    pub time_zone_id: Option<String>,
+    /// no description provided
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// no description provided
+    pub value: Option<i32>,
+}
+
+impl Part for BucketByTimePeriod {}
+
+
 /// Representation of an integrated device (such as a phone or a wearable) that can hold sensors. Each sensor is exposed as a data source.
 /// 
 /// The main purpose of the device information contained in this class is to identify the hardware of a particular data source. This can be useful in different ways, including:  
@@ -608,6 +638,8 @@ pub struct BucketByTime {
     /// Specifies that result buckets aggregate data by exactly durationMillis time frames. Time frames that contain no data will be included in the response with an empty dataset.
     #[serde(rename="durationMillis")]
     pub duration_millis: Option<String>,
+    /// no description provided
+    pub period: Option<BucketByTimePeriod>,
 }
 
 impl Part for BucketByTime {}
@@ -632,18 +664,21 @@ impl Part for BucketByTime {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DataSource {
+    /// An end-user visible name for this data source.
+    pub name: Option<String>,
+    /// 
+    #[serde(rename="dataQualityStandard")]
+    pub data_quality_standard: Option<Vec<String>>,
+    /// The data type defines the schema for a stream of data being collected by, inserted into, or queried from the Fitness API.
+    #[serde(rename="dataType")]
+    pub data_type: Option<DataType>,
+    /// The stream name uniquely identifies this particular data source among other data sources of the same type from the same underlying producer. Setting the stream name is optional, but should be done whenever an application exposes two streams for the same data type, or when a device has two equivalent sensors.
+    #[serde(rename="dataStreamName")]
+    pub data_stream_name: Option<String>,
     /// Information about an application which feeds sensor data into the platform.
     pub application: Option<Application>,
     /// Representation of an integrated device (such as a phone or a wearable) that can hold sensors.
     pub device: Option<Device>,
-    /// An end-user visible name for this data source.
-    pub name: Option<String>,
-    /// The stream name uniquely identifies this particular data source among other data sources of the same type from the same underlying producer. Setting the stream name is optional, but should be done whenever an application exposes two streams for the same data type, or when a device has two equivalent sensors.
-    #[serde(rename="dataStreamName")]
-    pub data_stream_name: Option<String>,
-    /// The data type defines the schema for a stream of data being collected by, inserted into, or queried from the Fitness API.
-    #[serde(rename="dataType")]
-    pub data_type: Option<DataType>,
     /// A unique identifier for the data stream produced by this data source. The identifier includes:
     /// 
     ///  
@@ -734,7 +769,7 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Delete the data source if there are no datapoints associated with it
+    /// Deletes the specified data source. The request will fail if the data source contains any data points.
     /// 
     /// # Arguments
     ///
@@ -862,7 +897,7 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns a data source identified by a data stream ID.
+    /// Returns the specified data source.
     /// 
     /// # Arguments
     ///
@@ -881,9 +916,9 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a given data source. It is an error to modify the data source's data stream ID, data type, type, stream name or device information apart from the device version. Changing these fields would require a new unique data stream ID and separate data source.
+    /// Updates the specified data source. The dataStreamId, dataType, type, dataStreamName, and device properties with the exception of version, cannot be modified.
     /// 
-    /// Data sources are identified by their data stream ID.
+    /// Data sources are identified by their dataStreamId.
     /// 
     /// # Arguments
     ///
@@ -947,9 +982,9 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a given data source. It is an error to modify the data source's data stream ID, data type, type, stream name or device information apart from the device version. Changing these fields would require a new unique data stream ID and separate data source.
+    /// Updates the specified data source. The dataStreamId, dataType, type, dataStreamName, and device properties with the exception of version, cannot be modified.
     /// 
-    /// Data sources are identified by their data stream ID. This method supports patch semantics.
+    /// Data sources are identified by their dataStreamId. This method supports patch semantics.
     /// 
     /// # Arguments
     ///
@@ -970,7 +1005,7 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all data sources that are visible to the developer, using the OAuth scopes provided. The list is not exhaustive: the user may have private data sources that are only visible to other developers or calls using other scopes.
+    /// Lists all data sources that are visible to the developer, using the OAuth scopes provided. The list is not exhaustive; the user may have private data sources that are only visible to other developers, or calls using other scopes.
     /// 
     /// # Arguments
     ///
@@ -1261,7 +1296,7 @@ impl<'a, C, A> UserDatasetAggregateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 }
 
 
-/// Delete the data source if there are no datapoints associated with it
+/// Deletes the specified data source. The request will fail if the data source contains any data points.
 ///
 /// A builder for the *dataSources.delete* method supported by a *user* resource.
 /// It is not used directly, but through a `UserMethods` instance.
@@ -1732,7 +1767,7 @@ impl<'a, C, A> UserDataSourceDatasetGetCall<'a, C, A> where C: BorrowMut<hyper::
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// If specified, no more than this many data points will be included in the dataset. If the there are more data points in the dataset, nextPageToken will be set in the dataset response.
+    /// If specified, no more than this many data points will be included in the dataset. If there are more data points in the dataset, nextPageToken will be set in the dataset response.
     ///
     /// Sets the *limit* query property to the given value.
     pub fn limit(mut self, new_value: i32) -> UserDataSourceDatasetGetCall<'a, C, A> {
@@ -2879,7 +2914,7 @@ impl<'a, C, A> UserSessionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
 }
 
 
-/// Returns a data source identified by a data stream ID.
+/// Returns the specified data source.
 ///
 /// A builder for the *dataSources.get* method supported by a *user* resource.
 /// It is not used directly, but through a `UserMethods` instance.
@@ -3126,9 +3161,9 @@ impl<'a, C, A> UserDataSourceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
 }
 
 
-/// Updates a given data source. It is an error to modify the data source's data stream ID, data type, type, stream name or device information apart from the device version. Changing these fields would require a new unique data stream ID and separate data source.
+/// Updates the specified data source. The dataStreamId, dataType, type, dataStreamName, and device properties with the exception of version, cannot be modified.
 /// 
-/// Data sources are identified by their data stream ID.
+/// Data sources are identified by their dataStreamId.
 ///
 /// A builder for the *dataSources.update* method supported by a *user* resource.
 /// It is not used directly, but through a `UserMethods` instance.
@@ -3979,9 +4014,9 @@ impl<'a, C, A> UserSessionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
 }
 
 
-/// Updates a given data source. It is an error to modify the data source's data stream ID, data type, type, stream name or device information apart from the device version. Changing these fields would require a new unique data stream ID and separate data source.
+/// Updates the specified data source. The dataStreamId, dataType, type, dataStreamName, and device properties with the exception of version, cannot be modified.
 /// 
-/// Data sources are identified by their data stream ID. This method supports patch semantics.
+/// Data sources are identified by their dataStreamId. This method supports patch semantics.
 ///
 /// A builder for the *dataSources.patch* method supported by a *user* resource.
 /// It is not used directly, but through a `UserMethods` instance.
@@ -4259,7 +4294,7 @@ impl<'a, C, A> UserDataSourcePatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
 }
 
 
-/// Lists all data sources that are visible to the developer, using the OAuth scopes provided. The list is not exhaustive: the user may have private data sources that are only visible to other developers or calls using other scopes.
+/// Lists all data sources that are visible to the developer, using the OAuth scopes provided. The list is not exhaustive; the user may have private data sources that are only visible to other developers, or calls using other scopes.
 ///
 /// A builder for the *dataSources.list* method supported by a *user* resource.
 /// It is not used directly, but through a `UserMethods` instance.

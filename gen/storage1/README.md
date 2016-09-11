@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-storage1` library allows access to all features of the *Google storage* service.
 
-This documentation was generated from *storage* crate version *0.1.14+20160330*, where *20160330* is the exact revision of the *storage:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
+This documentation was generated from *storage* crate version *0.1.14+20160901*, where *20160901* is the exact revision of the *storage:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
 
 Everything else about the *storage* *v1* API can be found at the
 [official documentation site](https://developers.google.com/storage/docs/json_api/).
@@ -148,6 +148,7 @@ let result = hub.objects().rewrite(req, "sourceBucket", "sourceObject", "destina
              .if_generation_not_match("nonumy")
              .if_generation_match("dolores")
              .destination_predefined_acl("gubergren")
+             .destination_kms_key_name("sadipscing")
              .doit();
 
 match result {

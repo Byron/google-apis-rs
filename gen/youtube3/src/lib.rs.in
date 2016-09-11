@@ -510,17 +510,39 @@ pub struct ChannelSettings {
 impl Part for ChannelSettings {}
 
 
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct LiveChatPollEditedDetails {
+    /// no description provided
+    pub items: Option<Vec<LiveChatPollItem>>,
+    /// no description provided
+    pub prompt: Option<String>,
+    /// no description provided
+    pub id: Option<String>,
+}
+
+impl Part for LiveChatPollEditedDetails {}
+
+
 /// Brief description of the live stream cdn settings.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CdnSettings {
+    /// The resolution of the inbound video data.
+    pub resolution: Option<String>,
     /// The format of the video stream that you are sending to Youtube.
     pub format: Option<String>,
     /// The ingestionInfo object contains information that YouTube provides that you need to transmit your RTMP or HTTP stream to YouTube.
     #[serde(rename="ingestionInfo")]
     pub ingestion_info: Option<IngestionInfo>,
+    /// The frame rate of the inbound video data.
+    #[serde(rename="frameRate")]
+    pub frame_rate: Option<String>,
     /// The method or protocol used to transmit the video stream.
     #[serde(rename="ingestionType")]
     pub ingestion_type: Option<String>,
@@ -531,30 +553,16 @@ impl Part for CdnSettings {}
 
 /// There is no detailed description.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [get rating videos](struct.VideoGetRatingCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct VideoGetRatingResponse {
-    /// Serialized EventId of the request which produced this response.
-    #[serde(rename="eventId")]
-    pub event_id: Option<String>,
-    /// A list of ratings that match the request criteria.
-    pub items: Option<Vec<VideoRating>>,
-    /// Identifies what kind of resource this is. Value: the fixed string "youtube#videoGetRatingResponse".
-    pub kind: Option<String>,
-    /// Etag of this resource.
-    pub etag: Option<String>,
-    /// The visitorId identifies the visitor.
-    #[serde(rename="visitorId")]
-    pub visitor_id: Option<String>,
+pub struct LiveChatMessageDeletedDetails {
+    /// no description provided
+    #[serde(rename="deletedMessageId")]
+    pub deleted_message_id: Option<String>,
 }
 
-impl ResponseResult for VideoGetRatingResponse {}
+impl Part for LiveChatMessageDeletedDetails {}
 
 
 /// There is no detailed description.
@@ -1299,6 +1307,20 @@ impl Part for CaptionSnippet {}
 
 /// There is no detailed description.
 /// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct LiveChatMessageRetractedDetails {
+    /// no description provided
+    #[serde(rename="retractedMessageId")]
+    pub retracted_message_id: Option<String>,
+}
+
+impl Part for LiveChatMessageRetractedDetails {}
+
+
+/// There is no detailed description.
+/// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
@@ -1481,6 +1503,9 @@ pub struct LiveChatMessageSnippet {
     /// Contains a string that can be displayed to the user. If this field is not present the message is silent, at the moment only messages of type TOMBSTONE and CHAT_ENDED_EVENT are silent.
     #[serde(rename="displayMessage")]
     pub display_message: Option<String>,
+    /// no description provided
+    #[serde(rename="messageRetractedDetails")]
+    pub message_retracted_details: Option<LiveChatMessageRetractedDetails>,
     /// Details about the funding event, this is only set if the type is 'fanFundingEvent'.
     #[serde(rename="fanFundingEventDetails")]
     pub fan_funding_event_details: Option<LiveChatFanFundingEventDetails>,
@@ -1491,17 +1516,35 @@ pub struct LiveChatMessageSnippet {
     #[serde(rename="publishedAt")]
     pub published_at: Option<String>,
     /// no description provided
+    #[serde(rename="userBannedDetails")]
+    pub user_banned_details: Option<LiveChatUserBannedMessageDetails>,
+    /// no description provided
     #[serde(rename="liveChatId")]
     pub live_chat_id: Option<String>,
-    /// The ID of the user that authored this message, this field is not always filled. textMessageEvent - the user that wrote the message fanFundingEvent - the user that funded the broadcast newSponsorEvent - the user that just became a sponsor
+    /// The ID of the user that authored this message, this field is not always filled. textMessageEvent - the user that wrote the message fanFundingEvent - the user that funded the broadcast newSponsorEvent - the user that just became a sponsor messageDeletedEvent - the moderator that took the action messageRetractedEvent - the author that retracted their message userBannedEvent - the moderator that took the action
     #[serde(rename="authorChannelId")]
     pub author_channel_id: Option<String>,
+    /// no description provided
+    #[serde(rename="pollEditedDetails")]
+    pub poll_edited_details: Option<LiveChatPollEditedDetails>,
     /// Details about the text message, this is only set if the type is 'textMessageEvent'.
     #[serde(rename="textMessageDetails")]
     pub text_message_details: Option<LiveChatTextMessageDetails>,
+    /// no description provided
+    #[serde(rename="messageDeletedDetails")]
+    pub message_deleted_details: Option<LiveChatMessageDeletedDetails>,
+    /// no description provided
+    #[serde(rename="pollVotedDetails")]
+    pub poll_voted_details: Option<LiveChatPollVotedDetails>,
+    /// no description provided
+    #[serde(rename="pollOpenedDetails")]
+    pub poll_opened_details: Option<LiveChatPollOpenedDetails>,
     /// The type of message, this will always be present, it determines the contents of the message as well as which fields will be present.
     #[serde(rename="type")]
     pub type_: Option<String>,
+    /// no description provided
+    #[serde(rename="pollClosedDetails")]
+    pub poll_closed_details: Option<LiveChatPollClosedDetails>,
 }
 
 impl Part for LiveChatMessageSnippet {}
@@ -2353,7 +2396,7 @@ pub struct LiveStreamStatus {
 impl Part for LiveStreamStatus {}
 
 
-/// Ratings schemes. The country-specific ratings are mostly for movies and shows. NEXT_ID: 67
+/// Ratings schemes. The country-specific ratings are mostly for movies and shows. NEXT_ID: 68
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -2539,6 +2582,9 @@ pub struct ContentRating {
     /// The video's Anatel (Asociación Nacional de Televisión) rating for Chilean television.
     #[serde(rename="anatelRating")]
     pub anatel_rating: Option<String>,
+    /// Reasons that explain why the video received its FPB (South Africa) rating.
+    #[serde(rename="fpbRatingReasons")]
+    pub fpb_rating_reasons: Option<Vec<String>>,
     /// The video's rating from Statens medieråd (Sweden's National Media Council).
     #[serde(rename="smsaRating")]
     pub smsa_rating: Option<String>,
@@ -2860,6 +2906,23 @@ pub struct IngestionInfo {
 impl Part for IngestionInfo {}
 
 
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct LiveChatPollOpenedDetails {
+    /// no description provided
+    pub items: Option<Vec<LiveChatPollItem>>,
+    /// no description provided
+    pub prompt: Option<String>,
+    /// no description provided
+    pub id: Option<String>,
+}
+
+impl Part for LiveChatPollOpenedDetails {}
+
+
 /// A videoCategory resource identifies a category that has been or could be associated with uploaded videos.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -3009,6 +3072,26 @@ pub struct ActivityContentDetailsLike {
 }
 
 impl Part for ActivityContentDetailsLike {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct LiveChatUserBannedMessageDetails {
+    /// The duration of the ban. This property is only present if the banType is temporary.
+    #[serde(rename="banDurationSeconds")]
+    pub ban_duration_seconds: Option<String>,
+    /// The type of ban.
+    #[serde(rename="banType")]
+    pub ban_type: Option<String>,
+    /// The details of the user that was banned.
+    #[serde(rename="bannedUserDetails")]
+    pub banned_user_details: Option<ChannelProfileDetails>,
+}
+
+impl Part for LiveChatUserBannedMessageDetails {}
 
 
 /// A playlist resource represents a YouTube playlist. A playlist is a collection of videos that can be viewed sequentially and shared with other users. A playlist can contain up to 200 videos, and YouTube does not limit the number of playlists that each user creates. By default, playlists are publicly visible to other users, but playlists can be public or private.
@@ -3465,6 +3548,20 @@ impl Part for ChannelBrandingSettings {}
 
 /// There is no detailed description.
 /// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct LiveChatPollClosedDetails {
+    /// The id of the poll that was closed.
+    #[serde(rename="pollId")]
+    pub poll_id: Option<String>,
+}
+
+impl Part for LiveChatPollClosedDetails {}
+
+
+/// There is no detailed description.
+/// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
@@ -3823,40 +3920,20 @@ pub struct LiveChatModeratorSnippet {
 impl Part for LiveChatModeratorSnippet {}
 
 
-/// Details about the content of an activity: the video that was shared, the channel that was subscribed to, etc.
+/// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ActivityContentDetails {
-    /// The comment object contains information about a resource that received a comment. This property is only present if the snippet.type is comment.
-    pub comment: Option<ActivityContentDetailsComment>,
-    /// The playlistItem object contains information about a new playlist item. This property is only present if the snippet.type is playlistItem.
-    #[serde(rename="playlistItem")]
-    pub playlist_item: Option<ActivityContentDetailsPlaylistItem>,
-    /// The like object contains information about a resource that received a positive (like) rating. This property is only present if the snippet.type is like.
-    pub like: Option<ActivityContentDetailsLike>,
-    /// The promotedItem object contains details about a resource which is being promoted. This property is only present if the snippet.type is promotedItem.
-    #[serde(rename="promotedItem")]
-    pub promoted_item: Option<ActivityContentDetailsPromotedItem>,
-    /// The recommendation object contains information about a recommended resource. This property is only present if the snippet.type is recommendation.
-    pub recommendation: Option<ActivityContentDetailsRecommendation>,
-    /// The favorite object contains information about a video that was marked as a favorite video. This property is only present if the snippet.type is favorite.
-    pub favorite: Option<ActivityContentDetailsFavorite>,
-    /// The upload object contains information about the uploaded video. This property is only present if the snippet.type is upload.
-    pub upload: Option<ActivityContentDetailsUpload>,
-    /// The social object contains details about a social network post. This property is only present if the snippet.type is social.
-    pub social: Option<ActivityContentDetailsSocial>,
-    /// The channelItem object contains details about a resource which was added to a channel. This property is only present if the snippet.type is channelItem.
-    #[serde(rename="channelItem")]
-    pub channel_item: Option<ActivityContentDetailsChannelItem>,
-    /// The bulletin object contains details about a channel bulletin post. This object is only present if the snippet.type is bulletin.
-    pub bulletin: Option<ActivityContentDetailsBulletin>,
-    /// The subscription object contains information about a channel that a user subscribed to. This property is only present if the snippet.type is subscription.
-    pub subscription: Option<ActivityContentDetailsSubscription>,
+pub struct LiveChatPollItem {
+    /// no description provided
+    #[serde(rename="itemId")]
+    pub item_id: Option<String>,
+    /// Plain text description of the item.
+    pub description: Option<String>,
 }
 
-impl Part for ActivityContentDetails {}
+impl Part for LiveChatPollItem {}
 
 
 /// There is no detailed description.
@@ -4001,7 +4078,7 @@ pub struct ChannelSnippet {
 impl Part for ChannelSnippet {}
 
 
-/// Branding properties for the watch.
+/// Branding properties for the watch. All deprecated.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -4019,6 +4096,34 @@ pub struct WatchSettings {
 }
 
 impl Part for WatchSettings {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [get rating videos](struct.VideoGetRatingCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct VideoGetRatingResponse {
+    /// Serialized EventId of the request which produced this response.
+    #[serde(rename="eventId")]
+    pub event_id: Option<String>,
+    /// A list of ratings that match the request criteria.
+    pub items: Option<Vec<VideoRating>>,
+    /// Identifies what kind of resource this is. Value: the fixed string "youtube#videoGetRatingResponse".
+    pub kind: Option<String>,
+    /// Etag of this resource.
+    pub etag: Option<String>,
+    /// The visitorId identifies the visitor.
+    #[serde(rename="visitorId")]
+    pub visitor_id: Option<String>,
+}
+
+impl ResponseResult for VideoGetRatingResponse {}
 
 
 /// A video resource represents a YouTube video.
@@ -4128,6 +4233,8 @@ impl ToParts for Video {
 pub struct VideoContentDetails {
     /// The value of definition indicates whether the video is available in high definition or only in standard definition.
     pub definition: Option<String>,
+    /// Specifies the projection format of the video.
+    pub projection: Option<String>,
     /// The countryRestriction object contains information about the countries where a video is (or is not) viewable.
     #[serde(rename="countryRestriction")]
     pub country_restriction: Option<AccessPolicy>,
@@ -5136,6 +5243,42 @@ pub struct LiveBroadcastSnippet {
 impl Part for LiveBroadcastSnippet {}
 
 
+/// Details about the content of an activity: the video that was shared, the channel that was subscribed to, etc.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ActivityContentDetails {
+    /// The comment object contains information about a resource that received a comment. This property is only present if the snippet.type is comment.
+    pub comment: Option<ActivityContentDetailsComment>,
+    /// The playlistItem object contains information about a new playlist item. This property is only present if the snippet.type is playlistItem.
+    #[serde(rename="playlistItem")]
+    pub playlist_item: Option<ActivityContentDetailsPlaylistItem>,
+    /// The like object contains information about a resource that received a positive (like) rating. This property is only present if the snippet.type is like.
+    pub like: Option<ActivityContentDetailsLike>,
+    /// The promotedItem object contains details about a resource which is being promoted. This property is only present if the snippet.type is promotedItem.
+    #[serde(rename="promotedItem")]
+    pub promoted_item: Option<ActivityContentDetailsPromotedItem>,
+    /// The recommendation object contains information about a recommended resource. This property is only present if the snippet.type is recommendation.
+    pub recommendation: Option<ActivityContentDetailsRecommendation>,
+    /// The favorite object contains information about a video that was marked as a favorite video. This property is only present if the snippet.type is favorite.
+    pub favorite: Option<ActivityContentDetailsFavorite>,
+    /// The upload object contains information about the uploaded video. This property is only present if the snippet.type is upload.
+    pub upload: Option<ActivityContentDetailsUpload>,
+    /// The social object contains details about a social network post. This property is only present if the snippet.type is social.
+    pub social: Option<ActivityContentDetailsSocial>,
+    /// The channelItem object contains details about a resource which was added to a channel. This property is only present if the snippet.type is channelItem.
+    #[serde(rename="channelItem")]
+    pub channel_item: Option<ActivityContentDetailsChannelItem>,
+    /// The bulletin object contains details about a channel bulletin post. This object is only present if the snippet.type is bulletin.
+    pub bulletin: Option<ActivityContentDetailsBulletin>,
+    /// The subscription object contains information about a channel that a user subscribed to. This property is only present if the snippet.type is subscription.
+    pub subscription: Option<ActivityContentDetailsSubscription>,
+}
+
+impl Part for ActivityContentDetails {}
+
+
 /// Basic details about a comment thread.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -5171,12 +5314,11 @@ impl Part for CommentThreadSnippet {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LiveBroadcastContentDetails {
-    /// Indicates whether this broadcast has low latency enabled.
-    #[serde(rename="enableLowLatency")]
-    pub enable_low_latency: Option<bool>,
-    /// The monitorStream object contains information about the monitor stream, which the broadcaster can use to review the event content before the broadcast stream is shown publicly.
-    #[serde(rename="monitorStream")]
-    pub monitor_stream: Option<MonitorStreamInfo>,
+    /// The date and time that the live stream referenced by boundStreamId was last updated.
+    #[serde(rename="boundStreamLastUpdateTimeMs")]
+    pub bound_stream_last_update_time_ms: Option<String>,
+    /// The projection format of this broadcast. This defaults to rectangular.
+    pub projection: Option<String>,
     /// This value uniquely identifies the live stream bound to the broadcast.
     #[serde(rename="boundStreamId")]
     pub bound_stream_id: Option<String>,
@@ -5186,6 +5328,12 @@ pub struct LiveBroadcastContentDetails {
     /// This setting indicates whether HTTP POST closed captioning is enabled for this broadcast. The ingestion URL of the closed captions is returned through the liveStreams API. This is mutually exclusive with using the closed_captions_type property, and is equivalent to setting closed_captions_type to CLOSED_CAPTIONS_HTTP_POST.
     #[serde(rename="enableClosedCaptions")]
     pub enable_closed_captions: Option<bool>,
+    /// Indicates whether this broadcast has low latency enabled.
+    #[serde(rename="enableLowLatency")]
+    pub enable_low_latency: Option<bool>,
+    /// This setting indicates whether the broadcast should automatically begin with an in-stream slate when you update the broadcast's status to live. After updating the status, you then need to send a liveCuepoints.insert request that sets the cuepoint's eventState to end to remove the in-stream slate and make your broadcast stream visible to viewers.
+    #[serde(rename="startWithSlate")]
+    pub start_with_slate: Option<bool>,
     /// no description provided
     #[serde(rename="closedCaptionsType")]
     pub closed_captions_type: Option<String>,
@@ -5206,9 +5354,9 @@ pub struct LiveBroadcastContentDetails {
     /// Important: You must set the value to true and also set the enableArchive property's value to true if you want to make playback available immediately after the broadcast ends.
     #[serde(rename="enableDvr")]
     pub enable_dvr: Option<bool>,
-    /// This setting indicates whether the broadcast should automatically begin with an in-stream slate when you update the broadcast's status to live. After updating the status, you then need to send a liveCuepoints.insert request that sets the cuepoint's eventState to end to remove the in-stream slate and make your broadcast stream visible to viewers.
-    #[serde(rename="startWithSlate")]
-    pub start_with_slate: Option<bool>,
+    /// The monitorStream object contains information about the monitor stream, which the broadcaster can use to review the event content before the broadcast stream is shown publicly.
+    #[serde(rename="monitorStream")]
+    pub monitor_stream: Option<MonitorStreamInfo>,
 }
 
 impl Part for LiveBroadcastContentDetails {}
@@ -5455,6 +5603,23 @@ pub struct LiveBroadcastTopic {
 }
 
 impl Part for LiveBroadcastTopic {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct LiveChatPollVotedDetails {
+    /// The poll item the user chose.
+    #[serde(rename="itemId")]
+    pub item_id: Option<String>,
+    /// The poll the user voted on.
+    #[serde(rename="pollId")]
+    pub poll_id: Option<String>,
+}
+
+impl Part for LiveChatPollVotedDetails {}
 
 
 
@@ -7336,6 +7501,7 @@ impl<'a, C, A> SubscriptionMethods<'a, C, A> {
             _on_behalf_of_content_owner_channel: Default::default(),
             _on_behalf_of_content_owner: Default::default(),
             _my_subscribers: Default::default(),
+            _my_recent_subscribers: Default::default(),
             _mine: Default::default(),
             _max_results: Default::default(),
             _id: Default::default(),
@@ -22888,11 +23054,12 @@ impl<'a, C, A> SubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 ///              .on_behalf_of_content_owner_channel("no")
 ///              .on_behalf_of_content_owner("invidunt")
 ///              .my_subscribers(true)
+///              .my_recent_subscribers(false)
 ///              .mine(false)
-///              .max_results(19)
-///              .id("elitr")
-///              .for_channel_id("consetetur")
-///              .channel_id("sea")
+///              .max_results(7)
+///              .id("consetetur")
+///              .for_channel_id("sea")
+///              .channel_id("elitr")
 ///              .doit();
 /// # }
 /// ```
@@ -22906,6 +23073,7 @@ pub struct SubscriptionListCall<'a, C, A>
     _on_behalf_of_content_owner_channel: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
     _my_subscribers: Option<bool>,
+    _my_recent_subscribers: Option<bool>,
     _mine: Option<bool>,
     _max_results: Option<u32>,
     _id: Option<String>,
@@ -22932,7 +23100,7 @@ impl<'a, C, A> SubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         };
         dlg.begin(MethodInfo { id: "youtube.subscriptions.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((13 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((14 + self._additional_params.len()));
         params.push(("part", self._part.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -22949,6 +23117,9 @@ impl<'a, C, A> SubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         if let Some(value) = self._my_subscribers {
             params.push(("mySubscribers", value.to_string()));
         }
+        if let Some(value) = self._my_recent_subscribers {
+            params.push(("myRecentSubscribers", value.to_string()));
+        }
         if let Some(value) = self._mine {
             params.push(("mine", value.to_string()));
         }
@@ -22964,7 +23135,7 @@ impl<'a, C, A> SubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         if let Some(value) = self._channel_id {
             params.push(("channelId", value.to_string()));
         }
-        for &field in ["alt", "part", "pageToken", "order", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner", "mySubscribers", "mine", "maxResults", "id", "forChannelId", "channelId"].iter() {
+        for &field in ["alt", "part", "pageToken", "order", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner", "mySubscribers", "myRecentSubscribers", "mine", "maxResults", "id", "forChannelId", "channelId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -23104,11 +23275,18 @@ impl<'a, C, A> SubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
-    /// Set this parameter's value to true to retrieve a feed of the subscribers of the authenticated user.
+    /// Set this parameter's value to true to retrieve a feed of the subscribers of the authenticated user in no particular order.
     ///
     /// Sets the *my subscribers* query property to the given value.
     pub fn my_subscribers(mut self, new_value: bool) -> SubscriptionListCall<'a, C, A> {
         self._my_subscribers = Some(new_value);
+        self
+    }
+    /// Set this parameter's value to true to retrieve a feed of the subscribers of the authenticated user in reverse chronological order (newest first).
+    ///
+    /// Sets the *my recent subscribers* query property to the given value.
+    pub fn my_recent_subscribers(mut self, new_value: bool) -> SubscriptionListCall<'a, C, A> {
+        self._my_recent_subscribers = Some(new_value);
         self
     }
     /// Set this parameter's value to true to retrieve a feed of the authenticated user's subscriptions.
@@ -23694,9 +23872,9 @@ impl<'a, C, A> LiveChatBanDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.sponsors().list("part")
-///              .page_token("sea")
-///              .max_results(5)
-///              .filter("diam")
+///              .page_token("consetetur")
+///              .max_results(22)
+///              .filter("accusam")
 ///              .doit();
 /// # }
 /// ```
@@ -23964,7 +24142,7 @@ impl<'a, C, A> SponsorListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.video_abuse_report_reasons().list("part")
-///              .hl("dolores")
+///              .hl("consetetur")
 ///              .doit();
 /// # }
 /// ```
@@ -24211,11 +24389,11 @@ impl<'a, C, A> VideoAbuseReportReasonListCall<'a, C, A> where C: BorrowMut<hyper
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().control("id", "part")
-///              .walltime("aliquyam")
-///              .on_behalf_of_content_owner_channel("elitr")
-///              .on_behalf_of_content_owner("ea")
-///              .offset_time_ms("et")
-///              .display_slate(false)
+///              .walltime("elitr")
+///              .on_behalf_of_content_owner_channel("ea")
+///              .on_behalf_of_content_owner("et")
+///              .offset_time_ms("Stet")
+///              .display_slate(true)
 ///              .doit();
 /// # }
 /// ```
@@ -24534,14 +24712,14 @@ impl<'a, C, A> LiveBroadcastControlCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// req.status = Default::default(); // is LiveBroadcastStatus
 /// req.content_details = Default::default(); // is LiveBroadcastContentDetails
 /// req.snippet = Default::default(); // is LiveBroadcastSnippet
-/// req.id = Some("sed".to_string());
+/// req.id = Some("dolor".to_string());
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().update(req)
-///              .on_behalf_of_content_owner_channel("dolor")
-///              .on_behalf_of_content_owner("sanctus")
+///              .on_behalf_of_content_owner_channel("sanctus")
+///              .on_behalf_of_content_owner("dolore")
 ///              .doit();
 /// # }
 /// ```
@@ -24850,8 +25028,8 @@ impl<'a, C, A> LiveBroadcastUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().bind("id", "part")
 ///              .stream_id("consetetur")
-///              .on_behalf_of_content_owner_channel("consetetur")
-///              .on_behalf_of_content_owner("eirmod")
+///              .on_behalf_of_content_owner_channel("eirmod")
+///              .on_behalf_of_content_owner("labore")
 ///              .doit();
 /// # }
 /// ```
@@ -25144,14 +25322,14 @@ impl<'a, C, A> LiveBroadcastBindCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// req.status = Default::default(); // is LiveBroadcastStatus
 /// req.content_details = Default::default(); // is LiveBroadcastContentDetails
 /// req.snippet = Default::default(); // is LiveBroadcastSnippet
-/// req.id = Some("labore".to_string());
+/// req.id = Some("gubergren".to_string());
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().insert(req)
-///              .on_behalf_of_content_owner_channel("gubergren")
-///              .on_behalf_of_content_owner("et")
+///              .on_behalf_of_content_owner_channel("et")
+///              .on_behalf_of_content_owner("sadipscing")
 ///              .doit();
 /// # }
 /// ```
@@ -25441,8 +25619,8 @@ impl<'a, C, A> LiveBroadcastInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().delete("id")
-///              .on_behalf_of_content_owner_channel("accusam")
-///              .on_behalf_of_content_owner("magna")
+///              .on_behalf_of_content_owner_channel("magna")
+///              .on_behalf_of_content_owner("Lorem")
 ///              .doit();
 /// # }
 /// ```
@@ -25691,14 +25869,14 @@ impl<'a, C, A> LiveBroadcastDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().list("part")
-///              .page_token("rebum.")
-///              .on_behalf_of_content_owner_channel("et")
-///              .on_behalf_of_content_owner("clita")
-///              .mine(true)
-///              .max_results(32)
-///              .id("vero")
-///              .broadcast_type("consetetur")
-///              .broadcast_status("vero")
+///              .page_token("et")
+///              .on_behalf_of_content_owner_channel("clita")
+///              .on_behalf_of_content_owner("eos")
+///              .mine(false)
+///              .max_results(76)
+///              .id("consetetur")
+///              .broadcast_type("vero")
+///              .broadcast_status("consetetur")
 ///              .doit();
 /// # }
 /// ```
@@ -26030,8 +26208,8 @@ impl<'a, C, A> LiveBroadcastListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().transition("broadcastStatus", "id", "part")
-///              .on_behalf_of_content_owner_channel("tempor")
-///              .on_behalf_of_content_owner("gubergren")
+///              .on_behalf_of_content_owner_channel("gubergren")
+///              .on_behalf_of_content_owner("dolore")
 ///              .doit();
 /// # }
 /// ```
@@ -26316,7 +26494,7 @@ impl<'a, C, A> LiveBroadcastTransitionCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.channel_banners().insert(req)
-///              .on_behalf_of_content_owner("dolore")
+///              .on_behalf_of_content_owner("amet.")
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
@@ -26670,36 +26848,36 @@ impl<'a, C, A> ChannelBannerInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.search().list("part")
-///              .video_type("dolore")
-///              .video_syndicated("magna")
-///              .video_license("elitr")
-///              .video_embeddable("magna")
-///              .video_duration("ipsum")
-///              .video_dimension("invidunt")
-///              .video_definition("accusam")
-///              .video_category_id("labore")
-///              .video_caption("diam")
-///              .type_("nonumy")
-///              .topic_id("sed")
-///              .safe_search("diam")
-///              .relevance_language("magna")
-///              .related_to_video_id("dolor")
-///              .region_code("Lorem")
-///              .q("dolor")
-///              .published_before("vero")
-///              .published_after("nonumy")
-///              .page_token("takimata")
-///              .order("dolores")
-///              .on_behalf_of_content_owner("consetetur")
-///              .max_results(71)
-///              .location_radius("amet.")
+///              .video_type("magna")
+///              .video_syndicated("elitr")
+///              .video_license("magna")
+///              .video_embeddable("ipsum")
+///              .video_duration("invidunt")
+///              .video_dimension("accusam")
+///              .video_definition("labore")
+///              .video_category_id("diam")
+///              .video_caption("nonumy")
+///              .type_("sed")
+///              .topic_id("diam")
+///              .safe_search("magna")
+///              .relevance_language("dolor")
+///              .related_to_video_id("Lorem")
+///              .region_code("dolor")
+///              .q("vero")
+///              .published_before("nonumy")
+///              .published_after("takimata")
+///              .page_token("dolores")
+///              .order("consetetur")
+///              .on_behalf_of_content_owner("erat")
+///              .max_results(49)
+///              .location_radius("dolores")
 ///              .location("dolores")
-///              .for_mine(false)
+///              .for_mine(true)
 ///              .for_developer(true)
-///              .for_content_owner(true)
-///              .event_type("et")
-///              .channel_type("aliquyam")
-///              .channel_id("nonumy")
+///              .for_content_owner(false)
+///              .event_type("aliquyam")
+///              .channel_type("nonumy")
+///              .channel_id("sit")
 ///              .doit();
 /// # }
 /// ```
@@ -27259,7 +27437,7 @@ impl<'a, C, A> SearchListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.thumbnails().set("videoId")
-///              .on_behalf_of_content_owner("aliquyam")
+///              .on_behalf_of_content_owner("sadipscing")
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
@@ -27610,9 +27788,9 @@ impl<'a, C, A> ThumbnailSetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.fan_funding_events().list("part")
-///              .page_token("magna")
-///              .max_results(40)
-///              .hl("sit")
+///              .page_token("gubergren")
+///              .max_results(3)
+///              .hl("gubergren")
 ///              .doit();
 /// # }
 /// ```

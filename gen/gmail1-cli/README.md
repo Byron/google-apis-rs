@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *gmail* API at revision *20160316*. The CLI is at version *0.3.6*.
+This documentation was generated from the *gmail* API at revision *20160711*. The CLI is at version *0.3.6*.
 
 ```bash
 gmail1 [options]
@@ -54,6 +54,29 @@ gmail1 [options]
                 messages-send <user-id> (-r <kv>)... (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
                 messages-trash <user-id> <id> [-p <v>]... [-o <out>]
                 messages-untrash <user-id> <id> [-p <v>]... [-o <out>]
+                settings-filters-create <user-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                settings-filters-delete <user-id> <id> [-p <v>]...
+                settings-filters-get <user-id> <id> [-p <v>]... [-o <out>]
+                settings-filters-list <user-id> [-p <v>]... [-o <out>]
+                settings-forwarding-addresses-create <user-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                settings-forwarding-addresses-delete <user-id> <forwarding-email> [-p <v>]...
+                settings-forwarding-addresses-get <user-id> <forwarding-email> [-p <v>]... [-o <out>]
+                settings-forwarding-addresses-list <user-id> [-p <v>]... [-o <out>]
+                settings-get-auto-forwarding <user-id> [-p <v>]... [-o <out>]
+                settings-get-imap <user-id> [-p <v>]... [-o <out>]
+                settings-get-pop <user-id> [-p <v>]... [-o <out>]
+                settings-get-vacation <user-id> [-p <v>]... [-o <out>]
+                settings-send-as-create <user-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                settings-send-as-delete <user-id> <send-as-email> [-p <v>]...
+                settings-send-as-get <user-id> <send-as-email> [-p <v>]... [-o <out>]
+                settings-send-as-list <user-id> [-p <v>]... [-o <out>]
+                settings-send-as-patch <user-id> <send-as-email> (-r <kv>)... [-p <v>]... [-o <out>]
+                settings-send-as-update <user-id> <send-as-email> (-r <kv>)... [-p <v>]... [-o <out>]
+                settings-send-as-verify <user-id> <send-as-email> [-p <v>]...
+                settings-update-auto-forwarding <user-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                settings-update-imap <user-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                settings-update-pop <user-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                settings-update-vacation <user-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 stop <user-id> [-p <v>]...
                 threads-delete <user-id> <id> [-p <v>]...
                 threads-get <user-id> <id> [-p <v>]... [-o <out>]

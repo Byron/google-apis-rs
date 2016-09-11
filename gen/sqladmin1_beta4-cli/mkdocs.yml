@@ -1,4 +1,4 @@
-site_name: SQL Admin v0.3.6+20160321
+site_name: SQL Admin v0.3.6+20160907
 site_url: http://byron.github.io/google-apis-rs/google-sqladmin1_beta4-cli
 site_description: Write integrating applications with bcore
 
@@ -11,6 +11,7 @@ pages:
 - ['index.md', 'Home']
 - ['backup-runs_delete.md', 'Backup Runs', 'Delete']
 - ['backup-runs_get.md', 'Backup Runs', 'Get']
+- ['backup-runs_insert.md', 'Backup Runs', 'Insert']
 - ['backup-runs_list.md', 'Backup Runs', 'List']
 - ['databases_delete.md', 'Databases', 'Delete']
 - ['databases_get.md', 'Databases', 'Get']

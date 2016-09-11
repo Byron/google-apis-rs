@@ -1467,7 +1467,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("metric-descriptors-get",
-                    Some(r##"Gets a single metric descriptor."##),
+                    Some(r##"Gets a single metric descriptor. This method does not require a Stackdriver account."##),
                     "Details at http://byron.github.io/google-apis-rs/google_monitoring3_cli/projects_metric-descriptors-get",
                   vec![
                     (Some(r##"name"##),
@@ -1489,7 +1489,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("metric-descriptors-list",
-                    Some(r##"Lists metric descriptors that match a filter."##),
+                    Some(r##"Lists metric descriptors that match a filter. This method does not require a Stackdriver account."##),
                     "Details at http://byron.github.io/google-apis-rs/google_monitoring3_cli/projects_metric-descriptors-list",
                   vec![
                     (Some(r##"name"##),
@@ -1511,7 +1511,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("monitored-resource-descriptors-get",
-                    Some(r##"Gets a single monitored resource descriptor."##),
+                    Some(r##"Gets a single monitored resource descriptor. This method does not require a Stackdriver account."##),
                     "Details at http://byron.github.io/google-apis-rs/google_monitoring3_cli/projects_monitored-resource-descriptors-get",
                   vec![
                     (Some(r##"name"##),
@@ -1533,7 +1533,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("monitored-resource-descriptors-list",
-                    Some(r##"Lists monitored resource descriptors that match a filter."##),
+                    Some(r##"Lists monitored resource descriptors that match a filter. This method does not require a Stackdriver account."##),
                     "Details at http://byron.github.io/google-apis-rs/google_monitoring3_cli/projects_monitored-resource-descriptors-list",
                   vec![
                     (Some(r##"name"##),
@@ -1583,7 +1583,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("time-series-list",
-                    Some(r##"Lists time series that match a filter."##),
+                    Some(r##"Lists time series that match a filter. This method does not require a Stackdriver account."##),
                     "Details at http://byron.github.io/google-apis-rs/google_monitoring3_cli/projects_time-series-list",
                   vec![
                     (Some(r##"name"##),
@@ -1610,8 +1610,8 @@ fn main() {
     
     let mut app = App::new("monitoring3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.6+20160321")
-           .about("The Google Monitoring API lets you manage your monitoring data and configurations.")
+           .version("0.3.6+20160425")
+           .about("Manages your Stackdriver monitoring data and configurations. Projects must be associated with a Stackdriver account, except for the following methods: [monitoredResourceDescriptors.list](v3/projects.monitoredResourceDescriptors/list), [monitoredResourceDescriptors.get](v3/projects.monitoredResourceDescriptors/get), [metricDescriptors.list](v3/projects.metricDescriptors/list), [metricDescriptors.get](v3/projects.metricDescriptors/get), and [timeSeries.list](v3/projects.timeSeries/list).")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_monitoring3_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

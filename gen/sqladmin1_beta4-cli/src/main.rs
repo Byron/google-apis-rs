@@ -149,6 +149,104 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _backup_runs_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "window-start-time" => Some(("windowStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "enqueued-time" => Some(("enqueuedTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance" => Some(("instance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "start-time" => Some(("startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "error.kind" => Some(("error.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "error.code" => Some(("error.code", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "error.message" => Some(("error.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-time" => Some(("endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["code", "description", "end-time", "enqueued-time", "error", "id", "instance", "kind", "message", "self-link", "start-time", "status", "type", "window-start-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::BackupRun = json::value::from_value(object).unwrap();
+        let mut call = self.hub.backup_runs().insert(request, opt.value_of("project").unwrap_or(""), opt.value_of("instance").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _backup_runs_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.backup_runs().list(opt.value_of("project").unwrap_or(""), opt.value_of("instance").unwrap_or(""));
@@ -1223,6 +1321,7 @@ impl<'n> Engine<'n> {
                     "settings.tier" => Some(("settings.tier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.pricing-plan" => Some(("settings.pricingPlan", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.settings-version" => Some(("settings.settingsVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.storage-auto-resize" => Some(("settings.storageAutoResize", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "settings.location-preference.kind" => Some(("settings.locationPreference.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.location-preference.zone" => Some(("settings.locationPreference.zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.location-preference.follow-gae-application" => Some(("settings.locationPreference.followGaeApplication", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1243,7 +1342,7 @@ impl<'n> Engine<'n> {
                     "replica-configuration.mysql-replica-configuration.client-key" => Some(("replicaConfiguration.mysqlReplicaConfiguration.clientKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-policy", "authorized-gae-applications", "available", "backend-type", "backup-configuration", "binary-log-enabled", "ca-certificate", "cert", "cert-serial-number", "client-certificate", "client-key", "common-name", "connect-retry-interval", "crash-safe-replication-enabled", "create-time", "current-disk-size", "data-disk-size-gb", "data-disk-type", "database-replication-enabled", "database-version", "day", "dump-file-path", "enabled", "etag", "expiration-time", "failover-replica", "failover-target", "follow-gae-application", "host-port", "hour", "instance", "instance-type", "ip-configuration", "ipv4-enabled", "ipv6-address", "kind", "location-preference", "maintenance-window", "master-heartbeat-period", "master-instance-name", "max-disk-size", "mysql-replica-configuration", "name", "on-premises-configuration", "password", "pricing-plan", "project", "region", "replica-configuration", "replica-names", "replication-type", "require-ssl", "self-link", "server-ca-cert", "service-account-email-address", "settings", "settings-version", "sha1-fingerprint", "ssl-cipher", "start-time", "state", "suspension-reason", "tier", "update-track", "username", "verify-server-certificate", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-policy", "authorized-gae-applications", "available", "backend-type", "backup-configuration", "binary-log-enabled", "ca-certificate", "cert", "cert-serial-number", "client-certificate", "client-key", "common-name", "connect-retry-interval", "crash-safe-replication-enabled", "create-time", "current-disk-size", "data-disk-size-gb", "data-disk-type", "database-replication-enabled", "database-version", "day", "dump-file-path", "enabled", "etag", "expiration-time", "failover-replica", "failover-target", "follow-gae-application", "host-port", "hour", "instance", "instance-type", "ip-configuration", "ipv4-enabled", "ipv6-address", "kind", "location-preference", "maintenance-window", "master-heartbeat-period", "master-instance-name", "max-disk-size", "mysql-replica-configuration", "name", "on-premises-configuration", "password", "pricing-plan", "project", "region", "replica-configuration", "replica-names", "replication-type", "require-ssl", "self-link", "server-ca-cert", "service-account-email-address", "settings", "settings-version", "sha1-fingerprint", "ssl-cipher", "start-time", "state", "storage-auto-resize", "suspension-reason", "tier", "update-track", "username", "verify-server-certificate", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1433,6 +1532,7 @@ impl<'n> Engine<'n> {
                     "settings.tier" => Some(("settings.tier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.pricing-plan" => Some(("settings.pricingPlan", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.settings-version" => Some(("settings.settingsVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.storage-auto-resize" => Some(("settings.storageAutoResize", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "settings.location-preference.kind" => Some(("settings.locationPreference.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.location-preference.zone" => Some(("settings.locationPreference.zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.location-preference.follow-gae-application" => Some(("settings.locationPreference.followGaeApplication", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1453,7 +1553,7 @@ impl<'n> Engine<'n> {
                     "replica-configuration.mysql-replica-configuration.client-key" => Some(("replicaConfiguration.mysqlReplicaConfiguration.clientKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-policy", "authorized-gae-applications", "available", "backend-type", "backup-configuration", "binary-log-enabled", "ca-certificate", "cert", "cert-serial-number", "client-certificate", "client-key", "common-name", "connect-retry-interval", "crash-safe-replication-enabled", "create-time", "current-disk-size", "data-disk-size-gb", "data-disk-type", "database-replication-enabled", "database-version", "day", "dump-file-path", "enabled", "etag", "expiration-time", "failover-replica", "failover-target", "follow-gae-application", "host-port", "hour", "instance", "instance-type", "ip-configuration", "ipv4-enabled", "ipv6-address", "kind", "location-preference", "maintenance-window", "master-heartbeat-period", "master-instance-name", "max-disk-size", "mysql-replica-configuration", "name", "on-premises-configuration", "password", "pricing-plan", "project", "region", "replica-configuration", "replica-names", "replication-type", "require-ssl", "self-link", "server-ca-cert", "service-account-email-address", "settings", "settings-version", "sha1-fingerprint", "ssl-cipher", "start-time", "state", "suspension-reason", "tier", "update-track", "username", "verify-server-certificate", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-policy", "authorized-gae-applications", "available", "backend-type", "backup-configuration", "binary-log-enabled", "ca-certificate", "cert", "cert-serial-number", "client-certificate", "client-key", "common-name", "connect-retry-interval", "crash-safe-replication-enabled", "create-time", "current-disk-size", "data-disk-size-gb", "data-disk-type", "database-replication-enabled", "database-version", "day", "dump-file-path", "enabled", "etag", "expiration-time", "failover-replica", "failover-target", "follow-gae-application", "host-port", "hour", "instance", "instance-type", "ip-configuration", "ipv4-enabled", "ipv6-address", "kind", "location-preference", "maintenance-window", "master-heartbeat-period", "master-instance-name", "max-disk-size", "mysql-replica-configuration", "name", "on-premises-configuration", "password", "pricing-plan", "project", "region", "replica-configuration", "replica-names", "replication-type", "require-ssl", "self-link", "server-ca-cert", "service-account-email-address", "settings", "settings-version", "sha1-fingerprint", "ssl-cipher", "start-time", "state", "storage-auto-resize", "suspension-reason", "tier", "update-track", "username", "verify-server-certificate", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1931,6 +2031,7 @@ impl<'n> Engine<'n> {
                     "settings.tier" => Some(("settings.tier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.pricing-plan" => Some(("settings.pricingPlan", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.settings-version" => Some(("settings.settingsVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.storage-auto-resize" => Some(("settings.storageAutoResize", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "settings.location-preference.kind" => Some(("settings.locationPreference.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.location-preference.zone" => Some(("settings.locationPreference.zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.location-preference.follow-gae-application" => Some(("settings.locationPreference.followGaeApplication", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1951,7 +2052,7 @@ impl<'n> Engine<'n> {
                     "replica-configuration.mysql-replica-configuration.client-key" => Some(("replicaConfiguration.mysqlReplicaConfiguration.clientKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-policy", "authorized-gae-applications", "available", "backend-type", "backup-configuration", "binary-log-enabled", "ca-certificate", "cert", "cert-serial-number", "client-certificate", "client-key", "common-name", "connect-retry-interval", "crash-safe-replication-enabled", "create-time", "current-disk-size", "data-disk-size-gb", "data-disk-type", "database-replication-enabled", "database-version", "day", "dump-file-path", "enabled", "etag", "expiration-time", "failover-replica", "failover-target", "follow-gae-application", "host-port", "hour", "instance", "instance-type", "ip-configuration", "ipv4-enabled", "ipv6-address", "kind", "location-preference", "maintenance-window", "master-heartbeat-period", "master-instance-name", "max-disk-size", "mysql-replica-configuration", "name", "on-premises-configuration", "password", "pricing-plan", "project", "region", "replica-configuration", "replica-names", "replication-type", "require-ssl", "self-link", "server-ca-cert", "service-account-email-address", "settings", "settings-version", "sha1-fingerprint", "ssl-cipher", "start-time", "state", "suspension-reason", "tier", "update-track", "username", "verify-server-certificate", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-policy", "authorized-gae-applications", "available", "backend-type", "backup-configuration", "binary-log-enabled", "ca-certificate", "cert", "cert-serial-number", "client-certificate", "client-key", "common-name", "connect-retry-interval", "crash-safe-replication-enabled", "create-time", "current-disk-size", "data-disk-size-gb", "data-disk-type", "database-replication-enabled", "database-version", "day", "dump-file-path", "enabled", "etag", "expiration-time", "failover-replica", "failover-target", "follow-gae-application", "host-port", "hour", "instance", "instance-type", "ip-configuration", "ipv4-enabled", "ipv6-address", "kind", "location-preference", "maintenance-window", "master-heartbeat-period", "master-instance-name", "max-disk-size", "mysql-replica-configuration", "name", "on-premises-configuration", "password", "pricing-plan", "project", "region", "replica-configuration", "replica-names", "replication-type", "require-ssl", "self-link", "server-ca-cert", "service-account-email-address", "settings", "settings-version", "sha1-fingerprint", "ssl-cipher", "start-time", "state", "storage-auto-resize", "suspension-reason", "tier", "update-track", "username", "verify-server-certificate", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2799,6 +2900,9 @@ impl<'n> Engine<'n> {
                     ("get", Some(opt)) => {
                         call_result = self._backup_runs_get(opt, dry_run, &mut err);
                     },
+                    ("insert", Some(opt)) => {
+                        call_result = self._backup_runs_insert(opt, dry_run, &mut err);
+                    },
                     ("list", Some(opt)) => {
                         call_result = self._backup_runs_list(opt, dry_run, &mut err);
                     },
@@ -3051,7 +3155,7 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("backup-runs", "methods: 'delete', 'get' and 'list'", vec![
+        ("backup-runs", "methods: 'delete', 'get', 'insert' and 'list'", vec![
             ("delete",
                     Some(r##"Deletes the backup taken by a backup run."##),
                     "Details at http://byron.github.io/google-apis-rs/google_sqladmin1_beta4_cli/backup-runs_delete",
@@ -3107,6 +3211,40 @@ fn main() {
                      Some(r##"The ID of this Backup Run."##),
                      Some(true),
                      Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("insert",
+                    Some(r##"Creates a new backup run on demand. This method is applicable only to Second Generation instances."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_sqladmin1_beta4_cli/backup-runs_insert",
+                  vec![
+                    (Some(r##"project"##),
+                     None,
+                     Some(r##"Project ID of the project that contains the instance."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"instance"##),
+                     None,
+                     Some(r##"Cloud SQL instance ID. This does not include the project ID."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -4275,7 +4413,7 @@ fn main() {
     
     let mut app = App::new("sqladmin1-beta4")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.6+20160321")
+           .version("0.3.6+20160907")
            .about("Creates and configures Cloud SQL instances, which provide fully-managed MySQL databases.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_sqladmin1_beta4_cli")
            .arg(Arg::with_name("url")

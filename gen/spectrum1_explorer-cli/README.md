@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *spectrum* API at revision *20160206*. The CLI is at version *0.3.6*.
+This documentation was generated from the *spectrum* API at revision *20160606*. The CLI is at version *0.3.6*.
 
 ```bash
 spectrum1-explorer [options]

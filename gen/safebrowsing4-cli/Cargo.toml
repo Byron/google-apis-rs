@@ -1,0 +1,42 @@
+# DO NOT EDIT !
+# This file was generated automatically from 'src/mako/Cargo.toml.mako'
+# DO NOT EDIT !
+[package]
+
+name = "google-safebrowsing4-cli"
+version = "0.3.6+20160520"
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
+description = "A complete library to interact with safebrowsing (protocol v4)"
+repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/safebrowsing4-cli"
+homepage = "https://developers.google.com/safe-browsing/"
+documentation = "http://byron.github.io/google-apis-rs/google_safebrowsing4_cli"
+license = "MIT"
+keywords = ["safebrowsing", "google", "cli"]
+
+[[bin]]
+name = "safebrowsing4"
+
+[dependencies]
+hyper = "^ 0.9"
+mime = "^ 0.2.0"
+serde = "^ 0.8"
+serde_json = "^ 0.8"
+yup-oauth2 = { version = "^ 0.6", optional = true, default-features = false }
+serde_macros = { version = "^ 0.8", optional = true }
+strsim = "^0.4"
+yup-hyper-mock = "^1.0"
+clap = "^2.0"
+
+[features]
+default = ["with-serde-codegen"]
+nightly = ["serde_macros","yup-oauth2/nightly","google-safebrowsing4/nightly"]
+with-serde-codegen = ["serde_codegen","yup-oauth2/with-serde-codegen","google-safebrowsing4/with-serde-codegen"]
+
+[build-dependencies]
+serde_codegen = { version = "^ 0.8", optional = true }
+
+
+[dependencies.google-safebrowsing4]
+path = "../safebrowsing4"
+optional = true
+default-features = false

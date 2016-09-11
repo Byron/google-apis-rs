@@ -68,18 +68,21 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "openid-realm" => Some(("openidRealm", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "oauth-scope" => Some(("oauthScope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "client-id" => Some(("clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "ota-app" => Some(("otaApp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "hosted-domain" => Some(("hostedDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "oauth-consumer-key" => Some(("oauthConsumerKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "openid-realm" => Some(("openidRealm", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "auth-flow-type" => Some(("authFlowType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "client-id" => Some(("clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oauth-scope" => Some(("oauthScope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ota-app" => Some(("otaApp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "session-id" => Some(("sessionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "provider-id" => Some(("providerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "context" => Some(("context", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-id" => Some(("appId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "continue-uri" => Some(("continueUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "identifier" => Some(("identifier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-id", "client-id", "context", "continue-uri", "identifier", "oauth-consumer-key", "oauth-scope", "openid-realm", "ota-app", "provider-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-id", "auth-flow-type", "client-id", "context", "continue-uri", "hosted-domain", "identifier", "oauth-consumer-key", "oauth-scope", "openid-realm", "ota-app", "provider-id", "session-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -740,6 +743,7 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "delete-provider" => Some(("deleteProvider", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "provider" => Some(("provider", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "delegated-project-number" => Some(("delegatedProjectNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "oob-code" => Some(("oobCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -748,19 +752,20 @@ impl<'n> Engine<'n> {
                     "photo-url" => Some(("photoUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "instance-id" => Some(("instanceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id-token" => Some(("idToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "delete-attribute" => Some(("deleteAttribute", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "last-login-at" => Some(("lastLoginAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "upgrade-to-federated-login" => Some(("upgradeToFederatedLogin", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "disable-user" => Some(("disableUser", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "email" => Some(("email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "delete-provider" => Some(("deleteProvider", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "delete-attribute" => Some(("deleteAttribute", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "captcha-challenge" => Some(("captchaChallenge", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "captcha-response" => Some(("captchaResponse", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "email-verified" => Some(("emailVerified", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "return-secure-token" => Some(("returnSecureToken", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "password" => Some(("password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created-at" => Some(("createdAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["captcha-challenge", "captcha-response", "delegated-project-number", "delete-attribute", "delete-provider", "disable-user", "display-name", "email", "email-verified", "id-token", "instance-id", "local-id", "oob-code", "password", "photo-url", "provider", "return-secure-token", "upgrade-to-federated-login", "valid-since"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["captcha-challenge", "captcha-response", "created-at", "delegated-project-number", "delete-attribute", "delete-provider", "disable-user", "display-name", "email", "email-verified", "id-token", "instance-id", "last-login-at", "local-id", "oob-code", "password", "photo-url", "provider", "return-secure-token", "upgrade-to-federated-login", "valid-since"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -849,6 +854,7 @@ impl<'n> Engine<'n> {
                     "verify-email-template.reply-to" => Some(("verifyEmailTemplate.replyTo", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "verify-email-template.subject" => Some(("verifyEmailTemplate.subject", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "enable-anonymous-user" => Some(("enableAnonymousUser", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "authorized-domains" => Some(("authorizedDomains", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "reset-password-template.body" => Some(("resetPasswordTemplate.body", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "reset-password-template.from-display-name" => Some(("resetPasswordTemplate.fromDisplayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "reset-password-template.from" => Some(("resetPasswordTemplate.from", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -870,7 +876,7 @@ impl<'n> Engine<'n> {
                     "change-email-template.reply-to" => Some(("changeEmailTemplate.replyTo", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "change-email-template.subject" => Some(("changeEmailTemplate.subject", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-password-user", "api-key", "body", "change-email-template", "delegated-project-number", "enable-anonymous-user", "format", "from", "from-display-name", "legacy-reset-password-template", "reply-to", "reset-password-template", "subject", "use-email-sending", "verify-email-template"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-password-user", "api-key", "authorized-domains", "body", "change-email-template", "delegated-project-number", "enable-anonymous-user", "format", "from", "from-display-name", "legacy-reset-password-template", "reply-to", "reset-password-template", "subject", "use-email-sending", "verify-email-template"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1033,16 +1039,15 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "captcha-challenge" => Some(("captchaChallenge", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "instance-id" => Some(("instanceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id-token" => Some(("idToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "captcha-response" => Some(("captchaResponse", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "return-secure-token" => Some(("returnSecureToken", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "id-token" => Some(("idToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "captcha-challenge" => Some(("captchaChallenge", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "password" => Some(("password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "email" => Some(("email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["captcha-challenge", "captcha-response", "display-name", "email", "id-token", "instance-id", "password", "return-secure-token"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["captcha-challenge", "captcha-response", "display-name", "email", "id-token", "instance-id", "password"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1218,8 +1223,9 @@ impl<'n> Engine<'n> {
                     "request-uri" => Some(("requestUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "return-secure-token" => Some(("returnSecureToken", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "return-refresh-token" => Some(("returnRefreshToken", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "return-idp-credential" => Some(("returnIdpCredential", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["delegated-project-number", "id-token", "instance-id", "pending-id-token", "post-body", "request-uri", "return-refresh-token", "return-secure-token", "session-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["delegated-project-number", "id-token", "instance-id", "pending-id-token", "post-body", "request-uri", "return-idp-credential", "return-refresh-token", "return-secure-token", "session-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1302,8 +1308,9 @@ impl<'n> Engine<'n> {
                     "instance-id" => Some(("instanceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "return-secure-token" => Some(("returnSecureToken", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "token" => Some(("token", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "delegated-project-number" => Some(("delegatedProjectNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["instance-id", "return-secure-token", "token"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["delegated-project-number", "instance-id", "return-secure-token", "token"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1959,7 +1966,7 @@ fn main() {
     
     let mut app = App::new("identitytoolkit3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.6+20160324")
+           .version("0.3.6+20160812")
            .about("Help the third party sites to implement federated login.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_identitytoolkit3_cli")
            .arg(Arg::with_name("folder")

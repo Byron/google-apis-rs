@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Android Enterprise* crate version *0.1.14+20160331*, where *20160331* is the exact revision of the *androidenterprise:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
+//! This documentation was generated from *Android Enterprise* crate version *0.1.14+20160831*, where *20160831* is the exact revision of the *androidenterprise:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
 //! 
 //! Everything else about the *Android Enterprise* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/android/work/play/emm-api).
@@ -18,7 +18,7 @@
 //! * [devices](struct.Device.html)
 //!  * [*get*](struct.DeviceGetCall.html), [*get state*](struct.DeviceGetStateCall.html), [*list*](struct.DeviceListCall.html) and [*set state*](struct.DeviceSetStateCall.html)
 //! * [enterprises](struct.Enterprise.html)
-//!  * [*delete*](struct.EnterpriseDeleteCall.html), [*enroll*](struct.EnterpriseEnrollCall.html), [*get*](struct.EnterpriseGetCall.html), [*get store layout*](struct.EnterpriseGetStoreLayoutCall.html), [*insert*](struct.EnterpriseInsertCall.html), [*list*](struct.EnterpriseListCall.html), [*send test push notification*](struct.EnterpriseSendTestPushNotificationCall.html), [*set account*](struct.EnterpriseSetAccountCall.html), [*set store layout*](struct.EnterpriseSetStoreLayoutCall.html) and [*unenroll*](struct.EnterpriseUnenrollCall.html)
+//!  * [*acknowledge notification set*](struct.EnterpriseAcknowledgeNotificationSetCall.html), [*complete signup*](struct.EnterpriseCompleteSignupCall.html), [*delete*](struct.EnterpriseDeleteCall.html), [*enroll*](struct.EnterpriseEnrollCall.html), [*generate signup url*](struct.EnterpriseGenerateSignupUrlCall.html), [*get*](struct.EnterpriseGetCall.html), [*get service account*](struct.EnterpriseGetServiceAccountCall.html), [*get store layout*](struct.EnterpriseGetStoreLayoutCall.html), [*insert*](struct.EnterpriseInsertCall.html), [*list*](struct.EnterpriseListCall.html), [*pull notification set*](struct.EnterprisePullNotificationSetCall.html), [*send test push notification*](struct.EnterpriseSendTestPushNotificationCall.html), [*set account*](struct.EnterpriseSetAccountCall.html), [*set store layout*](struct.EnterpriseSetStoreLayoutCall.html) and [*unenroll*](struct.EnterpriseUnenrollCall.html)
 //! * [entitlements](struct.Entitlement.html)
 //!  * [*delete*](struct.EntitlementDeleteCall.html), [*get*](struct.EntitlementGetCall.html), [*list*](struct.EntitlementListCall.html), [*patch*](struct.EntitlementPatchCall.html) and [*update*](struct.EntitlementUpdateCall.html)
 //! * grouplicenses
@@ -27,16 +27,22 @@
 //!  * [*list*](struct.GrouplicenseuserListCall.html)
 //! * [installs](struct.Install.html)
 //!  * [*delete*](struct.InstallDeleteCall.html), [*get*](struct.InstallGetCall.html), [*list*](struct.InstallListCall.html), [*patch*](struct.InstallPatchCall.html) and [*update*](struct.InstallUpdateCall.html)
+//! * managedconfigurationsfordevice
+//!  * [*delete*](struct.ManagedconfigurationsfordeviceDeleteCall.html), [*get*](struct.ManagedconfigurationsfordeviceGetCall.html), [*list*](struct.ManagedconfigurationsfordeviceListCall.html), [*patch*](struct.ManagedconfigurationsfordevicePatchCall.html) and [*update*](struct.ManagedconfigurationsfordeviceUpdateCall.html)
+//! * managedconfigurationsforuser
+//!  * [*delete*](struct.ManagedconfigurationsforuserDeleteCall.html), [*get*](struct.ManagedconfigurationsforuserGetCall.html), [*list*](struct.ManagedconfigurationsforuserListCall.html), [*patch*](struct.ManagedconfigurationsforuserPatchCall.html) and [*update*](struct.ManagedconfigurationsforuserUpdateCall.html)
 //! * [permissions](struct.Permission.html)
 //!  * [*get*](struct.PermissionGetCall.html)
 //! * [products](struct.Product.html)
-//!  * [*approve*](struct.ProductApproveCall.html), [*generate approval url*](struct.ProductGenerateApprovalUrlCall.html), [*get*](struct.ProductGetCall.html), [*get app restrictions schema*](struct.ProductGetAppRestrictionsSchemaCall.html), [*get permissions*](struct.ProductGetPermissionCall.html) and [*update permissions*](struct.ProductUpdatePermissionCall.html)
+//!  * [*approve*](struct.ProductApproveCall.html), [*generate approval url*](struct.ProductGenerateApprovalUrlCall.html), [*get*](struct.ProductGetCall.html), [*get app restrictions schema*](struct.ProductGetAppRestrictionsSchemaCall.html), [*get permissions*](struct.ProductGetPermissionCall.html), [*list*](struct.ProductListCall.html), [*unapprove*](struct.ProductUnapproveCall.html) and [*update permissions*](struct.ProductUpdatePermissionCall.html)
+//! * serviceaccountkeys
+//!  * [*delete*](struct.ServiceaccountkeyDeleteCall.html), [*insert*](struct.ServiceaccountkeyInsertCall.html) and [*list*](struct.ServiceaccountkeyListCall.html)
 //! * storelayoutclusters
 //!  * [*delete*](struct.StorelayoutclusterDeleteCall.html), [*get*](struct.StorelayoutclusterGetCall.html), [*insert*](struct.StorelayoutclusterInsertCall.html), [*list*](struct.StorelayoutclusterListCall.html), [*patch*](struct.StorelayoutclusterPatchCall.html) and [*update*](struct.StorelayoutclusterUpdateCall.html)
 //! * storelayoutpages
 //!  * [*delete*](struct.StorelayoutpageDeleteCall.html), [*get*](struct.StorelayoutpageGetCall.html), [*insert*](struct.StorelayoutpageInsertCall.html), [*list*](struct.StorelayoutpageListCall.html), [*patch*](struct.StorelayoutpagePatchCall.html) and [*update*](struct.StorelayoutpageUpdateCall.html)
 //! * [users](struct.User.html)
-//!  * [*generate token*](struct.UserGenerateTokenCall.html), [*get*](struct.UserGetCall.html), [*get available product set*](struct.UserGetAvailableProductSetCall.html), [*list*](struct.UserListCall.html), [*revoke token*](struct.UserRevokeTokenCall.html) and [*set available product set*](struct.UserSetAvailableProductSetCall.html)
+//!  * [*delete*](struct.UserDeleteCall.html), [*generate authentication token*](struct.UserGenerateAuthenticationTokenCall.html), [*generate token*](struct.UserGenerateTokenCall.html), [*get*](struct.UserGetCall.html), [*get available product set*](struct.UserGetAvailableProductSetCall.html), [*insert*](struct.UserInsertCall.html), [*list*](struct.UserListCall.html), [*patch*](struct.UserPatchCall.html), [*revoke token*](struct.UserRevokeTokenCall.html), [*set available product set*](struct.UserSetAvailableProductSetCall.html) and [*update*](struct.UserUpdateCall.html)
 //! 
 //! 
 //! 
@@ -72,15 +78,20 @@
 //! 
 //! ```ignore
 //! let r = hub.enterprises().send_test_push_notification(...).doit()
-//! let r = hub.enterprises().set_store_layout(...).doit()
 //! let r = hub.enterprises().get_store_layout(...).doit()
+//! let r = hub.enterprises().get_service_account(...).doit()
+//! let r = hub.enterprises().acknowledge_notification_set(...).doit()
+//! let r = hub.enterprises().set_store_layout(...).doit()
+//! let r = hub.enterprises().insert(...).doit()
+//! let r = hub.enterprises().complete_signup(...).doit()
 //! let r = hub.enterprises().list(...).doit()
 //! let r = hub.enterprises().unenroll(...).doit()
 //! let r = hub.enterprises().set_account(...).doit()
-//! let r = hub.enterprises().delete(...).doit()
+//! let r = hub.enterprises().pull_notification_set(...).doit()
 //! let r = hub.enterprises().enroll(...).doit()
-//! let r = hub.enterprises().insert(...).doit()
 //! let r = hub.enterprises().get(...).doit()
+//! let r = hub.enterprises().delete(...).doit()
+//! let r = hub.enterprises().generate_signup_url(...).doit()
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -105,7 +116,6 @@
 //! extern crate hyper;
 //! extern crate yup_oauth2 as oauth2;
 //! extern crate google_androidenterprise1 as androidenterprise1;
-//! use androidenterprise1::StoreLayout;
 //! use androidenterprise1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
@@ -124,15 +134,11 @@
 //!                               hyper::Client::new(),
 //!                               <MemoryStorage as Default>::default(), None);
 //! let mut hub = AndroidEnterprise::new(hyper::Client::new(), auth);
-//! // As the method needs a request, you would usually fill it with the desired information
-//! // into the respective structure. Some of the parts shown here might not be applicable !
-//! // Values shown here are possibly random and not representative !
-//! let mut req = StoreLayout::default();
-//! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.enterprises().set_store_layout(req, "enterpriseId")
+//! let result = hub.enterprises().get_service_account("enterpriseId")
+//!              .key_type("dolor")
 //!              .doit();
 //! 
 //! match result {

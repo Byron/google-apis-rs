@@ -1,0 +1,20 @@
+site_name: safebrowsing v0.3.6+20160520
+site_url: http://byron.github.io/google-apis-rs/google-safebrowsing4-cli
+site_description: Write integrating applications with bcore
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/safebrowsing4-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['full-hashes_find.md', 'Full Hashes', 'Find']
+- ['threat-list-updates_fetch.md', 'Threat List Updates', 'Fetch']
+- ['threat-lists_list.md', 'Threat Lists', 'List']
+- ['threat-matches_find.md', 'Threat Matches', 'Find']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+

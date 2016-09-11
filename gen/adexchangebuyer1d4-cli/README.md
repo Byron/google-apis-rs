@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Ad Exchange Buyer* API at revision *20160405*. The CLI is at version *0.3.6*.
+This documentation was generated from the *Ad Exchange Buyer* API at revision *20160831*. The CLI is at version *0.3.6*.
 
 ```bash
 adexchangebuyer1d4 [options]

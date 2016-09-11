@@ -45,6 +45,98 @@ struct Engine<'n> {
 
 
 impl<'n> Engine<'n> {
+    fn _apps_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "default-hostname" => Some(("defaultHostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "code-bucket" => Some(("codeBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-bucket" => Some(("defaultBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-cookie-expiration" => Some(("defaultCookieExpiration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location" => Some(("location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "auth-domain" => Some(("authDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auth-domain", "code-bucket", "default-bucket", "default-cookie-expiration", "default-hostname", "id", "location", "name"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::Application = json::value::from_value(object).unwrap();
+        let mut call = self.hub.apps().create(request);
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _apps_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.apps().get(opt.value_of("apps-id").unwrap_or(""));
@@ -68,6 +160,120 @@ impl<'n> Engine<'n> {
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["ensure-resources-exist"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _apps_locations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.apps().locations_get(opt.value_of("apps-id").unwrap_or(""), opt.value_of("locations-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _apps_locations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.apps().locations_list(opt.value_of("apps-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-token", "page-size"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -608,6 +814,253 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _apps_modules_versions_instances_debug(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::DebugInstanceRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.apps().modules_versions_instances_debug(request, opt.value_of("apps-id").unwrap_or(""), opt.value_of("modules-id").unwrap_or(""), opt.value_of("versions-id").unwrap_or(""), opt.value_of("instances-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _apps_modules_versions_instances_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.apps().modules_versions_instances_delete(opt.value_of("apps-id").unwrap_or(""), opt.value_of("modules-id").unwrap_or(""), opt.value_of("versions-id").unwrap_or(""), opt.value_of("instances-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _apps_modules_versions_instances_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.apps().modules_versions_instances_get(opt.value_of("apps-id").unwrap_or(""), opt.value_of("modules-id").unwrap_or(""), opt.value_of("versions-id").unwrap_or(""), opt.value_of("instances-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _apps_modules_versions_instances_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.apps().modules_versions_instances_list(opt.value_of("apps-id").unwrap_or(""), opt.value_of("modules-id").unwrap_or(""), opt.value_of("versions-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _apps_modules_versions_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.apps().modules_versions_list(opt.value_of("apps-id").unwrap_or(""), opt.value_of("modules-id").unwrap_or(""));
@@ -936,8 +1389,17 @@ impl<'n> Engine<'n> {
         match self.opt.subcommand() {
             ("apps", Some(opt)) => {
                 match opt.subcommand() {
+                    ("create", Some(opt)) => {
+                        call_result = self._apps_create(opt, dry_run, &mut err);
+                    },
                     ("get", Some(opt)) => {
                         call_result = self._apps_get(opt, dry_run, &mut err);
+                    },
+                    ("locations-get", Some(opt)) => {
+                        call_result = self._apps_locations_get(opt, dry_run, &mut err);
+                    },
+                    ("locations-list", Some(opt)) => {
+                        call_result = self._apps_locations_list(opt, dry_run, &mut err);
                     },
                     ("modules-delete", Some(opt)) => {
                         call_result = self._apps_modules_delete(opt, dry_run, &mut err);
@@ -959,6 +1421,18 @@ impl<'n> Engine<'n> {
                     },
                     ("modules-versions-get", Some(opt)) => {
                         call_result = self._apps_modules_versions_get(opt, dry_run, &mut err);
+                    },
+                    ("modules-versions-instances-debug", Some(opt)) => {
+                        call_result = self._apps_modules_versions_instances_debug(opt, dry_run, &mut err);
+                    },
+                    ("modules-versions-instances-delete", Some(opt)) => {
+                        call_result = self._apps_modules_versions_instances_delete(opt, dry_run, &mut err);
+                    },
+                    ("modules-versions-instances-get", Some(opt)) => {
+                        call_result = self._apps_modules_versions_instances_get(opt, dry_run, &mut err);
+                    },
+                    ("modules-versions-instances-list", Some(opt)) => {
+                        call_result = self._apps_modules_versions_instances_list(opt, dry_run, &mut err);
                     },
                     ("modules-versions-list", Some(opt)) => {
                         call_result = self._apps_modules_versions_list(opt, dry_run, &mut err);
@@ -1064,14 +1538,86 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("apps", "methods: 'get', 'modules-delete', 'modules-get', 'modules-list', 'modules-patch', 'modules-versions-create', 'modules-versions-delete', 'modules-versions-get', 'modules-versions-list', 'modules-versions-patch', 'operations-get' and 'operations-list'", vec![
+        ("apps", "methods: 'create', 'get', 'locations-get', 'locations-list', 'modules-delete', 'modules-get', 'modules-list', 'modules-patch', 'modules-versions-create', 'modules-versions-delete', 'modules-versions-get', 'modules-versions-instances-debug', 'modules-versions-instances-delete', 'modules-versions-instances-get', 'modules-versions-instances-list', 'modules-versions-list', 'modules-versions-patch', 'operations-get' and 'operations-list'", vec![
+            ("create",
+                    Some(r##"Creates an App Engine application for a Google Cloud Platform project. This requires a project that excludes an App Engine application. For details about creating a project without an application, see the [Google Cloud Resource Manager create project topic](https://cloud.google.com/resource-manager/docs/creating-project)."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_appengine1_beta4_cli/apps_create",
+                  vec![
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("get",
                     Some(r##"Gets information about an application."##),
                     "Details at http://byron.github.io/google-apis-rs/google_appengine1_beta4_cli/apps_get",
                   vec![
                     (Some(r##"apps-id"##),
                      None,
-                     Some(r##"Part of `name`. Name of the application to get. For example: "apps/myapp"."##),
+                     Some(r##"Part of `name`. Name of the application to get. Example: `apps/myapp`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-get",
+                    Some(r##"Get information about a location."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_appengine1_beta4_cli/apps_locations-get",
+                  vec![
+                    (Some(r##"apps-id"##),
+                     None,
+                     Some(r##"Part of `name`. Resource name for the location."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"locations-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `appsId`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-list",
+                    Some(r##"Lists information about the supported locations for this service."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_appengine1_beta4_cli/apps_locations-list",
+                  vec![
+                    (Some(r##"apps-id"##),
+                     None,
+                     Some(r##"Part of `name`. The resource that owns the locations collection, if applicable."##),
                      Some(true),
                      Some(false)),
         
@@ -1088,12 +1634,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("modules-delete",
-                    Some(r##"Deletes a module and all enclosed versions."##),
+                    Some(r##"Deletes the specified module and all enclosed versions."##),
                     "Details at http://byron.github.io/google-apis-rs/google_appengine1_beta4_cli/apps_modules-delete",
                   vec![
                     (Some(r##"apps-id"##),
                      None,
-                     Some(r##"Part of `name`. Name of the resource requested. For example: "apps/myapp/modules/default"."##),
+                     Some(r##"Part of `name`. Name of the resource requested. Example: `apps/myapp/modules/default`."##),
                      Some(true),
                      Some(false)),
         
@@ -1116,12 +1662,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("modules-get",
-                    Some(r##"Gets the current configuration of the module."##),
+                    Some(r##"Gets the current configuration of the specified module."##),
                     "Details at http://byron.github.io/google-apis-rs/google_appengine1_beta4_cli/apps_modules-get",
                   vec![
                     (Some(r##"apps-id"##),
                      None,
-                     Some(r##"Part of `name`. Name of the resource requested. For example: "apps/myapp/modules/default"."##),
+                     Some(r##"Part of `name`. Name of the resource requested. Example: `apps/myapp/modules/default`."##),
                      Some(true),
                      Some(false)),
         
@@ -1149,7 +1695,7 @@ fn main() {
                   vec![
                     (Some(r##"apps-id"##),
                      None,
-                     Some(r##"Part of `name`. Name of the resource requested. For example: "apps/myapp"."##),
+                     Some(r##"Part of `name`. Name of the resource requested. Example: `apps/myapp`."##),
                      Some(true),
                      Some(false)),
         
@@ -1171,7 +1717,7 @@ fn main() {
                   vec![
                     (Some(r##"apps-id"##),
                      None,
-                     Some(r##"Part of `name`. Name of the resource to update. For example: "apps/myapp/modules/default"."##),
+                     Some(r##"Part of `name`. Name of the resource to update. Example: `apps/myapp/modules/default`."##),
                      Some(true),
                      Some(false)),
         
@@ -1200,12 +1746,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("modules-versions-create",
-                    Some(r##"Deploys new code and resource files to a version."##),
+                    Some(r##"Deploys code and resource files to a new version."##),
                     "Details at http://byron.github.io/google-apis-rs/google_appengine1_beta4_cli/apps_modules-versions-create",
                   vec![
                     (Some(r##"apps-id"##),
                      None,
-                     Some(r##"Part of `name`. Name of the resource to update. For example: "apps/myapp/modules/default"."##),
+                     Some(r##"Part of `name`. Name of the resource to update. Example: `apps/myapp/modules/default`."##),
                      Some(true),
                      Some(false)),
         
@@ -1239,7 +1785,7 @@ fn main() {
                   vec![
                     (Some(r##"apps-id"##),
                      None,
-                     Some(r##"Part of `name`. Name of the resource requested. For example: "apps/myapp/modules/default/versions/v1"."##),
+                     Some(r##"Part of `name`. Name of the resource requested. Example: `apps/myapp/modules/default/versions/v1`."##),
                      Some(true),
                      Some(false)),
         
@@ -1268,12 +1814,172 @@ fn main() {
                      Some(false)),
                   ]),
             ("modules-versions-get",
-                    Some(r##"Gets application deployment information."##),
+                    Some(r##"Gets the specified Version resource. By default, only a `BASIC_VIEW` will be returned. Specify the `FULL_VIEW` parameter to get the full resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_appengine1_beta4_cli/apps_modules-versions-get",
                   vec![
                     (Some(r##"apps-id"##),
                      None,
-                     Some(r##"Part of `name`. Name of the resource requested. For example: "apps/myapp/modules/default/versions/v1"."##),
+                     Some(r##"Part of `name`. Name of the resource requested. Example: `apps/myapp/modules/default/versions/v1`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"modules-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `appsId`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"versions-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `appsId`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("modules-versions-instances-debug",
+                    Some(r##"Enables debugging on a VM instance. This allows you to use the SSH command to connect to the virtual machine where the instance lives. While in "debug mode", the instance continues to serve live traffic. You should delete the instance when you are done debugging and then allow the system to take over and determine if another instance should be started. Only applicable for instances in App Engine flexible environment."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_appengine1_beta4_cli/apps_modules-versions-instances-debug",
+                  vec![
+                    (Some(r##"apps-id"##),
+                     None,
+                     Some(r##"Part of `name`. Name of the resource requested. Example: `apps/myapp/modules/default/versions/v1/instances/instance-1`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"modules-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `appsId`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"versions-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `appsId`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"instances-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `appsId`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("modules-versions-instances-delete",
+                    Some(r##"Stops a running instance."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_appengine1_beta4_cli/apps_modules-versions-instances-delete",
+                  vec![
+                    (Some(r##"apps-id"##),
+                     None,
+                     Some(r##"Part of `name`. Name of the resource requested. Example: `apps/myapp/modules/default/versions/v1/instances/instance-1`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"modules-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `appsId`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"versions-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `appsId`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"instances-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `appsId`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("modules-versions-instances-get",
+                    Some(r##"Gets instance information."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_appengine1_beta4_cli/apps_modules-versions-instances-get",
+                  vec![
+                    (Some(r##"apps-id"##),
+                     None,
+                     Some(r##"Part of `name`. Name of the resource requested. Example: `apps/myapp/modules/default/versions/v1/instances/instance-1`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"modules-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `appsId`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"versions-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `appsId`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"instances-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `appsId`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("modules-versions-instances-list",
+                    Some(r##"Lists the instances of a version."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_appengine1_beta4_cli/apps_modules-versions-instances-list",
+                  vec![
+                    (Some(r##"apps-id"##),
+                     None,
+                     Some(r##"Part of `name`. Name of the resource requested. Example: `apps/myapp/modules/default/versions/v1`."##),
                      Some(true),
                      Some(false)),
         
@@ -1307,7 +2013,7 @@ fn main() {
                   vec![
                     (Some(r##"apps-id"##),
                      None,
-                     Some(r##"Part of `name`. Name of the resource requested. For example: "apps/myapp/modules/default"."##),
+                     Some(r##"Part of `name`. Name of the resource requested. Example: `apps/myapp/modules/default`."##),
                      Some(true),
                      Some(false)),
         
@@ -1330,12 +2036,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("modules-versions-patch",
-                    Some(r##"Updates an existing version. Note: UNIMPLEMENTED."##),
+                    Some(r##"Updates the specified Version resource. You can specify the following fields depending on the App Engine environment and type of scaling that the version resource uses: * [`serving_status`](https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1beta4/apps.modules.versions#Version.FIELDS.serving_status): For Version resources that use basic scaling, manual scaling, or run in the App Engine flexible environment. * [`instance_class`](https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1beta4/apps.modules.versions#Version.FIELDS.instance_class): For Version resources that run in the App Engine standard environment. * [`automatic_scaling.min_idle_instances`](https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1beta4/apps.modules.versions#Version.FIELDS.automatic_scaling): For Version resources that use automatic scaling and run in the App Engine standard environment. * [`automatic_scaling.max_idle_instances`](https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1beta4/apps.modules.versions#Version.FIELDS.automatic_scaling): For Version resources that use automatic scaling and run in the App Engine standard environment."##),
                     "Details at http://byron.github.io/google-apis-rs/google_appengine1_beta4_cli/apps_modules-versions-patch",
                   vec![
                     (Some(r##"apps-id"##),
                      None,
-                     Some(r##"Part of `name`. Name of the resource to update. For example: "apps/myapp/modules/default/versions/1"."##),
+                     Some(r##"Part of `name`. Name of the resource to update. Example: `apps/myapp/modules/default/versions/1`."##),
                      Some(true),
                      Some(false)),
         
@@ -1425,7 +2131,7 @@ fn main() {
     
     let mut app = App::new("appengine1-beta4")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.6+20160314")
+           .version("0.3.6+20160802")
            .about("Provisions and manages App Engine applications.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_appengine1_beta4_cli")
            .arg(Arg::with_name("url")

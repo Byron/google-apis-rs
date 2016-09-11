@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-androidpublisher2` library allows access to all features of the *Google Android Publisher* service.
 
-This documentation was generated from *Android Publisher* crate version *0.1.14+20160324*, where *20160324* is the exact revision of the *androidpublisher:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
+This documentation was generated from *Android Publisher* crate version *0.1.14+20160817*, where *20160817* is the exact revision of the *androidpublisher:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
 
 Everything else about the *Android Publisher* *v2* API can be found at the
 [official documentation site](https://developers.google.com/android-publisher).
@@ -21,6 +21,8 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
  * [*batch*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.InappproductBatchCall.html), [*delete*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.InappproductDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.InappproductGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.InappproductInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.InappproductListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.InappproductPatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.InappproductUpdateCall.html)
 * purchases
  * [*products get*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.PurchaseProductGetCall.html), [*subscriptions cancel*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.PurchaseSubscriptionCancelCall.html), [*subscriptions defer*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.PurchaseSubscriptionDeferCall.html), [*subscriptions get*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.PurchaseSubscriptionGetCall.html), [*subscriptions refund*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.PurchaseSubscriptionRefundCall.html) and [*subscriptions revoke*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.PurchaseSubscriptionRevokeCall.html)
+* [reviews](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.Review.html)
+ * [*get*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.ReviewGetCall.html), [*list*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.ReviewListCall.html) and [*reply*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.ReviewReplyCall.html)
 
 
 Upload supported by ...

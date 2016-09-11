@@ -70,8 +70,9 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.elections().voter_info_query("address")
+///              .return_all_available_data(true)
 ///              .official_only(false)
-///              .election_id("dolores")
+///              .election_id("accusam")
 ///              .doit();
 /// 
 /// match result {
@@ -194,6 +195,9 @@ impl Part for Official {}
 pub struct ElectoralDistrict {
     /// The geographic scope of this district. If unspecified the district's geography is not known. One of: national, statewide, congressional, stateUpper, stateLower, countywide, judicial, schoolBoard, cityWide, township, countyCouncil, cityCouncil, ward, special
     pub scope: Option<String>,
+    /// no description provided
+    #[serde(rename="kgForeignKey")]
+    pub kg_foreign_key: Option<String>,
     /// An identifier for this district, relative to its scope. For example, the 34th State Senate district would have id "34" and a scope of stateUpper.
     pub id: Option<String>,
     /// The name of the district.
@@ -312,7 +316,7 @@ pub struct Contest {
     /// A number specifying the position of this contest on the voter's ballot.
     #[serde(rename="ballotPlacement")]
     pub ballot_placement: Option<String>,
-    /// The set of ballot responses for the referendum. A ballot response represents a line on the ballot. Common examples might include "yes" or "no" for referenda, or a judge's name for a retention contest. This field is only populated for contests of type 'Referendum'.
+    /// The set of ballot responses for the referendum. A ballot response represents a line on the ballot. Common examples might include "yes" or "no" for referenda. This field is only populated for contests of type 'Referendum'.
     #[serde(rename="referendumBallotResponses")]
     pub referendum_ballot_responses: Option<Vec<String>>,
     /// A statement in favor of the referendum. It does not necessarily appear on the ballot. This field is only populated for contests of type 'Referendum'.
@@ -320,7 +324,7 @@ pub struct Contest {
     pub referendum_pro_statement: Option<String>,
     /// The candidate choices for this contest.
     pub candidates: Option<Vec<Candidate>>,
-    /// The type of contest. Usually this will be 'General', 'Primary', or 'Run-off' for contests with candidates. For referenda this will be 'Referendum'.
+    /// The type of contest. Usually this will be 'General', 'Primary', or 'Run-off' for contests with candidates. For referenda this will be 'Referendum'. For Retention contests this will typically be 'Retention'.
     #[serde(rename="type")]
     pub type_: Option<String>,
 }
@@ -443,9 +447,9 @@ pub struct AdministrativeBody {
     /// The mailing address of this administrative body.
     #[serde(rename="correspondenceAddress")]
     pub correspondence_address: Option<SimpleAddressType>,
-    /// A URL provided by this administrative body describing election rules to the voter.
-    #[serde(rename="electionRulesUrl")]
-    pub election_rules_url: Option<String>,
+    /// no description provided
+    #[serde(rename="addressLines")]
+    pub address_lines: Option<Vec<String>>,
     /// A description of the services this administrative body may provide.
     pub voter_services: Option<Vec<String>>,
     /// A URL provided by this administrative body to give contest information to the voter.
@@ -457,6 +461,9 @@ pub struct AdministrativeBody {
     /// The physical address of this administrative body.
     #[serde(rename="physicalAddress")]
     pub physical_address: Option<SimpleAddressType>,
+    /// A URL provided by this administrative body describing election rules to the voter.
+    #[serde(rename="electionRulesUrl")]
+    pub election_rules_url: Option<String>,
 }
 
 impl Part for AdministrativeBody {}
@@ -815,6 +822,7 @@ impl<'a, C, A> ElectionMethods<'a, C, A> {
         ElectionVoterInfoQueryCall {
             hub: self.hub,
             _address: address.to_string(),
+            _return_all_available_data: Default::default(),
             _official_only: Default::default(),
             _election_id: Default::default(),
             _delegate: Default::default(),
@@ -933,7 +941,7 @@ impl<'a, C, A> RepresentativeMethods<'a, C, A> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.divisions().search()
-///              .query("kasd")
+///              .query("takimata")
 ///              .doit();
 /// # }
 /// ```
@@ -1305,8 +1313,9 @@ impl<'a, C, A> ElectionElectionQueryCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.elections().voter_info_query("address")
-///              .official_only(true)
-///              .election_id("justo")
+///              .return_all_available_data(true)
+///              .official_only(false)
+///              .election_id("labore")
 ///              .doit();
 /// # }
 /// ```
@@ -1315,6 +1324,7 @@ pub struct ElectionVoterInfoQueryCall<'a, C, A>
 
     hub: &'a CivicInfo<C, A>,
     _address: String,
+    _return_all_available_data: Option<bool>,
     _official_only: Option<bool>,
     _election_id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
@@ -1337,15 +1347,18 @@ impl<'a, C, A> ElectionVoterInfoQueryCall<'a, C, A> where C: BorrowMut<hyper::Cl
         };
         dlg.begin(MethodInfo { id: "civicinfo.elections.voterInfoQuery",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("address", self._address.to_string()));
+        if let Some(value) = self._return_all_available_data {
+            params.push(("returnAllAvailableData", value.to_string()));
+        }
         if let Some(value) = self._official_only {
             params.push(("officialOnly", value.to_string()));
         }
         if let Some(value) = self._election_id {
             params.push(("electionId", value.to_string()));
         }
-        for &field in ["alt", "address", "officialOnly", "electionId"].iter() {
+        for &field in ["alt", "address", "returnAllAvailableData", "officialOnly", "electionId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -1444,6 +1457,13 @@ impl<'a, C, A> ElectionVoterInfoQueryCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._address = new_value.to_string();
         self
     }
+    /// If set to true, the query will return the success codeand include any partial information when it is unable to determine a matching address or unable to determine the election for electionId=0 queries.
+    ///
+    /// Sets the *return all available data* query property to the given value.
+    pub fn return_all_available_data(mut self, new_value: bool) -> ElectionVoterInfoQueryCall<'a, C, A> {
+        self._return_all_available_data = Some(new_value);
+        self
+    }
     /// If set to true, only data from official state sources will be returned.
     ///
     /// Sets the *official only* query property to the given value.
@@ -1521,10 +1541,10 @@ impl<'a, C, A> ElectionVoterInfoQueryCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.representatives().representative_info_by_address()
-///              .add_roles("amet.")
-///              .add_levels("erat")
+///              .add_roles("sea")
+///              .add_levels("nonumy")
 ///              .include_offices(true)
-///              .address("sea")
+///              .address("gubergren")
 ///              .doit();
 /// # }
 /// ```
@@ -1755,9 +1775,9 @@ impl<'a, C, A> RepresentativeRepresentativeInfoByAddresCall<'a, C, A> where C: B
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.representatives().representative_info_by_division("ocdId")
-///              .add_roles("dolores")
+///              .add_roles("aliquyam")
 ///              .recursive(false)
-///              .add_levels("sadipscing")
+///              .add_levels("no")
 ///              .doit();
 /// # }
 /// ```

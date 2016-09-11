@@ -3,14 +3,14 @@ DO NOT EDIT !
 This file was generated automatically from 'src/mako/cli/README.md.mako'
 DO NOT EDIT !
 -->
-The `playmoviespartner1` command-line interface *(CLI)* allows to use most features of the *Google playmoviespartner* service from the comfort of your terminal.
+The `playmoviespartner1` command-line interface *(CLI)* allows to use most features of the *Google Play Movies* service from the comfort of your terminal.
 
 By default all output is printed to standard out, but flags can be set to direct it into a file independent of your shell's
 capabilities. Errors will be printed to standard error, and cause the program's exit code to be non-zero.
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
-Everything else about the *playmoviespartner* API can be found at the
+Everything else about the *Play Movies* API can be found at the
 [official documentation site](https://developers.google.com/playmoviespartner/).
 
 # Downloads
@@ -24,12 +24,15 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *playmoviespartner* API at revision *20150812*. The CLI is at version *0.3.6*.
+This documentation was generated from the *Play Movies* API at revision *20160518*. The CLI is at version *0.3.6*.
 
 ```bash
 playmoviespartner1 [options]
         accounts
+                avails-get <account-id> <avail-id> [-p <v>]... [-o <out>]
                 avails-list <account-id> [-p <v>]... [-o <out>]
+                components-list <account-id> [-p <v>]... [-o <out>]
+                components-type-get <account-id> <component-id> <type> [-p <v>]... [-o <out>]
                 experience-locales-get <account-id> <el-id> [-p <v>]... [-o <out>]
                 experience-locales-list <account-id> [-p <v>]... [-o <out>]
                 orders-get <account-id> <order-id> [-p <v>]... [-o <out>]

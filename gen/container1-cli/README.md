@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *container* API at revision *20160321*. The CLI is at version *0.3.6*.
+This documentation was generated from the *container* API at revision *20160421*. The CLI is at version *0.3.6*.
 
 ```bash
 container1 [options]
@@ -33,6 +33,10 @@ container1 [options]
                 zones-clusters-delete <project-id> <zone> <cluster-id> [-p <v>]... [-o <out>]
                 zones-clusters-get <project-id> <zone> <cluster-id> [-p <v>]... [-o <out>]
                 zones-clusters-list <project-id> <zone> [-p <v>]... [-o <out>]
+                zones-clusters-node-pools-create <project-id> <zone> <cluster-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                zones-clusters-node-pools-delete <project-id> <zone> <cluster-id> <node-pool-id> [-p <v>]... [-o <out>]
+                zones-clusters-node-pools-get <project-id> <zone> <cluster-id> <node-pool-id> [-p <v>]... [-o <out>]
+                zones-clusters-node-pools-list <project-id> <zone> <cluster-id> [-p <v>]... [-o <out>]
                 zones-clusters-update <project-id> <zone> <cluster-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 zones-get-serverconfig <project-id> <zone> [-p <v>]... [-o <out>]
                 zones-operations-get <project-id> <zone> <operation-id> [-p <v>]... [-o <out>]

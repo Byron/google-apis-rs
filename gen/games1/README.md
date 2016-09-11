@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-games1` library allows access to all features of the *Google Games* service.
 
-This documentation was generated from *Games* crate version *0.1.14+20160401*, where *20160401* is the exact revision of the *games:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
+This documentation was generated from *Games* crate version *0.1.14+20160901*, where *20160901* is the exact revision of the *games:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
 
 Everything else about the *Games* *v1* API can be found at the
 [official documentation site](https://developers.google.com/games/services/).
@@ -130,6 +130,7 @@ let mut hub = Games::new(hyper::Client::new(), auth);
 let result = hub.turn_based_matches().leave_turn("matchId", -48)
              .pending_participant_id("Stet")
              .language("sed")
+             .consistency_token("et")
              .doit();
 
 match result {

@@ -24,13 +24,10 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *dataproc* API at revision *20160219*. The CLI is at version *0.3.6*.
+This documentation was generated from the *dataproc* API at revision *20160503*. The CLI is at version *0.3.6*.
 
 ```bash
 dataproc1 [options]
-        media
-                download <resource-name> [-p <v>]... [-o <out>]
-                upload <resource-name> (-r <kv>)... (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
         projects
                 regions-clusters-create <project-id> <region> (-r <kv>)... [-p <v>]... [-o <out>]
                 regions-clusters-delete <project-id> <region> <cluster-name> [-p <v>]... [-o <out>]

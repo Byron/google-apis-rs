@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Resource Manager* crate version *0.1.14+20160316*, where *20160316* is the exact revision of the *cloudresourcemanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
+//! This documentation was generated from *Cloud Resource Manager* crate version *0.1.14+20160617*, where *20160617* is the exact revision of the *cloudresourcemanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
 //! 
 //! Everything else about the *Cloud Resource Manager* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/resource-manager).
@@ -11,6 +11,8 @@
 //! 
 //! Handle the following *Resources* with ease from the central [hub](struct.CloudResourceManager.html) ... 
 //! 
+//! * [operations](struct.Operation.html)
+//!  * [*get*](struct.OperationGetCall.html)
 //! * [projects](struct.Project.html)
 //!  * [*delete*](struct.ProjectDeleteCall.html), [*get*](struct.ProjectGetCall.html), [*get iam policy*](struct.ProjectGetIamPolicyCall.html), [*list*](struct.ProjectListCall.html), [*set iam policy*](struct.ProjectSetIamPolicyCall.html), [*test iam permissions*](struct.ProjectTestIamPermissionCall.html), [*undelete*](struct.ProjectUndeleteCall.html) and [*update*](struct.ProjectUpdateCall.html)
 //! 
@@ -101,9 +103,9 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.projects().list()
-//!              .page_token("gubergren")
-//!              .page_size(-95)
-//!              .filter("aliquyam")
+//!              .page_token("sadipscing")
+//!              .page_size(-31)
+//!              .filter("ea")
 //!              .doit();
 //! 
 //! match result {

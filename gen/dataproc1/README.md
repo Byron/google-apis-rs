@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-dataproc1` library allows access to all features of the *Google dataproc* service.
 
-This documentation was generated from *dataproc* crate version *0.1.14+20160219*, where *20160219* is the exact revision of the *dataproc:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
+This documentation was generated from *dataproc* crate version *0.1.14+20160503*, where *20160503* is the exact revision of the *dataproc:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
 
 Everything else about the *dataproc* *v1* API can be found at the
 [official documentation site](https://cloud.google.com/dataproc/).
@@ -13,19 +13,9 @@ Everything else about the *dataproc* *v1* API can be found at the
 
 Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google_dataproc1/struct.Dataproc.html) ... 
 
-* [media](http://byron.github.io/google-apis-rs/google_dataproc1/struct.Media.html)
- * [*download*](http://byron.github.io/google-apis-rs/google_dataproc1/struct.MediaDownloadCall.html) and [*upload*](http://byron.github.io/google-apis-rs/google_dataproc1/struct.MediaUploadCall.html)
 * projects
  * [*regions clusters create*](http://byron.github.io/google-apis-rs/google_dataproc1/struct.ProjectRegionClusterCreateCall.html), [*regions clusters delete*](http://byron.github.io/google-apis-rs/google_dataproc1/struct.ProjectRegionClusterDeleteCall.html), [*regions clusters diagnose*](http://byron.github.io/google-apis-rs/google_dataproc1/struct.ProjectRegionClusterDiagnoseCall.html), [*regions clusters get*](http://byron.github.io/google-apis-rs/google_dataproc1/struct.ProjectRegionClusterGetCall.html), [*regions clusters list*](http://byron.github.io/google-apis-rs/google_dataproc1/struct.ProjectRegionClusterListCall.html), [*regions clusters patch*](http://byron.github.io/google-apis-rs/google_dataproc1/struct.ProjectRegionClusterPatchCall.html), [*regions jobs cancel*](http://byron.github.io/google-apis-rs/google_dataproc1/struct.ProjectRegionJobCancelCall.html), [*regions jobs delete*](http://byron.github.io/google-apis-rs/google_dataproc1/struct.ProjectRegionJobDeleteCall.html), [*regions jobs get*](http://byron.github.io/google-apis-rs/google_dataproc1/struct.ProjectRegionJobGetCall.html), [*regions jobs list*](http://byron.github.io/google-apis-rs/google_dataproc1/struct.ProjectRegionJobListCall.html), [*regions jobs submit*](http://byron.github.io/google-apis-rs/google_dataproc1/struct.ProjectRegionJobSubmitCall.html), [*regions operations cancel*](http://byron.github.io/google-apis-rs/google_dataproc1/struct.ProjectRegionOperationCancelCall.html), [*regions operations delete*](http://byron.github.io/google-apis-rs/google_dataproc1/struct.ProjectRegionOperationDeleteCall.html), [*regions operations get*](http://byron.github.io/google-apis-rs/google_dataproc1/struct.ProjectRegionOperationGetCall.html) and [*regions operations list*](http://byron.github.io/google-apis-rs/google_dataproc1/struct.ProjectRegionOperationListCall.html)
 
-
-Upload supported by ...
-
-* [*upload media*](http://byron.github.io/google-apis-rs/google_dataproc1/struct.MediaUploadCall.html)
-
-Download supported by ...
-
-* [*download media*](http://byron.github.io/google-apis-rs/google_dataproc1/struct.MediaDownloadCall.html)
 
 
 

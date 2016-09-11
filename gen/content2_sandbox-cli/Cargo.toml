@@ -4,7 +4,7 @@
 [package]
 
 name = "google-content2_sandbox-cli"
-version = "0.3.6+20160331"
+version = "0.3.6+20160905"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Shopping Content (protocol v2sandbox)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/content2_sandbox-cli"
@@ -19,10 +19,10 @@ name = "content2-sandbox"
 [dependencies]
 hyper = "^ 0.9"
 mime = "^ 0.2.0"
-serde = "^ 0.7.5"
-serde_json = "^ 0.7.0"
-yup-oauth2 = { version = "^ 0.6.0", optional = true, default-features = false }
-serde_macros = { version = "^ 0.7.5", optional = true }
+serde = "^ 0.8"
+serde_json = "^ 0.8"
+yup-oauth2 = { version = "^ 0.6", optional = true, default-features = false }
+serde_macros = { version = "^ 0.8", optional = true }
 strsim = "^0.4"
 yup-hyper-mock = "^1.0"
 clap = "^2.0"
@@ -33,7 +33,7 @@ nightly = ["serde_macros","yup-oauth2/nightly","google-content2_sandbox/nightly"
 with-serde-codegen = ["serde_codegen","yup-oauth2/with-serde-codegen","google-content2_sandbox/with-serde-codegen"]
 
 [build-dependencies]
-serde_codegen = { version = "^ 0.7.14", optional = true }
+serde_codegen = { version = "^ 0.8", optional = true }
 
 
 [dependencies.google-content2_sandbox]

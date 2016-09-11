@@ -1,4 +1,4 @@
-site_name: gmail v0.3.6+20160316
+site_name: gmail v0.3.6+20160711
 site_url: http://byron.github.io/google-apis-rs/google-gmail1-cli
 site_description: Write integrating applications with bcore
 
@@ -34,6 +34,29 @@ pages:
 - ['users_messages-send.md', 'Users', 'Messages Send']
 - ['users_messages-trash.md', 'Users', 'Messages Trash']
 - ['users_messages-untrash.md', 'Users', 'Messages Untrash']
+- ['users_settings-filters-create.md', 'Users', 'Settings Filters Create']
+- ['users_settings-filters-delete.md', 'Users', 'Settings Filters Delete']
+- ['users_settings-filters-get.md', 'Users', 'Settings Filters Get']
+- ['users_settings-filters-list.md', 'Users', 'Settings Filters List']
+- ['users_settings-forwarding-addresses-create.md', 'Users', 'Settings Forwarding Addresses Create']
+- ['users_settings-forwarding-addresses-delete.md', 'Users', 'Settings Forwarding Addresses Delete']
+- ['users_settings-forwarding-addresses-get.md', 'Users', 'Settings Forwarding Addresses Get']
+- ['users_settings-forwarding-addresses-list.md', 'Users', 'Settings Forwarding Addresses List']
+- ['users_settings-get-auto-forwarding.md', 'Users', 'Settings Get Auto Forwarding']
+- ['users_settings-get-imap.md', 'Users', 'Settings Get Imap']
+- ['users_settings-get-pop.md', 'Users', 'Settings Get Pop']
+- ['users_settings-get-vacation.md', 'Users', 'Settings Get Vacation']
+- ['users_settings-send-as-create.md', 'Users', 'Settings Send As Create']
+- ['users_settings-send-as-delete.md', 'Users', 'Settings Send As Delete']
+- ['users_settings-send-as-get.md', 'Users', 'Settings Send As Get']
+- ['users_settings-send-as-list.md', 'Users', 'Settings Send As List']
+- ['users_settings-send-as-patch.md', 'Users', 'Settings Send As Patch']
+- ['users_settings-send-as-update.md', 'Users', 'Settings Send As Update']
+- ['users_settings-send-as-verify.md', 'Users', 'Settings Send As Verify']
+- ['users_settings-update-auto-forwarding.md', 'Users', 'Settings Update Auto Forwarding']
+- ['users_settings-update-imap.md', 'Users', 'Settings Update Imap']
+- ['users_settings-update-pop.md', 'Users', 'Settings Update Pop']
+- ['users_settings-update-vacation.md', 'Users', 'Settings Update Vacation']
 - ['users_stop.md', 'Users', 'Stop']
 - ['users_threads-delete.md', 'Users', 'Threads Delete']
 - ['users_threads-get.md', 'Users', 'Threads Get']

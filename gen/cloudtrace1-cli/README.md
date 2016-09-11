@@ -3,14 +3,14 @@ DO NOT EDIT !
 This file was generated automatically from 'src/mako/cli/README.md.mako'
 DO NOT EDIT !
 -->
-The `cloudtrace1` command-line interface *(CLI)* allows to use most features of the *Google cloudtrace* service from the comfort of your terminal.
+The `cloudtrace1` command-line interface *(CLI)* allows to use most features of the *Google Cloud Trace* service from the comfort of your terminal.
 
 By default all output is printed to standard out, but flags can be set to direct it into a file independent of your shell's
 capabilities. Errors will be printed to standard error, and cause the program's exit code to be non-zero.
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
-Everything else about the *cloudtrace* API can be found at the
+Everything else about the *Cloud Trace* API can be found at the
 [official documentation site](https://cloud.google.com/tools/cloud-trace).
 
 # Downloads
@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *cloudtrace* API at revision *20151207*. The CLI is at version *0.3.6*.
+This documentation was generated from the *Cloud Trace* API at revision *20160518*. The CLI is at version *0.3.6*.
 
 ```bash
 cloudtrace1 [options]

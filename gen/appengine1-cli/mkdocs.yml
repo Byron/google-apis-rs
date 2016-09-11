@@ -1,0 +1,35 @@
+site_name: appengine v0.3.6+20160802
+site_url: http://byron.github.io/google-apis-rs/google-appengine1-cli
+site_description: Write integrating applications with bcore
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/appengine1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['apps_get.md', 'Apps', 'Get']
+- ['apps_locations-get.md', 'Apps', 'Locations Get']
+- ['apps_locations-list.md', 'Apps', 'Locations List']
+- ['apps_operations-get.md', 'Apps', 'Operations Get']
+- ['apps_operations-list.md', 'Apps', 'Operations List']
+- ['apps_repair.md', 'Apps', 'Repair']
+- ['apps_services-delete.md', 'Apps', 'Services Delete']
+- ['apps_services-get.md', 'Apps', 'Services Get']
+- ['apps_services-list.md', 'Apps', 'Services List']
+- ['apps_services-patch.md', 'Apps', 'Services Patch']
+- ['apps_services-versions-create.md', 'Apps', 'Services Versions Create']
+- ['apps_services-versions-delete.md', 'Apps', 'Services Versions Delete']
+- ['apps_services-versions-get.md', 'Apps', 'Services Versions Get']
+- ['apps_services-versions-instances-debug.md', 'Apps', 'Services Versions Instances Debug']
+- ['apps_services-versions-instances-delete.md', 'Apps', 'Services Versions Instances Delete']
+- ['apps_services-versions-instances-get.md', 'Apps', 'Services Versions Instances Get']
+- ['apps_services-versions-instances-list.md', 'Apps', 'Services Versions Instances List']
+- ['apps_services-versions-list.md', 'Apps', 'Services Versions List']
+- ['apps_services-versions-patch.md', 'Apps', 'Services Versions Patch']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+

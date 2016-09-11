@@ -1,4 +1,4 @@
-site_name: Android Publisher v0.3.6+20160324
+site_name: Android Publisher v0.3.6+20160817
 site_url: http://byron.github.io/google-apis-rs/google-androidpublisher2-cli
 site_description: Write integrating applications with bcore
 
@@ -61,6 +61,9 @@ pages:
 - ['purchases_subscriptions-get.md', 'Purchases', 'Subscriptions Get']
 - ['purchases_subscriptions-refund.md', 'Purchases', 'Subscriptions Refund']
 - ['purchases_subscriptions-revoke.md', 'Purchases', 'Subscriptions Revoke']
+- ['reviews_get.md', 'Reviews', 'Get']
+- ['reviews_list.md', 'Reviews', 'List']
+- ['reviews_reply.md', 'Reviews', 'Reply']
 
 theme: readthedocs
 

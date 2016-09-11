@@ -4,7 +4,7 @@
 [package]
 
 name = "google-dfareporting2d4"
-version = "0.1.14+20160323"
+version = "0.1.14+20160803"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with dfareporting (protocol v2.4)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/dfareporting2d4"
@@ -18,10 +18,10 @@ build = "src/build.rs"
 [dependencies]
 hyper = "^ 0.9"
 mime = "^ 0.2.0"
-serde = "^ 0.7.5"
-serde_json = "^ 0.7.0"
-yup-oauth2 = { version = "^ 0.6.0", optional = true, default-features = false }
-serde_macros = { version = "^ 0.7.5", optional = true }
+serde = "^ 0.8"
+serde_json = "^ 0.8"
+yup-oauth2 = { version = "^ 0.6", optional = true, default-features = false }
+serde_macros = { version = "^ 0.8", optional = true }
 url = "= 0.5"
 
 [features]
@@ -30,5 +30,5 @@ nightly = ["serde_macros","yup-oauth2/nightly"]
 with-serde-codegen = ["serde_codegen","yup-oauth2/with-serde-codegen"]
 
 [build-dependencies]
-serde_codegen = { version = "^ 0.7.14", optional = true }
+serde_codegen = { version = "^ 0.8", optional = true }
 

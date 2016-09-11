@@ -153,6 +153,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "return-all-available-data" => {
+                    call = call.return_all_available_data(arg_from_str(value.unwrap_or("false"), err, "return-all-available-data", "boolean"));
+                },
                 "official-only" => {
                     call = call.official_only(arg_from_str(value.unwrap_or("false"), err, "official-only", "boolean"));
                 },
@@ -172,7 +175,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["election-id", "official-only"].iter().map(|v|*v));
+                                                                           v.extend(["election-id", "official-only", "return-all-available-data"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -555,8 +558,8 @@ fn main() {
     
     let mut app = App::new("civicinfo2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.6+20150820")
-           .about("An API for accessing civic information.")
+           .version("0.3.6+20160823")
+           .about("Provides polling places, early vote locations, contest data, election officials, and government representatives for U.S. residential addresses.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_civicinfo2_cli")
            .arg(Arg::with_name("folder")
                    .long("config-dir")

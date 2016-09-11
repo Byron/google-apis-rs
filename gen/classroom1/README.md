@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-classroom1` library allows access to all features of the *Google classroom* service.
 
-This documentation was generated from *classroom* crate version *0.1.14+20151013*, where *20151013* is the exact revision of the *classroom:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
+This documentation was generated from *classroom* crate version *0.1.14+20160816*, where *20160816* is the exact revision of the *classroom:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
 
 Everything else about the *classroom* *v1* API can be found at the
 [official documentation site](https://developers.google.com/classroom/).
@@ -14,11 +14,11 @@ Everything else about the *classroom* *v1* API can be found at the
 Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google_classroom1/struct.Classroom.html) ... 
 
 * [courses](http://byron.github.io/google-apis-rs/google_classroom1/struct.Course.html)
- * [*aliases create*](http://byron.github.io/google-apis-rs/google_classroom1/struct.CourseAliaseCreateCall.html), [*aliases delete*](http://byron.github.io/google-apis-rs/google_classroom1/struct.CourseAliaseDeleteCall.html), [*aliases list*](http://byron.github.io/google-apis-rs/google_classroom1/struct.CourseAliaseListCall.html), [*create*](http://byron.github.io/google-apis-rs/google_classroom1/struct.CourseCreateCall.html), [*delete*](http://byron.github.io/google-apis-rs/google_classroom1/struct.CourseDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_classroom1/struct.CourseGetCall.html), [*list*](http://byron.github.io/google-apis-rs/google_classroom1/struct.CourseListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_classroom1/struct.CoursePatchCall.html), [*students create*](http://byron.github.io/google-apis-rs/google_classroom1/struct.CourseStudentCreateCall.html), [*students delete*](http://byron.github.io/google-apis-rs/google_classroom1/struct.CourseStudentDeleteCall.html), [*students get*](http://byron.github.io/google-apis-rs/google_classroom1/struct.CourseStudentGetCall.html), [*students list*](http://byron.github.io/google-apis-rs/google_classroom1/struct.CourseStudentListCall.html), [*teachers create*](http://byron.github.io/google-apis-rs/google_classroom1/struct.CourseTeacherCreateCall.html), [*teachers delete*](http://byron.github.io/google-apis-rs/google_classroom1/struct.CourseTeacherDeleteCall.html), [*teachers get*](http://byron.github.io/google-apis-rs/google_classroom1/struct.CourseTeacherGetCall.html), [*teachers list*](http://byron.github.io/google-apis-rs/google_classroom1/struct.CourseTeacherListCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_classroom1/struct.CourseUpdateCall.html)
+ * [*aliases create*](http://byron.github.io/google-apis-rs/google_classroom1/struct.CourseAliaseCreateCall.html), [*aliases delete*](http://byron.github.io/google-apis-rs/google_classroom1/struct.CourseAliaseDeleteCall.html), [*aliases list*](http://byron.github.io/google-apis-rs/google_classroom1/struct.CourseAliaseListCall.html), [*course work create*](http://byron.github.io/google-apis-rs/google_classroom1/struct.CourseCourseWorkCreateCall.html), [*course work get*](http://byron.github.io/google-apis-rs/google_classroom1/struct.CourseCourseWorkGetCall.html), [*course work list*](http://byron.github.io/google-apis-rs/google_classroom1/struct.CourseCourseWorkListCall.html), [*course work student submissions get*](http://byron.github.io/google-apis-rs/google_classroom1/struct.CourseCourseWorkStudentSubmissionGetCall.html), [*course work student submissions list*](http://byron.github.io/google-apis-rs/google_classroom1/struct.CourseCourseWorkStudentSubmissionListCall.html), [*course work student submissions modify attachments*](http://byron.github.io/google-apis-rs/google_classroom1/struct.CourseCourseWorkStudentSubmissionModifyAttachmentCall.html), [*course work student submissions patch*](http://byron.github.io/google-apis-rs/google_classroom1/struct.CourseCourseWorkStudentSubmissionPatchCall.html), [*course work student submissions reclaim*](http://byron.github.io/google-apis-rs/google_classroom1/struct.CourseCourseWorkStudentSubmissionReclaimCall.html), [*course work student submissions return*](http://byron.github.io/google-apis-rs/google_classroom1/struct.CourseCourseWorkStudentSubmissionReturnCall.html), [*course work student submissions turn in*](http://byron.github.io/google-apis-rs/google_classroom1/struct.CourseCourseWorkStudentSubmissionTurnInCall.html), [*create*](http://byron.github.io/google-apis-rs/google_classroom1/struct.CourseCreateCall.html), [*delete*](http://byron.github.io/google-apis-rs/google_classroom1/struct.CourseDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_classroom1/struct.CourseGetCall.html), [*list*](http://byron.github.io/google-apis-rs/google_classroom1/struct.CourseListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_classroom1/struct.CoursePatchCall.html), [*students create*](http://byron.github.io/google-apis-rs/google_classroom1/struct.CourseStudentCreateCall.html), [*students delete*](http://byron.github.io/google-apis-rs/google_classroom1/struct.CourseStudentDeleteCall.html), [*students get*](http://byron.github.io/google-apis-rs/google_classroom1/struct.CourseStudentGetCall.html), [*students list*](http://byron.github.io/google-apis-rs/google_classroom1/struct.CourseStudentListCall.html), [*teachers create*](http://byron.github.io/google-apis-rs/google_classroom1/struct.CourseTeacherCreateCall.html), [*teachers delete*](http://byron.github.io/google-apis-rs/google_classroom1/struct.CourseTeacherDeleteCall.html), [*teachers get*](http://byron.github.io/google-apis-rs/google_classroom1/struct.CourseTeacherGetCall.html), [*teachers list*](http://byron.github.io/google-apis-rs/google_classroom1/struct.CourseTeacherListCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_classroom1/struct.CourseUpdateCall.html)
 * [invitations](http://byron.github.io/google-apis-rs/google_classroom1/struct.Invitation.html)
  * [*accept*](http://byron.github.io/google-apis-rs/google_classroom1/struct.InvitationAcceptCall.html), [*create*](http://byron.github.io/google-apis-rs/google_classroom1/struct.InvitationCreateCall.html), [*delete*](http://byron.github.io/google-apis-rs/google_classroom1/struct.InvitationDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_classroom1/struct.InvitationGetCall.html) and [*list*](http://byron.github.io/google-apis-rs/google_classroom1/struct.InvitationListCall.html)
 * [user profiles](http://byron.github.io/google-apis-rs/google_classroom1/struct.UserProfile.html)
- * [*get*](http://byron.github.io/google-apis-rs/google_classroom1/struct.UserProfileGetCall.html)
+ * [*get*](http://byron.github.io/google-apis-rs/google_classroom1/struct.UserProfileGetCall.html), [*guardian invitations create*](http://byron.github.io/google-apis-rs/google_classroom1/struct.UserProfileGuardianInvitationCreateCall.html), [*guardian invitations get*](http://byron.github.io/google-apis-rs/google_classroom1/struct.UserProfileGuardianInvitationGetCall.html), [*guardian invitations list*](http://byron.github.io/google-apis-rs/google_classroom1/struct.UserProfileGuardianInvitationListCall.html), [*guardian invitations patch*](http://byron.github.io/google-apis-rs/google_classroom1/struct.UserProfileGuardianInvitationPatchCall.html), [*guardians delete*](http://byron.github.io/google-apis-rs/google_classroom1/struct.UserProfileGuardianDeleteCall.html), [*guardians get*](http://byron.github.io/google-apis-rs/google_classroom1/struct.UserProfileGuardianGetCall.html) and [*guardians list*](http://byron.github.io/google-apis-rs/google_classroom1/struct.UserProfileGuardianListCall.html)
 
 
 
@@ -51,23 +51,33 @@ let r = hub.resource().activity(...).doit()
 Or specifically ...
 
 ```ignore
-let r = hub.courses().update(...).doit()
-let r = hub.courses().list(...).doit()
-let r = hub.courses().teachers_list(...).doit()
+let r = hub.courses().course_work_student_submissions_patch(...).doit()
+let r = hub.courses().course_work_student_submissions_list(...).doit()
 let r = hub.courses().get(...).doit()
+let r = hub.courses().update(...).doit()
 let r = hub.courses().students_delete(...).doit()
-let r = hub.courses().patch(...).doit()
-let r = hub.courses().aliases_create(...).doit()
-let r = hub.courses().teachers_delete(...).doit()
-let r = hub.courses().students_create(...).doit()
-let r = hub.courses().students_get(...).doit()
-let r = hub.courses().aliases_delete(...).doit()
-let r = hub.courses().teachers_create(...).doit()
 let r = hub.courses().teachers_get(...).doit()
+let r = hub.courses().course_work_list(...).doit()
+let r = hub.courses().teachers_list(...).doit()
+let r = hub.courses().course_work_student_submissions_turn_in(...).doit()
+let r = hub.courses().course_work_student_submissions_modify_attachments(...).doit()
+let r = hub.courses().course_work_student_submissions_return(...).doit()
+let r = hub.courses().course_work_get(...).doit()
+let r = hub.courses().course_work_create(...).doit()
+let r = hub.courses().list(...).doit()
+let r = hub.courses().course_work_student_submissions_reclaim(...).doit()
+let r = hub.courses().aliases_create(...).doit()
+let r = hub.courses().students_create(...).doit()
+let r = hub.courses().aliases_delete(...).doit()
 let r = hub.courses().create(...).doit()
 let r = hub.courses().students_list(...).doit()
-let r = hub.courses().aliases_list(...).doit()
 let r = hub.courses().delete(...).doit()
+let r = hub.courses().patch(...).doit()
+let r = hub.courses().aliases_list(...).doit()
+let r = hub.courses().teachers_delete(...).doit()
+let r = hub.courses().teachers_create(...).doit()
+let r = hub.courses().course_work_student_submissions_get(...).doit()
+let r = hub.courses().students_get(...).doit()
 ```
 
 The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -112,11 +122,12 @@ let mut hub = Classroom::new(hyper::Client::new(), auth);
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
-let result = hub.courses().list()
-             .teacher_id("eirmod")
-             .student_id("sit")
-             .page_token("Stet")
-             .page_size(-42)
+let result = hub.courses().course_work_student_submissions_list("courseId", "courseWorkId")
+             .user_id("Stet")
+             .add_states("sed")
+             .page_token("et")
+             .page_size(-18)
+             .late("kasd")
              .doit();
 
 match result {

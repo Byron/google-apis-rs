@@ -41,9 +41,6 @@ pub enum Scope {
 
     /// View and manage your data across Google Cloud Platform services
     CloudPlatform,
-
-    /// Manage active breakpoints in cloud debugger
-    CloudDebugletcontroller,
 }
 
 impl AsRef<str> for Scope {
@@ -51,7 +48,6 @@ impl AsRef<str> for Scope {
         match *self {
             Scope::CloudDebugger => "https://www.googleapis.com/auth/cloud_debugger",
             Scope::CloudPlatform => "https://www.googleapis.com/auth/cloud-platform",
-            Scope::CloudDebugletcontroller => "https://www.googleapis.com/auth/cloud_debugletcontroller",
         }
     }
 }
@@ -68,7 +64,7 @@ impl Default for Scope {
 // HUB ###
 // ######
 
-/// Central instance to access all Clouddebugger related resource activities
+/// Central instance to access all CloudDebugger related resource activities
 ///
 /// # Examples
 ///
@@ -83,7 +79,7 @@ impl Default for Scope {
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// use clouddebugger2::Clouddebugger;
+/// use clouddebugger2::CloudDebugger;
 /// 
 /// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 /// // `client_secret`, among other things.
@@ -96,7 +92,7 @@ impl Default for Scope {
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::new(),
 ///                               <MemoryStorage as Default>::default(), None);
-/// let mut hub = Clouddebugger::new(hyper::Client::new(), auth);
+/// let mut hub = CloudDebugger::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -127,19 +123,19 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Clouddebugger<C, A> {
+pub struct CloudDebugger<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
 }
 
-impl<'a, C, A> Hub for Clouddebugger<C, A> {}
+impl<'a, C, A> Hub for CloudDebugger<C, A> {}
 
-impl<'a, C, A> Clouddebugger<C, A>
+impl<'a, C, A> CloudDebugger<C, A>
     where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> Clouddebugger<C, A> {
-        Clouddebugger {
+    pub fn new(client: C, authenticator: A) -> CloudDebugger<C, A> {
+        CloudDebugger {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/0.1.14".to_string(),
@@ -728,7 +724,7 @@ impl ResponseResult for GetBreakpointResponse {}
 // #################
 
 /// A builder providing access to all methods supported on *controller* resources.
-/// It is not used directly, but through the `Clouddebugger` hub.
+/// It is not used directly, but through the `CloudDebugger` hub.
 ///
 /// # Example
 ///
@@ -742,13 +738,13 @@ impl ResponseResult for GetBreakpointResponse {}
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// use clouddebugger2::Clouddebugger;
+/// use clouddebugger2::CloudDebugger;
 /// 
 /// let secret: ApplicationSecret = Default::default();
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::new(),
 ///                               <MemoryStorage as Default>::default(), None);
-/// let mut hub = Clouddebugger::new(hyper::Client::new(), auth);
+/// let mut hub = CloudDebugger::new(hyper::Client::new(), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `debuggees_breakpoints_list(...)`, `debuggees_breakpoints_update(...)` and `debuggees_register(...)`
 /// // to build up your call.
@@ -758,7 +754,7 @@ impl ResponseResult for GetBreakpointResponse {}
 pub struct ControllerMethods<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Clouddebugger<C, A>,
+    hub: &'a CloudDebugger<C, A>,
 }
 
 impl<'a, C, A> MethodsBuilder for ControllerMethods<'a, C, A> {}
@@ -826,7 +822,7 @@ impl<'a, C, A> ControllerMethods<'a, C, A> {
 
 
 /// A builder providing access to all methods supported on *debugger* resources.
-/// It is not used directly, but through the `Clouddebugger` hub.
+/// It is not used directly, but through the `CloudDebugger` hub.
 ///
 /// # Example
 ///
@@ -840,13 +836,13 @@ impl<'a, C, A> ControllerMethods<'a, C, A> {
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// use clouddebugger2::Clouddebugger;
+/// use clouddebugger2::CloudDebugger;
 /// 
 /// let secret: ApplicationSecret = Default::default();
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::new(),
 ///                               <MemoryStorage as Default>::default(), None);
-/// let mut hub = Clouddebugger::new(hyper::Client::new(), auth);
+/// let mut hub = CloudDebugger::new(hyper::Client::new(), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `debuggees_breakpoints_delete(...)`, `debuggees_breakpoints_get(...)`, `debuggees_breakpoints_list(...)`, `debuggees_breakpoints_set(...)` and `debuggees_list(...)`
 /// // to build up your call.
@@ -856,7 +852,7 @@ impl<'a, C, A> ControllerMethods<'a, C, A> {
 pub struct DebuggerMethods<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Clouddebugger<C, A>,
+    hub: &'a CloudDebugger<C, A>,
 }
 
 impl<'a, C, A> MethodsBuilder for DebuggerMethods<'a, C, A> {}
@@ -987,13 +983,13 @@ impl<'a, C, A> DebuggerMethods<'a, C, A> {
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use clouddebugger2::Clouddebugger;
+/// # use clouddebugger2::CloudDebugger;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Clouddebugger::new(hyper::Client::new(), auth);
+/// # let mut hub = CloudDebugger::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1009,7 +1005,7 @@ impl<'a, C, A> DebuggerMethods<'a, C, A> {
 pub struct ControllerDebuggeeBreakpointUpdateCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Clouddebugger<C, A>,
+    hub: &'a CloudDebugger<C, A>,
     _request: UpdateActiveBreakpointRequest,
     _debuggee_id: String,
     _id: String,
@@ -1271,13 +1267,13 @@ impl<'a, C, A> ControllerDebuggeeBreakpointUpdateCall<'a, C, A> where C: BorrowM
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use clouddebugger2::Clouddebugger;
+/// # use clouddebugger2::CloudDebugger;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Clouddebugger::new(hyper::Client::new(), auth);
+/// # let mut hub = CloudDebugger::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1293,7 +1289,7 @@ impl<'a, C, A> ControllerDebuggeeBreakpointUpdateCall<'a, C, A> where C: BorrowM
 pub struct ControllerDebuggeeRegisterCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Clouddebugger<C, A>,
+    hub: &'a CloudDebugger<C, A>,
     _request: RegisterDebuggeeRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
@@ -1509,13 +1505,13 @@ impl<'a, C, A> ControllerDebuggeeRegisterCall<'a, C, A> where C: BorrowMut<hyper
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use clouddebugger2::Clouddebugger;
+/// # use clouddebugger2::CloudDebugger;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Clouddebugger::new(hyper::Client::new(), auth);
+/// # let mut hub = CloudDebugger::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1528,7 +1524,7 @@ impl<'a, C, A> ControllerDebuggeeRegisterCall<'a, C, A> where C: BorrowMut<hyper
 pub struct ControllerDebuggeeBreakpointListCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Clouddebugger<C, A>,
+    hub: &'a CloudDebugger<C, A>,
     _debuggee_id: String,
     _wait_token: Option<String>,
     _success_on_timeout: Option<bool>,
@@ -1774,13 +1770,13 @@ impl<'a, C, A> ControllerDebuggeeBreakpointListCall<'a, C, A> where C: BorrowMut
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use clouddebugger2::Clouddebugger;
+/// # use clouddebugger2::CloudDebugger;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Clouddebugger::new(hyper::Client::new(), auth);
+/// # let mut hub = CloudDebugger::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1792,7 +1788,7 @@ impl<'a, C, A> ControllerDebuggeeBreakpointListCall<'a, C, A> where C: BorrowMut
 pub struct DebuggerDebuggeeBreakpointGetCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Clouddebugger<C, A>,
+    hub: &'a CloudDebugger<C, A>,
     _debuggee_id: String,
     _breakpoint_id: String,
     _client_version: Option<String>,
@@ -2039,13 +2035,13 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointGetCall<'a, C, A> where C: BorrowMut<hy
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use clouddebugger2::Clouddebugger;
+/// # use clouddebugger2::CloudDebugger;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Clouddebugger::new(hyper::Client::new(), auth);
+/// # let mut hub = CloudDebugger::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2057,7 +2053,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointGetCall<'a, C, A> where C: BorrowMut<hy
 pub struct DebuggerDebuggeeBreakpointDeleteCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Clouddebugger<C, A>,
+    hub: &'a CloudDebugger<C, A>,
     _debuggee_id: String,
     _breakpoint_id: String,
     _client_version: Option<String>,
@@ -2304,13 +2300,13 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointDeleteCall<'a, C, A> where C: BorrowMut
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use clouddebugger2::Clouddebugger;
+/// # use clouddebugger2::CloudDebugger;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Clouddebugger::new(hyper::Client::new(), auth);
+/// # let mut hub = CloudDebugger::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2324,7 +2320,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointDeleteCall<'a, C, A> where C: BorrowMut
 pub struct DebuggerDebuggeeListCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Clouddebugger<C, A>,
+    hub: &'a CloudDebugger<C, A>,
     _project: Option<String>,
     _include_inactive: Option<bool>,
     _client_version: Option<String>,
@@ -2549,13 +2545,13 @@ impl<'a, C, A> DebuggerDebuggeeListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use clouddebugger2::Clouddebugger;
+/// # use clouddebugger2::CloudDebugger;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Clouddebugger::new(hyper::Client::new(), auth);
+/// # let mut hub = CloudDebugger::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2572,7 +2568,7 @@ impl<'a, C, A> DebuggerDebuggeeListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 pub struct DebuggerDebuggeeBreakpointSetCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Clouddebugger<C, A>,
+    hub: &'a CloudDebugger<C, A>,
     _request: Breakpoint,
     _debuggee_id: String,
     _client_version: Option<String>,
@@ -2832,13 +2828,13 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointSetCall<'a, C, A> where C: BorrowMut<hy
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use clouddebugger2::Clouddebugger;
+/// # use clouddebugger2::CloudDebugger;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Clouddebugger::new(hyper::Client::new(), auth);
+/// # let mut hub = CloudDebugger::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2855,7 +2851,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointSetCall<'a, C, A> where C: BorrowMut<hy
 pub struct DebuggerDebuggeeBreakpointListCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Clouddebugger<C, A>,
+    hub: &'a CloudDebugger<C, A>,
     _debuggee_id: String,
     _wait_token: Option<String>,
     _strip_results: Option<bool>,

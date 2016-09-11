@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *prediction* API at revision *20160304*. The CLI is at version *0.3.6*.
+This documentation was generated from the *prediction* API at revision *20160511*. The CLI is at version *0.3.6*.
 
 ```bash
 prediction1d6 [options]

@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *compute* API at revision *20160328*. The CLI is at version *0.3.6*.
+This documentation was generated from the *compute* API at revision *20160908*. The CLI is at version *0.3.6*.
 
 ```bash
 compute1 [options]
@@ -92,6 +92,13 @@ compute1 [options]
                 delete <project> <operation> [-p <v>]...
                 get <project> <operation> [-p <v>]... [-o <out>]
                 list <project> [-p <v>]... [-o <out>]
+        health-checks
+                delete <project> <health-check> [-p <v>]... [-o <out>]
+                get <project> <health-check> [-p <v>]... [-o <out>]
+                insert <project> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <project> [-p <v>]... [-o <out>]
+                patch <project> <health-check> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <project> <health-check> (-r <kv>)... [-p <v>]... [-o <out>]
         http-health-checks
                 delete <project> <http-health-check> [-p <v>]... [-o <out>]
                 get <project> <http-health-check> [-p <v>]... [-o <out>]
@@ -110,6 +117,7 @@ compute1 [options]
                 delete <project> <image> [-p <v>]... [-o <out>]
                 deprecate <project> <image> (-r <kv>)... [-p <v>]... [-o <out>]
                 get <project> <image> [-p <v>]... [-o <out>]
+                get-from-family <project> <family> [-p <v>]... [-o <out>]
                 insert <project> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <project> [-p <v>]... [-o <out>]
         instance-group-managers
@@ -158,6 +166,7 @@ compute1 [options]
                 set-scheduling <project> <zone> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
                 set-tags <project> <zone> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
                 start <project> <zone> <instance> [-p <v>]... [-o <out>]
+                start-with-encryption-key <project> <zone> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
                 stop <project> <zone> <instance> [-p <v>]... [-o <out>]
         licenses
                 get <project> <license> [-p <v>]... [-o <out>]
@@ -183,6 +192,16 @@ compute1 [options]
         regions
                 get <project> <region> [-p <v>]... [-o <out>]
                 list <project> [-p <v>]... [-o <out>]
+        routers
+                aggregated-list <project> [-p <v>]... [-o <out>]
+                delete <project> <region> <router> [-p <v>]... [-o <out>]
+                get <project> <region> <router> [-p <v>]... [-o <out>]
+                get-router-status <project> <region> <router> [-p <v>]... [-o <out>]
+                insert <project> <region> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <project> <region> [-p <v>]... [-o <out>]
+                patch <project> <region> <router> (-r <kv>)... [-p <v>]... [-o <out>]
+                preview <project> <region> <router> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <project> <region> <router> (-r <kv>)... [-p <v>]... [-o <out>]
         routes
                 delete <project> <route> [-p <v>]... [-o <out>]
                 get <project> <route> [-p <v>]... [-o <out>]
@@ -234,6 +253,14 @@ compute1 [options]
                 remove-health-check <project> <region> <target-pool> (-r <kv>)... [-p <v>]... [-o <out>]
                 remove-instance <project> <region> <target-pool> (-r <kv>)... [-p <v>]... [-o <out>]
                 set-backup <project> <region> <target-pool> (-r <kv>)... [-p <v>]... [-o <out>]
+        target-ssl-proxies
+                delete <project> <target-ssl-proxy> [-p <v>]... [-o <out>]
+                get <project> <target-ssl-proxy> [-p <v>]... [-o <out>]
+                insert <project> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <project> [-p <v>]... [-o <out>]
+                set-backend-service <project> <target-ssl-proxy> (-r <kv>)... [-p <v>]... [-o <out>]
+                set-proxy-header <project> <target-ssl-proxy> (-r <kv>)... [-p <v>]... [-o <out>]
+                set-ssl-certificates <project> <target-ssl-proxy> (-r <kv>)... [-p <v>]... [-o <out>]
         target-vpn-gateways
                 aggregated-list <project> [-p <v>]... [-o <out>]
                 delete <project> <region> <target-vpn-gateway> [-p <v>]... [-o <out>]
@@ -244,6 +271,7 @@ compute1 [options]
                 delete <project> <url-map> [-p <v>]... [-o <out>]
                 get <project> <url-map> [-p <v>]... [-o <out>]
                 insert <project> (-r <kv>)... [-p <v>]... [-o <out>]
+                invalidate-cache <project> <url-map> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <project> [-p <v>]... [-o <out>]
                 patch <project> <url-map> (-r <kv>)... [-p <v>]... [-o <out>]
                 update <project> <url-map> (-r <kv>)... [-p <v>]... [-o <out>]

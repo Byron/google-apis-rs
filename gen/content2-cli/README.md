@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Shopping Content* API at revision *20160331*. The CLI is at version *0.3.6*.
+This documentation was generated from the *Shopping Content* API at revision *20160905*. The CLI is at version *0.3.6*.
 
 ```bash
 content2 [options]
@@ -94,6 +94,13 @@ content2 [options]
                 custombatch (-r <kv>)... [-p <v>]... [-o <out>]
                 get <merchant-id> <product-id> [-p <v>]... [-o <out>]
                 list <merchant-id> [-p <v>]... [-o <out>]
+        shippingsettings
+                custombatch (-r <kv>)... [-p <v>]... [-o <out>]
+                get <merchant-id> <account-id> [-p <v>]... [-o <out>]
+                getsupportedcarriers <merchant-id> [-p <v>]... [-o <out>]
+                list <merchant-id> [-p <v>]... [-o <out>]
+                patch <merchant-id> <account-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <merchant-id> <account-id> (-r <kv>)... [-p <v>]... [-o <out>]
   content2 --help
 
 Configuration:

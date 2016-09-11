@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *proximitybeacon* crate version *0.1.14+20150729*, where *20150729* is the exact revision of the *proximitybeacon:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
+//! This documentation was generated from *proximitybeacon* crate version *0.1.14+20160429*, where *20160429* is the exact revision of the *proximitybeacon:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
 //! 
 //! Everything else about the *proximitybeacon* *v1_beta1* API can be found at the
 //! [official documentation site](https://developers.google.com/beacons/proximity/).
@@ -16,8 +16,11 @@
 //! * [beacons](struct.Beacon.html)
 //!  * [*activate*](struct.BeaconActivateCall.html), [*attachments batch delete*](struct.BeaconAttachmentBatchDeleteCall.html), [*attachments create*](struct.BeaconAttachmentCreateCall.html), [*attachments delete*](struct.BeaconAttachmentDeleteCall.html), [*attachments list*](struct.BeaconAttachmentListCall.html), [*deactivate*](struct.BeaconDeactivateCall.html), [*decommission*](struct.BeaconDecommissionCall.html), [*diagnostics list*](struct.BeaconDiagnosticListCall.html), [*get*](struct.BeaconGetCall.html), [*list*](struct.BeaconListCall.html), [*register*](struct.BeaconRegisterCall.html) and [*update*](struct.BeaconUpdateCall.html)
 //! * [namespaces](struct.Namespace.html)
-//!  * [*list*](struct.NamespaceListCall.html)
+//!  * [*list*](struct.NamespaceListCall.html) and [*update*](struct.NamespaceUpdateCall.html)
 //! 
+//! Other activities are ...
+//! 
+//! * [get eidparams](struct.MethodGetEidparamCall.html)
 //! 
 //! 
 //! 
@@ -109,9 +112,10 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.beacons().diagnostics_list("beaconName")
-//!              .page_token("Lorem")
-//!              .page_size(-21)
-//!              .alert_filter("duo")
+//!              .project_id("invidunt")
+//!              .page_token("aliquyam")
+//!              .page_size(-73)
+//!              .alert_filter("Lorem")
 //!              .doit();
 //! 
 //! match result {

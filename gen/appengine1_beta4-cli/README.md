@@ -24,12 +24,15 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *appengine* API at revision *20160314*. The CLI is at version *0.3.6*.
+This documentation was generated from the *appengine* API at revision *20160802*. The CLI is at version *0.3.6*.
 
 ```bash
 appengine1-beta4 [options]
         apps
+                create (-r <kv>)... [-p <v>]... [-o <out>]
                 get <apps-id> [-p <v>]... [-o <out>]
+                locations-get <apps-id> <locations-id> [-p <v>]... [-o <out>]
+                locations-list <apps-id> [-p <v>]... [-o <out>]
                 modules-delete <apps-id> <modules-id> [-p <v>]... [-o <out>]
                 modules-get <apps-id> <modules-id> [-p <v>]... [-o <out>]
                 modules-list <apps-id> [-p <v>]... [-o <out>]
@@ -37,6 +40,10 @@ appengine1-beta4 [options]
                 modules-versions-create <apps-id> <modules-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 modules-versions-delete <apps-id> <modules-id> <versions-id> [-p <v>]... [-o <out>]
                 modules-versions-get <apps-id> <modules-id> <versions-id> [-p <v>]... [-o <out>]
+                modules-versions-instances-debug <apps-id> <modules-id> <versions-id> <instances-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                modules-versions-instances-delete <apps-id> <modules-id> <versions-id> <instances-id> [-p <v>]... [-o <out>]
+                modules-versions-instances-get <apps-id> <modules-id> <versions-id> <instances-id> [-p <v>]... [-o <out>]
+                modules-versions-instances-list <apps-id> <modules-id> <versions-id> [-p <v>]... [-o <out>]
                 modules-versions-list <apps-id> <modules-id> [-p <v>]... [-o <out>]
                 modules-versions-patch <apps-id> <modules-id> <versions-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 operations-get <apps-id> <operations-id> [-p <v>]... [-o <out>]

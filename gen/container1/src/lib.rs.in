@@ -70,7 +70,7 @@ impl Default for Scope {
 /// extern crate hyper;
 /// extern crate yup_oauth2 as oauth2;
 /// extern crate google_container1 as container1;
-/// use container1::UpdateClusterRequest;
+/// use container1::CreateNodePoolRequest;
 /// use container1::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -92,12 +92,12 @@ impl Default for Scope {
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = UpdateClusterRequest::default();
+/// let mut req = CreateNodePoolRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().zones_clusters_update(req, "projectId", "zone", "clusterId")
+/// let result = hub.projects().zones_clusters_node_pools_create(req, "projectId", "zone", "clusterId")
 ///              .doit();
 /// 
 /// match result {
@@ -165,6 +165,9 @@ pub struct ClusterUpdate {
     /// The Kubernetes version to change the master to. The only valid value is the latest supported version. Use "-" to have the server automatically select the latest version.
     #[serde(rename="desiredMasterVersion")]
     pub desired_master_version: Option<String>,
+    /// The node pool to be upgraded. This field is mandatory if the "desired_node_version" or "desired_image_family" is specified and there is more than one node pool on the cluster.
+    #[serde(rename="desiredNodePoolId")]
+    pub desired_node_pool_id: Option<String>,
     /// The Kubernetes version to change the nodes to (typically an upgrade). Use `-` to upgrade to the latest version supported by the server.
     #[serde(rename="desiredNodeVersion")]
     pub desired_node_version: Option<String>,
@@ -177,24 +180,6 @@ pub struct ClusterUpdate {
 }
 
 impl Part for ClusterUpdate {}
-
-
-/// CreateClusterRequest creates a cluster.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [zones clusters create projects](struct.ProjectZoneClusterCreateCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CreateClusterRequest {
-    /// A [cluster resource](/container-engine/reference/rest/v1/projects.zones.clusters)
-    pub cluster: Option<Cluster>,
-}
-
-impl RequestValue for CreateClusterRequest {}
 
 
 /// UpdateClusterRequest updates the settings of a cluster.
@@ -228,23 +213,6 @@ pub struct HttpLoadBalancing {
 impl Part for HttpLoadBalancing {}
 
 
-/// Configuration for the addons that can be automatically spun up in the cluster, enabling additional functionality.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AddonsConfig {
-    /// Configuration for the HTTP (L7) load balancing controller addon, which makes it easy to set up HTTP load balancers for services in a cluster.
-    #[serde(rename="httpLoadBalancing")]
-    pub http_load_balancing: Option<HttpLoadBalancing>,
-    /// Configuration for the horizontal pod autoscaling feature, which increases or decreases the number of replica pods a replication controller has based on the resource usage of the existing pods.
-    #[serde(rename="horizontalPodAutoscaling")]
-    pub horizontal_pod_autoscaling: Option<HorizontalPodAutoscaling>,
-}
-
-impl Part for AddonsConfig {}
-
-
 /// ListClustersResponse is the result of ListClustersRequest.
 /// 
 /// # Activities
@@ -264,6 +232,180 @@ pub struct ListClustersResponse {
 }
 
 impl ResponseResult for ListClustersResponse {}
+
+
+/// Configuration options for the horizontal pod autoscaling feature, which increases or decreases the number of replica pods a replication controller has based on the resource usage of the existing pods.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct HorizontalPodAutoscaling {
+    /// Whether the Horizontal Pod Autoscaling feature is enabled in the cluster. When enabled, it ensures that a Heapster pod is running in the cluster, which is also used by the Cloud Monitoring service.
+    pub disabled: Option<bool>,
+}
+
+impl Part for HorizontalPodAutoscaling {}
+
+
+/// Parameters that describe the nodes in a cluster.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct NodeConfig {
+    /// Size of the disk attached to each node, specified in GB. The smallest allowed disk size is 10GB. If unspecified, the default disk size is 100GB.
+    #[serde(rename="diskSizeGb")]
+    pub disk_size_gb: Option<i32>,
+    /// The name of a Google Compute Engine [machine type](/compute/docs/machine-types) (e.g. `n1-standard-1`). If unspecified, the default machine type is `n1-standard-1`.
+    #[serde(rename="machineType")]
+    pub machine_type: Option<String>,
+    /// The set of Google API scopes to be made available on all of the node VMs under the "default" service account. The following scopes are recommended, but not required, and by default are not included: * `https://www.googleapis.com/auth/compute` is required for mounting persistent storage on your nodes. * `https://www.googleapis.com/auth/devstorage.read_only` is required for communicating with **gcr.io** (the [Google Container Registry](/container-registry/)). If unspecified, no scopes are added, unless Cloud Logging or Cloud Monitoring are enabled, in which case their required scopes will be added.
+    #[serde(rename="oauthScopes")]
+    pub oauth_scopes: Option<Vec<String>>,
+    /// The metadata key/value pairs assigned to instances in the cluster. Keys must conform to the regexp [a-zA-Z0-9-_]+ and be less than 128 bytes in length. These are reflected as part of a URL in the metadata server. Additionally, to avoid ambiguity, keys must not conflict with any other metadata keys for the project or be one of the four reserved keys: "instance-template", "kube-env", "startup-script", and "user-data" Values are free-form strings, and only have meaning as interpreted by the image running in the instance. The only restriction placed on them is that each value's size must be less than or equal to 32 KB. The total size of all keys and values must be less than 512 KB.
+    pub metadata: Option<HashMap<String, String>>,
+}
+
+impl Part for NodeConfig {}
+
+
+/// Container Engine service configuration.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [zones get serverconfig projects](struct.ProjectZoneGetServerconfigCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ServerConfig {
+    /// Version of Kubernetes the service deploys by default.
+    #[serde(rename="defaultClusterVersion")]
+    pub default_cluster_version: Option<String>,
+    /// List of valid node upgrade target versions.
+    #[serde(rename="validNodeVersions")]
+    pub valid_node_versions: Option<Vec<String>>,
+    /// Default image family.
+    #[serde(rename="defaultImageFamily")]
+    pub default_image_family: Option<String>,
+    /// List of valid image families.
+    #[serde(rename="validImageFamilies")]
+    pub valid_image_families: Option<Vec<String>>,
+}
+
+impl ResponseResult for ServerConfig {}
+
+
+/// ListNodePoolsResponse is the result of ListNodePoolsRequest.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [zones clusters node pools list projects](struct.ProjectZoneClusterNodePoolListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListNodePoolsResponse {
+    /// A list of node pools for a cluster.
+    #[serde(rename="nodePools")]
+    pub node_pools: Option<Vec<NodePool>>,
+}
+
+impl ResponseResult for ListNodePoolsResponse {}
+
+
+/// NodePool contains the name and configuration for a cluster's node pool. Node pools are a set of nodes (i.e. VM's), with a common configuration and specification, under the control of the cluster master. They may have a set of Kubernetes labels applied to them, which may be used to reference them during pod scheduling. They may also be resized up or down, to accommodate the workload.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [zones clusters node pools get projects](struct.ProjectZoneClusterNodePoolGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct NodePool {
+    /// The status of the nodes in this pool instance.
+    pub status: Option<String>,
+    /// Server-defined URL for the resource.
+    #[serde(rename="selfLink")]
+    pub self_link: Option<String>,
+    /// The name of the node pool.
+    pub name: Option<String>,
+    /// [Output only] The resource URLs of [instance groups](/compute/docs/instance-groups/) associated with this node pool.
+    #[serde(rename="instanceGroupUrls")]
+    pub instance_group_urls: Option<Vec<String>>,
+    /// The version of the Kubernetes of this node.
+    pub version: Option<String>,
+    /// The initial node count for the pool. You must ensure that your Compute Engine resource quota is sufficient for this number of instances. You must also have available firewall and routes quota.
+    #[serde(rename="initialNodeCount")]
+    pub initial_node_count: Option<i32>,
+    /// The node configuration of the pool.
+    pub config: Option<NodeConfig>,
+    /// [Output only] Additional information about the current status of this node pool instance, if available.
+    #[serde(rename="statusMessage")]
+    pub status_message: Option<String>,
+}
+
+impl ResponseResult for NodePool {}
+
+
+/// CreateClusterRequest creates a cluster.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [zones clusters create projects](struct.ProjectZoneClusterCreateCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CreateClusterRequest {
+    /// A [cluster resource](/container-engine/reference/rest/v1/projects.zones.clusters)
+    pub cluster: Option<Cluster>,
+}
+
+impl RequestValue for CreateClusterRequest {}
+
+
+/// ListOperationsResponse is the result of ListOperationsRequest.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [zones operations list projects](struct.ProjectZoneOperationListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListOperationsResponse {
+    /// A list of operations in the project in the specified zone.
+    pub operations: Option<Vec<Operation>>,
+    /// If any zones are listed here, the list of operations returned may be missing the operations from those zones.
+    #[serde(rename="missingZones")]
+    pub missing_zones: Option<Vec<String>>,
+}
+
+impl ResponseResult for ListOperationsResponse {}
+
+
+/// Configuration for the addons that can be automatically spun up in the cluster, enabling additional functionality.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AddonsConfig {
+    /// Configuration for the HTTP (L7) load balancing controller addon, which makes it easy to set up HTTP load balancers for services in a cluster.
+    #[serde(rename="httpLoadBalancing")]
+    pub http_load_balancing: Option<HttpLoadBalancing>,
+    /// Configuration for the horizontal pod autoscaling feature, which increases or decreases the number of replica pods a replication controller has based on the resource usage of the existing pods.
+    #[serde(rename="horizontalPodAutoscaling")]
+    pub horizontal_pod_autoscaling: Option<HorizontalPodAutoscaling>,
+}
+
+impl Part for AddonsConfig {}
 
 
 /// The authentication information for accessing the master endpoint. Authentication can be done using HTTP basic auth or using client certificates.
@@ -288,19 +430,6 @@ pub struct MasterAuth {
 }
 
 impl Part for MasterAuth {}
-
-
-/// Configuration options for the horizontal pod autoscaling feature, which increases or decreases the number of replica pods a replication controller has based on the resource usage of the existing pods.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct HorizontalPodAutoscaling {
-    /// Whether the Horizontal Pod Autoscaling feature is enabled in the cluster. When enabled, it ensures that a Heapster pod is running in the cluster, which is also used by the Cloud Monitoring service.
-    pub disabled: Option<bool>,
-}
-
-impl Part for HorizontalPodAutoscaling {}
 
 
 /// A Google Container Engine cluster.
@@ -330,12 +459,17 @@ pub struct Cluster {
     /// Configurations for the various addons available to run in the cluster.
     #[serde(rename="addonsConfig")]
     pub addons_config: Option<AddonsConfig>,
+    /// The list of Google Compute Engine [locations](/compute/docs/zones#available) in which the cluster's nodes should be located.
+    pub locations: Option<Vec<String>>,
     /// The authentication information for accessing the master endpoint.
     #[serde(rename="masterAuth")]
     pub master_auth: Option<MasterAuth>,
     /// The number of nodes to create in this cluster. You must ensure that your Compute Engine resource quota is sufficient for this number of instances. You must also have available firewall and routes quota. For requests, this field should only be used in lieu of a "node_pool" object, since this configuration (along with the "node_config") will be used to create a "NodePool" object with an auto-generated name. Do not use this and a node_pool at the same time.
     #[serde(rename="initialNodeCount")]
     pub initial_node_count: Option<i32>,
+    /// The node pools associated with this cluster. When creating a new cluster, only a single node pool should be specified. This field should not be set if "node_config" or "initial_node_count" are specified.
+    #[serde(rename="nodePools")]
+    pub node_pools: Option<Vec<NodePool>>,
     /// The monitoring service the cluster should use to write metrics. Currently available options: * `monitoring.googleapis.com` - the Google Cloud Monitoring service. * `none` - no metrics will be exported from the cluster. * if left as an empty string, `monitoring.googleapis.com` will be used.
     #[serde(rename="monitoringService")]
     pub monitoring_service: Option<String>,
@@ -384,26 +518,23 @@ pub struct Cluster {
 impl ResponseResult for Cluster {}
 
 
-/// Parameters that describe the nodes in a cluster.
+/// CreateNodePoolRequest creates a node pool for a cluster.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [zones clusters node pools create projects](struct.ProjectZoneClusterNodePoolCreateCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct NodeConfig {
-    /// Size of the disk attached to each node, specified in GB. The smallest allowed disk size is 10GB. If unspecified, the default disk size is 100GB.
-    #[serde(rename="diskSizeGb")]
-    pub disk_size_gb: Option<i32>,
-    /// The name of a Google Compute Engine [machine type](/compute/docs/machine-types) (e.g. `n1-standard-1`). If unspecified, the default machine type is `n1-standard-1`.
-    #[serde(rename="machineType")]
-    pub machine_type: Option<String>,
-    /// The set of Google API scopes to be made available on all of the node VMs under the "default" service account. The following scopes are recommended, but not required, and by default are not included: * `https://www.googleapis.com/auth/compute` is required for mounting persistent storage on your nodes. * `https://www.googleapis.com/auth/devstorage.read_only` is required for communicating with **gcr.io** (the [Google Container Registry](/container-registry/)). If unspecified, no scopes are added, unless Cloud Logging or Cloud Monitoring are enabled, in which case their required scopes will be added.
-    #[serde(rename="oauthScopes")]
-    pub oauth_scopes: Option<Vec<String>>,
-    /// The metadata key/value pairs assigned to instances in the cluster. Keys must conform to the regexp [a-zA-Z0-9-_]+ and be less than 128 bytes in length. These are reflected as part of a URL in the metadata server. Additionally, to avoid ambiguity, keys must not conflict with any other metadata keys for the project or be one of the four reserved keys: "instance-template", "kube-env", "startup-script", and "user-data" Values are free-form strings, and only have meaning as interpreted by the image running in the instance. The only restriction placed on them is that each value's size must be less than or equal to 32 KB. The total size of all keys and values must be less than 512 KB.
-    pub metadata: Option<HashMap<String, String>>,
+pub struct CreateNodePoolRequest {
+    /// The node pool to create.
+    #[serde(rename="nodePool")]
+    pub node_pool: Option<NodePool>,
 }
 
-impl Part for NodeConfig {}
+impl RequestValue for CreateNodePoolRequest {}
 
 
 /// This operation resource represents operations that may have happened or are happening on the cluster. All fields are output only.
@@ -413,9 +544,11 @@ impl Part for NodeConfig {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [zones clusters update projects](struct.ProjectZoneClusterUpdateCall.html) (response)
-/// * [zones operations get projects](struct.ProjectZoneOperationGetCall.html) (response)
+/// * [zones clusters node pools create projects](struct.ProjectZoneClusterNodePoolCreateCall.html) (response)
 /// * [zones clusters delete projects](struct.ProjectZoneClusterDeleteCall.html) (response)
+/// * [zones operations get projects](struct.ProjectZoneOperationGetCall.html) (response)
+/// * [zones clusters node pools delete projects](struct.ProjectZoneClusterNodePoolDeleteCall.html) (response)
+/// * [zones clusters update projects](struct.ProjectZoneClusterUpdateCall.html) (response)
 /// * [zones clusters create projects](struct.ProjectZoneClusterCreateCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -443,49 +576,6 @@ pub struct Operation {
 }
 
 impl ResponseResult for Operation {}
-
-
-/// Container Engine service configuration.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [zones get serverconfig projects](struct.ProjectZoneGetServerconfigCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ServerConfig {
-    /// Version of Kubernetes the service deploys by default.
-    #[serde(rename="defaultClusterVersion")]
-    pub default_cluster_version: Option<String>,
-    /// List of valid node upgrade target versions.
-    #[serde(rename="validNodeVersions")]
-    pub valid_node_versions: Option<Vec<String>>,
-}
-
-impl ResponseResult for ServerConfig {}
-
-
-/// ListOperationsResponse is the result of ListOperationsRequest.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [zones operations list projects](struct.ProjectZoneOperationListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListOperationsResponse {
-    /// A list of operations in the project in the specified zone.
-    pub operations: Option<Vec<Operation>>,
-    /// If any zones are listed here, the list of operations returned may be missing the operations from those zones.
-    #[serde(rename="missingZones")]
-    pub missing_zones: Option<Vec<String>>,
-}
-
-impl ResponseResult for ListOperationsResponse {}
 
 
 
@@ -516,7 +606,7 @@ impl ResponseResult for ListOperationsResponse {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Container::new(hyper::Client::new(), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `zones_clusters_create(...)`, `zones_clusters_delete(...)`, `zones_clusters_get(...)`, `zones_clusters_list(...)`, `zones_clusters_update(...)`, `zones_get_serverconfig(...)`, `zones_operations_get(...)` and `zones_operations_list(...)`
+/// // like `zones_clusters_create(...)`, `zones_clusters_delete(...)`, `zones_clusters_get(...)`, `zones_clusters_list(...)`, `zones_clusters_node_pools_create(...)`, `zones_clusters_node_pools_delete(...)`, `zones_clusters_node_pools_get(...)`, `zones_clusters_node_pools_list(...)`, `zones_clusters_update(...)`, `zones_get_serverconfig(...)`, `zones_operations_get(...)` and `zones_operations_list(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -554,17 +644,44 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns configuration info about the Container Engine service.
+    /// Creates a node pool for a cluster.
     /// 
     /// # Arguments
     ///
-    /// * `projectId` - The Google Developers Console [project ID or project number](https://support.google.com/cloud/answer/6158840).
-    /// * `zone` - The name of the Google Compute Engine [zone](/compute/docs/zones#available) to return operations for.
-    pub fn zones_get_serverconfig(&self, project_id: &str, zone: &str) -> ProjectZoneGetServerconfigCall<'a, C, A> {
-        ProjectZoneGetServerconfigCall {
+    /// * `request` - No description provided.
+    /// * `projectId` - The Google Developers Console [project ID or project number](https://developers.google.com/console/help/new/#projectnumber).
+    /// * `zone` - The name of the Google Compute Engine [zone](/compute/docs/zones#available) in which the cluster resides.
+    /// * `clusterId` - The name of the cluster.
+    pub fn zones_clusters_node_pools_create(&self, request: CreateNodePoolRequest, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterNodePoolCreateCall<'a, C, A> {
+        ProjectZoneClusterNodePoolCreateCall {
+            hub: self.hub,
+            _request: request,
+            _project_id: project_id.to_string(),
+            _zone: zone.to_string(),
+            _cluster_id: cluster_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Retrieves the node pool requested.
+    /// 
+    /// # Arguments
+    ///
+    /// * `projectId` - The Google Developers Console [project ID or project number](https://developers.google.com/console/help/new/#projectnumber).
+    /// * `zone` - The name of the Google Compute Engine [zone](/compute/docs/zones#available) in which the cluster resides.
+    /// * `clusterId` - The name of the cluster.
+    /// * `nodePoolId` - The name of the node pool.
+    pub fn zones_clusters_node_pools_get(&self, project_id: &str, zone: &str, cluster_id: &str, node_pool_id: &str) -> ProjectZoneClusterNodePoolGetCall<'a, C, A> {
+        ProjectZoneClusterNodePoolGetCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
             _zone: zone.to_string(),
+            _cluster_id: cluster_id.to_string(),
+            _node_pool_id: node_pool_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -594,17 +711,59 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all clusters owned by a project in either the specified zone or all zones.
+    /// Returns configuration info about the Container Engine service.
     /// 
     /// # Arguments
     ///
     /// * `projectId` - The Google Developers Console [project ID or project number](https://support.google.com/cloud/answer/6158840).
-    /// * `zone` - The name of the Google Compute Engine [zone](/compute/docs/zones#available) in which the cluster resides, or "-" for all zones.
-    pub fn zones_clusters_list(&self, project_id: &str, zone: &str) -> ProjectZoneClusterListCall<'a, C, A> {
-        ProjectZoneClusterListCall {
+    /// * `zone` - The name of the Google Compute Engine [zone](/compute/docs/zones#available) to return operations for.
+    pub fn zones_get_serverconfig(&self, project_id: &str, zone: &str) -> ProjectZoneGetServerconfigCall<'a, C, A> {
+        ProjectZoneGetServerconfigCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
             _zone: zone.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Lists the node pools for a cluster.
+    /// 
+    /// # Arguments
+    ///
+    /// * `projectId` - The Google Developers Console [project ID or project number](https://developers.google.com/console/help/new/#projectnumber).
+    /// * `zone` - The name of the Google Compute Engine [zone](/compute/docs/zones#available) in which the cluster resides.
+    /// * `clusterId` - The name of the cluster.
+    pub fn zones_clusters_node_pools_list(&self, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterNodePoolListCall<'a, C, A> {
+        ProjectZoneClusterNodePoolListCall {
+            hub: self.hub,
+            _project_id: project_id.to_string(),
+            _zone: zone.to_string(),
+            _cluster_id: cluster_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets the specified operation.
+    /// 
+    /// # Arguments
+    ///
+    /// * `projectId` - The Google Developers Console [project ID or project number](https://support.google.com/cloud/answer/6158840).
+    /// * `zone` - The name of the Google Compute Engine [zone](/compute/docs/zones#available) in which the cluster resides.
+    /// * `operationId` - The server-assigned `name` of the operation.
+    pub fn zones_operations_get(&self, project_id: &str, zone: &str, operation_id: &str) -> ProjectZoneOperationGetCall<'a, C, A> {
+        ProjectZoneOperationGetCall {
+            hub: self.hub,
+            _project_id: project_id.to_string(),
+            _zone: zone.to_string(),
+            _operation_id: operation_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -676,19 +835,40 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the specified operation.
+    /// Lists all clusters owned by a project in either the specified zone or all zones.
     /// 
     /// # Arguments
     ///
     /// * `projectId` - The Google Developers Console [project ID or project number](https://support.google.com/cloud/answer/6158840).
-    /// * `zone` - The name of the Google Compute Engine [zone](/compute/docs/zones#available) in which the cluster resides.
-    /// * `operationId` - The server-assigned `name` of the operation.
-    pub fn zones_operations_get(&self, project_id: &str, zone: &str, operation_id: &str) -> ProjectZoneOperationGetCall<'a, C, A> {
-        ProjectZoneOperationGetCall {
+    /// * `zone` - The name of the Google Compute Engine [zone](/compute/docs/zones#available) in which the cluster resides, or "-" for all zones.
+    pub fn zones_clusters_list(&self, project_id: &str, zone: &str) -> ProjectZoneClusterListCall<'a, C, A> {
+        ProjectZoneClusterListCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
             _zone: zone.to_string(),
-            _operation_id: operation_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes a node pool from a cluster.
+    /// 
+    /// # Arguments
+    ///
+    /// * `projectId` - The Google Developers Console [project ID or project number](https://developers.google.com/console/help/new/#projectnumber).
+    /// * `zone` - The name of the Google Compute Engine [zone](/compute/docs/zones#available) in which the cluster resides.
+    /// * `clusterId` - The name of the cluster.
+    /// * `nodePoolId` - The name of the node pool to delete.
+    pub fn zones_clusters_node_pools_delete(&self, project_id: &str, zone: &str, cluster_id: &str, node_pool_id: &str) -> ProjectZoneClusterNodePoolDeleteCall<'a, C, A> {
+        ProjectZoneClusterNodePoolDeleteCall {
+            hub: self.hub,
+            _project_id: project_id.to_string(),
+            _zone: zone.to_string(),
+            _cluster_id: cluster_id.to_string(),
+            _node_pool_id: node_pool_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -969,9 +1149,305 @@ impl<'a, C, A> ProjectZoneClusterGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
 }
 
 
-/// Returns configuration info about the Container Engine service.
+/// Creates a node pool for a cluster.
 ///
-/// A builder for the *zones.getServerconfig* method supported by a *project* resource.
+/// A builder for the *zones.clusters.nodePools.create* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_container1 as container1;
+/// use container1::CreateNodePoolRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use container1::Container;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Container::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = CreateNodePoolRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().zones_clusters_node_pools_create(req, "projectId", "zone", "clusterId")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectZoneClusterNodePoolCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Container<C, A>,
+    _request: CreateNodePoolRequest,
+    _project_id: String,
+    _zone: String,
+    _cluster_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectZoneClusterNodePoolCreateCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectZoneClusterNodePoolCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "container.projects.zones.clusters.nodePools.create",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        params.push(("projectId", self._project_id.to_string()));
+        params.push(("zone", self._zone.to_string()));
+        params.push(("clusterId", self._cluster_id.to_string()));
+        for &field in ["alt", "projectId", "zone", "clusterId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://container.googleapis.com/v1/projects/{projectId}/zones/{zone}/clusters/{clusterId}/nodePools".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{projectId}", "projectId"), ("{zone}", "zone"), ("{clusterId}", "clusterId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
+            for param_name in ["clusterId", "zone", "projectId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request);
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: CreateNodePoolRequest) -> ProjectZoneClusterNodePoolCreateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The Google Developers Console [project ID or project number](https://developers.google.com/console/help/new/#projectnumber).
+    ///
+    /// Sets the *project id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolCreateCall<'a, C, A> {
+        self._project_id = new_value.to_string();
+        self
+    }
+    /// The name of the Google Compute Engine [zone](/compute/docs/zones#available) in which the cluster resides.
+    ///
+    /// Sets the *zone* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterNodePoolCreateCall<'a, C, A> {
+        self._zone = new_value.to_string();
+        self
+    }
+    /// The name of the cluster.
+    ///
+    /// Sets the *cluster id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolCreateCall<'a, C, A> {
+        self._cluster_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectZoneClusterNodePoolCreateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterNodePoolCreateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectZoneClusterNodePoolCreateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+/// Retrieves the node pool requested.
+///
+/// A builder for the *zones.clusters.nodePools.get* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -995,28 +1471,30 @@ impl<'a, C, A> ProjectZoneClusterGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().zones_get_serverconfig("projectId", "zone")
+/// let result = hub.projects().zones_clusters_node_pools_get("projectId", "zone", "clusterId", "nodePoolId")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectZoneGetServerconfigCall<'a, C, A>
+pub struct ProjectZoneClusterNodePoolGetCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Container<C, A>,
     _project_id: String,
     _zone: String,
+    _cluster_id: String,
+    _node_pool_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectZoneGetServerconfigCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectZoneClusterNodePoolGetCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectZoneGetServerconfigCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectZoneClusterNodePoolGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, ServerConfig)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, NodePool)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -1024,12 +1502,14 @@ impl<'a, C, A> ProjectZoneGetServerconfigCall<'a, C, A> where C: BorrowMut<hyper
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "container.projects.zones.getServerconfig",
+        dlg.begin(MethodInfo { id: "container.projects.zones.clusters.nodePools.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("projectId", self._project_id.to_string()));
         params.push(("zone", self._zone.to_string()));
-        for &field in ["alt", "projectId", "zone"].iter() {
+        params.push(("clusterId", self._cluster_id.to_string()));
+        params.push(("nodePoolId", self._node_pool_id.to_string()));
+        for &field in ["alt", "projectId", "zone", "clusterId", "nodePoolId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -1041,12 +1521,12 @@ impl<'a, C, A> ProjectZoneGetServerconfigCall<'a, C, A> where C: BorrowMut<hyper
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://container.googleapis.com/v1/projects/{projectId}/zones/{zone}/serverconfig".to_string();
+        let mut url = "https://container.googleapis.com/v1/projects/{projectId}/zones/{zone}/clusters/{clusterId}/nodePools/{nodePoolId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{projectId}", "projectId"), ("{zone}", "zone")].iter() {
+        for &(find_this, param_name) in [("{projectId}", "projectId"), ("{zone}", "zone"), ("{clusterId}", "clusterId"), ("{nodePoolId}", "nodePoolId")].iter() {
             let mut replace_with: Option<&str> = None;
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -1057,8 +1537,8 @@ impl<'a, C, A> ProjectZoneGetServerconfigCall<'a, C, A> where C: BorrowMut<hyper
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["zone", "projectId"].iter() {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(4);
+            for param_name in ["nodePoolId", "clusterId", "zone", "projectId"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -1144,24 +1624,44 @@ impl<'a, C, A> ProjectZoneGetServerconfigCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
-    /// The Google Developers Console [project ID or project number](https://support.google.com/cloud/answer/6158840).
+    /// The Google Developers Console [project ID or project number](https://developers.google.com/console/help/new/#projectnumber).
     ///
     /// Sets the *project id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectZoneGetServerconfigCall<'a, C, A> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolGetCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
-    /// The name of the Google Compute Engine [zone](/compute/docs/zones#available) to return operations for.
+    /// The name of the Google Compute Engine [zone](/compute/docs/zones#available) in which the cluster resides.
     ///
     /// Sets the *zone* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ProjectZoneGetServerconfigCall<'a, C, A> {
+    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterNodePoolGetCall<'a, C, A> {
         self._zone = new_value.to_string();
+        self
+    }
+    /// The name of the cluster.
+    ///
+    /// Sets the *cluster id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolGetCall<'a, C, A> {
+        self._cluster_id = new_value.to_string();
+        self
+    }
+    /// The name of the node pool.
+    ///
+    /// Sets the *node pool id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn node_pool_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolGetCall<'a, C, A> {
+        self._node_pool_id = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -1170,7 +1670,7 @@ impl<'a, C, A> ProjectZoneGetServerconfigCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectZoneGetServerconfigCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectZoneClusterNodePoolGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1197,7 +1697,7 @@ impl<'a, C, A> ProjectZoneGetServerconfigCall<'a, C, A> where C: BorrowMut<hyper
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneGetServerconfigCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterNodePoolGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1214,7 +1714,7 @@ impl<'a, C, A> ProjectZoneGetServerconfigCall<'a, C, A> where C: BorrowMut<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectZoneGetServerconfigCall<'a, C, A>
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectZoneClusterNodePoolGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1487,9 +1987,9 @@ impl<'a, C, A> ProjectZoneClusterDeleteCall<'a, C, A> where C: BorrowMut<hyper::
 }
 
 
-/// Lists all clusters owned by a project in either the specified zone or all zones.
+/// Returns configuration info about the Container Engine service.
 ///
-/// A builder for the *zones.clusters.list* method supported by a *project* resource.
+/// A builder for the *zones.getServerconfig* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -1513,11 +2013,11 @@ impl<'a, C, A> ProjectZoneClusterDeleteCall<'a, C, A> where C: BorrowMut<hyper::
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().zones_clusters_list("projectId", "zone")
+/// let result = hub.projects().zones_get_serverconfig("projectId", "zone")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectZoneClusterListCall<'a, C, A>
+pub struct ProjectZoneGetServerconfigCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Container<C, A>,
@@ -1528,13 +2028,13 @@ pub struct ProjectZoneClusterListCall<'a, C, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectZoneClusterListCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectZoneGetServerconfigCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectZoneClusterListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectZoneGetServerconfigCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, ListClustersResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ServerConfig)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -1542,7 +2042,7 @@ impl<'a, C, A> ProjectZoneClusterListCall<'a, C, A> where C: BorrowMut<hyper::Cl
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "container.projects.zones.clusters.list",
+        dlg.begin(MethodInfo { id: "container.projects.zones.getServerconfig",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("projectId", self._project_id.to_string()));
@@ -1559,7 +2059,7 @@ impl<'a, C, A> ProjectZoneClusterListCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://container.googleapis.com/v1/projects/{projectId}/zones/{zone}/clusters".to_string();
+        let mut url = "https://container.googleapis.com/v1/projects/{projectId}/zones/{zone}/serverconfig".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -1668,17 +2168,17 @@ impl<'a, C, A> ProjectZoneClusterListCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterListCall<'a, C, A> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectZoneGetServerconfigCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
-    /// The name of the Google Compute Engine [zone](/compute/docs/zones#available) in which the cluster resides, or "-" for all zones.
+    /// The name of the Google Compute Engine [zone](/compute/docs/zones#available) to return operations for.
     ///
     /// Sets the *zone* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterListCall<'a, C, A> {
+    pub fn zone(mut self, new_value: &str) -> ProjectZoneGetServerconfigCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
@@ -1688,7 +2188,7 @@ impl<'a, C, A> ProjectZoneClusterListCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectZoneClusterListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectZoneGetServerconfigCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1715,7 +2215,7 @@ impl<'a, C, A> ProjectZoneClusterListCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterListCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneGetServerconfigCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1732,7 +2232,537 @@ impl<'a, C, A> ProjectZoneClusterListCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectZoneClusterListCall<'a, C, A>
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectZoneGetServerconfigCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+/// Lists the node pools for a cluster.
+///
+/// A builder for the *zones.clusters.nodePools.list* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_container1 as container1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use container1::Container;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Container::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().zones_clusters_node_pools_list("projectId", "zone", "clusterId")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectZoneClusterNodePoolListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Container<C, A>,
+    _project_id: String,
+    _zone: String,
+    _cluster_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectZoneClusterNodePoolListCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectZoneClusterNodePoolListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListNodePoolsResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "container.projects.zones.clusters.nodePools.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        params.push(("projectId", self._project_id.to_string()));
+        params.push(("zone", self._zone.to_string()));
+        params.push(("clusterId", self._cluster_id.to_string()));
+        for &field in ["alt", "projectId", "zone", "clusterId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://container.googleapis.com/v1/projects/{projectId}/zones/{zone}/clusters/{clusterId}/nodePools".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{projectId}", "projectId"), ("{zone}", "zone"), ("{clusterId}", "clusterId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
+            for param_name in ["clusterId", "zone", "projectId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The Google Developers Console [project ID or project number](https://developers.google.com/console/help/new/#projectnumber).
+    ///
+    /// Sets the *project id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolListCall<'a, C, A> {
+        self._project_id = new_value.to_string();
+        self
+    }
+    /// The name of the Google Compute Engine [zone](/compute/docs/zones#available) in which the cluster resides.
+    ///
+    /// Sets the *zone* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterNodePoolListCall<'a, C, A> {
+        self._zone = new_value.to_string();
+        self
+    }
+    /// The name of the cluster.
+    ///
+    /// Sets the *cluster id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolListCall<'a, C, A> {
+        self._cluster_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectZoneClusterNodePoolListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterNodePoolListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectZoneClusterNodePoolListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+/// Gets the specified operation.
+///
+/// A builder for the *zones.operations.get* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_container1 as container1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use container1::Container;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Container::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().zones_operations_get("projectId", "zone", "operationId")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectZoneOperationGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Container<C, A>,
+    _project_id: String,
+    _zone: String,
+    _operation_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectZoneOperationGetCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "container.projects.zones.operations.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        params.push(("projectId", self._project_id.to_string()));
+        params.push(("zone", self._zone.to_string()));
+        params.push(("operationId", self._operation_id.to_string()));
+        for &field in ["alt", "projectId", "zone", "operationId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://container.googleapis.com/v1/projects/{projectId}/zones/{zone}/operations/{operationId}".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{projectId}", "projectId"), ("{zone}", "zone"), ("{operationId}", "operationId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
+            for param_name in ["operationId", "zone", "projectId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The Google Developers Console [project ID or project number](https://support.google.com/cloud/answer/6158840).
+    ///
+    /// Sets the *project id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn project_id(mut self, new_value: &str) -> ProjectZoneOperationGetCall<'a, C, A> {
+        self._project_id = new_value.to_string();
+        self
+    }
+    /// The name of the Google Compute Engine [zone](/compute/docs/zones#available) in which the cluster resides.
+    ///
+    /// Sets the *zone* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn zone(mut self, new_value: &str) -> ProjectZoneOperationGetCall<'a, C, A> {
+        self._zone = new_value.to_string();
+        self
+    }
+    /// The server-assigned `name` of the operation.
+    ///
+    /// Sets the *operation id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn operation_id(mut self, new_value: &str) -> ProjectZoneOperationGetCall<'a, C, A> {
+        self._operation_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectZoneOperationGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneOperationGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectZoneOperationGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2573,9 +3603,9 @@ impl<'a, C, A> ProjectZoneClusterUpdateCall<'a, C, A> where C: BorrowMut<hyper::
 }
 
 
-/// Gets the specified operation.
+/// Lists all clusters owned by a project in either the specified zone or all zones.
 ///
-/// A builder for the *zones.operations.get* method supported by a *project* resource.
+/// A builder for the *zones.clusters.list* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -2599,29 +3629,28 @@ impl<'a, C, A> ProjectZoneClusterUpdateCall<'a, C, A> where C: BorrowMut<hyper::
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().zones_operations_get("projectId", "zone", "operationId")
+/// let result = hub.projects().zones_clusters_list("projectId", "zone")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectZoneOperationGetCall<'a, C, A>
+pub struct ProjectZoneClusterListCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Container<C, A>,
     _project_id: String,
     _zone: String,
-    _operation_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectZoneOperationGetCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectZoneClusterListCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectZoneClusterListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListClustersResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -2629,13 +3658,12 @@ impl<'a, C, A> ProjectZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::C
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "container.projects.zones.operations.get",
+        dlg.begin(MethodInfo { id: "container.projects.zones.clusters.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("projectId", self._project_id.to_string()));
         params.push(("zone", self._zone.to_string()));
-        params.push(("operationId", self._operation_id.to_string()));
-        for &field in ["alt", "projectId", "zone", "operationId"].iter() {
+        for &field in ["alt", "projectId", "zone"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -2647,12 +3675,12 @@ impl<'a, C, A> ProjectZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://container.googleapis.com/v1/projects/{projectId}/zones/{zone}/operations/{operationId}".to_string();
+        let mut url = "https://container.googleapis.com/v1/projects/{projectId}/zones/{zone}/clusters".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{projectId}", "projectId"), ("{zone}", "zone"), ("{operationId}", "operationId")].iter() {
+        for &(find_this, param_name) in [("{projectId}", "projectId"), ("{zone}", "zone")].iter() {
             let mut replace_with: Option<&str> = None;
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -2663,8 +3691,8 @@ impl<'a, C, A> ProjectZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::C
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
-            for param_name in ["operationId", "zone", "projectId"].iter() {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["zone", "projectId"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -2756,28 +3784,18 @@ impl<'a, C, A> ProjectZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectZoneOperationGetCall<'a, C, A> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterListCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
-    /// The name of the Google Compute Engine [zone](/compute/docs/zones#available) in which the cluster resides.
+    /// The name of the Google Compute Engine [zone](/compute/docs/zones#available) in which the cluster resides, or "-" for all zones.
     ///
     /// Sets the *zone* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ProjectZoneOperationGetCall<'a, C, A> {
+    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterListCall<'a, C, A> {
         self._zone = new_value.to_string();
-        self
-    }
-    /// The server-assigned `name` of the operation.
-    ///
-    /// Sets the *operation id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn operation_id(mut self, new_value: &str) -> ProjectZoneOperationGetCall<'a, C, A> {
-        self._operation_id = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -2786,7 +3804,7 @@ impl<'a, C, A> ProjectZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectZoneOperationGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectZoneClusterListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2813,7 +3831,7 @@ impl<'a, C, A> ProjectZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::C
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneOperationGetCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2830,7 +3848,284 @@ impl<'a, C, A> ProjectZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::C
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectZoneOperationGetCall<'a, C, A>
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectZoneClusterListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+/// Deletes a node pool from a cluster.
+///
+/// A builder for the *zones.clusters.nodePools.delete* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_container1 as container1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use container1::Container;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Container::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().zones_clusters_node_pools_delete("projectId", "zone", "clusterId", "nodePoolId")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectZoneClusterNodePoolDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Container<C, A>,
+    _project_id: String,
+    _zone: String,
+    _cluster_id: String,
+    _node_pool_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectZoneClusterNodePoolDeleteCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectZoneClusterNodePoolDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "container.projects.zones.clusters.nodePools.delete",
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        params.push(("projectId", self._project_id.to_string()));
+        params.push(("zone", self._zone.to_string()));
+        params.push(("clusterId", self._cluster_id.to_string()));
+        params.push(("nodePoolId", self._node_pool_id.to_string()));
+        for &field in ["alt", "projectId", "zone", "clusterId", "nodePoolId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://container.googleapis.com/v1/projects/{projectId}/zones/{zone}/clusters/{clusterId}/nodePools/{nodePoolId}".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{projectId}", "projectId"), ("{zone}", "zone"), ("{clusterId}", "clusterId"), ("{nodePoolId}", "nodePoolId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(4);
+            for param_name in ["nodePoolId", "clusterId", "zone", "projectId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The Google Developers Console [project ID or project number](https://developers.google.com/console/help/new/#projectnumber).
+    ///
+    /// Sets the *project id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolDeleteCall<'a, C, A> {
+        self._project_id = new_value.to_string();
+        self
+    }
+    /// The name of the Google Compute Engine [zone](/compute/docs/zones#available) in which the cluster resides.
+    ///
+    /// Sets the *zone* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterNodePoolDeleteCall<'a, C, A> {
+        self._zone = new_value.to_string();
+        self
+    }
+    /// The name of the cluster.
+    ///
+    /// Sets the *cluster id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolDeleteCall<'a, C, A> {
+        self._cluster_id = new_value.to_string();
+        self
+    }
+    /// The name of the node pool to delete.
+    ///
+    /// Sets the *node pool id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn node_pool_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolDeleteCall<'a, C, A> {
+        self._node_pool_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectZoneClusterNodePoolDeleteCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterNodePoolDeleteCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectZoneClusterNodePoolDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

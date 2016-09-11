@@ -47,10 +47,13 @@ struct Engine<'n> {
 impl<'n> Engine<'n> {
     fn _organizations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.organizations().get(opt.value_of("organization-id").unwrap_or(""));
+        let mut call = self.hub.organizations().get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "organization-id" => {
+                    call = call.organization_id(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -64,6 +67,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["organization-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -437,12 +441,14 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "organization-id" => Some(("organizationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "owner.directory-customer-id" => Some(("owner.directoryCustomerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "organization-id" => Some(("organizationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "lifecycle-state" => Some(("lifecycleState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.directory-customer-id" => Some(("owner.directoryCustomerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "directory-customer-id", "display-name", "organization-id", "owner"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "directory-customer-id", "display-name", "lifecycle-state", "name", "organization-id", "owner"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -452,7 +458,7 @@ impl<'n> Engine<'n> {
             }
         }
         let mut request: api::Organization = json::value::from_value(object).unwrap();
-        let mut call = self.hub.organizations().update(request, opt.value_of("organization-id").unwrap_or(""));
+        let mut call = self.hub.organizations().update(request, opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -649,6 +655,90 @@ impl<'n> Engine<'n> {
     fn _projects_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().get(opt.value_of("project-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_get_ancestry(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GetAncestryRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().get_ancestry(request, opt.value_of("project-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -1233,6 +1323,9 @@ impl<'n> Engine<'n> {
                     ("get", Some(opt)) => {
                         call_result = self._projects_get(opt, dry_run, &mut err);
                     },
+                    ("get-ancestry", Some(opt)) => {
+                        call_result = self._projects_get_ancestry(opt, dry_run, &mut err);
+                    },
                     ("get-iam-policy", Some(opt)) => {
                         call_result = self._projects_get_iam_policy(opt, dry_run, &mut err);
                     },
@@ -1345,12 +1438,12 @@ fn main() {
     let arg_data = [
         ("organizations", "methods: 'get', 'get-iam-policy', 'list', 'set-iam-policy', 'test-iam-permissions' and 'update'", vec![
             ("get",
-                    Some(r##"Fetches an Organization resource identified by the specified `organization_id`."##),
+                    Some(r##"Fetches an Organization resource identified by the specified resource name."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1_cli/organizations_get",
                   vec![
-                    (Some(r##"organization-id"##),
+                    (Some(r##"name"##),
                      None,
-                     Some(r##"The id of the Organization resource to fetch."##),
+                     Some(r##"The resource name of the Organization to fetch. Its format is "organizations/[organization_id]". For example, "organizations/1234"."##),
                      Some(true),
                      Some(false)),
         
@@ -1367,7 +1460,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get-iam-policy",
-                    Some(r##"Gets the access control policy for an Organization resource. May be empty if no such policy or resource exists."##),
+                    Some(r##"Gets the access control policy for an Organization resource. May be empty if no such policy or resource exists. The `resource` field should be the organization's resource name, e.g. "organizations/123". For backward compatibility, the resource provided may also be the organization_id. This will not be supported in v1."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1_cli/organizations_get-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -1411,7 +1504,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("set-iam-policy",
-                    Some(r##"Sets the access control policy on an Organization resource. Replaces any existing policy."##),
+                    Some(r##"Sets the access control policy on an Organization resource. Replaces any existing policy. The `resource` field should be the organization's resource name, e.g. "organizations/123". For backward compatibility, the resource provided may also be the organization_id. This will not be supported in v1."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1_cli/organizations_set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -1439,7 +1532,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("test-iam-permissions",
-                    Some(r##"Returns permissions that a caller has on the specified Organization."##),
+                    Some(r##"Returns permissions that a caller has on the specified Organization. The `resource` field should be the organization's resource name, e.g. "organizations/123". For backward compatibility, the resource provided may also be the organization_id. This will not be supported in v1."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1_cli/organizations_test-iam-permissions",
                   vec![
                     (Some(r##"resource"##),
@@ -1467,12 +1560,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Updates an Organization resource identified by the specified `organization_id`."##),
+                    Some(r##"Updates an Organization resource identified by the specified resource name."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1_cli/organizations_update",
                   vec![
-                    (Some(r##"organization-id"##),
+                    (Some(r##"name"##),
                      None,
-                     Some(r##"An immutable id for the Organization that is assigned on creation. This should be omitted when creating a new Organization. This field is read-only."##),
+                     Some(r##"Output Only. The resource name of the organization. This is the organization's relative path in the API. Its format is "organizations/[organization_id]". For example, "organizations/1234"."##),
                      Some(true),
                      Some(false)),
         
@@ -1496,7 +1589,7 @@ fn main() {
                   ]),
             ]),
         
-        ("projects", "methods: 'create', 'delete', 'get', 'get-iam-policy', 'list', 'set-iam-policy', 'test-iam-permissions', 'undelete' and 'update'", vec![
+        ("projects", "methods: 'create', 'delete', 'get', 'get-ancestry', 'get-iam-policy', 'list', 'set-iam-policy', 'test-iam-permissions', 'undelete' and 'update'", vec![
             ("create",
                     Some(r##"Creates a Project resource. Initially, the Project resource is owned by its creator exclusively. The creator can later grant permission to others to read or update the Project. Several APIs are activated automatically for the Project, including Google Cloud Storage."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1_cli/projects_create",
@@ -1520,7 +1613,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("delete",
-                    Some(r##"Marks the Project identified by the specified `project_id` (for example, `my-project-123`) for deletion. This method will only affect the Project if the following criteria are met: + The Project does not have a billing account associated with it. + The Project has a lifecycle state of ACTIVE. This method changes the Project's lifecycle state from ACTIVE to DELETE_REQUESTED. The deletion starts at an unspecified time, at which point the lifecycle state changes to DELETE_IN_PROGRESS. Until the deletion completes, you can check the lifecycle state checked by retrieving the Project with GetProject, and the Project remains visible to ListProjects. However, you cannot update the project. After the deletion completes, the Project is not retrievable by the GetProject and ListProjects methods. The caller must have modify permissions for this Project."##),
+                    Some(r##"Marks the Project identified by the specified `project_id` (for example, `my-project-123`) for deletion. This method will only affect the Project if the following criteria are met: + The Project does not have a billing account associated with it. + The Project has a lifecycle state of ACTIVE. This method changes the Project's lifecycle state from ACTIVE to DELETE_REQUESTED. The deletion starts at an unspecified time, at which point the project is no longer accessible. Until the deletion completes, you can check the lifecycle state checked by retrieving the Project with GetProject, and the Project remains visible to ListProjects. However, you cannot update the project. After the deletion completes, the Project is not retrievable by the GetProject and ListProjects methods. The caller must have modify permissions for this Project."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1_cli/projects_delete",
                   vec![
                     (Some(r##"project-id"##),
@@ -1550,6 +1643,34 @@ fn main() {
                      Some(r##"The Project ID (for example, `my-project-123`). Required."##),
                      Some(true),
                      Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("get-ancestry",
+                    Some(r##"Gets a list of ancestors in the resource hierarchy for the Project identified by the specified `project_id` (for example, `my-project-123`). The caller must have read permissions for this Project."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1_cli/projects_get-ancestry",
+                  vec![
+                    (Some(r##"project-id"##),
+                     None,
+                     Some(r##"The Project ID (for example, `my-project-123`). Required."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -1608,7 +1729,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("set-iam-policy",
-                    Some(r##"Sets the IAM access control policy for the specified Project. Replaces any existing policy. The following constraints apply when using `setIamPolicy()`: + Project currently supports only `user:{emailid}` and `serviceAccount:{emailid}` members in a `Binding` of a `Policy`. + To be added as an `owner`, a user must be invited via Cloud Platform console and must accept the invitation. + Members cannot be added to more than one role in the same policy. + There must be at least one owner who has accepted the Terms of Service (ToS) agreement in the policy. Calling `setIamPolicy()` to to remove the last ToS-accepted owner from the policy will fail. + Calling this method requires enabling the App Engine Admin API. Note: Removing service accounts from policies or changing their roles can render services completely inoperable. It is important to understand how the service account is being used before removing or updating its roles."##),
+                    Some(r##"Sets the IAM access control policy for the specified Project. Replaces any existing policy. The following constraints apply when using `setIamPolicy()`: + Project does not support `allUsers` and `allAuthenticatedUsers` as `members` in a `Binding` of a `Policy`. + The owner role can be granted only to `user` and `serviceAccount`. + Service accounts can be made owners of a project directly without any restrictions. However, to be added as an owner, a user must be invited via Cloud Platform console and must accept the invitation. + A user cannot be granted the owner role using `setIamPolicy()`. The user must be granted the owner role using the Cloud Platform Console and must explicitly accept the invitation. + Invitations to grant the owner role cannot be sent using `setIamPolicy()`; they must be sent only using the Cloud Platform Console. + Membership changes that leave the project without any owners that have accepted the Terms of Service (ToS) will be rejected. + Members cannot be added to more than one role in the same policy. + There must be at least one owner who has accepted the Terms of Service (ToS) agreement in the policy. Calling `setIamPolicy()` to to remove the last ToS-accepted owner from the policy will fail. This restriction also applies to legacy projects that no longer have owners who have accepted the ToS. Edits to IAM policies will be rejected until the lack of a ToS-accepting owner is rectified. + Calling this method requires enabling the App Engine Admin API. Note: Removing service accounts from policies or changing their roles can render services completely inoperable. It is important to understand how the service account is being used before removing or updating its roles."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1_cli/projects_set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -1664,7 +1785,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("undelete",
-                    Some(r##"Restores the Project identified by the specified `project_id` (for example, `my-project-123`). You can only use this method for a Project that has a lifecycle state of DELETE_REQUESTED. After deletion starts, as indicated by a lifecycle state of DELETE_IN_PROGRESS, the Project cannot be restored. The caller must have modify permissions for this Project."##),
+                    Some(r##"Restores the Project identified by the specified `project_id` (for example, `my-project-123`). You can only use this method for a Project that has a lifecycle state of DELETE_REQUESTED. After deletion starts, the Project cannot be restored. The caller must have modify permissions for this Project."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1_cli/projects_undelete",
                   vec![
                     (Some(r##"project-id"##),
@@ -1725,7 +1846,7 @@ fn main() {
     
     let mut app = App::new("cloudresourcemanager1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.6+20160316")
+           .version("0.3.6+20160617")
            .about("The Google Cloud Resource Manager API provides methods for creating, reading, and updating project metadata.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1_cli")
            .arg(Arg::with_name("url")

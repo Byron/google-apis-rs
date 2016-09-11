@@ -381,7 +381,7 @@ pub struct About {
     /// The total number of quota bytes.
     #[serde(rename="quotaBytesTotal")]
     pub quota_bytes_total: Option<String>,
-    /// The number of remaining change ids.
+    /// The number of remaining change ids, limited to no more than 2500.
     #[serde(rename="remainingChangeIds")]
     pub remaining_change_ids: Option<String>,
     /// The ETag of the item.
@@ -1117,7 +1117,7 @@ pub struct Permission {
     pub name: Option<String>,
     /// This is always drive#permission.
     pub kind: Option<String>,
-    /// The email address or domain name for the entity. This is used during inserts and is not populated in responses. When making a drive.permissions.insert request, exactly one of the id or value fields must be specified.
+    /// The email address or domain name for the entity. This is used during inserts and is not populated in responses. When making a drive.permissions.insert request, exactly one of the id or value fields must be specified unless the permission type anyone, in which case both id and value are ignored.
     pub value: Option<String>,
     /// Additional roles for this user. Only commenter is currently allowed.
     #[serde(rename="additionalRoles")]
@@ -1130,9 +1130,9 @@ pub struct Permission {
     /// The email address of the user or group this permission refers to. This is an output-only field which is present when the permission type is user or group.
     #[serde(rename="emailAddress")]
     pub email_address: Option<String>,
-    /// A link to the profile photo, if available.
-    #[serde(rename="photoLink")]
-    pub photo_link: Option<String>,
+    /// The time at which this permission will expire (RFC 3339 date-time).
+    #[serde(rename="expirationDate")]
+    pub expiration_date: Option<String>,
     /// The primary role for this user. Allowed values are:  
     /// - owner 
     /// - reader 
@@ -1145,11 +1145,14 @@ pub struct Permission {
     /// - anyone
     #[serde(rename="type")]
     pub type_: Option<String>,
-    /// The ID of the user this permission refers to, and identical to the permissionId in the About and Files resources. When making a drive.permissions.insert request, exactly one of the id or value fields must be specified.
+    /// The ID of the user this permission refers to, and identical to the permissionId in the About and Files resources. When making a drive.permissions.insert request, exactly one of the id or value fields must be specified unless the permission type anyone, in which case both id and value are ignored.
     pub id: Option<String>,
     /// A link back to this permission.
     #[serde(rename="selfLink")]
     pub self_link: Option<String>,
+    /// A link to the profile photo, if available.
+    #[serde(rename="photoLink")]
+    pub photo_link: Option<String>,
 }
 
 impl RequestValue for Permission {}
@@ -2964,6 +2967,7 @@ impl<'a, C, A> PermissionMethods<'a, C, A> {
             _file_id: file_id.to_string(),
             _permission_id: permission_id.to_string(),
             _transfer_ownership: Default::default(),
+            _remove_expiration: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3003,6 +3007,7 @@ impl<'a, C, A> PermissionMethods<'a, C, A> {
             _file_id: file_id.to_string(),
             _permission_id: permission_id.to_string(),
             _transfer_ownership: Default::default(),
+            _remove_expiration: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -15066,6 +15071,7 @@ impl<'a, C, A> PermissionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.permissions().patch(req, "fileId", "permissionId")
 ///              .transfer_ownership(false)
+///              .remove_expiration(true)
 ///              .doit();
 /// # }
 /// ```
@@ -15077,6 +15083,7 @@ pub struct PermissionPatchCall<'a, C, A>
     _file_id: String,
     _permission_id: String,
     _transfer_ownership: Option<bool>,
+    _remove_expiration: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -15098,13 +15105,16 @@ impl<'a, C, A> PermissionPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "drive.permissions.patch",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
         params.push(("fileId", self._file_id.to_string()));
         params.push(("permissionId", self._permission_id.to_string()));
         if let Some(value) = self._transfer_ownership {
             params.push(("transferOwnership", value.to_string()));
         }
-        for &field in ["alt", "fileId", "permissionId", "transferOwnership"].iter() {
+        if let Some(value) = self._remove_expiration {
+            params.push(("removeExpiration", value.to_string()));
+        }
+        for &field in ["alt", "fileId", "permissionId", "transferOwnership", "removeExpiration"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -15268,6 +15278,13 @@ impl<'a, C, A> PermissionPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// Sets the *transfer ownership* query property to the given value.
     pub fn transfer_ownership(mut self, new_value: bool) -> PermissionPatchCall<'a, C, A> {
         self._transfer_ownership = Some(new_value);
+        self
+    }
+    /// Whether to remove the expiration date.
+    ///
+    /// Sets the *remove expiration* query property to the given value.
+    pub fn remove_expiration(mut self, new_value: bool) -> PermissionPatchCall<'a, C, A> {
+        self._remove_expiration = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -15591,6 +15608,7 @@ impl<'a, C, A> PermissionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.permissions().update(req, "fileId", "permissionId")
 ///              .transfer_ownership(true)
+///              .remove_expiration(true)
 ///              .doit();
 /// # }
 /// ```
@@ -15602,6 +15620,7 @@ pub struct PermissionUpdateCall<'a, C, A>
     _file_id: String,
     _permission_id: String,
     _transfer_ownership: Option<bool>,
+    _remove_expiration: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -15623,13 +15642,16 @@ impl<'a, C, A> PermissionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         };
         dlg.begin(MethodInfo { id: "drive.permissions.update",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
         params.push(("fileId", self._file_id.to_string()));
         params.push(("permissionId", self._permission_id.to_string()));
         if let Some(value) = self._transfer_ownership {
             params.push(("transferOwnership", value.to_string()));
         }
-        for &field in ["alt", "fileId", "permissionId", "transferOwnership"].iter() {
+        if let Some(value) = self._remove_expiration {
+            params.push(("removeExpiration", value.to_string()));
+        }
+        for &field in ["alt", "fileId", "permissionId", "transferOwnership", "removeExpiration"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -15793,6 +15815,13 @@ impl<'a, C, A> PermissionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// Sets the *transfer ownership* query property to the given value.
     pub fn transfer_ownership(mut self, new_value: bool) -> PermissionUpdateCall<'a, C, A> {
         self._transfer_ownership = Some(new_value);
+        self
+    }
+    /// Whether to remove the expiration date.
+    ///
+    /// Sets the *remove expiration* query property to the given value.
+    pub fn remove_expiration(mut self, new_value: bool) -> PermissionUpdateCall<'a, C, A> {
+        self._remove_expiration = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -16362,11 +16391,11 @@ impl<'a, C, A> PermissionGetIdForEmailCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.changes().watch(req)
-///              .start_change_id("et")
-///              .spaces("et")
-///              .page_token("vero")
-///              .max_results(-36)
-///              .include_subscribed(true)
+///              .start_change_id("vero")
+///              .spaces("ut")
+///              .page_token("sed")
+///              .max_results(-21)
+///              .include_subscribed(false)
 ///              .include_deleted(true)
 ///              .doit();
 /// # }
@@ -16661,11 +16690,11 @@ impl<'a, C, A> ChangeWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.changes().list()
-///              .start_change_id("ipsum")
-///              .spaces("justo")
-///              .page_token("dolore")
-///              .max_results(-26)
-///              .include_subscribed(false)
+///              .start_change_id("dolore")
+///              .spaces("vero")
+///              .page_token("dolor")
+///              .max_results(-58)
+///              .include_subscribed(true)
 ///              .include_deleted(false)
 ///              .doit();
 /// # }
@@ -17176,7 +17205,7 @@ impl<'a, C, A> ChangeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.properties().patch(req, "fileId", "propertyKey")
-///              .visibility("sed")
+///              .visibility("invidunt")
 ///              .doit();
 /// # }
 /// ```
@@ -17460,7 +17489,7 @@ impl<'a, C, A> PropertyPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.properties().delete("fileId", "propertyKey")
-///              .visibility("rebum.")
+///              .visibility("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -18215,7 +18244,7 @@ impl<'a, C, A> PropertyListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.properties().update(req, "fileId", "propertyKey")
-///              .visibility("sea")
+///              .visibility("At")
 ///              .doit();
 /// # }
 /// ```
@@ -18499,7 +18528,7 @@ impl<'a, C, A> PropertyUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.properties().get("fileId", "propertyKey")
-///              .visibility("sea")
+///              .visibility("diam")
 ///              .doit();
 /// # }
 /// ```

@@ -24,21 +24,22 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Resource Manager* API at revision *20160316*. The CLI is at version *0.3.6*.
+This documentation was generated from the *Cloud Resource Manager* API at revision *20160617*. The CLI is at version *0.3.6*.
 
 ```bash
 cloudresourcemanager1-beta1 [options]
         organizations
-                get <organization-id> [-p <v>]... [-o <out>]
+                get <name> [-p <v>]... [-o <out>]
                 get-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]
                 set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
-                update <organization-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <name> (-r <kv>)... [-p <v>]... [-o <out>]
         projects
                 create (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <project-id> [-p <v>]... [-o <out>]
                 get <project-id> [-p <v>]... [-o <out>]
+                get-ancestry <project-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 get-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]
                 set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]

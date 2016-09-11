@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *proximitybeacon* API at revision *20150729*. The CLI is at version *0.3.6*.
+This documentation was generated from the *proximitybeacon* API at revision *20160429*. The CLI is at version *0.3.6*.
 
 ```bash
 proximitybeacon1-beta1 [options]
@@ -43,11 +43,18 @@ proximitybeacon1-beta1 [options]
                 list [-p <v>]... [-o <out>]
                 register (-r <kv>)... [-p <v>]... [-o <out>]
                 update <beacon-name> (-r <kv>)... [-p <v>]... [-o <out>]
+        methods
+                get-eidparams [-p <v>]... [-o <out>]
         namespaces
                 list [-p <v>]... [-o <out>]
+                update <namespace-name> (-r <kv>)... [-p <v>]... [-o <out>]
   proximitybeacon1-beta1 --help
 
 Configuration:
+  [--scope <url>]...
+            Specify the authentication a method should be executed in. Each scope
+            requires the user to grant this application permission to use it.
+            If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to
             a user-writable directory that we will create during the first invocation.

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *dataproc* crate version *0.1.14+20160219*, where *20160219* is the exact revision of the *dataproc:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
+//! This documentation was generated from *dataproc* crate version *0.1.14+20160503*, where *20160503* is the exact revision of the *dataproc:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
 //! 
 //! Everything else about the *dataproc* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/dataproc/).
@@ -11,19 +11,9 @@
 //! 
 //! Handle the following *Resources* with ease from the central [hub](struct.Dataproc.html) ... 
 //! 
-//! * [media](struct.Media.html)
-//!  * [*download*](struct.MediaDownloadCall.html) and [*upload*](struct.MediaUploadCall.html)
 //! * projects
 //!  * [*regions clusters create*](struct.ProjectRegionClusterCreateCall.html), [*regions clusters delete*](struct.ProjectRegionClusterDeleteCall.html), [*regions clusters diagnose*](struct.ProjectRegionClusterDiagnoseCall.html), [*regions clusters get*](struct.ProjectRegionClusterGetCall.html), [*regions clusters list*](struct.ProjectRegionClusterListCall.html), [*regions clusters patch*](struct.ProjectRegionClusterPatchCall.html), [*regions jobs cancel*](struct.ProjectRegionJobCancelCall.html), [*regions jobs delete*](struct.ProjectRegionJobDeleteCall.html), [*regions jobs get*](struct.ProjectRegionJobGetCall.html), [*regions jobs list*](struct.ProjectRegionJobListCall.html), [*regions jobs submit*](struct.ProjectRegionJobSubmitCall.html), [*regions operations cancel*](struct.ProjectRegionOperationCancelCall.html), [*regions operations delete*](struct.ProjectRegionOperationDeleteCall.html), [*regions operations get*](struct.ProjectRegionOperationGetCall.html) and [*regions operations list*](struct.ProjectRegionOperationListCall.html)
 //! 
-//! 
-//! Upload supported by ...
-//! 
-//! * [*upload media*](struct.MediaUploadCall.html)
-//! 
-//! Download supported by ...
-//! 
-//! * [*download media*](struct.MediaDownloadCall.html)
 //! 
 //! 
 //! 

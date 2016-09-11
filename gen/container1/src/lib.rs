@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *container* crate version *0.1.14+20160321*, where *20160321* is the exact revision of the *container:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
+//! This documentation was generated from *container* crate version *0.1.14+20160421*, where *20160421* is the exact revision of the *container:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
 //! 
 //! Everything else about the *container* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/container-engine/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.Container.html) ... 
 //! 
 //! * projects
-//!  * [*zones clusters create*](struct.ProjectZoneClusterCreateCall.html), [*zones clusters delete*](struct.ProjectZoneClusterDeleteCall.html), [*zones clusters get*](struct.ProjectZoneClusterGetCall.html), [*zones clusters list*](struct.ProjectZoneClusterListCall.html), [*zones clusters update*](struct.ProjectZoneClusterUpdateCall.html), [*zones get serverconfig*](struct.ProjectZoneGetServerconfigCall.html), [*zones operations get*](struct.ProjectZoneOperationGetCall.html) and [*zones operations list*](struct.ProjectZoneOperationListCall.html)
+//!  * [*zones clusters create*](struct.ProjectZoneClusterCreateCall.html), [*zones clusters delete*](struct.ProjectZoneClusterDeleteCall.html), [*zones clusters get*](struct.ProjectZoneClusterGetCall.html), [*zones clusters list*](struct.ProjectZoneClusterListCall.html), [*zones clusters node pools create*](struct.ProjectZoneClusterNodePoolCreateCall.html), [*zones clusters node pools delete*](struct.ProjectZoneClusterNodePoolDeleteCall.html), [*zones clusters node pools get*](struct.ProjectZoneClusterNodePoolGetCall.html), [*zones clusters node pools list*](struct.ProjectZoneClusterNodePoolListCall.html), [*zones clusters update*](struct.ProjectZoneClusterUpdateCall.html), [*zones get serverconfig*](struct.ProjectZoneGetServerconfigCall.html), [*zones operations get*](struct.ProjectZoneOperationGetCall.html) and [*zones operations list*](struct.ProjectZoneOperationListCall.html)
 //! 
 //! 
 //! 
@@ -47,9 +47,11 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.projects().zones_clusters_update(...).doit()
-//! let r = hub.projects().zones_operations_get(...).doit()
+//! let r = hub.projects().zones_clusters_node_pools_create(...).doit()
 //! let r = hub.projects().zones_clusters_delete(...).doit()
+//! let r = hub.projects().zones_operations_get(...).doit()
+//! let r = hub.projects().zones_clusters_node_pools_delete(...).doit()
+//! let r = hub.projects().zones_clusters_update(...).doit()
 //! let r = hub.projects().zones_clusters_create(...).doit()
 //! ```
 //! 
@@ -75,7 +77,7 @@
 //! extern crate hyper;
 //! extern crate yup_oauth2 as oauth2;
 //! extern crate google_container1 as container1;
-//! use container1::UpdateClusterRequest;
+//! use container1::CreateNodePoolRequest;
 //! use container1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
@@ -97,12 +99,12 @@
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req = UpdateClusterRequest::default();
+//! let mut req = CreateNodePoolRequest::default();
 //! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.projects().zones_clusters_update(req, "projectId", "zone", "clusterId")
+//! let result = hub.projects().zones_clusters_node_pools_create(req, "projectId", "zone", "clusterId")
 //!              .doit();
 //! 
 //! match result {

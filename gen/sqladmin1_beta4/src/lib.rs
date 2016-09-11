@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *SQL Admin* crate version *0.1.14+20160321*, where *20160321* is the exact revision of the *sqladmin:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
+//! This documentation was generated from *SQL Admin* crate version *0.1.14+20160907*, where *20160907* is the exact revision of the *sqladmin:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
 //! 
 //! Everything else about the *SQL Admin* *v1_beta4* API can be found at the
 //! [official documentation site](https://cloud.google.com/sql/docs/reference/latest).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.SQLAdmin.html) ... 
 //! 
 //! * [backup runs](struct.BackupRun.html)
-//!  * [*delete*](struct.BackupRunDeleteCall.html), [*get*](struct.BackupRunGetCall.html) and [*list*](struct.BackupRunListCall.html)
+//!  * [*delete*](struct.BackupRunDeleteCall.html), [*get*](struct.BackupRunGetCall.html), [*insert*](struct.BackupRunInsertCall.html) and [*list*](struct.BackupRunListCall.html)
 //! * [databases](struct.Database.html)
 //!  * [*delete*](struct.DatabaseDeleteCall.html), [*get*](struct.DatabaseGetCall.html), [*insert*](struct.DatabaseInsertCall.html), [*list*](struct.DatabaseListCall.html), [*patch*](struct.DatabasePatchCall.html) and [*update*](struct.DatabaseUpdateCall.html)
 //! * [flags](struct.Flag.html)
@@ -82,6 +82,7 @@
 //! let r = hub.users().insert(...).doit()
 //! let r = hub.instances().insert(...).doit()
 //! let r = hub.instances().import(...).doit()
+//! let r = hub.backup_runs().insert(...).doit()
 //! let r = hub.instances().update(...).doit()
 //! let r = hub.instances().restart(...).doit()
 //! let r = hub.instances().export(...).doit()

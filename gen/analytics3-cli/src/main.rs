@@ -4328,6 +4328,441 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _management_remarketing_audience_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.management().remarketing_audience_get(opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("remarketing-audience-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _management_remarketing_audience_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "internal-web-property-id" => Some(("internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "linked-views" => Some(("linkedViews", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "state-based-audience-definition.include-conditions.days-to-look-back" => Some(("stateBasedAudienceDefinition.includeConditions.daysToLookBack", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "state-based-audience-definition.include-conditions.segment" => Some(("stateBasedAudienceDefinition.includeConditions.segment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state-based-audience-definition.include-conditions.kind" => Some(("stateBasedAudienceDefinition.includeConditions.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state-based-audience-definition.include-conditions.is-smart-list" => Some(("stateBasedAudienceDefinition.includeConditions.isSmartList", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "state-based-audience-definition.include-conditions.membership-duration-days" => Some(("stateBasedAudienceDefinition.includeConditions.membershipDurationDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "state-based-audience-definition.exclude-conditions.segment" => Some(("stateBasedAudienceDefinition.excludeConditions.segment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state-based-audience-definition.exclude-conditions.exclusion-duration" => Some(("stateBasedAudienceDefinition.excludeConditions.exclusionDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "audience-type" => Some(("audienceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "audience-definition.include-conditions.days-to-look-back" => Some(("audienceDefinition.includeConditions.daysToLookBack", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "audience-definition.include-conditions.segment" => Some(("audienceDefinition.includeConditions.segment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "audience-definition.include-conditions.kind" => Some(("audienceDefinition.includeConditions.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "audience-definition.include-conditions.is-smart-list" => Some(("audienceDefinition.includeConditions.isSmartList", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "audience-definition.include-conditions.membership-duration-days" => Some(("audienceDefinition.includeConditions.membershipDurationDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "audience-definition", "audience-type", "created", "days-to-look-back", "description", "exclude-conditions", "exclusion-duration", "id", "include-conditions", "internal-web-property-id", "is-smart-list", "kind", "linked-views", "membership-duration-days", "name", "segment", "state-based-audience-definition", "updated", "web-property-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::RemarketingAudience = json::value::from_value(object).unwrap();
+        let mut call = self.hub.management().remarketing_audience_insert(request, opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _management_remarketing_audience_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.management().remarketing_audience_list(opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "type" => {
+                    call = call.type_(value.unwrap_or(""));
+                },
+                "start-index" => {
+                    call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
+                },
+                "max-results" => {
+                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["start-index", "max-results", "type"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _management_remarketing_audience_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "internal-web-property-id" => Some(("internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "linked-views" => Some(("linkedViews", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "state-based-audience-definition.include-conditions.days-to-look-back" => Some(("stateBasedAudienceDefinition.includeConditions.daysToLookBack", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "state-based-audience-definition.include-conditions.segment" => Some(("stateBasedAudienceDefinition.includeConditions.segment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state-based-audience-definition.include-conditions.kind" => Some(("stateBasedAudienceDefinition.includeConditions.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state-based-audience-definition.include-conditions.is-smart-list" => Some(("stateBasedAudienceDefinition.includeConditions.isSmartList", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "state-based-audience-definition.include-conditions.membership-duration-days" => Some(("stateBasedAudienceDefinition.includeConditions.membershipDurationDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "state-based-audience-definition.exclude-conditions.segment" => Some(("stateBasedAudienceDefinition.excludeConditions.segment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state-based-audience-definition.exclude-conditions.exclusion-duration" => Some(("stateBasedAudienceDefinition.excludeConditions.exclusionDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "audience-type" => Some(("audienceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "audience-definition.include-conditions.days-to-look-back" => Some(("audienceDefinition.includeConditions.daysToLookBack", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "audience-definition.include-conditions.segment" => Some(("audienceDefinition.includeConditions.segment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "audience-definition.include-conditions.kind" => Some(("audienceDefinition.includeConditions.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "audience-definition.include-conditions.is-smart-list" => Some(("audienceDefinition.includeConditions.isSmartList", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "audience-definition.include-conditions.membership-duration-days" => Some(("audienceDefinition.includeConditions.membershipDurationDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "audience-definition", "audience-type", "created", "days-to-look-back", "description", "exclude-conditions", "exclusion-duration", "id", "include-conditions", "internal-web-property-id", "is-smart-list", "kind", "linked-views", "membership-duration-days", "name", "segment", "state-based-audience-definition", "updated", "web-property-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::RemarketingAudience = json::value::from_value(object).unwrap();
+        let mut call = self.hub.management().remarketing_audience_patch(request, opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("remarketing-audience-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _management_remarketing_audience_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "internal-web-property-id" => Some(("internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "linked-views" => Some(("linkedViews", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "state-based-audience-definition.include-conditions.days-to-look-back" => Some(("stateBasedAudienceDefinition.includeConditions.daysToLookBack", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "state-based-audience-definition.include-conditions.segment" => Some(("stateBasedAudienceDefinition.includeConditions.segment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state-based-audience-definition.include-conditions.kind" => Some(("stateBasedAudienceDefinition.includeConditions.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state-based-audience-definition.include-conditions.is-smart-list" => Some(("stateBasedAudienceDefinition.includeConditions.isSmartList", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "state-based-audience-definition.include-conditions.membership-duration-days" => Some(("stateBasedAudienceDefinition.includeConditions.membershipDurationDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "state-based-audience-definition.exclude-conditions.segment" => Some(("stateBasedAudienceDefinition.excludeConditions.segment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state-based-audience-definition.exclude-conditions.exclusion-duration" => Some(("stateBasedAudienceDefinition.excludeConditions.exclusionDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "audience-type" => Some(("audienceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "audience-definition.include-conditions.days-to-look-back" => Some(("audienceDefinition.includeConditions.daysToLookBack", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "audience-definition.include-conditions.segment" => Some(("audienceDefinition.includeConditions.segment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "audience-definition.include-conditions.kind" => Some(("audienceDefinition.includeConditions.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "audience-definition.include-conditions.is-smart-list" => Some(("audienceDefinition.includeConditions.isSmartList", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "audience-definition.include-conditions.membership-duration-days" => Some(("audienceDefinition.includeConditions.membershipDurationDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "audience-definition", "audience-type", "created", "days-to-look-back", "description", "exclude-conditions", "exclusion-duration", "id", "include-conditions", "internal-web-property-id", "is-smart-list", "kind", "linked-views", "membership-duration-days", "name", "segment", "state-based-audience-definition", "updated", "web-property-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::RemarketingAudience = json::value::from_value(object).unwrap();
+        let mut call = self.hub.management().remarketing_audience_update(request, opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("remarketing-audience-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _management_segments_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.management().segments_list();
@@ -6441,6 +6876,21 @@ impl<'n> Engine<'n> {
                     ("profiles-update", Some(opt)) => {
                         call_result = self._management_profiles_update(opt, dry_run, &mut err);
                     },
+                    ("remarketing-audience-get", Some(opt)) => {
+                        call_result = self._management_remarketing_audience_get(opt, dry_run, &mut err);
+                    },
+                    ("remarketing-audience-insert", Some(opt)) => {
+                        call_result = self._management_remarketing_audience_insert(opt, dry_run, &mut err);
+                    },
+                    ("remarketing-audience-list", Some(opt)) => {
+                        call_result = self._management_remarketing_audience_list(opt, dry_run, &mut err);
+                    },
+                    ("remarketing-audience-patch", Some(opt)) => {
+                        call_result = self._management_remarketing_audience_patch(opt, dry_run, &mut err);
+                    },
+                    ("remarketing-audience-update", Some(opt)) => {
+                        call_result = self._management_remarketing_audience_update(opt, dry_run, &mut err);
+                    },
                     ("segments-list", Some(opt)) => {
                         call_result = self._management_segments_list(opt, dry_run, &mut err);
                     },
@@ -6735,7 +7185,7 @@ fn main() {
                   ]),
             ]),
         
-        ("management", "methods: 'account-summaries-list', 'account-user-links-delete', 'account-user-links-insert', 'account-user-links-list', 'account-user-links-update', 'accounts-list', 'custom-data-sources-list', 'custom-dimensions-get', 'custom-dimensions-insert', 'custom-dimensions-list', 'custom-dimensions-patch', 'custom-dimensions-update', 'custom-metrics-get', 'custom-metrics-insert', 'custom-metrics-list', 'custom-metrics-patch', 'custom-metrics-update', 'experiments-delete', 'experiments-get', 'experiments-insert', 'experiments-list', 'experiments-patch', 'experiments-update', 'filters-delete', 'filters-get', 'filters-insert', 'filters-list', 'filters-patch', 'filters-update', 'goals-get', 'goals-insert', 'goals-list', 'goals-patch', 'goals-update', 'profile-filter-links-delete', 'profile-filter-links-get', 'profile-filter-links-insert', 'profile-filter-links-list', 'profile-filter-links-patch', 'profile-filter-links-update', 'profile-user-links-delete', 'profile-user-links-insert', 'profile-user-links-list', 'profile-user-links-update', 'profiles-delete', 'profiles-get', 'profiles-insert', 'profiles-list', 'profiles-patch', 'profiles-update', 'segments-list', 'unsampled-reports-delete', 'unsampled-reports-get', 'unsampled-reports-insert', 'unsampled-reports-list', 'uploads-delete-upload-data', 'uploads-get', 'uploads-list', 'uploads-upload-data', 'web-property-ad-words-links-delete', 'web-property-ad-words-links-get', 'web-property-ad-words-links-insert', 'web-property-ad-words-links-list', 'web-property-ad-words-links-patch', 'web-property-ad-words-links-update', 'webproperties-get', 'webproperties-insert', 'webproperties-list', 'webproperties-patch', 'webproperties-update', 'webproperty-user-links-delete', 'webproperty-user-links-insert', 'webproperty-user-links-list' and 'webproperty-user-links-update'", vec![
+        ("management", "methods: 'account-summaries-list', 'account-user-links-delete', 'account-user-links-insert', 'account-user-links-list', 'account-user-links-update', 'accounts-list', 'custom-data-sources-list', 'custom-dimensions-get', 'custom-dimensions-insert', 'custom-dimensions-list', 'custom-dimensions-patch', 'custom-dimensions-update', 'custom-metrics-get', 'custom-metrics-insert', 'custom-metrics-list', 'custom-metrics-patch', 'custom-metrics-update', 'experiments-delete', 'experiments-get', 'experiments-insert', 'experiments-list', 'experiments-patch', 'experiments-update', 'filters-delete', 'filters-get', 'filters-insert', 'filters-list', 'filters-patch', 'filters-update', 'goals-get', 'goals-insert', 'goals-list', 'goals-patch', 'goals-update', 'profile-filter-links-delete', 'profile-filter-links-get', 'profile-filter-links-insert', 'profile-filter-links-list', 'profile-filter-links-patch', 'profile-filter-links-update', 'profile-user-links-delete', 'profile-user-links-insert', 'profile-user-links-list', 'profile-user-links-update', 'profiles-delete', 'profiles-get', 'profiles-insert', 'profiles-list', 'profiles-patch', 'profiles-update', 'remarketing-audience-get', 'remarketing-audience-insert', 'remarketing-audience-list', 'remarketing-audience-patch', 'remarketing-audience-update', 'segments-list', 'unsampled-reports-delete', 'unsampled-reports-get', 'unsampled-reports-insert', 'unsampled-reports-list', 'uploads-delete-upload-data', 'uploads-get', 'uploads-list', 'uploads-upload-data', 'web-property-ad-words-links-delete', 'web-property-ad-words-links-get', 'web-property-ad-words-links-insert', 'web-property-ad-words-links-list', 'web-property-ad-words-links-patch', 'web-property-ad-words-links-update', 'webproperties-get', 'webproperties-insert', 'webproperties-list', 'webproperties-patch', 'webproperties-update', 'webproperty-user-links-delete', 'webproperty-user-links-insert', 'webproperty-user-links-list' and 'webproperty-user-links-update'", vec![
             ("account-summaries-list",
                     Some(r##"Lists account summaries (lightweight tree comprised of accounts/properties/profiles) to which the user has access."##),
                     "Details at http://byron.github.io/google-apis-rs/google_analytics3_cli/management_account-summaries-list",
@@ -8472,6 +8922,182 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("remarketing-audience-get",
+                    Some(r##"Gets remarketing audiences to which the user has access."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_analytics3_cli/management_remarketing-audience-get",
+                  vec![
+                    (Some(r##"account-id"##),
+                     None,
+                     Some(r##"Account ID for the remarketing audience to retrieve."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"web-property-id"##),
+                     None,
+                     Some(r##"Web property ID for the remarketing audience to retrieve."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"remarketing-audience-id"##),
+                     None,
+                     Some(r##"The ID to retrieve the Remarketing Audience for."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("remarketing-audience-insert",
+                    Some(r##"Creates a new remarketing audiences."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_analytics3_cli/management_remarketing-audience-insert",
+                  vec![
+                    (Some(r##"account-id"##),
+                     None,
+                     Some(r##"Account ID to create the remarketing audience for."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"web-property-id"##),
+                     None,
+                     Some(r##"Web property ID to create the remarketing audience for."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("remarketing-audience-list",
+                    Some(r##"Lists remarketing audiences to which the user has access."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_analytics3_cli/management_remarketing-audience-list",
+                  vec![
+                    (Some(r##"account-id"##),
+                     None,
+                     Some(r##"Account ID for the remarketing audience to retrieve."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"web-property-id"##),
+                     None,
+                     Some(r##"Web property ID for the remarketing audience to retrieve."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("remarketing-audience-patch",
+                    Some(r##"Updates an existing remarketing audiences. This method supports patch semantics."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_analytics3_cli/management_remarketing-audience-patch",
+                  vec![
+                    (Some(r##"account-id"##),
+                     None,
+                     Some(r##"Account ID for the remarketing audience to update."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"web-property-id"##),
+                     None,
+                     Some(r##"Web property ID for the remarketing audience to update."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"remarketing-audience-id"##),
+                     None,
+                     Some(r##"Remarketing audience ID of the remarketing audience to update."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("remarketing-audience-update",
+                    Some(r##"Updates an existing remarketing audiences."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_analytics3_cli/management_remarketing-audience-update",
+                  vec![
+                    (Some(r##"account-id"##),
+                     None,
+                     Some(r##"Account ID for the remarketing audience to update."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"web-property-id"##),
+                     None,
+                     Some(r##"Web property ID for the remarketing audience to update."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"remarketing-audience-id"##),
+                     None,
+                     Some(r##"Remarketing audience ID of the remarketing audience to update."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("segments-list",
                     Some(r##"Lists segments to which the user has access."##),
                     "Details at http://byron.github.io/google-apis-rs/google_analytics3_cli/management_segments-list",
@@ -9320,7 +9946,7 @@ fn main() {
     
     let mut app = App::new("analytics3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.6+20160308")
+           .version("0.3.6+20160805")
            .about("Views and manages your Google Analytics data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_analytics3_cli")
            .arg(Arg::with_name("url")

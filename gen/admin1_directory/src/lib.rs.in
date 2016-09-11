@@ -518,6 +518,8 @@ impl ResponseResult for Privileges {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Member {
+    /// Status of member (Immutable)
+    pub status: Option<String>,
     /// Kind of resource this is.
     pub kind: Option<String>,
     /// ETag of the resource.
@@ -1962,7 +1964,7 @@ pub struct Aliases {
     /// ETag of the resource.
     pub etag: Option<String>,
     /// List of alias objects.
-    pub aliases: Option<Vec<Alias>>,
+    pub aliases: Option<Vec<String>>,
 }
 
 impl ResponseResult for Aliases {}
@@ -2171,7 +2173,7 @@ impl<'a, C, A> CustomerMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrives a customer.
+    /// Retrieves a customer.
     /// 
     /// # Arguments
     ///
@@ -3765,7 +3767,7 @@ impl<'a, C, A> DomainMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrives a domain of the customer.
+    /// Retrieves a domain of the customer.
     /// 
     /// # Arguments
     ///
@@ -5582,7 +5584,7 @@ impl<'a, C, A> CustomerPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
-/// Retrives a customer.
+/// Retrieves a customer.
 ///
 /// A builder for the *get* method supported by a *customer* resource.
 /// It is not used directly, but through a `CustomerMethods` instance.
@@ -19715,7 +19717,7 @@ impl<'a, C, A> DomainListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 }
 
 
-/// Retrives a domain of the customer.
+/// Retrieves a domain of the customer.
 ///
 /// A builder for the *get* method supported by a *domain* resource.
 /// It is not used directly, but through a `DomainMethods` instance.

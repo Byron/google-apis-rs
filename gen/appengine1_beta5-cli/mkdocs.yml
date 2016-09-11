@@ -1,4 +1,4 @@
-site_name: appengine v0.3.6+20160314
+site_name: appengine v0.3.6+20160802
 site_url: http://byron.github.io/google-apis-rs/google-appengine1_beta5-cli
 site_description: Write integrating applications with bcore
 
@@ -9,7 +9,10 @@ site_dir: build_html
 
 pages:
 - ['index.md', 'Home']
+- ['apps_create.md', 'Apps', 'Create']
 - ['apps_get.md', 'Apps', 'Get']
+- ['apps_locations-get.md', 'Apps', 'Locations Get']
+- ['apps_locations-list.md', 'Apps', 'Locations List']
 - ['apps_operations-get.md', 'Apps', 'Operations Get']
 - ['apps_operations-list.md', 'Apps', 'Operations List']
 - ['apps_services-delete.md', 'Apps', 'Services Delete']
@@ -19,6 +22,10 @@ pages:
 - ['apps_services-versions-create.md', 'Apps', 'Services Versions Create']
 - ['apps_services-versions-delete.md', 'Apps', 'Services Versions Delete']
 - ['apps_services-versions-get.md', 'Apps', 'Services Versions Get']
+- ['apps_services-versions-instances-debug.md', 'Apps', 'Services Versions Instances Debug']
+- ['apps_services-versions-instances-delete.md', 'Apps', 'Services Versions Instances Delete']
+- ['apps_services-versions-instances-get.md', 'Apps', 'Services Versions Instances Get']
+- ['apps_services-versions-instances-list.md', 'Apps', 'Services Versions Instances List']
 - ['apps_services-versions-list.md', 'Apps', 'Services Versions List']
 - ['apps_services-versions-patch.md', 'Apps', 'Services Versions Patch']
 

@@ -38,7 +38,7 @@ enum DoitError {
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::Clouddebugger<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
+    hub: api::CloudDebugger<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
@@ -750,7 +750,7 @@ impl<'n> Engine<'n> {
             };
         let engine = Engine {
             opt: opt,
-            hub: api::Clouddebugger::new(client, auth),
+            hub: api::CloudDebugger::new(client, auth),
             gp: vec!["$-xgafv", "access-token", "alt", "bearer-token", "callback", "fields", "key", "oauth-token", "pp", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
                     ("$-xgafv", "$.xgafv"),
@@ -992,7 +992,7 @@ fn main() {
     
     let mut app = App::new("clouddebugger2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.6+20160309")
+           .version("0.3.6+20160810")
            .about("Examines the call stack and variables of a running application without stopping or slowing it down.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_clouddebugger2_cli")
            .arg(Arg::with_name("url")

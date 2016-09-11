@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Shopping Content* crate version *0.1.14+20160331*, where *20160331* is the exact revision of the *content:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
+//! This documentation was generated from *Shopping Content* crate version *0.1.14+20160905*, where *20160905* is the exact revision of the *content:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
 //! 
 //! Everything else about the *Shopping Content* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/shopping-content).
@@ -31,6 +31,8 @@
 //!  * [*custombatch*](struct.ProductCustombatchCall.html), [*delete*](struct.ProductDeleteCall.html), [*get*](struct.ProductGetCall.html), [*insert*](struct.ProductInsertCall.html) and [*list*](struct.ProductListCall.html)
 //! * productstatuses
 //!  * [*custombatch*](struct.ProductstatuseCustombatchCall.html), [*get*](struct.ProductstatuseGetCall.html) and [*list*](struct.ProductstatuseListCall.html)
+//! * shippingsettings
+//!  * [*custombatch*](struct.ShippingsettingCustombatchCall.html), [*get*](struct.ShippingsettingGetCall.html), [*getsupportedcarriers*](struct.ShippingsettingGetsupportedcarrierCall.html), [*list*](struct.ShippingsettingListCall.html), [*patch*](struct.ShippingsettingPatchCall.html) and [*update*](struct.ShippingsettingUpdateCall.html)
 //! 
 //! 
 //! 
@@ -126,13 +128,13 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.orders().list("merchantId")
-//!              .add_statuses("dolor")
-//!              .placed_date_start("diam")
-//!              .placed_date_end("kasd")
-//!              .page_token("invidunt")
+//!              .add_statuses("sit")
+//!              .placed_date_start("takimata")
+//!              .placed_date_end("elitr")
+//!              .page_token("nonumy")
 //!              .order_by("rebum.")
-//!              .max_results(50)
-//!              .acknowledged(false)
+//!              .max_results(95)
+//!              .acknowledged(true)
 //!              .doit();
 //! 
 //! match result {

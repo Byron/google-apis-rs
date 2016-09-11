@@ -3,18 +3,18 @@ DO NOT EDIT !
 This file was generated automatically from 'src/mako/api/README.md.mako'
 DO NOT EDIT !
 -->
-The `google-playmoviespartner1` library allows access to all features of the *Google playmoviespartner* service.
+The `google-playmoviespartner1` library allows access to all features of the *Google Play Movies* service.
 
-This documentation was generated from *playmoviespartner* crate version *0.1.14+20150812*, where *20150812* is the exact revision of the *playmoviespartner:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
+This documentation was generated from *Play Movies* crate version *0.1.14+20160518*, where *20160518* is the exact revision of the *playmoviespartner:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
 
-Everything else about the *playmoviespartner* *v1* API can be found at the
+Everything else about the *Play Movies* *v1* API can be found at the
 [official documentation site](https://developers.google.com/playmoviespartner/).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google_playmoviespartner1/struct.Playmoviespartner.html) ... 
+Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google_playmoviespartner1/struct.PlayMovies.html) ... 
 
 * accounts
- * [*avails list*](http://byron.github.io/google-apis-rs/google_playmoviespartner1/struct.AccountAvailListCall.html), [*experience locales get*](http://byron.github.io/google-apis-rs/google_playmoviespartner1/struct.AccountExperienceLocaleGetCall.html), [*experience locales list*](http://byron.github.io/google-apis-rs/google_playmoviespartner1/struct.AccountExperienceLocaleListCall.html), [*orders get*](http://byron.github.io/google-apis-rs/google_playmoviespartner1/struct.AccountOrderGetCall.html), [*orders list*](http://byron.github.io/google-apis-rs/google_playmoviespartner1/struct.AccountOrderListCall.html), [*store infos country get*](http://byron.github.io/google-apis-rs/google_playmoviespartner1/struct.AccountStoreInfoCountryGetCall.html) and [*store infos list*](http://byron.github.io/google-apis-rs/google_playmoviespartner1/struct.AccountStoreInfoListCall.html)
+ * [*avails get*](http://byron.github.io/google-apis-rs/google_playmoviespartner1/struct.AccountAvailGetCall.html), [*avails list*](http://byron.github.io/google-apis-rs/google_playmoviespartner1/struct.AccountAvailListCall.html), [*components list*](http://byron.github.io/google-apis-rs/google_playmoviespartner1/struct.AccountComponentListCall.html), [*components type get*](http://byron.github.io/google-apis-rs/google_playmoviespartner1/struct.AccountComponentTypeGetCall.html), [*experience locales get*](http://byron.github.io/google-apis-rs/google_playmoviespartner1/struct.AccountExperienceLocaleGetCall.html), [*experience locales list*](http://byron.github.io/google-apis-rs/google_playmoviespartner1/struct.AccountExperienceLocaleListCall.html), [*orders get*](http://byron.github.io/google-apis-rs/google_playmoviespartner1/struct.AccountOrderGetCall.html), [*orders list*](http://byron.github.io/google-apis-rs/google_playmoviespartner1/struct.AccountOrderListCall.html), [*store infos country get*](http://byron.github.io/google-apis-rs/google_playmoviespartner1/struct.AccountStoreInfoCountryGetCall.html) and [*store infos list*](http://byron.github.io/google-apis-rs/google_playmoviespartner1/struct.AccountStoreInfoListCall.html)
 
 
 
@@ -23,7 +23,7 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
 
 The API is structured into the following primary items:
 
-* **[Hub](http://byron.github.io/google-apis-rs/google_playmoviespartner1/struct.Playmoviespartner.html)**
+* **[Hub](http://byron.github.io/google-apis-rs/google_playmoviespartner1/struct.PlayMovies.html)**
     * a central object to maintain state and allow accessing all *Activities*
     * creates [*Method Builders*](http://byron.github.io/google-apis-rs/google_playmoviespartner1/trait.MethodsBuilder.html) which in turn
       allow access to individual [*Call Builders*](http://byron.github.io/google-apis-rs/google_playmoviespartner1/trait.CallBuilder.html)
@@ -47,7 +47,7 @@ let r = hub.resource().activity(...).doit()
 Or specifically ...
 
 ```ignore
-let r = hub.accounts().store_infos_country_get(...).doit()
+let r = hub.accounts().avails_get(...).doit()
 ```
 
 The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -75,7 +75,7 @@ extern crate google_playmoviespartner1 as playmoviespartner1;
 use playmoviespartner1::{Result, Error};
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-use playmoviespartner1::Playmoviespartner;
+use playmoviespartner1::PlayMovies;
 
 // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 // `client_secret`, among other things.
@@ -88,11 +88,11 @@ let secret: ApplicationSecret = Default::default();
 let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
                               hyper::Client::new(),
                               <MemoryStorage as Default>::default(), None);
-let mut hub = Playmoviespartner::new(hyper::Client::new(), auth);
+let mut hub = PlayMovies::new(hyper::Client::new(), auth);
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
-let result = hub.accounts().store_infos_country_get("accountId", "videoId", "country")
+let result = hub.accounts().avails_get("accountId", "availId")
              .doit();
 
 match result {

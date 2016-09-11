@@ -169,9 +169,9 @@ impl<'a, C, A> Groupssettings<C, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Groups {
-    /// Moderation level for messages. Possible values are: MODERATE_ALL_MESSAGES MODERATE_NON_MEMBERS MODERATE_NEW_MEMBERS MODERATE_NONE
-    #[serde(rename="messageModerationLevel")]
-    pub message_moderation_level: Option<String>,
+    /// Should the member be notified if his message is denied by owner.
+    #[serde(rename="sendMessageDenyNotification")]
+    pub send_message_deny_notification: Option<String>,
     /// Description of the group
     pub description: Option<String>,
     /// Are external members allowed to join the group.
@@ -183,9 +183,9 @@ pub struct Groups {
     /// Default email to which reply to any message should go.
     #[serde(rename="customReplyTo")]
     pub custom_reply_to: Option<String>,
-    /// Should the member be notified if his message is denied by owner.
-    #[serde(rename="sendMessageDenyNotification")]
-    pub send_message_deny_notification: Option<String>,
+    /// Moderation level for messages. Possible values are: MODERATE_ALL_MESSAGES MODERATE_NON_MEMBERS MODERATE_NEW_MEMBERS MODERATE_NONE
+    #[serde(rename="messageModerationLevel")]
+    pub message_moderation_level: Option<String>,
     /// Permission to contact owner of the group via web UI. Possible values are: ANYONE_CAN_CONTACT ALL_IN_DOMAIN_CAN_CONTACT ALL_MEMBERS_CAN_CONTACT ALL_MANAGERS_CAN_CONTACT
     #[serde(rename="whoCanContactOwner")]
     pub who_can_contact_owner: Option<String>,
@@ -217,9 +217,15 @@ pub struct Groups {
     pub kind: Option<String>,
     /// Name of the Group
     pub name: Option<String>,
+    /// Whether to include custom footer.
+    #[serde(rename="includeCustomFooter")]
+    pub include_custom_footer: Option<String>,
     /// Moderation level for messages detected as spam. Possible values are: ALLOW MODERATE SILENTLY_MODERATE REJECT
     #[serde(rename="spamModerationLevel")]
     pub spam_moderation_level: Option<String>,
+    /// Custom footer text.
+    #[serde(rename="customFooterText")]
+    pub custom_footer_text: Option<String>,
     /// Default message deny notification message
     #[serde(rename="defaultMessageDenyNotificationText")]
     pub default_message_deny_notification_text: Option<String>,

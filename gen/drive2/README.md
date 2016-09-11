@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-drive2` library allows access to all features of the *Google drive* service.
 
-This documentation was generated from *drive* crate version *0.1.14+20160331*, where *20160331* is the exact revision of the *drive:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
+This documentation was generated from *drive* crate version *0.1.14+20160901*, where *20160901* is the exact revision of the *drive:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.14*.
 
 Everything else about the *drive* *v2* API can be found at the
 [official documentation site](https://developers.google.com/drive/).

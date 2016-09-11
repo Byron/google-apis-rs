@@ -1,0 +1,34 @@
+# DO NOT EDIT !
+# This file was generated automatically from 'src/mako/Cargo.toml.mako'
+# DO NOT EDIT !
+[package]
+
+name = "google-appengine1"
+version = "0.1.14+20160802"
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
+description = "A complete library to interact with appengine (protocol v1)"
+repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/appengine1"
+homepage = "https://cloud.google.com/appengine/docs/admin-api/"
+documentation = "http://byron.github.io/google-apis-rs/google_appengine1"
+license = "MIT"
+keywords = ["appengine", "google", "protocol", "web", "api"]
+build = "src/build.rs"
+
+
+[dependencies]
+hyper = "^ 0.9"
+mime = "^ 0.2.0"
+serde = "^ 0.8"
+serde_json = "^ 0.8"
+yup-oauth2 = { version = "^ 0.6", optional = true, default-features = false }
+serde_macros = { version = "^ 0.8", optional = true }
+url = "= 0.5"
+
+[features]
+default = ["with-serde-codegen"]
+nightly = ["serde_macros","yup-oauth2/nightly"]
+with-serde-codegen = ["serde_codegen","yup-oauth2/with-serde-codegen"]
+
+[build-dependencies]
+serde_codegen = { version = "^ 0.8", optional = true }
+

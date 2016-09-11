@@ -244,19 +244,22 @@ impl ResponseResult for ListJobsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Job {
+    /// The date/time when this job will expire/expired. After a job expired, no new reports are generated.
+    #[serde(rename="expireTime")]
+    pub expire_time: Option<String>,
     /// The type of reports this job creates. Corresponds to the ID of a ReportType.
     #[serde(rename="reportTypeId")]
     pub report_type_id: Option<String>,
+    /// The name of the job (max. 100 characters).
+    pub name: Option<String>,
     /// True if this a system-managed job that cannot be modified by the user; otherwise false.
     #[serde(rename="systemManaged")]
     pub system_managed: Option<bool>,
-    /// The server-generated ID of the job (max. 40 characters).
-    pub id: Option<String>,
-    /// The name of the job (max. 100 characters).
-    pub name: Option<String>,
     /// The creation date/time of the job.
     #[serde(rename="createTime")]
     pub create_time: Option<String>,
+    /// The server-generated ID of the job (max. 40 characters).
+    pub id: Option<String>,
 }
 
 impl RequestValue for Job {}
@@ -303,6 +306,9 @@ pub struct ReportType {
     pub id: Option<String>,
     /// The name of the report type (max. 100 characters).
     pub name: Option<String>,
+    /// The date/time when this report type was/will be deprecated.
+    #[serde(rename="deprecateTime")]
+    pub deprecate_time: Option<String>,
 }
 
 impl Resource for ReportType {}
@@ -322,6 +328,9 @@ pub struct Report {
     /// The URL from which the report can be downloaded (max. 1000 characters).
     #[serde(rename="downloadUrl")]
     pub download_url: Option<String>,
+    /// The date/time when the job this report belongs to will expire/expired.
+    #[serde(rename="jobExpireTime")]
+    pub job_expire_time: Option<String>,
     /// The start of the time period that the report instance covers. The value is inclusive.
     #[serde(rename="startTime")]
     pub start_time: Option<String>,
@@ -405,7 +414,7 @@ impl<'a, C, A> MediaMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `resourceName` - Name of the media that is being downloaded. See ByteStream.ReadRequest.resource_name.
+    /// * `resourceName` - Name of the media that is being downloaded. See ReadRequest.resource_name.
     pub fn download(&self, resource_name: &str) -> MediaDownloadCall<'a, C, A> {
         MediaDownloadCall {
             hub: self.hub,
@@ -834,7 +843,7 @@ impl<'a, C, A> MediaDownloadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
-    /// Name of the media that is being downloaded. See ByteStream.ReadRequest.resource_name.
+    /// Name of the media that is being downloaded. See ReadRequest.resource_name.
     ///
     /// Sets the *resource name* path property to the given value.
     ///

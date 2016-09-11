@@ -1158,12 +1158,13 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "notification.more-from-series.opted-state" => Some(("notification.moreFromSeries.opted_state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "notification.more-from-authors.opted-state" => Some(("notification.moreFromAuthors.opted_state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "notes-export.is-enabled" => Some(("notesExport.isEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "notes-export.folder-name" => Some(("notesExport.folderName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["folder-name", "is-enabled", "kind", "more-from-authors", "notes-export", "notification", "opted-state"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["folder-name", "is-enabled", "kind", "more-from-authors", "more-from-series", "notes-export", "notification", "opted-state"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2919,6 +2920,9 @@ impl<'n> Engine<'n> {
                 "max-results" => {
                     call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
                 },
+                "max-allowed-maturity-rating" => {
+                    call = call.max_allowed_maturity_rating(value.unwrap_or(""));
+                },
                 "library-restrict" => {
                     call = call.library_restrict(value.unwrap_or(""));
                 },
@@ -2944,7 +2948,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["order-by", "projection", "library-restrict", "lang-restrict", "print-type", "show-preorders", "max-results", "filter", "source", "start-index", "download", "partner"].iter().map(|v|*v));
+                                                                           v.extend(["order-by", "projection", "library-restrict", "lang-restrict", "print-type", "show-preorders", "max-results", "filter", "source", "start-index", "max-allowed-maturity-rating", "download", "partner"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -4697,8 +4701,8 @@ fn main() {
     
     let mut app = App::new("books1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.6+20160226")
-           .about("Lets you search for books and manage your Google Books library.")
+           .version("0.3.6+20160823")
+           .about("Searches for books and manages your Google Books library.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_books1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")
