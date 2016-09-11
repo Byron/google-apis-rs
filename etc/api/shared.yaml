@@ -9,6 +9,8 @@ api:
     - firebaserules
     - runtimeconfig
     - analyticsreporting
+    # Doesn't work with stable due to a known issue serializing it using syntex_syntax
+    - compute
     - servicecontrol
     - servicemanagement
     - language
