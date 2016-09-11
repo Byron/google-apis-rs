@@ -29,10 +29,10 @@ name = "${util.program_name()}"
 hyper = "^ 0.9"
 ## Must match the one hyper uses, otherwise there are duplicate similarly named `Mime` structs
 mime = "^ 0.2.0"
-serde = "^ 0.7.5"
-serde_json = "^ 0.7.0"
-yup-oauth2 = { version = "^ 0.6.0", optional = true, default-features = false }
-serde_macros = { version = "^ 0.7.5", optional = true }
+serde = "^ 0.8"
+serde_json = "^ 0.8"
+yup-oauth2 = { version = "^ 0.6", optional = true, default-features = false }
+serde_macros = { version = "^ 0.8", optional = true }
 % for dep in cargo.get('dependencies', list()):
 ${dep}
 % endfor
@@ -55,7 +55,7 @@ nightly = [${','.join(enclose_in('"', nightly_features))}]
 with-serde-codegen = [${','.join(enclose_in('"', default_features))}]
 
 [build-dependencies]
-serde_codegen = { version = "^ 0.7.14", optional = true }
+serde_codegen = { version = "^ 0.8", optional = true }
 
 % if make.depends_on_suffix is not None:
 
