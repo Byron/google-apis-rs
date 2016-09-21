@@ -229,7 +229,7 @@ impl Part for InstanceGroupConfig {}
 /// * [regions operations delete projects](struct.ProjectRegionOperationDeleteCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Empty;
+pub struct Empty { _never_set: Option<bool> }
 
 impl ResponseResult for Empty {}
 
@@ -503,7 +503,7 @@ impl Part for NodeInitializationAction {}
 /// * [regions clusters diagnose projects](struct.ProjectRegionClusterDiagnoseCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DiagnoseClusterRequest;
+pub struct DiagnoseClusterRequest { _never_set: Option<bool> }
 
 impl RequestValue for DiagnoseClusterRequest {}
 
@@ -854,7 +854,7 @@ impl ResponseResult for Operation {}
 /// * [regions jobs cancel projects](struct.ProjectRegionJobCancelCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CancelJobRequest;
+pub struct CancelJobRequest { _never_set: Option<bool> }
 
 impl RequestValue for CancelJobRequest {}
 

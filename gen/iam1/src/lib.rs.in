@@ -351,7 +351,7 @@ impl ResponseResult for Policy {}
 /// * [service accounts keys delete projects](struct.ProjectServiceAccountKeyDeleteCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Empty;
+pub struct Empty { _never_set: Option<bool> }
 
 impl ResponseResult for Empty {}
 
@@ -361,7 +361,7 @@ impl ResponseResult for Empty {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CloudAuditOptions;
+pub struct CloudAuditOptions { _never_set: Option<bool> }
 
 impl Part for CloudAuditOptions {}
 
@@ -419,7 +419,7 @@ impl Part for Binding {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DataAccessOptions;
+pub struct DataAccessOptions { _never_set: Option<bool> }
 
 impl Part for DataAccessOptions {}
 

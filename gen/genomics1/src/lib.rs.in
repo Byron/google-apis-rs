@@ -436,7 +436,7 @@ impl RequestValue for ImportVariantsRequest {}
 /// * [delete annotationsets](struct.AnnotationsetDeleteCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Empty;
+pub struct Empty { _never_set: Option<bool> }
 
 impl ResponseResult for Empty {}
 
@@ -603,7 +603,7 @@ impl ResponseResult for Annotation {}
 /// * [get iam policy datasets](struct.DatasetGetIamPolicyCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GetIamPolicyRequest;
+pub struct GetIamPolicyRequest { _never_set: Option<bool> }
 
 impl RequestValue for GetIamPolicyRequest {}
 
@@ -1653,7 +1653,7 @@ impl RequestValue for SearchAnnotationSetsRequest {}
 /// * [undelete datasets](struct.DatasetUndeleteCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct UndeleteDatasetRequest;
+pub struct UndeleteDatasetRequest { _never_set: Option<bool> }
 
 impl RequestValue for UndeleteDatasetRequest {}
 
@@ -1941,7 +1941,7 @@ impl ResponseResult for Dataset {}
 /// * [cancel operations](struct.OperationCancelCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CancelOperationRequest;
+pub struct CancelOperationRequest { _never_set: Option<bool> }
 
 impl RequestValue for CancelOperationRequest {}
 

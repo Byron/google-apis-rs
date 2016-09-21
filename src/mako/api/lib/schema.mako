@@ -42,7 +42,8 @@ impl Default for ${et} {
     }
 }
 % else: ## it's an empty struct, i.e. struct Foo;
-${struct};
+        ## However, to enable the empty JSON object to be parsed, we set one unused optional parameter.
+${struct} { _never_set: Option<bool> }
 % endif ## 'properties' in s
 </%def>
 
