@@ -481,7 +481,7 @@ match result {
     /// Perform the operation you have build so far.
     ${action_fn} {
         % if URL_ENCODE in special_cases:
-        use url::percent_encoding::{percent_encode, FORM_URLENCODED_ENCODE_SET};
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         % endif
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -632,7 +632,7 @@ else {
             }
             % if URL_ENCODE in special_cases:
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), FORM_URLENCODED_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
             }
             % endif
             url = url.replace(find_this, ${url_replace_arg});
