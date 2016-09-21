@@ -1259,7 +1259,7 @@ impl<'a, C, A> ProjectSinkListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, ListSinksResponse)> {
-        use url::percent_encoding::{percent_encode, FORM_URLENCODED_ENCODE_SET};
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -1303,7 +1303,7 @@ impl<'a, C, A> ProjectSinkListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), FORM_URLENCODED_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -1524,7 +1524,7 @@ impl<'a, C, A> ProjectLogDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
-        use url::percent_encoding::{percent_encode, FORM_URLENCODED_ENCODE_SET};
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -1562,7 +1562,7 @@ impl<'a, C, A> ProjectLogDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), FORM_URLENCODED_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -1769,7 +1769,7 @@ impl<'a, C, A> ProjectSinkGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, LogSink)> {
-        use url::percent_encoding::{percent_encode, FORM_URLENCODED_ENCODE_SET};
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -1807,7 +1807,7 @@ impl<'a, C, A> ProjectSinkGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), FORM_URLENCODED_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2014,7 +2014,7 @@ impl<'a, C, A> ProjectMetricGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, LogMetric)> {
-        use url::percent_encoding::{percent_encode, FORM_URLENCODED_ENCODE_SET};
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -2052,7 +2052,7 @@ impl<'a, C, A> ProjectMetricGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), FORM_URLENCODED_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2266,7 +2266,7 @@ impl<'a, C, A> ProjectSinkUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, LogSink)> {
-        use url::percent_encoding::{percent_encode, FORM_URLENCODED_ENCODE_SET};
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -2304,7 +2304,7 @@ impl<'a, C, A> ProjectSinkUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), FORM_URLENCODED_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2535,7 +2535,7 @@ impl<'a, C, A> ProjectMetricDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
-        use url::percent_encoding::{percent_encode, FORM_URLENCODED_ENCODE_SET};
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -2573,7 +2573,7 @@ impl<'a, C, A> ProjectMetricDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), FORM_URLENCODED_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2787,7 +2787,7 @@ impl<'a, C, A> ProjectSinkCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, LogSink)> {
-        use url::percent_encoding::{percent_encode, FORM_URLENCODED_ENCODE_SET};
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -2825,7 +2825,7 @@ impl<'a, C, A> ProjectSinkCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), FORM_URLENCODED_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3063,7 +3063,7 @@ impl<'a, C, A> ProjectMetricCreateCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, LogMetric)> {
-        use url::percent_encoding::{percent_encode, FORM_URLENCODED_ENCODE_SET};
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -3101,7 +3101,7 @@ impl<'a, C, A> ProjectMetricCreateCall<'a, C, A> where C: BorrowMut<hyper::Clien
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), FORM_URLENCODED_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3332,7 +3332,7 @@ impl<'a, C, A> ProjectSinkDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
-        use url::percent_encoding::{percent_encode, FORM_URLENCODED_ENCODE_SET};
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -3370,7 +3370,7 @@ impl<'a, C, A> ProjectSinkDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), FORM_URLENCODED_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3581,7 +3581,7 @@ impl<'a, C, A> ProjectMetricListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, ListLogMetricsResponse)> {
-        use url::percent_encoding::{percent_encode, FORM_URLENCODED_ENCODE_SET};
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -3625,7 +3625,7 @@ impl<'a, C, A> ProjectMetricListCall<'a, C, A> where C: BorrowMut<hyper::Client>
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), FORM_URLENCODED_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3853,7 +3853,7 @@ impl<'a, C, A> ProjectMetricUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, LogMetric)> {
-        use url::percent_encoding::{percent_encode, FORM_URLENCODED_ENCODE_SET};
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -3891,7 +3891,7 @@ impl<'a, C, A> ProjectMetricUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), FORM_URLENCODED_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
             }
             url = url.replace(find_this, &replace_with);
         }

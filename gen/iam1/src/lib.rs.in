@@ -896,7 +896,7 @@ impl<'a, C, A> ProjectServiceAccountKeyListCall<'a, C, A> where C: BorrowMut<hyp
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, ListServiceAccountKeysResponse)> {
-        use url::percent_encoding::{percent_encode, FORM_URLENCODED_ENCODE_SET};
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -939,7 +939,7 @@ impl<'a, C, A> ProjectServiceAccountKeyListCall<'a, C, A> where C: BorrowMut<hyp
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), FORM_URLENCODED_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -1161,7 +1161,7 @@ impl<'a, C, A> ProjectServiceAccountSetIamPolicyCall<'a, C, A> where C: BorrowMu
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, Policy)> {
-        use url::percent_encoding::{percent_encode, FORM_URLENCODED_ENCODE_SET};
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -1199,7 +1199,7 @@ impl<'a, C, A> ProjectServiceAccountSetIamPolicyCall<'a, C, A> where C: BorrowMu
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), FORM_URLENCODED_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -1430,7 +1430,7 @@ impl<'a, C, A> ProjectServiceAccountKeyDeleteCall<'a, C, A> where C: BorrowMut<h
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
-        use url::percent_encoding::{percent_encode, FORM_URLENCODED_ENCODE_SET};
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -1468,7 +1468,7 @@ impl<'a, C, A> ProjectServiceAccountKeyDeleteCall<'a, C, A> where C: BorrowMut<h
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), FORM_URLENCODED_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -1682,7 +1682,7 @@ impl<'a, C, A> ProjectServiceAccountKeyCreateCall<'a, C, A> where C: BorrowMut<h
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, ServiceAccountKey)> {
-        use url::percent_encoding::{percent_encode, FORM_URLENCODED_ENCODE_SET};
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -1720,7 +1720,7 @@ impl<'a, C, A> ProjectServiceAccountKeyCreateCall<'a, C, A> where C: BorrowMut<h
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), FORM_URLENCODED_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -1958,7 +1958,7 @@ impl<'a, C, A> ProjectServiceAccountSignBlobCall<'a, C, A> where C: BorrowMut<hy
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, SignBlobResponse)> {
-        use url::percent_encoding::{percent_encode, FORM_URLENCODED_ENCODE_SET};
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -1996,7 +1996,7 @@ impl<'a, C, A> ProjectServiceAccountSignBlobCall<'a, C, A> where C: BorrowMut<hy
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), FORM_URLENCODED_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2234,7 +2234,7 @@ impl<'a, C, A> ProjectServiceAccountUpdateCall<'a, C, A> where C: BorrowMut<hype
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, ServiceAccount)> {
-        use url::percent_encoding::{percent_encode, FORM_URLENCODED_ENCODE_SET};
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -2272,7 +2272,7 @@ impl<'a, C, A> ProjectServiceAccountUpdateCall<'a, C, A> where C: BorrowMut<hype
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), FORM_URLENCODED_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2507,7 +2507,7 @@ impl<'a, C, A> ProjectServiceAccountListCall<'a, C, A> where C: BorrowMut<hyper:
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, ListServiceAccountsResponse)> {
-        use url::percent_encoding::{percent_encode, FORM_URLENCODED_ENCODE_SET};
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -2551,7 +2551,7 @@ impl<'a, C, A> ProjectServiceAccountListCall<'a, C, A> where C: BorrowMut<hyper:
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), FORM_URLENCODED_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2772,7 +2772,7 @@ impl<'a, C, A> ProjectServiceAccountDeleteCall<'a, C, A> where C: BorrowMut<hype
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
-        use url::percent_encoding::{percent_encode, FORM_URLENCODED_ENCODE_SET};
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -2810,7 +2810,7 @@ impl<'a, C, A> ProjectServiceAccountDeleteCall<'a, C, A> where C: BorrowMut<hype
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), FORM_URLENCODED_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3017,7 +3017,7 @@ impl<'a, C, A> ProjectServiceAccountKeyGetCall<'a, C, A> where C: BorrowMut<hype
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, ServiceAccountKey)> {
-        use url::percent_encoding::{percent_encode, FORM_URLENCODED_ENCODE_SET};
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -3055,7 +3055,7 @@ impl<'a, C, A> ProjectServiceAccountKeyGetCall<'a, C, A> where C: BorrowMut<hype
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), FORM_URLENCODED_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3262,7 +3262,7 @@ impl<'a, C, A> ProjectServiceAccountGetIamPolicyCall<'a, C, A> where C: BorrowMu
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, Policy)> {
-        use url::percent_encoding::{percent_encode, FORM_URLENCODED_ENCODE_SET};
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -3300,7 +3300,7 @@ impl<'a, C, A> ProjectServiceAccountGetIamPolicyCall<'a, C, A> where C: BorrowMu
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), FORM_URLENCODED_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3514,7 +3514,7 @@ impl<'a, C, A> ProjectServiceAccountTestIamPermissionCall<'a, C, A> where C: Bor
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, TestIamPermissionsResponse)> {
-        use url::percent_encoding::{percent_encode, FORM_URLENCODED_ENCODE_SET};
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -3552,7 +3552,7 @@ impl<'a, C, A> ProjectServiceAccountTestIamPermissionCall<'a, C, A> where C: Bor
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), FORM_URLENCODED_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3790,7 +3790,7 @@ impl<'a, C, A> ProjectServiceAccountCreateCall<'a, C, A> where C: BorrowMut<hype
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, ServiceAccount)> {
-        use url::percent_encoding::{percent_encode, FORM_URLENCODED_ENCODE_SET};
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -3828,7 +3828,7 @@ impl<'a, C, A> ProjectServiceAccountCreateCall<'a, C, A> where C: BorrowMut<hype
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), FORM_URLENCODED_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4059,7 +4059,7 @@ impl<'a, C, A> ProjectServiceAccountGetCall<'a, C, A> where C: BorrowMut<hyper::
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, ServiceAccount)> {
-        use url::percent_encoding::{percent_encode, FORM_URLENCODED_ENCODE_SET};
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -4097,7 +4097,7 @@ impl<'a, C, A> ProjectServiceAccountGetCall<'a, C, A> where C: BorrowMut<hyper::
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), FORM_URLENCODED_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
             }
             url = url.replace(find_this, &replace_with);
         }
