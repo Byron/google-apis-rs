@@ -3835,7 +3835,7 @@ impl Part for ChannelContentDetails {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TokenPagination;
+pub struct TokenPagination { _never_set: Option<bool> }
 
 impl Part for TokenPagination {}
 

@@ -371,7 +371,7 @@ impl Part for Library {}
 /// * [modules versions instances debug apps](struct.AppModuleVersionInstanceDebugCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DebugInstanceRequest;
+pub struct DebugInstanceRequest { _never_set: Option<bool> }
 
 impl RequestValue for DebugInstanceRequest {}
 

@@ -170,7 +170,7 @@ impl<'a, C, A> CloudResourceManager<C, A>
 /// * [undelete projects](struct.ProjectUndeleteCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct UndeleteProjectRequest;
+pub struct UndeleteProjectRequest { _never_set: Option<bool> }
 
 impl RequestValue for UndeleteProjectRequest {}
 
@@ -220,7 +220,7 @@ impl ResponseResult for TestIamPermissionsResponse {}
 /// * [get iam policy projects](struct.ProjectGetIamPolicyCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GetIamPolicyRequest;
+pub struct GetIamPolicyRequest { _never_set: Option<bool> }
 
 impl RequestValue for GetIamPolicyRequest {}
 
@@ -417,7 +417,7 @@ impl ResponseResult for ListProjectsResponse {}
 /// * [undelete projects](struct.ProjectUndeleteCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Empty;
+pub struct Empty { _never_set: Option<bool> }
 
 impl ResponseResult for Empty {}
 

@@ -465,7 +465,7 @@ impl Part for Distribution {}
 /// * [groups delete projects](struct.ProjectGroupDeleteCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Empty;
+pub struct Empty { _never_set: Option<bool> }
 
 impl ResponseResult for Empty {}
 

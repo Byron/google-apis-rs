@@ -201,7 +201,7 @@ impl Part for TransferSpec {}
 /// * [pause transfer operations](struct.TransferOperationPauseCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PauseTransferOperationRequest;
+pub struct PauseTransferOperationRequest { _never_set: Option<bool> }
 
 impl RequestValue for PauseTransferOperationRequest {}
 
@@ -443,7 +443,7 @@ impl Part for TimeOfDay {}
 /// * [resume transfer operations](struct.TransferOperationResumeCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Empty;
+pub struct Empty { _never_set: Option<bool> }
 
 impl ResponseResult for Empty {}
 
@@ -557,7 +557,7 @@ impl Part for ErrorSummary {}
 /// * [resume transfer operations](struct.TransferOperationResumeCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ResumeTransferOperationRequest;
+pub struct ResumeTransferOperationRequest { _never_set: Option<bool> }
 
 impl RequestValue for ResumeTransferOperationRequest {}
 

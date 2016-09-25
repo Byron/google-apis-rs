@@ -230,7 +230,7 @@ impl ResponseResult for Service {}
 /// * [repair apps](struct.AppRepairCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct RepairApplicationRequest;
+pub struct RepairApplicationRequest { _never_set: Option<bool> }
 
 impl RequestValue for RepairApplicationRequest {}
 
@@ -424,7 +424,7 @@ impl ResponseResult for Location {}
 /// * [services versions instances debug apps](struct.AppServiceVersionInstanceDebugCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DebugInstanceRequest;
+pub struct DebugInstanceRequest { _never_set: Option<bool> }
 
 impl RequestValue for DebugInstanceRequest {}
 

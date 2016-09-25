@@ -319,7 +319,7 @@ impl Part for AssignmentSubmission {}
 /// * [course work student submissions return courses](struct.CourseCourseWorkStudentSubmissionReturnCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ReturnStudentSubmissionRequest;
+pub struct ReturnStudentSubmissionRequest { _never_set: Option<bool> }
 
 impl RequestValue for ReturnStudentSubmissionRequest {}
 
@@ -343,7 +343,7 @@ impl RequestValue for ReturnStudentSubmissionRequest {}
 /// * [accept invitations](struct.InvitationAcceptCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Empty;
+pub struct Empty { _never_set: Option<bool> }
 
 impl ResponseResult for Empty {}
 
@@ -478,7 +478,7 @@ impl ResponseResult for Guardian {}
 /// * [course work student submissions turn in courses](struct.CourseCourseWorkStudentSubmissionTurnInCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TurnInStudentSubmissionRequest;
+pub struct TurnInStudentSubmissionRequest { _never_set: Option<bool> }
 
 impl RequestValue for TurnInStudentSubmissionRequest {}
 
@@ -894,7 +894,7 @@ impl ResponseResult for ListCourseAliasesResponse {}
 /// * [course work student submissions reclaim courses](struct.CourseCourseWorkStudentSubmissionReclaimCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ReclaimStudentSubmissionRequest;
+pub struct ReclaimStudentSubmissionRequest { _never_set: Option<bool> }
 
 impl RequestValue for ReclaimStudentSubmissionRequest {}
 

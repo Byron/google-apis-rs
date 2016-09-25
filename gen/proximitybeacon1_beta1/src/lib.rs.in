@@ -402,7 +402,7 @@ impl Part for BeaconInfo {}
 /// * [activate beacons](struct.BeaconActivateCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Empty;
+pub struct Empty { _never_set: Option<bool> }
 
 impl ResponseResult for Empty {}
 

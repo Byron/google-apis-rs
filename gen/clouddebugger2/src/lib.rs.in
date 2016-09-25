@@ -282,7 +282,7 @@ impl RequestValue for RegisterDebuggeeRequest {}
 /// * [debuggees breakpoints update controller](struct.ControllerDebuggeeBreakpointUpdateCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct UpdateActiveBreakpointResponse;
+pub struct UpdateActiveBreakpointResponse { _never_set: Option<bool> }
 
 impl ResponseResult for UpdateActiveBreakpointResponse {}
 
@@ -392,7 +392,7 @@ impl Part for RepoId {}
 /// * [debuggees breakpoints delete debugger](struct.DebuggerDebuggeeBreakpointDeleteCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Empty;
+pub struct Empty { _never_set: Option<bool> }
 
 impl ResponseResult for Empty {}
 

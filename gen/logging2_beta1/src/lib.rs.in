@@ -376,7 +376,7 @@ impl RequestValue for ListLogEntriesRequest {}
 /// * [sinks delete projects](struct.ProjectSinkDeleteCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Empty;
+pub struct Empty { _never_set: Option<bool> }
 
 impl ResponseResult for Empty {}
 
@@ -451,7 +451,7 @@ impl ResponseResult for ListSinksResponse {}
 /// * [write entries](struct.EntryWriteCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct WriteLogEntriesResponse;
+pub struct WriteLogEntriesResponse { _never_set: Option<bool> }
 
 impl ResponseResult for WriteLogEntriesResponse {}
 
