@@ -31,7 +31,7 @@ hyper = "^ 0.9"
 mime = "^ 0.2.0"
 serde = "^ 0.8"
 serde_json = "^ 0.8"
-yup-oauth2 = { version = "^ 0.6", optional = true, default-features = false }
+yup-oauth2 = { version = "^ 0.9", optional = true, default-features = false }
 serde_macros = { version = "^ 0.8", optional = true }
 % for dep in cargo.get('dependencies', list()):
 ${dep}
