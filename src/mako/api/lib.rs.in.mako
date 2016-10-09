@@ -19,6 +19,10 @@
 <%util:gen_info source="${self.uri}" />\
 </%block>
 
+#[cfg(feature = "nightly")]
+#[macro_use]
+extern crate serde_derive;
+
 extern crate hyper;
 extern crate serde;
 extern crate serde_json;

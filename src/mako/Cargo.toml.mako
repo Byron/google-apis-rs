@@ -32,7 +32,7 @@ mime = "^ 0.2.0"
 serde = "^ 0.8"
 serde_json = "^ 0.8"
 yup-oauth2 = { version = "^ 1.0", optional = true, default-features = false }
-serde_macros = { version = "^ 0.8", optional = true }
+serde_derive = { version = "^ 0.8", optional = true }
 % for dep in cargo.get('dependencies', list()):
 ${dep}
 % endfor
@@ -43,7 +43,7 @@ ${dep}
   crate_name_we_depend_on = None
   crate_version_we_depend_on = None
   
-  nightly_features = ["serde_macros", "yup-oauth2/nightly"]
+  nightly_features = ["serde_derive", "yup-oauth2/nightly"]
   default_features = ["serde_codegen", "yup-oauth2/with-serde-codegen"]
   
   if make.depends_on_suffix is not None:
