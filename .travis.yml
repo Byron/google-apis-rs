@@ -11,6 +11,7 @@ matrix:
       env: FEATURE=nightly
   allow_failures:
     - os: osx
+    - rust: nightly
 script:
   - make gen-all-cli cargo-api ARGS="test --no-default-features --features=$FEATURE"
   - make cargo-api ARGS="doc --no-default-features --features=$FEATURE"
