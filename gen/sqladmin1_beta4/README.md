@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-sqladmin1_beta4` library allows access to all features of the *Google SQL Admin* service.
 
-This documentation was generated from *SQL Admin* crate version *0.1.15+20160907*, where *20160907* is the exact revision of the *sqladmin:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.15*.
+This documentation was generated from *SQL Admin* crate version *1.0.0+20160907*, where *20160907* is the exact revision of the *sqladmin:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
 
 Everything else about the *SQL Admin* *v1_beta4* API can be found at the
 [official documentation site](https://cloud.google.com/sql/docs/reference/latest).

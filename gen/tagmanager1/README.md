@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-tagmanager1` library allows access to all features of the *Google Tag Manager* service.
 
-This documentation was generated from *Tag Manager* crate version *0.1.15+20160310*, where *20160310* is the exact revision of the *tagmanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.15*.
+This documentation was generated from *Tag Manager* crate version *1.0.0+20160310*, where *20160310* is the exact revision of the *tagmanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
 
 Everything else about the *Tag Manager* *v1* API can be found at the
 [official documentation site](https://developers.google.com/tag-manager/api/v1/).

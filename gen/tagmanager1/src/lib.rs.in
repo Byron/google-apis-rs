@@ -2,6 +2,10 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.in.mako'
 // DO NOT EDIT !
 
+#[cfg(feature = "nightly")]
+#[macro_use]
+extern crate serde_derive;
+
 extern crate hyper;
 extern crate serde;
 extern crate serde_json;
@@ -160,7 +164,7 @@ impl<'a, C, A> TagManager<C, A>
         TagManager {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.15".to_string(),
+            _user_agent: "google-api-rust-client/1.0.0".to_string(),
         }
     }
 
@@ -169,7 +173,7 @@ impl<'a, C, A> TagManager<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.15`.
+    /// It defaults to `google-api-rust-client/1.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {

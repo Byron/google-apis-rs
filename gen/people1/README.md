@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-people1` library allows access to all features of the *Google people* service.
 
-This documentation was generated from *people* crate version *0.1.15+20160210*, where *20160210* is the exact revision of the *people:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.15*.
+This documentation was generated from *people* crate version *1.0.0+20160210*, where *20160210* is the exact revision of the *people:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
 
 Everything else about the *people* *v1* API can be found at the
 [official documentation site](https://developers.google.com/people/).

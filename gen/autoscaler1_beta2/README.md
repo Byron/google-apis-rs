@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-autoscaler1_beta2` library allows access to all features of the *Google autoscaler* service.
 
-This documentation was generated from *autoscaler* crate version *0.1.15+20150629*, where *20150629* is the exact revision of the *autoscaler:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.15*.
+This documentation was generated from *autoscaler* crate version *1.0.0+20150629*, where *20150629* is the exact revision of the *autoscaler:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
 
 Everything else about the *autoscaler* *v1_beta2* API can be found at the
 [official documentation site](http://developers.google.com/compute/docs/autoscaler).

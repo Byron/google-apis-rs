@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-deploymentmanager2` library allows access to all features of the *Google Deployment Manager* service.
 
-This documentation was generated from *Deployment Manager* crate version *0.1.15+20160901*, where *20160901* is the exact revision of the *deploymentmanager:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.15*.
+This documentation was generated from *Deployment Manager* crate version *1.0.0+20160901*, where *20160901* is the exact revision of the *deploymentmanager:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
 
 Everything else about the *Deployment Manager* *v2* API can be found at the
 [official documentation site](https://cloud.google.com/deployment-manager/).

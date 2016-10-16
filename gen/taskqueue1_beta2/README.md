@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-taskqueue1_beta2` library allows access to all features of the *Google taskqueue* service.
 
-This documentation was generated from *taskqueue* crate version *0.1.15+20160428*, where *20160428* is the exact revision of the *taskqueue:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.15*.
+This documentation was generated from *taskqueue* crate version *1.0.0+20160428*, where *20160428* is the exact revision of the *taskqueue:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
 
 Everything else about the *taskqueue* *v1_beta2* API can be found at the
 [official documentation site](https://developers.google.com/appengine/docs/python/taskqueue/rest).
