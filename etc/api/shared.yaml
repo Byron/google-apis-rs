@@ -64,7 +64,7 @@ directories:
 # This somewhat intricate setup allows the CLI to access certain cargo-API values,
 # without having us duplicate them.
 cargo_api: &cargo_api
-  build_version: "0.1.15"
+  build_version: "1.0.0"
 cargo:
   # This means that the API must not specify the shared variables from cargo_api
   # anymore
