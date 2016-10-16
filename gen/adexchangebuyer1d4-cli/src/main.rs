@@ -3990,7 +3990,7 @@ fn main() {
     
     let mut app = App::new("adexchangebuyer1d4")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.6+20160831")
+           .version("1.0.0+20160831")
            .about("Accesses your bidding-account information, submits creatives for validation, finds available direct deals, and retrieves performance reports.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_adexchangebuyer1d4_cli")
            .arg(Arg::with_name("url")

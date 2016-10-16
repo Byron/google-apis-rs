@@ -558,7 +558,7 @@ fn main() {
     
     let mut app = App::new("civicinfo2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.6+20160823")
+           .version("1.0.0+20160823")
            .about("Provides polling places, early vote locations, contest data, election officials, and government representatives for U.S. residential addresses.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_civicinfo2_cli")
            .arg(Arg::with_name("folder")

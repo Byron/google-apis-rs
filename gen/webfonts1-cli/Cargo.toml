@@ -4,7 +4,7 @@
 [package]
 
 name = "google-webfonts1-cli"
-version = "0.3.6+20160302"
+version = "1.0.0+20160302"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with webfonts (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/webfonts1-cli"
@@ -21,15 +21,15 @@ hyper = "^ 0.9"
 mime = "^ 0.2.0"
 serde = "^ 0.8"
 serde_json = "^ 0.8"
-yup-oauth2 = { version = "^ 0.6", optional = true, default-features = false }
-serde_macros = { version = "^ 0.8", optional = true }
+yup-oauth2 = { version = "^ 1.0", optional = true, default-features = false }
+serde_derive = { version = "^ 0.8", optional = true }
 strsim = "^0.5"
 yup-hyper-mock = "^1.0"
 clap = "^2.0"
 
 [features]
 default = ["with-serde-codegen"]
-nightly = ["serde_macros","yup-oauth2/nightly","google-webfonts1/nightly"]
+nightly = ["serde_derive","yup-oauth2/nightly","google-webfonts1/nightly"]
 with-serde-codegen = ["serde_codegen","yup-oauth2/with-serde-codegen","google-webfonts1/with-serde-codegen"]
 
 [build-dependencies]
@@ -38,6 +38,6 @@ serde_codegen = { version = "^ 0.8", optional = true }
 
 [dependencies.google-webfonts1]
 path = "../webfonts1"
-version = "0.1.15"
+version = "1.0.0"
 optional = true
 default-features = false

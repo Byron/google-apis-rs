@@ -17,14 +17,14 @@ Everything else about the *replicapool* API can be found at the
 
 You can download the pre-compiled 64bit binaries for the following platforms:
 
-* ![icon](http://megaicons.net/static/img/icons_sizes/6/140/16/ubuntu-icon.png) [ubuntu](http://dl.byronimo.de/google.rs/cli/0.3.6/ubuntu/replicapool1-beta2.tar.gz)
-* ![icon](http://hydra-media.cursecdn.com/wow.gamepedia.com/a/a2/Apple-icon-16x16.png?version=25ddd67ac3dd3b634478e3978b76cb74) [osx](http://dl.byronimo.de/google.rs/cli/0.3.6/osx/replicapool1-beta2.tar.gz)
+* ![icon](http://megaicons.net/static/img/icons_sizes/6/140/16/ubuntu-icon.png) [ubuntu](http://dl.byronimo.de/google.rs/cli/1.0.0/ubuntu/replicapool1-beta2.tar.gz)
+* ![icon](http://hydra-media.cursecdn.com/wow.gamepedia.com/a/a2/Apple-icon-16x16.png?version=25ddd67ac3dd3b634478e3978b76cb74) [osx](http://dl.byronimo.de/google.rs/cli/1.0.0/osx/replicapool1-beta2.tar.gz)
 
 Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/replicapool1_beta2-cli).
 
 # Usage
 
-This documentation was generated from the *replicapool* API at revision *20160512*. The CLI is at version *0.3.6*.
+This documentation was generated from the *replicapool* API at revision *20160512*. The CLI is at version *1.0.0*.
 
 ```bash
 replicapool1-beta2 [options]

@@ -1009,7 +1009,7 @@ fn main() {
     
     let mut app = App::new("taskqueue1-beta2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.6+20160428")
+           .version("1.0.0+20160428")
            .about("Accesses a Google App Engine Pull Task Queue over REST.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_taskqueue1_beta2_cli")
            .arg(Arg::with_name("url")

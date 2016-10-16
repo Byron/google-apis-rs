@@ -17,14 +17,14 @@ Everything else about the *spectrum* API can be found at the
 
 You can download the pre-compiled 64bit binaries for the following platforms:
 
-* ![icon](http://megaicons.net/static/img/icons_sizes/6/140/16/ubuntu-icon.png) [ubuntu](http://dl.byronimo.de/google.rs/cli/0.3.6/ubuntu/spectrum1-explorer.tar.gz)
-* ![icon](http://hydra-media.cursecdn.com/wow.gamepedia.com/a/a2/Apple-icon-16x16.png?version=25ddd67ac3dd3b634478e3978b76cb74) [osx](http://dl.byronimo.de/google.rs/cli/0.3.6/osx/spectrum1-explorer.tar.gz)
+* ![icon](http://megaicons.net/static/img/icons_sizes/6/140/16/ubuntu-icon.png) [ubuntu](http://dl.byronimo.de/google.rs/cli/1.0.0/ubuntu/spectrum1-explorer.tar.gz)
+* ![icon](http://hydra-media.cursecdn.com/wow.gamepedia.com/a/a2/Apple-icon-16x16.png?version=25ddd67ac3dd3b634478e3978b76cb74) [osx](http://dl.byronimo.de/google.rs/cli/1.0.0/osx/spectrum1-explorer.tar.gz)
 
 Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/spectrum1_explorer-cli).
 
 # Usage
 
-This documentation was generated from the *spectrum* API at revision *20160606*. The CLI is at version *0.3.6*.
+This documentation was generated from the *spectrum* API at revision *20160606*. The CLI is at version *1.0.0*.
 
 ```bash
 spectrum1-explorer [options]

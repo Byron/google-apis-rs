@@ -891,7 +891,7 @@ fn main() {
     
     let mut app = App::new("youtubereporting1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.6+20160719")
+           .version("1.0.0+20160719")
            .about("Schedules reporting jobs containing your YouTube Analytics data and downloads the resulting bulk data reports in the form of CSV files.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_youtubereporting1_cli")
            .arg(Arg::with_name("url")

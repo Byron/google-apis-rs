@@ -448,7 +448,7 @@ fn main() {
     
     let mut app = App::new("cloudtrace1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.6+20160518")
+           .version("1.0.0+20160518")
            .about("Send and retrieve trace data from Google Cloud Trace. Data is generated and available by default for all App Engine applications. Data from other applications can be written to Cloud Trace for display, reporting, and analysis.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudtrace1_cli")
            .arg(Arg::with_name("url")

@@ -6040,7 +6040,7 @@ fn main() {
     
     let mut app = App::new("genomics1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.6+20160905")
+           .version("1.0.0+20160905")
            .about("Stores, processes, explores and shares genomic data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_genomics1_cli")
            .arg(Arg::with_name("url")

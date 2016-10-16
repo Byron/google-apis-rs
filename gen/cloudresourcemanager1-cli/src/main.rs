@@ -1060,7 +1060,7 @@ fn main() {
     
     let mut app = App::new("cloudresourcemanager1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.6+20160617")
+           .version("1.0.0+20160617")
            .about("The Google Cloud Resource Manager API provides methods for creating, reading, and updating project metadata.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli")
            .arg(Arg::with_name("url")
