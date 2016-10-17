@@ -24,6 +24,7 @@ api:
     - sheets
     - audit
     - cloudsearch
+    - cloudtrace
     - toolresults
     - datastore
     - consumersurveys
