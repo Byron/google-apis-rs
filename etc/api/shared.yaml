@@ -21,6 +21,7 @@ api:
     - freebase
     - acceleratedmobilepageurl
     - cloudbuild
+    - cloudtrace
     - sheets
     - audit
     - cloudsearch
