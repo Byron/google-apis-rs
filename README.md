@@ -49,7 +49,7 @@ To generate the APIs yourself, you will need to meet the following prerequisites
 * **an internet connection and wget**
  * Make will download all other prerequisites automatically into hidden directories within this repository, which requires it to make some downloads via wget.
 * **Rust Stable**
- * This project compiles on *stable* Rust *1.6 or greater* only. You might consider using [Multirust][multirust] to control
+ * This project compiles on *stable* Rust *1.6 or greater* only. You might consider using [Rustup][rustup] to control
    the toolchain on a per-project basis.
 
 ## Using Make
@@ -254,4 +254,4 @@ at your option.
 Unless you explicitly state otherwise, any contribution intentionally submitted
 for inclusion in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above, without any
 additional terms or conditions.
-[multirust]: https://github.com/Diggsey/multirust-rs
+[rustup]: https://github.com/rust-lang-nursery/rustup.rs
