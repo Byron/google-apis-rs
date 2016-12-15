@@ -179,11 +179,14 @@ help${agsuffix}:
 	target = target_dir + '/' + name + '-api.json'
 	## assure the target never actually exists to force him to wget whenver we ask !
 	fake_target = target + '-force'
+	## Some service urls have $ in them. This may cause the console to treat them as env vars.
+	## To handle this properly, we need to escape the $.
+	url = info['discoveryRestUrl'].replace("$", "$$")
 	json_api_targets.append(fake_target)
 %>\
 ${fake_target}:
 	@mkdir -p ${target_dir}
-	@-wget -nv ${info['discoveryRestUrl']} -O ${target}
+	@-wget -nv '${url}' -O ${target}
 % endfor
 
 update-json: ${' '.join(json_api_targets)}
