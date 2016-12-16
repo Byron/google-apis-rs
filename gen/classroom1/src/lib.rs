@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *classroom* crate version *1.0.0+20160816*, where *20160816* is the exact revision of the *classroom:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
+//! This documentation was generated from *classroom* crate version *1.0.0+20161006*, where *20161006* is the exact revision of the *classroom:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
 //! 
 //! Everything else about the *classroom* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/classroom/).
@@ -124,11 +124,11 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.courses().course_work_student_submissions_list("courseId", "courseWorkId")
-//!              .user_id("gubergren")
-//!              .add_states("aliquyam")
-//!              .page_token("eos")
-//!              .page_size(-38)
-//!              .late("sea")
+//!              .user_id("aliquyam")
+//!              .add_states("eos")
+//!              .page_token("tempor")
+//!              .page_size(-59)
+//!              .late("labore")
 //!              .doit();
 //! 
 //! match result {

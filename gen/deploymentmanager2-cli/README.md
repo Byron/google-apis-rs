@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Deployment Manager* API at revision *20160901*. The CLI is at version *1.0.0*.
+This documentation was generated from the *Deployment Manager* API at revision *20161209*. The CLI is at version *1.0.0*.
 
 ```bash
 deploymentmanager2 [options]
@@ -32,10 +32,13 @@ deploymentmanager2 [options]
                 cancel-preview <project> <deployment> (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <project> <deployment> [-p <v>]... [-o <out>]
                 get <project> <deployment> [-p <v>]... [-o <out>]
+                get-iam-policy <project> <resource> [-p <v>]... [-o <out>]
                 insert <project> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <project> [-p <v>]... [-o <out>]
                 patch <project> <deployment> (-r <kv>)... [-p <v>]... [-o <out>]
+                set-iam-policy <project> <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 stop <project> <deployment> (-r <kv>)... [-p <v>]... [-o <out>]
+                test-iam-permissions <project> <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 update <project> <deployment> (-r <kv>)... [-p <v>]... [-o <out>]
         manifests
                 get <project> <deployment> <manifest> [-p <v>]... [-o <out>]

@@ -3,11 +3,11 @@ DO NOT EDIT !
 This file was generated automatically from 'src/mako/api/README.md.mako'
 DO NOT EDIT !
 -->
-The `google-monitoring3` library allows access to all features of the *Google monitoring* service.
+The `google-monitoring3` library allows access to all features of the *Google Monitoring* service.
 
-This documentation was generated from *monitoring* crate version *1.0.0+20160425*, where *20160425* is the exact revision of the *monitoring:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
+This documentation was generated from *Monitoring* crate version *1.0.0+20161212*, where *20161212* is the exact revision of the *monitoring:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
 
-Everything else about the *monitoring* *v3* API can be found at the
+Everything else about the *Monitoring* *v3* API can be found at the
 [official documentation site](https://cloud.google.com/monitoring/api/).
 # Features
 

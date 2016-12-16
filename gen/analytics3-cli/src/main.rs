@@ -8923,24 +8923,24 @@ fn main() {
                      Some(false)),
                   ]),
             ("remarketing-audience-get",
-                    Some(r##"Gets remarketing audiences to which the user has access."##),
+                    Some(r##"Gets a remarketing audience to which the user has access."##),
                     "Details at http://byron.github.io/google-apis-rs/google_analytics3_cli/management_remarketing-audience-get",
                   vec![
                     (Some(r##"account-id"##),
                      None,
-                     Some(r##"Account ID for the remarketing audience to retrieve."##),
+                     Some(r##"The account ID of the remarketing audience to retrieve."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"web-property-id"##),
                      None,
-                     Some(r##"Web property ID for the remarketing audience to retrieve."##),
+                     Some(r##"The web property ID of the remarketing audience to retrieve."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"remarketing-audience-id"##),
                      None,
-                     Some(r##"The ID to retrieve the Remarketing Audience for."##),
+                     Some(r##"The ID of the remarketing audience to retrieve."##),
                      Some(true),
                      Some(false)),
         
@@ -8957,18 +8957,18 @@ fn main() {
                      Some(false)),
                   ]),
             ("remarketing-audience-insert",
-                    Some(r##"Creates a new remarketing audiences."##),
+                    Some(r##"Creates a new remarketing audience."##),
                     "Details at http://byron.github.io/google-apis-rs/google_analytics3_cli/management_remarketing-audience-insert",
                   vec![
                     (Some(r##"account-id"##),
                      None,
-                     Some(r##"Account ID to create the remarketing audience for."##),
+                     Some(r##"The account ID for which to create the remarketing audience."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"web-property-id"##),
                      None,
-                     Some(r##"Web property ID to create the remarketing audience for."##),
+                     Some(r##"Web property ID for which to create the remarketing audience."##),
                      Some(true),
                      Some(false)),
         
@@ -8996,13 +8996,13 @@ fn main() {
                   vec![
                     (Some(r##"account-id"##),
                      None,
-                     Some(r##"Account ID for the remarketing audience to retrieve."##),
+                     Some(r##"The account ID of the remarketing audiences to retrieve."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"web-property-id"##),
                      None,
-                     Some(r##"Web property ID for the remarketing audience to retrieve."##),
+                     Some(r##"The web property ID of the remarketing audiences to retrieve."##),
                      Some(true),
                      Some(false)),
         
@@ -9019,24 +9019,24 @@ fn main() {
                      Some(false)),
                   ]),
             ("remarketing-audience-patch",
-                    Some(r##"Updates an existing remarketing audiences. This method supports patch semantics."##),
+                    Some(r##"Updates an existing remarketing audience. This method supports patch semantics."##),
                     "Details at http://byron.github.io/google-apis-rs/google_analytics3_cli/management_remarketing-audience-patch",
                   vec![
                     (Some(r##"account-id"##),
                      None,
-                     Some(r##"Account ID for the remarketing audience to update."##),
+                     Some(r##"The account ID of the remarketing audience to update."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"web-property-id"##),
                      None,
-                     Some(r##"Web property ID for the remarketing audience to update."##),
+                     Some(r##"The web property ID of the remarketing audience to update."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"remarketing-audience-id"##),
                      None,
-                     Some(r##"Remarketing audience ID of the remarketing audience to update."##),
+                     Some(r##"The ID of the remarketing audience to update."##),
                      Some(true),
                      Some(false)),
         
@@ -9059,24 +9059,24 @@ fn main() {
                      Some(false)),
                   ]),
             ("remarketing-audience-update",
-                    Some(r##"Updates an existing remarketing audiences."##),
+                    Some(r##"Updates an existing remarketing audience."##),
                     "Details at http://byron.github.io/google-apis-rs/google_analytics3_cli/management_remarketing-audience-update",
                   vec![
                     (Some(r##"account-id"##),
                      None,
-                     Some(r##"Account ID for the remarketing audience to update."##),
+                     Some(r##"The account ID of the remarketing audience to update."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"web-property-id"##),
                      None,
-                     Some(r##"Web property ID for the remarketing audience to update."##),
+                     Some(r##"The web property ID of the remarketing audience to update."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"remarketing-audience-id"##),
                      None,
-                     Some(r##"Remarketing audience ID of the remarketing audience to update."##),
+                     Some(r##"The ID of the remarketing audience to update."##),
                      Some(true),
                      Some(false)),
         
@@ -9946,7 +9946,7 @@ fn main() {
     
     let mut app = App::new("analytics3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.0+20160805")
+           .version("1.0.0+20161004")
            .about("Views and manages your Google Analytics data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_analytics3_cli")
            .arg(Arg::with_name("url")

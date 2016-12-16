@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Resource Manager* crate version *1.0.0+20160617*, where *20160617* is the exact revision of the *cloudresourcemanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
+//! This documentation was generated from *Cloud Resource Manager* crate version *1.0.0+20161212*, where *20161212* is the exact revision of the *cloudresourcemanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
 //! 
 //! Everything else about the *Cloud Resource Manager* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/resource-manager).
@@ -13,8 +13,10 @@
 //! 
 //! * [operations](struct.Operation.html)
 //!  * [*get*](struct.OperationGetCall.html)
+//! * [organizations](struct.Organization.html)
+//!  * [*get*](struct.OrganizationGetCall.html), [*get iam policy*](struct.OrganizationGetIamPolicyCall.html), [*search*](struct.OrganizationSearchCall.html), [*set iam policy*](struct.OrganizationSetIamPolicyCall.html) and [*test iam permissions*](struct.OrganizationTestIamPermissionCall.html)
 //! * [projects](struct.Project.html)
-//!  * [*delete*](struct.ProjectDeleteCall.html), [*get*](struct.ProjectGetCall.html), [*get iam policy*](struct.ProjectGetIamPolicyCall.html), [*list*](struct.ProjectListCall.html), [*set iam policy*](struct.ProjectSetIamPolicyCall.html), [*test iam permissions*](struct.ProjectTestIamPermissionCall.html), [*undelete*](struct.ProjectUndeleteCall.html) and [*update*](struct.ProjectUpdateCall.html)
+//!  * [*create*](struct.ProjectCreateCall.html), [*delete*](struct.ProjectDeleteCall.html), [*get*](struct.ProjectGetCall.html), [*get ancestry*](struct.ProjectGetAncestryCall.html), [*get iam policy*](struct.ProjectGetIamPolicyCall.html), [*list*](struct.ProjectListCall.html), [*set iam policy*](struct.ProjectSetIamPolicyCall.html), [*test iam permissions*](struct.ProjectTestIamPermissionCall.html), [*undelete*](struct.ProjectUndeleteCall.html) and [*update*](struct.ProjectUpdateCall.html)
 //! 
 //! 
 //! 
@@ -49,13 +51,15 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.projects().get(...).doit()
+//! let r = hub.projects().test_iam_permissions(...).doit()
 //! let r = hub.projects().undelete(...).doit()
 //! let r = hub.projects().set_iam_policy(...).doit()
-//! let r = hub.projects().test_iam_permissions(...).doit()
+//! let r = hub.projects().get(...).doit()
+//! let r = hub.projects().get_ancestry(...).doit()
 //! let r = hub.projects().update(...).doit()
 //! let r = hub.projects().get_iam_policy(...).doit()
 //! let r = hub.projects().delete(...).doit()
+//! let r = hub.projects().create(...).doit()
 //! let r = hub.projects().list(...).doit()
 //! ```
 //! 
@@ -103,9 +107,9 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.projects().list()
-//!              .page_token("sadipscing")
-//!              .page_size(-31)
-//!              .filter("ea")
+//!              .page_token("justo")
+//!              .page_size(-34)
+//!              .filter("et")
 //!              .doit();
 //! 
 //! match result {

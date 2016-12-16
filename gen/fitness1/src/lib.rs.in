@@ -43,17 +43,44 @@ pub enum Scope {
     /// View body sensor information in Google Fit
     BodyRead,
 
-    /// View and store body sensor data in Google Fit
-    BodyWrite,
+    /// View and store reproductive health data in Google Fit
+    ReproductiveHealthWrite,
+
+    /// View blood pressure data in Google Fit
+    BloodPressureRead,
+
+    /// View and store nutrition information in Google Fit
+    NutritionWrite,
+
+    /// View and store blood glucose data in Google Fit
+    BloodGlucoseWrite,
+
+    /// View and store oxygen saturation data in Google Fit
+    OxygenSaturationWrite,
 
     /// View and store your location data in Google Fit
     LocationWrite,
 
+    /// View reproductive health data in Google Fit
+    ReproductiveHealthRead,
+
+    /// View and store body temperature data in Google Fit
+    BodyTemperatureWrite,
+
+    /// View and store body sensor data in Google Fit
+    BodyWrite,
+
+    /// View your activity information in Google Fit
+    ActivityRead,
+
     /// View your stored location data in Google Fit
     LocationRead,
 
-    /// View and store nutrition information in Google Fit
-    NutritionWrite,
+    /// View and store blood pressure data in Google Fit
+    BloodPressureWrite,
+
+    /// View body temperature data in Google Fit
+    BodyTemperatureRead,
 
     /// View and store your activity information in Google Fit
     ActivityWrite,
@@ -61,21 +88,34 @@ pub enum Scope {
     /// View nutrition information in Google Fit
     NutritionRead,
 
-    /// View your activity information in Google Fit
-    ActivityRead,
+    /// View blood glucose data in Google Fit
+    BloodGlucoseRead,
+
+    /// View oxygen saturation data in Google Fit
+    OxygenSaturationRead,
 }
 
 impl AsRef<str> for Scope {
     fn as_ref(&self) -> &str {
         match *self {
             Scope::BodyRead => "https://www.googleapis.com/auth/fitness.body.read",
-            Scope::BodyWrite => "https://www.googleapis.com/auth/fitness.body.write",
-            Scope::LocationWrite => "https://www.googleapis.com/auth/fitness.location.write",
-            Scope::LocationRead => "https://www.googleapis.com/auth/fitness.location.read",
+            Scope::ReproductiveHealthWrite => "https://www.googleapis.com/auth/fitness.reproductive_health.write",
+            Scope::BloodPressureRead => "https://www.googleapis.com/auth/fitness.blood_pressure.read",
             Scope::NutritionWrite => "https://www.googleapis.com/auth/fitness.nutrition.write",
+            Scope::BloodGlucoseWrite => "https://www.googleapis.com/auth/fitness.blood_glucose.write",
+            Scope::OxygenSaturationWrite => "https://www.googleapis.com/auth/fitness.oxygen_saturation.write",
+            Scope::LocationWrite => "https://www.googleapis.com/auth/fitness.location.write",
+            Scope::ReproductiveHealthRead => "https://www.googleapis.com/auth/fitness.reproductive_health.read",
+            Scope::BodyTemperatureWrite => "https://www.googleapis.com/auth/fitness.body_temperature.write",
+            Scope::BodyWrite => "https://www.googleapis.com/auth/fitness.body.write",
+            Scope::ActivityRead => "https://www.googleapis.com/auth/fitness.activity.read",
+            Scope::LocationRead => "https://www.googleapis.com/auth/fitness.location.read",
+            Scope::BloodPressureWrite => "https://www.googleapis.com/auth/fitness.blood_pressure.write",
+            Scope::BodyTemperatureRead => "https://www.googleapis.com/auth/fitness.body_temperature.read",
             Scope::ActivityWrite => "https://www.googleapis.com/auth/fitness.activity.write",
             Scope::NutritionRead => "https://www.googleapis.com/auth/fitness.nutrition.read",
-            Scope::ActivityRead => "https://www.googleapis.com/auth/fitness.activity.read",
+            Scope::BloodGlucoseRead => "https://www.googleapis.com/auth/fitness.blood_glucose.read",
+            Scope::OxygenSaturationRead => "https://www.googleapis.com/auth/fitness.oxygen_saturation.read",
         }
     }
 }
@@ -222,7 +262,7 @@ impl Part for ValueMapValEntry {}
 
 /// Holder object for the value of a single field in a data point.
 /// 
-/// A field value has a particular format and is only ever set to one of an integer or a floating point value.
+/// A field value has a particular format and is only ever set to one of an integer or a floating point value. LINT.IfChange
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -336,6 +376,9 @@ impl Part for DataPoint {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListSessionsResponse {
+    /// Flag to indicate server has more data to transfer
+    #[serde(rename="hasMoreData")]
+    pub has_more_data: Option<bool>,
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
@@ -392,7 +435,7 @@ pub struct BucketByActivity {
 impl Part for BucketByActivity {}
 
 
-/// There is no detailed description.
+/// Next id: 10
 /// 
 /// # Activities
 /// 

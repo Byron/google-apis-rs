@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Deployment Manager* crate version *1.0.0+20160901*, where *20160901* is the exact revision of the *deploymentmanager:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
+//! This documentation was generated from *Deployment Manager* crate version *1.0.0+20161209*, where *20161209* is the exact revision of the *deploymentmanager:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
 //! 
 //! Everything else about the *Deployment Manager* *v2* API can be found at the
 //! [official documentation site](https://cloud.google.com/deployment-manager/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.DeploymentManager.html) ... 
 //! 
 //! * [deployments](struct.Deployment.html)
-//!  * [*cancel preview*](struct.DeploymentCancelPreviewCall.html), [*delete*](struct.DeploymentDeleteCall.html), [*get*](struct.DeploymentGetCall.html), [*insert*](struct.DeploymentInsertCall.html), [*list*](struct.DeploymentListCall.html), [*patch*](struct.DeploymentPatchCall.html), [*stop*](struct.DeploymentStopCall.html) and [*update*](struct.DeploymentUpdateCall.html)
+//!  * [*cancel preview*](struct.DeploymentCancelPreviewCall.html), [*delete*](struct.DeploymentDeleteCall.html), [*get*](struct.DeploymentGetCall.html), [*get iam policy*](struct.DeploymentGetIamPolicyCall.html), [*insert*](struct.DeploymentInsertCall.html), [*list*](struct.DeploymentListCall.html), [*patch*](struct.DeploymentPatchCall.html), [*set iam policy*](struct.DeploymentSetIamPolicyCall.html), [*stop*](struct.DeploymentStopCall.html), [*test iam permissions*](struct.DeploymentTestIamPermissionCall.html) and [*update*](struct.DeploymentUpdateCall.html)
 //! * [manifests](struct.Manifest.html)
 //!  * [*get*](struct.ManifestGetCall.html) and [*list*](struct.ManifestListCall.html)
 //! * [operations](struct.Operation.html)
@@ -56,12 +56,15 @@
 //! 
 //! ```ignore
 //! let r = hub.deployments().update(...).doit()
+//! let r = hub.deployments().get(...).doit()
 //! let r = hub.deployments().insert(...).doit()
+//! let r = hub.deployments().test_iam_permissions(...).doit()
 //! let r = hub.deployments().cancel_preview(...).doit()
-//! let r = hub.operations().get(...).doit()
+//! let r = hub.deployments().list(...).doit()
 //! let r = hub.deployments().patch(...).doit()
 //! let r = hub.deployments().stop(...).doit()
-//! let r = hub.operations().list(...).doit()
+//! let r = hub.deployments().get_iam_policy(...).doit()
+//! let r = hub.deployments().set_iam_policy(...).doit()
 //! let r = hub.deployments().delete(...).doit()
 //! ```
 //! 
@@ -115,9 +118,9 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.deployments().update(req, "project", "deployment")
-//!              .preview(true)
-//!              .delete_policy("dolor")
-//!              .create_policy("et")
+//!              .preview(false)
+//!              .delete_policy("consetetur")
+//!              .create_policy("sadipscing")
 //!              .doit();
 //! 
 //! match result {

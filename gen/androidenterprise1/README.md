@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-androidenterprise1` library allows access to all features of the *Google Android Enterprise* service.
 
-This documentation was generated from *Android Enterprise* crate version *1.0.0+20160831*, where *20160831* is the exact revision of the *androidenterprise:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
+This documentation was generated from *Android Enterprise* crate version *1.0.0+20161207*, where *20161207* is the exact revision of the *androidenterprise:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
 
 Everything else about the *Android Enterprise* *v1* API can be found at the
 [official documentation site](https://developers.google.com/android/work/play/emm-api).
@@ -20,7 +20,7 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
 * [devices](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.Device.html)
  * [*get*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.DeviceGetCall.html), [*get state*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.DeviceGetStateCall.html), [*list*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.DeviceListCall.html) and [*set state*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.DeviceSetStateCall.html)
 * [enterprises](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.Enterprise.html)
- * [*acknowledge notification set*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseAcknowledgeNotificationSetCall.html), [*complete signup*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseCompleteSignupCall.html), [*delete*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseDeleteCall.html), [*enroll*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseEnrollCall.html), [*generate signup url*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseGenerateSignupUrlCall.html), [*get*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseGetCall.html), [*get service account*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseGetServiceAccountCall.html), [*get store layout*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseGetStoreLayoutCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseListCall.html), [*pull notification set*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterprisePullNotificationSetCall.html), [*send test push notification*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseSendTestPushNotificationCall.html), [*set account*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseSetAccountCall.html), [*set store layout*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseSetStoreLayoutCall.html) and [*unenroll*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseUnenrollCall.html)
+ * [*acknowledge notification set*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseAcknowledgeNotificationSetCall.html), [*complete signup*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseCompleteSignupCall.html), [*create web token*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseCreateWebTokenCall.html), [*delete*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseDeleteCall.html), [*enroll*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseEnrollCall.html), [*generate signup url*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseGenerateSignupUrlCall.html), [*get*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseGetCall.html), [*get service account*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseGetServiceAccountCall.html), [*get store layout*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseGetStoreLayoutCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseListCall.html), [*pull notification set*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterprisePullNotificationSetCall.html), [*send test push notification*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseSendTestPushNotificationCall.html), [*set account*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseSetAccountCall.html), [*set store layout*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseSetStoreLayoutCall.html) and [*unenroll*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseUnenrollCall.html)
 * [entitlements](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.Entitlement.html)
  * [*delete*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EntitlementDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EntitlementGetCall.html), [*list*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EntitlementListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EntitlementPatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EntitlementUpdateCall.html)
 * grouplicenses
@@ -78,20 +78,21 @@ Or specifically ...
 
 ```ignore
 let r = hub.enterprises().send_test_push_notification(...).doit()
-let r = hub.enterprises().get_store_layout(...).doit()
+let r = hub.enterprises().generate_signup_url(...).doit()
 let r = hub.enterprises().get_service_account(...).doit()
 let r = hub.enterprises().acknowledge_notification_set(...).doit()
 let r = hub.enterprises().set_store_layout(...).doit()
-let r = hub.enterprises().insert(...).doit()
-let r = hub.enterprises().complete_signup(...).doit()
-let r = hub.enterprises().list(...).doit()
-let r = hub.enterprises().unenroll(...).doit()
-let r = hub.enterprises().set_account(...).doit()
+let r = hub.enterprises().get_store_layout(...).doit()
 let r = hub.enterprises().pull_notification_set(...).doit()
-let r = hub.enterprises().enroll(...).doit()
-let r = hub.enterprises().get(...).doit()
+let r = hub.enterprises().list(...).doit()
+let r = hub.enterprises().complete_signup(...).doit()
+let r = hub.enterprises().set_account(...).doit()
 let r = hub.enterprises().delete(...).doit()
-let r = hub.enterprises().generate_signup_url(...).doit()
+let r = hub.enterprises().enroll(...).doit()
+let r = hub.enterprises().create_web_token(...).doit()
+let r = hub.enterprises().insert(...).doit()
+let r = hub.enterprises().get(...).doit()
+let r = hub.enterprises().unenroll(...).doit()
 ```
 
 The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 

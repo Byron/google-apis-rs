@@ -1052,6 +1052,7 @@ impl<'n> Engine<'n> {
                     "alternate-link" => Some(("alternateLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "enrollment-code" => Some(("enrollmentCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "section" => Some(("section", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "guardians-enabled" => Some(("guardiansEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "course-group-email" => Some(("courseGroupEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "teacher-group-email" => Some(("teacherGroupEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1065,7 +1066,7 @@ impl<'n> Engine<'n> {
                     "description-heading" => Some(("descriptionHeading", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "room" => Some(("room", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["alternate-link", "course-group-email", "course-state", "creation-time", "description", "description-heading", "enrollment-code", "id", "name", "owner-id", "room", "section", "teacher-folder", "teacher-group-email", "title", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["alternate-link", "course-group-email", "course-state", "creation-time", "description", "description-heading", "enrollment-code", "guardians-enabled", "id", "name", "owner-id", "room", "section", "teacher-folder", "teacher-group-email", "title", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1247,6 +1248,9 @@ impl<'n> Engine<'n> {
                 "page-size" => {
                     call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
                 },
+                "course-states" => {
+                    call = call.add_course_states(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1260,7 +1264,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["teacher-id", "page-token", "student-id", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["teacher-id", "page-token", "student-id", "page-size", "course-states"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1322,6 +1326,7 @@ impl<'n> Engine<'n> {
                     "alternate-link" => Some(("alternateLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "enrollment-code" => Some(("enrollmentCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "section" => Some(("section", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "guardians-enabled" => Some(("guardiansEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "course-group-email" => Some(("courseGroupEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "teacher-group-email" => Some(("teacherGroupEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1335,7 +1340,7 @@ impl<'n> Engine<'n> {
                     "description-heading" => Some(("descriptionHeading", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "room" => Some(("room", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["alternate-link", "course-group-email", "course-state", "creation-time", "description", "description-heading", "enrollment-code", "id", "name", "owner-id", "room", "section", "teacher-folder", "teacher-group-email", "title", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["alternate-link", "course-group-email", "course-state", "creation-time", "description", "description-heading", "enrollment-code", "guardians-enabled", "id", "name", "owner-id", "room", "section", "teacher-folder", "teacher-group-email", "title", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1944,6 +1949,7 @@ impl<'n> Engine<'n> {
                     "alternate-link" => Some(("alternateLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "enrollment-code" => Some(("enrollmentCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "section" => Some(("section", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "guardians-enabled" => Some(("guardiansEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "course-group-email" => Some(("courseGroupEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "teacher-group-email" => Some(("teacherGroupEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1957,7 +1963,7 @@ impl<'n> Engine<'n> {
                     "description-heading" => Some(("descriptionHeading", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "room" => Some(("room", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["alternate-link", "course-group-email", "course-state", "creation-time", "description", "description-heading", "enrollment-code", "id", "name", "owner-id", "room", "section", "teacher-folder", "teacher-group-email", "title", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["alternate-link", "course-group-email", "course-state", "creation-time", "description", "description-heading", "enrollment-code", "guardians-enabled", "id", "name", "owner-id", "room", "section", "teacher-folder", "teacher-group-email", "title", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4015,12 +4021,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("guardian-invitations-list",
-                    Some(r##"Returns a list of guardian invitations that the requesting user is permitted to view, filtered by the parameters provided. This method returns the following error codes: * `PERMISSION_DENIED` if a `student_id` is specified, and the requesting user is not permitted to view guardian invitations for that student, if guardians are not enabled for the domain in question, or for other access errors. * `INVALID_ARGUMENT` if a `student_id` is specified, but its format cannot be recognized (it is not an email address, nor a `student_id` from the API, nor the literal string `me`). May also be returned if an invalid `page_token` or `state` is provided. * `NOT_FOUND` if a `student_id` is specified, and its format can be recognized, but Classroom has no record of that student."##),
+                    Some(r##"Returns a list of guardian invitations that the requesting user is permitted to view, filtered by the parameters provided. This method returns the following error codes: * `PERMISSION_DENIED` if a `student_id` is specified, and the requesting user is not permitted to view guardian invitations for that student, if `"-"` is specified as the `student_id` and the user is not a domain administrator, if guardians are not enabled for the domain in question, or for other access errors. * `INVALID_ARGUMENT` if a `student_id` is specified, but its format cannot be recognized (it is not an email address, nor a `student_id` from the API, nor the literal string `me`). May also be returned if an invalid `page_token` or `state` is provided. * `NOT_FOUND` if a `student_id` is specified, and its format can be recognized, but Classroom has no record of that student."##),
                     "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/user-profiles_guardian-invitations-list",
                   vec![
                     (Some(r##"student-id"##),
                      None,
-                     Some(r##"The ID of the student whose guardian invitations are to be returned. The identifier can be one of the following: * the numeric identifier for the user * the email address of the user * the string literal `"me"`, indicating the requesting user"##),
+                     Some(r##"The ID of the student whose guardian invitations are to be returned. The identifier can be one of the following: * the numeric identifier for the user * the email address of the user * the string literal `"me"`, indicating the requesting user * the string literal `"-"`, indicating that results should be returned for all students that the requesting user is permitted to view guardian invitations."##),
                      Some(true),
                      Some(false)),
         
@@ -4127,12 +4133,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("guardians-list",
-                    Some(r##"Returns a list of guardians that the requesting user is permitted to view, restricted to those that match the request. This method returns the following error codes: * `PERMISSION_DENIED` if a `student_id` is specified, and the requesting user is not permitted to view guardian information for that student, if guardians are not enabled for the domain in question, if the `invited_email_address` filter is set by a user who is not a domain administrator, or for other access errors. * `INVALID_ARGUMENT` if a `student_id` is specified, but its format cannot be recognized (it is not an email address, nor a `student_id` from the API, nor the literal string `me`). May also be returned if an invalid `page_token` is provided. * `NOT_FOUND` if a `student_id` is specified, and its format can be recognized, but Classroom has no record of that student."##),
+                    Some(r##"Returns a list of guardians that the requesting user is permitted to view, restricted to those that match the request. To list guardians for any student that the requesting user may view guardians for, use the literal character `-` for the student ID. This method returns the following error codes: * `PERMISSION_DENIED` if a `student_id` is specified, and the requesting user is not permitted to view guardian information for that student, if `"-"` is specified as the `student_id` and the user is not a domain administrator, if guardians are not enabled for the domain in question, if the `invited_email_address` filter is set by a user who is not a domain administrator, or for other access errors. * `INVALID_ARGUMENT` if a `student_id` is specified, but its format cannot be recognized (it is not an email address, nor a `student_id` from the API, nor the literal string `me`). May also be returned if an invalid `page_token` is provided. * `NOT_FOUND` if a `student_id` is specified, and its format can be recognized, but Classroom has no record of that student."##),
                     "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/user-profiles_guardians-list",
                   vec![
                     (Some(r##"student-id"##),
                      None,
-                     Some(r##"Filter results by the student who the guardian is linked to. The identifier can be one of the following: * the numeric identifier for the user * the email address of the user * the string literal `"me"`, indicating the requesting user"##),
+                     Some(r##"Filter results by the student who the guardian is linked to. The identifier can be one of the following: * the numeric identifier for the user * the email address of the user * the string literal `"me"`, indicating the requesting user * the string literal `"-"`, indicating that results should be returned for all students that the requesting user has access to view."##),
                      Some(true),
                      Some(false)),
         
@@ -4154,7 +4160,7 @@ fn main() {
     
     let mut app = App::new("classroom1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.0+20160816")
+           .version("1.0.0+20161006")
            .about("Manages classes, rosters, and invitations in Google Classroom.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_classroom1_cli")
            .arg(Arg::with_name("url")

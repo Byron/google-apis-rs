@@ -1,0 +1,17 @@
+site_name: Firebase Dynamic Links v1.0.0+20161118
+site_url: http://byron.github.io/google-apis-rs/google-firebasedynamiclinks1-cli
+site_description: Write integrating applications with bcore
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/firebasedynamiclinks1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['short-links_create.md', 'Short Links', 'Create']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+

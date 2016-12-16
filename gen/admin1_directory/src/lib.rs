@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *directory* crate version *1.0.0+20160824*, where *20160824* is the exact revision of the *admin:directory_v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
+//! This documentation was generated from *directory* crate version *1.0.0+20161124*, where *20161124* is the exact revision of the *admin:directory_v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
 //! 
 //! Everything else about the *directory* *v1_directory* API can be found at the
 //! [official documentation site](https://developers.google.com/admin-sdk/directory/).
@@ -16,7 +16,7 @@
 //! * [channels](struct.Channel.html)
 //!  * [*stop*](struct.ChannelStopCall.html)
 //! * chromeosdevices
-//!  * [*get*](struct.ChromeosdeviceGetCall.html), [*list*](struct.ChromeosdeviceListCall.html), [*patch*](struct.ChromeosdevicePatchCall.html) and [*update*](struct.ChromeosdeviceUpdateCall.html)
+//!  * [*action*](struct.ChromeosdeviceActionCall.html), [*get*](struct.ChromeosdeviceGetCall.html), [*list*](struct.ChromeosdeviceListCall.html), [*patch*](struct.ChromeosdevicePatchCall.html) and [*update*](struct.ChromeosdeviceUpdateCall.html)
 //! * [customers](struct.Customer.html)
 //!  * [*get*](struct.CustomerGetCall.html), [*patch*](struct.CustomerPatchCall.html) and [*update*](struct.CustomerUpdateCall.html)
 //! * domain aliases
@@ -160,16 +160,16 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.users().watch(req)
-//!              .view_type("et")
-//!              .sort_order("sadipscing")
-//!              .show_deleted("accusam")
-//!              .query("magna")
-//!              .projection("Lorem")
-//!              .page_token("rebum.")
-//!              .order_by("et")
-//!              .max_results(-64)
-//!              .event("eos")
-//!              .domain("dolores")
+//!              .view_type("accusam")
+//!              .sort_order("magna")
+//!              .show_deleted("Lorem")
+//!              .query("rebum.")
+//!              .projection("et")
+//!              .page_token("clita")
+//!              .order_by("eos")
+//!              .max_results(-69)
+//!              .event("vero")
+//!              .domain("consetetur")
 //!              .customer("vero")
 //!              .custom_field_mask("consetetur")
 //!              .doit();

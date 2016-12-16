@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *YouTube Analytics* crate version *1.0.0+20160513*, where *20160513* is the exact revision of the *youtubeAnalytics:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
+//! This documentation was generated from *YouTube Analytics* crate version *1.0.0+20161213*, where *20161213* is the exact revision of the *youtubeAnalytics:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
 //! 
 //! Everything else about the *YouTube Analytics* *v1* API can be found at the
 //! [official documentation site](http://developers.google.com/youtube/analytics/).
@@ -11,10 +11,6 @@
 //! 
 //! Handle the following *Resources* with ease from the central [hub](struct.YouTubeAnalytics.html) ... 
 //! 
-//! * [batch report definitions](struct.BatchReportDefinition.html)
-//!  * [*list*](struct.BatchReportDefinitionListCall.html)
-//! * [batch reports](struct.BatchReport.html)
-//!  * [*list*](struct.BatchReportListCall.html)
 //! * [group items](struct.GroupItem.html)
 //!  * [*delete*](struct.GroupItemDeleteCall.html), [*insert*](struct.GroupItemInsertCall.html) and [*list*](struct.GroupItemListCall.html)
 //! * [groups](struct.Group.html)
@@ -105,10 +101,10 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.groups().list()
-//!              .page_token("erat")
-//!              .on_behalf_of_content_owner("sadipscing")
-//!              .mine(true)
-//!              .id("eirmod")
+//!              .page_token("sea")
+//!              .on_behalf_of_content_owner("Lorem")
+//!              .mine(false)
+//!              .id("erat")
 //!              .doit();
 //! 
 //! match result {

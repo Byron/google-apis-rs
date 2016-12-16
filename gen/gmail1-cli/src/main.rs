@@ -1192,6 +1192,85 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _users_messages_batch_modify(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "remove-label-ids" => Some(("removeLabelIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "ids" => Some(("ids", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "add-label-ids" => Some(("addLabelIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["add-label-ids", "ids", "remove-label-ids"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::BatchModifyMessagesRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.users().messages_batch_modify(request, opt.value_of("user-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok(mut response) => {
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _users_messages_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.users().messages_delete(opt.value_of("user-id").unwrap_or(""), opt.value_of("id").unwrap_or(""));
@@ -3949,6 +4028,9 @@ impl<'n> Engine<'n> {
                     ("messages-batch-delete", Some(opt)) => {
                         call_result = self._users_messages_batch_delete(opt, dry_run, &mut err);
                     },
+                    ("messages-batch-modify", Some(opt)) => {
+                        call_result = self._users_messages_batch_modify(opt, dry_run, &mut err);
+                    },
                     ("messages-delete", Some(opt)) => {
                         call_result = self._users_messages_delete(opt, dry_run, &mut err);
                     },
@@ -4158,7 +4240,7 @@ fn main() {
     let mut exit_status = 0i32;
     let upload_value_names = ["mode", "file"];
     let arg_data = [
-        ("users", "methods: 'drafts-create', 'drafts-delete', 'drafts-get', 'drafts-list', 'drafts-send', 'drafts-update', 'get-profile', 'history-list', 'labels-create', 'labels-delete', 'labels-get', 'labels-list', 'labels-patch', 'labels-update', 'messages-attachments-get', 'messages-batch-delete', 'messages-delete', 'messages-get', 'messages-import', 'messages-insert', 'messages-list', 'messages-modify', 'messages-send', 'messages-trash', 'messages-untrash', 'settings-filters-create', 'settings-filters-delete', 'settings-filters-get', 'settings-filters-list', 'settings-forwarding-addresses-create', 'settings-forwarding-addresses-delete', 'settings-forwarding-addresses-get', 'settings-forwarding-addresses-list', 'settings-get-auto-forwarding', 'settings-get-imap', 'settings-get-pop', 'settings-get-vacation', 'settings-send-as-create', 'settings-send-as-delete', 'settings-send-as-get', 'settings-send-as-list', 'settings-send-as-patch', 'settings-send-as-update', 'settings-send-as-verify', 'settings-update-auto-forwarding', 'settings-update-imap', 'settings-update-pop', 'settings-update-vacation', 'stop', 'threads-delete', 'threads-get', 'threads-list', 'threads-modify', 'threads-trash', 'threads-untrash' and 'watch'", vec![
+        ("users", "methods: 'drafts-create', 'drafts-delete', 'drafts-get', 'drafts-list', 'drafts-send', 'drafts-update', 'get-profile', 'history-list', 'labels-create', 'labels-delete', 'labels-get', 'labels-list', 'labels-patch', 'labels-update', 'messages-attachments-get', 'messages-batch-delete', 'messages-batch-modify', 'messages-delete', 'messages-get', 'messages-import', 'messages-insert', 'messages-list', 'messages-modify', 'messages-send', 'messages-trash', 'messages-untrash', 'settings-filters-create', 'settings-filters-delete', 'settings-filters-get', 'settings-filters-list', 'settings-forwarding-addresses-create', 'settings-forwarding-addresses-delete', 'settings-forwarding-addresses-get', 'settings-forwarding-addresses-list', 'settings-get-auto-forwarding', 'settings-get-imap', 'settings-get-pop', 'settings-get-vacation', 'settings-send-as-create', 'settings-send-as-delete', 'settings-send-as-get', 'settings-send-as-list', 'settings-send-as-patch', 'settings-send-as-update', 'settings-send-as-verify', 'settings-update-auto-forwarding', 'settings-update-imap', 'settings-update-pop', 'settings-update-vacation', 'stop', 'threads-delete', 'threads-get', 'threads-list', 'threads-modify', 'threads-trash', 'threads-untrash' and 'watch'", vec![
             ("drafts-create",
                     Some(r##"Creates a new draft with the DRAFT label."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gmail1_cli/users_drafts-create",
@@ -4588,6 +4670,28 @@ fn main() {
             ("messages-batch-delete",
                     Some(r##"Deletes many messages by message ID. Provides no guarantees that messages were not already deleted or even existed at all."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gmail1_cli/users_messages-batch-delete",
+                  vec![
+                    (Some(r##"user-id"##),
+                     None,
+                     Some(r##"The user's email address. The special value me can be used to indicate the authenticated user."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                  ]),
+            ("messages-batch-modify",
+                    Some(r##"Modifies the labels on the specified messages."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_gmail1_cli/users_messages-batch-modify",
                   vec![
                     (Some(r##"user-id"##),
                      None,
@@ -5673,7 +5777,7 @@ fn main() {
     
     let mut app = App::new("gmail1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.0+20160711")
+           .version("1.0.0+20161206")
            .about("Access Gmail mailboxes including sending user email.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_gmail1_cli")
            .arg(Arg::with_name("url")

@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-admin1_directory` library allows access to all features of the *Google directory* service.
 
-This documentation was generated from *directory* crate version *1.0.0+20160824*, where *20160824* is the exact revision of the *admin:directory_v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
+This documentation was generated from *directory* crate version *1.0.0+20161124*, where *20161124* is the exact revision of the *admin:directory_v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
 
 Everything else about the *directory* *v1_directory* API can be found at the
 [official documentation site](https://developers.google.com/admin-sdk/directory/).
@@ -18,7 +18,7 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
 * [channels](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.Channel.html)
  * [*stop*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.ChannelStopCall.html)
 * chromeosdevices
- * [*get*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.ChromeosdeviceGetCall.html), [*list*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.ChromeosdeviceListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.ChromeosdevicePatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.ChromeosdeviceUpdateCall.html)
+ * [*action*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.ChromeosdeviceActionCall.html), [*get*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.ChromeosdeviceGetCall.html), [*list*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.ChromeosdeviceListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.ChromeosdevicePatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.ChromeosdeviceUpdateCall.html)
 * [customers](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.Customer.html)
  * [*get*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.CustomerGetCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.CustomerPatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.CustomerUpdateCall.html)
 * domain aliases

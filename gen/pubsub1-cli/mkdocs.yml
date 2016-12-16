@@ -1,4 +1,4 @@
-site_name: pubsub v1.0.0+20160317
+site_name: pubsub v1.0.0+20161122
 site_url: http://byron.github.io/google-apis-rs/google-pubsub1-cli
 site_description: Write integrating applications with bcore
 
@@ -9,6 +9,9 @@ site_dir: build_html
 
 pages:
 - ['index.md', 'Home']
+- ['projects_snapshots-get-iam-policy.md', 'Projects', 'Snapshots Get Iam Policy']
+- ['projects_snapshots-set-iam-policy.md', 'Projects', 'Snapshots Set Iam Policy']
+- ['projects_snapshots-test-iam-permissions.md', 'Projects', 'Snapshots Test Iam Permissions']
 - ['projects_subscriptions-acknowledge.md', 'Projects', 'Subscriptions Acknowledge']
 - ['projects_subscriptions-create.md', 'Projects', 'Subscriptions Create']
 - ['projects_subscriptions-delete.md', 'Projects', 'Subscriptions Delete']

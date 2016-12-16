@@ -17839,7 +17839,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves a list of account user profiles, possibly filtered."##),
+                    Some(r##"Retrieves a list of account user profiles, possibly filtered. This method supports paging."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dfareporting2d6_cli/account-user-profiles_list",
                   vec![
                     (Some(r##"profile-id"##),
@@ -17954,7 +17954,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves the list of accounts, possibly filtered."##),
+                    Some(r##"Retrieves the list of accounts, possibly filtered. This method supports paging."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dfareporting2d6_cli/accounts_list",
                   vec![
                     (Some(r##"profile-id"##),
@@ -18097,7 +18097,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves a list of ads, possibly filtered."##),
+                    Some(r##"Retrieves a list of ads, possibly filtered. This method supports paging."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dfareporting2d6_cli/ads_list",
                   vec![
                     (Some(r##"profile-id"##),
@@ -18262,7 +18262,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves a list of advertiser groups, possibly filtered."##),
+                    Some(r##"Retrieves a list of advertiser groups, possibly filtered. This method supports paging."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dfareporting2d6_cli/advertiser-groups_list",
                   vec![
                     (Some(r##"profile-id"##),
@@ -18405,7 +18405,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves a list of advertisers, possibly filtered."##),
+                    Some(r##"Retrieves a list of advertisers, possibly filtered. This method supports paging."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dfareporting2d6_cli/advertisers_list",
                   vec![
                     (Some(r##"profile-id"##),
@@ -18551,7 +18551,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves the list of creative IDs associated with the specified campaign."##),
+                    Some(r##"Retrieves the list of creative IDs associated with the specified campaign. This method supports paging."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dfareporting2d6_cli/campaign-creative-associations_list",
                   vec![
                     (Some(r##"profile-id"##),
@@ -18650,7 +18650,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves a list of campaigns, possibly filtered."##),
+                    Some(r##"Retrieves a list of campaigns, possibly filtered. This method supports paging."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dfareporting2d6_cli/campaigns_list",
                   vec![
                     (Some(r##"profile-id"##),
@@ -18765,7 +18765,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves a list of change logs."##),
+                    Some(r##"Retrieves a list of change logs. This method supports paging."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dfareporting2d6_cli/change-logs_list",
                   vec![
                     (Some(r##"profile-id"##),
@@ -18946,7 +18946,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves a list of content categories, possibly filtered."##),
+                    Some(r##"Retrieves a list of content categories, possibly filtered. This method supports paging."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dfareporting2d6_cli/content-categories_list",
                   vec![
                     (Some(r##"profile-id"##),
@@ -19256,7 +19256,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves a list of creative field values, possibly filtered."##),
+                    Some(r##"Retrieves a list of creative field values, possibly filtered. This method supports paging."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dfareporting2d6_cli/creative-field-values_list",
                   vec![
                     (Some(r##"profile-id"##),
@@ -19439,7 +19439,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves a list of creative fields, possibly filtered."##),
+                    Some(r##"Retrieves a list of creative fields, possibly filtered. This method supports paging."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dfareporting2d6_cli/creative-fields_list",
                   vec![
                     (Some(r##"profile-id"##),
@@ -19582,7 +19582,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves a list of creative groups, possibly filtered."##),
+                    Some(r##"Retrieves a list of creative groups, possibly filtered. This method supports paging."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dfareporting2d6_cli/creative-groups_list",
                   vec![
                     (Some(r##"profile-id"##),
@@ -19725,7 +19725,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves a list of creatives, possibly filtered."##),
+                    Some(r##"Retrieves a list of creatives, possibly filtered. This method supports paging."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dfareporting2d6_cli/creatives_list",
                   vec![
                     (Some(r##"profile-id"##),
@@ -19871,7 +19871,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves a list of directory site contacts, possibly filtered."##),
+                    Some(r##"Retrieves a list of directory site contacts, possibly filtered. This method supports paging."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dfareporting2d6_cli/directory-site-contacts_list",
                   vec![
                     (Some(r##"profile-id"##),
@@ -19952,7 +19952,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves a list of directory sites, possibly filtered."##),
+                    Some(r##"Retrieves a list of directory sites, possibly filtered. This method supports paging."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dfareporting2d6_cli/directory-sites_list",
                   vec![
                     (Some(r##"profile-id"##),
@@ -20382,7 +20382,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves a list of floodlight activities, possibly filtered."##),
+                    Some(r##"Retrieves a list of floodlight activities, possibly filtered. This method supports paging."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dfareporting2d6_cli/floodlight-activities_list",
                   vec![
                     (Some(r##"profile-id"##),
@@ -20525,7 +20525,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves a list of floodlight activity groups, possibly filtered."##),
+                    Some(r##"Retrieves a list of floodlight activity groups, possibly filtered. This method supports paging."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dfareporting2d6_cli/floodlight-activity-groups_list",
                   vec![
                     (Some(r##"profile-id"##),
@@ -20761,7 +20761,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves a list of inventory items, possibly filtered."##),
+                    Some(r##"Retrieves a list of inventory items, possibly filtered. This method supports paging."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dfareporting2d6_cli/inventory-items_list",
                   vec![
                     (Some(r##"profile-id"##),
@@ -21236,7 +21236,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves a list of order documents, possibly filtered."##),
+                    Some(r##"Retrieves a list of order documents, possibly filtered. This method supports paging."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dfareporting2d6_cli/order-documents_list",
                   vec![
                     (Some(r##"profile-id"##),
@@ -21301,7 +21301,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves a list of orders, possibly filtered."##),
+                    Some(r##"Retrieves a list of orders, possibly filtered. This method supports paging."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dfareporting2d6_cli/orders_list",
                   vec![
                     (Some(r##"profile-id"##),
@@ -21388,7 +21388,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves a list of placement groups, possibly filtered."##),
+                    Some(r##"Retrieves a list of placement groups, possibly filtered. This method supports paging."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dfareporting2d6_cli/placement-groups_list",
                   vec![
                     (Some(r##"profile-id"##),
@@ -21553,7 +21553,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves a list of placement strategies, possibly filtered."##),
+                    Some(r##"Retrieves a list of placement strategies, possibly filtered. This method supports paging."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dfareporting2d6_cli/placement-strategies_list",
                   vec![
                     (Some(r##"profile-id"##),
@@ -21718,7 +21718,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves a list of placements, possibly filtered."##),
+                    Some(r##"Retrieves a list of placements, possibly filtered. This method supports paging."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dfareporting2d6_cli/placements_list",
                   vec![
                     (Some(r##"profile-id"##),
@@ -21939,7 +21939,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves a list of projects, possibly filtered."##),
+                    Some(r##"Retrieves a list of projects, possibly filtered. This method supports paging."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dfareporting2d6_cli/projects_list",
                   vec![
                     (Some(r##"profile-id"##),
@@ -22138,7 +22138,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves a list of remarketing lists, possibly filtered."##),
+                    Some(r##"Retrieves a list of remarketing lists, possibly filtered. This method supports paging."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dfareporting2d6_cli/remarketing-lists_list",
                   vec![
                     (Some(r##"profile-id"##),
@@ -22576,7 +22576,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves a list of sites, possibly filtered."##),
+                    Some(r##"Retrieves a list of sites, possibly filtered. This method supports paging."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dfareporting2d6_cli/sites_list",
                   vec![
                     (Some(r##"profile-id"##),
@@ -22800,7 +22800,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Gets a list of subaccounts, possibly filtered."##),
+                    Some(r##"Gets a list of subaccounts, possibly filtered. This method supports paging."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dfareporting2d6_cli/subaccounts_list",
                   vec![
                     (Some(r##"profile-id"##),
@@ -22915,7 +22915,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves a list of targetable remarketing lists, possibly filtered."##),
+                    Some(r##"Retrieves a list of targetable remarketing lists, possibly filtered. This method supports paging."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dfareporting2d6_cli/targetable-remarketing-lists_list",
                   vec![
                     (Some(r##"profile-id"##),
@@ -23002,7 +23002,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves a list of targeting templates, optionally filtered."##),
+                    Some(r##"Retrieves a list of targeting templates, optionally filtered. This method supports paging."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dfareporting2d6_cli/targeting-templates_list",
                   vec![
                     (Some(r##"profile-id"##),
@@ -23314,7 +23314,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves a list of user roles, possibly filtered."##),
+                    Some(r##"Retrieves a list of user roles, possibly filtered. This method supports paging."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dfareporting2d6_cli/user-roles_list",
                   vec![
                     (Some(r##"profile-id"##),
@@ -23403,7 +23403,7 @@ fn main() {
     
     let mut app = App::new("dfareporting2d6")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.0+20160803")
+           .version("1.0.0+20161027")
            .about("Manages your DoubleClick Campaign Manager ad campaigns and reports.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_dfareporting2d6_cli")
            .arg(Arg::with_name("url")

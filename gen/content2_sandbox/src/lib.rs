@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Shopping Content* crate version *1.0.0+20160905*, where *20160905* is the exact revision of the *content:v2sandbox* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
+//! This documentation was generated from *Shopping Content* crate version *1.0.0+20161205*, where *20161205* is the exact revision of the *content:v2sandbox* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
 //! 
 //! Everything else about the *Shopping Content* *v2_sandbox* API can be found at the
 //! [official documentation site](https://developers.google.com/shopping-content).

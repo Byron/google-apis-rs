@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *directory* API at revision *20160824*. The CLI is at version *1.0.0*.
+This documentation was generated from the *directory* API at revision *20161124*. The CLI is at version *1.0.0*.
 
 ```bash
 admin1-directory [options]
@@ -35,6 +35,7 @@ admin1-directory [options]
         channels
                 stop (-r <kv>)... [-p <v>]...
         chromeosdevices
+                action <customer-id> <resource-id> (-r <kv>)... [-p <v>]...
                 get <customer-id> <device-id> [-p <v>]... [-o <out>]
                 list <customer-id> [-p <v>]... [-o <out>]
                 patch <customer-id> <device-id> (-r <kv>)... [-p <v>]... [-o <out>]

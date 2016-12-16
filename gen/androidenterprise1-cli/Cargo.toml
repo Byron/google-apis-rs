@@ -4,7 +4,7 @@
 [package]
 
 name = "google-androidenterprise1-cli"
-version = "1.0.0+20160831"
+version = "1.0.0+20161207"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Android Enterprise (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/androidenterprise1-cli"

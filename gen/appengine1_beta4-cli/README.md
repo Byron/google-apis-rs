@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *appengine* API at revision *20160802*. The CLI is at version *1.0.0*.
+This documentation was generated from the *appengine* API at revision *20161208*. The CLI is at version *1.0.0*.
 
 ```bash
 appengine1-beta4 [options]
@@ -48,6 +48,7 @@ appengine1-beta4 [options]
                 modules-versions-patch <apps-id> <modules-id> <versions-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 operations-get <apps-id> <operations-id> [-p <v>]... [-o <out>]
                 operations-list <apps-id> [-p <v>]... [-o <out>]
+                patch <apps-id> (-r <kv>)... [-p <v>]... [-o <out>]
   appengine1-beta4 --help
 
 Configuration:

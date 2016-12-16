@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *plus* API at revision *20160907*. The CLI is at version *1.0.0*.
+This documentation was generated from the *plus* API at revision *20161214*. The CLI is at version *1.0.0*.
 
 ```bash
 plus1 [options]

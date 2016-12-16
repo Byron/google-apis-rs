@@ -1,0 +1,18 @@
+site_name: Manufacturer Center v1.0.0+20161028
+site_url: http://byron.github.io/google-apis-rs/google-manufacturers1-cli
+site_description: Write integrating applications with bcore
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/manufacturers1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['accounts_products-get.md', 'Accounts', 'Products Get']
+- ['accounts_products-list.md', 'Accounts', 'Products List']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+

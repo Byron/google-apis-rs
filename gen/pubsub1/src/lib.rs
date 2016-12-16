@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *pubsub* crate version *1.0.0+20160317*, where *20160317* is the exact revision of the *pubsub:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
+//! This documentation was generated from *pubsub* crate version *1.0.0+20161122*, where *20161122* is the exact revision of the *pubsub:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
 //! 
 //! Everything else about the *pubsub* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/pubsub/docs).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.Pubsub.html) ... 
 //! 
 //! * projects
-//!  * [*subscriptions acknowledge*](struct.ProjectSubscriptionAcknowledgeCall.html), [*subscriptions create*](struct.ProjectSubscriptionCreateCall.html), [*subscriptions delete*](struct.ProjectSubscriptionDeleteCall.html), [*subscriptions get*](struct.ProjectSubscriptionGetCall.html), [*subscriptions get iam policy*](struct.ProjectSubscriptionGetIamPolicyCall.html), [*subscriptions list*](struct.ProjectSubscriptionListCall.html), [*subscriptions modify ack deadline*](struct.ProjectSubscriptionModifyAckDeadlineCall.html), [*subscriptions modify push config*](struct.ProjectSubscriptionModifyPushConfigCall.html), [*subscriptions pull*](struct.ProjectSubscriptionPullCall.html), [*subscriptions set iam policy*](struct.ProjectSubscriptionSetIamPolicyCall.html), [*subscriptions test iam permissions*](struct.ProjectSubscriptionTestIamPermissionCall.html), [*topics create*](struct.ProjectTopicCreateCall.html), [*topics delete*](struct.ProjectTopicDeleteCall.html), [*topics get*](struct.ProjectTopicGetCall.html), [*topics get iam policy*](struct.ProjectTopicGetIamPolicyCall.html), [*topics list*](struct.ProjectTopicListCall.html), [*topics publish*](struct.ProjectTopicPublishCall.html), [*topics set iam policy*](struct.ProjectTopicSetIamPolicyCall.html), [*topics subscriptions list*](struct.ProjectTopicSubscriptionListCall.html) and [*topics test iam permissions*](struct.ProjectTopicTestIamPermissionCall.html)
+//!  * [*snapshots get iam policy*](struct.ProjectSnapshotGetIamPolicyCall.html), [*snapshots set iam policy*](struct.ProjectSnapshotSetIamPolicyCall.html), [*snapshots test iam permissions*](struct.ProjectSnapshotTestIamPermissionCall.html), [*subscriptions acknowledge*](struct.ProjectSubscriptionAcknowledgeCall.html), [*subscriptions create*](struct.ProjectSubscriptionCreateCall.html), [*subscriptions delete*](struct.ProjectSubscriptionDeleteCall.html), [*subscriptions get*](struct.ProjectSubscriptionGetCall.html), [*subscriptions get iam policy*](struct.ProjectSubscriptionGetIamPolicyCall.html), [*subscriptions list*](struct.ProjectSubscriptionListCall.html), [*subscriptions modify ack deadline*](struct.ProjectSubscriptionModifyAckDeadlineCall.html), [*subscriptions modify push config*](struct.ProjectSubscriptionModifyPushConfigCall.html), [*subscriptions pull*](struct.ProjectSubscriptionPullCall.html), [*subscriptions set iam policy*](struct.ProjectSubscriptionSetIamPolicyCall.html), [*subscriptions test iam permissions*](struct.ProjectSubscriptionTestIamPermissionCall.html), [*topics create*](struct.ProjectTopicCreateCall.html), [*topics delete*](struct.ProjectTopicDeleteCall.html), [*topics get*](struct.ProjectTopicGetCall.html), [*topics get iam policy*](struct.ProjectTopicGetIamPolicyCall.html), [*topics list*](struct.ProjectTopicListCall.html), [*topics publish*](struct.ProjectTopicPublishCall.html), [*topics set iam policy*](struct.ProjectTopicSetIamPolicyCall.html), [*topics subscriptions list*](struct.ProjectTopicSubscriptionListCall.html) and [*topics test iam permissions*](struct.ProjectTopicTestIamPermissionCall.html)
 //! 
 //! 
 //! 
@@ -47,11 +47,12 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.projects().subscriptions_acknowledge(...).doit()
-//! let r = hub.projects().subscriptions_modify_push_config(...).doit()
-//! let r = hub.projects().subscriptions_delete(...).doit()
-//! let r = hub.projects().topics_delete(...).doit()
-//! let r = hub.projects().subscriptions_modify_ack_deadline(...).doit()
+//! let r = hub.projects().snapshots_get_iam_policy(...).doit()
+//! let r = hub.projects().snapshots_set_iam_policy(...).doit()
+//! let r = hub.projects().topics_get_iam_policy(...).doit()
+//! let r = hub.projects().topics_set_iam_policy(...).doit()
+//! let r = hub.projects().subscriptions_get_iam_policy(...).doit()
+//! let r = hub.projects().subscriptions_set_iam_policy(...).doit()
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -76,7 +77,7 @@
 //! extern crate hyper;
 //! extern crate yup_oauth2 as oauth2;
 //! extern crate google_pubsub1 as pubsub1;
-//! use pubsub1::AcknowledgeRequest;
+//! use pubsub1::SetIamPolicyRequest;
 //! use pubsub1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
@@ -98,12 +99,12 @@
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req = AcknowledgeRequest::default();
+//! let mut req = SetIamPolicyRequest::default();
 //! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.projects().subscriptions_acknowledge(req, "subscription")
+//! let result = hub.projects().snapshots_set_iam_policy(req, "resource")
 //!              .doit();
 //! 
 //! match result {

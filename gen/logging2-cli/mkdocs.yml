@@ -1,0 +1,52 @@
+site_name: Logging v1.0.0+20161206
+site_url: http://byron.github.io/google-apis-rs/google-logging2-cli
+site_description: Write integrating applications with bcore
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/logging2-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['billing-accounts_logs-delete.md', 'Billing Accounts', 'Logs Delete']
+- ['billing-accounts_logs-list.md', 'Billing Accounts', 'Logs List']
+- ['billing-accounts_sinks-create.md', 'Billing Accounts', 'Sinks Create']
+- ['billing-accounts_sinks-delete.md', 'Billing Accounts', 'Sinks Delete']
+- ['billing-accounts_sinks-get.md', 'Billing Accounts', 'Sinks Get']
+- ['billing-accounts_sinks-list.md', 'Billing Accounts', 'Sinks List']
+- ['billing-accounts_sinks-update.md', 'Billing Accounts', 'Sinks Update']
+- ['entries_list.md', 'Entries', 'List']
+- ['entries_write.md', 'Entries', 'Write']
+- ['folders_logs-delete.md', 'Folders', 'Logs Delete']
+- ['folders_logs-list.md', 'Folders', 'Logs List']
+- ['folders_sinks-create.md', 'Folders', 'Sinks Create']
+- ['folders_sinks-delete.md', 'Folders', 'Sinks Delete']
+- ['folders_sinks-get.md', 'Folders', 'Sinks Get']
+- ['folders_sinks-list.md', 'Folders', 'Sinks List']
+- ['folders_sinks-update.md', 'Folders', 'Sinks Update']
+- ['monitored-resource-descriptors_list.md', 'Monitored Resource Descriptors', 'List']
+- ['organizations_logs-delete.md', 'Organizations', 'Logs Delete']
+- ['organizations_logs-list.md', 'Organizations', 'Logs List']
+- ['organizations_sinks-create.md', 'Organizations', 'Sinks Create']
+- ['organizations_sinks-delete.md', 'Organizations', 'Sinks Delete']
+- ['organizations_sinks-get.md', 'Organizations', 'Sinks Get']
+- ['organizations_sinks-list.md', 'Organizations', 'Sinks List']
+- ['organizations_sinks-update.md', 'Organizations', 'Sinks Update']
+- ['projects_logs-delete.md', 'Projects', 'Logs Delete']
+- ['projects_logs-list.md', 'Projects', 'Logs List']
+- ['projects_metrics-create.md', 'Projects', 'Metrics Create']
+- ['projects_metrics-delete.md', 'Projects', 'Metrics Delete']
+- ['projects_metrics-get.md', 'Projects', 'Metrics Get']
+- ['projects_metrics-list.md', 'Projects', 'Metrics List']
+- ['projects_metrics-update.md', 'Projects', 'Metrics Update']
+- ['projects_sinks-create.md', 'Projects', 'Sinks Create']
+- ['projects_sinks-delete.md', 'Projects', 'Sinks Delete']
+- ['projects_sinks-get.md', 'Projects', 'Sinks Get']
+- ['projects_sinks-list.md', 'Projects', 'Sinks List']
+- ['projects_sinks-update.md', 'Projects', 'Sinks Update']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+

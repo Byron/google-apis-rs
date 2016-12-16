@@ -423,7 +423,7 @@ pub struct About {
 impl ResponseResult for About {}
 
 
-/// Thumbnail for the file. Only accepted on upload and for files that are not already thumbnailed by Google.
+/// A thumbnail for the file. This will only be used if Drive cannot generate a standard thumbnail.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -464,16 +464,16 @@ impl Part for FileThumbnail {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct File {
+    /// Whether this file has a thumbnail.
+    #[serde(rename="hasThumbnail")]
+    pub has_thumbnail: Option<bool>,
     /// The MIME type of the file. This is only mutable on update when uploading new content. This field can be left blank, and the mimetype will be determined from the uploaded content's MIME type.
     #[serde(rename="mimeType")]
     pub mime_type: Option<String>,
-    /// Last time this file was viewed by the user (formatted RFC 3339 timestamp).
-    #[serde(rename="lastViewedByMeDate")]
-    pub last_viewed_by_me_date: Option<String>,
     /// Whether this file is in the Application Data folder.
     #[serde(rename="appDataContents")]
     pub app_data_contents: Option<bool>,
-    /// A short-lived link to the file's thumbnail. Typically lasts on the order of hours.
+    /// A short-lived link to the file's thumbnail. Typically lasts on the order of hours. Only populated when the requesting app can access the file's content.
     #[serde(rename="thumbnailLink")]
     pub thumbnail_link: Option<String>,
     /// A group of labels for the file.
@@ -481,6 +481,9 @@ pub struct File {
     /// Indexable text attributes for the file (can only be written)
     #[serde(rename="indexableText")]
     pub indexable_text: Option<FileIndexableText>,
+    /// The thumbnail version for use in client-contructable thumbnail URLs or thumbnail cache invalidation.
+    #[serde(rename="thumbnailVersion")]
+    pub thumbnail_version: Option<String>,
     /// Whether this file has been explicitly trashed, as opposed to recursively trashed.
     #[serde(rename="explicitlyTrashed")]
     pub explicitly_trashed: Option<bool>,
@@ -573,6 +576,9 @@ pub struct File {
     /// Create time for this file (formatted RFC 3339 timestamp).
     #[serde(rename="createdDate")]
     pub created_date: Option<String>,
+    /// Last time this file was viewed by the user (formatted RFC 3339 timestamp).
+    #[serde(rename="lastViewedByMeDate")]
+    pub last_viewed_by_me_date: Option<String>,
     /// The list of properties.
     pub properties: Option<Vec<Property>>,
     /// An MD5 checksum for the content of this file. This field is only populated for files with content stored in Drive; it is not populated for Google Docs or shortcut files.
@@ -595,7 +601,7 @@ pub struct File {
     /// Last time this file was modified by the user (formatted RFC 3339 timestamp). Note that setting modifiedDate will also update the modifiedByMe date for the user which set the date.
     #[serde(rename="modifiedByMeDate")]
     pub modified_by_me_date: Option<String>,
-    /// Thumbnail for the file. Only accepted on upload and for files that are not already thumbnailed by Google.
+    /// A thumbnail for the file. This will only be used if Drive cannot generate a standard thumbnail.
     pub thumbnail: Option<FileThumbnail>,
     /// no description provided
     #[serde(rename="downloadUrl")]
@@ -839,6 +845,9 @@ impl Part for AboutImportFormats {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RevisionList {
+    /// The page token for the next page of revisions. This field will be absent if the end of the revisions list has been reached. If the token is rejected for any reason, it should be discarded and pagination should be restarted from the first page of results.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
     /// The actual list of revisions.
     pub items: Option<Vec<Revision>>,
     /// This is always drive#revisionList.
@@ -876,16 +885,18 @@ impl Part for AboutMaxUploadSizes {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FileLabels {
-    /// Whether viewers and commenters are prevented from downloading, printing, and copying this file.
-    pub restricted: Option<bool>,
-    /// Deprecated.
-    pub hidden: Option<bool>,
-    /// Whether this file has been trashed. This label applies to all users accessing the file; however, only owners are allowed to see and untrash files.
-    pub trashed: Option<bool>,
     /// Whether this file is starred by the user.
     pub starred: Option<bool>,
     /// Whether this file has been viewed by this user.
     pub viewed: Option<bool>,
+    /// Whether viewers and commenters are prevented from downloading, printing, and copying this file.
+    pub restricted: Option<bool>,
+    /// Deprecated.
+    pub hidden: Option<bool>,
+    /// Whether the file has been modified by this user.
+    pub modified: Option<bool>,
+    /// Whether this file has been trashed. This label applies to all users accessing the file; however, only owners are allowed to see and untrash files.
+    pub trashed: Option<bool>,
 }
 
 impl NestedType for FileLabels {}
@@ -1121,7 +1132,7 @@ pub struct Permission {
     pub name: Option<String>,
     /// This is always drive#permission.
     pub kind: Option<String>,
-    /// The email address or domain name for the entity. This is used during inserts and is not populated in responses. When making a drive.permissions.insert request, exactly one of the id or value fields must be specified unless the permission type anyone, in which case both id and value are ignored.
+    /// The email address or domain name for the entity. This is used during inserts and is not populated in responses. When making a drive.permissions.insert request, exactly one of the id or value fields must be specified unless the permission type is anyone, in which case both id and value are ignored.
     pub value: Option<String>,
     /// Additional roles for this user. Only commenter is currently allowed.
     #[serde(rename="additionalRoles")]
@@ -1149,7 +1160,7 @@ pub struct Permission {
     /// - anyone
     #[serde(rename="type")]
     pub type_: Option<String>,
-    /// The ID of the user this permission refers to, and identical to the permissionId in the About and Files resources. When making a drive.permissions.insert request, exactly one of the id or value fields must be specified unless the permission type anyone, in which case both id and value are ignored.
+    /// The ID of the user this permission refers to, and identical to the permissionId in the About and Files resources. When making a drive.permissions.insert request, exactly one of the id or value fields must be specified unless the permission type is anyone, in which case both id and value are ignored.
     pub id: Option<String>,
     /// A link back to this permission.
     #[serde(rename="selfLink")]
@@ -3446,6 +3457,8 @@ impl<'a, C, A> RevisionMethods<'a, C, A> {
         RevisionListCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
+            _page_token: Default::default(),
+            _max_results: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -19830,6 +19843,8 @@ impl<'a, C, A> RevisionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.revisions().list("fileId")
+///              .page_token("sed")
+///              .max_results(-99)
 ///              .doit();
 /// # }
 /// ```
@@ -19838,6 +19853,8 @@ pub struct RevisionListCall<'a, C, A>
 
     hub: &'a Drive<C, A>,
     _file_id: String,
+    _page_token: Option<String>,
+    _max_results: Option<i32>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -19859,9 +19876,15 @@ impl<'a, C, A> RevisionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         };
         dlg.begin(MethodInfo { id: "drive.revisions.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("fileId", self._file_id.to_string()));
-        for &field in ["alt", "fileId"].iter() {
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._max_results {
+            params.push(("maxResults", value.to_string()));
+        }
+        for &field in ["alt", "fileId", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -19984,6 +20007,20 @@ impl<'a, C, A> RevisionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// we provide this method for API completeness.
     pub fn file_id(mut self, new_value: &str) -> RevisionListCall<'a, C, A> {
         self._file_id = new_value.to_string();
+        self
+    }
+    /// Page token for revisions. To get the next page of results, set this parameter to the value of "nextPageToken" from the previous response.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> RevisionListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Maximum number of revisions to return.
+    ///
+    /// Sets the *max results* query property to the given value.
+    pub fn max_results(mut self, new_value: i32) -> RevisionListCall<'a, C, A> {
+        self._max_results = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong

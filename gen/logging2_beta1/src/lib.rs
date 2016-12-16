@@ -2,21 +2,25 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *logging* crate version *1.0.0+20160322*, where *20160322* is the exact revision of the *logging:v2beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
+//! This documentation was generated from *Logging* crate version *1.0.0+20161206*, where *20161206* is the exact revision of the *logging:v2beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
 //! 
-//! Everything else about the *logging* *v2_beta1* API can be found at the
+//! Everything else about the *Logging* *v2_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/logging/docs/).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/logging2_beta1).
 //! # Features
 //! 
 //! Handle the following *Resources* with ease from the central [hub](struct.Logging.html) ... 
 //! 
+//! * billing accounts
+//!  * [*logs delete*](struct.BillingAccountLogDeleteCall.html) and [*logs list*](struct.BillingAccountLogListCall.html)
 //! * entries
 //!  * [*list*](struct.EntryListCall.html) and [*write*](struct.EntryWriteCall.html)
 //! * [monitored resource descriptors](struct.MonitoredResourceDescriptor.html)
 //!  * [*list*](struct.MonitoredResourceDescriptorListCall.html)
+//! * organizations
+//!  * [*logs delete*](struct.OrganizationLogDeleteCall.html) and [*logs list*](struct.OrganizationLogListCall.html)
 //! * projects
-//!  * [*logs delete*](struct.ProjectLogDeleteCall.html), [*metrics create*](struct.ProjectMetricCreateCall.html), [*metrics delete*](struct.ProjectMetricDeleteCall.html), [*metrics get*](struct.ProjectMetricGetCall.html), [*metrics list*](struct.ProjectMetricListCall.html), [*metrics update*](struct.ProjectMetricUpdateCall.html), [*sinks create*](struct.ProjectSinkCreateCall.html), [*sinks delete*](struct.ProjectSinkDeleteCall.html), [*sinks get*](struct.ProjectSinkGetCall.html), [*sinks list*](struct.ProjectSinkListCall.html) and [*sinks update*](struct.ProjectSinkUpdateCall.html)
+//!  * [*logs delete*](struct.ProjectLogDeleteCall.html), [*logs list*](struct.ProjectLogListCall.html), [*metrics create*](struct.ProjectMetricCreateCall.html), [*metrics delete*](struct.ProjectMetricDeleteCall.html), [*metrics get*](struct.ProjectMetricGetCall.html), [*metrics list*](struct.ProjectMetricListCall.html), [*metrics update*](struct.ProjectMetricUpdateCall.html), [*sinks create*](struct.ProjectSinkCreateCall.html), [*sinks delete*](struct.ProjectSinkDeleteCall.html), [*sinks get*](struct.ProjectSinkGetCall.html), [*sinks list*](struct.ProjectSinkListCall.html) and [*sinks update*](struct.ProjectSinkUpdateCall.html)
 //! 
 //! 
 //! 
@@ -51,9 +55,11 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.projects().sinks_get(...).doit()
-//! let r = hub.projects().sinks_update(...).doit()
-//! let r = hub.projects().sinks_create(...).doit()
+//! let r = hub.organizations().logs_delete(...).doit()
+//! let r = hub.projects().logs_delete(...).doit()
+//! let r = hub.projects().metrics_delete(...).doit()
+//! let r = hub.billing_accounts().logs_delete(...).doit()
+//! let r = hub.projects().sinks_delete(...).doit()
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -78,7 +84,6 @@
 //! extern crate hyper;
 //! extern crate yup_oauth2 as oauth2;
 //! extern crate google_logging2_beta1 as logging2_beta1;
-//! use logging2_beta1::LogSink;
 //! use logging2_beta1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
@@ -97,15 +102,10 @@
 //!                               hyper::Client::new(),
 //!                               <MemoryStorage as Default>::default(), None);
 //! let mut hub = Logging::new(hyper::Client::new(), auth);
-//! // As the method needs a request, you would usually fill it with the desired information
-//! // into the respective structure. Some of the parts shown here might not be applicable !
-//! // Values shown here are possibly random and not representative !
-//! let mut req = LogSink::default();
-//! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.projects().sinks_update(req, "sinkName")
+//! let result = hub.organizations().logs_delete("logName")
 //!              .doit();
 //! 
 //! match result {

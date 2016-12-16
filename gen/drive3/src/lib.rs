@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *drive* crate version *1.0.0+20160901*, where *20160901* is the exact revision of the *drive:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
+//! This documentation was generated from *drive* crate version *1.0.0+20161212*, where *20161212* is the exact revision of the *drive:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
 //! 
 //! Everything else about the *drive* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/drive/).
@@ -144,11 +144,11 @@
 //! // execute the final call using `upload_resumable(...)`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.files().update(req, "fileId")
-//!              .use_content_as_indexable_text(false)
-//!              .remove_parents("eirmod")
-//!              .ocr_language("consetetur")
-//!              .keep_revision_forever(false)
-//!              .add_parents("sed")
+//!              .use_content_as_indexable_text(true)
+//!              .remove_parents("labore")
+//!              .ocr_language("sed")
+//!              .keep_revision_forever(true)
+//!              .add_parents("gubergren")
 //!              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 //! 
 //! match result {

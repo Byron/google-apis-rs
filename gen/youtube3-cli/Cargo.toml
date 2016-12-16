@@ -4,7 +4,7 @@
 [package]
 
 name = "google-youtube3-cli"
-version = "1.0.0+20160805"
+version = "1.0.0+20161202"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with YouTube (protocol v3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/youtube3-cli"

@@ -1,4 +1,4 @@
-site_name: Ad Exchange Buyer v1.0.0+20160831
+site_name: Ad Exchange Buyer v1.0.0+20161020
 site_url: http://byron.github.io/google-apis-rs/google-adexchangebuyer1d4-cli
 site_description: Write integrating applications with bcore
 
@@ -22,6 +22,7 @@ pages:
 - ['creatives_get.md', 'Creatives', 'Get']
 - ['creatives_insert.md', 'Creatives', 'Insert']
 - ['creatives_list.md', 'Creatives', 'List']
+- ['creatives_list-deals.md', 'Creatives', 'List Deals']
 - ['creatives_remove-deal.md', 'Creatives', 'Remove Deal']
 - ['marketplacedeals_delete.md', 'Marketplacedeals', 'Delete']
 - ['marketplacedeals_insert.md', 'Marketplacedeals', 'Insert']

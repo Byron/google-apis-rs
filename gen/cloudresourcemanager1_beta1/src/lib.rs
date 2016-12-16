@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Resource Manager* crate version *1.0.0+20160617*, where *20160617* is the exact revision of the *cloudresourcemanager:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
+//! This documentation was generated from *Cloud Resource Manager* crate version *1.0.0+20161212*, where *20161212* is the exact revision of the *cloudresourcemanager:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
 //! 
 //! Everything else about the *Cloud Resource Manager* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/resource-manager).
@@ -105,9 +105,9 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.projects().list()
-//!              .page_token("ipsum")
-//!              .page_size(-5)
-//!              .filter("et")
+//!              .page_token("Lorem")
+//!              .page_size(-21)
+//!              .filter("duo")
 //!              .doit();
 //! 
 //! match result {

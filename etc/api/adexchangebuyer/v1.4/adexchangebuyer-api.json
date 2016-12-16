@@ -1,12 +1,12 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"C5oy1hgQsABtYOYIOXWcR3BgYqU/TVMTzMzY2Oz9Cw6N35WlTiR7OUE\"",
+ "etag": "\"tbys6C40o18GZwyMen5GMkdK-3s/EvKs3Hkvcx40X69CkSu-499XWyU\"",
  "discoveryVersion": "v1",
  "id": "adexchangebuyer:v1.4",
  "name": "adexchangebuyer",
  "canonicalName": "Ad Exchange Buyer",
  "version": "v1.4",
- "revision": "20160831",
+ "revision": "20161020",
  "title": "Ad Exchange Buyer API",
  "description": "Accesses your bidding-account information, submits creatives for validation, finds available direct deals, and retrieves performance reports.",
  "ownerDomain": "google.com",
@@ -90,7 +90,7 @@
       "properties": {
        "bidProtocol": {
         "type": "string",
-        "description": "The protocol that the bidder endpoint is using. By default, OpenRTB protocols use JSON, except PROTOCOL_OPENRTB_PROTOBUF. PROTOCOL_OPENRTB_PROTOBUF uses protobuf encoding over the latest OpenRTB protocol version, which is 2.3 right now. Allowed values:  \n- PROTOCOL_ADX \n- PROTOCOL_OPENRTB_2_2 \n- PROTOCOL_OPENRTB_2_3 \n- PROTOCOL_OPENRTB_PROTOBUF"
+        "description": "The protocol that the bidder endpoint is using. By default, OpenRTB protocols use JSON, except PROTOCOL_OPENRTB_PROTOBUF. PROTOCOL_OPENRTB_PROTOBUF uses protobuf encoding over the latest OpenRTB protocol version, which is 2.4 right now. Allowed values:  \n- PROTOCOL_ADX \n- PROTOCOL_OPENRTB_2_2 \n- PROTOCOL_OPENRTB_2_3 \n- PROTOCOL_OPENRTB_2_4 \n- PROTOCOL_OPENRTB_PROTOBUF"
        },
        "maximumQps": {
         "type": "integer",
@@ -568,7 +568,7 @@
     },
     "nativeAd": {
      "type": "object",
-     "description": "If nativeAd is set, HTMLSnippet and videoURL should not be set.",
+     "description": "If nativeAd is set, HTMLSnippet and the videoURL outside of nativeAd should not be set. (The videoURL inside nativeAd can be set.)",
      "properties": {
       "advertiser": {
        "type": "string"
@@ -597,6 +597,10 @@
       "callToAction": {
        "type": "string",
        "description": "A label for the button that the user is supposed to click."
+      },
+      "clickLinkUrl": {
+       "type": "string",
+       "description": "The URL that the browser/SDK will load when the user clicks the ad."
       },
       "clickTrackingUrl": {
        "type": "string",
@@ -659,6 +663,10 @@
       "store": {
        "type": "string",
        "description": "The URL to the app store to purchase/download the promoted app."
+      },
+      "videoURL": {
+       "type": "string",
+       "description": "The URL of the XML VAST for a native ad. Note this is a separate field from resource.video_url."
       }
      }
     },
@@ -773,7 +781,7 @@
     },
     "videoURL": {
      "type": "string",
-     "description": "The url to fetch a video ad. If set, HTMLSnippet should not be set."
+     "description": "The URL to fetch a video ad. If set, HTMLSnippet and the nativeAd should not be set. Note, this is different from resource.native_ad.video_url above."
     },
     "width": {
      "type": "integer",
@@ -784,6 +792,41 @@
        "adexchangebuyer.creatives.insert"
       ]
      }
+    }
+   }
+  },
+  "CreativeDealIds": {
+   "id": "CreativeDealIds",
+   "type": "object",
+   "description": "The external deal ids associated with a creative.",
+   "properties": {
+    "dealStatuses": {
+     "type": "array",
+     "description": "A list of external deal ids and ARC approval status.",
+     "items": {
+      "type": "object",
+      "properties": {
+       "arcStatus": {
+        "type": "string",
+        "description": "ARC approval status."
+       },
+       "dealId": {
+        "type": "string",
+        "description": "External deal ID.",
+        "format": "int64"
+       },
+       "webPropertyId": {
+        "type": "integer",
+        "description": "Publisher ID.",
+        "format": "int32"
+       }
+      }
+     }
+    },
+    "kind": {
+     "type": "string",
+     "description": "Resource type.",
+     "default": "adexchangebuyer#creativeDealIds"
     }
    }
   },
@@ -1264,6 +1307,10 @@
      "type": "string",
      "description": "Description for the deal terms. (updatable)"
     },
+    "isRfpTemplate": {
+     "type": "boolean",
+     "description": "Indicates whether the current deal is a RFP template. RFP template is created by buyer and not based on seller created products."
+    },
     "kind": {
      "type": "string",
      "description": "Identifies what kind of resource this is. Value: the fixed string \"adexchangebuyer#marketplaceDeal\".",
@@ -1716,6 +1763,13 @@
       "format": "int64"
      }
     },
+    "userIdentifierDataRequired": {
+     "type": "array",
+     "description": "Requests containing the specified type of user data will match. Possible values are HOSTED_MATCH_DATA, which means the request is cookie-targetable and has a match in the buyer's hosted match table, and COOKIE_OR_IDFA, which means the request has either a targetable cookie or an iOS IDFA.",
+     "items": {
+      "type": "string"
+     }
+    },
     "userLists": {
      "type": "array",
      "description": "Requests containing any of these user list ids will match.",
@@ -1976,6 +2030,13 @@
     "buyerPrivateData": {
      "$ref": "PrivateData",
      "description": "Private data for buyer. (hidden from seller)."
+    },
+    "dbmAdvertiserIds": {
+     "type": "array",
+     "description": "IDs of DBM advertisers permission to this proposal.",
+     "items": {
+      "type": "string"
+     }
     },
     "hasBuyerSignedOff": {
      "type": "boolean",
@@ -2759,6 +2820,37 @@
      },
      "response": {
       "$ref": "CreativesList"
+     },
+     "scopes": [
+      "https://www.googleapis.com/auth/adexchange.buyer"
+     ]
+    },
+    "listDeals": {
+     "id": "adexchangebuyer.creatives.listDeals",
+     "path": "creatives/{accountId}/{buyerCreativeId}/listDeals",
+     "httpMethod": "GET",
+     "description": "Lists the external deal ids associated with the creative.",
+     "parameters": {
+      "accountId": {
+       "type": "integer",
+       "description": "The id for the account that will serve this creative.",
+       "required": true,
+       "format": "int32",
+       "location": "path"
+      },
+      "buyerCreativeId": {
+       "type": "string",
+       "description": "The buyer-specific id for this creative.",
+       "required": true,
+       "location": "path"
+      }
+     },
+     "parameterOrder": [
+      "accountId",
+      "buyerCreativeId"
+     ],
+     "response": {
+      "$ref": "CreativeDealIds"
      },
      "scopes": [
       "https://www.googleapis.com/auth/adexchange.buyer"

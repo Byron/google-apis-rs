@@ -981,7 +981,7 @@ impl ResponseResult for OrdersCustomBatchResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OrderCustomer {
-    /// If set, this indicates the user explicitly chose to opt in or out of providing marketing rights to the merchant. If unset, this indicates the user has already made this choice in a previous purchase, and was thus not shown the marketing right opt in/out checkbox during the Purchases on Google checkout flow.
+    /// If set, this indicates the user explicitly chose to opt in or out of providing marketing rights to the merchant. If unset, this indicates the user has already made this choice in a previous purchase, and was thus not shown the marketing right opt in/out checkbox during the checkout flow.
     #[serde(rename="explicitMarketingPreference")]
     pub explicit_marketing_preference: Option<bool>,
     /// Full name of the customer.
@@ -1130,7 +1130,7 @@ impl RequestValue for OrdersRefundRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TestOrderCustomer {
-    /// If set, this indicates the user explicitly chose to opt in or out of providing marketing rights to the merchant. If unset, this indicates the user has already made this choice in a previous purchase, and was thus not shown the marketing right opt in/out checkbox during the Purchases on Google checkout flow. Optional.
+    /// If set, this indicates the user explicitly chose to opt in or out of providing marketing rights to the merchant. If unset, this indicates the user has already made this choice in a previous purchase, and was thus not shown the marketing right opt in/out checkbox during the checkout flow. Optional.
     #[serde(rename="explicitMarketingPreference")]
     pub explicit_marketing_preference: Option<bool>,
     /// Full name of the customer.
@@ -1655,7 +1655,7 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves an order from your Merchant Center account.
+    /// Retrieves an order from your Merchant Center account. This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -1674,7 +1674,7 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the orders in your Merchant Center account.
+    /// Lists the orders in your Merchant Center account. This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -1698,7 +1698,7 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a shipment's status, carrier, and/or tracking ID.
+    /// Updates a shipment's status, carrier, and/or tracking ID. This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -1719,7 +1719,7 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sandbox only. Moves a test order from state "inProgress" to state "pendingShipment".
+    /// Sandbox only. Moves a test order from state "inProgress" to state "pendingShipment". This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -1738,7 +1738,7 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the merchant order ID for a given order.
+    /// Updates the merchant order ID for a given order. This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -1759,7 +1759,7 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns a line item.
+    /// Returns a line item. This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -1780,7 +1780,7 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sandbox only. Retrieves an order template that can be used to quickly create a new order in sandbox.
+    /// Sandbox only. Retrieves an order template that can be used to quickly create a new order in sandbox. This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -1799,7 +1799,7 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sandbox only. Creates a test order.
+    /// Sandbox only. Creates a test order. This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -1818,7 +1818,7 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Refund a portion of the order, up to the full amount paid.
+    /// Refund a portion of the order, up to the full amount paid. This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -1839,7 +1839,7 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves or modifies multiple orders in a single request.
+    /// Retrieves or modifies multiple orders in a single request. This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -1856,7 +1856,7 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Cancels a line item.
+    /// Cancels a line item. This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -1877,7 +1877,7 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves an order using merchant order id.
+    /// Retrieves an order using merchant order id. This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -1896,7 +1896,7 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Marks an order as acknowledged.
+    /// Marks an order as acknowledged. This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -1917,7 +1917,7 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Cancels all line items in an order.
+    /// Cancels all line items in an order. This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -1938,7 +1938,7 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Marks line item(s) as shipped.
+    /// Marks line item(s) as shipped. This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -1966,7 +1966,7 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
 // CallBuilders   ###
 // #################
 
-/// Retrieves an order from your Merchant Center account.
+/// Retrieves an order from your Merchant Center account. This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *get* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
@@ -2213,7 +2213,7 @@ impl<'a, C, A> OrderGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 }
 
 
-/// Lists the orders in your Merchant Center account.
+/// Lists the orders in your Merchant Center account. This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *list* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
@@ -2537,7 +2537,7 @@ impl<'a, C, A> OrderListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 }
 
 
-/// Updates a shipment's status, carrier, and/or tracking ID.
+/// Updates a shipment's status, carrier, and/or tracking ID. This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *updateshipment* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
@@ -2815,7 +2815,7 @@ impl<'a, C, A> OrderUpdateshipmentCall<'a, C, A> where C: BorrowMut<hyper::Clien
 }
 
 
-/// Sandbox only. Moves a test order from state "inProgress" to state "pendingShipment".
+/// Sandbox only. Moves a test order from state "inProgress" to state "pendingShipment". This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *advancetestorder* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
@@ -3062,7 +3062,7 @@ impl<'a, C, A> OrderAdvancetestorderCall<'a, C, A> where C: BorrowMut<hyper::Cli
 }
 
 
-/// Updates the merchant order ID for a given order.
+/// Updates the merchant order ID for a given order. This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *updatemerchantorderid* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
@@ -3340,7 +3340,7 @@ impl<'a, C, A> OrderUpdatemerchantorderidCall<'a, C, A> where C: BorrowMut<hyper
 }
 
 
-/// Returns a line item.
+/// Returns a line item. This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *returnlineitem* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
@@ -3618,7 +3618,7 @@ impl<'a, C, A> OrderReturnlineitemCall<'a, C, A> where C: BorrowMut<hyper::Clien
 }
 
 
-/// Sandbox only. Retrieves an order template that can be used to quickly create a new order in sandbox.
+/// Sandbox only. Retrieves an order template that can be used to quickly create a new order in sandbox. This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *gettestordertemplate* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
@@ -3865,7 +3865,7 @@ impl<'a, C, A> OrderGettestordertemplateCall<'a, C, A> where C: BorrowMut<hyper:
 }
 
 
-/// Sandbox only. Creates a test order.
+/// Sandbox only. Creates a test order. This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *createtestorder* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
@@ -4131,7 +4131,7 @@ impl<'a, C, A> OrderCreatetestorderCall<'a, C, A> where C: BorrowMut<hyper::Clie
 }
 
 
-/// Refund a portion of the order, up to the full amount paid.
+/// Refund a portion of the order, up to the full amount paid. This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *refund* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
@@ -4409,7 +4409,7 @@ impl<'a, C, A> OrderRefundCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 }
 
 
-/// Retrieves or modifies multiple orders in a single request.
+/// Retrieves or modifies multiple orders in a single request. This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *custombatch* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
@@ -4642,7 +4642,7 @@ impl<'a, C, A> OrderCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 }
 
 
-/// Cancels a line item.
+/// Cancels a line item. This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *cancellineitem* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
@@ -4920,7 +4920,7 @@ impl<'a, C, A> OrderCancellineitemCall<'a, C, A> where C: BorrowMut<hyper::Clien
 }
 
 
-/// Retrieves an order using merchant order id.
+/// Retrieves an order using merchant order id. This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *getbymerchantorderid* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
@@ -5167,7 +5167,7 @@ impl<'a, C, A> OrderGetbymerchantorderidCall<'a, C, A> where C: BorrowMut<hyper:
 }
 
 
-/// Marks an order as acknowledged.
+/// Marks an order as acknowledged. This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *acknowledge* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
@@ -5445,7 +5445,7 @@ impl<'a, C, A> OrderAcknowledgeCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 }
 
 
-/// Cancels all line items in an order.
+/// Cancels all line items in an order. This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *cancel* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
@@ -5723,7 +5723,7 @@ impl<'a, C, A> OrderCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 }
 
 
-/// Marks line item(s) as shipped.
+/// Marks line item(s) as shipped. This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *shiplineitems* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.

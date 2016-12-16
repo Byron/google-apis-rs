@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *books* API at revision *20160823*. The CLI is at version *1.0.0*.
+This documentation was generated from the *books* API at revision *20161206*. The CLI is at version *1.0.0*.
 
 ```bash
 books1 [options]

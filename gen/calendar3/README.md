@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-calendar3` library allows access to all features of the *Google calendar* service.
 
-This documentation was generated from *calendar* crate version *1.0.0+20160830*, where *20160830* is the exact revision of the *calendar:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
+This documentation was generated from *calendar* crate version *1.0.0+20161211*, where *20161211* is the exact revision of the *calendar:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
 
 Everything else about the *calendar* *v3* API can be found at the
 [official documentation site](https://developers.google.com/google-apps/calendar/firstapp).

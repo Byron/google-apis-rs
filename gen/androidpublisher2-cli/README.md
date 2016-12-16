@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Android Publisher* API at revision *20160817*. The CLI is at version *1.0.0*.
+This documentation was generated from the *Android Publisher* API at revision *20161212*. The CLI is at version *1.0.0*.
 
 ```bash
 androidpublisher2 [options]
@@ -40,6 +40,7 @@ androidpublisher2 [options]
                 apks-upload <package-name> <edit-id> (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
                 commit <package-name> <edit-id> [-p <v>]... [-o <out>]
                 delete <package-name> <edit-id> [-p <v>]...
+                deobfuscationfiles-upload <package-name> <edit-id> <apk-version-code> <deobfuscation-file-type> (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
                 details-get <package-name> <edit-id> [-p <v>]... [-o <out>]
                 details-patch <package-name> <edit-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 details-update <package-name> <edit-id> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -84,6 +85,7 @@ androidpublisher2 [options]
                 subscriptions-get <package-name> <subscription-id> <token> [-p <v>]... [-o <out>]
                 subscriptions-refund <package-name> <subscription-id> <token> [-p <v>]...
                 subscriptions-revoke <package-name> <subscription-id> <token> [-p <v>]...
+                voidedpurchases-list <package-name> [-p <v>]... [-o <out>]
         reviews
                 get <package-name> <review-id> [-p <v>]... [-o <out>]
                 list <package-name> [-p <v>]... [-o <out>]

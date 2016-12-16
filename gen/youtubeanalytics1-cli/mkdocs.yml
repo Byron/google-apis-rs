@@ -1,4 +1,4 @@
-site_name: YouTube Analytics v1.0.0+20160513
+site_name: YouTube Analytics v1.0.0+20161213
 site_url: http://byron.github.io/google-apis-rs/google-youtubeanalytics1-cli
 site_description: Write integrating applications with bcore
 
@@ -9,8 +9,6 @@ site_dir: build_html
 
 pages:
 - ['index.md', 'Home']
-- ['batch-report-definitions_list.md', 'Batch Report Definitions', 'List']
-- ['batch-reports_list.md', 'Batch Reports', 'List']
 - ['group-items_delete.md', 'Group Items', 'Delete']
 - ['group-items_insert.md', 'Group Items', 'Insert']
 - ['group-items_list.md', 'Group Items', 'List']

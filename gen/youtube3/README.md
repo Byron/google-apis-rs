@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-youtube3` library allows access to all features of the *Google YouTube* service.
 
-This documentation was generated from *YouTube* crate version *1.0.0+20160805*, where *20160805* is the exact revision of the *youtube:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
+This documentation was generated from *YouTube* crate version *1.0.0+20161202*, where *20161202* is the exact revision of the *youtube:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
 
 Everything else about the *YouTube* *v3* API can be found at the
 [official documentation site](https://developers.google.com/youtube/v3).
@@ -171,11 +171,13 @@ let result = hub.videos().list("part")
              .page_token("sed")
              .on_behalf_of_content_owner("et")
              .my_rating("dolores")
-             .max_results(38)
-             .locale("accusam")
-             .id("takimata")
-             .hl("justo")
-             .chart("amet.")
+             .max_width(38)
+             .max_results(79)
+             .max_height(93)
+             .locale("justo")
+             .id("amet.")
+             .hl("erat")
+             .chart("labore")
              .doit();
 
 match result {

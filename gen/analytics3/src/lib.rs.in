@@ -713,6 +713,9 @@ pub struct GaData {
     /// The number of samples used to calculate the result.
     #[serde(rename="sampleSize")]
     pub sample_size: Option<String>,
+    /// The last refreshed time in seconds for Analytics data.
+    #[serde(rename="dataLastRefreshed")]
+    pub data_last_refreshed: Option<String>,
     /// Information for the view (profile), for which the Analytics data was requested.
     #[serde(rename="profileInfo")]
     pub profile_info: Option<GaDataProfileInfo>,
@@ -1106,7 +1109,7 @@ pub struct IncludeConditions {
     pub kind: Option<String>,
     /// The segment condition that will cause a user to be added to an audience.
     pub segment: Option<String>,
-    /// Number of days a user remains in the audience. Use any integer from 1-540. In remarketing audiences for search ads, membership duration is truncated to 180 days.
+    /// Number of days (in the range 1 to 540) a user remains in the audience.
     #[serde(rename="membershipDurationDays")]
     pub membership_duration_days: Option<i32>,
 }
@@ -2899,7 +2902,7 @@ pub struct Profile {
     /// Indicates whether this view (profile) is starred or not.
     pub starred: Option<bool>,
     /// The currency type associated with this view (profile), defaults to USD. The supported values are:
-    /// ARS, AUD, BGN, BRL, CAD, CHF, CNY, CZK, DKK, EUR, GBP, HKD, HUF, IDR, INR, JPY, KRW, LTL, MXN, NOK, NZD, PHP, PLN, RUB, SEK, THB, TRY, TWD, USD, VND, ZAR
+    /// USD, JPY, EUR, GBP, AUD, KRW, BRL, CNY, DKK, RUB, SEK, NOK, PLN, TRY, TWD, HKD, THB, IDR, ARS, MXN, VND, PHP, INR, CHF, CAD, CZK, NZD, HUF, BGN, LTL, ZAR, UAH, AED, BOB, CLP, COP, EGP, HRK, ILS, MAD, MYR, PEN, PKR, RON, RSD, SAR, SGD, VEF, LVL
     pub currency: Option<String>,
     /// Internal ID for the web property to which this view (profile) belongs.
     #[serde(rename="internalWebPropertyId")]
@@ -3613,14 +3616,14 @@ impl<'a, C, A> ManagementMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an existing remarketing audiences.
+    /// Updates an existing remarketing audience.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `accountId` - Account ID for the remarketing audience to update.
-    /// * `webPropertyId` - Web property ID for the remarketing audience to update.
-    /// * `remarketingAudienceId` - Remarketing audience ID of the remarketing audience to update.
+    /// * `accountId` - The account ID of the remarketing audience to update.
+    /// * `webPropertyId` - The web property ID of the remarketing audience to update.
+    /// * `remarketingAudienceId` - The ID of the remarketing audience to update.
     pub fn remarketing_audience_update(&self, request: RemarketingAudience, account_id: &str, web_property_id: &str, remarketing_audience_id: &str) -> ManagementRemarketingAudienceUpdateCall<'a, C, A> {
         ManagementRemarketingAudienceUpdateCall {
             hub: self.hub,
@@ -4379,13 +4382,13 @@ impl<'a, C, A> ManagementMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new remarketing audiences.
+    /// Creates a new remarketing audience.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `accountId` - Account ID to create the remarketing audience for.
-    /// * `webPropertyId` - Web property ID to create the remarketing audience for.
+    /// * `accountId` - The account ID for which to create the remarketing audience.
+    /// * `webPropertyId` - Web property ID for which to create the remarketing audience.
     pub fn remarketing_audience_insert(&self, request: RemarketingAudience, account_id: &str, web_property_id: &str) -> ManagementRemarketingAudienceInsertCall<'a, C, A> {
         ManagementRemarketingAudienceInsertCall {
             hub: self.hub,
@@ -4641,13 +4644,13 @@ impl<'a, C, A> ManagementMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets remarketing audiences to which the user has access.
+    /// Gets a remarketing audience to which the user has access.
     /// 
     /// # Arguments
     ///
-    /// * `accountId` - Account ID for the remarketing audience to retrieve.
-    /// * `webPropertyId` - Web property ID for the remarketing audience to retrieve.
-    /// * `remarketingAudienceId` - The ID to retrieve the Remarketing Audience for.
+    /// * `accountId` - The account ID of the remarketing audience to retrieve.
+    /// * `webPropertyId` - The web property ID of the remarketing audience to retrieve.
+    /// * `remarketingAudienceId` - The ID of the remarketing audience to retrieve.
     pub fn remarketing_audience_get(&self, account_id: &str, web_property_id: &str, remarketing_audience_id: &str) -> ManagementRemarketingAudienceGetCall<'a, C, A> {
         ManagementRemarketingAudienceGetCall {
             hub: self.hub,
@@ -4881,14 +4884,14 @@ impl<'a, C, A> ManagementMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an existing remarketing audiences. This method supports patch semantics.
+    /// Updates an existing remarketing audience. This method supports patch semantics.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `accountId` - Account ID for the remarketing audience to update.
-    /// * `webPropertyId` - Web property ID for the remarketing audience to update.
-    /// * `remarketingAudienceId` - Remarketing audience ID of the remarketing audience to update.
+    /// * `accountId` - The account ID of the remarketing audience to update.
+    /// * `webPropertyId` - The web property ID of the remarketing audience to update.
+    /// * `remarketingAudienceId` - The ID of the remarketing audience to update.
     pub fn remarketing_audience_patch(&self, request: RemarketingAudience, account_id: &str, web_property_id: &str, remarketing_audience_id: &str) -> ManagementRemarketingAudiencePatchCall<'a, C, A> {
         ManagementRemarketingAudiencePatchCall {
             hub: self.hub,
@@ -5030,8 +5033,8 @@ impl<'a, C, A> ManagementMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `accountId` - Account ID for the remarketing audience to retrieve.
-    /// * `webPropertyId` - Web property ID for the remarketing audience to retrieve.
+    /// * `accountId` - The account ID of the remarketing audiences to retrieve.
+    /// * `webPropertyId` - The web property ID of the remarketing audiences to retrieve.
     pub fn remarketing_audience_list(&self, account_id: &str, web_property_id: &str) -> ManagementRemarketingAudienceListCall<'a, C, A> {
         ManagementRemarketingAudienceListCall {
             hub: self.hub,
@@ -8814,7 +8817,7 @@ impl<'a, C, A> ManagementProfileFilterLinkDeleteCall<'a, C, A> where C: BorrowMu
 }
 
 
-/// Updates an existing remarketing audiences.
+/// Updates an existing remarketing audience.
 ///
 /// A builder for the *remarketingAudience.update* method supported by a *management* resource.
 /// It is not used directly, but through a `ManagementMethods` instance.
@@ -9022,7 +9025,7 @@ impl<'a, C, A> ManagementRemarketingAudienceUpdateCall<'a, C, A> where C: Borrow
         self._request = new_value;
         self
     }
-    /// Account ID for the remarketing audience to update.
+    /// The account ID of the remarketing audience to update.
     ///
     /// Sets the *account id* path property to the given value.
     ///
@@ -9032,7 +9035,7 @@ impl<'a, C, A> ManagementRemarketingAudienceUpdateCall<'a, C, A> where C: Borrow
         self._account_id = new_value.to_string();
         self
     }
-    /// Web property ID for the remarketing audience to update.
+    /// The web property ID of the remarketing audience to update.
     ///
     /// Sets the *web property id* path property to the given value.
     ///
@@ -9042,7 +9045,7 @@ impl<'a, C, A> ManagementRemarketingAudienceUpdateCall<'a, C, A> where C: Borrow
         self._web_property_id = new_value.to_string();
         self
     }
-    /// Remarketing audience ID of the remarketing audience to update.
+    /// The ID of the remarketing audience to update.
     ///
     /// Sets the *remarketing audience id* path property to the given value.
     ///
@@ -18581,7 +18584,7 @@ impl<'a, C, A> ManagementProfileUserLinkListCall<'a, C, A> where C: BorrowMut<hy
 }
 
 
-/// Creates a new remarketing audiences.
+/// Creates a new remarketing audience.
 ///
 /// A builder for the *remarketingAudience.insert* method supported by a *management* resource.
 /// It is not used directly, but through a `ManagementMethods` instance.
@@ -18787,7 +18790,7 @@ impl<'a, C, A> ManagementRemarketingAudienceInsertCall<'a, C, A> where C: Borrow
         self._request = new_value;
         self
     }
-    /// Account ID to create the remarketing audience for.
+    /// The account ID for which to create the remarketing audience.
     ///
     /// Sets the *account id* path property to the given value.
     ///
@@ -18797,7 +18800,7 @@ impl<'a, C, A> ManagementRemarketingAudienceInsertCall<'a, C, A> where C: Borrow
         self._account_id = new_value.to_string();
         self
     }
-    /// Web property ID to create the remarketing audience for.
+    /// Web property ID for which to create the remarketing audience.
     ///
     /// Sets the *web property id* path property to the given value.
     ///
@@ -21847,7 +21850,7 @@ impl<'a, C, A> ManagementCustomDimensionGetCall<'a, C, A> where C: BorrowMut<hyp
 }
 
 
-/// Gets remarketing audiences to which the user has access.
+/// Gets a remarketing audience to which the user has access.
 ///
 /// A builder for the *remarketingAudience.get* method supported by a *management* resource.
 /// It is not used directly, but through a `ManagementMethods` instance.
@@ -22024,7 +22027,7 @@ impl<'a, C, A> ManagementRemarketingAudienceGetCall<'a, C, A> where C: BorrowMut
     }
 
 
-    /// Account ID for the remarketing audience to retrieve.
+    /// The account ID of the remarketing audience to retrieve.
     ///
     /// Sets the *account id* path property to the given value.
     ///
@@ -22034,7 +22037,7 @@ impl<'a, C, A> ManagementRemarketingAudienceGetCall<'a, C, A> where C: BorrowMut
         self._account_id = new_value.to_string();
         self
     }
-    /// Web property ID for the remarketing audience to retrieve.
+    /// The web property ID of the remarketing audience to retrieve.
     ///
     /// Sets the *web property id* path property to the given value.
     ///
@@ -22044,7 +22047,7 @@ impl<'a, C, A> ManagementRemarketingAudienceGetCall<'a, C, A> where C: BorrowMut
         self._web_property_id = new_value.to_string();
         self
     }
-    /// The ID to retrieve the Remarketing Audience for.
+    /// The ID of the remarketing audience to retrieve.
     ///
     /// Sets the *remarketing audience id* path property to the given value.
     ///
@@ -24890,7 +24893,7 @@ impl<'a, C, A> ManagementCustomMetricUpdateCall<'a, C, A> where C: BorrowMut<hyp
 }
 
 
-/// Updates an existing remarketing audiences. This method supports patch semantics.
+/// Updates an existing remarketing audience. This method supports patch semantics.
 ///
 /// A builder for the *remarketingAudience.patch* method supported by a *management* resource.
 /// It is not used directly, but through a `ManagementMethods` instance.
@@ -25098,7 +25101,7 @@ impl<'a, C, A> ManagementRemarketingAudiencePatchCall<'a, C, A> where C: BorrowM
         self._request = new_value;
         self
     }
-    /// Account ID for the remarketing audience to update.
+    /// The account ID of the remarketing audience to update.
     ///
     /// Sets the *account id* path property to the given value.
     ///
@@ -25108,7 +25111,7 @@ impl<'a, C, A> ManagementRemarketingAudiencePatchCall<'a, C, A> where C: BorrowM
         self._account_id = new_value.to_string();
         self
     }
-    /// Web property ID for the remarketing audience to update.
+    /// The web property ID of the remarketing audience to update.
     ///
     /// Sets the *web property id* path property to the given value.
     ///
@@ -25118,7 +25121,7 @@ impl<'a, C, A> ManagementRemarketingAudiencePatchCall<'a, C, A> where C: BorrowM
         self._web_property_id = new_value.to_string();
         self
     }
-    /// Remarketing audience ID of the remarketing audience to update.
+    /// The ID of the remarketing audience to update.
     ///
     /// Sets the *remarketing audience id* path property to the given value.
     ///
@@ -26981,7 +26984,7 @@ impl<'a, C, A> ManagementRemarketingAudienceListCall<'a, C, A> where C: BorrowMu
     }
 
 
-    /// Account ID for the remarketing audience to retrieve.
+    /// The account ID of the remarketing audiences to retrieve.
     ///
     /// Sets the *account id* path property to the given value.
     ///
@@ -26991,7 +26994,7 @@ impl<'a, C, A> ManagementRemarketingAudienceListCall<'a, C, A> where C: BorrowMu
         self._account_id = new_value.to_string();
         self
     }
-    /// Web property ID for the remarketing audience to retrieve.
+    /// The web property ID of the remarketing audiences to retrieve.
     ///
     /// Sets the *web property id* path property to the given value.
     ///

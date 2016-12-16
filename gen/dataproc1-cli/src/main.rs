@@ -71,10 +71,16 @@ impl<'n> Engine<'n> {
                     "status.state" => Some(("status.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status.state-start-time" => Some(("status.stateStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status.detail" => Some(("status.detail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster-uuid" => Some(("clusterUuid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster-name" => Some(("clusterName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "metrics.yarn-metrics" => Some(("metrics.yarnMetrics", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "metrics.hdfs-metrics" => Some(("metrics.hdfsMetrics", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "config.software-config.image-version" => Some(("config.softwareConfig.imageVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.software-config.properties" => Some(("config.softwareConfig.properties", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "config.config-bucket" => Some(("config.configBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.gce-cluster-config.internal-ip-only" => Some(("config.gceClusterConfig.internalIpOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "config.gce-cluster-config.network-uri" => Some(("config.gceClusterConfig.networkUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.gce-cluster-config.tags" => Some(("config.gceClusterConfig.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "config.gce-cluster-config.zone-uri" => Some(("config.gceClusterConfig.zoneUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -108,10 +114,8 @@ impl<'n> Engine<'n> {
                     "config.master-config.managed-group-config.instance-group-manager-name" => Some(("config.masterConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.master-config.num-instances" => Some(("config.masterConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "config.master-config.image-uri" => Some(("config.masterConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "cluster-uuid" => Some(("clusterUuid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["boot-disk-size-gb", "cluster-name", "cluster-uuid", "config", "config-bucket", "detail", "disk-config", "gce-cluster-config", "image-uri", "image-version", "instance-group-manager-name", "instance-names", "instance-template-name", "is-preemptible", "machine-type-uri", "managed-group-config", "master-config", "metadata", "network-uri", "num-instances", "num-local-ssds", "project-id", "properties", "secondary-worker-config", "service-account-scopes", "software-config", "state", "state-start-time", "status", "subnetwork-uri", "tags", "worker-config", "zone-uri"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["boot-disk-size-gb", "cluster-name", "cluster-uuid", "config", "config-bucket", "detail", "disk-config", "gce-cluster-config", "hdfs-metrics", "image-uri", "image-version", "instance-group-manager-name", "instance-names", "instance-template-name", "internal-ip-only", "is-preemptible", "labels", "machine-type-uri", "managed-group-config", "master-config", "metadata", "metrics", "network-uri", "num-instances", "num-local-ssds", "project-id", "properties", "secondary-worker-config", "service-account-scopes", "software-config", "state", "state-start-time", "status", "subnetwork-uri", "tags", "worker-config", "yarn-metrics", "zone-uri"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -371,6 +375,9 @@ impl<'n> Engine<'n> {
                 "page-size" => {
                     call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
                 },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -384,7 +391,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-token", "page-size"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -444,10 +451,16 @@ impl<'n> Engine<'n> {
                     "status.state" => Some(("status.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status.state-start-time" => Some(("status.stateStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status.detail" => Some(("status.detail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster-uuid" => Some(("clusterUuid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster-name" => Some(("clusterName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "metrics.yarn-metrics" => Some(("metrics.yarnMetrics", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "metrics.hdfs-metrics" => Some(("metrics.hdfsMetrics", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "config.software-config.image-version" => Some(("config.softwareConfig.imageVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.software-config.properties" => Some(("config.softwareConfig.properties", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "config.config-bucket" => Some(("config.configBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.gce-cluster-config.internal-ip-only" => Some(("config.gceClusterConfig.internalIpOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "config.gce-cluster-config.network-uri" => Some(("config.gceClusterConfig.networkUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.gce-cluster-config.tags" => Some(("config.gceClusterConfig.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "config.gce-cluster-config.zone-uri" => Some(("config.gceClusterConfig.zoneUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -481,10 +494,8 @@ impl<'n> Engine<'n> {
                     "config.master-config.managed-group-config.instance-group-manager-name" => Some(("config.masterConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.master-config.num-instances" => Some(("config.masterConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "config.master-config.image-uri" => Some(("config.masterConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "cluster-uuid" => Some(("clusterUuid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["boot-disk-size-gb", "cluster-name", "cluster-uuid", "config", "config-bucket", "detail", "disk-config", "gce-cluster-config", "image-uri", "image-version", "instance-group-manager-name", "instance-names", "instance-template-name", "is-preemptible", "machine-type-uri", "managed-group-config", "master-config", "metadata", "network-uri", "num-instances", "num-local-ssds", "project-id", "properties", "secondary-worker-config", "service-account-scopes", "software-config", "state", "state-start-time", "status", "subnetwork-uri", "tags", "worker-config", "zone-uri"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["boot-disk-size-gb", "cluster-name", "cluster-uuid", "config", "config-bucket", "detail", "disk-config", "gce-cluster-config", "hdfs-metrics", "image-uri", "image-version", "instance-group-manager-name", "instance-names", "instance-template-name", "internal-ip-only", "is-preemptible", "labels", "machine-type-uri", "managed-group-config", "master-config", "metadata", "metrics", "network-uri", "num-instances", "num-local-ssds", "project-id", "properties", "secondary-worker-config", "service-account-scopes", "software-config", "state", "state-start-time", "status", "subnetwork-uri", "tags", "worker-config", "yarn-metrics", "zone-uri"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -751,6 +762,9 @@ impl<'n> Engine<'n> {
                 "job-state-matcher" => {
                     call = call.job_state_matcher(value.unwrap_or(""));
                 },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
                 "cluster-name" => {
                     call = call.cluster_name(value.unwrap_or(""));
                 },
@@ -767,7 +781,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["cluster-name", "page-token", "job-state-matcher", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-token", "cluster-name", "job-state-matcher", "page-size"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -835,6 +849,13 @@ impl<'n> Engine<'n> {
                     "job.hadoop-job.archive-uris" => Some(("job.hadoopJob.archiveUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "job.hadoop-job.main-jar-file-uri" => Some(("job.hadoopJob.mainJarFileUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job.hadoop-job.properties" => Some(("job.hadoopJob.properties", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "job.pig-job.query-file-uri" => Some(("job.pigJob.queryFileUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "job.pig-job.script-variables" => Some(("job.pigJob.scriptVariables", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "job.pig-job.logging-config.driver-log-levels" => Some(("job.pigJob.loggingConfig.driverLogLevels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "job.pig-job.jar-file-uris" => Some(("job.pigJob.jarFileUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "job.pig-job.query-list.queries" => Some(("job.pigJob.queryList.queries", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "job.pig-job.continue-on-failure" => Some(("job.pigJob.continueOnFailure", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "job.pig-job.properties" => Some(("job.pigJob.properties", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "job.placement.cluster-name" => Some(("job.placement.clusterName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job.placement.cluster-uuid" => Some(("job.placement.clusterUuid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job.reference.project-id" => Some(("job.reference.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -845,13 +866,7 @@ impl<'n> Engine<'n> {
                     "job.spark-sql-job.jar-file-uris" => Some(("job.sparkSqlJob.jarFileUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "job.spark-sql-job.query-list.queries" => Some(("job.sparkSqlJob.queryList.queries", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "job.spark-sql-job.properties" => Some(("job.sparkSqlJob.properties", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "job.pig-job.query-file-uri" => Some(("job.pigJob.queryFileUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "job.pig-job.script-variables" => Some(("job.pigJob.scriptVariables", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "job.pig-job.logging-config.driver-log-levels" => Some(("job.pigJob.loggingConfig.driverLogLevels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "job.pig-job.jar-file-uris" => Some(("job.pigJob.jarFileUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "job.pig-job.query-list.queries" => Some(("job.pigJob.queryList.queries", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "job.pig-job.continue-on-failure" => Some(("job.pigJob.continueOnFailure", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "job.pig-job.properties" => Some(("job.pigJob.properties", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "job.labels" => Some(("job.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "job.driver-output-resource-uri" => Some(("job.driverOutputResourceUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job.driver-control-files-uri" => Some(("job.driverControlFilesUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job.spark-job.args" => Some(("job.sparkJob.args", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -877,7 +892,7 @@ impl<'n> Engine<'n> {
                     "job.hive-job.continue-on-failure" => Some(("job.hiveJob.continueOnFailure", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "job.hive-job.properties" => Some(("job.hiveJob.properties", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["archive-uris", "args", "cluster-name", "cluster-uuid", "continue-on-failure", "details", "driver-control-files-uri", "driver-log-levels", "driver-output-resource-uri", "file-uris", "hadoop-job", "hive-job", "jar-file-uris", "job", "job-id", "logging-config", "main-class", "main-jar-file-uri", "main-python-file-uri", "pig-job", "placement", "project-id", "properties", "pyspark-job", "python-file-uris", "queries", "query-file-uri", "query-list", "reference", "script-variables", "spark-job", "spark-sql-job", "state", "state-start-time", "status"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["archive-uris", "args", "cluster-name", "cluster-uuid", "continue-on-failure", "details", "driver-control-files-uri", "driver-log-levels", "driver-output-resource-uri", "file-uris", "hadoop-job", "hive-job", "jar-file-uris", "job", "job-id", "labels", "logging-config", "main-class", "main-jar-file-uri", "main-python-file-uri", "pig-job", "placement", "project-id", "properties", "pyspark-job", "python-file-uris", "queries", "query-file-uri", "query-list", "reference", "script-variables", "spark-job", "spark-sql-job", "state", "state-start-time", "status"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1681,7 +1696,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("regions-operations-cancel",
-                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation."##),
+                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_regions-operations-cancel",
                   vec![
                     (Some(r##"name"##),
@@ -1774,8 +1789,8 @@ fn main() {
     
     let mut app = App::new("dataproc1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.0+20160503")
-           .about("Manages Hadoop-based clusters and jobs on Google Cloud Platform.")
+           .version("1.0.0+20161102")
+           .about("An API for managing Hadoop-based clusters and jobs on Google Cloud Platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_dataproc1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

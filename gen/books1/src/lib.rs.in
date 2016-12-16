@@ -525,6 +525,9 @@ pub struct Notification {
     /// no description provided
     pub reason: Option<String>,
     /// no description provided
+    #[serde(rename="notificationGroup")]
+    pub notification_group: Option<String>,
+    /// no description provided
     #[serde(rename="targetUrl")]
     pub target_url: Option<String>,
     /// no description provided

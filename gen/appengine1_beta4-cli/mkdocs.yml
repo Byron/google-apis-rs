@@ -1,4 +1,4 @@
-site_name: appengine v1.0.0+20160802
+site_name: appengine v1.0.0+20161208
 site_url: http://byron.github.io/google-apis-rs/google-appengine1_beta4-cli
 site_description: Write integrating applications with bcore
 
@@ -28,6 +28,7 @@ pages:
 - ['apps_modules-versions-patch.md', 'Apps', 'Modules Versions Patch']
 - ['apps_operations-get.md', 'Apps', 'Operations Get']
 - ['apps_operations-list.md', 'Apps', 'Operations List']
+- ['apps_patch.md', 'Apps', 'Patch']
 
 theme: readthedocs
 

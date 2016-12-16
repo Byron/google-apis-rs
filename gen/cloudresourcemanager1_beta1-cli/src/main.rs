@@ -270,8 +270,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "policy.version" => Some(("policy.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "policy.etag" => Some(("policy.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "policy.version" => Some(("policy.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "policy", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -536,9 +536,9 @@ impl<'n> Engine<'n> {
                     "parent.id" => Some(("parent.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "project-number" => Some(("projectNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "lifecycle-state" => Some(("lifecycleState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "lifecycle-state" => Some(("lifecycleState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "project-number" => Some(("projectNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "id", "labels", "lifecycle-state", "name", "parent", "project-id", "project-number", "type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -554,6 +554,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "use-legacy-stack" => {
+                    call = call.use_legacy_stack(arg_from_str(value.unwrap_or("false"), err, "use-legacy-stack", "boolean"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -567,6 +570,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["use-legacy-stack"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -957,8 +961,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "policy.version" => Some(("policy.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "policy.etag" => Some(("policy.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "policy.version" => Some(("policy.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "policy", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1217,9 +1221,9 @@ impl<'n> Engine<'n> {
                     "parent.id" => Some(("parent.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "project-number" => Some(("projectNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "lifecycle-state" => Some(("lifecycleState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "lifecycle-state" => Some(("lifecycleState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "project-number" => Some(("projectNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "id", "labels", "lifecycle-state", "name", "parent", "project-id", "project-number", "type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1443,7 +1447,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the Organization to fetch. Its format is "organizations/[organization_id]". For example, "organizations/1234"."##),
+                     Some(r##"The resource name of the Organization to fetch, e.g. "organizations/1234"."##),
                      Some(true),
                      Some(false)),
         
@@ -1460,12 +1464,16 @@ fn main() {
                      Some(false)),
                   ]),
             ("get-iam-policy",
-                    Some(r##"Gets the access control policy for an Organization resource. May be empty if no such policy or resource exists. The `resource` field should be the organization's resource name, e.g. "organizations/123". For backward compatibility, the resource provided may also be the organization_id. This will not be supported in v1."##),
+                    Some(r##"Gets the access control policy for an Organization resource. May be empty
+        if no such policy or resource exists. The `resource` field should be the
+        organization's resource name, e.g. "organizations/123"."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1_cli/organizations_get-iam-policy",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being requested. `resource` is usually specified as a path, such as `projects/*project*/zones/*zone*/disks/*disk*`. The format for the path specified in this value is resource specific and is specified in the `getIamPolicy` documentation."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being requested.
+        `resource` is usually specified as a path. For example, a Project
+        resource is specified as `projects/{project}`."##),
                      Some(true),
                      Some(false)),
         
@@ -1488,7 +1496,9 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Lists Organization resources that are visible to the user and satisfy the specified filter. This method returns Organizations in an unspecified order. New Organizations do not necessarily appear at the end of the list."##),
+                    Some(r##"Lists Organization resources that are visible to the user and satisfy
+        the specified filter. This method returns Organizations in an unspecified
+        order. New Organizations do not necessarily appear at the end of the list."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1_cli/organizations_list",
                   vec![
                     (Some(r##"v"##),
@@ -1504,12 +1514,16 @@ fn main() {
                      Some(false)),
                   ]),
             ("set-iam-policy",
-                    Some(r##"Sets the access control policy on an Organization resource. Replaces any existing policy. The `resource` field should be the organization's resource name, e.g. "organizations/123". For backward compatibility, the resource provided may also be the organization_id. This will not be supported in v1."##),
+                    Some(r##"Sets the access control policy on an Organization resource. Replaces any
+        existing policy. The `resource` field should be the organization's resource
+        name, e.g. "organizations/123"."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1_cli/organizations_set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being specified. `resource` is usually specified as a path, such as `projects/*project*/zones/*zone*/disks/*disk*`. The format for the path specified in this value is resource specific and is specified in the `setIamPolicy` documentation."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being specified.
+        `resource` is usually specified as a path. For example, a Project
+        resource is specified as `projects/{project}`."##),
                      Some(true),
                      Some(false)),
         
@@ -1532,12 +1546,16 @@ fn main() {
                      Some(false)),
                   ]),
             ("test-iam-permissions",
-                    Some(r##"Returns permissions that a caller has on the specified Organization. The `resource` field should be the organization's resource name, e.g. "organizations/123". For backward compatibility, the resource provided may also be the organization_id. This will not be supported in v1."##),
+                    Some(r##"Returns permissions that a caller has on the specified Organization.
+        The `resource` field should be the organization's resource name,
+        e.g. "organizations/123"."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1_cli/organizations_test-iam-permissions",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. `resource` is usually specified as a path, such as `projects/*project*/zones/*zone*/disks/*disk*`. The format for the path specified in this value is resource specific and is specified in the `testIamPermissions` documentation."##),
+                     Some(r##"REQUIRED: The resource for which the policy detail is being requested.
+        `resource` is usually specified as a path. For example, a Project
+        resource is specified as `projects/{project}`."##),
                      Some(true),
                      Some(false)),
         
@@ -1565,7 +1583,9 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Output Only. The resource name of the organization. This is the organization's relative path in the API. Its format is "organizations/[organization_id]". For example, "organizations/1234"."##),
+                     Some(r##"Output Only. The resource name of the organization. This is the
+        organization's relative path in the API. Its format is
+        "organizations/[organization_id]". For example, "organizations/1234"."##),
                      Some(true),
                      Some(false)),
         
@@ -1591,7 +1611,14 @@ fn main() {
         
         ("projects", "methods: 'create', 'delete', 'get', 'get-ancestry', 'get-iam-policy', 'list', 'set-iam-policy', 'test-iam-permissions', 'undelete' and 'update'", vec![
             ("create",
-                    Some(r##"Creates a Project resource. Initially, the Project resource is owned by its creator exclusively. The creator can later grant permission to others to read or update the Project. Several APIs are activated automatically for the Project, including Google Cloud Storage."##),
+                    Some(r##"Creates a Project resource.
+        
+        Initially, the Project resource is owned by its creator exclusively.
+        The creator can later grant permission to others to read or update the
+        Project.
+        
+        Several APIs are activated automatically for the Project, including
+        Google Cloud Storage."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1_cli/projects_create",
                   vec![
                     (Some(r##"kv"##),
@@ -1613,12 +1640,37 @@ fn main() {
                      Some(false)),
                   ]),
             ("delete",
-                    Some(r##"Marks the Project identified by the specified `project_id` (for example, `my-project-123`) for deletion. This method will only affect the Project if the following criteria are met: + The Project does not have a billing account associated with it. + The Project has a lifecycle state of ACTIVE. This method changes the Project's lifecycle state from ACTIVE to DELETE_REQUESTED. The deletion starts at an unspecified time, at which point the project is no longer accessible. Until the deletion completes, you can check the lifecycle state checked by retrieving the Project with GetProject, and the Project remains visible to ListProjects. However, you cannot update the project. After the deletion completes, the Project is not retrievable by the GetProject and ListProjects methods. The caller must have modify permissions for this Project."##),
+                    Some(r##"Marks the Project identified by the specified
+        `project_id` (for example, `my-project-123`) for deletion.
+        This method will only affect the Project if the following criteria are met:
+        
+        + The Project does not have a billing account associated with it.
+        + The Project has a lifecycle state of
+        ACTIVE.
+        
+        This method changes the Project's lifecycle state from
+        ACTIVE
+        to DELETE_REQUESTED.
+        The deletion starts at an unspecified time, at which point the project is
+        no longer accessible.
+        
+        Until the deletion completes, you can check the lifecycle state
+        checked by retrieving the Project with GetProject,
+        and the Project remains visible to ListProjects.
+        However, you cannot update the project.
+        
+        After the deletion completes, the Project is not retrievable by
+        the  GetProject and
+        ListProjects methods.
+        
+        The caller must have modify permissions for this Project."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1_cli/projects_delete",
                   vec![
                     (Some(r##"project-id"##),
                      None,
-                     Some(r##"The Project ID (for example, `foo-bar-123`). Required."##),
+                     Some(r##"The Project ID (for example, `foo-bar-123`).
+        
+        Required."##),
                      Some(true),
                      Some(false)),
         
@@ -1635,12 +1687,17 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Retrieves the Project identified by the specified `project_id` (for example, `my-project-123`). The caller must have read permissions for this Project."##),
+                    Some(r##"Retrieves the Project identified by the specified
+        `project_id` (for example, `my-project-123`).
+        
+        The caller must have read permissions for this Project."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1_cli/projects_get",
                   vec![
                     (Some(r##"project-id"##),
                      None,
-                     Some(r##"The Project ID (for example, `my-project-123`). Required."##),
+                     Some(r##"The Project ID (for example, `my-project-123`).
+        
+        Required."##),
                      Some(true),
                      Some(false)),
         
@@ -1657,12 +1714,17 @@ fn main() {
                      Some(false)),
                   ]),
             ("get-ancestry",
-                    Some(r##"Gets a list of ancestors in the resource hierarchy for the Project identified by the specified `project_id` (for example, `my-project-123`). The caller must have read permissions for this Project."##),
+                    Some(r##"Gets a list of ancestors in the resource hierarchy for the Project
+        identified by the specified `project_id` (for example, `my-project-123`).
+        
+        The caller must have read permissions for this Project."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1_cli/projects_get-ancestry",
                   vec![
                     (Some(r##"project-id"##),
                      None,
-                     Some(r##"The Project ID (for example, `my-project-123`). Required."##),
+                     Some(r##"The Project ID (for example, `my-project-123`).
+        
+        Required."##),
                      Some(true),
                      Some(false)),
         
@@ -1685,12 +1747,15 @@ fn main() {
                      Some(false)),
                   ]),
             ("get-iam-policy",
-                    Some(r##"Returns the IAM access control policy for the specified Project. Permission is denied if the policy or the resource does not exist."##),
+                    Some(r##"Returns the IAM access control policy for the specified Project.
+        Permission is denied if the policy or the resource does not exist."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1_cli/projects_get-iam-policy",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being requested. `resource` is usually specified as a path, such as `projects/*project*/zones/*zone*/disks/*disk*`. The format for the path specified in this value is resource specific and is specified in the `getIamPolicy` documentation."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being requested.
+        `resource` is usually specified as a path. For example, a Project
+        resource is specified as `projects/{project}`."##),
                      Some(true),
                      Some(false)),
         
@@ -1713,7 +1778,9 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Lists Projects that are visible to the user and satisfy the specified filter. This method returns Projects in an unspecified order. New Projects do not necessarily appear at the end of the list."##),
+                    Some(r##"Lists Projects that are visible to the user and satisfy the
+        specified filter. This method returns Projects in an unspecified order.
+        New Projects do not necessarily appear at the end of the list."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1_cli/projects_list",
                   vec![
                     (Some(r##"v"##),
@@ -1729,12 +1796,49 @@ fn main() {
                      Some(false)),
                   ]),
             ("set-iam-policy",
-                    Some(r##"Sets the IAM access control policy for the specified Project. Replaces any existing policy. The following constraints apply when using `setIamPolicy()`: + Project does not support `allUsers` and `allAuthenticatedUsers` as `members` in a `Binding` of a `Policy`. + The owner role can be granted only to `user` and `serviceAccount`. + Service accounts can be made owners of a project directly without any restrictions. However, to be added as an owner, a user must be invited via Cloud Platform console and must accept the invitation. + A user cannot be granted the owner role using `setIamPolicy()`. The user must be granted the owner role using the Cloud Platform Console and must explicitly accept the invitation. + Invitations to grant the owner role cannot be sent using `setIamPolicy()`; they must be sent only using the Cloud Platform Console. + Membership changes that leave the project without any owners that have accepted the Terms of Service (ToS) will be rejected. + Members cannot be added to more than one role in the same policy. + There must be at least one owner who has accepted the Terms of Service (ToS) agreement in the policy. Calling `setIamPolicy()` to to remove the last ToS-accepted owner from the policy will fail. This restriction also applies to legacy projects that no longer have owners who have accepted the ToS. Edits to IAM policies will be rejected until the lack of a ToS-accepting owner is rectified. + Calling this method requires enabling the App Engine Admin API. Note: Removing service accounts from policies or changing their roles can render services completely inoperable. It is important to understand how the service account is being used before removing or updating its roles."##),
+                    Some(r##"Sets the IAM access control policy for the specified Project. Replaces
+        any existing policy.
+        
+        The following constraints apply when using `setIamPolicy()`:
+        
+        + Project does not support `allUsers` and `allAuthenticatedUsers` as
+        `members` in a `Binding` of a `Policy`.
+        
+        + The owner role can be granted only to `user` and `serviceAccount`.
+        
+        + Service accounts can be made owners of a project directly
+        without any restrictions. However, to be added as an owner, a user must be
+        invited via Cloud Platform console and must accept the invitation.
+        
+        + A user cannot be granted the owner role using `setIamPolicy()`. The user
+        must be granted the owner role using the Cloud Platform Console and must
+        explicitly accept the invitation.
+        
+        + Invitations to grant the owner role cannot be sent using `setIamPolicy()`;
+        they must be sent only using the Cloud Platform Console.
+        
+        + Membership changes that leave the project without any owners that have
+        accepted the Terms of Service (ToS) will be rejected.
+        
+        + There must be at least one owner who has accepted the Terms of
+        Service (ToS) agreement in the policy. Calling `setIamPolicy()` to
+        to remove the last ToS-accepted owner from the policy will fail. This
+        restriction also applies to legacy projects that no longer have owners
+        who have accepted the ToS. Edits to IAM policies will be rejected until
+        the lack of a ToS-accepting owner is rectified.
+        
+        + Calling this method requires enabling the App Engine Admin API.
+        
+        Note: Removing service accounts from policies or changing their roles
+        can render services completely inoperable. It is important to understand
+        how the service account is being used before removing or updating its roles."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1_cli/projects_set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being specified. `resource` is usually specified as a path, such as `projects/*project*/zones/*zone*/disks/*disk*`. The format for the path specified in this value is resource specific and is specified in the `setIamPolicy` documentation."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being specified.
+        `resource` is usually specified as a path. For example, a Project
+        resource is specified as `projects/{project}`."##),
                      Some(true),
                      Some(false)),
         
@@ -1762,7 +1866,9 @@ fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. `resource` is usually specified as a path, such as `projects/*project*/zones/*zone*/disks/*disk*`. The format for the path specified in this value is resource specific and is specified in the `testIamPermissions` documentation."##),
+                     Some(r##"REQUIRED: The resource for which the policy detail is being requested.
+        `resource` is usually specified as a path. For example, a Project
+        resource is specified as `projects/{project}`."##),
                      Some(true),
                      Some(false)),
         
@@ -1785,12 +1891,20 @@ fn main() {
                      Some(false)),
                   ]),
             ("undelete",
-                    Some(r##"Restores the Project identified by the specified `project_id` (for example, `my-project-123`). You can only use this method for a Project that has a lifecycle state of DELETE_REQUESTED. After deletion starts, the Project cannot be restored. The caller must have modify permissions for this Project."##),
+                    Some(r##"Restores the Project identified by the specified
+        `project_id` (for example, `my-project-123`).
+        You can only use this method for a Project that has a lifecycle state of
+        DELETE_REQUESTED.
+        After deletion starts, the Project cannot be restored.
+        
+        The caller must have modify permissions for this Project."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1_cli/projects_undelete",
                   vec![
                     (Some(r##"project-id"##),
                      None,
-                     Some(r##"The project ID (for example, `foo-bar-123`). Required."##),
+                     Some(r##"The project ID (for example, `foo-bar-123`).
+        
+        Required."##),
                      Some(true),
                      Some(false)),
         
@@ -1813,12 +1927,17 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Updates the attributes of the Project identified by the specified `project_id` (for example, `my-project-123`). The caller must have modify permissions for this Project."##),
+                    Some(r##"Updates the attributes of the Project identified by the specified
+        `project_id` (for example, `my-project-123`).
+        
+        The caller must have modify permissions for this Project."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1_cli/projects_update",
                   vec![
                     (Some(r##"project-id"##),
                      None,
-                     Some(r##"The project ID (for example, `my-project-123`). Required."##),
+                     Some(r##"The project ID (for example, `my-project-123`).
+        
+        Required."##),
                      Some(true),
                      Some(false)),
         
@@ -1846,7 +1965,7 @@ fn main() {
     
     let mut app = App::new("cloudresourcemanager1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.0+20160617")
+           .version("1.0.0+20161212")
            .about("The Google Cloud Resource Manager API provides methods for creating, reading, and updating project metadata.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1_cli")
            .arg(Arg::with_name("url")

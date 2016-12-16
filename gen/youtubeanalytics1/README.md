@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-youtubeanalytics1` library allows access to all features of the *Google YouTube Analytics* service.
 
-This documentation was generated from *YouTube Analytics* crate version *1.0.0+20160513*, where *20160513* is the exact revision of the *youtubeAnalytics:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
+This documentation was generated from *YouTube Analytics* crate version *1.0.0+20161213*, where *20161213* is the exact revision of the *youtubeAnalytics:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
 
 Everything else about the *YouTube Analytics* *v1* API can be found at the
 [official documentation site](http://developers.google.com/youtube/analytics/).
@@ -13,10 +13,6 @@ Everything else about the *YouTube Analytics* *v1* API can be found at the
 
 Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google_youtubeanalytics1/struct.YouTubeAnalytics.html) ... 
 
-* [batch report definitions](http://byron.github.io/google-apis-rs/google_youtubeanalytics1/struct.BatchReportDefinition.html)
- * [*list*](http://byron.github.io/google-apis-rs/google_youtubeanalytics1/struct.BatchReportDefinitionListCall.html)
-* [batch reports](http://byron.github.io/google-apis-rs/google_youtubeanalytics1/struct.BatchReport.html)
- * [*list*](http://byron.github.io/google-apis-rs/google_youtubeanalytics1/struct.BatchReportListCall.html)
 * [group items](http://byron.github.io/google-apis-rs/google_youtubeanalytics1/struct.GroupItem.html)
  * [*delete*](http://byron.github.io/google-apis-rs/google_youtubeanalytics1/struct.GroupItemDeleteCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_youtubeanalytics1/struct.GroupItemInsertCall.html) and [*list*](http://byron.github.io/google-apis-rs/google_youtubeanalytics1/struct.GroupItemListCall.html)
 * [groups](http://byron.github.io/google-apis-rs/google_youtubeanalytics1/struct.Group.html)

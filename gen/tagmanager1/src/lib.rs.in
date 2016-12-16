@@ -40,25 +40,25 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
 #[derive(PartialEq, Eq, Hash)]
 pub enum Scope {
-    /// Manage user permissions of your Google Tag Manager data
+    /// Manage user permissions of your Google Tag Manager account and container
     ManageUser,
 
-    /// Manage your Google Tag Manager accounts
+    /// View and manage your Google Tag Manager accounts
     ManageAccount,
 
-    /// View your Google Tag Manager containers
+    /// View your Google Tag Manager container and its subcomponents
     Readonly,
 
     /// Manage your Google Tag Manager container versions
     EditContainerversion,
 
-    /// Manage your Google Tag Manager containers
+    /// Manage your Google Tag Manager container and its subcomponents, excluding versioning and publishing
     EditContainer,
 
     /// Delete your Google Tag Manager containers
     DeleteContainer,
 
-    /// Publish your Google Tag Manager containers
+    /// Publish your Google Tag Manager container versions
     Publish,
 }
 

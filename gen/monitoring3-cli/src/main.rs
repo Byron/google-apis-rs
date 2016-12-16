@@ -582,12 +582,12 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metric-kind" => Some(("metricKind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "value-type" => Some(("valueType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "unit" => Some(("unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["description", "display-name", "metric-kind", "name", "type", "unit", "value-type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1245,12 +1245,12 @@ fn main() {
     let arg_data = [
         ("projects", "methods: 'collectd-time-series-create', 'groups-create', 'groups-delete', 'groups-get', 'groups-list', 'groups-members-list', 'groups-update', 'metric-descriptors-create', 'metric-descriptors-delete', 'metric-descriptors-get', 'metric-descriptors-list', 'monitored-resource-descriptors-get', 'monitored-resource-descriptors-list', 'time-series-create' and 'time-series-list'", vec![
             ("collectd-time-series-create",
-                    Some(r##"Creates a new time series with the given data points. This method is only for use in `collectd`-related code, including the Google Monitoring Agent. See [google.monitoring.v3.MetricService.CreateTimeSeries] instead."##),
+                    Some(r##"Stackdriver Monitoring Agent only: Creates a new time series.<aside class="caution">This method is only for use by the Stackdriver Monitoring Agent. Use projects.timeSeries.create instead.</aside>"##),
                     "Details at http://byron.github.io/google-apis-rs/google_monitoring3_cli/projects_collectd-time-series-create",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The project in which to create the time series. The format is `"projects/PROJECT_ID_OR_NUMBER"`."##),
+                     Some(r##"The project in which to create the time series. The format is "projects/PROJECT_ID_OR_NUMBER"."##),
                      Some(true),
                      Some(false)),
         
@@ -1278,7 +1278,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The project in which to create the group. The format is `"projects/{project_id_or_number}"`."##),
+                     Some(r##"The project in which to create the group. The format is "projects/{project_id_or_number}"."##),
                      Some(true),
                      Some(false)),
         
@@ -1306,7 +1306,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The group to delete. The format is `"projects/{project_id_or_number}/groups/{group_id}"`."##),
+                     Some(r##"The group to delete. The format is "projects/{project_id_or_number}/groups/{group_id}"."##),
                      Some(true),
                      Some(false)),
         
@@ -1328,7 +1328,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The group to retrieve. The format is `"projects/{project_id_or_number}/groups/{group_id}"`."##),
+                     Some(r##"The group to retrieve. The format is "projects/{project_id_or_number}/groups/{group_id}"."##),
                      Some(true),
                      Some(false)),
         
@@ -1350,7 +1350,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The project whose groups are to be listed. The format is `"projects/{project_id_or_number}"`."##),
+                     Some(r##"The project whose groups are to be listed. The format is "projects/{project_id_or_number}"."##),
                      Some(true),
                      Some(false)),
         
@@ -1372,7 +1372,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The group whose members are listed. The format is `"projects/{project_id_or_number}/groups/{group_id}"`."##),
+                     Some(r##"The group whose members are listed. The format is "projects/{project_id_or_number}/groups/{group_id}"."##),
                      Some(true),
                      Some(false)),
         
@@ -1389,12 +1389,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("groups-update",
-                    Some(r##"Updates an existing group. You can change any group attributes except `name`."##),
+                    Some(r##"Updates an existing group. You can change any group attributes except name."##),
                     "Details at http://byron.github.io/google-apis-rs/google_monitoring3_cli/projects_groups-update",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of this group. The format is `"projects/{project_id_or_number}/groups/{group_id}"`. When creating a group, this field is ignored and a new name is created consisting of the project specified in the call to `CreateGroup` and a unique `{group_id}` that is generated automatically. @OutputOnly"##),
+                     Some(r##"Output only. The name of this group. The format is "projects/{project_id_or_number}/groups/{group_id}". When creating a group, this field is ignored and a new name is created consisting of the project specified in the call to CreateGroup and a unique {group_id} that is generated automatically."##),
                      Some(true),
                      Some(false)),
         
@@ -1417,12 +1417,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("metric-descriptors-create",
-                    Some(r##"Creates a new metric descriptor. User-created metric descriptors define [custom metrics](/monitoring/custom-metrics)."##),
+                    Some(r##"Creates a new metric descriptor. User-created metric descriptors define custom metrics."##),
                     "Details at http://byron.github.io/google-apis-rs/google_monitoring3_cli/projects_metric-descriptors-create",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The project on which to execute the request. The format is `"projects/{project_id_or_number}"`."##),
+                     Some(r##"The project on which to execute the request. The format is "projects/{project_id_or_number}"."##),
                      Some(true),
                      Some(false)),
         
@@ -1445,12 +1445,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("metric-descriptors-delete",
-                    Some(r##"Deletes a metric descriptor. Only user-created [custom metrics](/monitoring/custom-metrics) can be deleted."##),
+                    Some(r##"Deletes a metric descriptor. Only user-created custom metrics can be deleted."##),
                     "Details at http://byron.github.io/google-apis-rs/google_monitoring3_cli/projects_metric-descriptors-delete",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The metric descriptor on which to execute the request. The format is `"projects/{project_id_or_number}/metricDescriptors/{metric_id}"`. An example of `{metric_id}` is: `"custom.googleapis.com/my_test_metric"`."##),
+                     Some(r##"The metric descriptor on which to execute the request. The format is "projects/{project_id_or_number}/metricDescriptors/{metric_id}". An example of {metric_id} is: "custom.googleapis.com/my_test_metric"."##),
                      Some(true),
                      Some(false)),
         
@@ -1472,7 +1472,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The metric descriptor on which to execute the request. The format is `"projects/{project_id_or_number}/metricDescriptors/{metric_id}"`. An example value of `{metric_id}` is `"compute.googleapis.com/instance/disk/read_bytes_count"`."##),
+                     Some(r##"The metric descriptor on which to execute the request. The format is "projects/{project_id_or_number}/metricDescriptors/{metric_id}". An example value of {metric_id} is "compute.googleapis.com/instance/disk/read_bytes_count"."##),
                      Some(true),
                      Some(false)),
         
@@ -1494,7 +1494,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The project on which to execute the request. The format is `"projects/{project_id_or_number}"`."##),
+                     Some(r##"The project on which to execute the request. The format is "projects/{project_id_or_number}"."##),
                      Some(true),
                      Some(false)),
         
@@ -1516,7 +1516,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The monitored resource descriptor to get. The format is `"projects/{project_id_or_number}/monitoredResourceDescriptors/{resource_type}"`. The `{resource_type}` is a predefined type, such as `cloudsql_database`."##),
+                     Some(r##"The monitored resource descriptor to get. The format is "projects/{project_id_or_number}/monitoredResourceDescriptors/{resource_type}". The {resource_type} is a predefined type, such as cloudsql_database."##),
                      Some(true),
                      Some(false)),
         
@@ -1538,7 +1538,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The project on which to execute the request. The format is `"projects/{project_id_or_number}"`."##),
+                     Some(r##"The project on which to execute the request. The format is "projects/{project_id_or_number}"."##),
                      Some(true),
                      Some(false)),
         
@@ -1560,7 +1560,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The project on which to execute the request. The format is `"projects/{project_id_or_number}"`."##),
+                     Some(r##"The project on which to execute the request. The format is "projects/{project_id_or_number}"."##),
                      Some(true),
                      Some(false)),
         
@@ -1610,8 +1610,8 @@ fn main() {
     
     let mut app = App::new("monitoring3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.0+20160425")
-           .about("Manages your Stackdriver monitoring data and configurations. Projects must be associated with a Stackdriver account, except for the following methods: [monitoredResourceDescriptors.list](v3/projects.monitoredResourceDescriptors/list), [monitoredResourceDescriptors.get](v3/projects.monitoredResourceDescriptors/get), [metricDescriptors.list](v3/projects.metricDescriptors/list), [metricDescriptors.get](v3/projects.metricDescriptors/get), and [timeSeries.list](v3/projects.timeSeries/list).")
+           .version("1.0.0+20161212")
+           .about("Manages your Stackdriver Monitoring data and configurations. Most projects must be associated with a Stackdriver account, with a few exceptions as noted on the individual method pages.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_monitoring3_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

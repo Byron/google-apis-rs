@@ -797,9 +797,11 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "has-thumbnail" => Some(("hasThumbnail", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "mime-type" => Some(("mimeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "modified-by-me-time" => Some(("modifiedByMeTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "thumbnail-link" => Some(("thumbnailLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "thumbnail-version" => Some(("thumbnailVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "explicitly-trashed" => Some(("explicitlyTrashed", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "is-app-authorized" => Some(("isAppAuthorized", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "writers-can-share" => Some(("writersCanShare", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -840,6 +842,7 @@ impl<'n> Engine<'n> {
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "modified-time" => Some(("modifiedTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "viewed-by-me" => Some(("viewedByMe", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "modified-by-me" => Some(("modifiedByMe", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "quota-bytes-used" => Some(("quotaBytesUsed", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "file-extension" => Some(("fileExtension", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "properties" => Some(("properties", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
@@ -880,7 +883,7 @@ impl<'n> Engine<'n> {
                     "starred" => Some(("starred", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "head-revision-id" => Some(("headRevisionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["altitude", "aperture", "app-properties", "camera-make", "camera-model", "can-comment", "can-copy", "can-edit", "can-read-revisions", "can-share", "capabilities", "color-space", "content-hints", "created-time", "description", "display-name", "duration-millis", "email-address", "explicitly-trashed", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "head-revision-id", "height", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "iso-speed", "kind", "last-modifying-user", "latitude", "lens", "location", "longitude", "max-aperture-value", "md5-checksum", "me", "metering-mode", "mime-type", "modified-by-me-time", "modified-time", "name", "original-filename", "owned-by-me", "parents", "permission-id", "photo-link", "properties", "quota-bytes-used", "rotation", "sensor", "shared", "shared-with-me-time", "sharing-user", "size", "spaces", "starred", "subject-distance", "thumbnail", "thumbnail-link", "time", "trashed", "version", "video-media-metadata", "viewed-by-me", "viewed-by-me-time", "viewers-can-copy-content", "web-content-link", "web-view-link", "white-balance", "width", "writers-can-share"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["altitude", "aperture", "app-properties", "camera-make", "camera-model", "can-comment", "can-copy", "can-edit", "can-read-revisions", "can-share", "capabilities", "color-space", "content-hints", "created-time", "description", "display-name", "duration-millis", "email-address", "explicitly-trashed", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "has-thumbnail", "head-revision-id", "height", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "iso-speed", "kind", "last-modifying-user", "latitude", "lens", "location", "longitude", "max-aperture-value", "md5-checksum", "me", "metering-mode", "mime-type", "modified-by-me", "modified-by-me-time", "modified-time", "name", "original-filename", "owned-by-me", "parents", "permission-id", "photo-link", "properties", "quota-bytes-used", "rotation", "sensor", "shared", "shared-with-me-time", "sharing-user", "size", "spaces", "starred", "subject-distance", "thumbnail", "thumbnail-link", "thumbnail-version", "time", "trashed", "version", "video-media-metadata", "viewed-by-me", "viewed-by-me-time", "viewers-can-copy-content", "web-content-link", "web-view-link", "white-balance", "width", "writers-can-share"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -973,9 +976,11 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "has-thumbnail" => Some(("hasThumbnail", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "mime-type" => Some(("mimeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "modified-by-me-time" => Some(("modifiedByMeTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "thumbnail-link" => Some(("thumbnailLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "thumbnail-version" => Some(("thumbnailVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "explicitly-trashed" => Some(("explicitlyTrashed", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "is-app-authorized" => Some(("isAppAuthorized", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "writers-can-share" => Some(("writersCanShare", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1016,6 +1021,7 @@ impl<'n> Engine<'n> {
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "modified-time" => Some(("modifiedTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "viewed-by-me" => Some(("viewedByMe", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "modified-by-me" => Some(("modifiedByMe", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "quota-bytes-used" => Some(("quotaBytesUsed", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "file-extension" => Some(("fileExtension", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "properties" => Some(("properties", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
@@ -1056,7 +1062,7 @@ impl<'n> Engine<'n> {
                     "starred" => Some(("starred", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "head-revision-id" => Some(("headRevisionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["altitude", "aperture", "app-properties", "camera-make", "camera-model", "can-comment", "can-copy", "can-edit", "can-read-revisions", "can-share", "capabilities", "color-space", "content-hints", "created-time", "description", "display-name", "duration-millis", "email-address", "explicitly-trashed", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "head-revision-id", "height", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "iso-speed", "kind", "last-modifying-user", "latitude", "lens", "location", "longitude", "max-aperture-value", "md5-checksum", "me", "metering-mode", "mime-type", "modified-by-me-time", "modified-time", "name", "original-filename", "owned-by-me", "parents", "permission-id", "photo-link", "properties", "quota-bytes-used", "rotation", "sensor", "shared", "shared-with-me-time", "sharing-user", "size", "spaces", "starred", "subject-distance", "thumbnail", "thumbnail-link", "time", "trashed", "version", "video-media-metadata", "viewed-by-me", "viewed-by-me-time", "viewers-can-copy-content", "web-content-link", "web-view-link", "white-balance", "width", "writers-can-share"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["altitude", "aperture", "app-properties", "camera-make", "camera-model", "can-comment", "can-copy", "can-edit", "can-read-revisions", "can-share", "capabilities", "color-space", "content-hints", "created-time", "description", "display-name", "duration-millis", "email-address", "explicitly-trashed", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "has-thumbnail", "head-revision-id", "height", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "iso-speed", "kind", "last-modifying-user", "latitude", "lens", "location", "longitude", "max-aperture-value", "md5-checksum", "me", "metering-mode", "mime-type", "modified-by-me", "modified-by-me-time", "modified-time", "name", "original-filename", "owned-by-me", "parents", "permission-id", "photo-link", "properties", "quota-bytes-used", "rotation", "sensor", "shared", "shared-with-me-time", "sharing-user", "size", "spaces", "starred", "subject-distance", "thumbnail", "thumbnail-link", "thumbnail-version", "time", "trashed", "version", "video-media-metadata", "viewed-by-me", "viewed-by-me-time", "viewers-can-copy-content", "web-content-link", "web-view-link", "white-balance", "width", "writers-can-share"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1496,9 +1502,11 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "has-thumbnail" => Some(("hasThumbnail", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "mime-type" => Some(("mimeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "modified-by-me-time" => Some(("modifiedByMeTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "thumbnail-link" => Some(("thumbnailLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "thumbnail-version" => Some(("thumbnailVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "explicitly-trashed" => Some(("explicitlyTrashed", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "is-app-authorized" => Some(("isAppAuthorized", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "writers-can-share" => Some(("writersCanShare", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1539,6 +1547,7 @@ impl<'n> Engine<'n> {
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "modified-time" => Some(("modifiedTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "viewed-by-me" => Some(("viewedByMe", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "modified-by-me" => Some(("modifiedByMe", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "quota-bytes-used" => Some(("quotaBytesUsed", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "file-extension" => Some(("fileExtension", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "properties" => Some(("properties", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
@@ -1579,7 +1588,7 @@ impl<'n> Engine<'n> {
                     "starred" => Some(("starred", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "head-revision-id" => Some(("headRevisionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["altitude", "aperture", "app-properties", "camera-make", "camera-model", "can-comment", "can-copy", "can-edit", "can-read-revisions", "can-share", "capabilities", "color-space", "content-hints", "created-time", "description", "display-name", "duration-millis", "email-address", "explicitly-trashed", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "head-revision-id", "height", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "iso-speed", "kind", "last-modifying-user", "latitude", "lens", "location", "longitude", "max-aperture-value", "md5-checksum", "me", "metering-mode", "mime-type", "modified-by-me-time", "modified-time", "name", "original-filename", "owned-by-me", "parents", "permission-id", "photo-link", "properties", "quota-bytes-used", "rotation", "sensor", "shared", "shared-with-me-time", "sharing-user", "size", "spaces", "starred", "subject-distance", "thumbnail", "thumbnail-link", "time", "trashed", "version", "video-media-metadata", "viewed-by-me", "viewed-by-me-time", "viewers-can-copy-content", "web-content-link", "web-view-link", "white-balance", "width", "writers-can-share"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["altitude", "aperture", "app-properties", "camera-make", "camera-model", "can-comment", "can-copy", "can-edit", "can-read-revisions", "can-share", "capabilities", "color-space", "content-hints", "created-time", "description", "display-name", "duration-millis", "email-address", "explicitly-trashed", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "has-thumbnail", "head-revision-id", "height", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "iso-speed", "kind", "last-modifying-user", "latitude", "lens", "location", "longitude", "max-aperture-value", "md5-checksum", "me", "metering-mode", "mime-type", "modified-by-me", "modified-by-me-time", "modified-time", "name", "original-filename", "owned-by-me", "parents", "permission-id", "photo-link", "properties", "quota-bytes-used", "rotation", "sensor", "shared", "shared-with-me-time", "sharing-user", "size", "spaces", "starred", "subject-distance", "thumbnail", "thumbnail-link", "thumbnail-version", "time", "trashed", "version", "video-media-metadata", "viewed-by-me", "viewed-by-me-time", "viewers-can-copy-content", "web-content-link", "web-view-link", "white-balance", "width", "writers-can-share"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2592,6 +2601,12 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2605,6 +2620,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3883,7 +3899,7 @@ fn main() {
     
     let mut app = App::new("drive3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.0+20160901")
+           .version("1.0.0+20161212")
            .about("Manages files in Drive including uploading, downloading, searching, detecting changes, and updating sharing permissions.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_drive3_cli")
            .arg(Arg::with_name("url")

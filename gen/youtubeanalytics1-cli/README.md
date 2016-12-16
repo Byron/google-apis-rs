@@ -24,14 +24,10 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *YouTube Analytics* API at revision *20160513*. The CLI is at version *1.0.0*.
+This documentation was generated from the *YouTube Analytics* API at revision *20161213*. The CLI is at version *1.0.0*.
 
 ```bash
 youtubeanalytics1 [options]
-        batch-report-definitions
-                list <on-behalf-of-content-owner> [-p <v>]... [-o <out>]
-        batch-reports
-                list <batch-report-definition-id> <on-behalf-of-content-owner> [-p <v>]... [-o <out>]
         group-items
                 delete <id> [-p <v>]...
                 insert (-r <kv>)... [-p <v>]... [-o <out>]

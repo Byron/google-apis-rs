@@ -3,14 +3,14 @@ DO NOT EDIT !
 This file was generated automatically from 'src/mako/cli/README.md.mako'
 DO NOT EDIT !
 -->
-The `logging2-beta1` command-line interface *(CLI)* allows to use most features of the *Google logging* service from the comfort of your terminal.
+The `logging2-beta1` command-line interface *(CLI)* allows to use most features of the *Google Logging* service from the comfort of your terminal.
 
 By default all output is printed to standard out, but flags can be set to direct it into a file independent of your shell's
 capabilities. Errors will be printed to standard error, and cause the program's exit code to be non-zero.
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
-Everything else about the *logging* API can be found at the
+Everything else about the *Logging* API can be found at the
 [official documentation site](https://cloud.google.com/logging/docs/).
 
 # Downloads
@@ -24,26 +24,33 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *logging* API at revision *20160322*. The CLI is at version *1.0.0*.
+This documentation was generated from the *Logging* API at revision *20161206*. The CLI is at version *1.0.0*.
 
 ```bash
 logging2-beta1 [options]
+        billing-accounts
+                logs-delete <log-name> [-p <v>]... [-o <out>]
+                logs-list <parent> [-p <v>]... [-o <out>]
         entries
                 list (-r <kv>)... [-p <v>]... [-o <out>]
                 write (-r <kv>)... [-p <v>]... [-o <out>]
         monitored-resource-descriptors
                 list [-p <v>]... [-o <out>]
+        organizations
+                logs-delete <log-name> [-p <v>]... [-o <out>]
+                logs-list <parent> [-p <v>]... [-o <out>]
         projects
                 logs-delete <log-name> [-p <v>]... [-o <out>]
-                metrics-create <project-name> (-r <kv>)... [-p <v>]... [-o <out>]
+                logs-list <parent> [-p <v>]... [-o <out>]
+                metrics-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 metrics-delete <metric-name> [-p <v>]... [-o <out>]
                 metrics-get <metric-name> [-p <v>]... [-o <out>]
-                metrics-list <project-name> [-p <v>]... [-o <out>]
+                metrics-list <parent> [-p <v>]... [-o <out>]
                 metrics-update <metric-name> (-r <kv>)... [-p <v>]... [-o <out>]
-                sinks-create <project-name> (-r <kv>)... [-p <v>]... [-o <out>]
+                sinks-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 sinks-delete <sink-name> [-p <v>]... [-o <out>]
                 sinks-get <sink-name> [-p <v>]... [-o <out>]
-                sinks-list <project-name> [-p <v>]... [-o <out>]
+                sinks-list <parent> [-p <v>]... [-o <out>]
                 sinks-update <sink-name> (-r <kv>)... [-p <v>]... [-o <out>]
   logging2-beta1 --help
 

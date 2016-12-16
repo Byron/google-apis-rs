@@ -103,6 +103,7 @@ api:
     - v2.4
     - v2.5
     - v2.6
+    - v2.7
     discovery:
     - v1
     dns:
@@ -114,6 +115,8 @@ api:
     drive:
     - v2
     - v3
+    firebasedynamiclinks:
+    - v1
     firebaserules:
     - v1
     fitness:
@@ -146,17 +149,23 @@ api:
     kgsearch:
     - v1
     language:
+    - v1
     - v1beta1
     licensing:
     - v1
     logging:
+    - v2
     - v2beta1
     manager:
     - v1beta2
+    manufacturers:
+    - v1
     mapsengine:
     - v1
     mirror:
     - v1
+    ml:
+    - v1beta1
     monitoring:
     - v3
     oauth2:
@@ -191,6 +200,7 @@ api:
     resourceviews:
     - v1beta2
     runtimeconfig:
+    - v1
     - v1beta1
     safebrowsing:
     - v4
@@ -206,6 +216,8 @@ api:
     - v4
     siteverification:
     - v1
+    slides:
+    - v1
     spectrum:
     - v1explorer
     speech:
@@ -216,6 +228,8 @@ api:
     - v1
     storagetransfer:
     - v1
+    surveys:
+    - v2
     tagmanager:
     - v1
     taskqueue:

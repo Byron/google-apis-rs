@@ -335,11 +335,14 @@ pub struct User {
     /// The permission ID associated with this user. Equivalent to the Drive API's permission ID for this user, returned as part of the Drive Permissions resource.
     #[serde(rename="permissionId")]
     pub permission_id: Option<String>,
-    /// The displayable name of the user.
-    pub name: Option<String>,
     /// A boolean which indicates whether the specified User was deleted. If true, name, photo and permission_id will be omitted.
     #[serde(rename="isDeleted")]
     pub is_deleted: Option<bool>,
+    /// Whether the user is the authenticated user.
+    #[serde(rename="isMe")]
+    pub is_me: Option<bool>,
+    /// The displayable name of the user.
+    pub name: Option<String>,
 }
 
 impl Part for User {}

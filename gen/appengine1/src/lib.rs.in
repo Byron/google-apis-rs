@@ -40,14 +40,22 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
 #[derive(PartialEq, Eq, Hash)]
 pub enum Scope {
+    /// View and manage your applications deployed on Google App Engine
+    Admin,
+
     /// View and manage your data across Google Cloud Platform services
     CloudPlatform,
+
+    /// View your data across Google Cloud Platform services
+    CloudPlatformReadOnly,
 }
 
 impl AsRef<str> for Scope {
     fn as_ref(&self) -> &str {
         match *self {
+            Scope::Admin => "https://www.googleapis.com/auth/appengine.admin",
             Scope::CloudPlatform => "https://www.googleapis.com/auth/cloud-platform",
+            Scope::CloudPlatformReadOnly => "https://www.googleapis.com/auth/cloud-platform.read-only",
         }
     }
 }
@@ -160,7 +168,7 @@ impl<'a, C, A> Appengine<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// Response message for `Instances.ListInstances`.
+/// Response message for Instances.ListInstances.
 /// 
 /// # Activities
 /// 
@@ -193,8 +201,11 @@ pub struct Network {
     /// List of ports, or port pairs, to forward from the virtual machine to the application container.
     #[serde(rename="forwardedPorts")]
     pub forwarded_ports: Option<Vec<String>>,
-    /// Google Cloud Platform network where the virtual machines are created. Specify the short name, not the resource path. Defaults to `default`.
+    /// Google Cloud Platform network where the virtual machines are created. Specify the short name, not the resource path.Defaults to default.
     pub name: Option<String>,
+    /// Google Cloud Platform sub-network where the virtual machines are created. Specify the short name, not the resource path.If a subnetwork name is specified, a network name will also be required unless it is for the default network. If the network the VM instance is being created in is a Legacy network, then the IP address is allocated from the IPv4Range. If the network the VM instance is being created in is an auto Subnet Mode Network, then only network name should be specified (not the subnetwork_name) and the IP address is created from the IPCidrRange of the subnetwork that exists in that zone for that network. If the network the VM instance is being created in is a custom Subnet Mode Network, then the subnetwork_name must be specified and the IP address is created from the IPCidrRange of the subnetwork.If specified, the subnetwork must exist in the same region as the Flex app.
+    #[serde(rename="subnetworkName")]
+    pub subnetwork_name: Option<String>,
 }
 
 impl Part for Network {}
@@ -214,9 +225,9 @@ impl Part for Network {}
 pub struct Service {
     /// Mapping that defines fractional HTTP traffic diversion to different versions within the service.
     pub split: Option<TrafficSplit>,
-    /// Relative name of the service within the application. Example: `default`. @OutputOnly
+    /// Relative name of the service within the application. Example: default.@OutputOnly
     pub id: Option<String>,
-    /// Full path to the Service resource in the API. Example: `apps/myapp/services/default`. @OutputOnly
+    /// Full path to the Service resource in the API. Example: apps/myapp/services/default.@OutputOnly
     pub name: Option<String>,
 }
 
@@ -246,37 +257,40 @@ impl RequestValue for RepairApplicationRequest {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
+/// * [create apps](struct.AppCreateCall.html) (request)
+/// * [patch apps](struct.AppPatchCall.html) (request)
 /// * [get apps](struct.AppGetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Application {
-    /// Hostname used to reach this application, as resolved by App Engine. @OutputOnly
+    /// Hostname used to reach this application, as resolved by App Engine.@OutputOnly
     #[serde(rename="defaultHostname")]
     pub default_hostname: Option<String>,
-    /// Full path to the Application resource in the API. Example: `apps/myapp`. @OutputOnly
+    /// Full path to the Application resource in the API. Example: apps/myapp.@OutputOnly
     pub name: Option<String>,
-    /// Google Cloud Storage bucket that can be used for storing files associated with this application. This bucket is associated with the application and can be used by the gcloud deployment commands. @OutputOnly
+    /// Google Cloud Storage bucket that can be used for storing files associated with this application. This bucket is associated with the application and can be used by the gcloud deployment commands.@OutputOnly
     #[serde(rename="codeBucket")]
     pub code_bucket: Option<String>,
-    /// Google Cloud Storage bucket that can be used by this application to store content. @OutputOnly
+    /// Google Cloud Storage bucket that can be used by this application to store content.@OutputOnly
     #[serde(rename="defaultBucket")]
     pub default_bucket: Option<String>,
-    /// HTTP path dispatch rules for requests to the application that do not explicitly target a service or version. Rules are order-dependent. @OutputOnly
+    /// HTTP path dispatch rules for requests to the application that do not explicitly target a service or version. Rules are order-dependent.@OutputOnly
     #[serde(rename="dispatchRules")]
     pub dispatch_rules: Option<Vec<UrlDispatchRule>>,
-    /// Cookie expiration policy for this application. @OutputOnly
+    /// Cookie expiration policy for this application.
     #[serde(rename="defaultCookieExpiration")]
     pub default_cookie_expiration: Option<String>,
-    /// Location from which this application will be run. Application instances will run out of data centers in the chosen location, which is also where all of the application's end user content is stored. Defaults to `us-central`. Options are: `us-central` - Central US `europe-west` - Western Europe `us-east1` - Eastern US
+    /// Location from which this application will be run. Application instances will run out of data centers in the chosen location, which is also where all of the application's end user content is stored.Defaults to us-central.Options are:us-central - Central USeurope-west - Western Europeus-east1 - Eastern US
     #[serde(rename="locationId")]
     pub location_id: Option<String>,
-    /// Google Apps authentication domain that controls which users can access this application. Defaults to open access for any Google Account.
+    /// Google Apps authentication domain that controls which users can access this application.Defaults to open access for any Google Account.
     #[serde(rename="authDomain")]
     pub auth_domain: Option<String>,
-    /// Identifier of the Application resource. This identifier is equivalent to the project ID of the Google Cloud Platform project where you want to deploy your application. Example: `myapp`.
+    /// Identifier of the Application resource. This identifier is equivalent to the project ID of the Google Cloud Platform project where you want to deploy your application. Example: myapp.
     pub id: Option<String>,
 }
 
+impl RequestValue for Application {}
 impl ResponseResult for Application {}
 
 
@@ -293,10 +307,13 @@ impl ResponseResult for Application {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Version {
+    /// Cloud Endpoints configuration.If endpoints_api_service is set, the Cloud Endpoints Extensible Service Proxy will be provided to serve the API implemented by the app.
+    #[serde(rename="endpointsApiService")]
+    pub endpoints_api_service: Option<EndpointsApiService>,
     /// A service with basic scaling will create an instance when the application receives a request. The instance will be turned down when the app becomes idle. Basic scaling is ideal for work that is intermittent or driven by user activity.
     #[serde(rename="basicScaling")]
     pub basic_scaling: Option<BasicScaling>,
-    /// Full path to the Version resource in the API. Example: `apps/myapp/services/default/versions/v1`. @OutputOnly
+    /// Full path to the Version resource in the API. Example: apps/myapp/services/default/versions/v1.@OutputOnly
     pub name: Option<String>,
     /// Metadata settings that are supplied to this version to enable beta runtime features.
     #[serde(rename="betaSettings")]
@@ -306,62 +323,62 @@ pub struct Version {
     pub manual_scaling: Option<ManualScaling>,
     /// Whether to deploy this version in a container on a virtual machine.
     pub vm: Option<bool>,
-    /// Time that this version was created. @OutputOnly
+    /// Time that this version was created.@OutputOnly
     #[serde(rename="createTime")]
     pub create_time: Option<String>,
     /// Before an application can receive email or XMPP messages, the application must be configured to enable the service.
     #[serde(rename="inboundServices")]
     pub inbound_services: Option<Vec<String>>,
-    /// Instance class that is used to run this version. Valid values are: * AutomaticScaling: `F1`, `F2`, `F4`, `F4_1G` * ManualScaling or BasicScaling: `B1`, `B2`, `B4`, `B8`, `B4_1G` Defaults to `F1` for AutomaticScaling and `B1` for ManualScaling or BasicScaling.
+    /// Instance class that is used to run this version. Valid values are: AutomaticScaling: F1, F2, F4, F4_1G ManualScaling or BasicScaling: B1, B2, B4, B8, B4_1GDefaults to F1 for AutomaticScaling and B1 for ManualScaling or BasicScaling.
     #[serde(rename="instanceClass")]
     pub instance_class: Option<String>,
-    /// Email address of the user who created this version. @OutputOnly
+    /// Email address of the user who created this version.@OutputOnly
     #[serde(rename="createdBy")]
     pub created_by: Option<String>,
-    /// Code and application artifacts that make up this version. Only returned in `GET` requests if `view=FULL` is set.
+    /// Code and application artifacts that make up this version.Only returned in GET requests if view=FULL is set.
     pub deployment: Option<Deployment>,
-    /// Custom static error pages. Limited to 10KB per page. Only returned in `GET` requests if `view=FULL` is set.
+    /// Custom static error pages. Limited to 10KB per page.Only returned in GET requests if view=FULL is set.
     #[serde(rename="errorHandlers")]
     pub error_handlers: Option<Vec<ErrorHandler>>,
-    /// Current serving status of this version. Only the versions with a `SERVING` status create instances and can be billed. `SERVING_STATUS_UNSPECIFIED` is an invalid value. Defaults to `SERVING`.
+    /// Current serving status of this version. Only the versions with a SERVING status create instances and can be billed.SERVING_STATUS_UNSPECIFIED is an invalid value. Defaults to SERVING.
     #[serde(rename="servingStatus")]
     pub serving_status: Option<String>,
-    /// Relative name of the version within the service. Example: `v1`. Version names can contain only lowercase letters, numbers, or hyphens. Reserved names: "default", "latest", and any name with the prefix "ah-".
+    /// Relative name of the version within the service. Example: v1. Version names can contain only lowercase letters, numbers, or hyphens. Reserved names: "default", "latest", and any name with the prefix "ah-".
     pub id: Option<String>,
     /// Extra network settings. Only applicable for VM runtimes.
     pub network: Option<Network>,
-    /// Serving configuration for [Google Cloud Endpoints](https://cloud.google.com/appengine/docs/python/endpoints/). Only returned in `GET` requests if `view=FULL` is set.
+    /// Serving configuration for Google Cloud Endpoints (https://cloud.google.com/appengine/docs/python/endpoints/).Only returned in GET requests if view=FULL is set.
     #[serde(rename="apiConfig")]
     pub api_config: Option<ApiConfigHandler>,
-    /// Files that match this pattern will not be built into this version. Only applicable for Go runtimes. Only returned in `GET` requests if `view=FULL` is set.
+    /// Files that match this pattern will not be built into this version. Only applicable for Go runtimes.Only returned in GET requests if view=FULL is set.
     #[serde(rename="nobuildFilesRegex")]
     pub nobuild_files_regex: Option<String>,
     /// Whether multiple requests can be dispatched to this version at once.
     pub threadsafe: Option<bool>,
-    /// An ordered list of URL-matching patterns that should be applied to incoming requests. The first matching URL handles the request and other request handlers are not attempted. Only returned in `GET` requests if `view=FULL` is set.
+    /// An ordered list of URL-matching patterns that should be applied to incoming requests. The first matching URL handles the request and other request handlers are not attempted.Only returned in GET requests if view=FULL is set.
     pub handlers: Option<Vec<UrlMap>>,
-    /// Configures health checking for VM instances. Unhealthy instances are stopped and replaced with new instances. Only applicable for VM runtimes. Only returned in `GET` requests if `view=FULL` is set.
+    /// Configures health checking for VM instances. Unhealthy instances are stopped and replaced with new instances. Only applicable for VM runtimes.Only returned in GET requests if view=FULL is set.
     #[serde(rename="healthCheck")]
     pub health_check: Option<HealthCheck>,
-    /// Duration that static files should be cached by web proxies and browsers. Only applicable if the corresponding [StaticFilesHandler](https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#staticfileshandler) does not specify its own expiration time. Only returned in `GET` requests if `view=FULL` is set.
+    /// Duration that static files should be cached by web proxies and browsers. Only applicable if the corresponding StaticFilesHandler (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#staticfileshandler) does not specify its own expiration time.Only returned in GET requests if view=FULL is set.
     #[serde(rename="defaultExpiration")]
     pub default_expiration: Option<String>,
-    /// Serving URL for this version. Example: "https://myversion-dot-myservice-dot-myapp.appspot.com" @OutputOnly
+    /// Serving URL for this version. Example: "https://myversion-dot-myservice-dot-myapp.appspot.com"@OutputOnly
     #[serde(rename="versionUrl")]
     pub version_url: Option<String>,
-    /// Configuration for third-party Python runtime libraries that are required by the application. Only returned in `GET` requests if `view=FULL` is set.
+    /// Configuration for third-party Python runtime libraries that are required by the application.Only returned in GET requests if view=FULL is set.
     pub libraries: Option<Vec<Library>>,
-    /// App Engine execution environment for this version. Defaults to `standard`.
+    /// App Engine execution environment for this version.Defaults to standard.
     pub env: Option<String>,
-    /// Total size in bytes of all the files that are included in this version and curerntly hosted on the App Engine disk. @OutputOnly
+    /// Total size in bytes of all the files that are included in this version and curerntly hosted on the App Engine disk.@OutputOnly
     #[serde(rename="diskUsageBytes")]
     pub disk_usage_bytes: Option<String>,
     /// Automatic scaling is based on request rate, response latencies, and other application metrics.
     #[serde(rename="automaticScaling")]
     pub automatic_scaling: Option<AutomaticScaling>,
-    /// Desired runtime. Example: `python27`.
+    /// Desired runtime. Example: python27.
     pub runtime: Option<String>,
-    /// Environment variables available to the application. Only returned in `GET` requests if `view=FULL` is set.
+    /// Environment variables available to the application.Only returned in GET requests if view=FULL is set.
     #[serde(rename="envVariables")]
     pub env_variables: Option<HashMap<String, String>>,
     /// Machine resources for this version. Only applicable for VM runtimes.
@@ -406,10 +423,10 @@ impl ResponseResult for ListLocationsResponse {}
 pub struct Location {
     /// Cross-service attributes for the location. For example {"cloud.googleapis.com/region": "us-east1"}
     pub labels: Option<HashMap<String, String>>,
-    /// The cononical id for this location. For example: `"us-east1"`.
+    /// The canonical id for this location. For example: "us-east1".
     #[serde(rename="locationId")]
     pub location_id: Option<String>,
-    /// Resource name for the location, which may vary between implementations. For example: `"projects/example-project/locations/us-east1"`
+    /// Resource name for the location, which may vary between implementations. For example: "projects/example-project/locations/us-east1"
     pub name: Option<String>,
     /// Service-specific metadata. For example the available capacity at the given location.
     pub metadata: Option<HashMap<String, String>>,
@@ -418,7 +435,7 @@ pub struct Location {
 impl ResponseResult for Location {}
 
 
-/// Request message for `Instances.DebugInstance`.
+/// Request message for Instances.DebugInstance.
 /// 
 /// # Activities
 /// 
@@ -428,7 +445,11 @@ impl ResponseResult for Location {}
 /// * [services versions instances debug apps](struct.AppServiceVersionInstanceDebugCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DebugInstanceRequest { _never_set: Option<bool> }
+pub struct DebugInstanceRequest {
+    /// Public SSH key to add to the instance. Examples: [USERNAME]:ssh-rsa [KEY_VALUE] [USERNAME] [USERNAME]:ssh-rsa [KEY_VALUE] google-ssh {"userName":"[USERNAME]","expireOn":"[EXPIRE_TIME]"}For more information, see Adding and Removing SSH Keys (https://cloud.google.com/compute/docs/instances/adding-removing-ssh-keys).
+    #[serde(rename="sshKey")]
+    pub ssh_key: Option<String>,
+}
 
 impl RequestValue for DebugInstanceRequest {}
 
@@ -456,20 +477,22 @@ impl Part for CpuUtilization {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Resources {
+    /// Memory (GB) needed.
+    #[serde(rename="memoryGb")]
+    pub memory_gb: Option<f64>,
     /// Disk size (GB) needed.
     #[serde(rename="diskGb")]
     pub disk_gb: Option<f64>,
     /// Number of CPU cores needed.
     pub cpu: Option<f64>,
-    /// Memory (GB) needed.
-    #[serde(rename="memoryGb")]
-    pub memory_gb: Option<f64>,
+    /// User specified volumes.
+    pub volumes: Option<Vec<Volume>>,
 }
 
 impl Part for Resources {}
 
 
-/// The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). The error model is designed to be: - Simple to use and understand for most users - Flexible enough to meet unexpected needs # Overview The `Status` message contains three pieces of data: error code, error message, and error details. The error code should be an enum value of google.rpc.Code, but it may accept additional error codes if needed. The error message should be a developer-facing English message that helps developers *understand* and *resolve* the error. If a localized user-facing error message is needed, put the localized message in the error details or localize it in the client. The optional error details may contain arbitrary information about the error. There is a predefined set of error detail types in the package `google.rpc` which can be used for common error conditions. # Language mapping The `Status` message is the logical representation of the error model, but it is not necessarily the actual wire format. When the `Status` message is exposed in different client libraries and different wire protocols, it can be mapped differently. For example, it will likely be mapped to some exceptions in Java, but more likely mapped to some error codes in C. # Other uses The error model and the `Status` message can be used in a variety of environments, either with or without APIs, to provide a consistent developer experience across different environments. Example uses of this error model include: - Partial errors. If a service needs to return partial errors to the client, it may embed the `Status` in the normal response to indicate the partial errors. - Workflow errors. A typical workflow has multiple steps. Each step may have a `Status` message for error reporting purpose. - Batch operations. If a client uses batch request and batch response, the `Status` message should be used directly inside batch response, one for each error sub-response. - Asynchronous operations. If an API call embeds asynchronous operation results in its response, the status of those operations should be represented directly using the `Status` message. - Logging. If some API errors are stored in logs, the message `Status` could be used directly after any stripping needed for security/privacy reasons.
+/// The Status type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by gRPC (https://github.com/grpc). The error model is designed to be: Simple to use and understand for most users Flexible enough to meet unexpected needsOverviewThe Status message contains three pieces of data: error code, error message, and error details. The error code should be an enum value of google.rpc.Code, but it may accept additional error codes if needed. The error message should be a developer-facing English message that helps developers understand and resolve the error. If a localized user-facing error message is needed, put the localized message in the error details or localize it in the client. The optional error details may contain arbitrary information about the error. There is a predefined set of error detail types in the package google.rpc which can be used for common error conditions.Language mappingThe Status message is the logical representation of the error model, but it is not necessarily the actual wire format. When the Status message is exposed in different client libraries and different wire protocols, it can be mapped differently. For example, it will likely be mapped to some exceptions in Java, but more likely mapped to some error codes in C.Other usesThe error model and the Status message can be used in a variety of environments, either with or without APIs, to provide a consistent developer experience across different environments.Example uses of this error model include: Partial errors. If a service needs to return partial errors to the client, it may embed the Status in the normal response to indicate the partial errors. Workflow errors. A typical workflow has multiple steps. Each step may have a Status message for error reporting purpose. Batch operations. If a client uses batch request and batch response, the Status message should be used directly inside batch response, one for each error sub-response. Asynchronous operations. If an API call embeds asynchronous operation results in its response, the status of those operations should be represented directly using the Status message. Logging. If some API errors are stored in logs, the message Status could be used directly after any stripping needed for security/privacy reasons.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -509,7 +532,7 @@ impl Part for BasicScaling {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct StaticFilesHandler {
-    /// MIME type used to serve all files served by this handler. Defaults to file-specific MIME types, which are derived from each file's filename extension.
+    /// MIME type used to serve all files served by this handler.Defaults to file-specific MIME types, which are derived from each file's filename extension.
     #[serde(rename="mimeType")]
     pub mime_type: Option<String>,
     /// Time a static file served by this handler should be cached by web proxies and browsers.
@@ -556,7 +579,7 @@ pub struct NetworkUtilization {
 impl Part for NetworkUtilization {}
 
 
-/// Response message for `Versions.ListVersions`.
+/// Response message for Versions.ListVersions.
 /// 
 /// # Activities
 /// 
@@ -577,7 +600,26 @@ pub struct ListVersionsResponse {
 impl ResponseResult for ListVersionsResponse {}
 
 
-/// Response message for `Services.ListServices`.
+/// Volumes mounted within the app container. Only applicable for VM runtimes.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Volume {
+    /// Underlying volume type, e.g. 'tmpfs'.
+    #[serde(rename="volumeType")]
+    pub volume_type: Option<String>,
+    /// Unique name for the volume.
+    pub name: Option<String>,
+    /// Volume size in gigabytes.
+    #[serde(rename="sizeGb")]
+    pub size_gb: Option<f64>,
+}
+
+impl Part for Volume {}
+
+
+/// Response message for Services.ListServices.
 /// 
 /// # Activities
 /// 
@@ -618,11 +660,11 @@ impl Part for ScriptHandler {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UrlDispatchRule {
-    /// Pathname within the host. Must start with a "`/`". A single "`*`" can be included at the end of the path. The sum of the lengths of the domain and path may not exceed 100 characters.
+    /// Pathname within the host. Must start with a "/". A single "*" can be included at the end of the path. The sum of the lengths of the domain and path may not exceed 100 characters.
     pub path: Option<String>,
-    /// Domain name to match against. The wildcard "`*`" is supported if specified before a period: "`*.`". Defaults to matching all domains: "`*`".
+    /// Domain name to match against. The wildcard "*" is supported if specified before a period: "*.".Defaults to matching all domains: "*".
     pub domain: Option<String>,
-    /// Resource ID of a service in this application that should serve the matched request. The service must already exist. Example: `default`.
+    /// Resource ID of a service in this application that should serve the matched request. The service must already exist. Example: default.
     pub service: Option<String>,
 }
 
@@ -699,7 +741,7 @@ pub struct ErrorHandler {
     /// Error condition this handler applies to.
     #[serde(rename="errorCode")]
     pub error_code: Option<String>,
-    /// MIME type of file. Defaults to `text/html`.
+    /// MIME type of file. Defaults to text/html.
     #[serde(rename="mimeType")]
     pub mime_type: Option<String>,
     /// Static file content to be served for this error.
@@ -737,13 +779,13 @@ pub struct AutomaticScaling {
     /// Target scaling by request utilization.
     #[serde(rename="requestUtilization")]
     pub request_utilization: Option<RequestUtilization>,
-    /// Amount of time that the [Autoscaler](https://cloud.google.com/compute/docs/autoscaler/) should wait between changes to the number of virtual machines. Only applicable for VM runtimes.
+    /// Amount of time that the Autoscaler (https://cloud.google.com/compute/docs/autoscaler/) should wait between changes to the number of virtual machines. Only applicable for VM runtimes.
     #[serde(rename="coolDownPeriod")]
     pub cool_down_period: Option<String>,
     /// Maximum number of instances that should be started to handle requests.
     #[serde(rename="maxTotalInstances")]
     pub max_total_instances: Option<i32>,
-    /// Number of concurrent requests an automatic scaling instance can accept before the scheduler spawns a new instance. Defaults to a runtime-specific value.
+    /// Number of concurrent requests an automatic scaling instance can accept before the scheduler spawns a new instance.Defaults to a runtime-specific value.
     #[serde(rename="maxConcurrentRequests")]
     pub max_concurrent_requests: Option<i32>,
     /// Minimum number of instances that should be maintained for this version.
@@ -766,7 +808,7 @@ pub struct UrlMap {
     /// Security (HTTPS) enforcement for this URL.
     #[serde(rename="securityLevel")]
     pub security_level: Option<String>,
-    /// Action to take when users access resources that require authentication. Defaults to `redirect`.
+    /// Action to take when users access resources that require authentication. Defaults to redirect.
     #[serde(rename="authFailAction")]
     pub auth_fail_action: Option<String>,
     /// URL prefix. Uses regular expression syntax, which means regexp special characters must be escaped, but should not contain groupings. All URLs that begin with this prefix are handled by this handler, using the portion of the URL after the prefix as part of the file path.
@@ -782,7 +824,7 @@ pub struct UrlMap {
     pub api_endpoint: Option<ApiEndpointHandler>,
     /// Level of login required to access this resource.
     pub login: Option<String>,
-    /// `30x` code to use when performing redirects for the `secure` field. Defaults to `302`.
+    /// 30x code to use when performing redirects for the secure field. Defaults to 302.
     #[serde(rename="redirectHttpResponseCode")]
     pub redirect_http_response_code: Option<String>,
 }
@@ -796,10 +838,10 @@ impl Part for UrlMap {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FileInfo {
-    /// The MIME type of the file. Defaults to the value from Google Cloud Storage.
+    /// The MIME type of the file.Defaults to the value from Google Cloud Storage.
     #[serde(rename="mimeType")]
     pub mime_type: Option<String>,
-    /// URL source to use to fetch this file. Must be a URL to a resource in Google Cloud Storage in the form 'http(s)://storage.googleapis.com/\/\'.
+    /// URL source to use to fetch this file. Must be a URL to a resource in Google Cloud Storage in the form 'http(s)://storage.googleapis.com//'.
     #[serde(rename="sourceUrl")]
     pub source_url: Option<String>,
     /// The SHA1 hash of the file, in hex.
@@ -810,7 +852,7 @@ pub struct FileInfo {
 impl Part for FileInfo {}
 
 
-/// There is no detailed description.
+/// The zip file information for a zip deployment.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -819,12 +861,28 @@ pub struct ZipInfo {
     /// An estimate of the number of files in a zip for a zip deployment. If set, must be greater than or equal to the actual number of files. Used for optimizing performance; if not provided, deployment may be slow.
     #[serde(rename="filesCount")]
     pub files_count: Option<i32>,
-    /// URL of the zip file to deploy from. Must be a URL to a resource in Google Cloud Storage in the form 'http(s)://storage.googleapis.com/\/\'.
+    /// URL of the zip file to deploy from. Must be a URL to a resource in Google Cloud Storage in the form 'http(s)://storage.googleapis.com//'.
     #[serde(rename="sourceUrl")]
     pub source_url: Option<String>,
 }
 
 impl Part for ZipInfo {}
+
+
+/// Cloud Endpoints (https://cloud.google.com/endpoints) configuration. The Endpoints API Service provides tooling for serving Open API and gRPC endpoints via an NGINX proxy.The fields here refer to the name and configuration id of a "service" resource in the Service Management API (https://cloud.google.com/service-management/overview).
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct EndpointsApiService {
+    /// Endpoints service configuration id as specified by the Service Management API. For example "2016-09-19r1"
+    #[serde(rename="configId")]
+    pub config_id: Option<String>,
+    /// Endpoints service name which is the name of the "service" resource in the Service Management API. For example "myapi.endpoints.myproject.cloud.goog"
+    pub name: Option<String>,
+}
+
+impl Part for EndpointsApiService {}
 
 
 /// The response message for Operations.ListOperations.
@@ -859,45 +917,48 @@ impl ResponseResult for ListOperationsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Instance {
-    /// Number of errors since this instance was started. @OutputOnly
-    pub errors: Option<i32>,
-    /// Full path to the Instance resource in the API. Example: `apps/myapp/services/default/versions/v1/instances/instance-1`. @OutputOnly
-    pub name: Option<String>,
-    /// App Engine release this instance is running on. @OutputOnly
+    /// App Engine release this instance is running on.@OutputOnly
     #[serde(rename="appEngineRelease")]
     pub app_engine_release: Option<String>,
-    /// Virtual machine ID of this instance. Only applicable for instances in App Engine flexible environment. @OutputOnly
+    /// Virtual machine ID of this instance. Only applicable for instances in App Engine flexible environment.@OutputOnly
     #[serde(rename="vmId")]
     pub vm_id: Option<String>,
-    /// Total memory in use (bytes). @OutputOnly
+    /// Total memory in use (bytes).@OutputOnly
     #[serde(rename="memoryUsage")]
     pub memory_usage: Option<String>,
-    /// Availability of the instance. @OutputOnly
-    pub availability: Option<String>,
-    /// Average latency (ms) over the last minute. @OutputOnly
-    #[serde(rename="averageLatency")]
-    pub average_latency: Option<i32>,
-    /// Whether this instance is in debug mode. Only applicable for instances in App Engine flexible environment. @OutputOnly
+    /// Whether this instance is in debug mode. Only applicable for instances in App Engine flexible environment.@OutputOnly
     #[serde(rename="vmDebugEnabled")]
     pub vm_debug_enabled: Option<bool>,
-    /// Time that this instance was started. @OutputOnly
+    /// Time that this instance was started.@OutputOnly
     #[serde(rename="startTime")]
     pub start_time: Option<String>,
-    /// Average queries per second (QPS) over the last minute. @OutputOnly
+    /// The IP address of this instance. Only applicable for instances in App Engine flexible environment.@OutputOnly
+    #[serde(rename="vmIp")]
+    pub vm_ip: Option<String>,
+    /// Average queries per second (QPS) over the last minute.@OutputOnly
     pub qps: Option<f32>,
-    /// Number of requests since this instance was started. @OutputOnly
-    pub requests: Option<i32>,
-    /// Name of the virtual machine where this instance lives. Only applicable for instances in App Engine flexible environment. @OutputOnly
-    #[serde(rename="vmName")]
-    pub vm_name: Option<String>,
-    /// Relative name of the instance within the version. Example: `instance-1`. @OutputOnly
-    pub id: Option<String>,
-    /// Zone where the virtual machine is located. Only applicable for instances in App Engine flexible environment. @OutputOnly
-    #[serde(rename="vmZoneName")]
-    pub vm_zone_name: Option<String>,
-    /// Status of the virtual machine where this instance lives. Only applicable for instances in App Engine flexible environment. @OutputOnly
+    /// Availability of the instance.@OutputOnly
+    pub availability: Option<String>,
+    /// Full path to the Instance resource in the API. Example: apps/myapp/services/default/versions/v1/instances/instance-1.@OutputOnly
+    pub name: Option<String>,
+    /// Number of errors since this instance was started.@OutputOnly
+    pub errors: Option<i32>,
+    /// Status of the virtual machine where this instance lives. Only applicable for instances in App Engine flexible environment.@OutputOnly
     #[serde(rename="vmStatus")]
     pub vm_status: Option<String>,
+    /// Relative name of the instance within the version. Example: instance-1.@OutputOnly
+    pub id: Option<String>,
+    /// Average latency (ms) over the last minute.@OutputOnly
+    #[serde(rename="averageLatency")]
+    pub average_latency: Option<i32>,
+    /// Number of requests since this instance was started.@OutputOnly
+    pub requests: Option<i32>,
+    /// Name of the virtual machine where this instance lives. Only applicable for instances in App Engine flexible environment.@OutputOnly
+    #[serde(rename="vmName")]
+    pub vm_name: Option<String>,
+    /// Zone where the virtual machine is located. Only applicable for instances in App Engine flexible environment.@OutputOnly
+    #[serde(rename="vmZoneName")]
+    pub vm_zone_name: Option<String>,
 }
 
 impl ResponseResult for Instance {}
@@ -909,7 +970,7 @@ impl ResponseResult for Instance {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ManualScaling {
-    /// Number of instances to assign to the service at the start. This number can later be altered by using the [Modules API](https://cloud.google.com/appengine/docs/python/modules/functions) `set_num_instances()` function.
+    /// Number of instances to assign to the service at the start. This number can later be altered by using the Modules API (https://cloud.google.com/appengine/docs/python/modules/functions) set_num_instances() function.
     pub instances: Option<i32>,
 }
 
@@ -932,7 +993,7 @@ pub struct TrafficSplit {
 impl Part for TrafficSplit {}
 
 
-/// [Google Cloud Endpoints](https://cloud.google.com/appengine/docs/python/endpoints/) configuration for API handlers.
+/// Google Cloud Endpoints (https://cloud.google.com/appengine/docs/python/endpoints/) configuration for API handlers.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -943,10 +1004,10 @@ pub struct ApiConfigHandler {
     /// Security (HTTPS) enforcement for this URL.
     #[serde(rename="securityLevel")]
     pub security_level: Option<String>,
-    /// Action to take when users access resources that require authentication. Defaults to `redirect`.
+    /// Action to take when users access resources that require authentication. Defaults to redirect.
     #[serde(rename="authFailAction")]
     pub auth_fail_action: Option<String>,
-    /// Level of login required to access this resource. Defaults to `optional`.
+    /// Level of login required to access this resource. Defaults to optional.
     pub login: Option<String>,
     /// Path to the script from the application root directory.
     pub script: Option<String>,
@@ -1031,7 +1092,9 @@ impl Part for ContainerInfo {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [services versions create apps](struct.AppServiceVersionCreateCall.html) (response)
+/// * [patch apps](struct.AppPatchCall.html) (response)
 /// * [services versions instances debug apps](struct.AppServiceVersionInstanceDebugCall.html) (response)
+/// * [create apps](struct.AppCreateCall.html) (response)
 /// * [services versions instances delete apps](struct.AppServiceVersionInstanceDeleteCall.html) (response)
 /// * [services versions patch apps](struct.AppServiceVersionPatchCall.html) (response)
 /// * [operations get apps](struct.AppOperationGetCall.html) (response)
@@ -1044,13 +1107,13 @@ impl Part for ContainerInfo {}
 pub struct Operation {
     /// Service-specific metadata associated with the operation. It typically contains progress information and common metadata such as create time. Some services might not provide such metadata. Any method that returns a long-running operation should document the metadata type, if any.
     pub metadata: Option<HashMap<String, String>>,
-    /// If the value is `false`, it means the operation is still in progress. If true, the operation is completed, and either `error` or `response` is available.
+    /// If the value is false, it means the operation is still in progress. If true, the operation is completed, and either error or response is available.
     pub done: Option<bool>,
-    /// The normal response of the operation in case of success. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.
+    /// The normal response of the operation in case of success. If the original method returns no data on success, such as Delete, the response is google.protobuf.Empty. If the original method is standard Get/Create/Update, the response should be the resource. For other methods, the response should have the type XxxResponse, where Xxx is the original method name. For example, if the original method name is TakeSnapshot(), the inferred response type is TakeSnapshotResponse.
     pub response: Option<HashMap<String, String>>,
-    /// The server-assigned name, which is only unique within the same service that originally returns it. If you use the default HTTP mapping, the `name` should have the format of `operations/some/unique/name`.
+    /// The server-assigned name, which is only unique within the same service that originally returns it. If you use the default HTTP mapping, the name should have the format of operations/some/unique/name.
     pub name: Option<String>,
-    /// The error result of the operation in case of failure.
+    /// The error result of the operation in case of failure or cancellation.
     pub error: Option<Status>,
 }
 
@@ -1085,7 +1148,7 @@ impl ResponseResult for Operation {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Appengine::new(hyper::Client::new(), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `get(...)`, `locations_get(...)`, `locations_list(...)`, `operations_get(...)`, `operations_list(...)`, `repair(...)`, `services_delete(...)`, `services_get(...)`, `services_list(...)`, `services_patch(...)`, `services_versions_create(...)`, `services_versions_delete(...)`, `services_versions_get(...)`, `services_versions_instances_debug(...)`, `services_versions_instances_delete(...)`, `services_versions_instances_get(...)`, `services_versions_instances_list(...)`, `services_versions_list(...)` and `services_versions_patch(...)`
+/// // like `create(...)`, `get(...)`, `locations_get(...)`, `locations_list(...)`, `operations_get(...)`, `operations_list(...)`, `patch(...)`, `repair(...)`, `services_delete(...)`, `services_get(...)`, `services_list(...)`, `services_patch(...)`, `services_versions_create(...)`, `services_versions_delete(...)`, `services_versions_get(...)`, `services_versions_instances_debug(...)`, `services_versions_instances_delete(...)`, `services_versions_instances_get(...)`, `services_versions_instances_list(...)`, `services_versions_list(...)` and `services_versions_patch(...)`
 /// // to build up your call.
 /// let rb = hub.apps();
 /// # }
@@ -1106,7 +1169,7 @@ impl<'a, C, A> AppMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `appsId` - Part of `parent`. Name of the parent Version resource. Example: `apps/myapp/services/default/versions/v1`.
+    /// * `appsId` - Part of `parent`. Name of the parent Version resource. Example: apps/myapp/services/default/versions/v1.
     /// * `servicesId` - Part of `parent`. See documentation of `appsId`.
     /// * `versionsId` - Part of `parent`. See documentation of `appsId`.
     pub fn services_versions_instances_list(&self, apps_id: &str, services_id: &str, versions_id: &str) -> AppServiceVersionInstanceListCall<'a, C, A> {
@@ -1130,7 +1193,7 @@ impl<'a, C, A> AppMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `appsId` - Part of `parent`. Name of the parent resource to create this version under. Example: `apps/myapp/services/default`.
+    /// * `appsId` - Part of `parent`. Name of the parent resource to create this version under. Example: apps/myapp/services/default.
     /// * `servicesId` - Part of `parent`. See documentation of `appsId`.
     pub fn services_versions_create(&self, request: Version, apps_id: &str, services_id: &str) -> AppServiceVersionCreateCall<'a, C, A> {
         AppServiceVersionCreateCall {
@@ -1146,12 +1209,12 @@ impl<'a, C, A> AppMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Recreates the required App Engine features for the application in your project, for example a Cloud Storage bucket or App Engine service account. Use this method if you receive an error message about a missing feature, for example "*Error retrieving the App Engine service account*".
+    /// Recreates the required App Engine features for the specified App Engine application, for example a Cloud Storage bucket or App Engine service account. Use this method if you receive an error message about a missing feature, for example, Error retrieving the App Engine service account.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `appsId` - Part of `name`. Name of the application to repair. Example: `apps/myapp`
+    /// * `appsId` - Part of `name`. Name of the application to repair. Example: apps/myapp
     pub fn repair(&self, request: RepairApplicationRequest, apps_id: &str) -> AppRepairCall<'a, C, A> {
         AppRepairCall {
             hub: self.hub,
@@ -1165,12 +1228,12 @@ impl<'a, C, A> AppMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Enables debugging on a VM instance. This allows you to use the SSH command to connect to the virtual machine where the instance lives. While in "debug mode", the instance continues to serve live traffic. You should delete the instance when you are done debugging and then allow the system to take over and determine if another instance should be started. Only applicable for instances in App Engine flexible environment.
+    /// Enables debugging on a VM instance. This allows you to use the SSH command to connect to the virtual machine where the instance lives. While in "debug mode", the instance continues to serve live traffic. You should delete the instance when you are done debugging and then allow the system to take over and determine if another instance should be started.Only applicable for instances in App Engine flexible environment.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `appsId` - Part of `name`. Name of the resource requested. Example: `apps/myapp/services/default/versions/v1/instances/instance-1`.
+    /// * `appsId` - Part of `name`. Name of the resource requested. Example: apps/myapp/services/default/versions/v1/instances/instance-1.
     /// * `servicesId` - Part of `name`. See documentation of `appsId`.
     /// * `versionsId` - Part of `name`. See documentation of `appsId`.
     /// * `instancesId` - Part of `name`. See documentation of `appsId`.
@@ -1194,7 +1257,7 @@ impl<'a, C, A> AppMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `appsId` - Part of `name`. Name of the resource requested. Example: `apps/myapp/services/default`.
+    /// * `appsId` - Part of `name`. Name of the resource requested. Example: apps/myapp/services/default.
     /// * `servicesId` - Part of `name`. See documentation of `appsId`.
     pub fn services_get(&self, apps_id: &str, services_id: &str) -> AppServiceGetCall<'a, C, A> {
         AppServiceGetCall {
@@ -1209,11 +1272,31 @@ impl<'a, C, A> AppMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Updates the specified Application resource. You can update the following fields: auth_domain (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps#Application.FIELDS.auth_domain) default_cookie_expiration (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps#Application.FIELDS.default_cookie_expiration)
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `appsId` - Part of `name`. Name of the Application resource to update. Example: apps/myapp.
+    pub fn patch(&self, request: Application, apps_id: &str) -> AppPatchCall<'a, C, A> {
+        AppPatchCall {
+            hub: self.hub,
+            _request: request,
+            _apps_id: apps_id.to_string(),
+            _update_mask: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Stops a running instance.
     /// 
     /// # Arguments
     ///
-    /// * `appsId` - Part of `name`. Name of the resource requested. Example: `apps/myapp/services/default/versions/v1/instances/instance-1`.
+    /// * `appsId` - Part of `name`. Name of the resource requested. Example: apps/myapp/services/default/versions/v1/instances/instance-1.
     /// * `servicesId` - Part of `name`. See documentation of `appsId`.
     /// * `versionsId` - Part of `name`. See documentation of `appsId`.
     /// * `instancesId` - Part of `name`. See documentation of `appsId`.
@@ -1232,12 +1315,12 @@ impl<'a, C, A> AppMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the specified Version resource. You can specify the following fields depending on the App Engine environment and type of scaling that the version resource uses: * [`serving_status`](https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#Version.FIELDS.serving_status): For Version resources that use basic scaling, manual scaling, or run in the App Engine flexible environment. * [`instance_class`](https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#Version.FIELDS.instance_class): For Version resources that run in the App Engine standard environment. * [`automatic_scaling.min_idle_instances`](https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#Version.FIELDS.automatic_scaling): For Version resources that use automatic scaling and run in the App Engine standard environment. * [`automatic_scaling.max_idle_instances`](https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#Version.FIELDS.automatic_scaling): For Version resources that use automatic scaling and run in the App Engine standard environment.
+    /// Updates the specified Version resource. You can specify the following fields depending on the App Engine environment and type of scaling that the version resource uses: serving_status (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#Version.FIELDS.serving_status): For Version resources that use basic scaling, manual scaling, or run in the App Engine flexible environment. instance_class (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#Version.FIELDS.instance_class): For Version resources that run in the App Engine standard environment. automatic_scaling.min_idle_instances (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#Version.FIELDS.automatic_scaling): For Version resources that use automatic scaling and run in the App Engine standard environment. automatic_scaling.max_idle_instances (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#Version.FIELDS.automatic_scaling): For Version resources that use automatic scaling and run in the App Engine standard environment.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `appsId` - Part of `name`. Name of the resource to update. Example: `apps/myapp/services/default/versions/1`.
+    /// * `appsId` - Part of `name`. Name of the resource to update. Example: apps/myapp/services/default/versions/1.
     /// * `servicesId` - Part of `name`. See documentation of `appsId`.
     /// * `versionsId` - Part of `name`. See documentation of `appsId`.
     pub fn services_versions_patch(&self, request: Version, apps_id: &str, services_id: &str, versions_id: &str) -> AppServiceVersionPatchCall<'a, C, A> {
@@ -1260,7 +1343,7 @@ impl<'a, C, A> AppMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `appsId` - Part of `parent`. Name of the parent Service resource. Example: `apps/myapp/services/default`.
+    /// * `appsId` - Part of `parent`. Name of the parent Service resource. Example: apps/myapp/services/default.
     /// * `servicesId` - Part of `parent`. See documentation of `appsId`.
     pub fn services_versions_list(&self, apps_id: &str, services_id: &str) -> AppServiceVersionListCall<'a, C, A> {
         AppServiceVersionListCall {
@@ -1301,7 +1384,7 @@ impl<'a, C, A> AppMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `appsId` - Part of `parent`. Name of the parent Application resource. Example: `apps/myapp`.
+    /// * `appsId` - Part of `parent`. Name of the parent Application resource. Example: apps/myapp.
     pub fn services_list(&self, apps_id: &str) -> AppServiceListCall<'a, C, A> {
         AppServiceListCall {
             hub: self.hub,
@@ -1340,7 +1423,7 @@ impl<'a, C, A> AppMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `appsId` - Part of `name`. Name of the resource requested. Example: `apps/myapp/services/default/versions/v1/instances/instance-1`.
+    /// * `appsId` - Part of `name`. Name of the resource requested. Example: apps/myapp/services/default/versions/v1/instances/instance-1.
     /// * `servicesId` - Part of `name`. See documentation of `appsId`.
     /// * `versionsId` - Part of `name`. See documentation of `appsId`.
     /// * `instancesId` - Part of `name`. See documentation of `appsId`.
@@ -1359,7 +1442,7 @@ impl<'a, C, A> AppMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding below allows API services to override the binding to use different resource name schemes, such as `users/*/operations`.
+    /// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns UNIMPLEMENTED.NOTE: the name binding below allows API services to override the binding to use different resource name schemes, such as users/*/operations.
     /// 
     /// # Arguments
     ///
@@ -1383,7 +1466,7 @@ impl<'a, C, A> AppMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `appsId` - Part of `name`. Name of the resource requested. Example: `apps/myapp/services/default/versions/v1`.
+    /// * `appsId` - Part of `name`. Name of the resource requested. Example: apps/myapp/services/default/versions/v1.
     /// * `servicesId` - Part of `name`. See documentation of `appsId`.
     /// * `versionsId` - Part of `name`. See documentation of `appsId`.
     pub fn services_versions_delete(&self, apps_id: &str, services_id: &str, versions_id: &str) -> AppServiceVersionDeleteCall<'a, C, A> {
@@ -1424,7 +1507,7 @@ impl<'a, C, A> AppMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `appsId` - Part of `name`. Name of the resource to update. Example: `apps/myapp/services/default`.
+    /// * `appsId` - Part of `name`. Name of the resource to update. Example: apps/myapp/services/default.
     /// * `servicesId` - Part of `name`. See documentation of `appsId`.
     pub fn services_patch(&self, request: Service, apps_id: &str, services_id: &str) -> AppServicePatchCall<'a, C, A> {
         AppServicePatchCall {
@@ -1446,7 +1529,7 @@ impl<'a, C, A> AppMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `appsId` - Part of `name`. Name of the Application resource to get. Example: `apps/myapp`.
+    /// * `appsId` - Part of `name`. Name of the Application resource to get. Example: apps/myapp.
     pub fn get(&self, apps_id: &str) -> AppGetCall<'a, C, A> {
         AppGetCall {
             hub: self.hub,
@@ -1463,7 +1546,7 @@ impl<'a, C, A> AppMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `appsId` - Part of `name`. Name of the resource requested. Example: `apps/myapp/services/default`.
+    /// * `appsId` - Part of `name`. Name of the resource requested. Example: apps/myapp/services/default.
     /// * `servicesId` - Part of `name`. See documentation of `appsId`.
     pub fn services_delete(&self, apps_id: &str, services_id: &str) -> AppServiceDeleteCall<'a, C, A> {
         AppServiceDeleteCall {
@@ -1478,11 +1561,28 @@ impl<'a, C, A> AppMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the specified Version resource. By default, only a `BASIC_VIEW` will be returned. Specify the `FULL_VIEW` parameter to get the full resource.
+    /// Creates an App Engine application for a Google Cloud Platform project. This requires a project that excludes an App Engine application. For details about creating a project without an application, see the Google Cloud Resource Manager create project topic (https://cloud.google.com/resource-manager/docs/creating-project).
     /// 
     /// # Arguments
     ///
-    /// * `appsId` - Part of `name`. Name of the resource requested. Example: `apps/myapp/services/default/versions/v1`.
+    /// * `request` - No description provided.
+    pub fn create(&self, request: Application) -> AppCreateCall<'a, C, A> {
+        AppCreateCall {
+            hub: self.hub,
+            _request: request,
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets the specified Version resource. By default, only a BASIC_VIEW will be returned. Specify the FULL_VIEW parameter to get the full resource.
+    /// 
+    /// # Arguments
+    ///
+    /// * `appsId` - Part of `name`. Name of the resource requested. Example: apps/myapp/services/default/versions/v1.
     /// * `servicesId` - Part of `name`. See documentation of `appsId`.
     /// * `versionsId` - Part of `name`. See documentation of `appsId`.
     pub fn services_versions_get(&self, apps_id: &str, services_id: &str, versions_id: &str) -> AppServiceVersionGetCall<'a, C, A> {
@@ -1593,7 +1693,7 @@ impl<'a, C, A> AppServiceVersionInstanceListCall<'a, C, A> where C: BorrowMut<hy
 
         let mut url = "https://appengine.googleapis.com/v1/apps/{appsId}/services/{servicesId}/versions/{versionsId}/instances".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Admin.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{appsId}", "appsId"), ("{servicesId}", "servicesId"), ("{versionsId}", "versionsId")].iter() {
@@ -1694,7 +1794,7 @@ impl<'a, C, A> AppServiceVersionInstanceListCall<'a, C, A> where C: BorrowMut<hy
     }
 
 
-    /// Part of `parent`. Name of the parent Version resource. Example: `apps/myapp/services/default/versions/v1`.
+    /// Part of `parent`. Name of the parent Version resource. Example: apps/myapp/services/default/versions/v1.
     ///
     /// Sets the *apps id* path property to the given value.
     ///
@@ -1780,7 +1880,7 @@ impl<'a, C, A> AppServiceVersionInstanceListCall<'a, C, A> where C: BorrowMut<hy
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
+    /// `Scope::Admin`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2002,7 +2102,7 @@ impl<'a, C, A> AppServiceVersionCreateCall<'a, C, A> where C: BorrowMut<hyper::C
         self._request = new_value;
         self
     }
-    /// Part of `parent`. Name of the parent resource to create this version under. Example: `apps/myapp/services/default`.
+    /// Part of `parent`. Name of the parent resource to create this version under. Example: apps/myapp/services/default.
     ///
     /// Sets the *apps id* path property to the given value.
     ///
@@ -2080,7 +2180,7 @@ impl<'a, C, A> AppServiceVersionCreateCall<'a, C, A> where C: BorrowMut<hyper::C
 }
 
 
-/// Recreates the required App Engine features for the application in your project, for example a Cloud Storage bucket or App Engine service account. Use this method if you receive an error message about a missing feature, for example "*Error retrieving the App Engine service account*".
+/// Recreates the required App Engine features for the specified App Engine application, for example a Cloud Storage bucket or App Engine service account. Use this method if you receive an error message about a missing feature, for example, Error retrieving the App Engine service account.
 ///
 /// A builder for the *repair* method supported by a *app* resource.
 /// It is not used directly, but through a `AppMethods` instance.
@@ -2284,7 +2384,7 @@ impl<'a, C, A> AppRepairCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._request = new_value;
         self
     }
-    /// Part of `name`. Name of the application to repair. Example: `apps/myapp`
+    /// Part of `name`. Name of the application to repair. Example: apps/myapp
     ///
     /// Sets the *apps id* path property to the given value.
     ///
@@ -2352,7 +2452,7 @@ impl<'a, C, A> AppRepairCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 }
 
 
-/// Enables debugging on a VM instance. This allows you to use the SSH command to connect to the virtual machine where the instance lives. While in "debug mode", the instance continues to serve live traffic. You should delete the instance when you are done debugging and then allow the system to take over and determine if another instance should be started. Only applicable for instances in App Engine flexible environment.
+/// Enables debugging on a VM instance. This allows you to use the SSH command to connect to the virtual machine where the instance lives. While in "debug mode", the instance continues to serve live traffic. You should delete the instance when you are done debugging and then allow the system to take over and determine if another instance should be started.Only applicable for instances in App Engine flexible environment.
 ///
 /// A builder for the *services.versions.instances.debug* method supported by a *app* resource.
 /// It is not used directly, but through a `AppMethods` instance.
@@ -2562,7 +2662,7 @@ impl<'a, C, A> AppServiceVersionInstanceDebugCall<'a, C, A> where C: BorrowMut<h
         self._request = new_value;
         self
     }
-    /// Part of `name`. Name of the resource requested. Example: `apps/myapp/services/default/versions/v1/instances/instance-1`.
+    /// Part of `name`. Name of the resource requested. Example: apps/myapp/services/default/versions/v1/instances/instance-1.
     ///
     /// Sets the *apps id* path property to the given value.
     ///
@@ -2734,7 +2834,7 @@ impl<'a, C, A> AppServiceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         let mut url = "https://appengine.googleapis.com/v1/apps/{appsId}/services/{servicesId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Admin.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{appsId}", "appsId"), ("{servicesId}", "servicesId")].iter() {
@@ -2835,7 +2935,7 @@ impl<'a, C, A> AppServiceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
-    /// Part of `name`. Name of the resource requested. Example: `apps/myapp/services/default`.
+    /// Part of `name`. Name of the resource requested. Example: apps/myapp/services/default.
     ///
     /// Sets the *apps id* path property to the given value.
     ///
@@ -2897,7 +2997,7 @@ impl<'a, C, A> AppServiceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
+    /// `Scope::Admin`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2906,6 +3006,290 @@ impl<'a, C, A> AppServiceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AppServiceGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+/// Updates the specified Application resource. You can update the following fields: auth_domain (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps#Application.FIELDS.auth_domain) default_cookie_expiration (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps#Application.FIELDS.default_cookie_expiration)
+///
+/// A builder for the *patch* method supported by a *app* resource.
+/// It is not used directly, but through a `AppMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_appengine1 as appengine1;
+/// use appengine1::Application;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use appengine1::Appengine;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Appengine::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Application::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.apps().patch(req, "appsId")
+///              .update_mask("et")
+///              .doit();
+/// # }
+/// ```
+pub struct AppPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Appengine<C, A>,
+    _request: Application,
+    _apps_id: String,
+    _update_mask: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for AppPatchCall<'a, C, A> {}
+
+impl<'a, C, A> AppPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "appengine.apps.patch",
+                               http_method: hyper::method::Method::Patch });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        params.push(("appsId", self._apps_id.to_string()));
+        if let Some(value) = self._update_mask {
+            params.push(("updateMask", value.to_string()));
+        }
+        for &field in ["alt", "appsId", "updateMask"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://appengine.googleapis.com/v1/apps/{appsId}".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{appsId}", "appsId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["appsId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request);
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: Application) -> AppPatchCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Part of `name`. Name of the Application resource to update. Example: apps/myapp.
+    ///
+    /// Sets the *apps id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn apps_id(mut self, new_value: &str) -> AppPatchCall<'a, C, A> {
+        self._apps_id = new_value.to_string();
+        self
+    }
+    /// Standard field mask for the set of fields to be updated.
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(mut self, new_value: &str) -> AppPatchCall<'a, C, A> {
+        self._update_mask = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AppPatchCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> AppPatchCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> AppPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3092,7 +3476,7 @@ impl<'a, C, A> AppServiceVersionInstanceDeleteCall<'a, C, A> where C: BorrowMut<
     }
 
 
-    /// Part of `name`. Name of the resource requested. Example: `apps/myapp/services/default/versions/v1/instances/instance-1`.
+    /// Part of `name`. Name of the resource requested. Example: apps/myapp/services/default/versions/v1/instances/instance-1.
     ///
     /// Sets the *apps id* path property to the given value.
     ///
@@ -3190,7 +3574,7 @@ impl<'a, C, A> AppServiceVersionInstanceDeleteCall<'a, C, A> where C: BorrowMut<
 }
 
 
-/// Updates the specified Version resource. You can specify the following fields depending on the App Engine environment and type of scaling that the version resource uses: * [`serving_status`](https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#Version.FIELDS.serving_status): For Version resources that use basic scaling, manual scaling, or run in the App Engine flexible environment. * [`instance_class`](https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#Version.FIELDS.instance_class): For Version resources that run in the App Engine standard environment. * [`automatic_scaling.min_idle_instances`](https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#Version.FIELDS.automatic_scaling): For Version resources that use automatic scaling and run in the App Engine standard environment. * [`automatic_scaling.max_idle_instances`](https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#Version.FIELDS.automatic_scaling): For Version resources that use automatic scaling and run in the App Engine standard environment.
+/// Updates the specified Version resource. You can specify the following fields depending on the App Engine environment and type of scaling that the version resource uses: serving_status (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#Version.FIELDS.serving_status): For Version resources that use basic scaling, manual scaling, or run in the App Engine flexible environment. instance_class (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#Version.FIELDS.instance_class): For Version resources that run in the App Engine standard environment. automatic_scaling.min_idle_instances (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#Version.FIELDS.automatic_scaling): For Version resources that use automatic scaling and run in the App Engine standard environment. automatic_scaling.max_idle_instances (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#Version.FIELDS.automatic_scaling): For Version resources that use automatic scaling and run in the App Engine standard environment.
 ///
 /// A builder for the *services.versions.patch* method supported by a *app* resource.
 /// It is not used directly, but through a `AppMethods` instance.
@@ -3223,7 +3607,7 @@ impl<'a, C, A> AppServiceVersionInstanceDeleteCall<'a, C, A> where C: BorrowMut<
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.apps().services_versions_patch(req, "appsId", "servicesId", "versionsId")
-///              .update_mask("duo")
+///              .update_mask("sea")
 ///              .doit();
 /// # }
 /// ```
@@ -3403,7 +3787,7 @@ impl<'a, C, A> AppServiceVersionPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._request = new_value;
         self
     }
-    /// Part of `name`. Name of the resource to update. Example: `apps/myapp/services/default/versions/1`.
+    /// Part of `name`. Name of the resource to update. Example: apps/myapp/services/default/versions/1.
     ///
     /// Sets the *apps id* path property to the given value.
     ///
@@ -3525,9 +3909,9 @@ impl<'a, C, A> AppServiceVersionPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.apps().services_versions_list("appsId", "servicesId")
-///              .view("Lorem")
-///              .page_token("eos")
-///              .page_size(-81)
+///              .view("erat")
+///              .page_token("sadipscing")
+///              .page_size(-48)
 ///              .doit();
 /// # }
 /// ```
@@ -3587,7 +3971,7 @@ impl<'a, C, A> AppServiceVersionListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         let mut url = "https://appengine.googleapis.com/v1/apps/{appsId}/services/{servicesId}/versions".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Admin.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{appsId}", "appsId"), ("{servicesId}", "servicesId")].iter() {
@@ -3688,7 +4072,7 @@ impl<'a, C, A> AppServiceVersionListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
-    /// Part of `parent`. Name of the parent Service resource. Example: `apps/myapp/services/default`.
+    /// Part of `parent`. Name of the parent Service resource. Example: apps/myapp/services/default.
     ///
     /// Sets the *apps id* path property to the given value.
     ///
@@ -3708,7 +4092,7 @@ impl<'a, C, A> AppServiceVersionListCall<'a, C, A> where C: BorrowMut<hyper::Cli
         self._services_id = new_value.to_string();
         self
     }
-    /// Controls the set of fields returned in the `List` response.
+    /// Controls the set of fields returned in the List response.
     ///
     /// Sets the *view* query property to the given value.
     pub fn view(mut self, new_value: &str) -> AppServiceVersionListCall<'a, C, A> {
@@ -3771,7 +4155,7 @@ impl<'a, C, A> AppServiceVersionListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
+    /// `Scope::Admin`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3861,7 +4245,7 @@ impl<'a, C, A> AppOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         let mut url = "https://appengine.googleapis.com/v1/apps/{appsId}/operations/{operationsId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Admin.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{appsId}", "appsId"), ("{operationsId}", "operationsId")].iter() {
@@ -4024,7 +4408,7 @@ impl<'a, C, A> AppOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
+    /// `Scope::Admin`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4067,8 +4451,8 @@ impl<'a, C, A> AppOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.apps().services_list("appsId")
-///              .page_token("elitr")
-///              .page_size(-97)
+///              .page_token("no")
+///              .page_size(-36)
 ///              .doit();
 /// # }
 /// ```
@@ -4122,7 +4506,7 @@ impl<'a, C, A> AppServiceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         let mut url = "https://appengine.googleapis.com/v1/apps/{appsId}/services".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Admin.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{appsId}", "appsId")].iter() {
@@ -4223,7 +4607,7 @@ impl<'a, C, A> AppServiceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
-    /// Part of `parent`. Name of the parent Application resource. Example: `apps/myapp`.
+    /// Part of `parent`. Name of the parent Application resource. Example: apps/myapp.
     ///
     /// Sets the *apps id* path property to the given value.
     ///
@@ -4289,7 +4673,7 @@ impl<'a, C, A> AppServiceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
+    /// `Scope::Admin`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4332,9 +4716,9 @@ impl<'a, C, A> AppServiceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.apps().locations_list("appsId")
-///              .page_token("labore")
-///              .page_size(-39)
-///              .filter("dolore")
+///              .page_token("dolore")
+///              .page_size(-37)
+///              .filter("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -4392,7 +4776,7 @@ impl<'a, C, A> AppLocationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         let mut url = "https://appengine.googleapis.com/v1/apps/{appsId}/locations".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Admin.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{appsId}", "appsId")].iter() {
@@ -4566,7 +4950,7 @@ impl<'a, C, A> AppLocationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
+    /// `Scope::Admin`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4660,7 +5044,7 @@ impl<'a, C, A> AppServiceVersionInstanceGetCall<'a, C, A> where C: BorrowMut<hyp
 
         let mut url = "https://appengine.googleapis.com/v1/apps/{appsId}/services/{servicesId}/versions/{versionsId}/instances/{instancesId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Admin.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{appsId}", "appsId"), ("{servicesId}", "servicesId"), ("{versionsId}", "versionsId"), ("{instancesId}", "instancesId")].iter() {
@@ -4761,7 +5145,7 @@ impl<'a, C, A> AppServiceVersionInstanceGetCall<'a, C, A> where C: BorrowMut<hyp
     }
 
 
-    /// Part of `name`. Name of the resource requested. Example: `apps/myapp/services/default/versions/v1/instances/instance-1`.
+    /// Part of `name`. Name of the resource requested. Example: apps/myapp/services/default/versions/v1/instances/instance-1.
     ///
     /// Sets the *apps id* path property to the given value.
     ///
@@ -4843,7 +5227,7 @@ impl<'a, C, A> AppServiceVersionInstanceGetCall<'a, C, A> where C: BorrowMut<hyp
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
+    /// `Scope::Admin`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4859,7 +5243,7 @@ impl<'a, C, A> AppServiceVersionInstanceGetCall<'a, C, A> where C: BorrowMut<hyp
 }
 
 
-/// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding below allows API services to override the binding to use different resource name schemes, such as `users/*/operations`.
+/// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns UNIMPLEMENTED.NOTE: the name binding below allows API services to override the binding to use different resource name schemes, such as users/*/operations.
 ///
 /// A builder for the *operations.list* method supported by a *app* resource.
 /// It is not used directly, but through a `AppMethods` instance.
@@ -4887,8 +5271,8 @@ impl<'a, C, A> AppServiceVersionInstanceGetCall<'a, C, A> where C: BorrowMut<hyp
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.apps().operations_list("appsId")
 ///              .page_token("et")
-///              .page_size(-70)
-///              .filter("et")
+///              .page_size(-40)
+///              .filter("sanctus")
 ///              .doit();
 /// # }
 /// ```
@@ -4946,7 +5330,7 @@ impl<'a, C, A> AppOperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         let mut url = "https://appengine.googleapis.com/v1/apps/{appsId}/operations".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Admin.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{appsId}", "appsId")].iter() {
@@ -5120,7 +5504,7 @@ impl<'a, C, A> AppOperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
+    /// `Scope::Admin`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5313,7 +5697,7 @@ impl<'a, C, A> AppServiceVersionDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
-    /// Part of `name`. Name of the resource requested. Example: `apps/myapp/services/default/versions/v1`.
+    /// Part of `name`. Name of the resource requested. Example: apps/myapp/services/default/versions/v1.
     ///
     /// Sets the *apps id* path property to the given value.
     ///
@@ -5475,7 +5859,7 @@ impl<'a, C, A> AppLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         let mut url = "https://appengine.googleapis.com/v1/apps/{appsId}/locations/{locationsId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Admin.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{appsId}", "appsId"), ("{locationsId}", "locationsId")].iter() {
@@ -5638,7 +6022,7 @@ impl<'a, C, A> AppLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
+    /// `Scope::Admin`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5687,8 +6071,8 @@ impl<'a, C, A> AppLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.apps().services_patch(req, "appsId", "servicesId")
-///              .update_mask("ea")
-///              .migrate_traffic(false)
+///              .update_mask("dolor")
+///              .migrate_traffic(true)
 ///              .doit();
 /// # }
 /// ```
@@ -5870,7 +6254,7 @@ impl<'a, C, A> AppServicePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._request = new_value;
         self
     }
-    /// Part of `name`. Name of the resource to update. Example: `apps/myapp/services/default`.
+    /// Part of `name`. Name of the resource to update. Example: apps/myapp/services/default.
     ///
     /// Sets the *apps id* path property to the given value.
     ///
@@ -5897,7 +6281,7 @@ impl<'a, C, A> AppServicePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._update_mask = Some(new_value.to_string());
         self
     }
-    /// Set to `true` to gradually shift traffic from one version to another single version. By default, traffic is shifted immediately. For gradual traffic migration, the target version must be located within instances that are configured for both [warmup requests](https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#inboundservicetype) and [automatic scaling](https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#automaticscaling). You must specify the [`shardBy`](https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services#shardby) field in the Service resource. Gradual traffic migration is not supported in the App Engine flexible environment. For examples, see [Migrating and Splitting Traffic](https://cloud.google.com/appengine/docs/admin-api/migrating-splitting-traffic).
+    /// Set to true to gradually shift traffic from one version to another single version. By default, traffic is shifted immediately. For gradual traffic migration, the target version must be located within instances that are configured for both warmup requests (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#inboundservicetype) and automatic scaling (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#automaticscaling). You must specify the shardBy (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services#shardby) field in the Service resource. Gradual traffic migration is not supported in the App Engine flexible environment. For examples, see Migrating and Splitting Traffic (https://cloud.google.com/appengine/docs/admin-api/migrating-splitting-traffic).
     ///
     /// Sets the *migrate traffic* query property to the given value.
     pub fn migrate_traffic(mut self, new_value: bool) -> AppServicePatchCall<'a, C, A> {
@@ -6034,7 +6418,7 @@ impl<'a, C, A> AppGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
 
         let mut url = "https://appengine.googleapis.com/v1/apps/{appsId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Admin.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{appsId}", "appsId")].iter() {
@@ -6135,7 +6519,7 @@ impl<'a, C, A> AppGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
     }
 
 
-    /// Part of `name`. Name of the Application resource to get. Example: `apps/myapp`.
+    /// Part of `name`. Name of the Application resource to get. Example: apps/myapp.
     ///
     /// Sets the *apps id* path property to the given value.
     ///
@@ -6187,7 +6571,7 @@ impl<'a, C, A> AppGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
+    /// `Scope::Admin`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6378,7 +6762,7 @@ impl<'a, C, A> AppServiceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
-    /// Part of `name`. Name of the resource requested. Example: `apps/myapp/services/default`.
+    /// Part of `name`. Name of the resource requested. Example: apps/myapp/services/default.
     ///
     /// Sets the *apps id* path property to the given value.
     ///
@@ -6456,7 +6840,246 @@ impl<'a, C, A> AppServiceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 }
 
 
-/// Gets the specified Version resource. By default, only a `BASIC_VIEW` will be returned. Specify the `FULL_VIEW` parameter to get the full resource.
+/// Creates an App Engine application for a Google Cloud Platform project. This requires a project that excludes an App Engine application. For details about creating a project without an application, see the Google Cloud Resource Manager create project topic (https://cloud.google.com/resource-manager/docs/creating-project).
+///
+/// A builder for the *create* method supported by a *app* resource.
+/// It is not used directly, but through a `AppMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_appengine1 as appengine1;
+/// use appengine1::Application;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use appengine1::Appengine;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Appengine::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Application::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.apps().create(req)
+///              .doit();
+/// # }
+/// ```
+pub struct AppCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Appengine<C, A>,
+    _request: Application,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for AppCreateCall<'a, C, A> {}
+
+impl<'a, C, A> AppCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "appengine.apps.create",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        for &field in ["alt"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://appengine.googleapis.com/v1/apps".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request);
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: Application) -> AppCreateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AppCreateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> AppCreateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> AppCreateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+/// Gets the specified Version resource. By default, only a BASIC_VIEW will be returned. Specify the FULL_VIEW parameter to get the full resource.
 ///
 /// A builder for the *services.versions.get* method supported by a *app* resource.
 /// It is not used directly, but through a `AppMethods` instance.
@@ -6483,7 +7106,7 @@ impl<'a, C, A> AppServiceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.apps().services_versions_get("appsId", "servicesId", "versionsId")
-///              .view("voluptua.")
+///              .view("gubergren")
 ///              .doit();
 /// # }
 /// ```
@@ -6537,7 +7160,7 @@ impl<'a, C, A> AppServiceVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         let mut url = "https://appengine.googleapis.com/v1/apps/{appsId}/services/{servicesId}/versions/{versionsId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Admin.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{appsId}", "appsId"), ("{servicesId}", "servicesId"), ("{versionsId}", "versionsId")].iter() {
@@ -6638,7 +7261,7 @@ impl<'a, C, A> AppServiceVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
-    /// Part of `name`. Name of the resource requested. Example: `apps/myapp/services/default/versions/v1`.
+    /// Part of `name`. Name of the resource requested. Example: apps/myapp/services/default/versions/v1.
     ///
     /// Sets the *apps id* path property to the given value.
     ///
@@ -6668,7 +7291,7 @@ impl<'a, C, A> AppServiceVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._versions_id = new_value.to_string();
         self
     }
-    /// Controls the set of fields returned in the `Get` response.
+    /// Controls the set of fields returned in the Get response.
     ///
     /// Sets the *view* query property to the given value.
     pub fn view(mut self, new_value: &str) -> AppServiceVersionGetCall<'a, C, A> {
@@ -6717,7 +7340,7 @@ impl<'a, C, A> AppServiceVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
+    /// `Scope::Admin`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

@@ -717,6 +717,63 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _edits_deobfuscationfiles_upload(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let apk_version_code: i32 = arg_from_str(&opt.value_of("apk-version-code").unwrap_or(""), err, "<apk-version-code>", "integer");
+        let mut call = self.hub.edits().deobfuscationfiles_upload(opt.value_of("package-name").unwrap_or(""), opt.value_of("edit-id").unwrap_or(""), apk_version_code, opt.value_of("deobfuscation-file-type").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let vals = opt.values_of("mode").unwrap().collect::<Vec<&str>>();
+        let protocol = calltype_from_str(vals[0], ["simple", "resumable"].iter().map(|&v| v.to_string()).collect(), err);
+        let mut input_file = input_file_from_opts(vals[1], err);
+        let mime_type = input_mime_from_opts(opt.value_of("mime").unwrap_or("application/octet-stream"), err);
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Upload(UploadProtocol::Simple) => call.upload(input_file.unwrap(), mime_type.unwrap()),
+                CallType::Upload(UploadProtocol::Resumable) => call.upload_resumable(input_file.unwrap(), mime_type.unwrap()),
+                CallType::Standard => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _edits_details_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.edits().details_get(opt.value_of("package-name").unwrap_or(""), opt.value_of("edit-id").unwrap_or(""));
@@ -3424,12 +3481,27 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _reviews_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _purchases_voidedpurchases_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.reviews().get(opt.value_of("package-name").unwrap_or(""), opt.value_of("review-id").unwrap_or(""));
+        let mut call = self.hub.purchases().voidedpurchases_list(opt.value_of("package-name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "token" => {
+                    call = call.token(value.unwrap_or(""));
+                },
+                "start-time" => {
+                    call = call.start_time(value.unwrap_or(""));
+                },
+                "start-index" => {
+                    call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
+                },
+                "max-results" => {
+                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                },
+                "end-time" => {
+                    call = call.end_time(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -3443,6 +3515,63 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["token", "end-time", "max-results", "start-index", "start-time"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _reviews_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.reviews().get(opt.value_of("package-name").unwrap_or(""), opt.value_of("review-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "translation-language" => {
+                    call = call.translation_language(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["translation-language"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3482,6 +3611,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "translation-language" => {
+                    call = call.translation_language(value.unwrap_or(""));
+                },
                 "token" => {
                     call = call.token(value.unwrap_or(""));
                 },
@@ -3504,7 +3636,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["token", "start-index", "max-results"].iter().map(|v|*v));
+                                                                           v.extend(["token", "translation-language", "start-index", "max-results"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3663,6 +3795,9 @@ impl<'n> Engine<'n> {
                     ("delete", Some(opt)) => {
                         call_result = self._edits_delete(opt, dry_run, &mut err);
                     },
+                    ("deobfuscationfiles-upload", Some(opt)) => {
+                        call_result = self._edits_deobfuscationfiles_upload(opt, dry_run, &mut err);
+                    },
                     ("details-get", Some(opt)) => {
                         call_result = self._edits_details_get(opt, dry_run, &mut err);
                     },
@@ -3810,6 +3945,9 @@ impl<'n> Engine<'n> {
                     ("subscriptions-revoke", Some(opt)) => {
                         call_result = self._purchases_subscriptions_revoke(opt, dry_run, &mut err);
                     },
+                    ("voidedpurchases-list", Some(opt)) => {
+                        call_result = self._purchases_voidedpurchases_list(opt, dry_run, &mut err);
+                    },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("purchases".to_string()));
                         writeln!(io::stderr(), "{}\n", opt.usage()).ok();
@@ -3916,7 +4054,7 @@ fn main() {
     let mut exit_status = 0i32;
     let upload_value_names = ["mode", "file"];
     let arg_data = [
-        ("edits", "methods: 'apklistings-delete', 'apklistings-deleteall', 'apklistings-get', 'apklistings-list', 'apklistings-patch', 'apklistings-update', 'apks-addexternallyhosted', 'apks-list', 'apks-upload', 'commit', 'delete', 'details-get', 'details-patch', 'details-update', 'expansionfiles-get', 'expansionfiles-patch', 'expansionfiles-update', 'expansionfiles-upload', 'get', 'images-delete', 'images-deleteall', 'images-list', 'images-upload', 'insert', 'listings-delete', 'listings-deleteall', 'listings-get', 'listings-list', 'listings-patch', 'listings-update', 'testers-get', 'testers-patch', 'testers-update', 'tracks-get', 'tracks-list', 'tracks-patch', 'tracks-update' and 'validate'", vec![
+        ("edits", "methods: 'apklistings-delete', 'apklistings-deleteall', 'apklistings-get', 'apklistings-list', 'apklistings-patch', 'apklistings-update', 'apks-addexternallyhosted', 'apks-list', 'apks-upload', 'commit', 'delete', 'deobfuscationfiles-upload', 'details-get', 'details-patch', 'details-update', 'expansionfiles-get', 'expansionfiles-patch', 'expansionfiles-update', 'expansionfiles-upload', 'get', 'images-delete', 'images-deleteall', 'images-list', 'images-upload', 'insert', 'listings-delete', 'listings-deleteall', 'listings-get', 'listings-list', 'listings-patch', 'listings-update', 'testers-get', 'testers-patch', 'testers-update', 'tracks-get', 'tracks-list', 'tracks-patch', 'tracks-update' and 'validate'", vec![
             ("apklistings-delete",
                     Some(r##"Deletes the APK-specific localized listing for a specified APK and language code."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher2_cli/edits_apklistings-delete",
@@ -4290,6 +4428,52 @@ fn main() {
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
+                  ]),
+            ("deobfuscationfiles-upload",
+                    Some(r##"Uploads the deobfuscation file of the specified APK. If a deobfuscation file already exists, it will be replaced."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher2_cli/edits_deobfuscationfiles-upload",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"Unique identifier of the Android app for which the deobfuscatiuon files are being uploaded; for example, "com.spiffygame"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"edit-id"##),
+                     None,
+                     Some(r##"Unique identifier for this edit."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"apk-version-code"##),
+                     None,
+                     Some(r##"The version code of the APK whose deobfuscation file is being uploaded."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"deobfuscation-file-type"##),
+                     None,
+                     None,
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"mode"##),
+                     Some(r##"u"##),
+                     Some(r##"Specify the upload protocol (simple|resumable) and the file to upload"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
                   ]),
             ("details-get",
                     Some(r##"Fetches app details for this edit. This includes the default language and developer support contact information."##),
@@ -5483,7 +5667,7 @@ fn main() {
                   ]),
             ]),
         
-        ("purchases", "methods: 'products-get', 'subscriptions-cancel', 'subscriptions-defer', 'subscriptions-get', 'subscriptions-refund' and 'subscriptions-revoke'", vec![
+        ("purchases", "methods: 'products-get', 'subscriptions-cancel', 'subscriptions-defer', 'subscriptions-get', 'subscriptions-refund', 'subscriptions-revoke' and 'voidedpurchases-list'", vec![
             ("products-get",
                     Some(r##"Checks the purchase and consumption status of an inapp item."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher2_cli/purchases_products-get",
@@ -5676,6 +5860,28 @@ fn main() {
                      Some(false),
                      Some(true)),
                   ]),
+            ("voidedpurchases-list",
+                    Some(r##"Lists the purchases that were cancelled, refunded or charged-back."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher2_cli/purchases_voidedpurchases-list",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"The package name of the application for which voided purchases need to be returned (for example, 'com.some.thing')."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ]),
         
         ("reviews", "methods: 'get', 'list' and 'reply'", vec![
@@ -5769,7 +5975,7 @@ fn main() {
     
     let mut app = App::new("androidpublisher2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.0+20160817")
+           .version("1.0.0+20161212")
            .about("Lets Android application developers access their Google Play accounts.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_androidpublisher2_cli")
            .arg(Arg::with_name("url")

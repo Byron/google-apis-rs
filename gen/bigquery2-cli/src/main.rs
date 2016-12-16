@@ -706,30 +706,32 @@ impl<'n> Engine<'n> {
                     "statistics.creation-time" => Some(("statistics.creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "statistics.total-bytes-processed" => Some(("statistics.totalBytesProcessed", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "statistics.start-time" => Some(("statistics.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "statistics.query.statement-type" => Some(("statistics.query.statementType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "statistics.query.total-bytes-billed" => Some(("statistics.query.totalBytesBilled", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "statistics.query.total-bytes-processed" => Some(("statistics.query.totalBytesProcessed", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "statistics.query.cache-hit" => Some(("statistics.query.cacheHit", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "statistics.query.billing-tier" => Some(("statistics.query.billingTier", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "statistics.query.total-bytes-billed" => Some(("statistics.query.totalBytesBilled", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "statistics.query.num-dml-affected-rows" => Some(("statistics.query.numDmlAffectedRows", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "statistics.query.total-bytes-processed" => Some(("statistics.query.totalBytesProcessed", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "statistics.end-time" => Some(("statistics.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "statistics.extract.destination-uri-file-counts" => Some(("statistics.extract.destinationUriFileCounts", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Vec })),
                     "job-reference.project-id" => Some(("jobReference.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job-reference.job-id" => Some(("jobReference.jobId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-email" => Some(("user_email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "configuration.load.skip-leading-rows" => Some(("configuration.load.skipLeadingRows", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "configuration.load.schema-update-options" => Some(("configuration.load.schemaUpdateOptions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "configuration.load.encoding" => Some(("configuration.load.encoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "configuration.load.ignore-unknown-values" => Some(("configuration.load.ignoreUnknownValues", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "configuration.load.quote" => Some(("configuration.load.quote", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.load.skip-leading-rows" => Some(("configuration.load.skipLeadingRows", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "configuration.load.autodetect" => Some(("configuration.load.autodetect", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "configuration.load.destination-table.project-id" => Some(("configuration.load.destinationTable.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "configuration.load.destination-table.table-id" => Some(("configuration.load.destinationTable.tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "configuration.load.destination-table.dataset-id" => Some(("configuration.load.destinationTable.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "configuration.load.max-bad-records" => Some(("configuration.load.maxBadRecords", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "configuration.load.schema-update-options" => Some(("configuration.load.schemaUpdateOptions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "configuration.load.null-marker" => Some(("configuration.load.nullMarker", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "configuration.load.allow-jagged-rows" => Some(("configuration.load.allowJaggedRows", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "configuration.load.write-disposition" => Some(("configuration.load.writeDisposition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "configuration.load.source-uris" => Some(("configuration.load.sourceUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "configuration.load.quote" => Some(("configuration.load.quote", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "configuration.load.field-delimiter" => Some(("configuration.load.fieldDelimiter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "configuration.load.create-disposition" => Some(("configuration.load.createDisposition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "configuration.load.schema-inline-format" => Some(("configuration.load.schemaInlineFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -737,24 +739,8 @@ impl<'n> Engine<'n> {
                     "configuration.load.allow-quoted-newlines" => Some(("configuration.load.allowQuotedNewlines", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "configuration.load.projection-fields" => Some(("configuration.load.projectionFields", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "configuration.load.source-format" => Some(("configuration.load.sourceFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "configuration.extract.destination-uri" => Some(("configuration.extract.destinationUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "configuration.extract.compression" => Some(("configuration.extract.compression", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "configuration.extract.field-delimiter" => Some(("configuration.extract.fieldDelimiter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "configuration.extract.destination-format" => Some(("configuration.extract.destinationFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "configuration.extract.print-header" => Some(("configuration.extract.printHeader", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "configuration.extract.destination-uris" => Some(("configuration.extract.destinationUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "configuration.extract.source-table.project-id" => Some(("configuration.extract.sourceTable.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "configuration.extract.source-table.table-id" => Some(("configuration.extract.sourceTable.tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "configuration.extract.source-table.dataset-id" => Some(("configuration.extract.sourceTable.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "configuration.copy.create-disposition" => Some(("configuration.copy.createDisposition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "configuration.copy.write-disposition" => Some(("configuration.copy.writeDisposition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "configuration.copy.destination-table.project-id" => Some(("configuration.copy.destinationTable.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "configuration.copy.destination-table.table-id" => Some(("configuration.copy.destinationTable.tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "configuration.copy.destination-table.dataset-id" => Some(("configuration.copy.destinationTable.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "configuration.copy.source-table.project-id" => Some(("configuration.copy.sourceTable.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "configuration.copy.source-table.table-id" => Some(("configuration.copy.sourceTable.tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "configuration.copy.source-table.dataset-id" => Some(("configuration.copy.sourceTable.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "configuration.dry-run" => Some(("configuration.dryRun", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "configuration.labels" => Some(("configuration.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "configuration.query.flatten-results" => Some(("configuration.query.flattenResults", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "configuration.query.maximum-billing-tier" => Some(("configuration.query.maximumBillingTier", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "configuration.query.use-query-cache" => Some(("configuration.query.useQueryCache", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -773,10 +759,27 @@ impl<'n> Engine<'n> {
                     "configuration.query.preserve-nulls" => Some(("configuration.query.preserveNulls", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "configuration.query.maximum-bytes-billed" => Some(("configuration.query.maximumBytesBilled", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "configuration.query.parameter-mode" => Some(("configuration.query.parameterMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.copy.create-disposition" => Some(("configuration.copy.createDisposition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.copy.write-disposition" => Some(("configuration.copy.writeDisposition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.copy.destination-table.project-id" => Some(("configuration.copy.destinationTable.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.copy.destination-table.table-id" => Some(("configuration.copy.destinationTable.tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.copy.destination-table.dataset-id" => Some(("configuration.copy.destinationTable.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.copy.source-table.project-id" => Some(("configuration.copy.sourceTable.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.copy.source-table.table-id" => Some(("configuration.copy.sourceTable.tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.copy.source-table.dataset-id" => Some(("configuration.copy.sourceTable.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.extract.destination-uri" => Some(("configuration.extract.destinationUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.extract.compression" => Some(("configuration.extract.compression", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.extract.field-delimiter" => Some(("configuration.extract.fieldDelimiter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.extract.destination-format" => Some(("configuration.extract.destinationFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.extract.print-header" => Some(("configuration.extract.printHeader", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "configuration.extract.destination-uris" => Some(("configuration.extract.destinationUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "configuration.extract.source-table.project-id" => Some(("configuration.extract.sourceTable.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.extract.source-table.table-id" => Some(("configuration.extract.sourceTable.tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.extract.source-table.dataset-id" => Some(("configuration.extract.sourceTable.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-jagged-rows", "allow-large-results", "allow-quoted-newlines", "autodetect", "billing-tier", "cache-hit", "compression", "configuration", "copy", "create-disposition", "creation-time", "dataset-id", "debug-info", "default-dataset", "destination-format", "destination-table", "destination-uri", "destination-uri-file-counts", "destination-uris", "dry-run", "encoding", "end-time", "error-result", "etag", "extract", "field-delimiter", "flatten-results", "id", "ignore-unknown-values", "input-file-bytes", "input-files", "job-id", "job-reference", "kind", "load", "location", "max-bad-records", "maximum-billing-tier", "maximum-bytes-billed", "message", "num-dml-affected-rows", "output-bytes", "output-rows", "parameter-mode", "preserve-nulls", "print-header", "priority", "project-id", "projection-fields", "query", "quote", "reason", "schema-inline", "schema-inline-format", "schema-update-options", "self-link", "skip-leading-rows", "source-format", "source-table", "source-uris", "start-time", "state", "statistics", "status", "table-id", "total-bytes-billed", "total-bytes-processed", "use-legacy-sql", "use-query-cache", "user-email", "write-disposition"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-jagged-rows", "allow-large-results", "allow-quoted-newlines", "autodetect", "billing-tier", "cache-hit", "compression", "configuration", "copy", "create-disposition", "creation-time", "dataset-id", "debug-info", "default-dataset", "destination-format", "destination-table", "destination-uri", "destination-uri-file-counts", "destination-uris", "dry-run", "encoding", "end-time", "error-result", "etag", "extract", "field-delimiter", "flatten-results", "id", "ignore-unknown-values", "input-file-bytes", "input-files", "job-id", "job-reference", "kind", "labels", "load", "location", "max-bad-records", "maximum-billing-tier", "maximum-bytes-billed", "message", "null-marker", "num-dml-affected-rows", "output-bytes", "output-rows", "parameter-mode", "preserve-nulls", "print-header", "priority", "project-id", "projection-fields", "query", "quote", "reason", "schema-inline", "schema-inline-format", "schema-update-options", "self-link", "skip-leading-rows", "source-format", "source-table", "source-uris", "start-time", "state", "statement-type", "statistics", "status", "table-id", "total-bytes-billed", "total-bytes-processed", "use-legacy-sql", "use-query-cache", "user-email", "write-disposition"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1337,6 +1340,7 @@ impl<'n> Engine<'n> {
                     "streaming-buffer.estimated-bytes" => Some(("streamingBuffer.estimatedBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "streaming-buffer.estimated-rows" => Some(("streamingBuffer.estimatedRows", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "streaming-buffer.oldest-entry-time" => Some(("streamingBuffer.oldestEntryTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "table-reference.project-id" => Some(("tableReference.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "table-reference.table-id" => Some(("tableReference.tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1371,7 +1375,7 @@ impl<'n> Engine<'n> {
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "num-long-term-bytes" => Some(("numLongTermBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-jagged-rows", "allow-quoted-newlines", "autodetect", "bigtable-options", "compression", "creation-time", "csv-options", "dataset-id", "description", "encoding", "estimated-bytes", "estimated-rows", "etag", "expiration-ms", "expiration-time", "external-data-configuration", "field-delimiter", "friendly-name", "google-sheets-options", "id", "ignore-unknown-values", "ignore-unspecified-column-families", "kind", "last-modified-time", "location", "max-bad-records", "num-bytes", "num-long-term-bytes", "num-rows", "oldest-entry-time", "project-id", "query", "quote", "read-rowkey-as-string", "self-link", "skip-leading-rows", "source-format", "source-uris", "streaming-buffer", "table-id", "table-reference", "time-partitioning", "type", "use-legacy-sql", "view"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-jagged-rows", "allow-quoted-newlines", "autodetect", "bigtable-options", "compression", "creation-time", "csv-options", "dataset-id", "description", "encoding", "estimated-bytes", "estimated-rows", "etag", "expiration-ms", "expiration-time", "external-data-configuration", "field-delimiter", "friendly-name", "google-sheets-options", "id", "ignore-unknown-values", "ignore-unspecified-column-families", "kind", "labels", "last-modified-time", "location", "max-bad-records", "num-bytes", "num-long-term-bytes", "num-rows", "oldest-entry-time", "project-id", "query", "quote", "read-rowkey-as-string", "self-link", "skip-leading-rows", "source-format", "source-uris", "streaming-buffer", "table-id", "table-reference", "time-partitioning", "type", "use-legacy-sql", "view"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1519,6 +1523,7 @@ impl<'n> Engine<'n> {
                     "streaming-buffer.estimated-bytes" => Some(("streamingBuffer.estimatedBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "streaming-buffer.estimated-rows" => Some(("streamingBuffer.estimatedRows", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "streaming-buffer.oldest-entry-time" => Some(("streamingBuffer.oldestEntryTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "table-reference.project-id" => Some(("tableReference.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "table-reference.table-id" => Some(("tableReference.tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1553,7 +1558,7 @@ impl<'n> Engine<'n> {
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "num-long-term-bytes" => Some(("numLongTermBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-jagged-rows", "allow-quoted-newlines", "autodetect", "bigtable-options", "compression", "creation-time", "csv-options", "dataset-id", "description", "encoding", "estimated-bytes", "estimated-rows", "etag", "expiration-ms", "expiration-time", "external-data-configuration", "field-delimiter", "friendly-name", "google-sheets-options", "id", "ignore-unknown-values", "ignore-unspecified-column-families", "kind", "last-modified-time", "location", "max-bad-records", "num-bytes", "num-long-term-bytes", "num-rows", "oldest-entry-time", "project-id", "query", "quote", "read-rowkey-as-string", "self-link", "skip-leading-rows", "source-format", "source-uris", "streaming-buffer", "table-id", "table-reference", "time-partitioning", "type", "use-legacy-sql", "view"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-jagged-rows", "allow-quoted-newlines", "autodetect", "bigtable-options", "compression", "creation-time", "csv-options", "dataset-id", "description", "encoding", "estimated-bytes", "estimated-rows", "etag", "expiration-ms", "expiration-time", "external-data-configuration", "field-delimiter", "friendly-name", "google-sheets-options", "id", "ignore-unknown-values", "ignore-unspecified-column-families", "kind", "labels", "last-modified-time", "location", "max-bad-records", "num-bytes", "num-long-term-bytes", "num-rows", "oldest-entry-time", "project-id", "query", "quote", "read-rowkey-as-string", "self-link", "skip-leading-rows", "source-format", "source-uris", "streaming-buffer", "table-id", "table-reference", "time-partitioning", "type", "use-legacy-sql", "view"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1642,6 +1647,7 @@ impl<'n> Engine<'n> {
                     "streaming-buffer.estimated-bytes" => Some(("streamingBuffer.estimatedBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "streaming-buffer.estimated-rows" => Some(("streamingBuffer.estimatedRows", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "streaming-buffer.oldest-entry-time" => Some(("streamingBuffer.oldestEntryTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "table-reference.project-id" => Some(("tableReference.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "table-reference.table-id" => Some(("tableReference.tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1676,7 +1682,7 @@ impl<'n> Engine<'n> {
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "num-long-term-bytes" => Some(("numLongTermBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-jagged-rows", "allow-quoted-newlines", "autodetect", "bigtable-options", "compression", "creation-time", "csv-options", "dataset-id", "description", "encoding", "estimated-bytes", "estimated-rows", "etag", "expiration-ms", "expiration-time", "external-data-configuration", "field-delimiter", "friendly-name", "google-sheets-options", "id", "ignore-unknown-values", "ignore-unspecified-column-families", "kind", "last-modified-time", "location", "max-bad-records", "num-bytes", "num-long-term-bytes", "num-rows", "oldest-entry-time", "project-id", "query", "quote", "read-rowkey-as-string", "self-link", "skip-leading-rows", "source-format", "source-uris", "streaming-buffer", "table-id", "table-reference", "time-partitioning", "type", "use-legacy-sql", "view"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-jagged-rows", "allow-quoted-newlines", "autodetect", "bigtable-options", "compression", "creation-time", "csv-options", "dataset-id", "description", "encoding", "estimated-bytes", "estimated-rows", "etag", "expiration-ms", "expiration-time", "external-data-configuration", "field-delimiter", "friendly-name", "google-sheets-options", "id", "ignore-unknown-values", "ignore-unspecified-column-families", "kind", "labels", "last-modified-time", "location", "max-bad-records", "num-bytes", "num-long-term-bytes", "num-rows", "oldest-entry-time", "project-id", "query", "quote", "read-rowkey-as-string", "self-link", "skip-leading-rows", "source-format", "source-uris", "streaming-buffer", "table-id", "table-reference", "time-partitioning", "type", "use-legacy-sql", "view"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2576,7 +2582,7 @@ fn main() {
     
     let mut app = App::new("bigquery2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.0+20160903")
+           .version("1.0.0+20161130")
            .about("A data platform for customers to create, manage, share and query data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_bigquery2_cli")
            .arg(Arg::with_name("url")

@@ -467,6 +467,9 @@ impl Part for FileImageMediaMetadata {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RevisionList {
+    /// The page token for the next page of revisions. This will be absent if the end of the revisions list has been reached.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "drive#revisionList".
     pub kind: Option<String>,
     /// The full list of revisions.
@@ -870,6 +873,9 @@ impl Part for User {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct File {
+    /// Whether this file has a thumbnail.
+    #[serde(rename="hasThumbnail")]
+    pub has_thumbnail: Option<bool>,
     /// The MIME type of the file.
     /// Drive will attempt to automatically detect an appropriate value from uploaded content if no value is provided. The value cannot be changed unless a new revision is uploaded.
     /// If a file is created with a Google Doc MIME type, the uploaded content will be imported if possible. The supported import formats are published in the About resource.
@@ -878,9 +884,12 @@ pub struct File {
     /// The last time the file was modified by the user (RFC 3339 date-time).
     #[serde(rename="modifiedByMeTime")]
     pub modified_by_me_time: Option<String>,
-    /// A short-lived link to the file's thumbnail, if available. Typically lasts on the order of hours.
+    /// A short-lived link to the file's thumbnail, if available. Typically lasts on the order of hours. Only populated when the requesting app can access the file's content.
     #[serde(rename="thumbnailLink")]
     pub thumbnail_link: Option<String>,
+    /// The thumbnail version for use in client-contructable thumbnail URLs or thumbnail cache invalidation.
+    #[serde(rename="thumbnailVersion")]
+    pub thumbnail_version: Option<String>,
     /// Whether the file has been explicitly trashed, as opposed to recursively trashed from a parent folder.
     #[serde(rename="explicitlyTrashed")]
     pub explicitly_trashed: Option<bool>,
@@ -954,6 +963,9 @@ pub struct File {
     /// Whether the file has been viewed by this user.
     #[serde(rename="viewedByMe")]
     pub viewed_by_me: Option<bool>,
+    /// Whether the file has been modified by this user.
+    #[serde(rename="modifiedByMe")]
+    pub modified_by_me: Option<bool>,
     /// Identifies what kind of resource this is. Value: the fixed string "drive#file".
     pub kind: Option<String>,
     /// The time at which the file was created (RFC 3339 date-time).
@@ -1833,6 +1845,8 @@ impl<'a, C, A> RevisionMethods<'a, C, A> {
         RevisionListCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -8881,6 +8895,8 @@ impl<'a, C, A> RevisionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.revisions().list("fileId")
+///              .page_token("invidunt")
+///              .page_size(-96)
 ///              .doit();
 /// # }
 /// ```
@@ -8889,6 +8905,8 @@ pub struct RevisionListCall<'a, C, A>
 
     hub: &'a Drive<C, A>,
     _file_id: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -8910,9 +8928,15 @@ impl<'a, C, A> RevisionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         };
         dlg.begin(MethodInfo { id: "drive.revisions.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("fileId", self._file_id.to_string()));
-        for &field in ["alt", "fileId"].iter() {
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        for &field in ["alt", "fileId", "pageToken", "pageSize"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -9035,6 +9059,20 @@ impl<'a, C, A> RevisionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// we provide this method for API completeness.
     pub fn file_id(mut self, new_value: &str) -> RevisionListCall<'a, C, A> {
         self._file_id = new_value.to_string();
+        self
+    }
+    /// The token for continuing a previous list request on the next page. This should be set to the value of 'nextPageToken' from the previous response.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> RevisionListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// The maximum number of revisions to return per page.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> RevisionListCall<'a, C, A> {
+        self._page_size = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -9324,10 +9362,10 @@ impl<'a, C, A> ChangeGetStartPageTokenCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.changes().watch(req, "pageToken")
-///              .spaces("consetetur")
+///              .spaces("duo")
 ///              .restrict_to_my_drive(false)
-///              .page_size(-19)
-///              .include_removed(false)
+///              .page_size(-5)
+///              .include_removed(true)
 ///              .doit();
 /// # }
 /// ```
@@ -9611,10 +9649,10 @@ impl<'a, C, A> ChangeWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.changes().list("pageToken")
-///              .spaces("et")
-///              .restrict_to_my_drive(true)
-///              .page_size(-45)
-///              .include_removed(false)
+///              .spaces("consetetur")
+///              .restrict_to_my_drive(false)
+///              .page_size(-40)
+///              .include_removed(true)
 ///              .doit();
 /// # }
 /// ```
@@ -10351,7 +10389,7 @@ impl<'a, C, A> PermissionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.permissions().update(req, "fileId", "permissionId")
 ///              .transfer_ownership(false)
-///              .remove_expiration(true)
+///              .remove_expiration(false)
 ///              .doit();
 /// # }
 /// ```
@@ -10900,8 +10938,8 @@ impl<'a, C, A> PermissionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.permissions().create(req, "fileId")
 ///              .transfer_ownership(true)
-///              .send_notification_email(true)
-///              .email_message("sed")
+///              .send_notification_email(false)
+///              .email_message("sit")
 ///              .doit();
 /// # }
 /// ```

@@ -116,16 +116,18 @@ impl Default for Scope {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.videos().list("part")
-///              .video_category_id("labore")
-///              .region_code("sea")
-///              .page_token("nonumy")
-///              .on_behalf_of_content_owner("dolores")
-///              .my_rating("gubergren")
-///              .max_results(6)
-///              .locale("aliquyam")
-///              .id("ea")
-///              .hl("no")
-///              .chart("justo")
+///              .video_category_id("nonumy")
+///              .region_code("dolores")
+///              .page_token("gubergren")
+///              .on_behalf_of_content_owner("sadipscing")
+///              .my_rating("aliquyam")
+///              .max_width(35)
+///              .max_results(40)
+///              .max_height(80)
+///              .locale("justo")
+///              .id("et")
+///              .hl("et")
+///              .chart("diam")
 ///              .doit();
 /// 
 /// match result {
@@ -329,9 +331,6 @@ pub struct VideoFileDetails {
     pub bitrate_bps: Option<String>,
     /// The uploaded video file's container format.
     pub container: Option<String>,
-    /// Geographic coordinates that identify the place where the uploaded video was recorded. Coordinates are defined using WGS 84.
-    #[serde(rename="recordingLocation")]
-    pub recording_location: Option<GeoPoint>,
     /// The uploaded file's type as detected by YouTube's video processing engine. Currently, YouTube only processes video files, but this field is present whether a video file or another type of file was uploaded.
     #[serde(rename="fileType")]
     pub file_type: Option<String>,
@@ -2400,7 +2399,7 @@ pub struct LiveStreamStatus {
 impl Part for LiveStreamStatus {}
 
 
-/// Ratings schemes. The country-specific ratings are mostly for movies and shows. NEXT_ID: 68
+/// Ratings schemes. The country-specific ratings are mostly for movies and shows. NEXT_ID: 69
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -2487,6 +2486,9 @@ pub struct ContentRating {
     /// The video's rating from South Africa's Film and Publication Board.
     #[serde(rename="fpbRating")]
     pub fpb_rating: Option<String>,
+    /// The video's rating system for Vietnam - MCST
+    #[serde(rename="mcstRating")]
+    pub mcst_rating: Option<String>,
     /// The video's rating in Iceland.
     #[serde(rename="smaisRating")]
     pub smais_rating: Option<String>,
@@ -3384,51 +3386,48 @@ pub struct CommentSnippet {
     /// Link to the author's YouTube channel, if any.
     #[serde(rename="authorChannelUrl")]
     pub author_channel_url: Option<String>,
-    /// The id of the corresponding YouTube channel. In case of a channel comment this is the channel the comment refers to. In case of a video comment it's the video's channel.
-    #[serde(rename="channelId")]
-    pub channel_id: Option<String>,
-    /// The ID of the video the comment refers to, if any.
-    #[serde(rename="videoId")]
-    pub video_id: Option<String>,
-    /// The date and time when the comment was orignally published. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
-    #[serde(rename="publishedAt")]
-    pub published_at: Option<String>,
-    /// The total number of likes this comment has received.
-    #[serde(rename="likeCount")]
-    pub like_count: Option<u32>,
-    /// Whether the current viewer can rate this comment.
-    #[serde(rename="canRate")]
-    pub can_rate: Option<bool>,
-    /// The date and time when was last updated . The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
-    #[serde(rename="updatedAt")]
-    pub updated_at: Option<String>,
     /// The URL for the avatar of the user who posted the comment.
     #[serde(rename="authorProfileImageUrl")]
     pub author_profile_image_url: Option<String>,
-    /// Link to the author's Google+ profile, if any.
-    #[serde(rename="authorGoogleplusProfileUrl")]
-    pub author_googleplus_profile_url: Option<String>,
-    /// The comment's text. The format is either plain text or HTML dependent on what has been requested. Even the plain text representation may differ from the text originally posted in that it may replace video links with video titles etc.
-    #[serde(rename="textDisplay")]
-    pub text_display: Option<String>,
     /// The name of the user who posted the comment.
     #[serde(rename="authorDisplayName")]
     pub author_display_name: Option<String>,
+    /// The id of the corresponding YouTube channel. In case of a channel comment this is the channel the comment refers to. In case of a video comment it's the video's channel.
+    #[serde(rename="channelId")]
+    pub channel_id: Option<String>,
     /// The rating the viewer has given to this comment. For the time being this will never return RATE_TYPE_DISLIKE and instead return RATE_TYPE_NONE. This may change in the future.
     #[serde(rename="viewerRating")]
     pub viewer_rating: Option<String>,
     /// The comment's moderation status. Will not be set if the comments were requested through the id filter.
     #[serde(rename="moderationStatus")]
     pub moderation_status: Option<String>,
+    /// The ID of the video the comment refers to, if any.
+    #[serde(rename="videoId")]
+    pub video_id: Option<String>,
     /// The id of the author's YouTube channel, if any.
     #[serde(rename="authorChannelId")]
     pub author_channel_id: Option<String>,
     /// The unique id of the parent comment, only set for replies.
     #[serde(rename="parentId")]
     pub parent_id: Option<String>,
+    /// The date and time when the comment was orignally published. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
+    #[serde(rename="publishedAt")]
+    pub published_at: Option<String>,
+    /// Whether the current viewer can rate this comment.
+    #[serde(rename="canRate")]
+    pub can_rate: Option<bool>,
     /// The comment's original raw text as initially posted or last updated. The original text will only be returned if it is accessible to the viewer, which is only guaranteed if the viewer is the comment's author.
     #[serde(rename="textOriginal")]
     pub text_original: Option<String>,
+    /// The date and time when was last updated . The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
+    #[serde(rename="updatedAt")]
+    pub updated_at: Option<String>,
+    /// The total number of likes this comment has received.
+    #[serde(rename="likeCount")]
+    pub like_count: Option<u32>,
+    /// The comment's text. The format is either plain text or HTML dependent on what has been requested. Even the plain text representation may differ from the text originally posted in that it may replace video links with video titles etc.
+    #[serde(rename="textDisplay")]
+    pub text_display: Option<String>,
 }
 
 impl Part for CommentSnippet {}
@@ -3826,9 +3825,6 @@ pub struct ChannelContentDetails {
     /// no description provided
     #[serde(rename="relatedPlaylists")]
     pub related_playlists: Option<ChannelContentDetailsRelatedPlaylists>,
-    /// The googlePlusUserId object identifies the Google+ profile ID associated with this channel.
-    #[serde(rename="googlePlusUserId")]
-    pub google_plus_user_id: Option<String>,
 }
 
 impl Part for ChannelContentDetails {}
@@ -3948,6 +3944,9 @@ impl Part for LiveChatPollItem {}
 pub struct PlaylistItemContentDetails {
     /// A user-generated note for this item.
     pub note: Option<String>,
+    /// The date and time that the video was published to YouTube. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
+    #[serde(rename="videoPublishedAt")]
+    pub video_published_at: Option<String>,
     /// The time, measured in seconds from the start of the video, when the video should start playing. (The playlist owner can specify the times when the video should start and stop playing when the video is played in the context of the playlist.) The default value is 0.
     #[serde(rename="startAt")]
     pub start_at: Option<String>,
@@ -4047,6 +4046,12 @@ pub struct VideoPlayer {
     /// An <iframe> tag that embeds a player that will play the video.
     #[serde(rename="embedHtml")]
     pub embed_html: Option<String>,
+    /// no description provided
+    #[serde(rename="embedHeight")]
+    pub embed_height: Option<String>,
+    /// The embed width
+    #[serde(rename="embedWidth")]
+    pub embed_width: Option<String>,
 }
 
 impl Part for VideoPlayer {}
@@ -4242,6 +4247,9 @@ pub struct VideoContentDetails {
     /// The countryRestriction object contains information about the countries where a video is (or is not) viewable.
     #[serde(rename="countryRestriction")]
     pub country_restriction: Option<AccessPolicy>,
+    /// Indicates whether the video uploader has provided a custom thumbnail image for the video. This property is only visible to the video uploader.
+    #[serde(rename="hasCustomThumbnail")]
+    pub has_custom_thumbnail: Option<bool>,
     /// Specifies the ratings that the video received under various rating schemes.
     #[serde(rename="contentRating")]
     pub content_rating: Option<ContentRating>,
@@ -5953,7 +5961,9 @@ impl<'a, C, A> VideoMethods<'a, C, A> {
             _page_token: Default::default(),
             _on_behalf_of_content_owner: Default::default(),
             _my_rating: Default::default(),
+            _max_width: Default::default(),
             _max_results: Default::default(),
+            _max_height: Default::default(),
             _locale: Default::default(),
             _id: Default::default(),
             _hl: Default::default(),
@@ -7142,6 +7152,7 @@ impl<'a, C, A> PlaylistItemMethods<'a, C, A> {
         PlaylistItemDeleteCall {
             hub: self.hub,
             _id: id.to_string(),
+            _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -7185,6 +7196,7 @@ impl<'a, C, A> PlaylistItemMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _part: parts,
+            _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -8234,11 +8246,11 @@ impl<'a, C, A> FanFundingEventMethods<'a, C, A> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.channel_sections().list("part")
-///              .on_behalf_of_content_owner("et")
+///              .on_behalf_of_content_owner("Lorem")
 ///              .mine(true)
-///              .id("diam")
-///              .hl("ipsum")
-///              .channel_id("Lorem")
+///              .id("duo")
+///              .hl("aliquyam")
+///              .channel_id("sea")
 ///              .doit();
 /// # }
 /// ```
@@ -8541,8 +8553,8 @@ impl<'a, C, A> ChannelSectionListCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.channel_sections().insert(req)
-///              .on_behalf_of_content_owner_channel("et")
-///              .on_behalf_of_content_owner("duo")
+///              .on_behalf_of_content_owner_channel("Lorem")
+///              .on_behalf_of_content_owner("eos")
 ///              .doit();
 /// # }
 /// ```
@@ -8828,7 +8840,7 @@ impl<'a, C, A> ChannelSectionInsertCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.channel_sections().delete("id")
-///              .on_behalf_of_content_owner("sea")
+///              .on_behalf_of_content_owner("sadipscing")
 ///              .doit();
 /// # }
 /// ```
@@ -9068,7 +9080,7 @@ impl<'a, C, A> ChannelSectionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.channel_sections().update(req)
-///              .on_behalf_of_content_owner("Lorem")
+///              .on_behalf_of_content_owner("dolor")
 ///              .doit();
 /// # }
 /// ```
@@ -9345,8 +9357,8 @@ impl<'a, C, A> ChannelSectionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlists().insert(req)
-///              .on_behalf_of_content_owner_channel("eos")
-///              .on_behalf_of_content_owner("erat")
+///              .on_behalf_of_content_owner_channel("eirmod")
+///              .on_behalf_of_content_owner("elitr")
 ///              .doit();
 /// # }
 /// ```
@@ -9620,14 +9632,14 @@ impl<'a, C, A> PlaylistInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlists().list("part")
-///              .page_token("dolor")
-///              .on_behalf_of_content_owner_channel("eirmod")
-///              .on_behalf_of_content_owner("elitr")
-///              .mine(false)
-///              .max_results(41)
-///              .id("labore")
-///              .hl("eirmod")
-///              .channel_id("dolore")
+///              .page_token("no")
+///              .on_behalf_of_content_owner_channel("labore")
+///              .on_behalf_of_content_owner("eirmod")
+///              .mine(true)
+///              .max_results(64)
+///              .id("aliquyam")
+///              .hl("accusam")
+///              .channel_id("Lorem")
 ///              .doit();
 /// # }
 /// ```
@@ -9938,7 +9950,7 @@ impl<'a, C, A> PlaylistListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlists().delete("id")
-///              .on_behalf_of_content_owner("aliquyam")
+///              .on_behalf_of_content_owner("et")
 ///              .doit();
 /// # }
 /// ```
@@ -10161,7 +10173,7 @@ impl<'a, C, A> PlaylistDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlists().update(req)
-///              .on_behalf_of_content_owner("accusam")
+///              .on_behalf_of_content_owner("duo")
 ///              .doit();
 /// # }
 /// ```
@@ -10428,7 +10440,7 @@ impl<'a, C, A> PlaylistUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.videos().report_abuse(req)
-///              .on_behalf_of_content_owner("Lorem")
+///              .on_behalf_of_content_owner("et")
 ///              .doit();
 /// # }
 /// ```
@@ -10658,16 +10670,18 @@ impl<'a, C, A> VideoReportAbuseCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.videos().list("part")
-///              .video_category_id("et")
-///              .region_code("duo")
-///              .page_token("et")
-///              .on_behalf_of_content_owner("eirmod")
-///              .my_rating("sanctus")
-///              .max_results(79)
-///              .locale("amet")
-///              .id("et")
-///              .hl("consetetur")
-///              .chart("ut")
+///              .video_category_id("sanctus")
+///              .region_code("et")
+///              .page_token("amet")
+///              .on_behalf_of_content_owner("et")
+///              .my_rating("consetetur")
+///              .max_width(65)
+///              .max_results(85)
+///              .max_height(21)
+///              .locale("dolor")
+///              .id("dolor")
+///              .hl("dolor")
+///              .chart("et")
 ///              .doit();
 /// # }
 /// ```
@@ -10681,7 +10695,9 @@ pub struct VideoListCall<'a, C, A>
     _page_token: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
     _my_rating: Option<String>,
+    _max_width: Option<u32>,
     _max_results: Option<u32>,
+    _max_height: Option<u32>,
     _locale: Option<String>,
     _id: Option<String>,
     _hl: Option<String>,
@@ -10707,7 +10723,7 @@ impl<'a, C, A> VideoListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         };
         dlg.begin(MethodInfo { id: "youtube.videos.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((13 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((15 + self._additional_params.len()));
         params.push(("part", self._part.to_string()));
         if let Some(value) = self._video_category_id {
             params.push(("videoCategoryId", value.to_string()));
@@ -10724,8 +10740,14 @@ impl<'a, C, A> VideoListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         if let Some(value) = self._my_rating {
             params.push(("myRating", value.to_string()));
         }
+        if let Some(value) = self._max_width {
+            params.push(("maxWidth", value.to_string()));
+        }
         if let Some(value) = self._max_results {
             params.push(("maxResults", value.to_string()));
+        }
+        if let Some(value) = self._max_height {
+            params.push(("maxHeight", value.to_string()));
         }
         if let Some(value) = self._locale {
             params.push(("locale", value.to_string()));
@@ -10739,7 +10761,7 @@ impl<'a, C, A> VideoListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         if let Some(value) = self._chart {
             params.push(("chart", value.to_string()));
         }
-        for &field in ["alt", "part", "videoCategoryId", "regionCode", "pageToken", "onBehalfOfContentOwner", "myRating", "maxResults", "locale", "id", "hl", "chart"].iter() {
+        for &field in ["alt", "part", "videoCategoryId", "regionCode", "pageToken", "onBehalfOfContentOwner", "myRating", "maxWidth", "maxResults", "maxHeight", "locale", "id", "hl", "chart"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -10861,7 +10883,7 @@ impl<'a, C, A> VideoListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
     /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.
     /// 
-    /// Note: This parameter is supported for use in conjunction with the myRating parameter, but it is not supported for use in conjunction with the id parameter.
+    /// Note: This parameter is supported for use in conjunction with the myRating and chart parameters, but it is not supported for use in conjunction with the id parameter.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> VideoListCall<'a, C, A> {
@@ -10884,13 +10906,27 @@ impl<'a, C, A> VideoListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._my_rating = Some(new_value.to_string());
         self
     }
+    /// The maxWidth parameter specifies a maximum width of the embedded player. If maxHeight is provided, maxWidth may not be reached in order to not violate the height request.
+    ///
+    /// Sets the *max width* query property to the given value.
+    pub fn max_width(mut self, new_value: u32) -> VideoListCall<'a, C, A> {
+        self._max_width = Some(new_value);
+        self
+    }
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.
     /// 
-    /// Note: This parameter is supported for use in conjunction with the myRating parameter, but it is not supported for use in conjunction with the id parameter.
+    /// Note: This parameter is supported for use in conjunction with the myRating and chart parameters, but it is not supported for use in conjunction with the id parameter.
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> VideoListCall<'a, C, A> {
         self._max_results = Some(new_value);
+        self
+    }
+    /// The maxHeight parameter specifies a maximum height of the embedded player. If maxWidth is provided, maxHeight may not be reached in order to not violate the width request.
+    ///
+    /// Sets the *max height* query property to the given value.
+    pub fn max_height(mut self, new_value: u32) -> VideoListCall<'a, C, A> {
+        self._max_height = Some(new_value);
         self
     }
     /// DEPRECATED
@@ -11217,7 +11253,7 @@ impl<'a, C, A> VideoRateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.videos().get_rating("id")
-///              .on_behalf_of_content_owner("dolor")
+///              .on_behalf_of_content_owner("Lorem")
 ///              .doit();
 /// # }
 /// ```
@@ -11445,7 +11481,7 @@ impl<'a, C, A> VideoGetRatingCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.videos().delete("id")
-///              .on_behalf_of_content_owner("et")
+///              .on_behalf_of_content_owner("justo")
 ///              .doit();
 /// # }
 /// ```
@@ -11668,7 +11704,7 @@ impl<'a, C, A> VideoDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.videos().update(req)
-///              .on_behalf_of_content_owner("consetetur")
+///              .on_behalf_of_content_owner("sit")
 ///              .doit();
 /// # }
 /// ```
@@ -11938,9 +11974,9 @@ impl<'a, C, A> VideoUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `upload_resumable(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.videos().insert(req)
-///              .stabilize(false)
-///              .on_behalf_of_content_owner_channel("voluptua.")
-///              .on_behalf_of_content_owner("Lorem")
+///              .stabilize(true)
+///              .on_behalf_of_content_owner_channel("diam")
+///              .on_behalf_of_content_owner("rebum.")
 ///              .notify_subscribers(true)
 ///              .auto_levels(true)
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
@@ -12364,14 +12400,14 @@ impl<'a, C, A> VideoInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.activities().list("part")
-///              .region_code("vero")
-///              .published_before("diam")
-///              .published_after("rebum.")
-///              .page_token("consetetur")
+///              .region_code("sadipscing")
+///              .published_before("invidunt")
+///              .published_after("consetetur")
+///              .page_token("dolore")
 ///              .mine(true)
-///              .max_results(25)
-///              .home(false)
-///              .channel_id("invidunt")
+///              .max_results(19)
+///              .home(true)
+///              .channel_id("et")
 ///              .doit();
 /// # }
 /// ```
@@ -12949,14 +12985,14 @@ impl<'a, C, A> ActivityInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// req.status = Default::default(); // is LiveStreamStatus
 /// req.snippet = Default::default(); // is LiveStreamSnippet
 /// req.cdn = Default::default(); // is CdnSettings
-/// req.id = Some("consetetur".to_string());
+/// req.id = Some("clita".to_string());
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_streams().update(req)
-///              .on_behalf_of_content_owner_channel("dolore")
-///              .on_behalf_of_content_owner("duo")
+///              .on_behalf_of_content_owner_channel("consetetur")
+///              .on_behalf_of_content_owner("takimata")
 ///              .doit();
 /// # }
 /// ```
@@ -13248,8 +13284,8 @@ impl<'a, C, A> LiveStreamUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_streams().delete("id")
-///              .on_behalf_of_content_owner_channel("Lorem")
-///              .on_behalf_of_content_owner("et")
+///              .on_behalf_of_content_owner_channel("kasd")
+///              .on_behalf_of_content_owner("sanctus")
 ///              .doit();
 /// # }
 /// ```
@@ -13498,12 +13534,12 @@ impl<'a, C, A> LiveStreamDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_streams().list("part")
-///              .page_token("consetetur")
-///              .on_behalf_of_content_owner_channel("takimata")
-///              .on_behalf_of_content_owner("nonumy")
-///              .mine(true)
-///              .max_results(94)
-///              .id("takimata")
+///              .page_token("At")
+///              .on_behalf_of_content_owner_channel("labore")
+///              .on_behalf_of_content_owner("invidunt")
+///              .mine(false)
+///              .max_results(6)
+///              .id("rebum.")
 ///              .doit();
 /// # }
 /// ```
@@ -13817,14 +13853,14 @@ impl<'a, C, A> LiveStreamListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// req.status = Default::default(); // is LiveStreamStatus
 /// req.snippet = Default::default(); // is LiveStreamSnippet
 /// req.cdn = Default::default(); // is CdnSettings
-/// req.id = Some("At".to_string());
+/// req.id = Some("dolore".to_string());
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_streams().insert(req)
-///              .on_behalf_of_content_owner_channel("labore")
-///              .on_behalf_of_content_owner("invidunt")
+///              .on_behalf_of_content_owner_channel("nonumy")
+///              .on_behalf_of_content_owner("sed")
 ///              .doit();
 /// # }
 /// ```
@@ -14120,7 +14156,7 @@ impl<'a, C, A> LiveStreamInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.channels().update(req)
-///              .on_behalf_of_content_owner("ea")
+///              .on_behalf_of_content_owner("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -14381,16 +14417,16 @@ impl<'a, C, A> ChannelUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.channels().list("part")
-///              .page_token("rebum.")
-///              .on_behalf_of_content_owner("dolore")
-///              .my_subscribers(true)
+///              .page_token("eirmod")
+///              .on_behalf_of_content_owner("consetetur")
+///              .my_subscribers(false)
 ///              .mine(true)
-///              .max_results(19)
+///              .max_results(85)
 ///              .managed_by_me(false)
-///              .id("eirmod")
-///              .hl("consetetur")
-///              .for_username("labore")
-///              .category_id("sed")
+///              .id("aliquyam")
+///              .hl("eos")
+///              .for_username("tempor")
+///              .category_id("sea")
 ///              .doit();
 /// # }
 /// ```
@@ -14728,7 +14764,7 @@ impl<'a, C, A> ChannelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.watermarks().set(req, "channelId")
-///              .on_behalf_of_content_owner("gubergren")
+///              .on_behalf_of_content_owner("ipsum")
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
@@ -15083,7 +15119,7 @@ impl<'a, C, A> WatermarkSetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.watermarks().unset("channelId")
-///              .on_behalf_of_content_owner("eos")
+///              .on_behalf_of_content_owner("dolores")
 ///              .doit();
 /// # }
 /// ```
@@ -15566,8 +15602,8 @@ impl<'a, C, A> LiveChatModeratorInsertCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_chat_moderators().list("liveChatId", "part")
-///              .page_token("labore")
-///              .max_results(47)
+///              .page_token("ut")
+///              .max_results(31)
 ///              .doit();
 /// # }
 /// ```
@@ -16024,8 +16060,8 @@ impl<'a, C, A> LiveChatModeratorDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.captions().delete("id")
-///              .on_behalf_of_content_owner("sit")
-///              .on_behalf_of("diam")
+///              .on_behalf_of_content_owner("accusam")
+///              .on_behalf_of("clita")
 ///              .doit();
 /// # }
 /// ```
@@ -16260,7 +16296,7 @@ impl<'a, C, A> CaptionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `upload_resumable(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.captions().insert(req)
-///              .sync(true)
+///              .sync(false)
 ///              .on_behalf_of_content_owner("justo")
 ///              .on_behalf_of("est")
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
@@ -16672,9 +16708,9 @@ impl<'a, C, A> CaptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.captions().list("part", "videoId")
-///              .on_behalf_of_content_owner("clita")
-///              .on_behalf_of("diam")
-///              .id("justo")
+///              .on_behalf_of_content_owner("ut")
+///              .on_behalf_of("dolores")
+///              .id("eos")
 ///              .doit();
 /// # }
 /// ```
@@ -16944,10 +16980,10 @@ impl<'a, C, A> CaptionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.captions().download("id")
-///              .tlang("clita")
-///              .tfmt("invidunt")
-///              .on_behalf_of_content_owner("ut")
-///              .on_behalf_of("dolores")
+///              .tlang("duo")
+///              .tfmt("sed")
+///              .on_behalf_of_content_owner("aliquyam")
+///              .on_behalf_of("ea")
 ///              .doit();
 /// # }
 /// ```
@@ -17226,8 +17262,8 @@ impl<'a, C, A> CaptionDownloadCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.captions().update(req)
 ///              .sync(true)
-///              .on_behalf_of_content_owner("voluptua.")
-///              .on_behalf_of("duo")
+///              .on_behalf_of_content_owner("et")
+///              .on_behalf_of("dolor")
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
@@ -17623,7 +17659,7 @@ impl<'a, C, A> CaptionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.i18n_languages().list("part")
-///              .hl("aliquyam")
+///              .hl("kasd")
 ///              .doit();
 /// # }
 /// ```
@@ -17849,9 +17885,9 @@ impl<'a, C, A> I18nLanguageListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.guide_categories().list("part")
-///              .region_code("ea")
-///              .id("et")
-///              .hl("dolor")
+///              .region_code("rebum.")
+///              .id("Lorem")
+///              .hl("clita")
 ///              .doit();
 /// # }
 /// ```
@@ -18099,16 +18135,16 @@ impl<'a, C, A> GuideCategoryListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.comment_threads().list("part")
-///              .video_id("kasd")
-///              .text_format("invidunt")
-///              .search_terms("rebum.")
-///              .page_token("Lorem")
-///              .order("clita")
-///              .moderation_status("invidunt")
-///              .max_results(11)
-///              .id("At")
-///              .channel_id("consetetur")
-///              .all_threads_related_to_channel_id("et")
+///              .video_id("eirmod")
+///              .text_format("At")
+///              .search_terms("consetetur")
+///              .page_token("et")
+///              .order("sed")
+///              .moderation_status("sit")
+///              .max_results(93)
+///              .id("elitr")
+///              .channel_id("nonumy")
+///              .all_threads_related_to_channel_id("rebum.")
 ///              .doit();
 /// # }
 /// ```
@@ -19628,11 +19664,11 @@ impl<'a, C, A> CommentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.comments().list("part")
-///              .text_format("rebum.")
-///              .parent_id("Lorem")
-///              .page_token("Lorem")
-///              .max_results(59)
-///              .id("ut")
+///              .text_format("amet.")
+///              .parent_id("ipsum")
+///              .page_token("ut")
+///              .max_results(98)
+///              .id("sea")
 ///              .doit();
 /// # }
 /// ```
@@ -20368,7 +20404,7 @@ impl<'a, C, A> CommentMarkAsSpamCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlist_items().insert(req)
-///              .on_behalf_of_content_owner("amet.")
+///              .on_behalf_of_content_owner("eirmod")
 ///              .doit();
 /// # }
 /// ```
@@ -20627,6 +20663,7 @@ impl<'a, C, A> PlaylistItemInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlist_items().delete("id")
+///              .on_behalf_of_content_owner("voluptua.")
 ///              .doit();
 /// # }
 /// ```
@@ -20635,6 +20672,7 @@ pub struct PlaylistItemDeleteCall<'a, C, A>
 
     hub: &'a YouTube<C, A>,
     _id: String,
+    _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -20656,9 +20694,12 @@ impl<'a, C, A> PlaylistItemDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
         };
         dlg.begin(MethodInfo { id: "youtube.playlistItems.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((2 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
         params.push(("id", self._id.to_string()));
-        for &field in ["id"].iter() {
+        if let Some(value) = self._on_behalf_of_content_owner {
+            params.push(("onBehalfOfContentOwner", value.to_string()));
+        }
+        for &field in ["id", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -20751,6 +20792,15 @@ impl<'a, C, A> PlaylistItemDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._id = new_value.to_string();
         self
     }
+    /// Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+    ///
+    /// Sets the *on behalf of content owner* query property to the given value.
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistItemDeleteCall<'a, C, A> {
+        self._on_behalf_of_content_owner = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -20830,12 +20880,12 @@ impl<'a, C, A> PlaylistItemDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlist_items().list("part")
-///              .video_id("dolor")
-///              .playlist_id("sea")
-///              .page_token("ut")
-///              .on_behalf_of_content_owner("eirmod")
-///              .max_results(93)
-///              .id("voluptua.")
+///              .video_id("et")
+///              .playlist_id("et")
+///              .page_token("vero")
+///              .on_behalf_of_content_owner("ut")
+///              .max_results(71)
+///              .id("et")
 ///              .doit();
 /// # }
 /// ```
@@ -21126,6 +21176,7 @@ impl<'a, C, A> PlaylistItemListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlist_items().update(req)
+///              .on_behalf_of_content_owner("ipsum")
 ///              .doit();
 /// # }
 /// ```
@@ -21135,6 +21186,7 @@ pub struct PlaylistItemUpdateCall<'a, C, A>
     hub: &'a YouTube<C, A>,
     _request: PlaylistItem,
     _part: String,
+    _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -21156,12 +21208,15 @@ impl<'a, C, A> PlaylistItemUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
         };
         dlg.begin(MethodInfo { id: "youtube.playlistItems.update",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
         params.push(("part", self._part.to_string()));
-        for &field in ["alt", "part"].iter() {
+        if let Some(value) = self._on_behalf_of_content_owner {
+            params.push(("onBehalfOfContentOwner", value.to_string()));
+        }
+        for &field in ["alt", "part", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -21294,6 +21349,15 @@ impl<'a, C, A> PlaylistItemUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._part = new_value.to_string();
         self
     }
+    /// Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+    ///
+    /// Sets the *on behalf of content owner* query property to the given value.
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistItemUpdateCall<'a, C, A> {
+        self._on_behalf_of_content_owner = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -21388,10 +21452,10 @@ impl<'a, C, A> PlaylistItemUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_chat_messages().list("liveChatId", "part")
-///              .profile_image_size(16)
-///              .page_token("vero")
-///              .max_results(65)
-///              .hl("sed")
+///              .profile_image_size(75)
+///              .page_token("dolor")
+///              .max_results(43)
+///              .hl("et")
 ///              .doit();
 /// # }
 /// ```
@@ -22123,9 +22187,9 @@ impl<'a, C, A> LiveChatMessageInsertCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.video_categories().list("part")
-///              .region_code("justo")
-///              .id("dolore")
-///              .hl("vero")
+///              .region_code("sed")
+///              .id("no")
+///              .hl("invidunt")
 ///              .doit();
 /// # }
 /// ```
@@ -22373,7 +22437,7 @@ impl<'a, C, A> VideoCategoryListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.i18n_regions().list("part")
-///              .hl("takimata")
+///              .hl("labore")
 ///              .doit();
 /// # }
 /// ```
@@ -23053,17 +23117,17 @@ impl<'a, C, A> SubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.subscriptions().list("part")
-///              .page_token("et")
-///              .order("sed")
-///              .on_behalf_of_content_owner_channel("no")
-///              .on_behalf_of_content_owner("invidunt")
+///              .page_token("consetetur")
+///              .order("sea")
+///              .on_behalf_of_content_owner_channel("elitr")
+///              .on_behalf_of_content_owner("At")
 ///              .my_subscribers(true)
 ///              .my_recent_subscribers(false)
 ///              .mine(false)
-///              .max_results(7)
-///              .id("consetetur")
-///              .for_channel_id("sea")
-///              .channel_id("elitr")
+///              .max_results(79)
+///              .id("dolores")
+///              .for_channel_id("consetetur")
+///              .channel_id("dolor")
 ///              .doit();
 /// # }
 /// ```
@@ -23876,9 +23940,9 @@ impl<'a, C, A> LiveChatBanDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.sponsors().list("part")
-///              .page_token("consetetur")
-///              .max_results(22)
-///              .filter("accusam")
+///              .page_token("ea")
+///              .max_results(66)
+///              .filter("Stet")
 ///              .doit();
 /// # }
 /// ```
@@ -24146,7 +24210,7 @@ impl<'a, C, A> SponsorListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.video_abuse_report_reasons().list("part")
-///              .hl("consetetur")
+///              .hl("dolor")
 ///              .doit();
 /// # }
 /// ```
@@ -24393,10 +24457,10 @@ impl<'a, C, A> VideoAbuseReportReasonListCall<'a, C, A> where C: BorrowMut<hyper
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().control("id", "part")
-///              .walltime("elitr")
-///              .on_behalf_of_content_owner_channel("ea")
-///              .on_behalf_of_content_owner("et")
-///              .offset_time_ms("Stet")
+///              .walltime("Lorem")
+///              .on_behalf_of_content_owner_channel("consetetur")
+///              .on_behalf_of_content_owner("consetetur")
+///              .offset_time_ms("eirmod")
 ///              .display_slate(true)
 ///              .doit();
 /// # }
@@ -24716,14 +24780,14 @@ impl<'a, C, A> LiveBroadcastControlCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// req.status = Default::default(); // is LiveBroadcastStatus
 /// req.content_details = Default::default(); // is LiveBroadcastContentDetails
 /// req.snippet = Default::default(); // is LiveBroadcastSnippet
-/// req.id = Some("dolor".to_string());
+/// req.id = Some("gubergren".to_string());
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().update(req)
-///              .on_behalf_of_content_owner_channel("sanctus")
-///              .on_behalf_of_content_owner("dolore")
+///              .on_behalf_of_content_owner_channel("et")
+///              .on_behalf_of_content_owner("sadipscing")
 ///              .doit();
 /// # }
 /// ```
@@ -25031,9 +25095,9 @@ impl<'a, C, A> LiveBroadcastUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().bind("id", "part")
-///              .stream_id("consetetur")
-///              .on_behalf_of_content_owner_channel("eirmod")
-///              .on_behalf_of_content_owner("labore")
+///              .stream_id("Lorem")
+///              .on_behalf_of_content_owner_channel("rebum.")
+///              .on_behalf_of_content_owner("et")
 ///              .doit();
 /// # }
 /// ```
@@ -25326,14 +25390,14 @@ impl<'a, C, A> LiveBroadcastBindCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// req.status = Default::default(); // is LiveBroadcastStatus
 /// req.content_details = Default::default(); // is LiveBroadcastContentDetails
 /// req.snippet = Default::default(); // is LiveBroadcastSnippet
-/// req.id = Some("gubergren".to_string());
+/// req.id = Some("clita".to_string());
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().insert(req)
-///              .on_behalf_of_content_owner_channel("et")
-///              .on_behalf_of_content_owner("sadipscing")
+///              .on_behalf_of_content_owner_channel("eos")
+///              .on_behalf_of_content_owner("dolores")
 ///              .doit();
 /// # }
 /// ```
@@ -25623,8 +25687,8 @@ impl<'a, C, A> LiveBroadcastInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().delete("id")
-///              .on_behalf_of_content_owner_channel("magna")
-///              .on_behalf_of_content_owner("Lorem")
+///              .on_behalf_of_content_owner_channel("consetetur")
+///              .on_behalf_of_content_owner("vero")
 ///              .doit();
 /// # }
 /// ```
@@ -25873,14 +25937,14 @@ impl<'a, C, A> LiveBroadcastDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().list("part")
-///              .page_token("et")
-///              .on_behalf_of_content_owner_channel("clita")
-///              .on_behalf_of_content_owner("eos")
+///              .page_token("eos")
+///              .on_behalf_of_content_owner_channel("justo")
+///              .on_behalf_of_content_owner("tempor")
 ///              .mine(false)
-///              .max_results(76)
-///              .id("consetetur")
-///              .broadcast_type("vero")
-///              .broadcast_status("consetetur")
+///              .max_results(17)
+///              .id("amet.")
+///              .broadcast_type("dolore")
+///              .broadcast_status("magna")
 ///              .doit();
 /// # }
 /// ```
@@ -26212,8 +26276,8 @@ impl<'a, C, A> LiveBroadcastListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().transition("broadcastStatus", "id", "part")
-///              .on_behalf_of_content_owner_channel("gubergren")
-///              .on_behalf_of_content_owner("dolore")
+///              .on_behalf_of_content_owner_channel("invidunt")
+///              .on_behalf_of_content_owner("accusam")
 ///              .doit();
 /// # }
 /// ```
@@ -26498,7 +26562,7 @@ impl<'a, C, A> LiveBroadcastTransitionCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.channel_banners().insert(req)
-///              .on_behalf_of_content_owner("amet.")
+///              .on_behalf_of_content_owner("labore")
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
@@ -26852,36 +26916,36 @@ impl<'a, C, A> ChannelBannerInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.search().list("part")
-///              .video_type("magna")
-///              .video_syndicated("elitr")
-///              .video_license("magna")
-///              .video_embeddable("ipsum")
-///              .video_duration("invidunt")
-///              .video_dimension("accusam")
-///              .video_definition("labore")
-///              .video_category_id("diam")
+///              .video_type("nonumy")
+///              .video_syndicated("sed")
+///              .video_license("diam")
+///              .video_embeddable("magna")
+///              .video_duration("dolor")
+///              .video_dimension("Lorem")
+///              .video_definition("dolor")
+///              .video_category_id("vero")
 ///              .video_caption("nonumy")
-///              .type_("sed")
-///              .topic_id("diam")
-///              .safe_search("magna")
-///              .relevance_language("dolor")
-///              .related_to_video_id("Lorem")
-///              .region_code("dolor")
-///              .q("vero")
-///              .published_before("nonumy")
-///              .published_after("takimata")
-///              .page_token("dolores")
-///              .order("consetetur")
-///              .on_behalf_of_content_owner("erat")
-///              .max_results(49)
-///              .location_radius("dolores")
-///              .location("dolores")
+///              .type_("takimata")
+///              .topic_id("dolores")
+///              .safe_search("consetetur")
+///              .relevance_language("erat")
+///              .related_to_video_id("amet.")
+///              .region_code("dolores")
+///              .q("dolores")
+///              .published_before("et")
+///              .published_after("sed")
+///              .page_token("et")
+///              .order("aliquyam")
+///              .on_behalf_of_content_owner("nonumy")
+///              .max_results(54)
+///              .location_radius("aliquyam")
+///              .location("sadipscing")
 ///              .for_mine(true)
-///              .for_developer(true)
+///              .for_developer(false)
 ///              .for_content_owner(false)
-///              .event_type("aliquyam")
-///              .channel_type("nonumy")
-///              .channel_id("sit")
+///              .event_type("gubergren")
+///              .channel_type("sit")
+///              .channel_id("amet")
 ///              .doit();
 /// # }
 /// ```
@@ -27441,7 +27505,7 @@ impl<'a, C, A> SearchListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.thumbnails().set("videoId")
-///              .on_behalf_of_content_owner("sadipscing")
+///              .on_behalf_of_content_owner("sanctus")
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
@@ -27792,9 +27856,9 @@ impl<'a, C, A> ThumbnailSetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.fan_funding_events().list("part")
-///              .page_token("gubergren")
-///              .max_results(3)
-///              .hl("gubergren")
+///              .page_token("amet.")
+///              .max_results(60)
+///              .hl("eirmod")
 ///              .doit();
 /// # }
 /// ```

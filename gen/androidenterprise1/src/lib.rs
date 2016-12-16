@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Android Enterprise* crate version *1.0.0+20160831*, where *20160831* is the exact revision of the *androidenterprise:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
+//! This documentation was generated from *Android Enterprise* crate version *1.0.0+20161207*, where *20161207* is the exact revision of the *androidenterprise:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
 //! 
 //! Everything else about the *Android Enterprise* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/android/work/play/emm-api).
@@ -18,7 +18,7 @@
 //! * [devices](struct.Device.html)
 //!  * [*get*](struct.DeviceGetCall.html), [*get state*](struct.DeviceGetStateCall.html), [*list*](struct.DeviceListCall.html) and [*set state*](struct.DeviceSetStateCall.html)
 //! * [enterprises](struct.Enterprise.html)
-//!  * [*acknowledge notification set*](struct.EnterpriseAcknowledgeNotificationSetCall.html), [*complete signup*](struct.EnterpriseCompleteSignupCall.html), [*delete*](struct.EnterpriseDeleteCall.html), [*enroll*](struct.EnterpriseEnrollCall.html), [*generate signup url*](struct.EnterpriseGenerateSignupUrlCall.html), [*get*](struct.EnterpriseGetCall.html), [*get service account*](struct.EnterpriseGetServiceAccountCall.html), [*get store layout*](struct.EnterpriseGetStoreLayoutCall.html), [*insert*](struct.EnterpriseInsertCall.html), [*list*](struct.EnterpriseListCall.html), [*pull notification set*](struct.EnterprisePullNotificationSetCall.html), [*send test push notification*](struct.EnterpriseSendTestPushNotificationCall.html), [*set account*](struct.EnterpriseSetAccountCall.html), [*set store layout*](struct.EnterpriseSetStoreLayoutCall.html) and [*unenroll*](struct.EnterpriseUnenrollCall.html)
+//!  * [*acknowledge notification set*](struct.EnterpriseAcknowledgeNotificationSetCall.html), [*complete signup*](struct.EnterpriseCompleteSignupCall.html), [*create web token*](struct.EnterpriseCreateWebTokenCall.html), [*delete*](struct.EnterpriseDeleteCall.html), [*enroll*](struct.EnterpriseEnrollCall.html), [*generate signup url*](struct.EnterpriseGenerateSignupUrlCall.html), [*get*](struct.EnterpriseGetCall.html), [*get service account*](struct.EnterpriseGetServiceAccountCall.html), [*get store layout*](struct.EnterpriseGetStoreLayoutCall.html), [*insert*](struct.EnterpriseInsertCall.html), [*list*](struct.EnterpriseListCall.html), [*pull notification set*](struct.EnterprisePullNotificationSetCall.html), [*send test push notification*](struct.EnterpriseSendTestPushNotificationCall.html), [*set account*](struct.EnterpriseSetAccountCall.html), [*set store layout*](struct.EnterpriseSetStoreLayoutCall.html) and [*unenroll*](struct.EnterpriseUnenrollCall.html)
 //! * [entitlements](struct.Entitlement.html)
 //!  * [*delete*](struct.EntitlementDeleteCall.html), [*get*](struct.EntitlementGetCall.html), [*list*](struct.EntitlementListCall.html), [*patch*](struct.EntitlementPatchCall.html) and [*update*](struct.EntitlementUpdateCall.html)
 //! * grouplicenses
@@ -78,20 +78,21 @@
 //! 
 //! ```ignore
 //! let r = hub.enterprises().send_test_push_notification(...).doit()
-//! let r = hub.enterprises().get_store_layout(...).doit()
+//! let r = hub.enterprises().generate_signup_url(...).doit()
 //! let r = hub.enterprises().get_service_account(...).doit()
 //! let r = hub.enterprises().acknowledge_notification_set(...).doit()
 //! let r = hub.enterprises().set_store_layout(...).doit()
-//! let r = hub.enterprises().insert(...).doit()
-//! let r = hub.enterprises().complete_signup(...).doit()
-//! let r = hub.enterprises().list(...).doit()
-//! let r = hub.enterprises().unenroll(...).doit()
-//! let r = hub.enterprises().set_account(...).doit()
+//! let r = hub.enterprises().get_store_layout(...).doit()
 //! let r = hub.enterprises().pull_notification_set(...).doit()
-//! let r = hub.enterprises().enroll(...).doit()
-//! let r = hub.enterprises().get(...).doit()
+//! let r = hub.enterprises().list(...).doit()
+//! let r = hub.enterprises().complete_signup(...).doit()
+//! let r = hub.enterprises().set_account(...).doit()
 //! let r = hub.enterprises().delete(...).doit()
-//! let r = hub.enterprises().generate_signup_url(...).doit()
+//! let r = hub.enterprises().enroll(...).doit()
+//! let r = hub.enterprises().create_web_token(...).doit()
+//! let r = hub.enterprises().insert(...).doit()
+//! let r = hub.enterprises().get(...).doit()
+//! let r = hub.enterprises().unenroll(...).doit()
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -138,7 +139,7 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.enterprises().get_service_account("enterpriseId")
-//!              .key_type("dolor")
+//!              .key_type("aliquyam")
 //!              .doit();
 //! 
 //! match result {

@@ -180,16 +180,16 @@ impl<'a, C, A> AndroidPublisher<C, A>
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [subscriptions defer purchases](struct.PurchaseSubscriptionDeferCall.html) (request)
+/// * [reply reviews](struct.ReviewReplyCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SubscriptionPurchasesDeferRequest {
-    /// The information about the new desired expiry time for the subscription.
-    #[serde(rename="deferralInfo")]
-    pub deferral_info: Option<SubscriptionDeferralInfo>,
+pub struct ReviewsReplyRequest {
+    /// The text to set as the reply. Replies of more than approximately 350 characters will be rejected. HTML tags will be stripped.
+    #[serde(rename="replyText")]
+    pub reply_text: Option<String>,
 }
 
-impl RequestValue for SubscriptionPurchasesDeferRequest {}
+impl RequestValue for ReviewsReplyRequest {}
 
 
 /// An Entitlement resource indicates a user's current entitlement to an inapp item or subscription.
@@ -461,6 +461,49 @@ impl RequestValue for InappproductsBatchRequest {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DeviceMetadata {
+    /// Screen density in DPI
+    #[serde(rename="screenDensityDpi")]
+    pub screen_density_dpi: Option<i32>,
+    /// Screen height in pixels
+    #[serde(rename="screenHeightPx")]
+    pub screen_height_px: Option<i32>,
+    /// Device CPU model e.g. "MSM8974"
+    #[serde(rename="cpuModel")]
+    pub cpu_model: Option<String>,
+    /// Device model name (e.g. Droid)
+    #[serde(rename="productName")]
+    pub product_name: Option<String>,
+    /// Comma separated list of native platforms (e.g. "arm", "arm7")
+    #[serde(rename="nativePlatform")]
+    pub native_platform: Option<String>,
+    /// Device class (e.g. tablet)
+    #[serde(rename="deviceClass")]
+    pub device_class: Option<String>,
+    /// Device CPU make e.g. "Qualcomm"
+    #[serde(rename="cpuMake")]
+    pub cpu_make: Option<String>,
+    /// Device RAM in Megabytes e.g. "2048"
+    #[serde(rename="ramMb")]
+    pub ram_mb: Option<i32>,
+    /// Device manufacturer (e.g. Motorola)
+    pub manufacturer: Option<String>,
+    /// OpenGL version
+    #[serde(rename="glEsVersion")]
+    pub gl_es_version: Option<i32>,
+    /// Screen width in pixels
+    #[serde(rename="screenWidthPx")]
+    pub screen_width_px: Option<i32>,
+}
+
+impl Part for DeviceMetadata {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MonthDay {
     /// Day of a month, value in [1, 31] range. Valid range depends on the specified month.
     pub day: Option<u32>,
@@ -598,16 +641,30 @@ impl Part for InAppProductListing {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [reply reviews](struct.ReviewReplyCall.html) (request)
+/// * [subscriptions defer purchases](struct.PurchaseSubscriptionDeferCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ReviewsReplyRequest {
-    /// The text to set as the reply. Replies of more than approximately 350 characters will be rejected. HTML tags will be stripped.
-    #[serde(rename="replyText")]
-    pub reply_text: Option<String>,
+pub struct SubscriptionPurchasesDeferRequest {
+    /// The information about the new desired expiry time for the subscription.
+    #[serde(rename="deferralInfo")]
+    pub deferral_info: Option<SubscriptionDeferralInfo>,
 }
 
-impl RequestValue for ReviewsReplyRequest {}
+impl RequestValue for SubscriptionPurchasesDeferRequest {}
+
+
+/// Represents a deobfuscation file.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DeobfuscationFile {
+    /// The type of the deobfuscation file.
+    #[serde(rename="symbolType")]
+    pub symbol_type: Option<String>,
+}
+
+impl Part for DeobfuscationFile {}
 
 
 /// There is no detailed description.
@@ -737,12 +794,18 @@ pub struct UserComment {
     /// Integer version code of the app as installed at the time the review was written. May be absent.
     #[serde(rename="appVersionCode")]
     pub app_version_code: Option<i32>,
+    /// Untranslated text of the review, in the case where the review has been translated. If the review has not been translated this is left blank.
+    #[serde(rename="originalText")]
+    pub original_text: Option<String>,
     /// Language code for the reviewer. This is taken from the device settings so is not guaranteed to match the language the review is written in. May be absent.
     #[serde(rename="reviewerLanguage")]
     pub reviewer_language: Option<String>,
     /// The last time at which this comment was updated.
     #[serde(rename="lastModified")]
     pub last_modified: Option<Timestamp>,
+    /// Number of users who have given this review a thumbs up
+    #[serde(rename="thumbsUpCount")]
+    pub thumbs_up_count: Option<i32>,
     /// The star rating associated with the review, from 1 to 5.
     #[serde(rename="starRating")]
     pub star_rating: Option<i32>,
@@ -753,9 +816,15 @@ pub struct UserComment {
     /// Integer Android SDK version of the user's device at the time the review was written, e.g. 23 is Marshmallow. May be absent.
     #[serde(rename="androidOsVersion")]
     pub android_os_version: Option<i32>,
+    /// Some information about the characteristics of the user's device
+    #[serde(rename="deviceMetadata")]
+    pub device_metadata: Option<DeviceMetadata>,
     /// String version name of the app as installed at the time the review was written. May be absent.
     #[serde(rename="appVersionName")]
     pub app_version_name: Option<String>,
+    /// Number of users who have given this review a thumbs down
+    #[serde(rename="thumbsDownCount")]
+    pub thumbs_down_count: Option<i32>,
 }
 
 impl Part for UserComment {}
@@ -925,6 +994,31 @@ impl Part for TokenPagination {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
+/// * [voidedpurchases list purchases](struct.PurchaseVoidedpurchaseListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct VoidedPurchasesListResponse {
+    /// no description provided
+    #[serde(rename="voidedPurchases")]
+    pub voided_purchases: Option<Vec<VoidedPurchase>>,
+    /// no description provided
+    #[serde(rename="tokenPagination")]
+    pub token_pagination: Option<TokenPagination>,
+    /// no description provided
+    #[serde(rename="pageInfo")]
+    pub page_info: Option<PageInfo>,
+}
+
+impl ResponseResult for VoidedPurchasesListResponse {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
 /// * [apklistings get edits](struct.EditApklistingGetCall.html) (response)
 /// * [apklistings patch edits](struct.EditApklistingPatchCall.html) (request|response)
 /// * [apklistings update edits](struct.EditApklistingUpdateCall.html) (request|response)
@@ -981,6 +1075,28 @@ pub struct Testers {
 
 impl RequestValue for Testers {}
 impl ResponseResult for Testers {}
+
+
+/// A VoidedPurchase resource indicates the purchase was either cancelled/refunded/charged-back.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct VoidedPurchase {
+    /// This kind represents a voided purchase object in the androidpublisher service.
+    pub kind: Option<String>,
+    /// The time when the purchase was cancelled/refunded/chargeback, in milliseconds since the epoch (Jan 1, 1970).
+    #[serde(rename="voidedTimeMillis")]
+    pub voided_time_millis: Option<String>,
+    /// The token that was generated when a purchase was made and uniquely identifies a purchase.
+    #[serde(rename="purchaseToken")]
+    pub purchase_token: Option<String>,
+    /// The time the purchase was made, in milliseconds since the epoch (Jan 1, 1970).
+    #[serde(rename="purchaseTimeMillis")]
+    pub purchase_time_millis: Option<String>,
+}
+
+impl Part for VoidedPurchase {}
 
 
 /// There is no detailed description.
@@ -1115,6 +1231,25 @@ pub struct SubscriptionPurchase {
 }
 
 impl ResponseResult for SubscriptionPurchase {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [deobfuscationfiles upload edits](struct.EditDeobfuscationfileUploadCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DeobfuscationFilesUploadResponse {
+    /// no description provided
+    #[serde(rename="deobfuscationFile")]
+    pub deobfuscation_file: Option<DeobfuscationFile>,
+}
+
+impl ResponseResult for DeobfuscationFilesUploadResponse {}
 
 
 /// There is no detailed description.
@@ -1460,7 +1595,7 @@ impl<'a, C, A> EntitlementMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = AndroidPublisher::new(hyper::Client::new(), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `products_get(...)`, `subscriptions_cancel(...)`, `subscriptions_defer(...)`, `subscriptions_get(...)`, `subscriptions_refund(...)` and `subscriptions_revoke(...)`
+/// // like `products_get(...)`, `subscriptions_cancel(...)`, `subscriptions_defer(...)`, `subscriptions_get(...)`, `subscriptions_refund(...)`, `subscriptions_revoke(...)` and `voidedpurchases_list(...)`
 /// // to build up your call.
 /// let rb = hub.purchases();
 /// # }
@@ -1532,6 +1667,28 @@ impl<'a, C, A> PurchaseMethods<'a, C, A> {
             _package_name: package_name.to_string(),
             _subscription_id: subscription_id.to_string(),
             _token: token.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Lists the purchases that were cancelled, refunded or charged-back.
+    /// 
+    /// # Arguments
+    ///
+    /// * `packageName` - The package name of the application for which voided purchases need to be returned (for example, 'com.some.thing').
+    pub fn voidedpurchases_list(&self, package_name: &str) -> PurchaseVoidedpurchaseListCall<'a, C, A> {
+        PurchaseVoidedpurchaseListCall {
+            hub: self.hub,
+            _package_name: package_name.to_string(),
+            _token: Default::default(),
+            _start_time: Default::default(),
+            _start_index: Default::default(),
+            _max_results: Default::default(),
+            _end_time: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1629,7 +1786,7 @@ impl<'a, C, A> PurchaseMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = AndroidPublisher::new(hyper::Client::new(), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `apklistings_delete(...)`, `apklistings_deleteall(...)`, `apklistings_get(...)`, `apklistings_list(...)`, `apklistings_patch(...)`, `apklistings_update(...)`, `apks_addexternallyhosted(...)`, `apks_list(...)`, `apks_upload(...)`, `commit(...)`, `delete(...)`, `details_get(...)`, `details_patch(...)`, `details_update(...)`, `expansionfiles_get(...)`, `expansionfiles_patch(...)`, `expansionfiles_update(...)`, `expansionfiles_upload(...)`, `get(...)`, `images_delete(...)`, `images_deleteall(...)`, `images_list(...)`, `images_upload(...)`, `insert(...)`, `listings_delete(...)`, `listings_deleteall(...)`, `listings_get(...)`, `listings_list(...)`, `listings_patch(...)`, `listings_update(...)`, `testers_get(...)`, `testers_patch(...)`, `testers_update(...)`, `tracks_get(...)`, `tracks_list(...)`, `tracks_patch(...)`, `tracks_update(...)` and `validate(...)`
+/// // like `apklistings_delete(...)`, `apklistings_deleteall(...)`, `apklistings_get(...)`, `apklistings_list(...)`, `apklistings_patch(...)`, `apklistings_update(...)`, `apks_addexternallyhosted(...)`, `apks_list(...)`, `apks_upload(...)`, `commit(...)`, `delete(...)`, `deobfuscationfiles_upload(...)`, `details_get(...)`, `details_patch(...)`, `details_update(...)`, `expansionfiles_get(...)`, `expansionfiles_patch(...)`, `expansionfiles_update(...)`, `expansionfiles_upload(...)`, `get(...)`, `images_delete(...)`, `images_deleteall(...)`, `images_list(...)`, `images_upload(...)`, `insert(...)`, `listings_delete(...)`, `listings_deleteall(...)`, `listings_get(...)`, `listings_list(...)`, `listings_patch(...)`, `listings_update(...)`, `testers_get(...)`, `testers_patch(...)`, `testers_update(...)`, `tracks_get(...)`, `tracks_list(...)`, `tracks_patch(...)`, `tracks_update(...)` and `validate(...)`
 /// // to build up your call.
 /// let rb = hub.edits();
 /// # }
@@ -1643,6 +1800,29 @@ pub struct EditMethods<'a, C, A>
 impl<'a, C, A> MethodsBuilder for EditMethods<'a, C, A> {}
 
 impl<'a, C, A> EditMethods<'a, C, A> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Uploads the deobfuscation file of the specified APK. If a deobfuscation file already exists, it will be replaced.
+    /// 
+    /// # Arguments
+    ///
+    /// * `packageName` - Unique identifier of the Android app for which the deobfuscatiuon files are being uploaded; for example, "com.spiffygame".
+    /// * `editId` - Unique identifier for this edit.
+    /// * `apkVersionCode` - The version code of the APK whose deobfuscation file is being uploaded.
+    /// * `deobfuscationFileType` - No description provided.
+    pub fn deobfuscationfiles_upload(&self, package_name: &str, edit_id: &str, apk_version_code: i32, deobfuscation_file_type: &str) -> EditDeobfuscationfileUploadCall<'a, C, A> {
+        EditDeobfuscationfileUploadCall {
+            hub: self.hub,
+            _package_name: package_name.to_string(),
+            _edit_id: edit_id.to_string(),
+            _apk_version_code: apk_version_code,
+            _deobfuscation_file_type: deobfuscation_file_type.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2526,6 +2706,7 @@ impl<'a, C, A> ReviewMethods<'a, C, A> {
             hub: self.hub,
             _package_name: package_name.to_string(),
             _review_id: review_id.to_string(),
+            _translation_language: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2543,6 +2724,7 @@ impl<'a, C, A> ReviewMethods<'a, C, A> {
         ReviewListCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
+            _translation_language: Default::default(),
             _token: Default::default(),
             _start_index: Default::default(),
             _max_results: Default::default(),
@@ -3762,6 +3944,298 @@ impl<'a, C, A> PurchaseSubscriptionGetCall<'a, C, A> where C: BorrowMut<hyper::C
 }
 
 
+/// Lists the purchases that were cancelled, refunded or charged-back.
+///
+/// A builder for the *voidedpurchases.list* method supported by a *purchase* resource.
+/// It is not used directly, but through a `PurchaseMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_androidpublisher2 as androidpublisher2;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use androidpublisher2::AndroidPublisher;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.purchases().voidedpurchases_list("packageName")
+///              .token("justo")
+///              .start_time("justo")
+///              .start_index(67)
+///              .max_results(84)
+///              .end_time("diam")
+///              .doit();
+/// # }
+/// ```
+pub struct PurchaseVoidedpurchaseListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AndroidPublisher<C, A>,
+    _package_name: String,
+    _token: Option<String>,
+    _start_time: Option<String>,
+    _start_index: Option<u32>,
+    _max_results: Option<u32>,
+    _end_time: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for PurchaseVoidedpurchaseListCall<'a, C, A> {}
+
+impl<'a, C, A> PurchaseVoidedpurchaseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, VoidedPurchasesListResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "androidpublisher.purchases.voidedpurchases.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
+        params.push(("packageName", self._package_name.to_string()));
+        if let Some(value) = self._token {
+            params.push(("token", value.to_string()));
+        }
+        if let Some(value) = self._start_time {
+            params.push(("startTime", value.to_string()));
+        }
+        if let Some(value) = self._start_index {
+            params.push(("startIndex", value.to_string()));
+        }
+        if let Some(value) = self._max_results {
+            params.push(("maxResults", value.to_string()));
+        }
+        if let Some(value) = self._end_time {
+            params.push(("endTime", value.to_string()));
+        }
+        for &field in ["alt", "packageName", "token", "startTime", "startIndex", "maxResults", "endTime"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/purchases/voidedpurchases".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{packageName}", "packageName")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["packageName"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The package name of the application for which voided purchases need to be returned (for example, 'com.some.thing').
+    ///
+    /// Sets the *package name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn package_name(mut self, new_value: &str) -> PurchaseVoidedpurchaseListCall<'a, C, A> {
+        self._package_name = new_value.to_string();
+        self
+    }
+    ///
+    /// Sets the *token* query property to the given value.
+    pub fn token(mut self, new_value: &str) -> PurchaseVoidedpurchaseListCall<'a, C, A> {
+        self._token = Some(new_value.to_string());
+        self
+    }
+    /// The start time of list window, in milliseconds since the epoch (Jan 1, 1970). If not specified, default to current time - 30 days, which is also the earlies accepted start time. This parameter will be ignored if pagination token is set.
+    ///
+    /// Sets the *start time* query property to the given value.
+    pub fn start_time(mut self, new_value: &str) -> PurchaseVoidedpurchaseListCall<'a, C, A> {
+        self._start_time = Some(new_value.to_string());
+        self
+    }
+    ///
+    /// Sets the *start index* query property to the given value.
+    pub fn start_index(mut self, new_value: u32) -> PurchaseVoidedpurchaseListCall<'a, C, A> {
+        self._start_index = Some(new_value);
+        self
+    }
+    ///
+    /// Sets the *max results* query property to the given value.
+    pub fn max_results(mut self, new_value: u32) -> PurchaseVoidedpurchaseListCall<'a, C, A> {
+        self._max_results = Some(new_value);
+        self
+    }
+    /// The end time of list window, in milliseconds since the epoch (Jan 1, 1970). If not specified, default to current time, which is also the latest accepted end time. This parameter will be ignored if pagination token is set.
+    ///
+    /// Sets the *end time* query property to the given value.
+    pub fn end_time(mut self, new_value: &str) -> PurchaseVoidedpurchaseListCall<'a, C, A> {
+        self._end_time = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PurchaseVoidedpurchaseListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> PurchaseVoidedpurchaseListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> PurchaseVoidedpurchaseListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
 /// Cancels a user's subscription purchase. The subscription remains valid until its expiration time.
 ///
 /// A builder for the *subscriptions.cancel* method supported by a *purchase* resource.
@@ -4548,6 +5022,385 @@ impl<'a, C, A> PurchaseSubscriptionDeferCall<'a, C, A> where C: BorrowMut<hyper:
 }
 
 
+/// Uploads the deobfuscation file of the specified APK. If a deobfuscation file already exists, it will be replaced.
+///
+/// A builder for the *deobfuscationfiles.upload* method supported by a *edit* resource.
+/// It is not used directly, but through a `EditMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_androidpublisher2 as androidpublisher2;
+/// use std::fs;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use androidpublisher2::AndroidPublisher;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `upload_resumable(...)`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.edits().deobfuscationfiles_upload("packageName", "editId", -39, "deobfuscationFileType")
+///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
+/// # }
+/// ```
+pub struct EditDeobfuscationfileUploadCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AndroidPublisher<C, A>,
+    _package_name: String,
+    _edit_id: String,
+    _apk_version_code: i32,
+    _deobfuscation_file_type: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for EditDeobfuscationfileUploadCall<'a, C, A> {}
+
+impl<'a, C, A> EditDeobfuscationfileUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    fn doit<RS>(mut self, mut reader: RS, reader_mime_type: mime::Mime, protocol: &'static str) -> Result<(hyper::client::Response, DeobfuscationFilesUploadResponse)>
+		where RS: ReadSeek {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "androidpublisher.edits.deobfuscationfiles.upload",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        params.push(("packageName", self._package_name.to_string()));
+        params.push(("editId", self._edit_id.to_string()));
+        params.push(("apkVersionCode", self._apk_version_code.to_string()));
+        params.push(("deobfuscationFileType", self._deobfuscation_file_type.to_string()));
+        for &field in ["alt", "packageName", "editId", "apkVersionCode", "deobfuscationFileType"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let (mut url, upload_type) =
+            if protocol == "simple" {
+                ("https://www.googleapis.com/upload/androidpublisher/v2/applications/{packageName}/edits/{editId}/apks/{apkVersionCode}/deobfuscationFiles/{deobfuscationFileType}".to_string(), "multipart")
+            } else if protocol == "resumable" {
+                ("https://www.googleapis.com/resumable/upload/androidpublisher/v2/applications/{packageName}/edits/{editId}/apks/{apkVersionCode}/deobfuscationFiles/{deobfuscationFileType}".to_string(), "resumable")
+            } else {
+                unreachable!()
+            };
+        params.push(("uploadType", upload_type.to_string()));
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{packageName}", "packageName"), ("{editId}", "editId"), ("{apkVersionCode}", "apkVersionCode"), ("{deobfuscationFileType}", "deobfuscationFileType")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(4);
+            for param_name in ["deobfuscationFileType", "apkVersionCode", "editId", "packageName"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+        let mut should_ask_dlg_for_url = false;
+        let mut upload_url_from_server;
+        let mut upload_url: Option<String> = None;
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
+                    should_ask_dlg_for_url = false;
+                    upload_url_from_server = false;
+                    let url = upload_url.as_ref().and_then(|s| Some(hyper::Url::parse(s).unwrap())).unwrap();
+                    hyper::client::Response::new(url, Box::new(cmn::DummyNetworkStream)).and_then(|mut res| {
+                        res.status = hyper::status::StatusCode::Ok;
+                        res.headers.set(Location(upload_url.as_ref().unwrap().clone()));
+                        Ok(res)
+                    })
+                } else {
+                    let mut client = &mut *self.hub.client.borrow_mut();
+                    let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                        .header(UserAgent(self.hub._user_agent.clone()))
+                        .header(auth_header.clone());
+                    if protocol == "simple" {
+                        let size = reader.seek(io::SeekFrom::End(0)).unwrap();
+                    reader.seek(io::SeekFrom::Start(0)).unwrap();
+                    if size > 314572800 {
+                    	return Err(Error::UploadSizeLimitExceeded(size, 314572800))
+                    }
+                        req = req.header(ContentType(reader_mime_type.clone()))
+                                 .header(ContentLength(size))
+                                 .body(&mut reader);
+                    }
+                    upload_url_from_server = true;
+                    if protocol == "resumable" {
+                        req = req.header(cmn::XUploadContentType(reader_mime_type.clone()));
+                    }
+    
+                    dlg.pre_request();
+                    req.send()
+                }
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    if protocol == "resumable" {
+                        let size = reader.seek(io::SeekFrom::End(0)).unwrap();
+                        reader.seek(io::SeekFrom::Start(0)).unwrap();
+                        if size > 314572800 {
+                        	return Err(Error::UploadSizeLimitExceeded(size, 314572800))
+                        }
+                        let mut client = &mut *self.hub.client.borrow_mut();
+                        let upload_result = {
+                            let url_str = &res.headers.get::<Location>().expect("Location header is part of protocol").0;
+                            if upload_url_from_server {
+                                dlg.store_upload_url(Some(url_str));
+                            }
+
+                            cmn::ResumableUploadHelper {
+                                client: &mut client.borrow_mut(),
+                                delegate: dlg,
+                                start_at: if upload_url_from_server { Some(0) } else { None },
+                                auth: &mut *self.hub.auth.borrow_mut(),
+                                user_agent: &self.hub._user_agent,
+                                auth_header: auth_header.clone(),
+                                url: url_str,
+                                reader: &mut reader,
+                                media_type: reader_mime_type.clone(),
+                                content_length: size
+                            }.upload()
+                        };
+                        match upload_result {
+                            None => {
+                                dlg.finished(false);
+                                return Err(Error::Cancelled)
+                            }
+                            Some(Err(err)) => {
+                                dlg.finished(false);
+                                return Err(Error::HttpError(err))
+                            }
+                            Some(Ok(upload_result)) => {
+                                res = upload_result;
+                                if !res.status.is_success() {
+                                    dlg.store_upload_url(None);
+                                    dlg.finished(false);
+                                    return Err(Error::Failure(res))
+                                }
+                            }
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+    /// Upload media all at once.
+    /// If the upload fails for whichever reason, all progress is lost.
+    ///
+    /// * *max size*: 300MB
+    /// * *multipart*: yes
+    /// * *valid mime types*: 'application/octet-stream'
+    pub fn upload<RS>(self, stream: RS, mime_type: mime::Mime) -> Result<(hyper::client::Response, DeobfuscationFilesUploadResponse)>
+                where RS: ReadSeek {
+        self.doit(stream, mime_type, "simple")
+    }
+    /// Upload media in a resumable fashion.
+    /// Even if the upload fails or is interrupted, it can be resumed for a
+    /// certain amount of time as the server maintains state temporarily.
+    /// 
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL
+    /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
+    /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
+    /// `cancel_chunk_upload(...)`.
+    ///
+    /// * *max size*: 300MB
+    /// * *multipart*: yes
+    /// * *valid mime types*: 'application/octet-stream'
+    pub fn upload_resumable<RS>(self, resumeable_stream: RS, mime_type: mime::Mime) -> Result<(hyper::client::Response, DeobfuscationFilesUploadResponse)>
+                where RS: ReadSeek {
+        self.doit(resumeable_stream, mime_type, "resumable")
+    }
+
+    /// Unique identifier of the Android app for which the deobfuscatiuon files are being uploaded; for example, "com.spiffygame".
+    ///
+    /// Sets the *package name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn package_name(mut self, new_value: &str) -> EditDeobfuscationfileUploadCall<'a, C, A> {
+        self._package_name = new_value.to_string();
+        self
+    }
+    /// Unique identifier for this edit.
+    ///
+    /// Sets the *edit id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn edit_id(mut self, new_value: &str) -> EditDeobfuscationfileUploadCall<'a, C, A> {
+        self._edit_id = new_value.to_string();
+        self
+    }
+    /// The version code of the APK whose deobfuscation file is being uploaded.
+    ///
+    /// Sets the *apk version code* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn apk_version_code(mut self, new_value: i32) -> EditDeobfuscationfileUploadCall<'a, C, A> {
+        self._apk_version_code = new_value;
+        self
+    }
+    ///
+    /// Sets the *deobfuscation file type* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn deobfuscation_file_type(mut self, new_value: &str) -> EditDeobfuscationfileUploadCall<'a, C, A> {
+        self._deobfuscation_file_type = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditDeobfuscationfileUploadCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> EditDeobfuscationfileUploadCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> EditDeobfuscationfileUploadCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
 /// Uploads a new image and adds it to the list of images for the specified language and image type.
 ///
 /// A builder for the *images.upload* method supported by a *edit* resource.
@@ -4959,7 +5812,7 @@ impl<'a, C, A> EditImageUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.edits().expansionfiles_update(req, "packageName", "editId", -95, "expansionFileType")
+/// let result = hub.edits().expansionfiles_update(req, "packageName", "editId", -82, "expansionFileType")
 ///              .doit();
 /// # }
 /// ```
@@ -6015,7 +6868,7 @@ impl<'a, C, A> EditApkAddexternallyhostedCall<'a, C, A> where C: BorrowMut<hyper
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.edits().apklistings_deleteall("packageName", "editId", -82)
+/// let result = hub.edits().apklistings_deleteall("packageName", "editId", -46)
 ///              .doit();
 /// # }
 /// ```
@@ -6806,7 +7659,7 @@ impl<'a, C, A> EditTrackGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.edits().expansionfiles_patch(req, "packageName", "editId", -58, "expansionFileType")
+/// let result = hub.edits().expansionfiles_patch(req, "packageName", "editId", -48, "expansionFileType")
 ///              .doit();
 /// # }
 /// ```
@@ -8829,7 +9682,7 @@ impl<'a, C, A> EditApkUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.edits().apklistings_update(req, "packageName", "editId", -44, "language")
+/// let result = hub.edits().apklistings_update(req, "packageName", "editId", -13, "language")
 ///              .doit();
 /// # }
 /// ```
@@ -9376,7 +10229,7 @@ impl<'a, C, A> EditApkListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.edits().apklistings_patch(req, "packageName", "editId", -19, "language")
+/// let result = hub.edits().apklistings_patch(req, "packageName", "editId", -58, "language")
 ///              .doit();
 /// # }
 /// ```
@@ -9931,7 +10784,7 @@ impl<'a, C, A> EditListingGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.edits().apklistings_delete("packageName", "editId", -40, "language")
+/// let result = hub.edits().apklistings_delete("packageName", "editId", -33, "language")
 ///              .doit();
 /// # }
 /// ```
@@ -10684,7 +11537,7 @@ impl<'a, C, A> EditDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `upload_resumable(...)`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.edits().expansionfiles_upload("packageName", "editId", -66, "expansionFileType")
+/// let result = hub.edits().expansionfiles_upload("packageName", "editId", -16, "expansionFileType")
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
@@ -12893,7 +13746,7 @@ impl<'a, C, A> EditListingUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.edits().expansionfiles_get("packageName", "editId", -69, "expansionFileType")
+/// let result = hub.edits().expansionfiles_get("packageName", "editId", -71, "expansionFileType")
 ///              .doit();
 /// # }
 /// ```
@@ -14249,7 +15102,7 @@ impl<'a, C, A> EditListingDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.edits().apklistings_get("packageName", "editId", -24, "language")
+/// let result = hub.edits().apklistings_get("packageName", "editId", -62, "language")
 ///              .doit();
 /// # }
 /// ```
@@ -14807,7 +15660,7 @@ impl<'a, C, A> EditTesterUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.edits().apklistings_list("packageName", "editId", -74)
+/// let result = hub.edits().apklistings_list("packageName", "editId", -77)
 ///              .doit();
 /// # }
 /// ```
@@ -15344,6 +16197,7 @@ impl<'a, C, A> ReviewReplyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.reviews().get("packageName", "reviewId")
+///              .translation_language("takimata")
 ///              .doit();
 /// # }
 /// ```
@@ -15353,6 +16207,7 @@ pub struct ReviewGetCall<'a, C, A>
     hub: &'a AndroidPublisher<C, A>,
     _package_name: String,
     _review_id: String,
+    _translation_language: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -15374,10 +16229,13 @@ impl<'a, C, A> ReviewGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         };
         dlg.begin(MethodInfo { id: "androidpublisher.reviews.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("packageName", self._package_name.to_string()));
         params.push(("reviewId", self._review_id.to_string()));
-        for &field in ["alt", "packageName", "reviewId"].iter() {
+        if let Some(value) = self._translation_language {
+            params.push(("translationLanguage", value.to_string()));
+        }
+        for &field in ["alt", "packageName", "reviewId", "translationLanguage"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -15511,6 +16369,12 @@ impl<'a, C, A> ReviewGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._review_id = new_value.to_string();
         self
     }
+    ///
+    /// Sets the *translation language* query property to the given value.
+    pub fn translation_language(mut self, new_value: &str) -> ReviewGetCall<'a, C, A> {
+        self._translation_language = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -15590,9 +16454,10 @@ impl<'a, C, A> ReviewGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.reviews().list("packageName")
-///              .token("Lorem")
-///              .start_index(38)
-///              .max_results(64)
+///              .translation_language("nonumy")
+///              .token("rebum.")
+///              .start_index(95)
+///              .max_results(51)
 ///              .doit();
 /// # }
 /// ```
@@ -15601,6 +16466,7 @@ pub struct ReviewListCall<'a, C, A>
 
     hub: &'a AndroidPublisher<C, A>,
     _package_name: String,
+    _translation_language: Option<String>,
     _token: Option<String>,
     _start_index: Option<u32>,
     _max_results: Option<u32>,
@@ -15625,8 +16491,11 @@ impl<'a, C, A> ReviewListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         };
         dlg.begin(MethodInfo { id: "androidpublisher.reviews.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
         params.push(("packageName", self._package_name.to_string()));
+        if let Some(value) = self._translation_language {
+            params.push(("translationLanguage", value.to_string()));
+        }
         if let Some(value) = self._token {
             params.push(("token", value.to_string()));
         }
@@ -15636,7 +16505,7 @@ impl<'a, C, A> ReviewListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         if let Some(value) = self._max_results {
             params.push(("maxResults", value.to_string()));
         }
-        for &field in ["alt", "packageName", "token", "startIndex", "maxResults"].iter() {
+        for &field in ["alt", "packageName", "translationLanguage", "token", "startIndex", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -15759,6 +16628,12 @@ impl<'a, C, A> ReviewListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     /// we provide this method for API completeness.
     pub fn package_name(mut self, new_value: &str) -> ReviewListCall<'a, C, A> {
         self._package_name = new_value.to_string();
+        self
+    }
+    ///
+    /// Sets the *translation language* query property to the given value.
+    pub fn translation_language(mut self, new_value: &str) -> ReviewListCall<'a, C, A> {
+        self._translation_language = Some(new_value.to_string());
         self
     }
     ///
@@ -16089,9 +16964,9 @@ impl<'a, C, A> InappproductBatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.inappproducts().list("packageName")
-///              .token("At")
-///              .start_index(5)
-///              .max_results(79)
+///              .token("ut")
+///              .start_index(64)
+///              .max_results(50)
 ///              .doit();
 /// # }
 /// ```
@@ -16363,7 +17238,7 @@ impl<'a, C, A> InappproductListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.inappproducts().insert(req, "packageName")
-///              .auto_convert_missing_prices(true)
+///              .auto_convert_missing_prices(false)
 ///              .doit();
 /// # }
 /// ```
@@ -17123,7 +17998,7 @@ impl<'a, C, A> InappproductGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.inappproducts().update(req, "packageName", "sku")
-///              .auto_convert_missing_prices(true)
+///              .auto_convert_missing_prices(false)
 ///              .doit();
 /// # }
 /// ```
@@ -17413,7 +18288,7 @@ impl<'a, C, A> InappproductUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.inappproducts().patch(req, "packageName", "sku")
-///              .auto_convert_missing_prices(false)
+///              .auto_convert_missing_prices(true)
 ///              .doit();
 /// # }
 /// ```

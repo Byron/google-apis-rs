@@ -3,14 +3,14 @@ DO NOT EDIT !
 This file was generated automatically from 'src/mako/cli/README.md.mako'
 DO NOT EDIT !
 -->
-The `monitoring3` command-line interface *(CLI)* allows to use most features of the *Google monitoring* service from the comfort of your terminal.
+The `monitoring3` command-line interface *(CLI)* allows to use most features of the *Google Monitoring* service from the comfort of your terminal.
 
 By default all output is printed to standard out, but flags can be set to direct it into a file independent of your shell's
 capabilities. Errors will be printed to standard error, and cause the program's exit code to be non-zero.
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
-Everything else about the *monitoring* API can be found at the
+Everything else about the *Monitoring* API can be found at the
 [official documentation site](https://cloud.google.com/monitoring/api/).
 
 # Downloads
@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *monitoring* API at revision *20160425*. The CLI is at version *1.0.0*.
+This documentation was generated from the *Monitoring* API at revision *20161212*. The CLI is at version *1.0.0*.
 
 ```bash
 monitoring3 [options]

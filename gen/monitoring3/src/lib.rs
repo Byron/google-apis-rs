@@ -2,9 +2,9 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *monitoring* crate version *1.0.0+20160425*, where *20160425* is the exact revision of the *monitoring:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
+//! This documentation was generated from *Monitoring* crate version *1.0.0+20161212*, where *20161212* is the exact revision of the *monitoring:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
 //! 
-//! Everything else about the *monitoring* *v3* API can be found at the
+//! Everything else about the *Monitoring* *v3* API can be found at the
 //! [official documentation site](https://cloud.google.com/monitoring/api/).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/monitoring3).
 //! # Features

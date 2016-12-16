@@ -699,7 +699,7 @@ impl ResponseResult for AdClients {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AdStyle {
-    /// The style of the corners in the ad.
+    /// The style of the corners in the ad (deprecated: never populated, ignored).
     pub corners: Option<String>,
     /// The colors which are included in the style. These are represented as six hexadecimal characters, similar to HTML color codes, but without the leading hash.
     pub colors: Option<AdStyleColors>,

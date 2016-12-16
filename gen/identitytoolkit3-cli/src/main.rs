@@ -80,9 +80,10 @@ impl<'n> Engine<'n> {
                     "context" => Some(("context", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-id" => Some(("appId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "continue-uri" => Some(("continueUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-parameter" => Some(("customParameter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "identifier" => Some(("identifier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-id", "auth-flow-type", "client-id", "context", "continue-uri", "hosted-domain", "identifier", "oauth-consumer-key", "oauth-scope", "openid-realm", "ota-app", "provider-id", "session-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-id", "auth-flow-type", "client-id", "context", "continue-uri", "custom-parameter", "hosted-domain", "identifier", "oauth-consumer-key", "oauth-scope", "openid-realm", "ota-app", "provider-id", "session-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -119,6 +120,9 @@ impl<'n> Engine<'n> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
@@ -203,6 +207,9 @@ impl<'n> Engine<'n> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
@@ -247,10 +254,11 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "next-page-token" => Some(("nextPageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "target-project-id" => Some(("targetProjectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "delegated-project-number" => Some(("delegatedProjectNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "max-results" => Some(("maxResults", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["delegated-project-number", "max-results", "next-page-token"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["delegated-project-number", "max-results", "next-page-token", "target-project-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -287,6 +295,9 @@ impl<'n> Engine<'n> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
@@ -372,6 +383,9 @@ impl<'n> Engine<'n> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
@@ -461,6 +475,9 @@ impl<'n> Engine<'n> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
@@ -517,6 +534,9 @@ impl<'n> Engine<'n> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
@@ -566,6 +586,9 @@ impl<'n> Engine<'n> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
@@ -615,6 +638,9 @@ impl<'n> Engine<'n> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
@@ -700,6 +726,9 @@ impl<'n> Engine<'n> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
@@ -802,6 +831,9 @@ impl<'n> Engine<'n> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
@@ -913,6 +945,9 @@ impl<'n> Engine<'n> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
@@ -996,6 +1031,9 @@ impl<'n> Engine<'n> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
@@ -1039,15 +1077,18 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "instance-id" => Some(("instanceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "photo-url" => Some(("photoUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-id" => Some(("instanceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "email-verified" => Some(("emailVerified", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "disabled" => Some(("disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "captcha-response" => Some(("captchaResponse", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id-token" => Some(("idToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "captcha-challenge" => Some(("captchaChallenge", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "password" => Some(("password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "email" => Some(("email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["captcha-challenge", "captcha-response", "display-name", "email", "id-token", "instance-id", "password"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["captcha-challenge", "captcha-response", "disabled", "display-name", "email", "email-verified", "id-token", "instance-id", "password", "photo-url"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1084,6 +1125,9 @@ impl<'n> Engine<'n> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
@@ -1129,12 +1173,15 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "hash-algorithm" => Some(("hashAlgorithm", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "delegated-project-number" => Some(("delegatedProjectNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "allow-overwrite" => Some(("allowOverwrite", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "sanity-check" => Some(("sanityCheck", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "signer-key" => Some(("signerKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "memory-cost" => Some(("memoryCost", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "salt-separator" => Some(("saltSeparator", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "target-project-id" => Some(("targetProjectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rounds" => Some(("rounds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["delegated-project-number", "hash-algorithm", "memory-cost", "rounds", "salt-separator", "signer-key"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-overwrite", "delegated-project-number", "hash-algorithm", "memory-cost", "rounds", "salt-separator", "sanity-check", "signer-key", "target-project-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1171,6 +1218,9 @@ impl<'n> Engine<'n> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
@@ -1262,6 +1312,9 @@ impl<'n> Engine<'n> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
@@ -1347,6 +1400,9 @@ impl<'n> Engine<'n> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
@@ -1437,6 +1493,9 @@ impl<'n> Engine<'n> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
@@ -1966,9 +2025,14 @@ fn main() {
     
     let mut app = App::new("identitytoolkit3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.0+20160812")
+           .version("1.0.0+20161206")
            .about("Help the third party sites to implement federated login.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_identitytoolkit3_cli")
+           .arg(Arg::with_name("url")
+                   .long("scope")
+                   .help("Specify the authentication a method should be executed in. Each scope requires the user to grant this application permission to use it.If unset, it defaults to the shortest scope url for a particular method.")
+                   .multiple(true)
+                   .takes_value(true))
            .arg(Arg::with_name("folder")
                    .long("config-dir")
                    .help("A directory into which we will store our persistent data. Defaults to a user-writable directory that we will create during the first invocation.[default: ~/.google-service-cli")

@@ -1,4 +1,4 @@
-site_name: Android Publisher v1.0.0+20160817
+site_name: Android Publisher v1.0.0+20161212
 site_url: http://byron.github.io/google-apis-rs/google-androidpublisher2-cli
 site_description: Write integrating applications with bcore
 
@@ -20,6 +20,7 @@ pages:
 - ['edits_apks-upload.md', 'Edits', 'Apks Upload']
 - ['edits_commit.md', 'Edits', 'Commit']
 - ['edits_delete.md', 'Edits', 'Delete']
+- ['edits_deobfuscationfiles-upload.md', 'Edits', 'Deobfuscationfiles Upload']
 - ['edits_details-get.md', 'Edits', 'Details Get']
 - ['edits_details-patch.md', 'Edits', 'Details Patch']
 - ['edits_details-update.md', 'Edits', 'Details Update']
@@ -61,6 +62,7 @@ pages:
 - ['purchases_subscriptions-get.md', 'Purchases', 'Subscriptions Get']
 - ['purchases_subscriptions-refund.md', 'Purchases', 'Subscriptions Refund']
 - ['purchases_subscriptions-revoke.md', 'Purchases', 'Subscriptions Revoke']
+- ['purchases_voidedpurchases-list.md', 'Purchases', 'Voidedpurchases List']
 - ['reviews_get.md', 'Reviews', 'Get']
 - ['reviews_list.md', 'Reviews', 'List']
 - ['reviews_reply.md', 'Reviews', 'Reply']

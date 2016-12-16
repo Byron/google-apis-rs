@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *genomics* crate version *1.0.0+20160905*, where *20160905* is the exact revision of the *genomics:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
+//! This documentation was generated from *genomics* crate version *1.0.0+20160928*, where *20160928* is the exact revision of the *genomics:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
 //! 
 //! Everything else about the *genomics* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/genomics/).

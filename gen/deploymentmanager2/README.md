@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-deploymentmanager2` library allows access to all features of the *Google Deployment Manager* service.
 
-This documentation was generated from *Deployment Manager* crate version *1.0.0+20160901*, where *20160901* is the exact revision of the *deploymentmanager:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
+This documentation was generated from *Deployment Manager* crate version *1.0.0+20161209*, where *20161209* is the exact revision of the *deploymentmanager:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
 
 Everything else about the *Deployment Manager* *v2* API can be found at the
 [official documentation site](https://cloud.google.com/deployment-manager/).
@@ -14,7 +14,7 @@ Everything else about the *Deployment Manager* *v2* API can be found at the
 Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.DeploymentManager.html) ... 
 
 * [deployments](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.Deployment.html)
- * [*cancel preview*](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.DeploymentCancelPreviewCall.html), [*delete*](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.DeploymentDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.DeploymentGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.DeploymentInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.DeploymentListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.DeploymentPatchCall.html), [*stop*](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.DeploymentStopCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.DeploymentUpdateCall.html)
+ * [*cancel preview*](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.DeploymentCancelPreviewCall.html), [*delete*](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.DeploymentDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.DeploymentGetCall.html), [*get iam policy*](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.DeploymentGetIamPolicyCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.DeploymentInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.DeploymentListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.DeploymentPatchCall.html), [*set iam policy*](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.DeploymentSetIamPolicyCall.html), [*stop*](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.DeploymentStopCall.html), [*test iam permissions*](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.DeploymentTestIamPermissionCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.DeploymentUpdateCall.html)
 * [manifests](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.Manifest.html)
  * [*get*](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.ManifestGetCall.html) and [*list*](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.ManifestListCall.html)
 * [operations](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.Operation.html)
@@ -56,12 +56,15 @@ Or specifically ...
 
 ```ignore
 let r = hub.deployments().update(...).doit()
+let r = hub.deployments().get(...).doit()
 let r = hub.deployments().insert(...).doit()
+let r = hub.deployments().test_iam_permissions(...).doit()
 let r = hub.deployments().cancel_preview(...).doit()
-let r = hub.operations().get(...).doit()
+let r = hub.deployments().list(...).doit()
 let r = hub.deployments().patch(...).doit()
 let r = hub.deployments().stop(...).doit()
-let r = hub.operations().list(...).doit()
+let r = hub.deployments().get_iam_policy(...).doit()
+let r = hub.deployments().set_iam_policy(...).doit()
 let r = hub.deployments().delete(...).doit()
 ```
 

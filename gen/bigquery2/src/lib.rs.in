@@ -255,7 +255,7 @@ pub struct QueryRequest {
     /// [Optional] Specifies the default datasetId and projectId to assume for any unqualified table names in the query. If not set, all table names in the query string must be qualified in the format 'datasetId.tableId'.
     #[serde(rename="defaultDataset")]
     pub default_dataset: Option<DatasetReference>,
-    /// [Experimental] Specifies whether to use BigQuery's legacy SQL dialect for this query. The default value is true. If set to false, the query will use BigQuery's standard SQL: https://cloud.google.com/bigquery/sql-reference/ When useLegacySql is set to false, the values of allowLargeResults and flattenResults are ignored; query will be run as if allowLargeResults is true and flattenResults is false.
+    /// Specifies whether to use BigQuery's legacy SQL dialect for this query. The default value is true. If set to false, the query will use BigQuery's standard SQL: https://cloud.google.com/bigquery/sql-reference/ When useLegacySql is set to false, the values of allowLargeResults and flattenResults are ignored; query will be run as if allowLargeResults is true and flattenResults is false.
     #[serde(rename="useLegacySql")]
     pub use_legacy_sql: Option<bool>,
     /// [Optional] The maximum number of rows of data to return per page of results. Setting this flag to a small value such as 1000 and then paging through results might improve reliability when the query result set is large. In addition to this limit, responses are also limited to 10 MB. By default, there is no maximum row count, and only the byte limit applies.
@@ -283,6 +283,9 @@ pub struct JobStatistics2 {
     /// [Output-only, Experimental] Describes execution plan for the query.
     #[serde(rename="queryPlan")]
     pub query_plan: Option<Vec<ExplainQueryStage>>,
+    /// [Output-only, Experimental] The type of query statement, if valid.
+    #[serde(rename="statementType")]
+    pub statement_type: Option<String>,
     /// [Output-only] Total bytes billed for the job.
     #[serde(rename="totalBytesBilled")]
     pub total_bytes_billed: Option<String>,
@@ -382,7 +385,7 @@ pub struct TableFieldSchema {
     pub fields: Option<Vec<TableFieldSchema>>,
     /// [Optional] The field description. The maximum length is 16K characters.
     pub description: Option<String>,
-    /// [Required] The field data type. Possible values include STRING, BYTES, INTEGER, FLOAT, BOOLEAN, TIMESTAMP or RECORD (where RECORD indicates that the field contains a nested schema).
+    /// [Required] The field data type. Possible values include STRING, BYTES, INTEGER, INT64 (same as INTEGER), FLOAT, FLOAT64 (same as FLOAT), BOOLEAN, BOOL (same as BOOLEAN), TIMESTAMP, DATE, TIME, DATETIME, RECORD (where RECORD indicates that the field contains a nested schema) or STRUCT (same as RECORD).
     #[serde(rename="type")]
     pub type_: Option<String>,
     /// [Optional] The field mode. Possible values include NULLABLE, REQUIRED and REPEATED. The default value is NULLABLE.
@@ -665,19 +668,21 @@ impl Part for UserDefinedFunctionResource {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TableListTables {
+    /// The resource type.
+    pub kind: Option<String>,
     /// The user-friendly name for this table.
     #[serde(rename="friendlyName")]
     pub friendly_name: Option<String>,
-    /// The resource type.
-    pub kind: Option<String>,
+    /// [Experimental] The labels associated with this table. You can use these to organize and group your tables.
+    pub labels: Option<HashMap<String, String>>,
     /// The type of table. Possible values are: TABLE, VIEW.
     #[serde(rename="type")]
     pub type_: Option<String>,
-    /// An opaque ID of the table
-    pub id: Option<String>,
     /// A reference uniquely identifying the table.
     #[serde(rename="tableReference")]
     pub table_reference: Option<TableReference>,
+    /// An opaque ID of the table
+    pub id: Option<String>,
 }
 
 impl NestedType for TableListTables {}
@@ -854,8 +859,9 @@ impl Part for TimePartitioning {}
 pub struct JobConfigurationLoad {
     /// [Optional] The character encoding of the data. The supported values are UTF-8 or ISO-8859-1. The default value is UTF-8. BigQuery decodes the data after the raw, binary data has been split using the values of the quote and fieldDelimiter properties.
     pub encoding: Option<String>,
-    /// [Optional] The value that is used to quote data sections in a CSV file. BigQuery converts the string to ISO-8859-1 encoding, and then uses the first byte of the encoded string to split the data in its raw, binary state. The default value is a double-quote ('"'). If your data does not contain quoted sections, set the property value to an empty string. If your data contains quoted newline characters, you must also set the allowQuotedNewlines property to true.
-    pub quote: Option<String>,
+    /// [Optional] The number of rows at the top of a CSV file that BigQuery will skip when loading the data. The default value is 0. This property is useful if you have header rows in the file that should be skipped.
+    #[serde(rename="skipLeadingRows")]
+    pub skip_leading_rows: Option<i32>,
     /// [Experimental] Indicates if we should automatically infer the options and schema for CSV and JSON sources.
     pub autodetect: Option<bool>,
     /// [Required] The destination table to load the data into.
@@ -864,12 +870,15 @@ pub struct JobConfigurationLoad {
     /// [Required] The fully-qualified URIs that point to your data in Google Cloud Storage. Each URI can contain one '*' wildcard character and it must come after the 'bucket' name.
     #[serde(rename="sourceUris")]
     pub source_uris: Option<Vec<String>>,
-    /// Indicates if BigQuery should allow quoted data sections that contain newline characters in a CSV file. The default value is false.
-    #[serde(rename="allowQuotedNewlines")]
-    pub allow_quoted_newlines: Option<bool>,
+    /// [Optional] This string will be interpreted as a null value when it appears in a CSV file. The default value is the empty string. Please refer to the documentation for further information.
+    #[serde(rename="nullMarker")]
+    pub null_marker: Option<String>,
     /// [Experimental] If sourceFormat is set to "DATASTORE_BACKUP", indicates which entity properties to load into BigQuery from a Cloud Datastore backup. Property names are case sensitive and must be top-level properties. If no properties are specified, BigQuery loads all properties. If any named property isn't found in the Cloud Datastore backup, an invalid error is returned in the job result.
     #[serde(rename="projectionFields")]
     pub projection_fields: Option<Vec<String>>,
+    /// Indicates if BigQuery should allow quoted data sections that contain newline characters in a CSV file. The default value is false.
+    #[serde(rename="allowQuotedNewlines")]
+    pub allow_quoted_newlines: Option<bool>,
     /// [Optional] Accept rows that are missing trailing optional columns. The missing values are treated as nulls. If false, records with missing trailing columns are treated as bad records, and if there are too many bad records, an invalid error is returned in the job result. The default value is false. Only applicable to CSV, ignored for other formats.
     #[serde(rename="allowJaggedRows")]
     pub allow_jagged_rows: Option<bool>,
@@ -891,9 +900,8 @@ pub struct JobConfigurationLoad {
     /// [Optional] Specifies the action that occurs if the destination table already exists. The following values are supported: WRITE_TRUNCATE: If the table already exists, BigQuery overwrites the table data. WRITE_APPEND: If the table already exists, BigQuery appends the data to the table. WRITE_EMPTY: If the table already exists and contains data, a 'duplicate' error is returned in the job result. The default value is WRITE_APPEND. Each action is atomic and only occurs if BigQuery is able to complete the job successfully. Creation, truncation and append actions occur as one atomic update upon job completion.
     #[serde(rename="writeDisposition")]
     pub write_disposition: Option<String>,
-    /// [Optional] The number of rows at the top of a CSV file that BigQuery will skip when loading the data. The default value is 0. This property is useful if you have header rows in the file that should be skipped.
-    #[serde(rename="skipLeadingRows")]
-    pub skip_leading_rows: Option<i32>,
+    /// [Optional] The value that is used to quote data sections in a CSV file. BigQuery converts the string to ISO-8859-1 encoding, and then uses the first byte of the encoded string to split the data in its raw, binary state. The default value is a double-quote ('"'). If your data does not contain quoted sections, set the property value to an empty string. If your data contains quoted newline characters, you must also set the allowQuotedNewlines property to true.
+    pub quote: Option<String>,
     /// [Optional] Specifies whether the job is allowed to create new tables. The following values are supported: CREATE_IF_NEEDED: If the table does not exist, BigQuery creates the table. CREATE_NEVER: The table must already exist. If it does not, a 'notFound' error is returned in the job result. The default value is CREATE_IF_NEEDED. Creation, truncation and append actions occur as one atomic update upon job completion.
     #[serde(rename="createDisposition")]
     pub create_disposition: Option<String>,
@@ -1141,7 +1149,7 @@ impl Part for ErrorProto {}
 pub struct ViewDefinition {
     /// [Required] A query that BigQuery executes when the view is referenced.
     pub query: Option<String>,
-    /// [Experimental] Specifies whether to use BigQuery's legacy SQL for this view. The default value is true. If set to false, the view will use BigQuery's standard SQL: https://cloud.google.com/bigquery/sql-reference/ Queries and views that reference this view must use the same flag value.
+    /// Specifies whether to use BigQuery's legacy SQL for this view. The default value is true. If set to false, the view will use BigQuery's standard SQL: https://cloud.google.com/bigquery/sql-reference/ Queries and views that reference this view must use the same flag value.
     #[serde(rename="useLegacySql")]
     pub use_legacy_sql: Option<bool>,
     /// [Experimental] Describes user-defined function resources used in the query.
@@ -1345,7 +1353,7 @@ pub struct JobConfigurationQuery {
     /// [Optional] Describes the table where the query results should be stored. If not present, a new table will be created to store the results.
     #[serde(rename="destinationTable")]
     pub destination_table: Option<TableReference>,
-    /// [Experimental] Query parameters for Standard SQL queries.
+    /// Query parameters for standard SQL queries.
     #[serde(rename="queryParameters")]
     pub query_parameters: Option<Vec<QueryParameter>>,
     /// [Required] BigQuery SQL query to execute.
@@ -1365,10 +1373,10 @@ pub struct JobConfigurationQuery {
     /// [Optional] Specifies the default dataset to use for unqualified table names in the query.
     #[serde(rename="defaultDataset")]
     pub default_dataset: Option<DatasetReference>,
-    /// [Experimental] Specifies whether to use BigQuery's legacy SQL dialect for this query. The default value is true. If set to false, the query will use BigQuery's standard SQL: https://cloud.google.com/bigquery/sql-reference/ When useLegacySql is set to false, the values of allowLargeResults and flattenResults are ignored; query will be run as if allowLargeResults is true and flattenResults is false.
+    /// Specifies whether to use BigQuery's legacy SQL dialect for this query. The default value is true. If set to false, the query will use BigQuery's standard SQL: https://cloud.google.com/bigquery/sql-reference/ When useLegacySql is set to false, the values of allowLargeResults and flattenResults are ignored; query will be run as if allowLargeResults is true and flattenResults is false.
     #[serde(rename="useLegacySql")]
     pub use_legacy_sql: Option<bool>,
-    /// [Experimental] Allows the schema of the desitination table to be updated as a side effect of the query job. Schema update options are supported in two cases: when writeDisposition is WRITE_APPEND; when writeDisposition is WRITE_TRUNCATE and the destination table is a partition of a table, specified by partition decorators. For normal tables, WRITE_TRUNCATE will always overwrite the schema. One or more of the following values are specified: ALLOW_FIELD_ADDITION: allow adding a nullable field to the schema. ALLOW_FIELD_RELAXATION: allow relaxing a required field in the original schema to nullable.
+    /// [Experimental] Allows the schema of the destination table to be updated as a side effect of the query job. Schema update options are supported in two cases: when writeDisposition is WRITE_APPEND; when writeDisposition is WRITE_TRUNCATE and the destination table is a partition of a table, specified by partition decorators. For normal tables, WRITE_TRUNCATE will always overwrite the schema. One or more of the following values are specified: ALLOW_FIELD_ADDITION: allow adding a nullable field to the schema. ALLOW_FIELD_RELAXATION: allow relaxing a required field in the original schema to nullable.
     #[serde(rename="schemaUpdateOptions")]
     pub schema_update_options: Option<Vec<String>>,
     /// [Optional] Specifies a priority for the query. Possible values include INTERACTIVE and BATCH. The default value is INTERACTIVE.
@@ -1431,15 +1439,17 @@ impl Part for TableRow {}
 pub struct JobConfiguration {
     /// [Pick one] Configures a load job.
     pub load: Option<JobConfigurationLoad>,
+    /// [Pick one] Copies a table.
+    pub copy: Option<JobConfigurationTableCopy>,
     /// [Optional] If set, don't actually run this job. A valid query will return a mostly empty response with some processing statistics, while an invalid query will return the same error it would if it wasn't a dry run. Behavior of non-query jobs is undefined.
     #[serde(rename="dryRun")]
     pub dry_run: Option<bool>,
-    /// [Pick one] Copies a table.
-    pub copy: Option<JobConfigurationTableCopy>,
-    /// [Pick one] Configures an extract job.
-    pub extract: Option<JobConfigurationExtract>,
     /// [Pick one] Configures a query job.
     pub query: Option<JobConfigurationQuery>,
+    /// [Experimental] The labels associated with this job. You can use these to organize and group your jobs. Label keys and values can be no longer than 63 characters, can only contain letters, numeric characters, underscores and dashes. International characters are allowed. Label values are optional. Label keys must start with a letter and must be unique within a dataset. Both keys and values are additionally constrained to be <= 128 bytes in size.
+    pub labels: Option<HashMap<String, String>>,
+    /// [Pick one] Configures an extract job.
+    pub extract: Option<JobConfigurationExtract>,
 }
 
 impl Part for JobConfiguration {}
@@ -1585,6 +1595,8 @@ pub struct Table {
     /// [Output-only] The time when this table was created, in milliseconds since the epoch.
     #[serde(rename="creationTime")]
     pub creation_time: Option<String>,
+    /// [Experimental] The labels associated with this table. You can use these to organize and group your tables. Label keys and values can be no longer than 63 characters, can only contain letters, numeric characters, underscores and dashes. International characters are allowed. Label values are optional. Label keys must start with a letter and must be unique within a dataset. Both keys and values are additionally constrained to be <= 128 bytes in size.
+    pub labels: Option<HashMap<String, String>>,
     /// [Output-only] The size of this table in bytes, excluding any data in the streaming buffer.
     #[serde(rename="numBytes")]
     pub num_bytes: Option<String>,

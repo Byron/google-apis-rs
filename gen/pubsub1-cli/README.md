@@ -24,11 +24,14 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *pubsub* API at revision *20160317*. The CLI is at version *1.0.0*.
+This documentation was generated from the *pubsub* API at revision *20161122*. The CLI is at version *1.0.0*.
 
 ```bash
 pubsub1 [options]
         projects
+                snapshots-get-iam-policy <resource> [-p <v>]... [-o <out>]
+                snapshots-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                snapshots-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 subscriptions-acknowledge <subscription> (-r <kv>)... [-p <v>]... [-o <out>]
                 subscriptions-create <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 subscriptions-delete <subscription> [-p <v>]... [-o <out>]

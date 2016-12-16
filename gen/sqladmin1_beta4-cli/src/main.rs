@@ -1288,6 +1288,7 @@ impl<'n> Engine<'n> {
                     "replica-names" => Some(("replicaNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "on-premises-configuration.kind" => Some(("onPremisesConfiguration.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "on-premises-configuration.host-port" => Some(("onPremisesConfiguration.hostPort", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-name" => Some(("connectionName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "ipv6-address" => Some(("ipv6Address", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1342,7 +1343,7 @@ impl<'n> Engine<'n> {
                     "replica-configuration.mysql-replica-configuration.client-key" => Some(("replicaConfiguration.mysqlReplicaConfiguration.clientKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-policy", "authorized-gae-applications", "available", "backend-type", "backup-configuration", "binary-log-enabled", "ca-certificate", "cert", "cert-serial-number", "client-certificate", "client-key", "common-name", "connect-retry-interval", "crash-safe-replication-enabled", "create-time", "current-disk-size", "data-disk-size-gb", "data-disk-type", "database-replication-enabled", "database-version", "day", "dump-file-path", "enabled", "etag", "expiration-time", "failover-replica", "failover-target", "follow-gae-application", "host-port", "hour", "instance", "instance-type", "ip-configuration", "ipv4-enabled", "ipv6-address", "kind", "location-preference", "maintenance-window", "master-heartbeat-period", "master-instance-name", "max-disk-size", "mysql-replica-configuration", "name", "on-premises-configuration", "password", "pricing-plan", "project", "region", "replica-configuration", "replica-names", "replication-type", "require-ssl", "self-link", "server-ca-cert", "service-account-email-address", "settings", "settings-version", "sha1-fingerprint", "ssl-cipher", "start-time", "state", "storage-auto-resize", "suspension-reason", "tier", "update-track", "username", "verify-server-certificate", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-policy", "authorized-gae-applications", "available", "backend-type", "backup-configuration", "binary-log-enabled", "ca-certificate", "cert", "cert-serial-number", "client-certificate", "client-key", "common-name", "connect-retry-interval", "connection-name", "crash-safe-replication-enabled", "create-time", "current-disk-size", "data-disk-size-gb", "data-disk-type", "database-replication-enabled", "database-version", "day", "dump-file-path", "enabled", "etag", "expiration-time", "failover-replica", "failover-target", "follow-gae-application", "host-port", "hour", "instance", "instance-type", "ip-configuration", "ipv4-enabled", "ipv6-address", "kind", "location-preference", "maintenance-window", "master-heartbeat-period", "master-instance-name", "max-disk-size", "mysql-replica-configuration", "name", "on-premises-configuration", "password", "pricing-plan", "project", "region", "replica-configuration", "replica-names", "replication-type", "require-ssl", "self-link", "server-ca-cert", "service-account-email-address", "settings", "settings-version", "sha1-fingerprint", "ssl-cipher", "start-time", "state", "storage-auto-resize", "suspension-reason", "tier", "update-track", "username", "verify-server-certificate", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1499,6 +1500,7 @@ impl<'n> Engine<'n> {
                     "replica-names" => Some(("replicaNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "on-premises-configuration.kind" => Some(("onPremisesConfiguration.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "on-premises-configuration.host-port" => Some(("onPremisesConfiguration.hostPort", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-name" => Some(("connectionName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "ipv6-address" => Some(("ipv6Address", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1553,7 +1555,7 @@ impl<'n> Engine<'n> {
                     "replica-configuration.mysql-replica-configuration.client-key" => Some(("replicaConfiguration.mysqlReplicaConfiguration.clientKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-policy", "authorized-gae-applications", "available", "backend-type", "backup-configuration", "binary-log-enabled", "ca-certificate", "cert", "cert-serial-number", "client-certificate", "client-key", "common-name", "connect-retry-interval", "crash-safe-replication-enabled", "create-time", "current-disk-size", "data-disk-size-gb", "data-disk-type", "database-replication-enabled", "database-version", "day", "dump-file-path", "enabled", "etag", "expiration-time", "failover-replica", "failover-target", "follow-gae-application", "host-port", "hour", "instance", "instance-type", "ip-configuration", "ipv4-enabled", "ipv6-address", "kind", "location-preference", "maintenance-window", "master-heartbeat-period", "master-instance-name", "max-disk-size", "mysql-replica-configuration", "name", "on-premises-configuration", "password", "pricing-plan", "project", "region", "replica-configuration", "replica-names", "replication-type", "require-ssl", "self-link", "server-ca-cert", "service-account-email-address", "settings", "settings-version", "sha1-fingerprint", "ssl-cipher", "start-time", "state", "storage-auto-resize", "suspension-reason", "tier", "update-track", "username", "verify-server-certificate", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-policy", "authorized-gae-applications", "available", "backend-type", "backup-configuration", "binary-log-enabled", "ca-certificate", "cert", "cert-serial-number", "client-certificate", "client-key", "common-name", "connect-retry-interval", "connection-name", "crash-safe-replication-enabled", "create-time", "current-disk-size", "data-disk-size-gb", "data-disk-type", "database-replication-enabled", "database-version", "day", "dump-file-path", "enabled", "etag", "expiration-time", "failover-replica", "failover-target", "follow-gae-application", "host-port", "hour", "instance", "instance-type", "ip-configuration", "ipv4-enabled", "ipv6-address", "kind", "location-preference", "maintenance-window", "master-heartbeat-period", "master-instance-name", "max-disk-size", "mysql-replica-configuration", "name", "on-premises-configuration", "password", "pricing-plan", "project", "region", "replica-configuration", "replica-names", "replication-type", "require-ssl", "self-link", "server-ca-cert", "service-account-email-address", "settings", "settings-version", "sha1-fingerprint", "ssl-cipher", "start-time", "state", "storage-auto-resize", "suspension-reason", "tier", "update-track", "username", "verify-server-certificate", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1960,6 +1962,58 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _instances_truncate_log(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.instances().truncate_log(opt.value_of("project").unwrap_or(""), opt.value_of("instance").unwrap_or(""), opt.value_of("log-type").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _instances_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -1998,6 +2052,7 @@ impl<'n> Engine<'n> {
                     "replica-names" => Some(("replicaNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "on-premises-configuration.kind" => Some(("onPremisesConfiguration.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "on-premises-configuration.host-port" => Some(("onPremisesConfiguration.hostPort", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-name" => Some(("connectionName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "ipv6-address" => Some(("ipv6Address", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2052,7 +2107,7 @@ impl<'n> Engine<'n> {
                     "replica-configuration.mysql-replica-configuration.client-key" => Some(("replicaConfiguration.mysqlReplicaConfiguration.clientKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-policy", "authorized-gae-applications", "available", "backend-type", "backup-configuration", "binary-log-enabled", "ca-certificate", "cert", "cert-serial-number", "client-certificate", "client-key", "common-name", "connect-retry-interval", "crash-safe-replication-enabled", "create-time", "current-disk-size", "data-disk-size-gb", "data-disk-type", "database-replication-enabled", "database-version", "day", "dump-file-path", "enabled", "etag", "expiration-time", "failover-replica", "failover-target", "follow-gae-application", "host-port", "hour", "instance", "instance-type", "ip-configuration", "ipv4-enabled", "ipv6-address", "kind", "location-preference", "maintenance-window", "master-heartbeat-period", "master-instance-name", "max-disk-size", "mysql-replica-configuration", "name", "on-premises-configuration", "password", "pricing-plan", "project", "region", "replica-configuration", "replica-names", "replication-type", "require-ssl", "self-link", "server-ca-cert", "service-account-email-address", "settings", "settings-version", "sha1-fingerprint", "ssl-cipher", "start-time", "state", "storage-auto-resize", "suspension-reason", "tier", "update-track", "username", "verify-server-certificate", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-policy", "authorized-gae-applications", "available", "backend-type", "backup-configuration", "binary-log-enabled", "ca-certificate", "cert", "cert-serial-number", "client-certificate", "client-key", "common-name", "connect-retry-interval", "connection-name", "crash-safe-replication-enabled", "create-time", "current-disk-size", "data-disk-size-gb", "data-disk-type", "database-replication-enabled", "database-version", "day", "dump-file-path", "enabled", "etag", "expiration-time", "failover-replica", "failover-target", "follow-gae-application", "host-port", "hour", "instance", "instance-type", "ip-configuration", "ipv4-enabled", "ipv6-address", "kind", "location-preference", "maintenance-window", "master-heartbeat-period", "master-instance-name", "max-disk-size", "mysql-replica-configuration", "name", "on-premises-configuration", "password", "pricing-plan", "project", "region", "replica-configuration", "replica-names", "replication-type", "require-ssl", "self-link", "server-ca-cert", "service-account-email-address", "settings", "settings-version", "sha1-fingerprint", "ssl-cipher", "start-time", "state", "storage-auto-resize", "suspension-reason", "tier", "update-track", "username", "verify-server-certificate", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2996,6 +3051,9 @@ impl<'n> Engine<'n> {
                     ("stop-replica", Some(opt)) => {
                         call_result = self._instances_stop_replica(opt, dry_run, &mut err);
                     },
+                    ("truncate-log", Some(opt)) => {
+                        call_result = self._instances_truncate_log(opt, dry_run, &mut err);
+                    },
                     ("update", Some(opt)) => {
                         call_result = self._instances_update(opt, dry_run, &mut err);
                     },
@@ -3520,7 +3578,7 @@ fn main() {
                   ]),
             ]),
         
-        ("instances", "methods: 'clone', 'delete', 'export', 'failover', 'get', 'import', 'insert', 'list', 'patch', 'promote-replica', 'reset-ssl-config', 'restart', 'restore-backup', 'start-replica', 'stop-replica' and 'update'", vec![
+        ("instances", "methods: 'clone', 'delete', 'export', 'failover', 'get', 'import', 'insert', 'list', 'patch', 'promote-replica', 'reset-ssl-config', 'restart', 'restore-backup', 'start-replica', 'stop-replica', 'truncate-log' and 'update'", vec![
             ("clone",
                     Some(r##"Creates a Cloud SQL instance as a clone of the source instance. The API is not ready for Second Generation instances yet."##),
                     "Details at http://byron.github.io/google-apis-rs/google_sqladmin1_beta4_cli/instances_clone",
@@ -3956,6 +4014,40 @@ fn main() {
                     (Some(r##"instance"##),
                      None,
                      Some(r##"Cloud SQL read replica instance name."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("truncate-log",
+                    Some(r##"Truncate MySQL general and slow query log tables"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_sqladmin1_beta4_cli/instances_truncate-log",
+                  vec![
+                    (Some(r##"project"##),
+                     None,
+                     Some(r##"Project ID of the Cloud SQL project."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"instance"##),
+                     None,
+                     Some(r##"Cloud SQL instance ID. This does not include the project ID."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"log-type"##),
+                     None,
+                     Some(r##"The type of Log Table to truncate. Valid values are MYSQL_GENERAL_TABLE and MYSQL_SLOW_TABLE"##),
                      Some(true),
                      Some(false)),
         
@@ -4413,7 +4505,7 @@ fn main() {
     
     let mut app = App::new("sqladmin1-beta4")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.0+20160907")
+           .version("1.0.0+20161213")
            .about("Creates and configures Cloud SQL instances, which provide fully-managed MySQL databases.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_sqladmin1_beta4_cli")
            .arg(Arg::with_name("url")

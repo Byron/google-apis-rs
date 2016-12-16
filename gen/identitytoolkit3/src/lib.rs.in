@@ -35,6 +35,32 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 // UTILITIES ###
 // ############
 
+/// Identifies the an OAuth2 authorization scope.
+/// A scope is needed when requesting an
+/// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
+#[derive(PartialEq, Eq, Hash)]
+pub enum Scope {
+    /// View and manage your data across Google Cloud Platform services
+    CloudPlatform,
+
+    /// View and administer all your Firebase data and settings
+    Firebase,
+}
+
+impl AsRef<str> for Scope {
+    fn as_ref(&self) -> &str {
+        match *self {
+            Scope::CloudPlatform => "https://www.googleapis.com/auth/cloud-platform",
+            Scope::Firebase => "https://www.googleapis.com/auth/firebase",
+        }
+    }
+}
+
+impl Default for Scope {
+    fn default() -> Scope {
+        Scope::Firebase
+    }
+}
 
 
 
@@ -206,9 +232,9 @@ impl ResponseResult for IdentitytoolkitRelyingpartySetProjectConfigResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IdentitytoolkitRelyingpartyGetProjectConfigResponse {
-    /// Whether to allow password user sign in or sign up.
-    #[serde(rename="allowPasswordUser")]
-    pub allow_password_user: Option<bool>,
+    /// no description provided
+    #[serde(rename="dynamicLinksDomain")]
+    pub dynamic_links_domain: Option<String>,
     /// Browser API key, needed when making http request to Apiary.
     #[serde(rename="apiKey")]
     pub api_key: Option<String>,
@@ -233,6 +259,9 @@ pub struct IdentitytoolkitRelyingpartyGetProjectConfigResponse {
     /// Verify email template.
     #[serde(rename="verifyEmailTemplate")]
     pub verify_email_template: Option<EmailTemplate>,
+    /// Whether to allow password user sign in or sign up.
+    #[serde(rename="allowPasswordUser")]
+    pub allow_password_user: Option<bool>,
     /// Reset password email template.
     #[serde(rename="resetPasswordTemplate")]
     pub reset_password_template: Option<EmailTemplate>,
@@ -468,10 +497,16 @@ impl ResponseResult for VerifyPasswordResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResetPasswordResponse {
+    /// The request type.
+    #[serde(rename="requestType")]
+    pub request_type: Option<String>,
     /// The fixed string "identitytoolkit#ResetPasswordResponse".
     pub kind: Option<String>,
-    /// The user's email.
+    /// The user's email. If the out-of-band code is for email recovery, the user's original email.
     pub email: Option<String>,
+    /// If the out-of-band code is for email recovery, the user's new email.
+    #[serde(rename="newEmail")]
+    pub new_email: Option<String>,
 }
 
 impl ResponseResult for ResetPasswordResponse {}
@@ -541,6 +576,9 @@ pub struct IdentitytoolkitRelyingpartyCreateAuthUriRequest {
     /// The URI to which the IDP redirects the user after the federated login flow.
     #[serde(rename="continueUri")]
     pub continue_uri: Option<String>,
+    /// The query parameter that client can customize by themselves in auth url. The following parameters are reserved for server so that they cannot be customized by clients: client_id, response_type, scope, redirect_uri, state, oauth_token.
+    #[serde(rename="customParameter")]
+    pub custom_parameter: Option<HashMap<String, String>>,
     /// Optional realm for OpenID protocol. The sub string "scheme://domain:port" of the param "continueUri" is used if this is not set.
     #[serde(rename="openidRealm")]
     pub openid_realm: Option<String>,
@@ -560,21 +598,29 @@ impl RequestValue for IdentitytoolkitRelyingpartyCreateAuthUriRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IdentitytoolkitRelyingpartySignupNewUserRequest {
-    /// Response to the captcha.
-    #[serde(rename="captchaResponse")]
-    pub captcha_response: Option<String>,
     /// The name of the user.
     #[serde(rename="displayName")]
     pub display_name: Option<String>,
-    /// The captcha challenge.
-    #[serde(rename="captchaChallenge")]
-    pub captcha_challenge: Option<String>,
+    /// The photo url of the user.
+    #[serde(rename="photoUrl")]
+    pub photo_url: Option<String>,
     /// Instance id token of the app.
     #[serde(rename="instanceId")]
     pub instance_id: Option<String>,
+    /// Mark the email as verified or not. Only can be used by service account.
+    #[serde(rename="emailVerified")]
+    pub email_verified: Option<bool>,
+    /// Whether to disable the user. Only can be used by service account.
+    pub disabled: Option<bool>,
+    /// Response to the captcha.
+    #[serde(rename="captchaResponse")]
+    pub captcha_response: Option<String>,
     /// The GITKit token of the authenticated user.
     #[serde(rename="idToken")]
     pub id_token: Option<String>,
+    /// The captcha challenge.
+    #[serde(rename="captchaChallenge")]
+    pub captcha_challenge: Option<String>,
     /// The new password of the user.
     pub password: Option<String>,
     /// The email of the user.
@@ -613,6 +659,9 @@ pub struct IdentitytoolkitRelyingpartyDownloadAccountRequest {
     /// The token for the next page. This should be taken from the previous response.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
+    /// Specify which project (field value is actually project id) to operate. Only used when provided credential.
+    #[serde(rename="targetProjectId")]
+    pub target_project_id: Option<String>,
     /// GCP project number of the requesting delegated app. Currently only intended for Firebase V1 migration.
     #[serde(rename="delegatedProjectNumber")]
     pub delegated_project_number: Option<String>,
@@ -987,24 +1036,21 @@ pub struct UserInfoProviderUserInfo {
     /// User's identifier at IDP.
     #[serde(rename="federatedId")]
     pub federated_id: Option<String>,
+    /// The IdP ID. For white listed IdPs it's a short domain name, e.g., google.com, aol.com, live.net and yahoo.com. For other OpenID IdPs it's the OP identifier.
+    #[serde(rename="providerId")]
+    pub provider_id: Option<String>,
     /// The user's display name at the IDP.
     #[serde(rename="displayName")]
     pub display_name: Option<String>,
     /// The user's photo url at the IDP.
     #[serde(rename="photoUrl")]
     pub photo_url: Option<String>,
-    /// Raw IDP-returned user info.
-    #[serde(rename="rawUserInfo")]
-    pub raw_user_info: Option<String>,
-    /// The IdP ID. For white listed IdPs it's a short domain name, e.g., google.com, aol.com, live.net and yahoo.com. For other OpenID IdPs it's the OP identifier.
-    #[serde(rename="providerId")]
-    pub provider_id: Option<String>,
     /// User's raw identifier directly returned from IDP.
     #[serde(rename="rawId")]
     pub raw_id: Option<String>,
     /// User's email at IDP.
     pub email: Option<String>,
-    /// User's screen name at Twitter.
+    /// User's screen name at Twitter or login name at Github.
     #[serde(rename="screenName")]
     pub screen_name: Option<String>,
 }
@@ -1111,7 +1157,7 @@ pub struct VerifyAssertionResponse {
     pub nick_name: Option<String>,
     /// The email returned by the IdP. NOTE: The federated login user may not own the email.
     pub email: Option<String>,
-    /// The screen_name of a Twitter user.
+    /// The screen_name of a Twitter user or the login name at Github.
     #[serde(rename="screenName")]
     pub screen_name: Option<String>,
     /// URL for OTA app installation.
@@ -1266,17 +1312,26 @@ pub struct IdentitytoolkitRelyingpartyUploadAccountRequest {
     /// GCP project number of the requesting delegated app. Currently only intended for Firebase V1 migration.
     #[serde(rename="delegatedProjectNumber")]
     pub delegated_project_number: Option<String>,
-    /// Memory cost for hash calculation. Used by scrypt similar algorithms.
-    #[serde(rename="memoryCost")]
-    pub memory_cost: Option<i32>,
+    /// Whether allow overwrite existing account when user local_id exists.
+    #[serde(rename="allowOverwrite")]
+    pub allow_overwrite: Option<bool>,
     /// The account info to be stored.
     pub users: Option<Vec<UserInfo>>,
-    /// The salt separator.
-    #[serde(rename="saltSeparator")]
-    pub salt_separator: Option<String>,
+    /// If true, backend will do sanity check(including duplicate email and federated id) when uploading account.
+    #[serde(rename="sanityCheck")]
+    pub sanity_check: Option<bool>,
     /// The key for to hash the password.
     #[serde(rename="signerKey")]
     pub signer_key: Option<String>,
+    /// Memory cost for hash calculation. Used by scrypt similar algorithms.
+    #[serde(rename="memoryCost")]
+    pub memory_cost: Option<i32>,
+    /// The salt separator.
+    #[serde(rename="saltSeparator")]
+    pub salt_separator: Option<String>,
+    /// Specify which project (field value is actually project id) to operate. Only used when provided credential.
+    #[serde(rename="targetProjectId")]
+    pub target_project_id: Option<String>,
     /// Rounds for hash calculation. Used by scrypt and similar algorithms.
     pub rounds: Option<i32>,
 }
@@ -1290,12 +1345,12 @@ impl RequestValue for IdentitytoolkitRelyingpartyUploadAccountRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UserInfo {
-    /// last login timestamp.
-    #[serde(rename="lastLoginAt")]
-    pub last_login_at: Option<String>,
-    /// The name of the user.
-    #[serde(rename="displayName")]
-    pub display_name: Option<String>,
+    /// The user's plain text password.
+    #[serde(rename="rawPassword")]
+    pub raw_password: Option<String>,
+    /// The user's hashed password.
+    #[serde(rename="passwordHash")]
+    pub password_hash: Option<String>,
     /// The local ID of the user.
     #[serde(rename="localId")]
     pub local_id: Option<String>,
@@ -1305,30 +1360,36 @@ pub struct UserInfo {
     /// The URL of the user profile photo.
     #[serde(rename="photoUrl")]
     pub photo_url: Option<String>,
+    /// last login timestamp.
+    #[serde(rename="lastLoginAt")]
+    pub last_login_at: Option<String>,
+    /// Whether the user is authenticated by the developer.
+    #[serde(rename="customAuth")]
+    pub custom_auth: Option<bool>,
+    /// Whether the user is disabled.
+    pub disabled: Option<bool>,
+    /// The timestamp when the password was last updated.
+    #[serde(rename="passwordUpdatedAt")]
+    pub password_updated_at: Option<f64>,
+    /// User creation timestamp.
+    #[serde(rename="createdAt")]
+    pub created_at: Option<String>,
+    /// The name of the user.
+    #[serde(rename="displayName")]
+    pub display_name: Option<String>,
     /// Whether the email has been verified.
     #[serde(rename="emailVerified")]
     pub email_verified: Option<bool>,
-    /// The user's hashed password.
-    #[serde(rename="passwordHash")]
-    pub password_hash: Option<String>,
-    /// Whether the user is disabled.
-    pub disabled: Option<bool>,
     /// Version of the user's password.
     pub version: Option<i32>,
     /// The IDP of the user.
     #[serde(rename="providerUserInfo")]
     pub provider_user_info: Option<Vec<UserInfoProviderUserInfo>>,
-    /// The timestamp when the password was last updated.
-    #[serde(rename="passwordUpdatedAt")]
-    pub password_updated_at: Option<f64>,
     /// The user's password salt.
     pub salt: Option<String>,
     /// The email of the user.
     pub email: Option<String>,
-    /// User creation timestamp.
-    #[serde(rename="createdAt")]
-    pub created_at: Option<String>,
-    /// User's screen name at Twitter.
+    /// User's screen name at Twitter or login name at Github.
     #[serde(rename="screenName")]
     pub screen_name: Option<String>,
 }
@@ -1467,6 +1528,7 @@ impl<'a, C, A> RelyingpartyMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _delegate: Default::default(),
+            _scopes: Default::default(),
             _additional_params: Default::default(),
         }
     }
@@ -1483,6 +1545,7 @@ impl<'a, C, A> RelyingpartyMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _delegate: Default::default(),
+            _scopes: Default::default(),
             _additional_params: Default::default(),
         }
     }
@@ -1499,6 +1562,7 @@ impl<'a, C, A> RelyingpartyMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _delegate: Default::default(),
+            _scopes: Default::default(),
             _additional_params: Default::default(),
         }
     }
@@ -1515,6 +1579,7 @@ impl<'a, C, A> RelyingpartyMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _delegate: Default::default(),
+            _scopes: Default::default(),
             _additional_params: Default::default(),
         }
     }
@@ -1531,6 +1596,7 @@ impl<'a, C, A> RelyingpartyMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _delegate: Default::default(),
+            _scopes: Default::default(),
             _additional_params: Default::default(),
         }
     }
@@ -1547,6 +1613,7 @@ impl<'a, C, A> RelyingpartyMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _delegate: Default::default(),
+            _scopes: Default::default(),
             _additional_params: Default::default(),
         }
     }
@@ -1563,6 +1630,7 @@ impl<'a, C, A> RelyingpartyMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _delegate: Default::default(),
+            _scopes: Default::default(),
             _additional_params: Default::default(),
         }
     }
@@ -1579,6 +1647,7 @@ impl<'a, C, A> RelyingpartyMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _delegate: Default::default(),
+            _scopes: Default::default(),
             _additional_params: Default::default(),
         }
     }
@@ -1595,6 +1664,7 @@ impl<'a, C, A> RelyingpartyMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _delegate: Default::default(),
+            _scopes: Default::default(),
             _additional_params: Default::default(),
         }
     }
@@ -1611,6 +1681,7 @@ impl<'a, C, A> RelyingpartyMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _delegate: Default::default(),
+            _scopes: Default::default(),
             _additional_params: Default::default(),
         }
     }
@@ -1627,6 +1698,7 @@ impl<'a, C, A> RelyingpartyMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _delegate: Default::default(),
+            _scopes: Default::default(),
             _additional_params: Default::default(),
         }
     }
@@ -1643,6 +1715,7 @@ impl<'a, C, A> RelyingpartyMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _delegate: Default::default(),
+            _scopes: Default::default(),
             _additional_params: Default::default(),
         }
     }
@@ -1654,6 +1727,7 @@ impl<'a, C, A> RelyingpartyMethods<'a, C, A> {
         RelyingpartyGetPublicKeyCall {
             hub: self.hub,
             _delegate: Default::default(),
+            _scopes: Default::default(),
             _additional_params: Default::default(),
         }
     }
@@ -1665,6 +1739,7 @@ impl<'a, C, A> RelyingpartyMethods<'a, C, A> {
         RelyingpartyGetRecaptchaParamCall {
             hub: self.hub,
             _delegate: Default::default(),
+            _scopes: Default::default(),
             _additional_params: Default::default(),
         }
     }
@@ -1681,6 +1756,7 @@ impl<'a, C, A> RelyingpartyMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _delegate: Default::default(),
+            _scopes: Default::default(),
             _additional_params: Default::default(),
         }
     }
@@ -1697,6 +1773,7 @@ impl<'a, C, A> RelyingpartyMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _delegate: Default::default(),
+            _scopes: Default::default(),
             _additional_params: Default::default(),
         }
     }
@@ -1710,6 +1787,7 @@ impl<'a, C, A> RelyingpartyMethods<'a, C, A> {
             _project_number: Default::default(),
             _delegated_project_number: Default::default(),
             _delegate: Default::default(),
+            _scopes: Default::default(),
             _additional_params: Default::default(),
         }
     }
@@ -1766,6 +1844,7 @@ pub struct RelyingpartyGetOobConfirmationCodeCall<'a, C, A>
     _request: Relyingparty,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, A> CallBuilder for RelyingpartyGetOobConfirmationCodeCall<'a, C, A> {}
@@ -1798,17 +1877,8 @@ impl<'a, C, A> RelyingpartyGetOobConfirmationCodeCall<'a, C, A> where C: BorrowM
         params.push(("alt", "json".to_string()));
 
         let mut url = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/getOobConfirmationCode".to_string();
-        
-        let mut key = self.hub.auth.borrow_mut().api_key();
-        if key.is_none() {
-            key = dlg.api_key();
-        }
-        match key {
-            Some(value) => params.push(("key", value)),
-            None => {
-                dlg.finished(false);
-                return Err(Error::MissingAPIKey)
-            }
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
 
@@ -1831,11 +1901,25 @@ impl<'a, C, A> RelyingpartyGetOobConfirmationCodeCall<'a, C, A> where C: BorrowM
 
 
         loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
                     .body(&mut request_value_reader);
@@ -1931,6 +2015,22 @@ impl<'a, C, A> RelyingpartyGetOobConfirmationCodeCall<'a, C, A> where C: BorrowM
         self
     }
 
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> RelyingpartyGetOobConfirmationCodeCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
 }
 
 
@@ -1977,6 +2077,7 @@ pub struct RelyingpartySignupNewUserCall<'a, C, A>
     _request: IdentitytoolkitRelyingpartySignupNewUserRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, A> CallBuilder for RelyingpartySignupNewUserCall<'a, C, A> {}
@@ -2009,17 +2110,8 @@ impl<'a, C, A> RelyingpartySignupNewUserCall<'a, C, A> where C: BorrowMut<hyper:
         params.push(("alt", "json".to_string()));
 
         let mut url = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser".to_string();
-        
-        let mut key = self.hub.auth.borrow_mut().api_key();
-        if key.is_none() {
-            key = dlg.api_key();
-        }
-        match key {
-            Some(value) => params.push(("key", value)),
-            None => {
-                dlg.finished(false);
-                return Err(Error::MissingAPIKey)
-            }
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
 
@@ -2042,11 +2134,25 @@ impl<'a, C, A> RelyingpartySignupNewUserCall<'a, C, A> where C: BorrowMut<hyper:
 
 
         loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
                     .body(&mut request_value_reader);
@@ -2142,6 +2248,22 @@ impl<'a, C, A> RelyingpartySignupNewUserCall<'a, C, A> where C: BorrowMut<hyper:
         self
     }
 
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> RelyingpartySignupNewUserCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
 }
 
 
@@ -2188,6 +2310,7 @@ pub struct RelyingpartyCreateAuthUriCall<'a, C, A>
     _request: IdentitytoolkitRelyingpartyCreateAuthUriRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, A> CallBuilder for RelyingpartyCreateAuthUriCall<'a, C, A> {}
@@ -2220,17 +2343,8 @@ impl<'a, C, A> RelyingpartyCreateAuthUriCall<'a, C, A> where C: BorrowMut<hyper:
         params.push(("alt", "json".to_string()));
 
         let mut url = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/createAuthUri".to_string();
-        
-        let mut key = self.hub.auth.borrow_mut().api_key();
-        if key.is_none() {
-            key = dlg.api_key();
-        }
-        match key {
-            Some(value) => params.push(("key", value)),
-            None => {
-                dlg.finished(false);
-                return Err(Error::MissingAPIKey)
-            }
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
 
@@ -2253,11 +2367,25 @@ impl<'a, C, A> RelyingpartyCreateAuthUriCall<'a, C, A> where C: BorrowMut<hyper:
 
 
         loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
                     .body(&mut request_value_reader);
@@ -2353,6 +2481,22 @@ impl<'a, C, A> RelyingpartyCreateAuthUriCall<'a, C, A> where C: BorrowMut<hyper:
         self
     }
 
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> RelyingpartyCreateAuthUriCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
 }
 
 
@@ -2399,6 +2543,7 @@ pub struct RelyingpartySignOutUserCall<'a, C, A>
     _request: IdentitytoolkitRelyingpartySignOutUserRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, A> CallBuilder for RelyingpartySignOutUserCall<'a, C, A> {}
@@ -2431,17 +2576,8 @@ impl<'a, C, A> RelyingpartySignOutUserCall<'a, C, A> where C: BorrowMut<hyper::C
         params.push(("alt", "json".to_string()));
 
         let mut url = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/signOutUser".to_string();
-        
-        let mut key = self.hub.auth.borrow_mut().api_key();
-        if key.is_none() {
-            key = dlg.api_key();
-        }
-        match key {
-            Some(value) => params.push(("key", value)),
-            None => {
-                dlg.finished(false);
-                return Err(Error::MissingAPIKey)
-            }
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
 
@@ -2464,11 +2600,25 @@ impl<'a, C, A> RelyingpartySignOutUserCall<'a, C, A> where C: BorrowMut<hyper::C
 
 
         loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
                     .body(&mut request_value_reader);
@@ -2564,6 +2714,22 @@ impl<'a, C, A> RelyingpartySignOutUserCall<'a, C, A> where C: BorrowMut<hyper::C
         self
     }
 
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> RelyingpartySignOutUserCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
 }
 
 
@@ -2610,6 +2776,7 @@ pub struct RelyingpartyVerifyAssertionCall<'a, C, A>
     _request: IdentitytoolkitRelyingpartyVerifyAssertionRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, A> CallBuilder for RelyingpartyVerifyAssertionCall<'a, C, A> {}
@@ -2642,17 +2809,8 @@ impl<'a, C, A> RelyingpartyVerifyAssertionCall<'a, C, A> where C: BorrowMut<hype
         params.push(("alt", "json".to_string()));
 
         let mut url = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyAssertion".to_string();
-        
-        let mut key = self.hub.auth.borrow_mut().api_key();
-        if key.is_none() {
-            key = dlg.api_key();
-        }
-        match key {
-            Some(value) => params.push(("key", value)),
-            None => {
-                dlg.finished(false);
-                return Err(Error::MissingAPIKey)
-            }
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
 
@@ -2675,11 +2833,25 @@ impl<'a, C, A> RelyingpartyVerifyAssertionCall<'a, C, A> where C: BorrowMut<hype
 
 
         loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
                     .body(&mut request_value_reader);
@@ -2775,6 +2947,22 @@ impl<'a, C, A> RelyingpartyVerifyAssertionCall<'a, C, A> where C: BorrowMut<hype
         self
     }
 
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> RelyingpartyVerifyAssertionCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
 }
 
 
@@ -2821,6 +3009,7 @@ pub struct RelyingpartyUploadAccountCall<'a, C, A>
     _request: IdentitytoolkitRelyingpartyUploadAccountRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, A> CallBuilder for RelyingpartyUploadAccountCall<'a, C, A> {}
@@ -2853,17 +3042,8 @@ impl<'a, C, A> RelyingpartyUploadAccountCall<'a, C, A> where C: BorrowMut<hyper:
         params.push(("alt", "json".to_string()));
 
         let mut url = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/uploadAccount".to_string();
-        
-        let mut key = self.hub.auth.borrow_mut().api_key();
-        if key.is_none() {
-            key = dlg.api_key();
-        }
-        match key {
-            Some(value) => params.push(("key", value)),
-            None => {
-                dlg.finished(false);
-                return Err(Error::MissingAPIKey)
-            }
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
 
@@ -2886,11 +3066,25 @@ impl<'a, C, A> RelyingpartyUploadAccountCall<'a, C, A> where C: BorrowMut<hyper:
 
 
         loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
                     .body(&mut request_value_reader);
@@ -2986,6 +3180,22 @@ impl<'a, C, A> RelyingpartyUploadAccountCall<'a, C, A> where C: BorrowMut<hyper:
         self
     }
 
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> RelyingpartyUploadAccountCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
 }
 
 
@@ -3032,6 +3242,7 @@ pub struct RelyingpartyGetAccountInfoCall<'a, C, A>
     _request: IdentitytoolkitRelyingpartyGetAccountInfoRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, A> CallBuilder for RelyingpartyGetAccountInfoCall<'a, C, A> {}
@@ -3064,17 +3275,8 @@ impl<'a, C, A> RelyingpartyGetAccountInfoCall<'a, C, A> where C: BorrowMut<hyper
         params.push(("alt", "json".to_string()));
 
         let mut url = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/getAccountInfo".to_string();
-        
-        let mut key = self.hub.auth.borrow_mut().api_key();
-        if key.is_none() {
-            key = dlg.api_key();
-        }
-        match key {
-            Some(value) => params.push(("key", value)),
-            None => {
-                dlg.finished(false);
-                return Err(Error::MissingAPIKey)
-            }
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
 
@@ -3097,11 +3299,25 @@ impl<'a, C, A> RelyingpartyGetAccountInfoCall<'a, C, A> where C: BorrowMut<hyper
 
 
         loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
                     .body(&mut request_value_reader);
@@ -3197,6 +3413,22 @@ impl<'a, C, A> RelyingpartyGetAccountInfoCall<'a, C, A> where C: BorrowMut<hyper
         self
     }
 
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> RelyingpartyGetAccountInfoCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
 }
 
 
@@ -3243,6 +3475,7 @@ pub struct RelyingpartyVerifyCustomTokenCall<'a, C, A>
     _request: IdentitytoolkitRelyingpartyVerifyCustomTokenRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, A> CallBuilder for RelyingpartyVerifyCustomTokenCall<'a, C, A> {}
@@ -3275,17 +3508,8 @@ impl<'a, C, A> RelyingpartyVerifyCustomTokenCall<'a, C, A> where C: BorrowMut<hy
         params.push(("alt", "json".to_string()));
 
         let mut url = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyCustomToken".to_string();
-        
-        let mut key = self.hub.auth.borrow_mut().api_key();
-        if key.is_none() {
-            key = dlg.api_key();
-        }
-        match key {
-            Some(value) => params.push(("key", value)),
-            None => {
-                dlg.finished(false);
-                return Err(Error::MissingAPIKey)
-            }
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
 
@@ -3308,11 +3532,25 @@ impl<'a, C, A> RelyingpartyVerifyCustomTokenCall<'a, C, A> where C: BorrowMut<hy
 
 
         loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
                     .body(&mut request_value_reader);
@@ -3408,6 +3646,22 @@ impl<'a, C, A> RelyingpartyVerifyCustomTokenCall<'a, C, A> where C: BorrowMut<hy
         self
     }
 
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> RelyingpartyVerifyCustomTokenCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
 }
 
 
@@ -3454,6 +3708,7 @@ pub struct RelyingpartyResetPasswordCall<'a, C, A>
     _request: IdentitytoolkitRelyingpartyResetPasswordRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, A> CallBuilder for RelyingpartyResetPasswordCall<'a, C, A> {}
@@ -3486,17 +3741,8 @@ impl<'a, C, A> RelyingpartyResetPasswordCall<'a, C, A> where C: BorrowMut<hyper:
         params.push(("alt", "json".to_string()));
 
         let mut url = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/resetPassword".to_string();
-        
-        let mut key = self.hub.auth.borrow_mut().api_key();
-        if key.is_none() {
-            key = dlg.api_key();
-        }
-        match key {
-            Some(value) => params.push(("key", value)),
-            None => {
-                dlg.finished(false);
-                return Err(Error::MissingAPIKey)
-            }
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
 
@@ -3519,11 +3765,25 @@ impl<'a, C, A> RelyingpartyResetPasswordCall<'a, C, A> where C: BorrowMut<hyper:
 
 
         loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
                     .body(&mut request_value_reader);
@@ -3619,6 +3879,22 @@ impl<'a, C, A> RelyingpartyResetPasswordCall<'a, C, A> where C: BorrowMut<hyper:
         self
     }
 
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> RelyingpartyResetPasswordCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
 }
 
 
@@ -3665,6 +3941,7 @@ pub struct RelyingpartyDownloadAccountCall<'a, C, A>
     _request: IdentitytoolkitRelyingpartyDownloadAccountRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, A> CallBuilder for RelyingpartyDownloadAccountCall<'a, C, A> {}
@@ -3697,17 +3974,8 @@ impl<'a, C, A> RelyingpartyDownloadAccountCall<'a, C, A> where C: BorrowMut<hype
         params.push(("alt", "json".to_string()));
 
         let mut url = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/downloadAccount".to_string();
-        
-        let mut key = self.hub.auth.borrow_mut().api_key();
-        if key.is_none() {
-            key = dlg.api_key();
-        }
-        match key {
-            Some(value) => params.push(("key", value)),
-            None => {
-                dlg.finished(false);
-                return Err(Error::MissingAPIKey)
-            }
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
 
@@ -3730,11 +3998,25 @@ impl<'a, C, A> RelyingpartyDownloadAccountCall<'a, C, A> where C: BorrowMut<hype
 
 
         loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
                     .body(&mut request_value_reader);
@@ -3830,6 +4112,22 @@ impl<'a, C, A> RelyingpartyDownloadAccountCall<'a, C, A> where C: BorrowMut<hype
         self
     }
 
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> RelyingpartyDownloadAccountCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
 }
 
 
@@ -3876,6 +4174,7 @@ pub struct RelyingpartySetAccountInfoCall<'a, C, A>
     _request: IdentitytoolkitRelyingpartySetAccountInfoRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, A> CallBuilder for RelyingpartySetAccountInfoCall<'a, C, A> {}
@@ -3908,17 +4207,8 @@ impl<'a, C, A> RelyingpartySetAccountInfoCall<'a, C, A> where C: BorrowMut<hyper
         params.push(("alt", "json".to_string()));
 
         let mut url = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/setAccountInfo".to_string();
-        
-        let mut key = self.hub.auth.borrow_mut().api_key();
-        if key.is_none() {
-            key = dlg.api_key();
-        }
-        match key {
-            Some(value) => params.push(("key", value)),
-            None => {
-                dlg.finished(false);
-                return Err(Error::MissingAPIKey)
-            }
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
 
@@ -3941,11 +4231,25 @@ impl<'a, C, A> RelyingpartySetAccountInfoCall<'a, C, A> where C: BorrowMut<hyper
 
 
         loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
                     .body(&mut request_value_reader);
@@ -4041,6 +4345,22 @@ impl<'a, C, A> RelyingpartySetAccountInfoCall<'a, C, A> where C: BorrowMut<hyper
         self
     }
 
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> RelyingpartySetAccountInfoCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
 }
 
 
@@ -4087,6 +4407,7 @@ pub struct RelyingpartyDeleteAccountCall<'a, C, A>
     _request: IdentitytoolkitRelyingpartyDeleteAccountRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, A> CallBuilder for RelyingpartyDeleteAccountCall<'a, C, A> {}
@@ -4119,17 +4440,8 @@ impl<'a, C, A> RelyingpartyDeleteAccountCall<'a, C, A> where C: BorrowMut<hyper:
         params.push(("alt", "json".to_string()));
 
         let mut url = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/deleteAccount".to_string();
-        
-        let mut key = self.hub.auth.borrow_mut().api_key();
-        if key.is_none() {
-            key = dlg.api_key();
-        }
-        match key {
-            Some(value) => params.push(("key", value)),
-            None => {
-                dlg.finished(false);
-                return Err(Error::MissingAPIKey)
-            }
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
 
@@ -4152,11 +4464,25 @@ impl<'a, C, A> RelyingpartyDeleteAccountCall<'a, C, A> where C: BorrowMut<hyper:
 
 
         loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
                     .body(&mut request_value_reader);
@@ -4252,6 +4578,22 @@ impl<'a, C, A> RelyingpartyDeleteAccountCall<'a, C, A> where C: BorrowMut<hyper:
         self
     }
 
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> RelyingpartyDeleteAccountCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
 }
 
 
@@ -4291,6 +4633,7 @@ pub struct RelyingpartyGetPublicKeyCall<'a, C, A>
     hub: &'a IdentityToolkit<C, A>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, A> CallBuilder for RelyingpartyGetPublicKeyCall<'a, C, A> {}
@@ -4323,17 +4666,8 @@ impl<'a, C, A> RelyingpartyGetPublicKeyCall<'a, C, A> where C: BorrowMut<hyper::
         params.push(("alt", "json".to_string()));
 
         let mut url = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/publicKeys".to_string();
-        
-        let mut key = self.hub.auth.borrow_mut().api_key();
-        if key.is_none() {
-            key = dlg.api_key();
-        }
-        match key {
-            Some(value) => params.push(("key", value)),
-            None => {
-                dlg.finished(false);
-                return Err(Error::MissingAPIKey)
-            }
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
 
@@ -4345,10 +4679,24 @@ impl<'a, C, A> RelyingpartyGetPublicKeyCall<'a, C, A> where C: BorrowMut<hyper::
 
 
         loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()));
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -4432,6 +4780,22 @@ impl<'a, C, A> RelyingpartyGetPublicKeyCall<'a, C, A> where C: BorrowMut<hyper::
         self
     }
 
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> RelyingpartyGetPublicKeyCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
 }
 
 
@@ -4471,6 +4835,7 @@ pub struct RelyingpartyGetRecaptchaParamCall<'a, C, A>
     hub: &'a IdentityToolkit<C, A>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, A> CallBuilder for RelyingpartyGetRecaptchaParamCall<'a, C, A> {}
@@ -4503,17 +4868,8 @@ impl<'a, C, A> RelyingpartyGetRecaptchaParamCall<'a, C, A> where C: BorrowMut<hy
         params.push(("alt", "json".to_string()));
 
         let mut url = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/getRecaptchaParam".to_string();
-        
-        let mut key = self.hub.auth.borrow_mut().api_key();
-        if key.is_none() {
-            key = dlg.api_key();
-        }
-        match key {
-            Some(value) => params.push(("key", value)),
-            None => {
-                dlg.finished(false);
-                return Err(Error::MissingAPIKey)
-            }
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
 
@@ -4525,10 +4881,24 @@ impl<'a, C, A> RelyingpartyGetRecaptchaParamCall<'a, C, A> where C: BorrowMut<hy
 
 
         loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()));
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -4612,6 +4982,22 @@ impl<'a, C, A> RelyingpartyGetRecaptchaParamCall<'a, C, A> where C: BorrowMut<hy
         self
     }
 
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> RelyingpartyGetRecaptchaParamCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
 }
 
 
@@ -4658,6 +5044,7 @@ pub struct RelyingpartyVerifyPasswordCall<'a, C, A>
     _request: IdentitytoolkitRelyingpartyVerifyPasswordRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, A> CallBuilder for RelyingpartyVerifyPasswordCall<'a, C, A> {}
@@ -4690,17 +5077,8 @@ impl<'a, C, A> RelyingpartyVerifyPasswordCall<'a, C, A> where C: BorrowMut<hyper
         params.push(("alt", "json".to_string()));
 
         let mut url = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword".to_string();
-        
-        let mut key = self.hub.auth.borrow_mut().api_key();
-        if key.is_none() {
-            key = dlg.api_key();
-        }
-        match key {
-            Some(value) => params.push(("key", value)),
-            None => {
-                dlg.finished(false);
-                return Err(Error::MissingAPIKey)
-            }
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
 
@@ -4723,11 +5101,25 @@ impl<'a, C, A> RelyingpartyVerifyPasswordCall<'a, C, A> where C: BorrowMut<hyper
 
 
         loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
                     .body(&mut request_value_reader);
@@ -4823,6 +5215,22 @@ impl<'a, C, A> RelyingpartyVerifyPasswordCall<'a, C, A> where C: BorrowMut<hyper
         self
     }
 
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> RelyingpartyVerifyPasswordCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
 }
 
 
@@ -4869,6 +5277,7 @@ pub struct RelyingpartySetProjectConfigCall<'a, C, A>
     _request: IdentitytoolkitRelyingpartySetProjectConfigRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, A> CallBuilder for RelyingpartySetProjectConfigCall<'a, C, A> {}
@@ -4901,17 +5310,8 @@ impl<'a, C, A> RelyingpartySetProjectConfigCall<'a, C, A> where C: BorrowMut<hyp
         params.push(("alt", "json".to_string()));
 
         let mut url = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/setProjectConfig".to_string();
-        
-        let mut key = self.hub.auth.borrow_mut().api_key();
-        if key.is_none() {
-            key = dlg.api_key();
-        }
-        match key {
-            Some(value) => params.push(("key", value)),
-            None => {
-                dlg.finished(false);
-                return Err(Error::MissingAPIKey)
-            }
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
 
@@ -4934,11 +5334,25 @@ impl<'a, C, A> RelyingpartySetProjectConfigCall<'a, C, A> where C: BorrowMut<hyp
 
 
         loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
                     .body(&mut request_value_reader);
@@ -5034,6 +5448,22 @@ impl<'a, C, A> RelyingpartySetProjectConfigCall<'a, C, A> where C: BorrowMut<hyp
         self
     }
 
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> RelyingpartySetProjectConfigCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
 }
 
 
@@ -5077,6 +5507,7 @@ pub struct RelyingpartyGetProjectConfigCall<'a, C, A>
     _delegated_project_number: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, A> CallBuilder for RelyingpartyGetProjectConfigCall<'a, C, A> {}
@@ -5115,17 +5546,8 @@ impl<'a, C, A> RelyingpartyGetProjectConfigCall<'a, C, A> where C: BorrowMut<hyp
         params.push(("alt", "json".to_string()));
 
         let mut url = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/getProjectConfig".to_string();
-        
-        let mut key = self.hub.auth.borrow_mut().api_key();
-        if key.is_none() {
-            key = dlg.api_key();
-        }
-        match key {
-            Some(value) => params.push(("key", value)),
-            None => {
-                dlg.finished(false);
-                return Err(Error::MissingAPIKey)
-            }
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
 
@@ -5137,10 +5559,24 @@ impl<'a, C, A> RelyingpartyGetProjectConfigCall<'a, C, A> where C: BorrowMut<hyp
 
 
         loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()));
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -5238,6 +5674,22 @@ impl<'a, C, A> RelyingpartyGetProjectConfigCall<'a, C, A> where C: BorrowMut<hyp
         self
     }
 
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> RelyingpartyGetProjectConfigCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
 }
 
 

@@ -1,0 +1,20 @@
+site_name: Slides v1.0.0+20161213
+site_url: http://byron.github.io/google-apis-rs/google-slides1-cli
+site_description: Write integrating applications with bcore
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/slides1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['presentations_batch-update.md', 'Presentations', 'Batch Update']
+- ['presentations_create.md', 'Presentations', 'Create']
+- ['presentations_get.md', 'Presentations', 'Get']
+- ['presentations_pages-get.md', 'Presentations', 'Pages Get']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+

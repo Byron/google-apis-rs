@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *calendar* API at revision *20160830*. The CLI is at version *1.0.0*.
+This documentation was generated from the *calendar* API at revision *20161211*. The CLI is at version *1.0.0*.
 
 ```bash
 calendar3 [options]

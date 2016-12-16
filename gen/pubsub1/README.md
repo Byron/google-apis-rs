@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-pubsub1` library allows access to all features of the *Google pubsub* service.
 
-This documentation was generated from *pubsub* crate version *1.0.0+20160317*, where *20160317* is the exact revision of the *pubsub:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
+This documentation was generated from *pubsub* crate version *1.0.0+20161122*, where *20161122* is the exact revision of the *pubsub:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
 
 Everything else about the *pubsub* *v1* API can be found at the
 [official documentation site](https://cloud.google.com/pubsub/docs).
@@ -14,7 +14,7 @@ Everything else about the *pubsub* *v1* API can be found at the
 Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google_pubsub1/struct.Pubsub.html) ... 
 
 * projects
- * [*subscriptions acknowledge*](http://byron.github.io/google-apis-rs/google_pubsub1/struct.ProjectSubscriptionAcknowledgeCall.html), [*subscriptions create*](http://byron.github.io/google-apis-rs/google_pubsub1/struct.ProjectSubscriptionCreateCall.html), [*subscriptions delete*](http://byron.github.io/google-apis-rs/google_pubsub1/struct.ProjectSubscriptionDeleteCall.html), [*subscriptions get*](http://byron.github.io/google-apis-rs/google_pubsub1/struct.ProjectSubscriptionGetCall.html), [*subscriptions get iam policy*](http://byron.github.io/google-apis-rs/google_pubsub1/struct.ProjectSubscriptionGetIamPolicyCall.html), [*subscriptions list*](http://byron.github.io/google-apis-rs/google_pubsub1/struct.ProjectSubscriptionListCall.html), [*subscriptions modify ack deadline*](http://byron.github.io/google-apis-rs/google_pubsub1/struct.ProjectSubscriptionModifyAckDeadlineCall.html), [*subscriptions modify push config*](http://byron.github.io/google-apis-rs/google_pubsub1/struct.ProjectSubscriptionModifyPushConfigCall.html), [*subscriptions pull*](http://byron.github.io/google-apis-rs/google_pubsub1/struct.ProjectSubscriptionPullCall.html), [*subscriptions set iam policy*](http://byron.github.io/google-apis-rs/google_pubsub1/struct.ProjectSubscriptionSetIamPolicyCall.html), [*subscriptions test iam permissions*](http://byron.github.io/google-apis-rs/google_pubsub1/struct.ProjectSubscriptionTestIamPermissionCall.html), [*topics create*](http://byron.github.io/google-apis-rs/google_pubsub1/struct.ProjectTopicCreateCall.html), [*topics delete*](http://byron.github.io/google-apis-rs/google_pubsub1/struct.ProjectTopicDeleteCall.html), [*topics get*](http://byron.github.io/google-apis-rs/google_pubsub1/struct.ProjectTopicGetCall.html), [*topics get iam policy*](http://byron.github.io/google-apis-rs/google_pubsub1/struct.ProjectTopicGetIamPolicyCall.html), [*topics list*](http://byron.github.io/google-apis-rs/google_pubsub1/struct.ProjectTopicListCall.html), [*topics publish*](http://byron.github.io/google-apis-rs/google_pubsub1/struct.ProjectTopicPublishCall.html), [*topics set iam policy*](http://byron.github.io/google-apis-rs/google_pubsub1/struct.ProjectTopicSetIamPolicyCall.html), [*topics subscriptions list*](http://byron.github.io/google-apis-rs/google_pubsub1/struct.ProjectTopicSubscriptionListCall.html) and [*topics test iam permissions*](http://byron.github.io/google-apis-rs/google_pubsub1/struct.ProjectTopicTestIamPermissionCall.html)
+ * [*snapshots get iam policy*](http://byron.github.io/google-apis-rs/google_pubsub1/struct.ProjectSnapshotGetIamPolicyCall.html), [*snapshots set iam policy*](http://byron.github.io/google-apis-rs/google_pubsub1/struct.ProjectSnapshotSetIamPolicyCall.html), [*snapshots test iam permissions*](http://byron.github.io/google-apis-rs/google_pubsub1/struct.ProjectSnapshotTestIamPermissionCall.html), [*subscriptions acknowledge*](http://byron.github.io/google-apis-rs/google_pubsub1/struct.ProjectSubscriptionAcknowledgeCall.html), [*subscriptions create*](http://byron.github.io/google-apis-rs/google_pubsub1/struct.ProjectSubscriptionCreateCall.html), [*subscriptions delete*](http://byron.github.io/google-apis-rs/google_pubsub1/struct.ProjectSubscriptionDeleteCall.html), [*subscriptions get*](http://byron.github.io/google-apis-rs/google_pubsub1/struct.ProjectSubscriptionGetCall.html), [*subscriptions get iam policy*](http://byron.github.io/google-apis-rs/google_pubsub1/struct.ProjectSubscriptionGetIamPolicyCall.html), [*subscriptions list*](http://byron.github.io/google-apis-rs/google_pubsub1/struct.ProjectSubscriptionListCall.html), [*subscriptions modify ack deadline*](http://byron.github.io/google-apis-rs/google_pubsub1/struct.ProjectSubscriptionModifyAckDeadlineCall.html), [*subscriptions modify push config*](http://byron.github.io/google-apis-rs/google_pubsub1/struct.ProjectSubscriptionModifyPushConfigCall.html), [*subscriptions pull*](http://byron.github.io/google-apis-rs/google_pubsub1/struct.ProjectSubscriptionPullCall.html), [*subscriptions set iam policy*](http://byron.github.io/google-apis-rs/google_pubsub1/struct.ProjectSubscriptionSetIamPolicyCall.html), [*subscriptions test iam permissions*](http://byron.github.io/google-apis-rs/google_pubsub1/struct.ProjectSubscriptionTestIamPermissionCall.html), [*topics create*](http://byron.github.io/google-apis-rs/google_pubsub1/struct.ProjectTopicCreateCall.html), [*topics delete*](http://byron.github.io/google-apis-rs/google_pubsub1/struct.ProjectTopicDeleteCall.html), [*topics get*](http://byron.github.io/google-apis-rs/google_pubsub1/struct.ProjectTopicGetCall.html), [*topics get iam policy*](http://byron.github.io/google-apis-rs/google_pubsub1/struct.ProjectTopicGetIamPolicyCall.html), [*topics list*](http://byron.github.io/google-apis-rs/google_pubsub1/struct.ProjectTopicListCall.html), [*topics publish*](http://byron.github.io/google-apis-rs/google_pubsub1/struct.ProjectTopicPublishCall.html), [*topics set iam policy*](http://byron.github.io/google-apis-rs/google_pubsub1/struct.ProjectTopicSetIamPolicyCall.html), [*topics subscriptions list*](http://byron.github.io/google-apis-rs/google_pubsub1/struct.ProjectTopicSubscriptionListCall.html) and [*topics test iam permissions*](http://byron.github.io/google-apis-rs/google_pubsub1/struct.ProjectTopicTestIamPermissionCall.html)
 
 
 
@@ -47,11 +47,12 @@ let r = hub.resource().activity(...).doit()
 Or specifically ...
 
 ```ignore
-let r = hub.projects().subscriptions_acknowledge(...).doit()
-let r = hub.projects().subscriptions_modify_push_config(...).doit()
-let r = hub.projects().subscriptions_delete(...).doit()
-let r = hub.projects().topics_delete(...).doit()
-let r = hub.projects().subscriptions_modify_ack_deadline(...).doit()
+let r = hub.projects().snapshots_get_iam_policy(...).doit()
+let r = hub.projects().snapshots_set_iam_policy(...).doit()
+let r = hub.projects().topics_get_iam_policy(...).doit()
+let r = hub.projects().topics_set_iam_policy(...).doit()
+let r = hub.projects().subscriptions_get_iam_policy(...).doit()
+let r = hub.projects().subscriptions_set_iam_policy(...).doit()
 ```
 
 The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -76,7 +77,7 @@ google-pubsub1 = "*"
 extern crate hyper;
 extern crate yup_oauth2 as oauth2;
 extern crate google_pubsub1 as pubsub1;
-use pubsub1::AcknowledgeRequest;
+use pubsub1::SetIamPolicyRequest;
 use pubsub1::{Result, Error};
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -97,12 +98,12 @@ let mut hub = Pubsub::new(hyper::Client::new(), auth);
 // As the method needs a request, you would usually fill it with the desired information
 // into the respective structure. Some of the parts shown here might not be applicable !
 // Values shown here are possibly random and not representative !
-let mut req = AcknowledgeRequest::default();
+let mut req = SetIamPolicyRequest::default();
 
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
-let result = hub.projects().subscriptions_acknowledge(req, "subscription")
+let result = hub.projects().snapshots_set_iam_policy(req, "resource")
              .doit();
 
 match result {

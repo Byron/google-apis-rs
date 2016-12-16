@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *SQL Admin* crate version *1.0.0+20160907*, where *20160907* is the exact revision of the *sqladmin:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
+//! This documentation was generated from *SQL Admin* crate version *1.0.0+20161213*, where *20161213* is the exact revision of the *sqladmin:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
 //! 
 //! Everything else about the *SQL Admin* *v1_beta4* API can be found at the
 //! [official documentation site](https://cloud.google.com/sql/docs/reference/latest).
@@ -18,7 +18,7 @@
 //! * [flags](struct.Flag.html)
 //!  * [*list*](struct.FlagListCall.html)
 //! * instances
-//!  * [*clone*](struct.InstanceCloneCall.html), [*delete*](struct.InstanceDeleteCall.html), [*export*](struct.InstanceExportCall.html), [*failover*](struct.InstanceFailoverCall.html), [*get*](struct.InstanceGetCall.html), [*import*](struct.InstanceImportCall.html), [*insert*](struct.InstanceInsertCall.html), [*list*](struct.InstanceListCall.html), [*patch*](struct.InstancePatchCall.html), [*promote replica*](struct.InstancePromoteReplicaCall.html), [*reset ssl config*](struct.InstanceResetSslConfigCall.html), [*restart*](struct.InstanceRestartCall.html), [*restore backup*](struct.InstanceRestoreBackupCall.html), [*start replica*](struct.InstanceStartReplicaCall.html), [*stop replica*](struct.InstanceStopReplicaCall.html) and [*update*](struct.InstanceUpdateCall.html)
+//!  * [*clone*](struct.InstanceCloneCall.html), [*delete*](struct.InstanceDeleteCall.html), [*export*](struct.InstanceExportCall.html), [*failover*](struct.InstanceFailoverCall.html), [*get*](struct.InstanceGetCall.html), [*import*](struct.InstanceImportCall.html), [*insert*](struct.InstanceInsertCall.html), [*list*](struct.InstanceListCall.html), [*patch*](struct.InstancePatchCall.html), [*promote replica*](struct.InstancePromoteReplicaCall.html), [*reset ssl config*](struct.InstanceResetSslConfigCall.html), [*restart*](struct.InstanceRestartCall.html), [*restore backup*](struct.InstanceRestoreBackupCall.html), [*start replica*](struct.InstanceStartReplicaCall.html), [*stop replica*](struct.InstanceStopReplicaCall.html), [*truncate log*](struct.InstanceTruncateLogCall.html) and [*update*](struct.InstanceUpdateCall.html)
 //! * [operations](struct.Operation.html)
 //!  * [*get*](struct.OperationGetCall.html) and [*list*](struct.OperationListCall.html)
 //! * [ssl certs](struct.SslCert.html)
@@ -62,6 +62,7 @@
 //! 
 //! ```ignore
 //! let r = hub.ssl_certs().delete(...).doit()
+//! let r = hub.instances().truncate_log(...).doit()
 //! let r = hub.users().delete(...).doit()
 //! let r = hub.databases().delete(...).doit()
 //! let r = hub.instances().failover(...).doit()

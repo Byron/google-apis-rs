@@ -1,11 +1,11 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"C5oy1hgQsABtYOYIOXWcR3BgYqU/VlhO-7U_LLGUoZP3BlsW4eOrFfk\"",
+ "etag": "\"tbys6C40o18GZwyMen5GMkdK-3s/wyP_l3wPjLK3LUrJqeSGHNESSW0\"",
  "discoveryVersion": "v1",
  "id": "bigquery:v2",
  "name": "bigquery",
  "version": "v2",
- "revision": "20160903",
+ "revision": "20161130",
  "title": "BigQuery API",
  "description": "A data platform for customers to create, manage, share and query data.",
  "ownerDomain": "google.com",
@@ -687,6 +687,13 @@
      "$ref": "JobConfigurationExtract",
      "description": "[Pick one] Configures an extract job."
     },
+    "labels": {
+     "type": "object",
+     "description": "[Experimental] The labels associated with this job. You can use these to organize and group your jobs. Label keys and values can be no longer than 63 characters, can only contain letters, numeric characters, underscores and dashes. International characters are allowed. Label values are optional. Label keys must start with a letter and must be unique within a dataset. Both keys and values are additionally constrained to be \u003c= 128 bytes in size.",
+     "additionalProperties": {
+      "type": "string"
+     }
+    },
     "load": {
      "$ref": "JobConfigurationLoad",
      "description": "[Pick one] Configures a load job."
@@ -775,6 +782,10 @@
      "type": "integer",
      "description": "[Optional] The maximum number of bad records that BigQuery can ignore when running the job. If the number of bad records exceeds this value, an invalid error is returned in the job result. The default value is 0, which requires that all records are valid.",
      "format": "int32"
+    },
+    "nullMarker": {
+     "type": "string",
+     "description": "[Optional] This string will be interpreted as a null value when it appears in a CSV file. The default value is the empty string. Please refer to the documentation for further information."
     },
     "projectionFields": {
      "type": "array",
@@ -884,14 +895,14 @@
     },
     "queryParameters": {
      "type": "array",
-     "description": "[Experimental] Query parameters for Standard SQL queries.",
+     "description": "Query parameters for standard SQL queries.",
      "items": {
       "$ref": "QueryParameter"
      }
     },
     "schemaUpdateOptions": {
      "type": "array",
-     "description": "[Experimental] Allows the schema of the desitination table to be updated as a side effect of the query job. Schema update options are supported in two cases: when writeDisposition is WRITE_APPEND; when writeDisposition is WRITE_TRUNCATE and the destination table is a partition of a table, specified by partition decorators. For normal tables, WRITE_TRUNCATE will always overwrite the schema. One or more of the following values are specified: ALLOW_FIELD_ADDITION: allow adding a nullable field to the schema. ALLOW_FIELD_RELAXATION: allow relaxing a required field in the original schema to nullable.",
+     "description": "[Experimental] Allows the schema of the destination table to be updated as a side effect of the query job. Schema update options are supported in two cases: when writeDisposition is WRITE_APPEND; when writeDisposition is WRITE_TRUNCATE and the destination table is a partition of a table, specified by partition decorators. For normal tables, WRITE_TRUNCATE will always overwrite the schema. One or more of the following values are specified: ALLOW_FIELD_ADDITION: allow adding a nullable field to the schema. ALLOW_FIELD_RELAXATION: allow relaxing a required field in the original schema to nullable.",
      "items": {
       "type": "string"
      }
@@ -905,7 +916,7 @@
     },
     "useLegacySql": {
      "type": "boolean",
-     "description": "[Experimental] Specifies whether to use BigQuery's legacy SQL dialect for this query. The default value is true. If set to false, the query will use BigQuery's standard SQL: https://cloud.google.com/bigquery/sql-reference/ When useLegacySql is set to false, the values of allowLargeResults and flattenResults are ignored; query will be run as if allowLargeResults is true and flattenResults is false."
+     "description": "Specifies whether to use BigQuery's legacy SQL dialect for this query. The default value is true. If set to false, the query will use BigQuery's standard SQL: https://cloud.google.com/bigquery/sql-reference/ When useLegacySql is set to false, the values of allowLargeResults and flattenResults are ignored; query will be run as if allowLargeResults is true and flattenResults is false."
     },
     "useQueryCache": {
      "type": "boolean",
@@ -1116,6 +1127,10 @@
     "schema": {
      "$ref": "TableSchema",
      "description": "[Output-only, Experimental] The schema of the results. Present only for successful dry run of non-legacy SQL queries."
+    },
+    "statementType": {
+     "type": "string",
+     "description": "[Output-only, Experimental] The type of query statement, if valid."
     },
     "totalBytesBilled": {
      "type": "string",
@@ -1404,7 +1419,7 @@
     },
     "useLegacySql": {
      "type": "boolean",
-     "description": "[Experimental] Specifies whether to use BigQuery's legacy SQL dialect for this query. The default value is true. If set to false, the query will use BigQuery's standard SQL: https://cloud.google.com/bigquery/sql-reference/ When useLegacySql is set to false, the values of allowLargeResults and flattenResults are ignored; query will be run as if allowLargeResults is true and flattenResults is false.",
+     "description": "Specifies whether to use BigQuery's legacy SQL dialect for this query. The default value is true. If set to false, the query will use BigQuery's standard SQL: https://cloud.google.com/bigquery/sql-reference/ When useLegacySql is set to false, the values of allowLargeResults and flattenResults are ignored; query will be run as if allowLargeResults is true and flattenResults is false.",
      "default": "true"
     },
     "useQueryCache": {
@@ -1533,6 +1548,13 @@
      "type": "string",
      "description": "[Output-only] The type of the resource.",
      "default": "bigquery#table"
+    },
+    "labels": {
+     "type": "object",
+     "description": "[Experimental] The labels associated with this table. You can use these to organize and group your tables. Label keys and values can be no longer than 63 characters, can only contain letters, numeric characters, underscores and dashes. International characters are allowed. Label values are optional. Label keys must start with a letter and must be unique within a dataset. Both keys and values are additionally constrained to be \u003c= 128 bytes in size.",
+     "additionalProperties": {
+      "type": "string"
+     }
     },
     "lastModifiedTime": {
      "type": "string",
@@ -1725,7 +1747,7 @@
     },
     "type": {
      "type": "string",
-     "description": "[Required] The field data type. Possible values include STRING, BYTES, INTEGER, FLOAT, BOOLEAN, TIMESTAMP or RECORD (where RECORD indicates that the field contains a nested schema)."
+     "description": "[Required] The field data type. Possible values include STRING, BYTES, INTEGER, INT64 (same as INTEGER), FLOAT, FLOAT64 (same as FLOAT), BOOLEAN, BOOL (same as BOOLEAN), TIMESTAMP, DATE, TIME, DATETIME, RECORD (where RECORD indicates that the field contains a nested schema) or STRUCT (same as RECORD)."
     }
    }
   },
@@ -1764,6 +1786,13 @@
         "type": "string",
         "description": "The resource type.",
         "default": "bigquery#table"
+       },
+       "labels": {
+        "type": "object",
+        "description": "[Experimental] The labels associated with this table. You can use these to organize and group your tables.",
+        "additionalProperties": {
+         "type": "string"
+        }
        },
        "tableReference": {
         "$ref": "TableReference",
@@ -1881,7 +1910,7 @@
     },
     "useLegacySql": {
      "type": "boolean",
-     "description": "[Experimental] Specifies whether to use BigQuery's legacy SQL for this view. The default value is true. If set to false, the view will use BigQuery's standard SQL: https://cloud.google.com/bigquery/sql-reference/ Queries and views that reference this view must use the same flag value."
+     "description": "Specifies whether to use BigQuery's legacy SQL for this view. The default value is true. If set to false, the view will use BigQuery's standard SQL: https://cloud.google.com/bigquery/sql-reference/ Queries and views that reference this view must use the same flag value."
     },
     "userDefinedFunctionResources": {
      "type": "array",

@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-games1` library allows access to all features of the *Google Games* service.
 
-This documentation was generated from *Games* crate version *1.0.0+20160901*, where *20160901* is the exact revision of the *games:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
+This documentation was generated from *Games* crate version *1.0.0+20161207*, where *20161207* is the exact revision of the *games:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
 
 Everything else about the *Games* *v1* API can be found at the
 [official documentation site](https://developers.google.com/games/services/).

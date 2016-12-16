@@ -1,4 +1,4 @@
-site_name: directory v1.0.0+20160824
+site_name: directory v1.0.0+20161124
 site_url: http://byron.github.io/google-apis-rs/google-admin1_directory-cli
 site_description: Write integrating applications with bcore
 
@@ -13,6 +13,7 @@ pages:
 - ['asps_get.md', 'Asps', 'Get']
 - ['asps_list.md', 'Asps', 'List']
 - ['channels_stop.md', 'Channels', 'Stop']
+- ['chromeosdevices_action.md', 'Chromeosdevices', 'Action']
 - ['chromeosdevices_get.md', 'Chromeosdevices', 'Get']
 - ['chromeosdevices_list.md', 'Chromeosdevices', 'List']
 - ['chromeosdevices_patch.md', 'Chromeosdevices', 'Patch']

@@ -1,4 +1,4 @@
-site_name: Android Enterprise v1.0.0+20160831
+site_name: Android Enterprise v1.0.0+20161207
 site_url: http://byron.github.io/google-apis-rs/google-androidenterprise1-cli
 site_description: Write integrating applications with bcore
 
@@ -26,6 +26,7 @@ pages:
 - ['devices_set-state.md', 'Devices', 'Set State']
 - ['enterprises_acknowledge-notification-set.md', 'Enterprises', 'Acknowledge Notification Set']
 - ['enterprises_complete-signup.md', 'Enterprises', 'Complete Signup']
+- ['enterprises_create-web-token.md', 'Enterprises', 'Create Web Token']
 - ['enterprises_delete.md', 'Enterprises', 'Delete']
 - ['enterprises_enroll.md', 'Enterprises', 'Enroll']
 - ['enterprises_generate-signup-url.md', 'Enterprises', 'Generate Signup Url']

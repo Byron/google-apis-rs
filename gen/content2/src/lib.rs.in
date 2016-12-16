@@ -412,7 +412,7 @@ impl ResponseResult for ProductStatus {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TestOrderCustomer {
-    /// If set, this indicates the user explicitly chose to opt in or out of providing marketing rights to the merchant. If unset, this indicates the user has already made this choice in a previous purchase, and was thus not shown the marketing right opt in/out checkbox during the Purchases on Google checkout flow. Optional.
+    /// If set, this indicates the user explicitly chose to opt in or out of providing marketing rights to the merchant. If unset, this indicates the user has already made this choice in a previous purchase, and was thus not shown the marketing right opt in/out checkbox during the checkout flow. Optional.
     #[serde(rename="explicitMarketingPreference")]
     pub explicit_marketing_preference: Option<bool>,
     /// Full name of the customer.
@@ -912,14 +912,16 @@ impl Part for TestOrderPaymentMethod {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ProductCustomGroup {
-    /// The sub-attributes.
-    pub attributes: Option<Vec<ProductCustomAttribute>>,
-    /// The name of the group. Underscores will be replaced by spaces upon insertion.
-    pub name: Option<String>,
+pub struct InventoryPickup {
+    /// Whether store pickup is available for this offer and whether the pickup option should be shown as buy, reserve, or not supported. Only supported for local inventory. Unless the value is "not supported", must be submitted together with pickupSla.
+    #[serde(rename="pickupMethod")]
+    pub pickup_method: Option<String>,
+    /// The expected date that an order will be ready for pickup, relative to when the order is placed. Only supported for local inventory. Must be submitted together with pickupMethod.
+    #[serde(rename="pickupSla")]
+    pub pickup_sla: Option<String>,
 }
 
-impl Part for ProductCustomGroup {}
+impl Part for InventoryPickup {}
 
 
 /// There is no detailed description.
@@ -1135,6 +1137,8 @@ pub struct Inventory {
     /// The quantity of the product that is reserved for sell-on-google ads. Supported only for online products.
     #[serde(rename="sellOnGoogleQuantity")]
     pub sell_on_google_quantity: Option<u32>,
+    /// Store pickup information. Only supported for local inventory. Not setting pickup means "don't update" while setting it to the empty value ({} in JSON) means "delete". Otherwise, pickupMethod and pickupSla must be set together, unless pickupMethod is "not supported".
+    pub pickup: Option<InventoryPickup>,
     /// The sale price of the product. Mandatory if sale_price_effective_date is defined.
     #[serde(rename="salePrice")]
     pub sale_price: Option<Price>,
@@ -2325,7 +2329,7 @@ impl ResponseResult for OrdersCancelLineItemResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OrderCustomer {
-    /// If set, this indicates the user explicitly chose to opt in or out of providing marketing rights to the merchant. If unset, this indicates the user has already made this choice in a previous purchase, and was thus not shown the marketing right opt in/out checkbox during the Purchases on Google checkout flow.
+    /// If set, this indicates the user explicitly chose to opt in or out of providing marketing rights to the merchant. If unset, this indicates the user has already made this choice in a previous purchase, and was thus not shown the marketing right opt in/out checkbox during the checkout flow.
     #[serde(rename="explicitMarketingPreference")]
     pub explicit_marketing_preference: Option<bool>,
     /// Full name of the customer.
@@ -2355,6 +2359,30 @@ pub struct AccountstatusesCustomBatchResponseEntry {
 }
 
 impl Part for AccountstatusesCustomBatchResponseEntry {}
+
+
+/// The status of an account, i.e., information about its products, which is computed offline and not returned immediately at insertion time.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [get accountstatuses](struct.AccountstatuseGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AccountStatus {
+    /// Identifies what kind of resource this is. Value: the fixed string "content#accountStatus".
+    pub kind: Option<String>,
+    /// A list of data quality issues.
+    #[serde(rename="dataQualityIssues")]
+    pub data_quality_issues: Option<Vec<AccountStatusDataQualityIssue>>,
+    /// The ID of the account for which the status is reported.
+    #[serde(rename="accountId")]
+    pub account_id: Option<String>,
+}
+
+impl ResponseResult for AccountStatus {}
 
 
 /// There is no detailed description.
@@ -2859,28 +2887,19 @@ pub struct ProductUnitPricingMeasure {
 impl Part for ProductUnitPricingMeasure {}
 
 
-/// The status of an account, i.e., information about its products, which is computed offline and not returned immediately at insertion time.
+/// There is no detailed description.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [get accountstatuses](struct.AccountstatuseGetCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AccountStatus {
-    /// Identifies what kind of resource this is. Value: the fixed string "content#accountStatus".
-    pub kind: Option<String>,
-    /// A list of data quality issues.
-    #[serde(rename="dataQualityIssues")]
-    pub data_quality_issues: Option<Vec<AccountStatusDataQualityIssue>>,
-    /// The ID of the account for which the status is reported.
-    #[serde(rename="accountId")]
-    pub account_id: Option<String>,
+pub struct ProductCustomGroup {
+    /// The sub-attributes.
+    pub attributes: Option<Vec<ProductCustomAttribute>>,
+    /// The name of the group. Underscores will be replaced by spaces upon insertion.
+    pub name: Option<String>,
 }
 
-impl ResponseResult for AccountStatus {}
+impl Part for ProductCustomGroup {}
 
 
 /// There is no detailed description.
@@ -3697,6 +3716,8 @@ pub struct InventorySetRequest {
     /// The quantity of the product that is reserved for sell-on-google ads. Supported only for online products.
     #[serde(rename="sellOnGoogleQuantity")]
     pub sell_on_google_quantity: Option<u32>,
+    /// Store pickup information. Only supported for local inventory. Not setting pickup means "don't update" while setting it to the empty value ({} in JSON) means "delete". Otherwise, pickupMethod and pickupSla must be set together, unless pickupMethod is "not supported".
+    pub pickup: Option<InventoryPickup>,
     /// The sale price of the product. Mandatory if sale_price_effective_date is defined.
     #[serde(rename="salePrice")]
     pub sale_price: Option<Price>,
@@ -4323,7 +4344,7 @@ impl<'a, C, A> AccounttaxMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the tax settings of the account. This method supports patch semantics.
+    /// Updates the tax settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself or sub-accounts if the managing account is a multi-client account. This method supports patch semantics.
     /// 
     /// # Arguments
     ///
@@ -4345,7 +4366,7 @@ impl<'a, C, A> AccounttaxMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the tax settings of the sub-accounts in your Merchant Center account.
+    /// Lists the tax settings of the sub-accounts in your Merchant Center account. This method can only be called for multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -4364,7 +4385,7 @@ impl<'a, C, A> AccounttaxMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the tax settings of the account.
+    /// Updates the tax settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself or sub-accounts if the managing account is a multi-client account.
     /// 
     /// # Arguments
     ///
@@ -4386,7 +4407,7 @@ impl<'a, C, A> AccounttaxMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the tax settings of the account.
+    /// Retrieves the tax settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself or sub-accounts if the managing account is a multi-client account.
     /// 
     /// # Arguments
     ///
@@ -4446,7 +4467,7 @@ impl<'a, C, A> DatafeedstatuseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the status of a datafeed from your Merchant Center account.
+    /// Retrieves the status of a datafeed from your Merchant Center account. This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -4465,7 +4486,7 @@ impl<'a, C, A> DatafeedstatuseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the statuses of the datafeeds in your Merchant Center account.
+    /// Lists the statuses of the datafeeds in your Merchant Center account. This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -4539,7 +4560,7 @@ impl<'a, C, A> ShippingsettingMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the shipping settings of the account. This method supports patch semantics.
+    /// Updates the shipping settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself or sub-accounts if the managing account is a multi-client account. This method supports patch semantics.
     /// 
     /// # Arguments
     ///
@@ -4578,7 +4599,7 @@ impl<'a, C, A> ShippingsettingMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the shipping settings of the sub-accounts in your Merchant Center account.
+    /// Lists the shipping settings of the sub-accounts in your Merchant Center account. This method can only be called for multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -4615,7 +4636,7 @@ impl<'a, C, A> ShippingsettingMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the shipping settings of the account.
+    /// Updates the shipping settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself or sub-accounts if the managing account is a multi-client account.
     /// 
     /// # Arguments
     ///
@@ -4637,7 +4658,7 @@ impl<'a, C, A> ShippingsettingMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the shipping settings of the account.
+    /// Retrieves the shipping settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself or sub-accounts if the managing account is a multi-client account.
     /// 
     /// # Arguments
     ///
@@ -4712,7 +4733,7 @@ impl<'a, C, A> DatafeedMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a datafeed from your Merchant Center account.
+    /// Retrieves a datafeed from your Merchant Center account. This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -4731,7 +4752,7 @@ impl<'a, C, A> DatafeedMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a datafeed of your Merchant Center account. This method supports patch semantics.
+    /// Updates a datafeed of your Merchant Center account. This method can only be called for non-multi-client accounts. This method supports patch semantics.
     /// 
     /// # Arguments
     ///
@@ -4753,7 +4774,7 @@ impl<'a, C, A> DatafeedMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a datafeed from your Merchant Center account.
+    /// Deletes a datafeed from your Merchant Center account. This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -4773,7 +4794,7 @@ impl<'a, C, A> DatafeedMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Registers a datafeed with your Merchant Center account.
+    /// Registers a datafeed with your Merchant Center account. This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -4793,7 +4814,7 @@ impl<'a, C, A> DatafeedMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the datafeeds in your Merchant Center account.
+    /// Lists the datafeeds in your Merchant Center account. This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -4812,7 +4833,7 @@ impl<'a, C, A> DatafeedMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a datafeed of your Merchant Center account.
+    /// Updates a datafeed of your Merchant Center account. This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -4875,7 +4896,7 @@ impl<'a, C, A> AccountstatuseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the status of a Merchant Center account.
+    /// Retrieves the status of a Merchant Center account. This method can only be called for accounts to which the managing account has access: either the managing account itself or sub-accounts if the managing account is a multi-client account.
     /// 
     /// # Arguments
     ///
@@ -4908,7 +4929,7 @@ impl<'a, C, A> AccountstatuseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the statuses of the sub-accounts in your Merchant Center account.
+    /// Lists the statuses of the sub-accounts in your Merchant Center account. This method can only be called for multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -4968,7 +4989,7 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a Merchant Center account.
+    /// Updates a Merchant Center account. This method can only be called for multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -5002,7 +5023,7 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a Merchant Center account. This method supports patch semantics.
+    /// Updates a Merchant Center account. This method can only be called for multi-client accounts. This method supports patch semantics.
     /// 
     /// # Arguments
     ///
@@ -5024,7 +5045,7 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the sub-accounts in your Merchant Center account.
+    /// Lists the sub-accounts in your Merchant Center account. This method can only be called for multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -5043,7 +5064,7 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a Merchant Center sub-account.
+    /// Deletes a Merchant Center sub-account. This method can only be called for multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -5081,7 +5102,7 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a Merchant Center account.
+    /// Retrieves a Merchant Center account. This method can only be called for accounts to which the managing account has access: either the managing account itself or sub-accounts if the managing account is a multi-client account.
     /// 
     /// # Arguments
     ///
@@ -5100,7 +5121,7 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a Merchant Center sub-account.
+    /// Creates a Merchant Center sub-account. This method can only be called for multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -5161,7 +5182,7 @@ impl<'a, C, A> InventoryMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates price and availability for multiple products or stores in a single request. This operation does not update the expiration date of the products.
+    /// Updates price and availability for multiple products or stores in a single request. This operation does not update the expiration date of the products. This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -5179,7 +5200,7 @@ impl<'a, C, A> InventoryMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates price and availability of a product in your Merchant Center account. This operation does not update the expiration date of the product.
+    /// Updates price and availability of a product in your Merchant Center account. This operation does not update the expiration date of the product. This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -5244,7 +5265,7 @@ impl<'a, C, A> ProductstatuseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the status of a product from your Merchant Center account.
+    /// Gets the status of a product from your Merchant Center account. This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -5263,7 +5284,7 @@ impl<'a, C, A> ProductstatuseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the statuses of the products in your Merchant Center account.
+    /// Lists the statuses of the products in your Merchant Center account. This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -5283,7 +5304,7 @@ impl<'a, C, A> ProductstatuseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the statuses of multiple products in a single request.
+    /// Gets the statuses of multiple products in a single request. This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -5341,7 +5362,7 @@ impl<'a, C, A> ProductMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the products in your Merchant Center account.
+    /// Lists the products in your Merchant Center account. This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -5361,7 +5382,7 @@ impl<'a, C, A> ProductMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a product from your Merchant Center account.
+    /// Retrieves a product from your Merchant Center account. This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -5380,7 +5401,7 @@ impl<'a, C, A> ProductMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a product from your Merchant Center account.
+    /// Deletes a product from your Merchant Center account. This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -5400,7 +5421,7 @@ impl<'a, C, A> ProductMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves, inserts, and deletes multiple products in a single request.
+    /// Retrieves, inserts, and deletes multiple products in a single request. This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -5418,7 +5439,7 @@ impl<'a, C, A> ProductMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Uploads a product to your Merchant Center account.
+    /// Uploads a product to your Merchant Center account. If an item with the same channel, contentLanguage, offerId, and targetCountry already exists, this method updates that entry. This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -5479,7 +5500,7 @@ impl<'a, C, A> AccountshippingMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the shipping settings of the sub-accounts in your Merchant Center account.
+    /// Lists the shipping settings of the sub-accounts in your Merchant Center account. This method can only be called for multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -5498,7 +5519,7 @@ impl<'a, C, A> AccountshippingMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the shipping settings of the account. This method supports patch semantics.
+    /// Updates the shipping settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself or sub-accounts if the managing account is a multi-client account. This method supports patch semantics.
     /// 
     /// # Arguments
     ///
@@ -5520,7 +5541,7 @@ impl<'a, C, A> AccountshippingMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the shipping settings of the account.
+    /// Updates the shipping settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself or sub-accounts if the managing account is a multi-client account.
     /// 
     /// # Arguments
     ///
@@ -5560,7 +5581,7 @@ impl<'a, C, A> AccountshippingMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the shipping settings of the account.
+    /// Retrieves the shipping settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself or sub-accounts if the managing account is a multi-client account.
     /// 
     /// # Arguments
     ///
@@ -5620,7 +5641,7 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the orders in your Merchant Center account.
+    /// Lists the orders in your Merchant Center account. This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -5644,7 +5665,7 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sandbox only. Retrieves an order template that can be used to quickly create a new order in sandbox.
+    /// Sandbox only. Retrieves an order template that can be used to quickly create a new order in sandbox. This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -5663,7 +5684,7 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves an order from your Merchant Center account.
+    /// Retrieves an order from your Merchant Center account. This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -5682,7 +5703,7 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Refund a portion of the order, up to the full amount paid.
+    /// Refund a portion of the order, up to the full amount paid. This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -5703,7 +5724,7 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Marks an order as acknowledged.
+    /// Marks an order as acknowledged. This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -5724,7 +5745,7 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the merchant order ID for a given order.
+    /// Updates the merchant order ID for a given order. This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -5745,7 +5766,7 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sandbox only. Moves a test order from state "inProgress" to state "pendingShipment".
+    /// Sandbox only. Moves a test order from state "inProgress" to state "pendingShipment". This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -5764,7 +5785,7 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sandbox only. Creates a test order.
+    /// Sandbox only. Creates a test order. This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -5783,7 +5804,7 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns a line item.
+    /// Returns a line item. This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -5804,7 +5825,7 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves an order using merchant order id.
+    /// Retrieves an order using merchant order id. This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -5823,7 +5844,7 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves or modifies multiple orders in a single request.
+    /// Retrieves or modifies multiple orders in a single request. This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -5840,7 +5861,7 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Marks line item(s) as shipped.
+    /// Marks line item(s) as shipped. This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -5861,7 +5882,7 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a shipment's status, carrier, and/or tracking ID.
+    /// Updates a shipment's status, carrier, and/or tracking ID. This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -5882,7 +5903,7 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Cancels a line item.
+    /// Cancels a line item. This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -5903,7 +5924,7 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Cancels all line items in an order.
+    /// Cancels all line items in an order. This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -6176,7 +6197,7 @@ impl<'a, C, A> AccounttaxCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
 }
 
 
-/// Updates the tax settings of the account. This method supports patch semantics.
+/// Updates the tax settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself or sub-accounts if the managing account is a multi-client account. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *accounttax* resource.
 /// It is not used directly, but through a `AccounttaxMethods` instance.
@@ -6466,7 +6487,7 @@ impl<'a, C, A> AccounttaxPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 }
 
 
-/// Lists the tax settings of the sub-accounts in your Merchant Center account.
+/// Lists the tax settings of the sub-accounts in your Merchant Center account. This method can only be called for multi-client accounts.
 ///
 /// A builder for the *list* method supported by a *accounttax* resource.
 /// It is not used directly, but through a `AccounttaxMethods` instance.
@@ -6725,7 +6746,7 @@ impl<'a, C, A> AccounttaxListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 }
 
 
-/// Updates the tax settings of the account.
+/// Updates the tax settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself or sub-accounts if the managing account is a multi-client account.
 ///
 /// A builder for the *update* method supported by a *accounttax* resource.
 /// It is not used directly, but through a `AccounttaxMethods` instance.
@@ -7015,7 +7036,7 @@ impl<'a, C, A> AccounttaxUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 }
 
 
-/// Retrieves the tax settings of the account.
+/// Retrieves the tax settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself or sub-accounts if the managing account is a multi-client account.
 ///
 /// A builder for the *get* method supported by a *accounttax* resource.
 /// It is not used directly, but through a `AccounttaxMethods` instance.
@@ -7262,7 +7283,7 @@ impl<'a, C, A> AccounttaxGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
-/// Retrieves the status of a datafeed from your Merchant Center account.
+/// Retrieves the status of a datafeed from your Merchant Center account. This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *get* method supported by a *datafeedstatuse* resource.
 /// It is not used directly, but through a `DatafeedstatuseMethods` instance.
@@ -7507,7 +7528,7 @@ impl<'a, C, A> DatafeedstatuseGetCall<'a, C, A> where C: BorrowMut<hyper::Client
 }
 
 
-/// Lists the statuses of the datafeeds in your Merchant Center account.
+/// Lists the statuses of the datafeeds in your Merchant Center account. This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *list* method supported by a *datafeedstatuse* resource.
 /// It is not used directly, but through a `DatafeedstatuseMethods` instance.
@@ -7997,7 +8018,7 @@ impl<'a, C, A> DatafeedstatuseCustombatchCall<'a, C, A> where C: BorrowMut<hyper
 }
 
 
-/// Updates the shipping settings of the account. This method supports patch semantics.
+/// Updates the shipping settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself or sub-accounts if the managing account is a multi-client account. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *shippingsetting* resource.
 /// It is not used directly, but through a `ShippingsettingMethods` instance.
@@ -8522,7 +8543,7 @@ impl<'a, C, A> ShippingsettingGetsupportedcarrierCall<'a, C, A> where C: BorrowM
 }
 
 
-/// Lists the shipping settings of the sub-accounts in your Merchant Center account.
+/// Lists the shipping settings of the sub-accounts in your Merchant Center account. This method can only be called for multi-client accounts.
 ///
 /// A builder for the *list* method supported by a *shippingsetting* resource.
 /// It is not used directly, but through a `ShippingsettingMethods` instance.
@@ -9026,7 +9047,7 @@ impl<'a, C, A> ShippingsettingCustombatchCall<'a, C, A> where C: BorrowMut<hyper
 }
 
 
-/// Updates the shipping settings of the account.
+/// Updates the shipping settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself or sub-accounts if the managing account is a multi-client account.
 ///
 /// A builder for the *update* method supported by a *shippingsetting* resource.
 /// It is not used directly, but through a `ShippingsettingMethods` instance.
@@ -9316,7 +9337,7 @@ impl<'a, C, A> ShippingsettingUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 }
 
 
-/// Retrieves the shipping settings of the account.
+/// Retrieves the shipping settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself or sub-accounts if the managing account is a multi-client account.
 ///
 /// A builder for the *get* method supported by a *shippingsetting* resource.
 /// It is not used directly, but through a `ShippingsettingMethods` instance.
@@ -9806,7 +9827,7 @@ impl<'a, C, A> DatafeedCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
 }
 
 
-/// Retrieves a datafeed from your Merchant Center account.
+/// Retrieves a datafeed from your Merchant Center account. This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *get* method supported by a *datafeed* resource.
 /// It is not used directly, but through a `DatafeedMethods` instance.
@@ -10051,7 +10072,7 @@ impl<'a, C, A> DatafeedGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 }
 
 
-/// Updates a datafeed of your Merchant Center account. This method supports patch semantics.
+/// Updates a datafeed of your Merchant Center account. This method can only be called for non-multi-client accounts. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *datafeed* resource.
 /// It is not used directly, but through a `DatafeedMethods` instance.
@@ -10339,7 +10360,7 @@ impl<'a, C, A> DatafeedPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
-/// Deletes a datafeed from your Merchant Center account.
+/// Deletes a datafeed from your Merchant Center account. This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *delete* method supported by a *datafeed* resource.
 /// It is not used directly, but through a `DatafeedMethods` instance.
@@ -10585,7 +10606,7 @@ impl<'a, C, A> DatafeedDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 }
 
 
-/// Registers a datafeed with your Merchant Center account.
+/// Registers a datafeed with your Merchant Center account. This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *insert* method supported by a *datafeed* resource.
 /// It is not used directly, but through a `DatafeedMethods` instance.
@@ -10862,7 +10883,7 @@ impl<'a, C, A> DatafeedInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 }
 
 
-/// Lists the datafeeds in your Merchant Center account.
+/// Lists the datafeeds in your Merchant Center account. This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *list* method supported by a *datafeed* resource.
 /// It is not used directly, but through a `DatafeedMethods` instance.
@@ -11121,7 +11142,7 @@ impl<'a, C, A> DatafeedListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 }
 
 
-/// Updates a datafeed of your Merchant Center account.
+/// Updates a datafeed of your Merchant Center account. This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *update* method supported by a *datafeed* resource.
 /// It is not used directly, but through a `DatafeedMethods` instance.
@@ -11409,7 +11430,7 @@ impl<'a, C, A> DatafeedUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 }
 
 
-/// Retrieves the status of a Merchant Center account.
+/// Retrieves the status of a Merchant Center account. This method can only be called for accounts to which the managing account has access: either the managing account itself or sub-accounts if the managing account is a multi-client account.
 ///
 /// A builder for the *get* method supported by a *accountstatuse* resource.
 /// It is not used directly, but through a `AccountstatuseMethods` instance.
@@ -11887,7 +11908,7 @@ impl<'a, C, A> AccountstatuseCustombatchCall<'a, C, A> where C: BorrowMut<hyper:
 }
 
 
-/// Lists the statuses of the sub-accounts in your Merchant Center account.
+/// Lists the statuses of the sub-accounts in your Merchant Center account. This method can only be called for multi-client accounts.
 ///
 /// A builder for the *list* method supported by a *accountstatuse* resource.
 /// It is not used directly, but through a `AccountstatuseMethods` instance.
@@ -12146,7 +12167,7 @@ impl<'a, C, A> AccountstatuseListCall<'a, C, A> where C: BorrowMut<hyper::Client
 }
 
 
-/// Updates a Merchant Center account.
+/// Updates a Merchant Center account. This method can only be called for multi-client accounts.
 ///
 /// A builder for the *update* method supported by a *account* resource.
 /// It is not used directly, but through a `AccountMethods` instance.
@@ -12638,7 +12659,7 @@ impl<'a, C, A> AccountAuthinfoCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 }
 
 
-/// Updates a Merchant Center account. This method supports patch semantics.
+/// Updates a Merchant Center account. This method can only be called for multi-client accounts. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *account* resource.
 /// It is not used directly, but through a `AccountMethods` instance.
@@ -12928,7 +12949,7 @@ impl<'a, C, A> AccountPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 }
 
 
-/// Lists the sub-accounts in your Merchant Center account.
+/// Lists the sub-accounts in your Merchant Center account. This method can only be called for multi-client accounts.
 ///
 /// A builder for the *list* method supported by a *account* resource.
 /// It is not used directly, but through a `AccountMethods` instance.
@@ -13187,7 +13208,7 @@ impl<'a, C, A> AccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 }
 
 
-/// Deletes a Merchant Center sub-account.
+/// Deletes a Merchant Center sub-account. This method can only be called for multi-client accounts.
 ///
 /// A builder for the *delete* method supported by a *account* resource.
 /// It is not used directly, but through a `AccountMethods` instance.
@@ -13680,7 +13701,7 @@ impl<'a, C, A> AccountCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Client
 }
 
 
-/// Retrieves a Merchant Center account.
+/// Retrieves a Merchant Center account. This method can only be called for accounts to which the managing account has access: either the managing account itself or sub-accounts if the managing account is a multi-client account.
 ///
 /// A builder for the *get* method supported by a *account* resource.
 /// It is not used directly, but through a `AccountMethods` instance.
@@ -13927,7 +13948,7 @@ impl<'a, C, A> AccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 }
 
 
-/// Creates a Merchant Center sub-account.
+/// Creates a Merchant Center sub-account. This method can only be called for multi-client accounts.
 ///
 /// A builder for the *insert* method supported by a *account* resource.
 /// It is not used directly, but through a `AccountMethods` instance.
@@ -14205,7 +14226,7 @@ impl<'a, C, A> AccountInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
-/// Updates price and availability for multiple products or stores in a single request. This operation does not update the expiration date of the products.
+/// Updates price and availability for multiple products or stores in a single request. This operation does not update the expiration date of the products. This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *custombatch* method supported by a *inventory* resource.
 /// It is not used directly, but through a `InventoryMethods` instance.
@@ -14450,7 +14471,7 @@ impl<'a, C, A> InventoryCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
 }
 
 
-/// Updates price and availability of a product in your Merchant Center account. This operation does not update the expiration date of the product.
+/// Updates price and availability of a product in your Merchant Center account. This operation does not update the expiration date of the product. This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *set* method supported by a *inventory* resource.
 /// It is not used directly, but through a `InventoryMethods` instance.
@@ -14752,7 +14773,7 @@ impl<'a, C, A> InventorySetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 }
 
 
-/// Gets the status of a product from your Merchant Center account.
+/// Gets the status of a product from your Merchant Center account. This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *get* method supported by a *productstatuse* resource.
 /// It is not used directly, but through a `ProductstatuseMethods` instance.
@@ -14999,7 +15020,7 @@ impl<'a, C, A> ProductstatuseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
 }
 
 
-/// Lists the statuses of the products in your Merchant Center account.
+/// Lists the statuses of the products in your Merchant Center account. This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *list* method supported by a *productstatuse* resource.
 /// It is not used directly, but through a `ProductstatuseMethods` instance.
@@ -15270,7 +15291,7 @@ impl<'a, C, A> ProductstatuseListCall<'a, C, A> where C: BorrowMut<hyper::Client
 }
 
 
-/// Gets the statuses of multiple products in a single request.
+/// Gets the statuses of multiple products in a single request. This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *custombatch* method supported by a *productstatuse* resource.
 /// It is not used directly, but through a `ProductstatuseMethods` instance.
@@ -15503,7 +15524,7 @@ impl<'a, C, A> ProductstatuseCustombatchCall<'a, C, A> where C: BorrowMut<hyper:
 }
 
 
-/// Lists the products in your Merchant Center account.
+/// Lists the products in your Merchant Center account. This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *list* method supported by a *product* resource.
 /// It is not used directly, but through a `ProductMethods` instance.
@@ -15774,7 +15795,7 @@ impl<'a, C, A> ProductListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 }
 
 
-/// Retrieves a product from your Merchant Center account.
+/// Retrieves a product from your Merchant Center account. This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *get* method supported by a *product* resource.
 /// It is not used directly, but through a `ProductMethods` instance.
@@ -16021,7 +16042,7 @@ impl<'a, C, A> ProductGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 }
 
 
-/// Deletes a product from your Merchant Center account.
+/// Deletes a product from your Merchant Center account. This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *delete* method supported by a *product* resource.
 /// It is not used directly, but through a `ProductMethods` instance.
@@ -16269,7 +16290,7 @@ impl<'a, C, A> ProductDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
-/// Retrieves, inserts, and deletes multiple products in a single request.
+/// Retrieves, inserts, and deletes multiple products in a single request. This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *custombatch* method supported by a *product* resource.
 /// It is not used directly, but through a `ProductMethods` instance.
@@ -16514,7 +16535,7 @@ impl<'a, C, A> ProductCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Client
 }
 
 
-/// Uploads a product to your Merchant Center account.
+/// Uploads a product to your Merchant Center account. If an item with the same channel, contentLanguage, offerId, and targetCountry already exists, this method updates that entry. This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *insert* method supported by a *product* resource.
 /// It is not used directly, but through a `ProductMethods` instance.
@@ -16792,7 +16813,7 @@ impl<'a, C, A> ProductInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
-/// Lists the shipping settings of the sub-accounts in your Merchant Center account.
+/// Lists the shipping settings of the sub-accounts in your Merchant Center account. This method can only be called for multi-client accounts.
 ///
 /// A builder for the *list* method supported by a *accountshipping* resource.
 /// It is not used directly, but through a `AccountshippingMethods` instance.
@@ -17051,7 +17072,7 @@ impl<'a, C, A> AccountshippingListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 }
 
 
-/// Updates the shipping settings of the account. This method supports patch semantics.
+/// Updates the shipping settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself or sub-accounts if the managing account is a multi-client account. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *accountshipping* resource.
 /// It is not used directly, but through a `AccountshippingMethods` instance.
@@ -17341,7 +17362,7 @@ impl<'a, C, A> AccountshippingPatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
 }
 
 
-/// Updates the shipping settings of the account.
+/// Updates the shipping settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself or sub-accounts if the managing account is a multi-client account.
 ///
 /// A builder for the *update* method supported by a *accountshipping* resource.
 /// It is not used directly, but through a `AccountshippingMethods` instance.
@@ -17876,7 +17897,7 @@ impl<'a, C, A> AccountshippingCustombatchCall<'a, C, A> where C: BorrowMut<hyper
 }
 
 
-/// Retrieves the shipping settings of the account.
+/// Retrieves the shipping settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself or sub-accounts if the managing account is a multi-client account.
 ///
 /// A builder for the *get* method supported by a *accountshipping* resource.
 /// It is not used directly, but through a `AccountshippingMethods` instance.
@@ -18123,7 +18144,7 @@ impl<'a, C, A> AccountshippingGetCall<'a, C, A> where C: BorrowMut<hyper::Client
 }
 
 
-/// Lists the orders in your Merchant Center account.
+/// Lists the orders in your Merchant Center account. This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *list* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
@@ -18447,7 +18468,7 @@ impl<'a, C, A> OrderListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 }
 
 
-/// Sandbox only. Retrieves an order template that can be used to quickly create a new order in sandbox.
+/// Sandbox only. Retrieves an order template that can be used to quickly create a new order in sandbox. This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *gettestordertemplate* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
@@ -18694,7 +18715,7 @@ impl<'a, C, A> OrderGettestordertemplateCall<'a, C, A> where C: BorrowMut<hyper:
 }
 
 
-/// Retrieves an order from your Merchant Center account.
+/// Retrieves an order from your Merchant Center account. This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *get* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
@@ -18941,7 +18962,7 @@ impl<'a, C, A> OrderGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 }
 
 
-/// Refund a portion of the order, up to the full amount paid.
+/// Refund a portion of the order, up to the full amount paid. This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *refund* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
@@ -19219,7 +19240,7 @@ impl<'a, C, A> OrderRefundCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 }
 
 
-/// Marks an order as acknowledged.
+/// Marks an order as acknowledged. This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *acknowledge* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
@@ -19497,7 +19518,7 @@ impl<'a, C, A> OrderAcknowledgeCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 }
 
 
-/// Updates the merchant order ID for a given order.
+/// Updates the merchant order ID for a given order. This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *updatemerchantorderid* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
@@ -19775,7 +19796,7 @@ impl<'a, C, A> OrderUpdatemerchantorderidCall<'a, C, A> where C: BorrowMut<hyper
 }
 
 
-/// Sandbox only. Moves a test order from state "inProgress" to state "pendingShipment".
+/// Sandbox only. Moves a test order from state "inProgress" to state "pendingShipment". This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *advancetestorder* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
@@ -20022,7 +20043,7 @@ impl<'a, C, A> OrderAdvancetestorderCall<'a, C, A> where C: BorrowMut<hyper::Cli
 }
 
 
-/// Sandbox only. Creates a test order.
+/// Sandbox only. Creates a test order. This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *createtestorder* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
@@ -20288,7 +20309,7 @@ impl<'a, C, A> OrderCreatetestorderCall<'a, C, A> where C: BorrowMut<hyper::Clie
 }
 
 
-/// Returns a line item.
+/// Returns a line item. This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *returnlineitem* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
@@ -20566,7 +20587,7 @@ impl<'a, C, A> OrderReturnlineitemCall<'a, C, A> where C: BorrowMut<hyper::Clien
 }
 
 
-/// Retrieves an order using merchant order id.
+/// Retrieves an order using merchant order id. This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *getbymerchantorderid* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
@@ -20813,7 +20834,7 @@ impl<'a, C, A> OrderGetbymerchantorderidCall<'a, C, A> where C: BorrowMut<hyper:
 }
 
 
-/// Retrieves or modifies multiple orders in a single request.
+/// Retrieves or modifies multiple orders in a single request. This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *custombatch* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
@@ -21046,7 +21067,7 @@ impl<'a, C, A> OrderCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 }
 
 
-/// Marks line item(s) as shipped.
+/// Marks line item(s) as shipped. This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *shiplineitems* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
@@ -21324,7 +21345,7 @@ impl<'a, C, A> OrderShiplineitemCall<'a, C, A> where C: BorrowMut<hyper::Client>
 }
 
 
-/// Updates a shipment's status, carrier, and/or tracking ID.
+/// Updates a shipment's status, carrier, and/or tracking ID. This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *updateshipment* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
@@ -21602,7 +21623,7 @@ impl<'a, C, A> OrderUpdateshipmentCall<'a, C, A> where C: BorrowMut<hyper::Clien
 }
 
 
-/// Cancels a line item.
+/// Cancels a line item. This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *cancellineitem* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
@@ -21880,7 +21901,7 @@ impl<'a, C, A> OrderCancellineitemCall<'a, C, A> where C: BorrowMut<hyper::Clien
 }
 
 
-/// Cancels all line items in an order.
+/// Cancels all line items in an order. This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *cancel* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.

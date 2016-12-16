@@ -584,7 +584,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _rubicon_notifyproposalchange(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _sdf_download(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -607,12 +607,12 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "action" => Some(("action", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "token" => Some(("token", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "href" => Some(("href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "filter-type" => Some(("filterType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "file-types" => Some(("fileTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "filter-ids" => Some(("filterIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["action", "href", "id", "token"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["file-types", "filter-ids", "filter-type", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -621,8 +621,8 @@ impl<'n> Engine<'n> {
                 FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
-        let mut request: api::NotifyProposalChangeRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.rubicon().notifyproposalchange(request);
+        let mut request: api::DownloadRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.sdf().download(request);
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -649,12 +649,20 @@ impl<'n> Engine<'n> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
                 CallType::Standard => call.doit(),
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok(mut response) => {
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -714,13 +722,13 @@ impl<'n> Engine<'n> {
                     }
                 }
             },
-            ("rubicon", Some(opt)) => {
+            ("sdf", Some(opt)) => {
                 match opt.subcommand() {
-                    ("notifyproposalchange", Some(opt)) => {
-                        call_result = self._rubicon_notifyproposalchange(opt, dry_run, &mut err);
+                    ("download", Some(opt)) => {
+                        call_result = self._sdf_download(opt, dry_run, &mut err);
                     },
                     _ => {
-                        err.issues.push(CLIError::MissingMethodError("rubicon".to_string()));
+                        err.issues.push(CLIError::MissingMethodError("sdf".to_string()));
                         writeln!(io::stderr(), "{}\n", opt.usage()).ok();
                     }
                 }
@@ -980,10 +988,10 @@ fn main() {
                   ]),
             ]),
         
-        ("rubicon", "methods: 'notifyproposalchange'", vec![
-            ("notifyproposalchange",
-                    Some(r##"Update proposal upon actions of Rubicon publisher."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_doubleclickbidmanager1_cli/rubicon_notifyproposalchange",
+        ("sdf", "methods: 'download'", vec![
+            ("download",
+                    Some(r##"Retrieves entities in SDF format."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_doubleclickbidmanager1_cli/sdf_download",
                   vec![
                     (Some(r##"kv"##),
                      Some(r##"r"##),
@@ -996,6 +1004,12 @@ fn main() {
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
                   ]),
             ]),
         
@@ -1003,7 +1017,7 @@ fn main() {
     
     let mut app = App::new("doubleclickbidmanager1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.0+20160608")
+           .version("1.0.0+20161010")
            .about("API for viewing and managing your reports in DoubleClick Bid Manager.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_doubleclickbidmanager1_cli")
            .arg(Arg::with_name("folder")

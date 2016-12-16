@@ -1,4 +1,4 @@
-site_name: iam v1.0.0+20160129
+site_name: iam v1.0.0+20160915
 site_url: http://byron.github.io/google-apis-rs/google-iam1-cli
 site_description: Write integrating applications with bcore
 
@@ -22,6 +22,7 @@ pages:
 - ['projects_service-accounts-sign-blob.md', 'Projects', 'Service Accounts Sign Blob']
 - ['projects_service-accounts-test-iam-permissions.md', 'Projects', 'Service Accounts Test Iam Permissions']
 - ['projects_service-accounts-update.md', 'Projects', 'Service Accounts Update']
+- ['roles_query-grantable-roles.md', 'Roles', 'Query Grantable Roles']
 
 theme: readthedocs
 

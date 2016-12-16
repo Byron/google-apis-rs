@@ -52,6 +52,7 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 /// extern crate hyper;
 /// extern crate yup_oauth2 as oauth2;
 /// extern crate google_civicinfo2 as civicinfo2;
+/// use civicinfo2::VoterInfoRequest;
 /// use civicinfo2::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -70,10 +71,15 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 ///                               hyper::Client::new(),
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = CivicInfo::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = VoterInfoRequest::default();
+/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.elections().voter_info_query("address")
+/// let result = hub.elections().voter_info_query(req, "address")
 ///              .return_all_available_data(true)
 ///              .official_only(false)
 ///              .election_id("accusam")
@@ -141,6 +147,25 @@ impl<'a, C, A> CivicInfo<C, A>
 // ############
 // SCHEMAS ###
 // ##########
+/// A search request for political geographies.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [search divisions](struct.DivisionSearchCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DivisionSearchRequest {
+    /// no description provided
+    #[serde(rename="contextParams")]
+    pub context_params: Option<ContextParams>,
+}
+
+impl RequestValue for DivisionSearchRequest {}
+
+
 /// Describes information about a regional election administrative area.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -211,24 +236,28 @@ pub struct ElectoralDistrict {
 impl Part for ElectoralDistrict {}
 
 
-/// The result of a division search query.
+/// Information about individual election officials.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [search divisions](struct.DivisionSearchCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DivisionSearchResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "civicinfo#divisionSearchResponse".
-    pub kind: Option<String>,
-    /// no description provided
-    pub results: Option<Vec<DivisionSearchResult>>,
+pub struct ElectionOfficial {
+    /// The fax number of the election official.
+    #[serde(rename="faxNumber")]
+    pub fax_number: Option<String>,
+    /// The email address of the election official.
+    #[serde(rename="emailAddress")]
+    pub email_address: Option<String>,
+    /// The full name of the election official.
+    pub name: Option<String>,
+    /// The office phone number of the election official.
+    #[serde(rename="officePhoneNumber")]
+    pub office_phone_number: Option<String>,
+    /// The title of the election official.
+    pub title: Option<String>,
 }
 
-impl ResponseResult for DivisionSearchResponse {}
+impl Part for ElectionOfficial {}
 
 
 /// Information about a candidate running for elected office.
@@ -237,7 +266,7 @@ impl ResponseResult for DivisionSearchResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Candidate {
-    /// The candidate's name.
+    /// The candidate's name. If this is a joint ticket it will indicate the name of the candidate at the top of a ticket followed by a / and that name of candidate at the bottom of the ticket. e.g. "Mitt Romney / Paul Ryan"
     pub name: Option<String>,
     /// A URL for a photo of the candidate.
     #[serde(rename="photoUrl")]
@@ -383,6 +412,28 @@ pub struct RepresentativeInfoResponse {
 impl ResponseResult for RepresentativeInfoResponse {}
 
 
+/// A request for information about a voter.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [voter info query elections](struct.ElectionVoterInfoQueryCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct VoterInfoRequest {
+    /// no description provided
+    #[serde(rename="voterInfoSegmentResult")]
+    pub voter_info_segment_result: Option<VoterInfoSegmentResult>,
+    /// no description provided
+    #[serde(rename="contextParams")]
+    pub context_params: Option<ContextParams>,
+}
+
+impl RequestValue for VoterInfoRequest {}
+
+
 /// Contains information about the data source for the element containing it.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -398,28 +449,142 @@ pub struct Source {
 impl Part for Source {}
 
 
-/// Information about individual election officials.
+/// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ElectionOfficial {
-    /// The fax number of the election official.
-    #[serde(rename="faxNumber")]
-    pub fax_number: Option<String>,
-    /// The email address of the election official.
-    #[serde(rename="emailAddress")]
-    pub email_address: Option<String>,
-    /// The full name of the election official.
-    pub name: Option<String>,
-    /// The office phone number of the election official.
-    #[serde(rename="officePhoneNumber")]
-    pub office_phone_number: Option<String>,
-    /// The title of the election official.
-    pub title: Option<String>,
+pub struct ContextParams {
+    /// no description provided
+    #[serde(rename="clientProfile")]
+    pub client_profile: Option<String>,
 }
 
-impl Part for ElectionOfficial {}
+impl Part for ContextParams {}
+
+
+/// The result of a division search query.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [search divisions](struct.DivisionSearchCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DivisionSearchResponse {
+    /// Identifies what kind of resource this is. Value: the fixed string "civicinfo#divisionSearchResponse".
+    pub kind: Option<String>,
+    /// no description provided
+    pub results: Option<Vec<DivisionSearchResult>>,
+}
+
+impl ResponseResult for DivisionSearchResponse {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PostalAddress {
+    /// no description provided
+    #[serde(rename="languageCode")]
+    pub language_code: Option<String>,
+    /// no description provided
+    #[serde(rename="dependentThoroughfareTrailingType")]
+    pub dependent_thoroughfare_trailing_type: Option<String>,
+    /// no description provided
+    #[serde(rename="postalCodeNumber")]
+    pub postal_code_number: Option<String>,
+    /// no description provided
+    #[serde(rename="dependentThoroughfaresType")]
+    pub dependent_thoroughfares_type: Option<String>,
+    /// no description provided
+    #[serde(rename="thoroughfareTrailingType")]
+    pub thoroughfare_trailing_type: Option<String>,
+    /// no description provided
+    #[serde(rename="dependentThoroughfaresIndicator")]
+    pub dependent_thoroughfares_indicator: Option<String>,
+    /// no description provided
+    #[serde(rename="dependentThoroughfareLeadingType")]
+    pub dependent_thoroughfare_leading_type: Option<String>,
+    /// no description provided
+    #[serde(rename="countryName")]
+    pub country_name: Option<String>,
+    /// no description provided
+    #[serde(rename="premiseName")]
+    pub premise_name: Option<String>,
+    /// no description provided
+    #[serde(rename="postalCodeNumberExtension")]
+    pub postal_code_number_extension: Option<String>,
+    /// no description provided
+    #[serde(rename="localityName")]
+    pub locality_name: Option<String>,
+    /// no description provided
+    #[serde(rename="thoroughfarePreDirection")]
+    pub thoroughfare_pre_direction: Option<String>,
+    /// no description provided
+    #[serde(rename="recipientName")]
+    pub recipient_name: Option<String>,
+    /// no description provided
+    #[serde(rename="thoroughfareNumber")]
+    pub thoroughfare_number: Option<String>,
+    /// no description provided
+    #[serde(rename="dependentThoroughfarePreDirection")]
+    pub dependent_thoroughfare_pre_direction: Option<String>,
+    /// no description provided
+    #[serde(rename="administrativeAreaName")]
+    pub administrative_area_name: Option<String>,
+    /// no description provided
+    #[serde(rename="thoroughfareLeadingType")]
+    pub thoroughfare_leading_type: Option<String>,
+    /// no description provided
+    #[serde(rename="firmName")]
+    pub firm_name: Option<String>,
+    /// no description provided
+    #[serde(rename="dependentThoroughfarePostDirection")]
+    pub dependent_thoroughfare_post_direction: Option<String>,
+    /// no description provided
+    #[serde(rename="countryNameCode")]
+    pub country_name_code: Option<String>,
+    /// no description provided
+    #[serde(rename="sortingCode")]
+    pub sorting_code: Option<String>,
+    /// no description provided
+    #[serde(rename="dependentThoroughfaresConnector")]
+    pub dependent_thoroughfares_connector: Option<String>,
+    /// no description provided
+    #[serde(rename="isDisputed")]
+    pub is_disputed: Option<bool>,
+    /// no description provided
+    #[serde(rename="subAdministrativeAreaName")]
+    pub sub_administrative_area_name: Option<String>,
+    /// no description provided
+    #[serde(rename="thoroughfarePostDirection")]
+    pub thoroughfare_post_direction: Option<String>,
+    /// no description provided
+    #[serde(rename="dependentLocalityName")]
+    pub dependent_locality_name: Option<String>,
+    /// no description provided
+    #[serde(rename="dependentThoroughfareName")]
+    pub dependent_thoroughfare_name: Option<String>,
+    /// no description provided
+    #[serde(rename="subPremiseName")]
+    pub sub_premise_name: Option<String>,
+    /// no description provided
+    #[serde(rename="thoroughfareName")]
+    pub thoroughfare_name: Option<String>,
+    /// no description provided
+    #[serde(rename="postBoxNumber")]
+    pub post_box_number: Option<String>,
+    /// no description provided
+    #[serde(rename="addressLines")]
+    pub address_lines: Option<Vec<String>>,
+}
+
+impl Part for PostalAddress {}
 
 
 /// Information about an election administrative body (e.g. County Board of Elections).
@@ -489,6 +654,46 @@ pub struct Channel {
 impl Part for Channel {}
 
 
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct VoterInfoSegmentResult {
+    /// no description provided
+    #[serde(rename="postalAddress")]
+    pub postal_address: Option<PostalAddress>,
+    /// no description provided
+    pub request: Option<VoterInfoRequest>,
+    /// no description provided
+    pub response: Option<VoterInfoResponse>,
+    /// no description provided
+    #[serde(rename="generatedMillis")]
+    pub generated_millis: Option<String>,
+}
+
+impl Part for VoterInfoSegmentResult {}
+
+
+/// A request for political geography and representative information for an address.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [representative info by address representatives](struct.RepresentativeRepresentativeInfoByAddresCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RepresentativeInfoRequest {
+    /// no description provided
+    #[serde(rename="contextParams")]
+    pub context_params: Option<ContextParams>,
+}
+
+impl RequestValue for RepresentativeInfoRequest {}
+
+
 /// Information about an Office held by one or more Officials.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -512,24 +717,6 @@ pub struct Office {
 }
 
 impl Part for Office {}
-
-
-/// Represents a political geographic division that matches the requested query.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DivisionSearchResult {
-    /// The unique Open Civic Data identifier for this division.
-    #[serde(rename="ocdId")]
-    pub ocd_id: Option<String>,
-    /// The name of the division.
-    pub name: Option<String>,
-    /// Other Open Civic Data identifiers that refer to the same division -- for example, those that refer to other political divisions whose boundaries are defined to be coterminous with this one. For example, ocd-division/country:us/state:wy will include an alias of ocd-division/country:us/state:wy/cd:1, since Wyoming has only one Congressional district.
-    pub aliases: Option<Vec<String>>,
-}
-
-impl Part for DivisionSearchResult {}
 
 
 /// A simple representation of an address.
@@ -556,6 +743,43 @@ pub struct SimpleAddressType {
 }
 
 impl Part for SimpleAddressType {}
+
+
+/// Represents a political geographic division that matches the requested query.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DivisionSearchResult {
+    /// The unique Open Civic Data identifier for this division.
+    #[serde(rename="ocdId")]
+    pub ocd_id: Option<String>,
+    /// The name of the division.
+    pub name: Option<String>,
+    /// Other Open Civic Data identifiers that refer to the same division -- for example, those that refer to other political divisions whose boundaries are defined to be coterminous with this one. For example, ocd-division/country:us/state:wy will include an alias of ocd-division/country:us/state:wy/cd:1, since Wyoming has only one Congressional district.
+    pub aliases: Option<Vec<String>>,
+}
+
+impl Part for DivisionSearchResult {}
+
+
+/// A request to look up representative information for a single division.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [representative info by division representatives](struct.RepresentativeRepresentativeInfoByDivisionCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DivisionRepresentativeInfoRequest {
+    /// no description provided
+    #[serde(rename="contextParams")]
+    pub context_params: Option<ContextParams>,
+}
+
+impl RequestValue for DivisionRepresentativeInfoRequest {}
 
 
 /// Describes a political geography.
@@ -614,6 +838,33 @@ pub struct PollingLocation {
 impl Part for PollingLocation {}
 
 
+/// Information about the election that was queried.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [voter info query elections](struct.ElectionVoterInfoQueryCall.html) (none)
+/// * [election query elections](struct.ElectionElectionQueryCall.html) (none)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Election {
+    /// Day of the election in YYYY-MM-DD format.
+    #[serde(rename="electionDay")]
+    pub election_day: Option<String>,
+    /// The unique ID of this election.
+    pub id: Option<String>,
+    /// A displayable name for the election.
+    pub name: Option<String>,
+    /// The political division of the election. Represented as an OCD Division ID. Voters within these political jurisdictions are covered by this election. This is typically a state such as ocd-division/country:us/state:ca or for the midterms or general election the entire US (i.e. ocd-division/country:us).
+    #[serde(rename="ocdDivisionId")]
+    pub ocd_division_id: Option<String>,
+}
+
+impl Resource for Election {}
+
+
 /// There is no detailed description.
 /// 
 /// # Activities
@@ -621,19 +872,16 @@ impl Part for PollingLocation {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [representative info by division representatives](struct.RepresentativeRepresentativeInfoByDivisionCall.html) (response)
+/// * [election query elections](struct.ElectionElectionQueryCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct RepresentativeInfoData {
-    /// Political geographic divisions that contain the requested address.
-    pub divisions: Option<HashMap<String, GeographicDivision>>,
-    /// Officials holding the offices listed above. Will only be present if includeOffices was true in the request.
-    pub officials: Option<Vec<Official>>,
-    /// Elected offices referenced by the divisions listed above. Will only be present if includeOffices was true in the request.
-    pub offices: Option<Vec<Office>>,
+pub struct ElectionsQueryRequest {
+    /// no description provided
+    #[serde(rename="contextParams")]
+    pub context_params: Option<ContextParams>,
 }
 
-impl ResponseResult for RepresentativeInfoData {}
+impl RequestValue for ElectionsQueryRequest {}
 
 
 /// The result of a voter info lookup query.
@@ -681,31 +929,26 @@ pub struct VoterInfoResponse {
 impl ResponseResult for VoterInfoResponse {}
 
 
-/// Information about the election that was queried.
+/// There is no detailed description.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [voter info query elections](struct.ElectionVoterInfoQueryCall.html) (none)
-/// * [election query elections](struct.ElectionElectionQueryCall.html) (none)
+/// * [representative info by division representatives](struct.RepresentativeRepresentativeInfoByDivisionCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Election {
-    /// Day of the election in YYYY-MM-DD format.
-    #[serde(rename="electionDay")]
-    pub election_day: Option<String>,
-    /// The unique ID of this election.
-    pub id: Option<String>,
-    /// A displayable name for the election.
-    pub name: Option<String>,
-    /// The political division of the election. Represented as an OCD Division ID. Voters within these political jurisdictions are covered by this election. This is typically a state such as ocd-division/country:us/state:ca or for the midterms or general election the entire US (i.e. ocd-division/country:us).
-    #[serde(rename="ocdDivisionId")]
-    pub ocd_division_id: Option<String>,
+pub struct RepresentativeInfoData {
+    /// Political geographic divisions that contain the requested address.
+    pub divisions: Option<HashMap<String, GeographicDivision>>,
+    /// Officials holding the offices listed above. Will only be present if includeOffices was true in the request.
+    pub officials: Option<Vec<Official>>,
+    /// Elected offices referenced by the divisions listed above. Will only be present if includeOffices was true in the request.
+    pub offices: Option<Vec<Office>>,
 }
 
-impl Resource for Election {}
+impl ResponseResult for RepresentativeInfoData {}
 
 
 
@@ -754,9 +997,14 @@ impl<'a, C, A> DivisionMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Searches for political divisions by their natural name or OCD ID.
-    pub fn search(&self) -> DivisionSearchCall<'a, C, A> {
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    pub fn search(&self, request: DivisionSearchRequest) -> DivisionSearchCall<'a, C, A> {
         DivisionSearchCall {
             hub: self.hub,
+            _request: request,
             _query: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
@@ -807,9 +1055,14 @@ impl<'a, C, A> ElectionMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// List of available elections to query.
-    pub fn election_query(&self) -> ElectionElectionQueryCall<'a, C, A> {
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    pub fn election_query(&self, request: ElectionsQueryRequest) -> ElectionElectionQueryCall<'a, C, A> {
         ElectionElectionQueryCall {
             hub: self.hub,
+            _request: request,
             _delegate: Default::default(),
             _additional_params: Default::default(),
         }
@@ -821,10 +1074,12 @@ impl<'a, C, A> ElectionMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
+    /// * `request` - No description provided.
     /// * `address` - The registered address of the voter to look up.
-    pub fn voter_info_query(&self, address: &str) -> ElectionVoterInfoQueryCall<'a, C, A> {
+    pub fn voter_info_query(&self, request: VoterInfoRequest, address: &str) -> ElectionVoterInfoQueryCall<'a, C, A> {
         ElectionVoterInfoQueryCall {
             hub: self.hub,
+            _request: request,
             _address: address.to_string(),
             _return_all_available_data: Default::default(),
             _official_only: Default::default(),
@@ -878,9 +1133,14 @@ impl<'a, C, A> RepresentativeMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Looks up political geography and representative information for a single address.
-    pub fn representative_info_by_address(&self) -> RepresentativeRepresentativeInfoByAddresCall<'a, C, A> {
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    pub fn representative_info_by_address(&self, request: RepresentativeInfoRequest) -> RepresentativeRepresentativeInfoByAddresCall<'a, C, A> {
         RepresentativeRepresentativeInfoByAddresCall {
             hub: self.hub,
+            _request: request,
             _roles: Default::default(),
             _levels: Default::default(),
             _include_offices: Default::default(),
@@ -896,10 +1156,12 @@ impl<'a, C, A> RepresentativeMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
+    /// * `request` - No description provided.
     /// * `ocdId` - The Open Civic Data division identifier of the division to look up.
-    pub fn representative_info_by_division(&self, ocd_id: &str) -> RepresentativeRepresentativeInfoByDivisionCall<'a, C, A> {
+    pub fn representative_info_by_division(&self, request: DivisionRepresentativeInfoRequest, ocd_id: &str) -> RepresentativeRepresentativeInfoByDivisionCall<'a, C, A> {
         RepresentativeRepresentativeInfoByDivisionCall {
             hub: self.hub,
+            _request: request,
             _ocd_id: ocd_id.to_string(),
             _roles: Default::default(),
             _recursive: Default::default(),
@@ -931,6 +1193,7 @@ impl<'a, C, A> RepresentativeMethods<'a, C, A> {
 /// # extern crate hyper;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_civicinfo2 as civicinfo2;
+/// use civicinfo2::DivisionSearchRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -941,10 +1204,15 @@ impl<'a, C, A> RepresentativeMethods<'a, C, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = CivicInfo::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = DivisionSearchRequest::default();
+/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.divisions().search()
+/// let result = hub.divisions().search(req)
 ///              .query("takimata")
 ///              .doit();
 /// # }
@@ -953,6 +1221,7 @@ pub struct DivisionSearchCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a CivicInfo<C, A>,
+    _request: DivisionSearchRequest,
     _query: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
@@ -974,7 +1243,7 @@ impl<'a, C, A> DivisionSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         };
         dlg.begin(MethodInfo { id: "civicinfo.divisions.search",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         if let Some(value) = self._query {
             params.push(("query", value.to_string()));
         }
@@ -1010,13 +1279,28 @@ impl<'a, C, A> DivisionSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request);
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()));
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
 
                 dlg.pre_request();
                 req.send()
@@ -1067,6 +1351,15 @@ impl<'a, C, A> DivisionSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: DivisionSearchRequest) -> DivisionSearchCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
     /// The search query. Queries can cover any parts of a OCD ID or a human readable division name. All words given in the query are treated as required patterns. In addition to that, most query operators of the Apache Lucene library are supported. See http://lucene.apache.org/core/2_9_4/queryparsersyntax.html
     ///
     /// Sets the *query* query property to the given value.
@@ -1123,6 +1416,7 @@ impl<'a, C, A> DivisionSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// # extern crate hyper;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_civicinfo2 as civicinfo2;
+/// use civicinfo2::ElectionsQueryRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -1133,10 +1427,15 @@ impl<'a, C, A> DivisionSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = CivicInfo::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = ElectionsQueryRequest::default();
+/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.elections().election_query()
+/// let result = hub.elections().election_query(req)
 ///              .doit();
 /// # }
 /// ```
@@ -1144,6 +1443,7 @@ pub struct ElectionElectionQueryCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a CivicInfo<C, A>,
+    _request: ElectionsQueryRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
 }
@@ -1164,7 +1464,7 @@ impl<'a, C, A> ElectionElectionQueryCall<'a, C, A> where C: BorrowMut<hyper::Cli
         };
         dlg.begin(MethodInfo { id: "civicinfo.elections.electionQuery",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((2 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -1197,13 +1497,28 @@ impl<'a, C, A> ElectionElectionQueryCall<'a, C, A> where C: BorrowMut<hyper::Cli
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request);
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()));
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
 
                 dlg.pre_request();
                 req.send()
@@ -1254,6 +1569,15 @@ impl<'a, C, A> ElectionElectionQueryCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: ElectionsQueryRequest) -> ElectionElectionQueryCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -1303,6 +1627,7 @@ impl<'a, C, A> ElectionElectionQueryCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// # extern crate hyper;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_civicinfo2 as civicinfo2;
+/// use civicinfo2::VoterInfoRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -1313,10 +1638,15 @@ impl<'a, C, A> ElectionElectionQueryCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = CivicInfo::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = VoterInfoRequest::default();
+/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.elections().voter_info_query("address")
+/// let result = hub.elections().voter_info_query(req, "address")
 ///              .return_all_available_data(true)
 ///              .official_only(false)
 ///              .election_id("labore")
@@ -1327,6 +1657,7 @@ pub struct ElectionVoterInfoQueryCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a CivicInfo<C, A>,
+    _request: VoterInfoRequest,
     _address: String,
     _return_all_available_data: Option<bool>,
     _official_only: Option<bool>,
@@ -1351,7 +1682,7 @@ impl<'a, C, A> ElectionVoterInfoQueryCall<'a, C, A> where C: BorrowMut<hyper::Cl
         };
         dlg.begin(MethodInfo { id: "civicinfo.elections.voterInfoQuery",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
         params.push(("address", self._address.to_string()));
         if let Some(value) = self._return_all_available_data {
             params.push(("returnAllAvailableData", value.to_string()));
@@ -1394,13 +1725,28 @@ impl<'a, C, A> ElectionVoterInfoQueryCall<'a, C, A> where C: BorrowMut<hyper::Cl
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request);
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()));
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
 
                 dlg.pre_request();
                 req.send()
@@ -1451,6 +1797,15 @@ impl<'a, C, A> ElectionVoterInfoQueryCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: VoterInfoRequest) -> ElectionVoterInfoQueryCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
     /// The registered address of the voter to look up.
     ///
     /// Sets the *address* query property to the given value.
@@ -1531,6 +1886,7 @@ impl<'a, C, A> ElectionVoterInfoQueryCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// # extern crate hyper;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_civicinfo2 as civicinfo2;
+/// use civicinfo2::RepresentativeInfoRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -1541,10 +1897,15 @@ impl<'a, C, A> ElectionVoterInfoQueryCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = CivicInfo::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = RepresentativeInfoRequest::default();
+/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.representatives().representative_info_by_address()
+/// let result = hub.representatives().representative_info_by_address(req)
 ///              .add_roles("sea")
 ///              .add_levels("nonumy")
 ///              .include_offices(true)
@@ -1556,6 +1917,7 @@ pub struct RepresentativeRepresentativeInfoByAddresCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a CivicInfo<C, A>,
+    _request: RepresentativeInfoRequest,
     _roles: Vec<String>,
     _levels: Vec<String>,
     _include_offices: Option<bool>,
@@ -1580,7 +1942,7 @@ impl<'a, C, A> RepresentativeRepresentativeInfoByAddresCall<'a, C, A> where C: B
         };
         dlg.begin(MethodInfo { id: "civicinfo.representatives.representativeInfoByAddress",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
         if self._roles.len() > 0 {
             for f in self._roles.iter() {
                 params.push(("roles", f.to_string()));
@@ -1629,13 +1991,28 @@ impl<'a, C, A> RepresentativeRepresentativeInfoByAddresCall<'a, C, A> where C: B
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request);
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()));
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
 
                 dlg.pre_request();
                 req.send()
@@ -1686,6 +2063,15 @@ impl<'a, C, A> RepresentativeRepresentativeInfoByAddresCall<'a, C, A> where C: B
     }
 
 
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: RepresentativeInfoRequest) -> RepresentativeRepresentativeInfoByAddresCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
     /// A list of office roles to filter by. Only offices fulfilling one of these roles will be returned. Divisions that don't contain a matching office will not be returned.
     ///
     /// Append the given value to the *roles* query property.
@@ -1765,6 +2151,7 @@ impl<'a, C, A> RepresentativeRepresentativeInfoByAddresCall<'a, C, A> where C: B
 /// # extern crate hyper;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_civicinfo2 as civicinfo2;
+/// use civicinfo2::DivisionRepresentativeInfoRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -1775,10 +2162,15 @@ impl<'a, C, A> RepresentativeRepresentativeInfoByAddresCall<'a, C, A> where C: B
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = CivicInfo::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = DivisionRepresentativeInfoRequest::default();
+/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.representatives().representative_info_by_division("ocdId")
+/// let result = hub.representatives().representative_info_by_division(req, "ocdId")
 ///              .add_roles("aliquyam")
 ///              .recursive(false)
 ///              .add_levels("no")
@@ -1789,6 +2181,7 @@ pub struct RepresentativeRepresentativeInfoByDivisionCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a CivicInfo<C, A>,
+    _request: DivisionRepresentativeInfoRequest,
     _ocd_id: String,
     _roles: Vec<String>,
     _recursive: Option<bool>,
@@ -1813,7 +2206,7 @@ impl<'a, C, A> RepresentativeRepresentativeInfoByDivisionCall<'a, C, A> where C:
         };
         dlg.begin(MethodInfo { id: "civicinfo.representatives.representativeInfoByDivision",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
         params.push(("ocdId", self._ocd_id.to_string()));
         if self._roles.len() > 0 {
             for f in self._roles.iter() {
@@ -1881,13 +2274,28 @@ impl<'a, C, A> RepresentativeRepresentativeInfoByDivisionCall<'a, C, A> where C:
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request);
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()));
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
 
                 dlg.pre_request();
                 req.send()
@@ -1938,6 +2346,15 @@ impl<'a, C, A> RepresentativeRepresentativeInfoByDivisionCall<'a, C, A> where C:
     }
 
 
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: DivisionRepresentativeInfoRequest) -> RepresentativeRepresentativeInfoByDivisionCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
     /// The Open Civic Data division identifier of the division to look up.
     ///
     /// Sets the *ocd id* path property to the given value.

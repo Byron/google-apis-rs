@@ -281,6 +281,84 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _chromeosdevices_action(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "action" => Some(("action", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "deprovision-reason" => Some(("deprovisionReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["action", "deprovision-reason"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::ChromeOsDeviceAction = json::value::from_value(object).unwrap();
+        let mut call = self.hub.chromeosdevices().action(request, opt.value_of("customer-id").unwrap_or(""), opt.value_of("resource-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok(mut response) => {
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _chromeosdevices_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.chromeosdevices().get(opt.value_of("customer-id").unwrap_or(""), opt.value_of("device-id").unwrap_or(""));
@@ -6725,6 +6803,9 @@ impl<'n> Engine<'n> {
             },
             ("chromeosdevices", Some(opt)) => {
                 match opt.subcommand() {
+                    ("action", Some(opt)) => {
+                        call_result = self._chromeosdevices_action(opt, dry_run, &mut err);
+                    },
                     ("get", Some(opt)) => {
                         call_result = self._chromeosdevices_get(opt, dry_run, &mut err);
                     },
@@ -7308,7 +7389,35 @@ fn main() {
                   ]),
             ]),
         
-        ("chromeosdevices", "methods: 'get', 'list', 'patch' and 'update'", vec![
+        ("chromeosdevices", "methods: 'action', 'get', 'list', 'patch' and 'update'", vec![
+            ("action",
+                    Some(r##"Take action on Chrome OS Device"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_admin1_directory_cli/chromeosdevices_action",
+                  vec![
+                    (Some(r##"customer-id"##),
+                     None,
+                     Some(r##"Immutable id of the Google Apps account"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"resource-id"##),
+                     None,
+                     Some(r##"Immutable id of Chrome OS Device"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                  ]),
             ("get",
                     Some(r##"Retrieve Chrome OS Device"##),
                     "Details at http://byron.github.io/google-apis-rs/google_admin1_directory_cli/chromeosdevices_get",
@@ -9683,7 +9792,7 @@ fn main() {
     
     let mut app = App::new("admin1-directory")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.0+20160824")
+           .version("1.0.0+20161124")
            .about("The Admin SDK Directory API lets you view and manage enterprise resources such as users and groups, administrative notifications, security features, and more.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_admin1_directory_cli")
            .arg(Arg::with_name("url")

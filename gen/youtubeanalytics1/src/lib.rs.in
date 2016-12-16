@@ -155,12 +155,6 @@ impl<'a, C, A> YouTubeAnalytics<C, A>
         }
     }
 
-    pub fn batch_report_definitions(&'a self) -> BatchReportDefinitionMethods<'a, C, A> {
-        BatchReportDefinitionMethods { hub: &self }
-    }
-    pub fn batch_reports(&'a self) -> BatchReportMethods<'a, C, A> {
-        BatchReportMethods { hub: &self }
-    }
     pub fn group_items(&'a self) -> GroupItemMethods<'a, C, A> {
         GroupItemMethods { hub: &self }
     }
@@ -186,26 +180,6 @@ impl<'a, C, A> YouTubeAnalytics<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// A paginated list of batchReportDefinition resources returned in response to a youtubeAnalytics.batchReportDefinitions.list request.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list batch report definitions](struct.BatchReportDefinitionListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BatchReportDefinitionList {
-    /// A list of batchReportDefinition resources that match the request criteria.
-    pub items: Option<Vec<BatchReportDefinition>>,
-    /// This value specifies the type of data included in the API response. For the list method, the kind property value is youtubeAnalytics#batchReportDefinitionList.
-    pub kind: Option<String>,
-}
-
-impl ResponseResult for BatchReportDefinitionList {}
-
-
 /// There is no detailed description.
 /// 
 /// # Activities
@@ -281,26 +255,6 @@ pub struct GroupListResponse {
 impl ResponseResult for GroupListResponse {}
 
 
-/// This value specifies information about the data returned in the rows fields. Each item in the columnHeaders list identifies a field returned in the rows value, which contains a list of comma-delimited data. The columnHeaders list will begin with the dimensions specified in the API request, which will be followed by the metrics specified in the API request. The order of both dimensions and metrics will match the ordering in the API request. For example, if the API request contains the parameters dimensions=ageGroup,gender&metrics=viewerPercentage, the API response will return columns in this order: ageGroup,gender,viewerPercentage.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ResultTableColumnHeaders {
-    /// The type of the data in the column (STRING, INTEGER, FLOAT, etc.).
-    #[serde(rename="dataType")]
-    pub data_type: Option<String>,
-    /// The type of the column (DIMENSION or METRIC).
-    #[serde(rename="columnType")]
-    pub column_type: Option<String>,
-    /// The name of the dimension or metric.
-    pub name: Option<String>,
-}
-
-impl NestedType for ResultTableColumnHeaders {}
-impl Part for ResultTableColumnHeaders {}
-
-
 /// A paginated list of grouList resources returned in response to a youtubeAnalytics.groupApi.list request.
 /// 
 /// # Activities
@@ -321,26 +275,6 @@ pub struct GroupItemListResponse {
 }
 
 impl ResponseResult for GroupItemListResponse {}
-
-
-/// Report outputs.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BatchReportOutputs {
-    /// Cloud storage URL to download this report. This URL is valid for 30 minutes.
-    #[serde(rename="downloadUrl")]
-    pub download_url: Option<String>,
-    /// Type of the output.
-    #[serde(rename="type")]
-    pub type_: Option<String>,
-    /// Format of the output.
-    pub format: Option<String>,
-}
-
-impl NestedType for BatchReportOutputs {}
-impl Part for BatchReportOutputs {}
 
 
 /// There is no detailed description.
@@ -391,6 +325,26 @@ impl Resource for GroupItem {}
 impl ResponseResult for GroupItem {}
 
 
+/// This value specifies information about the data returned in the rows fields. Each item in the columnHeaders list identifies a field returned in the rows value, which contains a list of comma-delimited data. The columnHeaders list will begin with the dimensions specified in the API request, which will be followed by the metrics specified in the API request. The order of both dimensions and metrics will match the ordering in the API request. For example, if the API request contains the parameters dimensions=ageGroup,gender&metrics=viewerPercentage, the API response will return columns in this order: ageGroup,gender,viewerPercentage.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ResultTableColumnHeaders {
+    /// The type of the data in the column (STRING, INTEGER, FLOAT, etc.).
+    #[serde(rename="dataType")]
+    pub data_type: Option<String>,
+    /// The type of the column (DIMENSION or METRIC).
+    #[serde(rename="columnType")]
+    pub column_type: Option<String>,
+    /// The name of the dimension or metric.
+    pub name: Option<String>,
+}
+
+impl NestedType for ResultTableColumnHeaders {}
+impl Part for ResultTableColumnHeaders {}
+
+
 /// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -405,33 +359,6 @@ pub struct GroupItemResource {
 
 impl NestedType for GroupItemResource {}
 impl Part for GroupItemResource {}
-
-
-/// Contains single batchReportDefinition resource.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list batch report definitions](struct.BatchReportDefinitionListCall.html) (none)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BatchReportDefinition {
-    /// Status of the report definition.
-    pub status: Option<String>,
-    /// This value specifies the type of data of this item. For batch report definition the kind property value is youtubeAnalytics#batchReportDefinition.
-    pub kind: Option<String>,
-    /// Type of the report definition.
-    #[serde(rename="type")]
-    pub type_: Option<String>,
-    /// The ID that YouTube assigns and uses to uniquely identify the report definition.
-    pub id: Option<String>,
-    /// Name of the report definition.
-    pub name: Option<String>,
-}
-
-impl Resource for BatchReportDefinition {}
 
 
 /// Contains a single result table. The table is returned as an array of rows that contain the values for the cells of the table. Depending on the metric or dimension, the cell can contain a string (video ID, country code) or a number (number of views or number of likes).
@@ -455,75 +382,6 @@ pub struct ResultTable {
 }
 
 impl ResponseResult for ResultTable {}
-
-
-/// Contains single batchReport resource.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list batch reports](struct.BatchReportListCall.html) (none)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BatchReport {
-    /// This value specifies the type of data of this item. For batch report the kind property value is youtubeAnalytics#batchReport.
-    pub kind: Option<String>,
-    /// The ID of the the report definition.
-    #[serde(rename="reportId")]
-    pub report_id: Option<String>,
-    /// Period included in the report. For reports containing all entities endTime is not set. Both startTime and endTime are inclusive.
-    #[serde(rename="timeSpan")]
-    pub time_span: Option<BatchReportTimeSpan>,
-    /// Report outputs.
-    pub outputs: Option<Vec<BatchReportOutputs>>,
-    /// The time when the report was updated.
-    #[serde(rename="timeUpdated")]
-    pub time_updated: Option<String>,
-    /// The ID that YouTube assigns and uses to uniquely identify the report.
-    pub id: Option<String>,
-}
-
-impl Resource for BatchReport {}
-
-
-/// Period included in the report. For reports containing all entities endTime is not set. Both startTime and endTime are inclusive.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BatchReportTimeSpan {
-    /// End of the period included in the report. Inclusive. For reports containing all entities endTime is not set.
-    #[serde(rename="endTime")]
-    pub end_time: Option<String>,
-    /// Start of the period included in the report. Inclusive.
-    #[serde(rename="startTime")]
-    pub start_time: Option<String>,
-}
-
-impl NestedType for BatchReportTimeSpan {}
-impl Part for BatchReportTimeSpan {}
-
-
-/// A paginated list of batchReport resources returned in response to a youtubeAnalytics.batchReport.list request.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list batch reports](struct.BatchReportListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BatchReportList {
-    /// A list of batchReport resources that match the request criteria.
-    pub items: Option<Vec<BatchReport>>,
-    /// This value specifies the type of data included in the API response. For the list method, the kind property value is youtubeAnalytics#batchReportList.
-    pub kind: Option<String>,
-}
-
-impl ResponseResult for BatchReportList {}
 
 
 
@@ -594,64 +452,6 @@ impl<'a, C, A> ReportMethods<'a, C, A> {
             _filters: Default::default(),
             _dimensions: Default::default(),
             _currency: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-}
-
-
-
-/// A builder providing access to all methods supported on *batchReportDefinition* resources.
-/// It is not used directly, but through the `YouTubeAnalytics` hub.
-///
-/// # Example
-///
-/// Instantiate a resource builder
-///
-/// ```test_harness,no_run
-/// extern crate hyper;
-/// extern crate yup_oauth2 as oauth2;
-/// extern crate google_youtubeanalytics1 as youtubeanalytics1;
-/// 
-/// # #[test] fn egal() {
-/// use std::default::Default;
-/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// use youtubeanalytics1::YouTubeAnalytics;
-/// 
-/// let secret: ApplicationSecret = Default::default();
-/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-///                               hyper::Client::new(),
-///                               <MemoryStorage as Default>::default(), None);
-/// let mut hub = YouTubeAnalytics::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `list(...)`
-/// // to build up your call.
-/// let rb = hub.batch_report_definitions();
-/// # }
-/// ```
-pub struct BatchReportDefinitionMethods<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a YouTubeAnalytics<C, A>,
-}
-
-impl<'a, C, A> MethodsBuilder for BatchReportDefinitionMethods<'a, C, A> {}
-
-impl<'a, C, A> BatchReportDefinitionMethods<'a, C, A> {
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Retrieves a list of available batch report definitions.
-    /// 
-    /// # Arguments
-    ///
-    /// * `onBehalfOfContentOwner` - The onBehalfOfContentOwner parameter identifies the content owner that the user is acting on behalf of.
-    pub fn list(&self, on_behalf_of_content_owner: &str) -> BatchReportDefinitionListCall<'a, C, A> {
-        BatchReportDefinitionListCall {
-            hub: self.hub,
-            _on_behalf_of_content_owner: on_behalf_of_content_owner.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -858,66 +658,6 @@ impl<'a, C, A> GroupMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _on_behalf_of_content_owner: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-}
-
-
-
-/// A builder providing access to all methods supported on *batchReport* resources.
-/// It is not used directly, but through the `YouTubeAnalytics` hub.
-///
-/// # Example
-///
-/// Instantiate a resource builder
-///
-/// ```test_harness,no_run
-/// extern crate hyper;
-/// extern crate yup_oauth2 as oauth2;
-/// extern crate google_youtubeanalytics1 as youtubeanalytics1;
-/// 
-/// # #[test] fn egal() {
-/// use std::default::Default;
-/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// use youtubeanalytics1::YouTubeAnalytics;
-/// 
-/// let secret: ApplicationSecret = Default::default();
-/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-///                               hyper::Client::new(),
-///                               <MemoryStorage as Default>::default(), None);
-/// let mut hub = YouTubeAnalytics::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `list(...)`
-/// // to build up your call.
-/// let rb = hub.batch_reports();
-/// # }
-/// ```
-pub struct BatchReportMethods<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a YouTubeAnalytics<C, A>,
-}
-
-impl<'a, C, A> MethodsBuilder for BatchReportMethods<'a, C, A> {}
-
-impl<'a, C, A> BatchReportMethods<'a, C, A> {
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Retrieves a list of processed batch reports.
-    /// 
-    /// # Arguments
-    ///
-    /// * `batchReportDefinitionId` - The batchReportDefinitionId parameter specifies the ID of the batch reportort definition for which you are retrieving reports.
-    /// * `onBehalfOfContentOwner` - The onBehalfOfContentOwner parameter identifies the content owner that the user is acting on behalf of.
-    pub fn list(&self, batch_report_definition_id: &str, on_behalf_of_content_owner: &str) -> BatchReportListCall<'a, C, A> {
-        BatchReportListCall {
-            hub: self.hub,
-            _batch_report_definition_id: batch_report_definition_id.to_string(),
-            _on_behalf_of_content_owner: on_behalf_of_content_owner.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1257,220 +997,6 @@ impl<'a, C, A> ReportQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 }
 
 
-/// Retrieves a list of available batch report definitions.
-///
-/// A builder for the *list* method supported by a *batchReportDefinition* resource.
-/// It is not used directly, but through a `BatchReportDefinitionMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_youtubeanalytics1 as youtubeanalytics1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use youtubeanalytics1::YouTubeAnalytics;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::new(),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = YouTubeAnalytics::new(hyper::Client::new(), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.batch_report_definitions().list("onBehalfOfContentOwner")
-///              .doit();
-/// # }
-/// ```
-pub struct BatchReportDefinitionListCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a YouTubeAnalytics<C, A>,
-    _on_behalf_of_content_owner: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for BatchReportDefinitionListCall<'a, C, A> {}
-
-impl<'a, C, A> BatchReportDefinitionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, BatchReportDefinitionList)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "youtubeAnalytics.batchReportDefinitions.list",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
-        params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.to_string()));
-        for &field in ["alt", "onBehalfOfContentOwner"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = "https://www.googleapis.com/youtube/analytics/v1/batchReportDefinitions".to_string();
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::YtAnalyticMonetaryReadonly.as_ref().to_string(), ());
-        }
-
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The onBehalfOfContentOwner parameter identifies the content owner that the user is acting on behalf of.
-    ///
-    /// Sets the *on behalf of content owner* query property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> BatchReportDefinitionListCall<'a, C, A> {
-        self._on_behalf_of_content_owner = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BatchReportDefinitionListCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> BatchReportDefinitionListCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::YtAnalyticMonetaryReadonly`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> BatchReportDefinitionListCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._scopes.insert(scope.as_ref().to_string(), ());
-        self
-    }
-}
-
-
 /// Creates a group item.
 ///
 /// A builder for the *insert* method supported by a *groupItem* resource.
@@ -1504,7 +1030,7 @@ impl<'a, C, A> BatchReportDefinitionListCall<'a, C, A> where C: BorrowMut<hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.group_items().insert(req)
-///              .on_behalf_of_content_owner("ea")
+///              .on_behalf_of_content_owner("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -1745,7 +1271,7 @@ impl<'a, C, A> GroupItemInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.group_items().list("groupId")
-///              .on_behalf_of_content_owner("justo")
+///              .on_behalf_of_content_owner("no")
 ///              .doit();
 /// # }
 /// ```
@@ -1973,7 +1499,7 @@ impl<'a, C, A> GroupItemListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.group_items().delete("id")
-///              .on_behalf_of_content_owner("et")
+///              .on_behalf_of_content_owner("justo")
 ///              .doit();
 /// # }
 /// ```
@@ -2190,7 +1716,7 @@ impl<'a, C, A> GroupItemDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.groups().delete("id")
-///              .on_behalf_of_content_owner("diam")
+///              .on_behalf_of_content_owner("et")
 ///              .doit();
 /// # }
 /// ```
@@ -2413,7 +1939,7 @@ impl<'a, C, A> GroupDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.groups().insert(req)
-///              .on_behalf_of_content_owner("ipsum")
+///              .on_behalf_of_content_owner("diam")
 ///              .doit();
 /// # }
 /// ```
@@ -2654,10 +2180,10 @@ impl<'a, C, A> GroupInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.groups().list()
-///              .page_token("Lorem")
-///              .on_behalf_of_content_owner("et")
-///              .mine(false)
-///              .id("aliquyam")
+///              .page_token("ipsum")
+///              .on_behalf_of_content_owner("Lorem")
+///              .mine(true)
+///              .id("duo")
 ///              .doit();
 /// # }
 /// ```
@@ -2912,7 +2438,7 @@ impl<'a, C, A> GroupListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.groups().update(req)
-///              .on_behalf_of_content_owner("sea")
+///              .on_behalf_of_content_owner("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -3119,232 +2645,6 @@ impl<'a, C, A> GroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> GroupUpdateCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._scopes.insert(scope.as_ref().to_string(), ());
-        self
-    }
-}
-
-
-/// Retrieves a list of processed batch reports.
-///
-/// A builder for the *list* method supported by a *batchReport* resource.
-/// It is not used directly, but through a `BatchReportMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_youtubeanalytics1 as youtubeanalytics1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use youtubeanalytics1::YouTubeAnalytics;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::new(),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = YouTubeAnalytics::new(hyper::Client::new(), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.batch_reports().list("batchReportDefinitionId", "onBehalfOfContentOwner")
-///              .doit();
-/// # }
-/// ```
-pub struct BatchReportListCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a YouTubeAnalytics<C, A>,
-    _batch_report_definition_id: String,
-    _on_behalf_of_content_owner: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for BatchReportListCall<'a, C, A> {}
-
-impl<'a, C, A> BatchReportListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, BatchReportList)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "youtubeAnalytics.batchReports.list",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
-        params.push(("batchReportDefinitionId", self._batch_report_definition_id.to_string()));
-        params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.to_string()));
-        for &field in ["alt", "batchReportDefinitionId", "onBehalfOfContentOwner"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = "https://www.googleapis.com/youtube/analytics/v1/batchReports".to_string();
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::YtAnalyticMonetaryReadonly.as_ref().to_string(), ());
-        }
-
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The batchReportDefinitionId parameter specifies the ID of the batch reportort definition for which you are retrieving reports.
-    ///
-    /// Sets the *batch report definition id* query property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn batch_report_definition_id(mut self, new_value: &str) -> BatchReportListCall<'a, C, A> {
-        self._batch_report_definition_id = new_value.to_string();
-        self
-    }
-    /// The onBehalfOfContentOwner parameter identifies the content owner that the user is acting on behalf of.
-    ///
-    /// Sets the *on behalf of content owner* query property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> BatchReportListCall<'a, C, A> {
-        self._on_behalf_of_content_owner = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BatchReportListCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> BatchReportListCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::YtAnalyticMonetaryReadonly`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> BatchReportListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

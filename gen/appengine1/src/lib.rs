@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *appengine* crate version *1.0.0+20160802*, where *20160802* is the exact revision of the *appengine:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
+//! This documentation was generated from *appengine* crate version *1.0.0+20161208*, where *20161208* is the exact revision of the *appengine:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
 //! 
 //! Everything else about the *appengine* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/appengine/docs/admin-api/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.Appengine.html) ... 
 //! 
 //! * apps
-//!  * [*get*](struct.AppGetCall.html), [*locations get*](struct.AppLocationGetCall.html), [*locations list*](struct.AppLocationListCall.html), [*operations get*](struct.AppOperationGetCall.html), [*operations list*](struct.AppOperationListCall.html), [*repair*](struct.AppRepairCall.html), [*services delete*](struct.AppServiceDeleteCall.html), [*services get*](struct.AppServiceGetCall.html), [*services list*](struct.AppServiceListCall.html), [*services patch*](struct.AppServicePatchCall.html), [*services versions create*](struct.AppServiceVersionCreateCall.html), [*services versions delete*](struct.AppServiceVersionDeleteCall.html), [*services versions get*](struct.AppServiceVersionGetCall.html), [*services versions instances debug*](struct.AppServiceVersionInstanceDebugCall.html), [*services versions instances delete*](struct.AppServiceVersionInstanceDeleteCall.html), [*services versions instances get*](struct.AppServiceVersionInstanceGetCall.html), [*services versions instances list*](struct.AppServiceVersionInstanceListCall.html), [*services versions list*](struct.AppServiceVersionListCall.html) and [*services versions patch*](struct.AppServiceVersionPatchCall.html)
+//!  * [*create*](struct.AppCreateCall.html), [*get*](struct.AppGetCall.html), [*locations get*](struct.AppLocationGetCall.html), [*locations list*](struct.AppLocationListCall.html), [*operations get*](struct.AppOperationGetCall.html), [*operations list*](struct.AppOperationListCall.html), [*patch*](struct.AppPatchCall.html), [*repair*](struct.AppRepairCall.html), [*services delete*](struct.AppServiceDeleteCall.html), [*services get*](struct.AppServiceGetCall.html), [*services list*](struct.AppServiceListCall.html), [*services patch*](struct.AppServicePatchCall.html), [*services versions create*](struct.AppServiceVersionCreateCall.html), [*services versions delete*](struct.AppServiceVersionDeleteCall.html), [*services versions get*](struct.AppServiceVersionGetCall.html), [*services versions instances debug*](struct.AppServiceVersionInstanceDebugCall.html), [*services versions instances delete*](struct.AppServiceVersionInstanceDeleteCall.html), [*services versions instances get*](struct.AppServiceVersionInstanceGetCall.html), [*services versions instances list*](struct.AppServiceVersionInstanceListCall.html), [*services versions list*](struct.AppServiceVersionListCall.html) and [*services versions patch*](struct.AppServiceVersionPatchCall.html)
 //! 
 //! 
 //! 
@@ -48,7 +48,9 @@
 //! 
 //! ```ignore
 //! let r = hub.apps().services_versions_create(...).doit()
+//! let r = hub.apps().patch(...).doit()
 //! let r = hub.apps().services_versions_instances_debug(...).doit()
+//! let r = hub.apps().create(...).doit()
 //! let r = hub.apps().services_versions_instances_delete(...).doit()
 //! let r = hub.apps().services_versions_patch(...).doit()
 //! let r = hub.apps().operations_get(...).doit()

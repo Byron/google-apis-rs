@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-spectrum1_explorer` library allows access to all features of the *Google spectrum* service.
 
-This documentation was generated from *spectrum* crate version *1.0.0+20160606*, where *20160606* is the exact revision of the *spectrum:v1explorer* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
+This documentation was generated from *spectrum* crate version *1.0.0+20161116*, where *20161116* is the exact revision of the *spectrum:v1explorer* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
 
 Everything else about the *spectrum* *v1_explorer* API can be found at the
 [official documentation site](http://developers.google.com/spectrum).

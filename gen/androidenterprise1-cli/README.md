@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Android Enterprise* API at revision *20160831*. The CLI is at version *1.0.0*.
+This documentation was generated from the *Android Enterprise* API at revision *20161207*. The CLI is at version *1.0.0*.
 
 ```bash
 androidenterprise1 [options]
@@ -49,6 +49,7 @@ androidenterprise1 [options]
         enterprises
                 acknowledge-notification-set [-p <v>]...
                 complete-signup [-p <v>]... [-o <out>]
+                create-web-token <enterprise-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <enterprise-id> [-p <v>]...
                 enroll <token> (-r <kv>)... [-p <v>]... [-o <out>]
                 generate-signup-url [-p <v>]... [-o <out>]

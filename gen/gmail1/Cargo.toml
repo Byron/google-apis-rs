@@ -4,7 +4,7 @@
 [package]
 
 name = "google-gmail1"
-version = "1.0.0+20160711"
+version = "1.0.0+20161206"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with gmail (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/gmail1"

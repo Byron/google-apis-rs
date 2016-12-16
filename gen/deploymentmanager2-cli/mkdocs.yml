@@ -1,4 +1,4 @@
-site_name: Deployment Manager v1.0.0+20160901
+site_name: Deployment Manager v1.0.0+20161209
 site_url: http://byron.github.io/google-apis-rs/google-deploymentmanager2-cli
 site_description: Write integrating applications with bcore
 
@@ -12,10 +12,13 @@ pages:
 - ['deployments_cancel-preview.md', 'Deployments', 'Cancel Preview']
 - ['deployments_delete.md', 'Deployments', 'Delete']
 - ['deployments_get.md', 'Deployments', 'Get']
+- ['deployments_get-iam-policy.md', 'Deployments', 'Get Iam Policy']
 - ['deployments_insert.md', 'Deployments', 'Insert']
 - ['deployments_list.md', 'Deployments', 'List']
 - ['deployments_patch.md', 'Deployments', 'Patch']
+- ['deployments_set-iam-policy.md', 'Deployments', 'Set Iam Policy']
 - ['deployments_stop.md', 'Deployments', 'Stop']
+- ['deployments_test-iam-permissions.md', 'Deployments', 'Test Iam Permissions']
 - ['deployments_update.md', 'Deployments', 'Update']
 - ['manifests_get.md', 'Manifests', 'Get']
 - ['manifests_list.md', 'Manifests', 'List']

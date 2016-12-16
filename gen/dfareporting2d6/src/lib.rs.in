@@ -397,7 +397,7 @@ pub struct Conversion {
     pub encrypted_user_id_candidates: Option<Vec<String>>,
     /// The value of the conversion.
     pub value: Option<f64>,
-    /// Whether the user has Limit Ad Tracking set.
+    /// Whether Limit Ad Tracking is enabled. When set to true, the conversion will be used for reporting but not targeting. This will prevent remarketing.
     #[serde(rename="limitAdTracking")]
     pub limit_ad_tracking: Option<bool>,
     /// The quantity of the conversion.
@@ -6504,7 +6504,7 @@ pub struct Ad {
     pub id: Option<String>,
     /// Size of this ad. Applicable when type is AD_SERVING_DEFAULT_AD.
     pub size: Option<Size>,
-    /// Whether this ad is archived.
+    /// Whether this ad is archived. When true, active must be false.
     pub archived: Option<bool>,
     /// Targeting template ID, used to apply preconfigured targeting information to this ad. This cannot be set while any of dayPartTargeting, geoTargeting, keyValueTargetingExpression, languageTargeting, remarketingListExpression, or technologyTargeting are set. Applicable when type is AD_SERVING_STANDARD_AD.
     #[serde(rename="targetingTemplateId")]
@@ -6554,7 +6554,7 @@ pub struct Ad {
     /// Date and time that this ad should start serving. If creating an ad, this field must be a time in the future. This is a required field on insertion.
     #[serde(rename="startTime")]
     pub start_time: Option<String>,
-    /// Whether this ad is active.
+    /// Whether this ad is active. When true, archived must be false.
     pub active: Option<bool>,
     /// Compatibility of this ad. Applicable when type is AD_SERVING_DEFAULT_AD. DISPLAY and DISPLAY_INTERSTITIAL refer to either rendering on desktop or on mobile devices or in mobile apps for regular or interstitial ads, respectively. APP and APP_INTERSTITIAL are only used for existing default ads. New mobile placements must be assigned DISPLAY or DISPLAY_INTERSTITIAL and default ads created for those placements will be limited to those compatibility types. IN_STREAM_VIDEO refers to rendering in-stream video ads developed with the VAST standard.
     pub compatibility: Option<String>,
@@ -7346,7 +7346,7 @@ impl<'a, C, A> OrderDocumentMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of order documents, possibly filtered.
+    /// Retrieves a list of order documents, possibly filtered. This method supports paging.
     /// 
     /// # Arguments
     ///
@@ -7434,7 +7434,7 @@ impl<'a, C, A> CreativeFieldMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of creative fields, possibly filtered.
+    /// Retrieves a list of creative fields, possibly filtered. This method supports paging.
     /// 
     /// # Arguments
     ///
@@ -7674,7 +7674,7 @@ impl<'a, C, A> UserRoleMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of user roles, possibly filtered.
+    /// Retrieves a list of user roles, possibly filtered. This method supports paging.
     /// 
     /// # Arguments
     ///
@@ -8067,7 +8067,7 @@ impl<'a, C, A> CampaignCreativeAssociationMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the list of creative IDs associated with the specified campaign.
+    /// Retrieves the list of creative IDs associated with the specified campaign. This method supports paging.
     /// 
     /// # Arguments
     ///
@@ -8130,7 +8130,7 @@ impl<'a, C, A> ChangeLogMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of change logs.
+    /// Retrieves a list of change logs. This method supports paging.
     /// 
     /// # Arguments
     ///
@@ -8602,7 +8602,7 @@ impl<'a, C, A> AdvertiserMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of advertisers, possibly filtered.
+    /// Retrieves a list of advertisers, possibly filtered. This method supports paging.
     /// 
     /// # Arguments
     ///
@@ -8812,7 +8812,7 @@ impl<'a, C, A> FloodlightActivityGroupMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of floodlight activity groups, possibly filtered.
+    /// Retrieves a list of floodlight activity groups, possibly filtered. This method supports paging.
     /// 
     /// # Arguments
     ///
@@ -8975,7 +8975,7 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of orders, possibly filtered.
+    /// Retrieves a list of orders, possibly filtered. This method supports paging.
     /// 
     /// # Arguments
     ///
@@ -9140,7 +9140,7 @@ impl<'a, C, A> DirectorySiteContactMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of directory site contacts, possibly filtered.
+    /// Retrieves a list of directory site contacts, possibly filtered. This method supports paging.
     /// 
     /// # Arguments
     ///
@@ -9315,7 +9315,7 @@ impl<'a, C, A> AdMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of ads, possibly filtered.
+    /// Retrieves a list of ads, possibly filtered. This method supports paging.
     /// 
     /// # Arguments
     ///
@@ -9589,7 +9589,7 @@ impl<'a, C, A> TargetableRemarketingListMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of targetable remarketing lists, possibly filtered.
+    /// Retrieves a list of targetable remarketing lists, possibly filtered. This method supports paging.
     /// 
     /// # Arguments
     ///
@@ -9693,7 +9693,7 @@ impl<'a, C, A> AdvertiserGroupMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of advertiser groups, possibly filtered.
+    /// Retrieves a list of advertiser groups, possibly filtered. This method supports paging.
     /// 
     /// # Arguments
     ///
@@ -9873,7 +9873,7 @@ impl<'a, C, A> SiteMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of sites, possibly filtered.
+    /// Retrieves a list of sites, possibly filtered. This method supports paging.
     /// 
     /// # Arguments
     ///
@@ -10005,7 +10005,7 @@ impl<'a, C, A> FloodlightActivityMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of floodlight activities, possibly filtered.
+    /// Retrieves a list of floodlight activities, possibly filtered. This method supports paging.
     /// 
     /// # Arguments
     ///
@@ -10287,7 +10287,7 @@ impl<'a, C, A> CreativeGroupMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of creative groups, possibly filtered.
+    /// Retrieves a list of creative groups, possibly filtered. This method supports paging.
     /// 
     /// # Arguments
     ///
@@ -10395,7 +10395,7 @@ impl<'a, C, A> TargetingTemplateMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of targeting templates, optionally filtered.
+    /// Retrieves a list of targeting templates, optionally filtered. This method supports paging.
     /// 
     /// # Arguments
     ///
@@ -10576,7 +10576,7 @@ impl<'a, C, A> SubaccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a list of subaccounts, possibly filtered.
+    /// Gets a list of subaccounts, possibly filtered. This method supports paging.
     /// 
     /// # Arguments
     ///
@@ -11013,7 +11013,7 @@ impl<'a, C, A> PlacementGroupMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of placement groups, possibly filtered.
+    /// Retrieves a list of placement groups, possibly filtered. This method supports paging.
     /// 
     /// # Arguments
     ///
@@ -11168,7 +11168,7 @@ impl<'a, C, A> InventoryItemMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of inventory items, possibly filtered.
+    /// Retrieves a list of inventory items, possibly filtered. This method supports paging.
     /// 
     /// # Arguments
     ///
@@ -11413,7 +11413,7 @@ impl<'a, C, A> ContentCategoryMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of content categories, possibly filtered.
+    /// Retrieves a list of content categories, possibly filtered. This method supports paging.
     /// 
     /// # Arguments
     ///
@@ -11631,7 +11631,7 @@ impl<'a, C, A> CreativeMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of creatives, possibly filtered.
+    /// Retrieves a list of creatives, possibly filtered. This method supports paging.
     /// 
     /// # Arguments
     ///
@@ -11808,7 +11808,7 @@ impl<'a, C, A> CampaignMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of campaigns, possibly filtered.
+    /// Retrieves a list of campaigns, possibly filtered. This method supports paging.
     /// 
     /// # Arguments
     ///
@@ -12082,7 +12082,7 @@ impl<'a, C, A> RemarketingListMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of remarketing lists, possibly filtered.
+    /// Retrieves a list of remarketing lists, possibly filtered. This method supports paging.
     /// 
     /// # Arguments
     ///
@@ -12289,7 +12289,7 @@ impl<'a, C, A> PlacementStrategyMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of placement strategies, possibly filtered.
+    /// Retrieves a list of placement strategies, possibly filtered. This method supports paging.
     /// 
     /// # Arguments
     ///
@@ -12412,7 +12412,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of projects, possibly filtered.
+    /// Retrieves a list of projects, possibly filtered. This method supports paging.
     /// 
     /// # Arguments
     ///
@@ -12515,7 +12515,7 @@ impl<'a, C, A> DirectorySiteMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of directory sites, possibly filtered.
+    /// Retrieves a list of directory sites, possibly filtered. This method supports paging.
     /// 
     /// # Arguments
     ///
@@ -12888,7 +12888,7 @@ impl<'a, C, A> AccountUserProfileMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of account user profiles, possibly filtered.
+    /// Retrieves a list of account user profiles, possibly filtered. This method supports paging.
     /// 
     /// # Arguments
     ///
@@ -13198,7 +13198,7 @@ impl<'a, C, A> CreativeFieldValueMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of creative field values, possibly filtered.
+    /// Retrieves a list of creative field values, possibly filtered. This method supports paging.
     /// 
     /// # Arguments
     ///
@@ -13418,7 +13418,7 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the list of accounts, possibly filtered.
+    /// Retrieves the list of accounts, possibly filtered. This method supports paging.
     /// 
     /// # Arguments
     ///
@@ -13544,7 +13544,7 @@ impl<'a, C, A> PlacementMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of placements, possibly filtered.
+    /// Retrieves a list of placements, possibly filtered. This method supports paging.
     /// 
     /// # Arguments
     ///
@@ -15156,7 +15156,7 @@ impl<'a, C, A> OrderDocumentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 }
 
 
-/// Retrieves a list of order documents, possibly filtered.
+/// Retrieves a list of order documents, possibly filtered. This method supports paging.
 ///
 /// A builder for the *list* method supported by a *orderDocument* resource.
 /// It is not used directly, but through a `OrderDocumentMethods` instance.
@@ -15786,7 +15786,7 @@ impl<'a, C, A> CreativeFieldUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
 }
 
 
-/// Retrieves a list of creative fields, possibly filtered.
+/// Retrieves a list of creative fields, possibly filtered. This method supports paging.
 ///
 /// A builder for the *list* method supported by a *creativeField* resource.
 /// It is not used directly, but through a `CreativeFieldMethods` instance.
@@ -18431,7 +18431,7 @@ impl<'a, C, A> UserRolePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
-/// Retrieves a list of user roles, possibly filtered.
+/// Retrieves a list of user roles, possibly filtered. This method supports paging.
 ///
 /// A builder for the *list* method supported by a *userRole* resource.
 /// It is not used directly, but through a `UserRoleMethods` instance.
@@ -21517,7 +21517,7 @@ impl<'a, C, A> CampaignCreativeAssociationInsertCall<'a, C, A> where C: BorrowMu
 }
 
 
-/// Retrieves the list of creative IDs associated with the specified campaign.
+/// Retrieves the list of creative IDs associated with the specified campaign. This method supports paging.
 ///
 /// A builder for the *list* method supported by a *campaignCreativeAssociation* resource.
 /// It is not used directly, but through a `CampaignCreativeAssociationMethods` instance.
@@ -21800,7 +21800,7 @@ impl<'a, C, A> CampaignCreativeAssociationListCall<'a, C, A> where C: BorrowMut<
 }
 
 
-/// Retrieves a list of change logs.
+/// Retrieves a list of change logs. This method supports paging.
 ///
 /// A builder for the *list* method supported by a *changeLog* resource.
 /// It is not used directly, but through a `ChangeLogMethods` instance.
@@ -26446,7 +26446,7 @@ impl<'a, C, A> AdvertiserPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 }
 
 
-/// Retrieves a list of advertisers, possibly filtered.
+/// Retrieves a list of advertisers, possibly filtered. This method supports paging.
 ///
 /// A builder for the *list* method supported by a *advertiser* resource.
 /// It is not used directly, but through a `AdvertiserMethods` instance.
@@ -28162,7 +28162,7 @@ impl<'a, C, A> FloodlightActivityGroupPatchCall<'a, C, A> where C: BorrowMut<hyp
 }
 
 
-/// Retrieves a list of floodlight activity groups, possibly filtered.
+/// Retrieves a list of floodlight activity groups, possibly filtered. This method supports paging.
 ///
 /// A builder for the *list* method supported by a *floodlightActivityGroup* resource.
 /// It is not used directly, but through a `FloodlightActivityGroupMethods` instance.
@@ -29275,7 +29275,7 @@ impl<'a, C, A> MetroListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 }
 
 
-/// Retrieves a list of orders, possibly filtered.
+/// Retrieves a list of orders, possibly filtered. This method supports paging.
 ///
 /// A builder for the *list* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
@@ -30353,7 +30353,7 @@ impl<'a, C, A> DirectorySiteContactGetCall<'a, C, A> where C: BorrowMut<hyper::C
 }
 
 
-/// Retrieves a list of directory site contacts, possibly filtered.
+/// Retrieves a list of directory site contacts, possibly filtered. This method supports paging.
 ///
 /// A builder for the *list* method supported by a *directorySiteContact* resource.
 /// It is not used directly, but through a `DirectorySiteContactMethods` instance.
@@ -31659,7 +31659,7 @@ impl<'a, C, A> AdInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 }
 
 
-/// Retrieves a list of ads, possibly filtered.
+/// Retrieves a list of ads, possibly filtered. This method supports paging.
 ///
 /// A builder for the *list* method supported by a *ad* resource.
 /// It is not used directly, but through a `AdMethods` instance.
@@ -33689,7 +33689,7 @@ impl<'a, C, A> ConnectionTypeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
 }
 
 
-/// Retrieves a list of targetable remarketing lists, possibly filtered.
+/// Retrieves a list of targetable remarketing lists, possibly filtered. This method supports paging.
 ///
 /// A builder for the *list* method supported by a *targetableRemarketingList* resource.
 /// It is not used directly, but through a `TargetableRemarketingListMethods` instance.
@@ -34502,7 +34502,7 @@ impl<'a, C, A> AdvertiserGroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client
 }
 
 
-/// Retrieves a list of advertiser groups, possibly filtered.
+/// Retrieves a list of advertiser groups, possibly filtered. This method supports paging.
 ///
 /// A builder for the *list* method supported by a *advertiserGroup* resource.
 /// It is not used directly, but through a `AdvertiserGroupMethods` instance.
@@ -36371,7 +36371,7 @@ impl<'a, C, A> SiteGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 }
 
 
-/// Retrieves a list of sites, possibly filtered.
+/// Retrieves a list of sites, possibly filtered. This method supports paging.
 ///
 /// A builder for the *list* method supported by a *site* resource.
 /// It is not used directly, but through a `SiteMethods` instance.
@@ -37586,7 +37586,7 @@ impl<'a, C, A> FloodlightActivityGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
 }
 
 
-/// Retrieves a list of floodlight activities, possibly filtered.
+/// Retrieves a list of floodlight activities, possibly filtered. This method supports paging.
 ///
 /// A builder for the *list* method supported by a *floodlightActivity* resource.
 /// It is not used directly, but through a `FloodlightActivityMethods` instance.
@@ -40290,7 +40290,7 @@ impl<'a, C, A> CreativeGroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
 }
 
 
-/// Retrieves a list of creative groups, possibly filtered.
+/// Retrieves a list of creative groups, possibly filtered. This method supports paging.
 ///
 /// A builder for the *list* method supported by a *creativeGroup* resource.
 /// It is not used directly, but through a `CreativeGroupMethods` instance.
@@ -41183,7 +41183,7 @@ impl<'a, C, A> TargetingTemplatePatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
 }
 
 
-/// Retrieves a list of targeting templates, optionally filtered.
+/// Retrieves a list of targeting templates, optionally filtered. This method supports paging.
 ///
 /// A builder for the *list* method supported by a *targetingTemplate* resource.
 /// It is not used directly, but through a `TargetingTemplateMethods` instance.
@@ -43094,7 +43094,7 @@ impl<'a, C, A> SubaccountUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 }
 
 
-/// Gets a list of subaccounts, possibly filtered.
+/// Gets a list of subaccounts, possibly filtered. This method supports paging.
 ///
 /// A builder for the *list* method supported by a *subaccount* resource.
 /// It is not used directly, but through a `SubaccountMethods` instance.
@@ -46219,7 +46219,7 @@ impl<'a, C, A> FileGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 }
 
 
-/// Retrieves a list of placement groups, possibly filtered.
+/// Retrieves a list of placement groups, possibly filtered. This method supports paging.
 ///
 /// A builder for the *list* method supported by a *placementGroup* resource.
 /// It is not used directly, but through a `PlacementGroupMethods` instance.
@@ -47763,7 +47763,7 @@ impl<'a, C, A> PlacementGroupPatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
 }
 
 
-/// Retrieves a list of inventory items, possibly filtered.
+/// Retrieves a list of inventory items, possibly filtered. This method supports paging.
 ///
 /// A builder for the *list* method supported by a *inventoryItem* resource.
 /// It is not used directly, but through a `InventoryItemMethods` instance.
@@ -49365,7 +49365,7 @@ impl<'a, C, A> AccountPermissionGroupGetCall<'a, C, A> where C: BorrowMut<hyper:
 }
 
 
-/// Retrieves a list of content categories, possibly filtered.
+/// Retrieves a list of content categories, possibly filtered. This method supports paging.
 ///
 /// A builder for the *list* method supported by a *contentCategory* resource.
 /// It is not used directly, but through a `ContentCategoryMethods` instance.
@@ -51747,7 +51747,7 @@ impl<'a, C, A> CreativeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 }
 
 
-/// Retrieves a list of creatives, possibly filtered.
+/// Retrieves a list of creatives, possibly filtered. This method supports paging.
 ///
 /// A builder for the *list* method supported by a *creative* resource.
 /// It is not used directly, but through a `CreativeMethods` instance.
@@ -53551,7 +53551,7 @@ impl<'a, C, A> CampaignUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 }
 
 
-/// Retrieves a list of campaigns, possibly filtered.
+/// Retrieves a list of campaigns, possibly filtered. This method supports paging.
 ///
 /// A builder for the *list* method supported by a *campaign* resource.
 /// It is not used directly, but through a `CampaignMethods` instance.
@@ -56121,7 +56121,7 @@ impl<'a, C, A> RemarketingListUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 }
 
 
-/// Retrieves a list of remarketing lists, possibly filtered.
+/// Retrieves a list of remarketing lists, possibly filtered. This method supports paging.
 ///
 /// A builder for the *list* method supported by a *remarketingList* resource.
 /// It is not used directly, but through a `RemarketingListMethods` instance.
@@ -57801,7 +57801,7 @@ impl<'a, C, A> PlacementStrategyGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
 }
 
 
-/// Retrieves a list of placement strategies, possibly filtered.
+/// Retrieves a list of placement strategies, possibly filtered. This method supports paging.
 ///
 /// A builder for the *list* method supported by a *placementStrategy* resource.
 /// It is not used directly, but through a `PlacementStrategyMethods` instance.
@@ -58891,7 +58891,7 @@ impl<'a, C, A> PlacementStrategyPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
 }
 
 
-/// Retrieves a list of projects, possibly filtered.
+/// Retrieves a list of projects, possibly filtered. This method supports paging.
 ///
 /// A builder for the *list* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -59729,7 +59729,7 @@ impl<'a, C, A> DirectorySiteInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
 }
 
 
-/// Retrieves a list of directory sites, possibly filtered.
+/// Retrieves a list of directory sites, possibly filtered. This method supports paging.
 ///
 /// A builder for the *list* method supported by a *directorySite* resource.
 /// It is not used directly, but through a `DirectorySiteMethods` instance.
@@ -62494,7 +62494,7 @@ impl<'a, C, A> AccountUserProfileUpdateCall<'a, C, A> where C: BorrowMut<hyper::
 }
 
 
-/// Retrieves a list of account user profiles, possibly filtered.
+/// Retrieves a list of account user profiles, possibly filtered. This method supports paging.
 ///
 /// A builder for the *list* method supported by a *accountUserProfile* resource.
 /// It is not used directly, but through a `AccountUserProfileMethods` instance.
@@ -65466,7 +65466,7 @@ impl<'a, C, A> CreativeFieldValueUpdateCall<'a, C, A> where C: BorrowMut<hyper::
 }
 
 
-/// Retrieves a list of creative field values, possibly filtered.
+/// Retrieves a list of creative field values, possibly filtered. This method supports paging.
 ///
 /// A builder for the *list* method supported by a *creativeFieldValue* resource.
 /// It is not used directly, but through a `CreativeFieldValueMethods` instance.
@@ -66752,7 +66752,7 @@ impl<'a, C, A> AccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 }
 
 
-/// Retrieves the list of accounts, possibly filtered.
+/// Retrieves the list of accounts, possibly filtered. This method supports paging.
 ///
 /// A builder for the *list* method supported by a *account* resource.
 /// It is not used directly, but through a `AccountMethods` instance.
@@ -67896,7 +67896,7 @@ impl<'a, C, A> PlacementPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 }
 
 
-/// Retrieves a list of placements, possibly filtered.
+/// Retrieves a list of placements, possibly filtered. This method supports paging.
 ///
 /// A builder for the *list* method supported by a *placement* resource.
 /// It is not used directly, but through a `PlacementMethods` instance.

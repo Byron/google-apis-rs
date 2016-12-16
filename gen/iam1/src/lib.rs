@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *iam* crate version *1.0.0+20160129*, where *20160129* is the exact revision of the *iam:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
+//! This documentation was generated from *iam* crate version *1.0.0+20160915*, where *20160915* is the exact revision of the *iam:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
 //! 
 //! Everything else about the *iam* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/iam/).
@@ -13,6 +13,8 @@
 //! 
 //! * projects
 //!  * [*service accounts create*](struct.ProjectServiceAccountCreateCall.html), [*service accounts delete*](struct.ProjectServiceAccountDeleteCall.html), [*service accounts get*](struct.ProjectServiceAccountGetCall.html), [*service accounts get iam policy*](struct.ProjectServiceAccountGetIamPolicyCall.html), [*service accounts keys create*](struct.ProjectServiceAccountKeyCreateCall.html), [*service accounts keys delete*](struct.ProjectServiceAccountKeyDeleteCall.html), [*service accounts keys get*](struct.ProjectServiceAccountKeyGetCall.html), [*service accounts keys list*](struct.ProjectServiceAccountKeyListCall.html), [*service accounts list*](struct.ProjectServiceAccountListCall.html), [*service accounts set iam policy*](struct.ProjectServiceAccountSetIamPolicyCall.html), [*service accounts sign blob*](struct.ProjectServiceAccountSignBlobCall.html), [*service accounts test iam permissions*](struct.ProjectServiceAccountTestIamPermissionCall.html) and [*service accounts update*](struct.ProjectServiceAccountUpdateCall.html)
+//! * [roles](struct.Role.html)
+//!  * [*query grantable roles*](struct.RoleQueryGrantableRoleCall.html)
 //! 
 //! 
 //! 

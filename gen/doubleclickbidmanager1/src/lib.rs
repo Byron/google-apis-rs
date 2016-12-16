@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *DoubleClick Bid Manager* crate version *1.0.0+20160608*, where *20160608* is the exact revision of the *doubleclickbidmanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
+//! This documentation was generated from *DoubleClick Bid Manager* crate version *1.0.0+20161010*, where *20161010* is the exact revision of the *doubleclickbidmanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
 //! 
 //! Everything else about the *DoubleClick Bid Manager* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/bid-manager/).
@@ -17,8 +17,8 @@
 //!  * [*createquery*](struct.QueryCreatequeryCall.html), [*deletequery*](struct.QueryDeletequeryCall.html), [*getquery*](struct.QueryGetqueryCall.html), [*listqueries*](struct.QueryListqueryCall.html) and [*runquery*](struct.QueryRunqueryCall.html)
 //! * [reports](struct.Report.html)
 //!  * [*listreports*](struct.ReportListreportCall.html)
-//! * rubicon
-//!  * [*notifyproposalchange*](struct.RubiconNotifyproposalchangeCall.html)
+//! * sdf
+//!  * [*download*](struct.SdfDownloadCall.html)
 //! 
 //! 
 //! 

@@ -136,6 +136,62 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "delete-policy" => {
+                    call = call.delete_policy(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["delete-policy"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _deployments_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.deployments().get(opt.value_of("project").unwrap_or(""), opt.value_of("deployment").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -182,9 +238,9 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _deployments_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _deployments_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.deployments().get(opt.value_of("project").unwrap_or(""), opt.value_of("deployment").unwrap_or(""));
+        let mut call = self.hub.deployments().get_iam_policy(opt.value_of("project").unwrap_or(""), opt.value_of("resource").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -361,6 +417,9 @@ impl<'n> Engine<'n> {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
+                "order-by" => {
+                    call = call.order_by(value.unwrap_or(""));
+                },
                 "max-results" => {
                     call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
                 },
@@ -380,7 +439,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["filter", "page-token", "max-results"].iter().map(|v|*v));
+                                                                           v.extend(["order-by", "page-token", "filter", "max-results"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -538,6 +597,93 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _deployments_set_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "version" => Some(("version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "iam-owned" => Some(("iamOwned", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "iam-owned", "version"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::Policy = json::value::from_value(object).unwrap();
+        let mut call = self.hub.deployments().set_iam_policy(request, opt.value_of("project").unwrap_or(""), opt.value_of("resource").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _deployments_stop(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -574,6 +720,91 @@ impl<'n> Engine<'n> {
         }
         let mut request: api::DeploymentsStopRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.deployments().stop(request, opt.value_of("project").unwrap_or(""), opt.value_of("deployment").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _deployments_test_iam_permissions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "permissions" => Some(("permissions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["permissions"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::TestPermissionsRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.deployments().test_iam_permissions(request, opt.value_of("project").unwrap_or(""), opt.value_of("resource").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -808,6 +1039,9 @@ impl<'n> Engine<'n> {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
+                "order-by" => {
+                    call = call.order_by(value.unwrap_or(""));
+                },
                 "max-results" => {
                     call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
                 },
@@ -827,7 +1061,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["filter", "page-token", "max-results"].iter().map(|v|*v));
+                                                                           v.extend(["order-by", "page-token", "filter", "max-results"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -922,6 +1156,9 @@ impl<'n> Engine<'n> {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
+                "order-by" => {
+                    call = call.order_by(value.unwrap_or(""));
+                },
                 "max-results" => {
                     call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
                 },
@@ -941,7 +1178,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["filter", "page-token", "max-results"].iter().map(|v|*v));
+                                                                           v.extend(["order-by", "page-token", "filter", "max-results"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1036,6 +1273,9 @@ impl<'n> Engine<'n> {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
+                "order-by" => {
+                    call = call.order_by(value.unwrap_or(""));
+                },
                 "max-results" => {
                     call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
                 },
@@ -1055,7 +1295,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["filter", "page-token", "max-results"].iter().map(|v|*v));
+                                                                           v.extend(["order-by", "page-token", "filter", "max-results"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1098,6 +1338,9 @@ impl<'n> Engine<'n> {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
+                "order-by" => {
+                    call = call.order_by(value.unwrap_or(""));
+                },
                 "max-results" => {
                     call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
                 },
@@ -1117,7 +1360,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["filter", "page-token", "max-results"].iter().map(|v|*v));
+                                                                           v.extend(["order-by", "page-token", "filter", "max-results"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1167,6 +1410,9 @@ impl<'n> Engine<'n> {
                     ("get", Some(opt)) => {
                         call_result = self._deployments_get(opt, dry_run, &mut err);
                     },
+                    ("get-iam-policy", Some(opt)) => {
+                        call_result = self._deployments_get_iam_policy(opt, dry_run, &mut err);
+                    },
                     ("insert", Some(opt)) => {
                         call_result = self._deployments_insert(opt, dry_run, &mut err);
                     },
@@ -1176,8 +1422,14 @@ impl<'n> Engine<'n> {
                     ("patch", Some(opt)) => {
                         call_result = self._deployments_patch(opt, dry_run, &mut err);
                     },
+                    ("set-iam-policy", Some(opt)) => {
+                        call_result = self._deployments_set_iam_policy(opt, dry_run, &mut err);
+                    },
                     ("stop", Some(opt)) => {
                         call_result = self._deployments_stop(opt, dry_run, &mut err);
+                    },
+                    ("test-iam-permissions", Some(opt)) => {
+                        call_result = self._deployments_test_iam_permissions(opt, dry_run, &mut err);
                     },
                     ("update", Some(opt)) => {
                         call_result = self._deployments_update(opt, dry_run, &mut err);
@@ -1323,7 +1575,7 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("deployments", "methods: 'cancel-preview', 'delete', 'get', 'insert', 'list', 'patch', 'stop' and 'update'", vec![
+        ("deployments", "methods: 'cancel-preview', 'delete', 'get', 'get-iam-policy', 'insert', 'list', 'patch', 'set-iam-policy', 'stop', 'test-iam-permissions' and 'update'", vec![
             ("cancel-preview",
                     Some(r##"Cancels and removes the preview currently associated with the deployment."##),
                     "Details at http://byron.github.io/google-apis-rs/google_deploymentmanager2_cli/deployments_cancel-preview",
@@ -1399,6 +1651,34 @@ fn main() {
                     (Some(r##"deployment"##),
                      None,
                      Some(r##"The name of the deployment for this request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("get-iam-policy",
+                    Some(r##"Gets the access control policy for a resource. May be empty if no such policy or resource exists."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_deploymentmanager2_cli/deployments_get-iam-policy",
+                  vec![
+                    (Some(r##"project"##),
+                     None,
+                     Some(r##"Project ID for this request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"resource"##),
+                     None,
+                     Some(r##"Name of the resource for this request."##),
                      Some(true),
                      Some(false)),
         
@@ -1498,6 +1778,40 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("set-iam-policy",
+                    Some(r##"Sets the access control policy on the specified resource. Replaces any existing policy."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_deploymentmanager2_cli/deployments_set-iam-policy",
+                  vec![
+                    (Some(r##"project"##),
+                     None,
+                     Some(r##"Project ID for this request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"resource"##),
+                     None,
+                     Some(r##"Name of the resource for this request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("stop",
                     Some(r##"Stops an ongoing operation. This does not roll back any work that has already been completed, but prevents any new work from being started."##),
                     "Details at http://byron.github.io/google-apis-rs/google_deploymentmanager2_cli/deployments_stop",
@@ -1511,6 +1825,40 @@ fn main() {
                     (Some(r##"deployment"##),
                      None,
                      Some(r##"The name of the deployment for this request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("test-iam-permissions",
+                    Some(r##"Returns permissions that a caller has on the specified resource."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_deploymentmanager2_cli/deployments_test-iam-permissions",
+                  vec![
+                    (Some(r##"project"##),
+                     None,
+                     Some(r##"Project ID for this request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"resource"##),
+                     None,
+                     Some(r##"Name of the resource for this request."##),
                      Some(true),
                      Some(false)),
         
@@ -1780,7 +2128,7 @@ fn main() {
     
     let mut app = App::new("deploymentmanager2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.0+20160901")
+           .version("1.0.0+20161209")
            .about("Declares, configures, and deploys complex solutions on Google Cloud Platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_deploymentmanager2_cli")
            .arg(Arg::with_name("url")

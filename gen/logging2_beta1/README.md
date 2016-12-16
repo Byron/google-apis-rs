@@ -3,22 +3,26 @@ DO NOT EDIT !
 This file was generated automatically from 'src/mako/api/README.md.mako'
 DO NOT EDIT !
 -->
-The `google-logging2_beta1` library allows access to all features of the *Google logging* service.
+The `google-logging2_beta1` library allows access to all features of the *Google Logging* service.
 
-This documentation was generated from *logging* crate version *1.0.0+20160322*, where *20160322* is the exact revision of the *logging:v2beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
+This documentation was generated from *Logging* crate version *1.0.0+20161206*, where *20161206* is the exact revision of the *logging:v2beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
 
-Everything else about the *logging* *v2_beta1* API can be found at the
+Everything else about the *Logging* *v2_beta1* API can be found at the
 [official documentation site](https://cloud.google.com/logging/docs/).
 # Features
 
 Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google_logging2_beta1/struct.Logging.html) ... 
 
+* billing accounts
+ * [*logs delete*](http://byron.github.io/google-apis-rs/google_logging2_beta1/struct.BillingAccountLogDeleteCall.html) and [*logs list*](http://byron.github.io/google-apis-rs/google_logging2_beta1/struct.BillingAccountLogListCall.html)
 * entries
  * [*list*](http://byron.github.io/google-apis-rs/google_logging2_beta1/struct.EntryListCall.html) and [*write*](http://byron.github.io/google-apis-rs/google_logging2_beta1/struct.EntryWriteCall.html)
 * [monitored resource descriptors](http://byron.github.io/google-apis-rs/google_logging2_beta1/struct.MonitoredResourceDescriptor.html)
  * [*list*](http://byron.github.io/google-apis-rs/google_logging2_beta1/struct.MonitoredResourceDescriptorListCall.html)
+* organizations
+ * [*logs delete*](http://byron.github.io/google-apis-rs/google_logging2_beta1/struct.OrganizationLogDeleteCall.html) and [*logs list*](http://byron.github.io/google-apis-rs/google_logging2_beta1/struct.OrganizationLogListCall.html)
 * projects
- * [*logs delete*](http://byron.github.io/google-apis-rs/google_logging2_beta1/struct.ProjectLogDeleteCall.html), [*metrics create*](http://byron.github.io/google-apis-rs/google_logging2_beta1/struct.ProjectMetricCreateCall.html), [*metrics delete*](http://byron.github.io/google-apis-rs/google_logging2_beta1/struct.ProjectMetricDeleteCall.html), [*metrics get*](http://byron.github.io/google-apis-rs/google_logging2_beta1/struct.ProjectMetricGetCall.html), [*metrics list*](http://byron.github.io/google-apis-rs/google_logging2_beta1/struct.ProjectMetricListCall.html), [*metrics update*](http://byron.github.io/google-apis-rs/google_logging2_beta1/struct.ProjectMetricUpdateCall.html), [*sinks create*](http://byron.github.io/google-apis-rs/google_logging2_beta1/struct.ProjectSinkCreateCall.html), [*sinks delete*](http://byron.github.io/google-apis-rs/google_logging2_beta1/struct.ProjectSinkDeleteCall.html), [*sinks get*](http://byron.github.io/google-apis-rs/google_logging2_beta1/struct.ProjectSinkGetCall.html), [*sinks list*](http://byron.github.io/google-apis-rs/google_logging2_beta1/struct.ProjectSinkListCall.html) and [*sinks update*](http://byron.github.io/google-apis-rs/google_logging2_beta1/struct.ProjectSinkUpdateCall.html)
+ * [*logs delete*](http://byron.github.io/google-apis-rs/google_logging2_beta1/struct.ProjectLogDeleteCall.html), [*logs list*](http://byron.github.io/google-apis-rs/google_logging2_beta1/struct.ProjectLogListCall.html), [*metrics create*](http://byron.github.io/google-apis-rs/google_logging2_beta1/struct.ProjectMetricCreateCall.html), [*metrics delete*](http://byron.github.io/google-apis-rs/google_logging2_beta1/struct.ProjectMetricDeleteCall.html), [*metrics get*](http://byron.github.io/google-apis-rs/google_logging2_beta1/struct.ProjectMetricGetCall.html), [*metrics list*](http://byron.github.io/google-apis-rs/google_logging2_beta1/struct.ProjectMetricListCall.html), [*metrics update*](http://byron.github.io/google-apis-rs/google_logging2_beta1/struct.ProjectMetricUpdateCall.html), [*sinks create*](http://byron.github.io/google-apis-rs/google_logging2_beta1/struct.ProjectSinkCreateCall.html), [*sinks delete*](http://byron.github.io/google-apis-rs/google_logging2_beta1/struct.ProjectSinkDeleteCall.html), [*sinks get*](http://byron.github.io/google-apis-rs/google_logging2_beta1/struct.ProjectSinkGetCall.html), [*sinks list*](http://byron.github.io/google-apis-rs/google_logging2_beta1/struct.ProjectSinkListCall.html) and [*sinks update*](http://byron.github.io/google-apis-rs/google_logging2_beta1/struct.ProjectSinkUpdateCall.html)
 
 
 
@@ -51,9 +55,11 @@ let r = hub.resource().activity(...).doit()
 Or specifically ...
 
 ```ignore
-let r = hub.projects().sinks_get(...).doit()
-let r = hub.projects().sinks_update(...).doit()
-let r = hub.projects().sinks_create(...).doit()
+let r = hub.organizations().logs_delete(...).doit()
+let r = hub.projects().logs_delete(...).doit()
+let r = hub.projects().metrics_delete(...).doit()
+let r = hub.billing_accounts().logs_delete(...).doit()
+let r = hub.projects().sinks_delete(...).doit()
 ```
 
 The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -78,7 +84,6 @@ google-logging2_beta1 = "*"
 extern crate hyper;
 extern crate yup_oauth2 as oauth2;
 extern crate google_logging2_beta1 as logging2_beta1;
-use logging2_beta1::LogSink;
 use logging2_beta1::{Result, Error};
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -96,15 +101,10 @@ let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
                               hyper::Client::new(),
                               <MemoryStorage as Default>::default(), None);
 let mut hub = Logging::new(hyper::Client::new(), auth);
-// As the method needs a request, you would usually fill it with the desired information
-// into the respective structure. Some of the parts shown here might not be applicable !
-// Values shown here are possibly random and not representative !
-let mut req = LogSink::default();
-
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
-let result = hub.projects().sinks_update(req, "sinkName")
+let result = hub.organizations().logs_delete("logName")
              .doit();
 
 match result {

@@ -119,19 +119,18 @@ impl Default for Scope {
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().rewrite(req, "sourceBucket", "sourceObject", "destinationBucket", "destinationObject")
 ///              .source_generation("justo")
-///              .rewrite_token("et")
+///              .rewrite_token("justo")
 ///              .projection("et")
-///              .max_bytes_rewritten_per_call("diam")
-///              .if_source_metageneration_not_match("ipsum")
-///              .if_source_metageneration_match("Lorem")
-///              .if_source_generation_not_match("et")
-///              .if_source_generation_match("duo")
-///              .if_metageneration_not_match("aliquyam")
-///              .if_metageneration_match("sea")
-///              .if_generation_not_match("Lorem")
-///              .if_generation_match("eos")
-///              .destination_predefined_acl("erat")
-///              .destination_kms_key_name("sadipscing")
+///              .max_bytes_rewritten_per_call("et")
+///              .if_source_metageneration_not_match("diam")
+///              .if_source_metageneration_match("ipsum")
+///              .if_source_generation_not_match("Lorem")
+///              .if_source_generation_match("et")
+///              .if_metageneration_not_match("duo")
+///              .if_metageneration_match("aliquyam")
+///              .if_generation_not_match("sea")
+///              .if_generation_match("Lorem")
+///              .destination_predefined_acl("eos")
 ///              .doit();
 /// 
 /// match result {
@@ -267,11 +266,14 @@ pub struct BucketLifecycleRuleCondition {
     /// Relevant only for versioned objects. If the value is true, this condition matches live objects; if the value is false, it matches archived objects.
     #[serde(rename="isLive")]
     pub is_live: Option<bool>,
+    /// Objects having any of the storage classes specified by this condition will be matched. Values include MULTI_REGIONAL, REGIONAL, NEARLINE, COLDLINE, STANDARD, and DURABLE_REDUCED_AVAILABILITY.
+    #[serde(rename="matchesStorageClass")]
+    pub matches_storage_class: Option<Vec<String>>,
+    /// Age of an object (in days). This condition is satisfied when an object reaches the specified age.
+    pub age: Option<i32>,
     /// Relevant only for versioned objects. If the value is N, this condition is satisfied when there are at least N versions (including the live version) newer than this version of the object.
     #[serde(rename="numNewerVersions")]
     pub num_newer_versions: Option<i32>,
-    /// Age of an object (in days). This condition is satisfied when an object reaches the specified age.
-    pub age: Option<i32>,
     /// A date in RFC 3339 format with only the date part (for instance, "2013-01-15"). This condition is satisfied when an object is created before midnight of the specified date in UTC.
     #[serde(rename="createdBefore")]
     pub created_before: Option<String>,
@@ -426,14 +428,14 @@ pub struct Object {
     /// Number of underlying components that make up this object. Components are accumulated by compose operations.
     #[serde(rename="componentCount")]
     pub component_count: Option<i32>,
+    /// The time at which the object's storage class was last changed. When the object is initially created, it will be set to timeCreated.
+    #[serde(rename="timeStorageClassUpdated")]
+    pub time_storage_class_updated: Option<String>,
     /// The version of the metadata for this object at this generation. Used for preconditions and for detecting changes in metadata. A metageneration number is only meaningful in the context of a particular generation of a particular object.
     pub metageneration: Option<String>,
     /// Media download link.
     #[serde(rename="mediaLink")]
     pub media_link: Option<String>,
-    /// Cloud KMS Key used to encrypt this object, if the object is encrypted by such a key.
-    #[serde(rename="kmsKeyName")]
-    pub kms_key_name: Option<String>,
     /// The owner of the object. This will always be the uploader of the object.
     pub owner: Option<ObjectOwner>,
     /// Cache-Control directive for the object data. If omitted, and the object is accessible to all anonymous users, the default will be public, max-age=3600.
@@ -542,7 +544,7 @@ impl Part for BucketCors {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ObjectAccessControls {
     /// The list of items.
-    pub items: Option<Vec<String>>,
+    pub items: Option<Vec<ObjectAccessControl>>,
     /// The kind of item this is. For lists of object access control entries, this is always storage#objectAccessControls.
     pub kind: Option<String>,
 }
@@ -645,14 +647,12 @@ pub struct Bucket {
     pub logging: Option<BucketLogging>,
     /// The name of the bucket.
     pub name: Option<String>,
-    /// Encryption configuration used by default for newly inserted objects, when no encryption config is specified.
-    pub encryption: Option<BucketEncryption>,
     /// The project number of the project the bucket belongs to.
     #[serde(rename="projectNumber")]
     pub project_number: Option<String>,
     /// HTTP 1.1 Entity tag for the bucket.
     pub etag: Option<String>,
-    /// The bucket's storage class. This defines how objects in the bucket are stored and determines the SLA and the cost of storage. Values include STANDARD, NEARLINE and DURABLE_REDUCED_AVAILABILITY. Defaults to STANDARD. For more information, see storage classes.
+    /// The bucket's default storage class, used whenever no storageClass is specified for a newly-created object. This defines how objects in the bucket are stored and determines the SLA and the cost of storage. Values include MULTI_REGIONAL, REGIONAL, STANDARD, NEARLINE, COLDLINE, and DURABLE_REDUCED_AVAILABILITY. If this value is not specified when the bucket is created, it will default to STANDARD. For more information, see storage classes.
     #[serde(rename="storageClass")]
     pub storage_class: Option<String>,
     /// The bucket's lifecycle configuration. See lifecycle management for more information.
@@ -667,20 +667,6 @@ pub struct Bucket {
 impl RequestValue for Bucket {}
 impl Resource for Bucket {}
 impl ResponseResult for Bucket {}
-
-
-/// Encryption configuration used by default for newly inserted objects, when no encryption config is specified.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BucketEncryption {
-    /// no description provided
-    pub default_kms_key_name: Option<String>,
-}
-
-impl NestedType for BucketEncryption {}
-impl Part for BucketEncryption {}
 
 
 /// Metadata of customer-supplied encryption key, if the object is encrypted by such a key.
@@ -782,9 +768,9 @@ impl ResponseResult for BucketAccessControl {}
 pub struct ObjectAccessControl {
     /// The domain associated with the entity, if any.
     pub domain: Option<String>,
-    /// The content generation of the object.
+    /// The content generation of the object, if applied to an object.
     pub generation: Option<String>,
-    /// The name of the object.
+    /// The name of the object, if applied to an object.
     pub object: Option<String>,
     /// The name of the bucket.
     pub bucket: Option<String>,
@@ -881,9 +867,12 @@ impl Part for ObjectOwner {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BucketLifecycleRuleAction {
-    /// Type of the action. Currently, only Delete is supported.
+    /// Type of the action. Currently, only Delete and SetStorageClass are supported.
     #[serde(rename="type")]
     pub type_: Option<String>,
+    /// Target storage class. Required iff the type of the action is SetStorageClass.
+    #[serde(rename="storageClass")]
+    pub storage_class: Option<String>,
 }
 
 impl NestedType for BucketLifecycleRuleAction {}
@@ -1402,7 +1391,6 @@ impl<'a, C, A> ObjectMethods<'a, C, A> {
             _if_generation_not_match: Default::default(),
             _if_generation_match: Default::default(),
             _destination_predefined_acl: Default::default(),
-            _destination_kms_key_name: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1503,7 +1491,6 @@ impl<'a, C, A> ObjectMethods<'a, C, A> {
             _projection: Default::default(),
             _predefined_acl: Default::default(),
             _name: Default::default(),
-            _kms_key_name: Default::default(),
             _if_metageneration_not_match: Default::default(),
             _if_metageneration_match: Default::default(),
             _if_generation_not_match: Default::default(),
@@ -1530,7 +1517,6 @@ impl<'a, C, A> ObjectMethods<'a, C, A> {
             _request: request,
             _destination_bucket: destination_bucket.to_string(),
             _destination_object: destination_object.to_string(),
-            _kms_key_name: Default::default(),
             _if_metageneration_match: Default::default(),
             _if_generation_match: Default::default(),
             _destination_predefined_acl: Default::default(),
@@ -1869,7 +1855,7 @@ impl<'a, C, A> BucketMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a bucket.
+    /// Updates a bucket. Changes to the bucket will be readable immediately after writing, but configuration changes may take time to propagate.
     /// 
     /// # Arguments
     ///
@@ -1954,7 +1940,7 @@ impl<'a, C, A> BucketMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a bucket. This method supports patch semantics.
+    /// Updates a bucket. Changes to the bucket will be readable immediately after writing, but configuration changes may take time to propagate. This method supports patch semantics.
     /// 
     /// # Arguments
     ///
@@ -2577,8 +2563,8 @@ impl<'a, C, A> DefaultObjectAccessControlUpdateCall<'a, C, A> where C: BorrowMut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.default_object_access_controls().list("bucket")
-///              .if_metageneration_not_match("no")
-///              .if_metageneration_match("labore")
+///              .if_metageneration_not_match("elitr")
+///              .if_metageneration_match("amet")
 ///              .doit();
 /// # }
 /// ```
@@ -5365,20 +5351,19 @@ impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().rewrite(req, "sourceBucket", "sourceObject", "destinationBucket", "destinationObject")
-///              .source_generation("dolor")
+///              .source_generation("sed")
 ///              .rewrite_token("dolor")
-///              .projection("et")
-///              .max_bytes_rewritten_per_call("consetetur")
-///              .if_source_metageneration_not_match("amet.")
-///              .if_source_metageneration_match("voluptua.")
-///              .if_source_generation_not_match("Lorem")
-///              .if_source_generation_match("gubergren")
-///              .if_metageneration_not_match("justo")
-///              .if_metageneration_match("sit")
-///              .if_generation_not_match("vero")
-///              .if_generation_match("diam")
-///              .destination_predefined_acl("rebum.")
-///              .destination_kms_key_name("consetetur")
+///              .projection("dolor")
+///              .max_bytes_rewritten_per_call("dolor")
+///              .if_source_metageneration_not_match("et")
+///              .if_source_metageneration_match("consetetur")
+///              .if_source_generation_not_match("amet.")
+///              .if_source_generation_match("voluptua.")
+///              .if_metageneration_not_match("Lorem")
+///              .if_metageneration_match("gubergren")
+///              .if_generation_not_match("justo")
+///              .if_generation_match("sit")
+///              .destination_predefined_acl("vero")
 ///              .doit();
 /// # }
 /// ```
@@ -5404,7 +5389,6 @@ pub struct ObjectRewriteCall<'a, C, A>
     _if_generation_not_match: Option<String>,
     _if_generation_match: Option<String>,
     _destination_predefined_acl: Option<String>,
-    _destination_kms_key_name: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -5426,7 +5410,7 @@ impl<'a, C, A> ObjectRewriteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "storage.objects.rewrite",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((21 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((20 + self._additional_params.len()));
         params.push(("sourceBucket", self._source_bucket.to_string()));
         params.push(("sourceObject", self._source_object.to_string()));
         params.push(("destinationBucket", self._destination_bucket.to_string()));
@@ -5470,10 +5454,7 @@ impl<'a, C, A> ObjectRewriteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         if let Some(value) = self._destination_predefined_acl {
             params.push(("destinationPredefinedAcl", value.to_string()));
         }
-        if let Some(value) = self._destination_kms_key_name {
-            params.push(("destinationKmsKeyName", value.to_string()));
-        }
-        for &field in ["alt", "sourceBucket", "sourceObject", "destinationBucket", "destinationObject", "sourceGeneration", "rewriteToken", "projection", "maxBytesRewrittenPerCall", "ifSourceMetagenerationNotMatch", "ifSourceMetagenerationMatch", "ifSourceGenerationNotMatch", "ifSourceGenerationMatch", "ifMetagenerationNotMatch", "ifMetagenerationMatch", "ifGenerationNotMatch", "ifGenerationMatch", "destinationPredefinedAcl", "destinationKmsKeyName"].iter() {
+        for &field in ["alt", "sourceBucket", "sourceObject", "destinationBucket", "destinationObject", "sourceGeneration", "rewriteToken", "projection", "maxBytesRewrittenPerCall", "ifSourceMetagenerationNotMatch", "ifSourceMetagenerationMatch", "ifSourceGenerationNotMatch", "ifSourceGenerationMatch", "ifMetagenerationNotMatch", "ifMetagenerationMatch", "ifGenerationNotMatch", "ifGenerationMatch", "destinationPredefinedAcl"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -5743,13 +5724,6 @@ impl<'a, C, A> ObjectRewriteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._destination_predefined_acl = Some(new_value.to_string());
         self
     }
-    /// Resource name of the Cloud KMS key, of the form projects/my-project/locations/global/keyRings/my-kr/cryptoKeys/my-key, that will be used to encrypt the object. Overrides the object metadata's kms_key_name value, if any.
-    ///
-    /// Sets the *destination kms key name* query property to the given value.
-    pub fn destination_kms_key_name(mut self, new_value: &str) -> ObjectRewriteCall<'a, C, A> {
-        self._destination_kms_key_name = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -5834,12 +5808,12 @@ impl<'a, C, A> ObjectRewriteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().get("bucket", "object")
-///              .projection("sadipscing")
-///              .if_metageneration_not_match("invidunt")
-///              .if_metageneration_match("consetetur")
-///              .if_generation_not_match("dolore")
-///              .if_generation_match("duo")
-///              .generation("aliquyam")
+///              .projection("consetetur")
+///              .if_metageneration_not_match("sadipscing")
+///              .if_metageneration_match("vero")
+///              .if_generation_not_match("sadipscing")
+///              .if_generation_match("invidunt")
+///              .generation("consetetur")
 ///              .doit();
 /// # }
 /// ```
@@ -6180,13 +6154,13 @@ impl<'a, C, A> ObjectGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().update(req, "bucket", "object")
-///              .projection("clita")
-///              .predefined_acl("consetetur")
-///              .if_metageneration_not_match("takimata")
-///              .if_metageneration_match("nonumy")
-///              .if_generation_not_match("kasd")
-///              .if_generation_match("sanctus")
-///              .generation("takimata")
+///              .projection("aliquyam")
+///              .predefined_acl("Lorem")
+///              .if_metageneration_not_match("et")
+///              .if_metageneration_match("clita")
+///              .if_generation_not_match("consetetur")
+///              .if_generation_match("takimata")
+///              .generation("nonumy")
 ///              .doit();
 /// # }
 /// ```
@@ -6558,12 +6532,12 @@ impl<'a, C, A> ObjectUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().watch_all(req, "bucket")
-///              .versions(false)
-///              .projection("invidunt")
-///              .prefix("ea")
-///              .page_token("sadipscing")
-///              .max_results(35)
-///              .delimiter("dolore")
+///              .versions(true)
+///              .projection("takimata")
+///              .prefix("At")
+///              .page_token("labore")
+///              .max_results(64)
+///              .delimiter("ea")
 ///              .doit();
 /// # }
 /// ```
@@ -6902,15 +6876,14 @@ impl<'a, C, A> ObjectWatchAllCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().insert(req, "bucket")
-///              .projection("sed")
-///              .predefined_acl("aliquyam")
-///              .name("sit")
-///              .kms_key_name("eirmod")
-///              .if_metageneration_not_match("consetetur")
-///              .if_metageneration_match("labore")
-///              .if_generation_not_match("sed")
-///              .if_generation_match("ea")
-///              .content_encoding("gubergren")
+///              .projection("rebum.")
+///              .predefined_acl("dolore")
+///              .name("nonumy")
+///              .if_metageneration_not_match("sed")
+///              .if_metageneration_match("aliquyam")
+///              .if_generation_not_match("sit")
+///              .if_generation_match("eirmod")
+///              .content_encoding("consetetur")
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
@@ -6923,7 +6896,6 @@ pub struct ObjectInsertCall<'a, C, A>
     _projection: Option<String>,
     _predefined_acl: Option<String>,
     _name: Option<String>,
-    _kms_key_name: Option<String>,
     _if_metageneration_not_match: Option<String>,
     _if_metageneration_match: Option<String>,
     _if_generation_not_match: Option<String>,
@@ -6951,7 +6923,7 @@ impl<'a, C, A> ObjectInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         };
         dlg.begin(MethodInfo { id: "storage.objects.insert",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((12 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((11 + self._additional_params.len()));
         params.push(("bucket", self._bucket.to_string()));
         if let Some(value) = self._projection {
             params.push(("projection", value.to_string()));
@@ -6961,9 +6933,6 @@ impl<'a, C, A> ObjectInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         }
         if let Some(value) = self._name {
             params.push(("name", value.to_string()));
-        }
-        if let Some(value) = self._kms_key_name {
-            params.push(("kmsKeyName", value.to_string()));
         }
         if let Some(value) = self._if_metageneration_not_match {
             params.push(("ifMetagenerationNotMatch", value.to_string()));
@@ -6980,7 +6949,7 @@ impl<'a, C, A> ObjectInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         if let Some(value) = self._content_encoding {
             params.push(("contentEncoding", value.to_string()));
         }
-        for &field in ["bucket", "projection", "predefinedAcl", "name", "kmsKeyName", "ifMetagenerationNotMatch", "ifMetagenerationMatch", "ifGenerationNotMatch", "ifGenerationMatch", "contentEncoding"].iter() {
+        for &field in ["bucket", "projection", "predefinedAcl", "name", "ifMetagenerationNotMatch", "ifMetagenerationMatch", "ifGenerationNotMatch", "ifGenerationMatch", "contentEncoding"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -7274,13 +7243,6 @@ impl<'a, C, A> ObjectInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._name = Some(new_value.to_string());
         self
     }
-    /// Resource name of the Cloud KMS key, of the form projects/my-project/locations/global/keyRings/my-kr/cryptoKeys/my-key, that will be used to encrypt the object. Overrides the object metadata's kms_key_name value, if any.
-    ///
-    /// Sets the *kms key name* query property to the given value.
-    pub fn kms_key_name(mut self, new_value: &str) -> ObjectInsertCall<'a, C, A> {
-        self._kms_key_name = Some(new_value.to_string());
-        self
-    }
     /// Makes the operation conditional on whether the object's current metageneration does not match the given value.
     ///
     /// Sets the *if metageneration not match* query property to the given value.
@@ -7406,10 +7368,9 @@ impl<'a, C, A> ObjectInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().compose(req, "destinationBucket", "destinationObject")
-///              .kms_key_name("tempor")
-///              .if_metageneration_match("sea")
-///              .if_generation_match("labore")
-///              .destination_predefined_acl("ipsum")
+///              .if_metageneration_match("ea")
+///              .if_generation_match("gubergren")
+///              .destination_predefined_acl("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -7420,7 +7381,6 @@ pub struct ObjectComposeCall<'a, C, A>
     _request: ComposeRequest,
     _destination_bucket: String,
     _destination_object: String,
-    _kms_key_name: Option<String>,
     _if_metageneration_match: Option<String>,
     _if_generation_match: Option<String>,
     _destination_predefined_acl: Option<String>,
@@ -7445,12 +7405,9 @@ impl<'a, C, A> ObjectComposeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "storage.objects.compose",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
         params.push(("destinationBucket", self._destination_bucket.to_string()));
         params.push(("destinationObject", self._destination_object.to_string()));
-        if let Some(value) = self._kms_key_name {
-            params.push(("kmsKeyName", value.to_string()));
-        }
         if let Some(value) = self._if_metageneration_match {
             params.push(("ifMetagenerationMatch", value.to_string()));
         }
@@ -7460,7 +7417,7 @@ impl<'a, C, A> ObjectComposeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         if let Some(value) = self._destination_predefined_acl {
             params.push(("destinationPredefinedAcl", value.to_string()));
         }
-        for &field in ["destinationBucket", "destinationObject", "kmsKeyName", "ifMetagenerationMatch", "ifGenerationMatch", "destinationPredefinedAcl"].iter() {
+        for &field in ["destinationBucket", "destinationObject", "ifMetagenerationMatch", "ifGenerationMatch", "destinationPredefinedAcl"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -7635,13 +7592,6 @@ impl<'a, C, A> ObjectComposeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._destination_object = new_value.to_string();
         self
     }
-    /// Resource name of the Cloud KMS key, of the form projects/my-project/locations/global/keyRings/my-kr/cryptoKeys/my-key, that will be used to encrypt the object. Overrides the object metadata's kms_key_name value, if any.
-    ///
-    /// Sets the *kms key name* query property to the given value.
-    pub fn kms_key_name(mut self, new_value: &str) -> ObjectComposeCall<'a, C, A> {
-        self._kms_key_name = Some(new_value.to_string());
-        self
-    }
     /// Makes the operation conditional on whether the object's current metageneration matches the given value.
     ///
     /// Sets the *if metageneration match* query property to the given value.
@@ -7742,11 +7692,11 @@ impl<'a, C, A> ObjectComposeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().delete("bucket", "object")
-///              .if_metageneration_not_match("sit")
-///              .if_metageneration_match("diam")
-///              .if_generation_not_match("ut")
-///              .if_generation_match("justo")
-///              .generation("est")
+///              .if_metageneration_not_match("sea")
+///              .if_metageneration_match("labore")
+///              .if_generation_not_match("ipsum")
+///              .if_generation_match("aliquyam")
+///              .generation("dolores")
 ///              .doit();
 /// # }
 /// ```
@@ -8039,11 +7989,11 @@ impl<'a, C, A> ObjectDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().list("bucket")
 ///              .versions(true)
-///              .projection("clita")
-///              .prefix("diam")
-///              .page_token("justo")
-///              .max_results(44)
-///              .delimiter("clita")
+///              .projection("ut")
+///              .prefix("justo")
+///              .page_token("est")
+///              .max_results(55)
+///              .delimiter("accusam")
 ///              .doit();
 /// # }
 /// ```
@@ -8356,17 +8306,17 @@ impl<'a, C, A> ObjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().copy(req, "sourceBucket", "sourceObject", "destinationBucket", "destinationObject")
-///              .source_generation("voluptua.")
-///              .projection("duo")
-///              .if_source_metageneration_not_match("sed")
-///              .if_source_metageneration_match("aliquyam")
-///              .if_source_generation_not_match("ea")
-///              .if_source_generation_match("ea")
-///              .if_metageneration_not_match("et")
-///              .if_metageneration_match("dolor")
-///              .if_generation_not_match("diam")
-///              .if_generation_match("kasd")
-///              .destination_predefined_acl("invidunt")
+///              .source_generation("clita")
+///              .projection("invidunt")
+///              .if_source_metageneration_not_match("ut")
+///              .if_source_metageneration_match("dolores")
+///              .if_source_generation_not_match("eos")
+///              .if_source_generation_match("voluptua.")
+///              .if_metageneration_not_match("duo")
+///              .if_metageneration_match("sed")
+///              .if_generation_not_match("aliquyam")
+///              .if_generation_match("ea")
+///              .destination_predefined_acl("ea")
 ///              .doit();
 /// # }
 /// ```
@@ -8806,13 +8756,13 @@ impl<'a, C, A> ObjectCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().patch(req, "bucket", "object")
-///              .projection("clita")
-///              .predefined_acl("invidunt")
-///              .if_metageneration_not_match("eirmod")
-///              .if_metageneration_match("At")
-///              .if_generation_not_match("consetetur")
-///              .if_generation_match("et")
-///              .generation("sed")
+///              .projection("diam")
+///              .predefined_acl("kasd")
+///              .if_metageneration_not_match("invidunt")
+///              .if_metageneration_match("rebum.")
+///              .if_generation_not_match("Lorem")
+///              .if_generation_match("clita")
+///              .generation("invidunt")
 ///              .doit();
 /// # }
 /// ```
@@ -9168,7 +9118,7 @@ impl<'a, C, A> ObjectPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.object_access_controls().insert(req, "bucket", "object")
-///              .generation("elitr")
+///              .generation("consetetur")
 ///              .doit();
 /// # }
 /// ```
@@ -9458,7 +9408,7 @@ impl<'a, C, A> ObjectAccessControlInsertCall<'a, C, A> where C: BorrowMut<hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.object_access_controls().patch(req, "bucket", "object", "entity")
-///              .generation("Lorem")
+///              .generation("takimata")
 ///              .doit();
 /// # }
 /// ```
@@ -9754,7 +9704,7 @@ impl<'a, C, A> ObjectAccessControlPatchCall<'a, C, A> where C: BorrowMut<hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.object_access_controls().list("bucket", "object")
-///              .generation("ut")
+///              .generation("rebum.")
 ///              .doit();
 /// # }
 /// ```
@@ -10013,7 +9963,7 @@ impl<'a, C, A> ObjectAccessControlListCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.object_access_controls().delete("bucket", "object", "entity")
-///              .generation("dolor")
+///              .generation("ut")
 ///              .doit();
 /// # }
 /// ```
@@ -10273,7 +10223,7 @@ impl<'a, C, A> ObjectAccessControlDeleteCall<'a, C, A> where C: BorrowMut<hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.object_access_controls().get("bucket", "object", "entity")
-///              .generation("sanctus")
+///              .generation("ut")
 ///              .doit();
 /// # }
 /// ```
@@ -10550,7 +10500,7 @@ impl<'a, C, A> ObjectAccessControlGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.object_access_controls().update(req, "bucket", "object", "entity")
-///              .generation("et")
+///              .generation("eirmod")
 ///              .doit();
 /// # }
 /// ```
@@ -10819,7 +10769,7 @@ impl<'a, C, A> ObjectAccessControlUpdateCall<'a, C, A> where C: BorrowMut<hyper:
 }
 
 
-/// Updates a bucket.
+/// Updates a bucket. Changes to the bucket will be readable immediately after writing, but configuration changes may take time to propagate.
 ///
 /// A builder for the *update* method supported by a *bucket* resource.
 /// It is not used directly, but through a `BucketMethods` instance.
@@ -10852,11 +10802,11 @@ impl<'a, C, A> ObjectAccessControlUpdateCall<'a, C, A> where C: BorrowMut<hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().update(req, "bucket")
-///              .projection("ut")
-///              .predefined_default_object_acl("sed")
+///              .projection("voluptua.")
+///              .predefined_default_object_acl("dolor")
 ///              .predefined_acl("et")
-///              .if_metageneration_not_match("ipsum")
-///              .if_metageneration_match("justo")
+///              .if_metageneration_not_match("et")
+///              .if_metageneration_match("vero")
 ///              .doit();
 /// # }
 /// ```
@@ -11172,9 +11122,9 @@ impl<'a, C, A> BucketUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().get("bucket")
-///              .projection("vero")
-///              .if_metageneration_not_match("dolor")
-///              .if_metageneration_match("takimata")
+///              .projection("sed")
+///              .if_metageneration_not_match("et")
+///              .if_metageneration_match("ipsum")
 ///              .doit();
 /// # }
 /// ```
@@ -11443,8 +11393,8 @@ impl<'a, C, A> BucketGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().delete("bucket")
-///              .if_metageneration_not_match("nonumy")
-///              .if_metageneration_match("et")
+///              .if_metageneration_not_match("dolore")
+///              .if_metageneration_match("vero")
 ///              .doit();
 /// # }
 /// ```
@@ -11697,9 +11647,9 @@ impl<'a, C, A> BucketDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().insert(req, "project")
-///              .projection("no")
-///              .predefined_default_object_acl("invidunt")
-///              .predefined_acl("rebum.")
+///              .projection("takimata")
+///              .predefined_default_object_acl("et")
+///              .predefined_acl("nonumy")
 ///              .doit();
 /// # }
 /// ```
@@ -11945,7 +11895,7 @@ impl<'a, C, A> BucketInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 }
 
 
-/// Updates a bucket. This method supports patch semantics.
+/// Updates a bucket. Changes to the bucket will be readable immediately after writing, but configuration changes may take time to propagate. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *bucket* resource.
 /// It is not used directly, but through a `BucketMethods` instance.
@@ -11978,11 +11928,11 @@ impl<'a, C, A> BucketInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().patch(req, "bucket")
-///              .projection("aliquyam")
-///              .predefined_default_object_acl("elitr")
-///              .predefined_acl("consetetur")
-///              .if_metageneration_not_match("sea")
-///              .if_metageneration_match("elitr")
+///              .projection("sed")
+///              .predefined_default_object_acl("no")
+///              .predefined_acl("invidunt")
+///              .if_metageneration_not_match("rebum.")
+///              .if_metageneration_match("labore")
 ///              .doit();
 /// # }
 /// ```
@@ -12298,10 +12248,10 @@ impl<'a, C, A> BucketPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().list("project")
-///              .projection("sea")
+///              .projection("elitr")
 ///              .prefix("consetetur")
-///              .page_token("diam")
-///              .max_results(79)
+///              .page_token("sea")
+///              .max_results(58)
 ///              .doit();
 /// # }
 /// ```

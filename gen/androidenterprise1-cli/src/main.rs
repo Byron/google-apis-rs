@@ -1139,6 +1139,93 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _enterprises_create_web_token(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent" => Some(("parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "permission" => Some(("permission", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["kind", "parent", "permission"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::AdministratorWebTokenSpec = json::value::from_value(object).unwrap();
+        let mut call = self.hub.enterprises().create_web_token(request, opt.value_of("enterprise-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _enterprises_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.enterprises().delete(opt.value_of("enterprise-id").unwrap_or(""));
@@ -1846,8 +1933,9 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "homepage-id" => Some(("homepageId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "store-layout-type" => Some(("storeLayoutType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["homepage-id", "kind"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["homepage-id", "kind", "store-layout-type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4020,12 +4108,13 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "public-data" => Some(("publicData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "data" => Some(("data", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["data", "id", "kind", "type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["data", "id", "kind", "public-data", "type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -5512,9 +5601,10 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "product-set-behavior" => Some(("productSetBehavior", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "product-id" => Some(("productId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["kind", "product-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["kind", "product-id", "product-set-behavior"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -5746,6 +5836,9 @@ impl<'n> Engine<'n> {
                     },
                     ("complete-signup", Some(opt)) => {
                         call_result = self._enterprises_complete_signup(opt, dry_run, &mut err);
+                    },
+                    ("create-web-token", Some(opt)) => {
+                        call_result = self._enterprises_create_web_token(opt, dry_run, &mut err);
                     },
                     ("delete", Some(opt)) => {
                         call_result = self._enterprises_delete(opt, dry_run, &mut err);
@@ -6627,7 +6720,7 @@ fn main() {
                   ]),
             ]),
         
-        ("enterprises", "methods: 'acknowledge-notification-set', 'complete-signup', 'delete', 'enroll', 'generate-signup-url', 'get', 'get-service-account', 'get-store-layout', 'insert', 'list', 'pull-notification-set', 'send-test-push-notification', 'set-account', 'set-store-layout' and 'unenroll'", vec![
+        ("enterprises", "methods: 'acknowledge-notification-set', 'complete-signup', 'create-web-token', 'delete', 'enroll', 'generate-signup-url', 'get', 'get-service-account', 'get-store-layout', 'insert', 'list', 'pull-notification-set', 'send-test-push-notification', 'set-account', 'set-store-layout' and 'unenroll'", vec![
             ("acknowledge-notification-set",
                     Some(r##"Acknowledges notifications that were received from Enterprises.PullNotificationSet to prevent subsequent calls from returning the same notifications."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/enterprises_acknowledge-notification-set",
@@ -6642,6 +6735,34 @@ fn main() {
                     Some(r##"Completes the signup flow, by specifying the Completion token and Enterprise token. This request must not be called multiple times for a given Enterprise Token."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/enterprises_complete-signup",
                   vec![
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("create-web-token",
+                    Some(r##"Returns a unique token to access an embeddable UI. To generate a web UI, pass the generated token into the Play for Work javascript API. Each token may only be used to start one UI session. See the javascript API documentation for further information."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/enterprises_create-web-token",
+                  vec![
+                    (Some(r##"enterprise-id"##),
+                     None,
+                     Some(r##"The ID of the enterprise."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -6838,9 +6959,10 @@ fn main() {
                   ]),
             ("pull-notification-set",
                     Some(r##"Pulls and returns a notification set for the enterprises associated with the service account authenticated for the request. The notification set may be empty if no notification are pending.
-        A notification set returned needs to be acknowledged within 20 seconds by calling Enterprises.AcknowledgeNotificationSet, unless the notification set is empty.
+        A notification set returned needs to be acknowledged within 20 seconds by calling Enterprises​.AcknowledgeNotificationSet, unless the notification set is empty.
         Notifications that are not acknowledged within the 20 seconds will eventually be included again in the response to another PullNotificationSet request, and those that are never acknowledged will ultimately be deleted according to the Google Cloud Platform Pub/Sub system policy.
-        Multiple requests might be performed concurrently to retrieve notifications, in which case the pending notifications (if any) will be split among each caller, if any are pending."##),
+        Multiple requests might be performed concurrently to retrieve notifications, in which case the pending notifications (if any) will be split among each caller, if any are pending.
+        If no notifications are present, an empty notification list is returned. Subsequent requests may return more notifications once they become available."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/enterprises_pull-notification-set",
                   vec![
                     (Some(r##"v"##),
@@ -6906,7 +7028,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("set-store-layout",
-                    Some(r##"Sets the store layout for the enterprise."##),
+                    Some(r##"Sets the store layout for the enterprise. By default, storeLayoutType is set to "basic" and the basic store layout is enabled. The basic layout only contains apps approved by the administrator, and that have been added to the available product set for a user (using the  setAvailableProductSet call). Apps on the page are sorted in order of their product ID value. If you create a custom store layout (by setting storeLayoutType = "custom"), the basic store layout is disabled."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/enterprises_set-store-layout",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -8636,7 +8758,8 @@ fn main() {
             ("insert",
                     Some(r##"Creates a new EMM-managed user.
         
-        The Users resource passed in the body of the request should include an accountIdentifier and an accountType."##),
+        The Users resource passed in the body of the request should include an accountIdentifier and an accountType.
+        If a corresponding user already exists with the same account identifier, the user will be updated with the resource. In this case only the displayName field can be changed."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/users_insert",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -8825,7 +8948,7 @@ fn main() {
     
     let mut app = App::new("androidenterprise1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.0+20160831")
+           .version("1.0.0+20161207")
            .about("Manages the deployment of apps to Android for Work users.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli")
            .arg(Arg::with_name("url")

@@ -45,6 +45,117 @@ struct Engine<'n> {
 
 
 impl<'n> Engine<'n> {
+    fn _billing_accounts_logs_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.billing_accounts().logs_delete(opt.value_of("log-name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _billing_accounts_logs_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.billing_accounts().logs_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _entries_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -69,13 +180,13 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "order-by" => Some(("orderBy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "resource-names" => Some(("resourceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "page-size" => Some(("pageSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "partial-success" => Some(("partialSuccess", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "filter" => Some(("filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "project-ids" => Some(("projectIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["filter", "order-by", "page-size", "page-token", "partial-success", "project-ids"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["filter", "order-by", "page-size", "page-token", "project-ids", "resource-names"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -283,6 +394,117 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _organizations_logs_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.organizations().logs_delete(opt.value_of("log-name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _organizations_logs_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.organizations().logs_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _projects_logs_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().logs_delete(opt.value_of("log-name").unwrap_or(""));
@@ -302,6 +524,65 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_logs_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().logs_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -359,10 +640,11 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "filter" => Some(("filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["description", "filter", "name"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["description", "filter", "name", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -372,7 +654,7 @@ impl<'n> Engine<'n> {
             }
         }
         let mut request: api::LogMetric = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().metrics_create(request, opt.value_of("project-name").unwrap_or(""));
+        let mut call = self.hub.projects().metrics_create(request, opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -528,7 +810,7 @@ impl<'n> Engine<'n> {
 
     fn _projects_metrics_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.projects().metrics_list(opt.value_of("project-name").unwrap_or(""));
+        let mut call = self.hub.projects().metrics_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -609,10 +891,11 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "filter" => Some(("filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["description", "filter", "name"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["description", "filter", "name", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -695,12 +978,15 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "filter" => Some(("filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "destination" => Some(("destination", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-time" => Some(("endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "destination" => Some(("destination", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "filter" => Some(("filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "start-time" => Some(("startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "output-version-format" => Some(("outputVersionFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "writer-identity" => Some(("writerIdentity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["destination", "filter", "name", "output-version-format"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["destination", "end-time", "filter", "name", "output-version-format", "start-time", "writer-identity"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -710,10 +996,13 @@ impl<'n> Engine<'n> {
             }
         }
         let mut request: api::LogSink = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().sinks_create(request, opt.value_of("project-name").unwrap_or(""));
+        let mut call = self.hub.projects().sinks_create(request, opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "unique-writer-identity" => {
+                    call = call.unique_writer_identity(arg_from_str(value.unwrap_or("false"), err, "unique-writer-identity", "boolean"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -727,6 +1016,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["unique-writer-identity"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -866,7 +1156,7 @@ impl<'n> Engine<'n> {
 
     fn _projects_sinks_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.projects().sinks_list(opt.value_of("project-name").unwrap_or(""));
+        let mut call = self.hub.projects().sinks_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -946,12 +1236,15 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "filter" => Some(("filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "destination" => Some(("destination", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-time" => Some(("endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "destination" => Some(("destination", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "filter" => Some(("filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "start-time" => Some(("startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "output-version-format" => Some(("outputVersionFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "writer-identity" => Some(("writerIdentity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["destination", "filter", "name", "output-version-format"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["destination", "end-time", "filter", "name", "output-version-format", "start-time", "writer-identity"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -965,6 +1258,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "unique-writer-identity" => {
+                    call = call.unique_writer_identity(arg_from_str(value.unwrap_or("false"), err, "unique-writer-identity", "boolean"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -978,6 +1274,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["unique-writer-identity"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1016,6 +1313,20 @@ impl<'n> Engine<'n> {
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
         match self.opt.subcommand() {
+            ("billing-accounts", Some(opt)) => {
+                match opt.subcommand() {
+                    ("logs-delete", Some(opt)) => {
+                        call_result = self._billing_accounts_logs_delete(opt, dry_run, &mut err);
+                    },
+                    ("logs-list", Some(opt)) => {
+                        call_result = self._billing_accounts_logs_list(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("billing-accounts".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
             ("entries", Some(opt)) => {
                 match opt.subcommand() {
                     ("list", Some(opt)) => {
@@ -1041,10 +1352,27 @@ impl<'n> Engine<'n> {
                     }
                 }
             },
+            ("organizations", Some(opt)) => {
+                match opt.subcommand() {
+                    ("logs-delete", Some(opt)) => {
+                        call_result = self._organizations_logs_delete(opt, dry_run, &mut err);
+                    },
+                    ("logs-list", Some(opt)) => {
+                        call_result = self._organizations_logs_list(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("organizations".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
             ("projects", Some(opt)) => {
                 match opt.subcommand() {
                     ("logs-delete", Some(opt)) => {
                         call_result = self._projects_logs_delete(opt, dry_run, &mut err);
+                    },
+                    ("logs-list", Some(opt)) => {
+                        call_result = self._projects_logs_list(opt, dry_run, &mut err);
                     },
                     ("metrics-create", Some(opt)) => {
                         call_result = self._projects_metrics_create(opt, dry_run, &mut err);
@@ -1168,9 +1496,62 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
+        ("billing-accounts", "methods: 'logs-delete' and 'logs-list'", vec![
+            ("logs-delete",
+                    Some(r##"Deletes all the log entries in a log. The log reappears if it receives new entries."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_logging2_beta1_cli/billing-accounts_logs-delete",
+                  vec![
+                    (Some(r##"log-name"##),
+                     None,
+                     Some(r##"Required. The resource name of the log to delete:
+        "projects/[PROJECT_ID]/logs/[LOG_ID]"
+        "organizations/[ORGANIZATION_ID]/logs/[LOG_ID]"
+        [LOG_ID] must be URL-encoded. For example, "projects/my-project-id/logs/syslog", "organizations/1234567890/logs/cloudresourcemanager.googleapis.com%2Factivity". For more information about log names, see LogEntry."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("logs-list",
+                    Some(r##"Lists the logs in projects or organizations. Only logs that have entries are listed."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_logging2_beta1_cli/billing-accounts_logs-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The resource name that owns the logs:
+        "projects/[PROJECT_ID]"
+        "organizations/[ORGANIZATION_ID]"
+        "##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
         ("entries", "methods: 'list' and 'write'", vec![
             ("list",
-                    Some(r##"Lists log entries. Use this method to retrieve log entries from Cloud Logging. For ways to export log entries, see [Exporting Logs](/logging/docs/export)."##),
+                    Some(r##"Lists log entries. Use this method to retrieve log entries from Stackdriver Logging. For ways to export log entries, see Exporting Logs."##),
                     "Details at http://byron.github.io/google-apis-rs/google_logging2_beta1_cli/entries_list",
                   vec![
                     (Some(r##"kv"##),
@@ -1192,7 +1573,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("write",
-                    Some(r##"Writes log entries to Cloud Logging. All log entries in Cloud Logging are written by this method."##),
+                    Some(r##"Writes log entries to Stackdriver Logging. All log entries are written by this method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_logging2_beta1_cli/entries_write",
                   vec![
                     (Some(r##"kv"##),
@@ -1217,7 +1598,7 @@ fn main() {
         
         ("monitored-resource-descriptors", "methods: 'list'", vec![
             ("list",
-                    Some(r##"Lists monitored resource descriptors that are used by Cloud Logging."##),
+                    Some(r##"Lists the descriptors for monitored resource types used by Stackdriver Logging."##),
                     "Details at http://byron.github.io/google-apis-rs/google_logging2_beta1_cli/monitored-resource-descriptors_list",
                   vec![
                     (Some(r##"v"##),
@@ -1234,14 +1615,95 @@ fn main() {
                   ]),
             ]),
         
-        ("projects", "methods: 'logs-delete', 'metrics-create', 'metrics-delete', 'metrics-get', 'metrics-list', 'metrics-update', 'sinks-create', 'sinks-delete', 'sinks-get', 'sinks-list' and 'sinks-update'", vec![
+        ("organizations", "methods: 'logs-delete' and 'logs-list'", vec![
             ("logs-delete",
-                    Some(r##"Deletes a log and all its log entries. The log will reappear if it receives new entries."##),
+                    Some(r##"Deletes all the log entries in a log. The log reappears if it receives new entries."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_logging2_beta1_cli/organizations_logs-delete",
+                  vec![
+                    (Some(r##"log-name"##),
+                     None,
+                     Some(r##"Required. The resource name of the log to delete:
+        "projects/[PROJECT_ID]/logs/[LOG_ID]"
+        "organizations/[ORGANIZATION_ID]/logs/[LOG_ID]"
+        [LOG_ID] must be URL-encoded. For example, "projects/my-project-id/logs/syslog", "organizations/1234567890/logs/cloudresourcemanager.googleapis.com%2Factivity". For more information about log names, see LogEntry."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("logs-list",
+                    Some(r##"Lists the logs in projects or organizations. Only logs that have entries are listed."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_logging2_beta1_cli/organizations_logs-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The resource name that owns the logs:
+        "projects/[PROJECT_ID]"
+        "organizations/[ORGANIZATION_ID]"
+        "##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+        ("projects", "methods: 'logs-delete', 'logs-list', 'metrics-create', 'metrics-delete', 'metrics-get', 'metrics-list', 'metrics-update', 'sinks-create', 'sinks-delete', 'sinks-get', 'sinks-list' and 'sinks-update'", vec![
+            ("logs-delete",
+                    Some(r##"Deletes all the log entries in a log. The log reappears if it receives new entries."##),
                     "Details at http://byron.github.io/google-apis-rs/google_logging2_beta1_cli/projects_logs-delete",
                   vec![
                     (Some(r##"log-name"##),
                      None,
-                     Some(r##"Required. The resource name of the log to delete. Example: `"projects/my-project/logs/syslog"`."##),
+                     Some(r##"Required. The resource name of the log to delete:
+        "projects/[PROJECT_ID]/logs/[LOG_ID]"
+        "organizations/[ORGANIZATION_ID]/logs/[LOG_ID]"
+        [LOG_ID] must be URL-encoded. For example, "projects/my-project-id/logs/syslog", "organizations/1234567890/logs/cloudresourcemanager.googleapis.com%2Factivity". For more information about log names, see LogEntry."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("logs-list",
+                    Some(r##"Lists the logs in projects or organizations. Only logs that have entries are listed."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_logging2_beta1_cli/projects_logs-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The resource name that owns the logs:
+        "projects/[PROJECT_ID]"
+        "organizations/[ORGANIZATION_ID]"
+        "##),
                      Some(true),
                      Some(false)),
         
@@ -1261,9 +1723,11 @@ fn main() {
                     Some(r##"Creates a logs-based metric."##),
                     "Details at http://byron.github.io/google-apis-rs/google_logging2_beta1_cli/projects_metrics-create",
                   vec![
-                    (Some(r##"project-name"##),
+                    (Some(r##"parent"##),
                      None,
-                     Some(r##"The resource name of the project in which to create the metric. Example: `"projects/my-project-id"`. The new metric must be provided in the request."##),
+                     Some(r##"The resource name of the project in which to create the metric:
+        "projects/[PROJECT_ID]"
+        The new metric must be provided in the request."##),
                      Some(true),
                      Some(false)),
         
@@ -1291,7 +1755,9 @@ fn main() {
                   vec![
                     (Some(r##"metric-name"##),
                      None,
-                     Some(r##"The resource name of the metric to delete. Example: `"projects/my-project-id/metrics/my-metric-id"`."##),
+                     Some(r##"The resource name of the metric to delete:
+        "projects/[PROJECT_ID]/metrics/[METRIC_ID]"
+        "##),
                      Some(true),
                      Some(false)),
         
@@ -1313,7 +1779,9 @@ fn main() {
                   vec![
                     (Some(r##"metric-name"##),
                      None,
-                     Some(r##"The resource name of the desired metric. Example: `"projects/my-project-id/metrics/my-metric-id"`."##),
+                     Some(r##"The resource name of the desired metric:
+        "projects/[PROJECT_ID]/metrics/[METRIC_ID]"
+        "##),
                      Some(true),
                      Some(false)),
         
@@ -1333,9 +1801,11 @@ fn main() {
                     Some(r##"Lists logs-based metrics."##),
                     "Details at http://byron.github.io/google-apis-rs/google_logging2_beta1_cli/projects_metrics-list",
                   vec![
-                    (Some(r##"project-name"##),
+                    (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The resource name of the project containing the metrics. Example: `"projects/my-project-id"`."##),
+                     Some(r##"Required. The name of the project containing the metrics:
+        "projects/[PROJECT_ID]"
+        "##),
                      Some(true),
                      Some(false)),
         
@@ -1357,7 +1827,9 @@ fn main() {
                   vec![
                     (Some(r##"metric-name"##),
                      None,
-                     Some(r##"The resource name of the metric to update. Example: `"projects/my-project-id/metrics/my-metric-id"`. The updated metric must be provided in the request and have the same identifier that is specified in `metricName`. If the metric does not exist, it is created."##),
+                     Some(r##"The resource name of the metric to update:
+        "projects/[PROJECT_ID]/metrics/[METRIC_ID]"
+        The updated metric must be provided in the request and it's name field must be the same as [METRIC_ID] If the metric does not exist in [PROJECT_ID], then a new metric is created."##),
                      Some(true),
                      Some(false)),
         
@@ -1380,12 +1852,15 @@ fn main() {
                      Some(false)),
                   ]),
             ("sinks-create",
-                    Some(r##"Creates a sink."##),
+                    Some(r##"Creates a sink that exports specified log entries to a destination. The export of newly-ingested log entries begins immediately, unless the current time is outside the sink's start and end times or the sink's writer_identity is not permitted to write to the destination. A sink can export log entries only from the resource owning the sink."##),
                     "Details at http://byron.github.io/google-apis-rs/google_logging2_beta1_cli/projects_sinks-create",
                   vec![
-                    (Some(r##"project-name"##),
+                    (Some(r##"parent"##),
                      None,
-                     Some(r##"The resource name of the project in which to create the sink. Example: `"projects/my-project-id"`. The new sink must be provided in the request."##),
+                     Some(r##"Required. The resource in which to create the sink:
+        "projects/[PROJECT_ID]"
+        "organizations/[ORGANIZATION_ID]"
+        Examples: "projects/my-logging-project", "organizations/123456789"."##),
                      Some(true),
                      Some(false)),
         
@@ -1408,12 +1883,15 @@ fn main() {
                      Some(false)),
                   ]),
             ("sinks-delete",
-                    Some(r##"Deletes a sink."##),
+                    Some(r##"Deletes a sink. If the sink has a unique writer_identity, then that service account is also deleted."##),
                     "Details at http://byron.github.io/google-apis-rs/google_logging2_beta1_cli/projects_sinks-delete",
                   vec![
                     (Some(r##"sink-name"##),
                      None,
-                     Some(r##"The resource name of the sink to delete. Example: `"projects/my-project-id/sinks/my-sink-id"`."##),
+                     Some(r##"Required. The full resource name of the sink to delete, including the parent resource and the sink identifier:
+        "projects/[PROJECT_ID]/sinks/[SINK_ID]"
+        "organizations/[ORGANIZATION_ID]/sinks/[SINK_ID]"
+        It is an error if the sink does not exist. Example: "projects/my-project-id/sinks/my-sink-id". It is an error if the sink does not exist."##),
                      Some(true),
                      Some(false)),
         
@@ -1435,7 +1913,10 @@ fn main() {
                   vec![
                     (Some(r##"sink-name"##),
                      None,
-                     Some(r##"The resource name of the sink to return. Example: `"projects/my-project-id/sinks/my-sink-id"`."##),
+                     Some(r##"Required. The parent resource name of the sink:
+        "projects/[PROJECT_ID]/sinks/[SINK_ID]"
+        "organizations/[ORGANIZATION_ID]/sinks/[SINK_ID]"
+        Example: "projects/my-project-id/sinks/my-sink-id"."##),
                      Some(true),
                      Some(false)),
         
@@ -1455,9 +1936,9 @@ fn main() {
                     Some(r##"Lists sinks."##),
                     "Details at http://byron.github.io/google-apis-rs/google_logging2_beta1_cli/projects_sinks-list",
                   vec![
-                    (Some(r##"project-name"##),
+                    (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The resource name of the project containing the sinks. Example: `"projects/my-logging-project"`."##),
+                     Some(r##"Required. The parent resource whose sinks are to be listed. Examples: "projects/my-logging-project", "organizations/123456789"."##),
                      Some(true),
                      Some(false)),
         
@@ -1474,12 +1955,15 @@ fn main() {
                      Some(false)),
                   ]),
             ("sinks-update",
-                    Some(r##"Creates or updates a sink."##),
+                    Some(r##"Updates a sink. If the named sink doesn't exist, then this method is identical to sinks.create. If the named sink does exist, then this method replaces the following fields in the existing sink with values from the new sink: destination, filter, output_version_format, start_time, and end_time. The updated filter might also have a new writer_identity; see the unique_writer_identity field."##),
                     "Details at http://byron.github.io/google-apis-rs/google_logging2_beta1_cli/projects_sinks-update",
                   vec![
                     (Some(r##"sink-name"##),
                      None,
-                     Some(r##"The resource name of the sink to update. Example: `"projects/my-project-id/sinks/my-sink-id"`. The updated sink must be provided in the request and have the same name that is specified in `sinkName`. If the sink does not exist, it is created."##),
+                     Some(r##"Required. The full resource name of the sink to update, including the parent resource and the sink identifier:
+        "projects/[PROJECT_ID]/sinks/[SINK_ID]"
+        "organizations/[ORGANIZATION_ID]/sinks/[SINK_ID]"
+        Example: "projects/my-project-id/sinks/my-sink-id"."##),
                      Some(true),
                      Some(false)),
         
@@ -1507,8 +1991,8 @@ fn main() {
     
     let mut app = App::new("logging2-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.0+20160322")
-           .about("Writes log entries and manages your logs, log sinks, and logs-based metrics.")
+           .version("1.0.0+20161206")
+           .about("Writes log entries and manages your Stackdriver Logging configuration.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_logging2_beta1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

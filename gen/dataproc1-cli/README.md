@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *dataproc* API at revision *20160503*. The CLI is at version *1.0.0*.
+This documentation was generated from the *dataproc* API at revision *20161102*. The CLI is at version *1.0.0*.
 
 ```bash
 dataproc1 [options]

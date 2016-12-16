@@ -1,4 +1,4 @@
-site_name: SQL Admin v1.0.0+20160907
+site_name: SQL Admin v1.0.0+20161213
 site_url: http://byron.github.io/google-apis-rs/google-sqladmin1_beta4-cli
 site_description: Write integrating applications with bcore
 
@@ -35,6 +35,7 @@ pages:
 - ['instances_restore-backup.md', 'Instances', 'Restore Backup']
 - ['instances_start-replica.md', 'Instances', 'Start Replica']
 - ['instances_stop-replica.md', 'Instances', 'Stop Replica']
+- ['instances_truncate-log.md', 'Instances', 'Truncate Log']
 - ['instances_update.md', 'Instances', 'Update']
 - ['operations_get.md', 'Operations', 'Get']
 - ['operations_list.md', 'Operations', 'List']

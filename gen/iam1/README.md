@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-iam1` library allows access to all features of the *Google iam* service.
 
-This documentation was generated from *iam* crate version *1.0.0+20160129*, where *20160129* is the exact revision of the *iam:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
+This documentation was generated from *iam* crate version *1.0.0+20160915*, where *20160915* is the exact revision of the *iam:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
 
 Everything else about the *iam* *v1* API can be found at the
 [official documentation site](https://cloud.google.com/iam/).
@@ -15,6 +15,8 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
 
 * projects
  * [*service accounts create*](http://byron.github.io/google-apis-rs/google_iam1/struct.ProjectServiceAccountCreateCall.html), [*service accounts delete*](http://byron.github.io/google-apis-rs/google_iam1/struct.ProjectServiceAccountDeleteCall.html), [*service accounts get*](http://byron.github.io/google-apis-rs/google_iam1/struct.ProjectServiceAccountGetCall.html), [*service accounts get iam policy*](http://byron.github.io/google-apis-rs/google_iam1/struct.ProjectServiceAccountGetIamPolicyCall.html), [*service accounts keys create*](http://byron.github.io/google-apis-rs/google_iam1/struct.ProjectServiceAccountKeyCreateCall.html), [*service accounts keys delete*](http://byron.github.io/google-apis-rs/google_iam1/struct.ProjectServiceAccountKeyDeleteCall.html), [*service accounts keys get*](http://byron.github.io/google-apis-rs/google_iam1/struct.ProjectServiceAccountKeyGetCall.html), [*service accounts keys list*](http://byron.github.io/google-apis-rs/google_iam1/struct.ProjectServiceAccountKeyListCall.html), [*service accounts list*](http://byron.github.io/google-apis-rs/google_iam1/struct.ProjectServiceAccountListCall.html), [*service accounts set iam policy*](http://byron.github.io/google-apis-rs/google_iam1/struct.ProjectServiceAccountSetIamPolicyCall.html), [*service accounts sign blob*](http://byron.github.io/google-apis-rs/google_iam1/struct.ProjectServiceAccountSignBlobCall.html), [*service accounts test iam permissions*](http://byron.github.io/google-apis-rs/google_iam1/struct.ProjectServiceAccountTestIamPermissionCall.html) and [*service accounts update*](http://byron.github.io/google-apis-rs/google_iam1/struct.ProjectServiceAccountUpdateCall.html)
+* [roles](http://byron.github.io/google-apis-rs/google_iam1/struct.Role.html)
+ * [*query grantable roles*](http://byron.github.io/google-apis-rs/google_iam1/struct.RoleQueryGrantableRoleCall.html)
 
 
 

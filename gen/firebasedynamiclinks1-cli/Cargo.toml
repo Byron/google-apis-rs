@@ -1,0 +1,43 @@
+# DO NOT EDIT !
+# This file was generated automatically from 'src/mako/Cargo.toml.mako'
+# DO NOT EDIT !
+[package]
+
+name = "google-firebasedynamiclinks1-cli"
+version = "1.0.0+20161118"
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
+description = "A complete library to interact with Firebase Dynamic Links (protocol v1)"
+repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/firebasedynamiclinks1-cli"
+homepage = "https://firebase.google.com/docs/dynamic-links/"
+documentation = "http://byron.github.io/google-apis-rs/google_firebasedynamiclinks1_cli"
+license = "MIT"
+keywords = ["firebasedynamiclinks", "google", "cli"]
+
+[[bin]]
+name = "firebasedynamiclinks1"
+
+[dependencies]
+hyper = "^ 0.9"
+mime = "^ 0.2.0"
+serde = "^ 0.8"
+serde_json = "^ 0.8"
+yup-oauth2 = { version = "^ 1.0", optional = true, default-features = false }
+serde_derive = { version = "^ 0.8", optional = true }
+strsim = "^0.5"
+yup-hyper-mock = "^1.0"
+clap = "^2.0"
+
+[features]
+default = ["with-serde-codegen"]
+nightly = ["serde_derive","yup-oauth2/nightly","google-firebasedynamiclinks1/nightly"]
+with-serde-codegen = ["serde_codegen","yup-oauth2/with-serde-codegen","google-firebasedynamiclinks1/with-serde-codegen"]
+
+[build-dependencies]
+serde_codegen = { version = "^ 0.8", optional = true }
+
+
+[dependencies.google-firebasedynamiclinks1]
+path = "../firebasedynamiclinks1"
+version = "1.0.0"
+optional = true
+default-features = false

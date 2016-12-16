@@ -176,7 +176,10 @@ impl<'a, C, A> Pubsub<C, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TestIamPermissionsRequest {
-    /// The set of permissions to check for the `resource`. Permissions with wildcards (such as '*' or 'storage.*') are not allowed. For more information see IAM Overview.
+    /// The set of permissions to check for the `resource`. Permissions with
+    /// wildcards (such as '*' or 'storage.*') are not allowed. For more
+    /// information see
+    /// [IAM Overview](https://cloud.google.com/iam/docs/overview#permissions).
     pub permissions: Option<Vec<String>>,
 }
 
@@ -194,7 +197,9 @@ impl RequestValue for TestIamPermissionsRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListTopicSubscriptionsResponse {
-    /// If not empty, indicates that there may be more subscriptions that match the request; this value should be passed in a new `ListTopicSubscriptionsRequest` to get more subscriptions.
+    /// If not empty, indicates that there may be more subscriptions that match
+    /// the request; this value should be passed in a new
+    /// `ListTopicSubscriptionsRequest` to get more subscriptions.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
     /// The names of the subscriptions that match the request.
@@ -216,7 +221,10 @@ impl ResponseResult for ListTopicSubscriptionsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SetIamPolicyRequest {
-    /// REQUIRED: The complete policy to be applied to the `resource`. The size of the policy is limited to a few 10s of KB. An empty policy is a valid policy but certain Cloud Platform services (such as Projects) might reject them.
+    /// REQUIRED: The complete policy to be applied to the `resource`. The size of
+    /// the policy is limited to a few 10s of KB. An empty policy is a
+    /// valid policy but certain Cloud Platform services (such as Projects)
+    /// might reject them.
     pub policy: Option<Policy>,
 }
 
@@ -250,7 +258,8 @@ impl Part for ReceivedMessage {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AcknowledgeRequest {
-    /// The acknowledgment ID for the messages being acknowledged that was returned by the Pub/Sub system in the `Pull` response. Must not be empty.
+    /// The acknowledgment ID for the messages being acknowledged that was returned
+    /// by the Pub/Sub system in the `Pull` response. Must not be empty.
     #[serde(rename="ackIds")]
     pub ack_ids: Option<Vec<String>>,
 }
@@ -269,10 +278,15 @@ impl RequestValue for AcknowledgeRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ModifyAckDeadlineRequest {
-    /// The new ack deadline with respect to the time this request was sent to the Pub/Sub system. Must be >= 0. For example, if the value is 10, the new ack deadline will expire 10 seconds after the `ModifyAckDeadline` call was made. Specifying zero may immediately make the message available for another pull request.
+    /// The new ack deadline with respect to the time this request was sent to
+    /// the Pub/Sub system. Must be >= 0. For example, if the value is 10, the new
+    /// ack deadline will expire 10 seconds after the `ModifyAckDeadline` call
+    /// was made. Specifying zero may immediately make the message available for
+    /// another pull request.
     #[serde(rename="ackDeadlineSeconds")]
     pub ack_deadline_seconds: Option<i32>,
-    /// The acknowledgment ID. Either this or ack_ids must be populated, but not both.
+    /// The acknowledgment ID. Either this or ack_ids must be populated, but not
+    /// both.
     #[serde(rename="ackId")]
     pub ack_id: Option<String>,
     /// List of acknowledgment IDs.
@@ -301,7 +315,37 @@ pub struct PublishRequest {
 impl RequestValue for PublishRequest {}
 
 
-/// Defines an Identity and Access Management (IAM) policy. It is used to specify access control policies for Cloud Platform resources. A `Policy` consists of a list of `bindings`. A `Binding` binds a list of `members` to a `role`, where the members can be user accounts, Google groups, Google domains, and service accounts. A `role` is a named list of permissions defined by IAM. **Example** { "bindings": [ { "role": "roles/owner", "members": [ "user:mike@example.com", "group:admins@example.com", "domain:google.com", "serviceAccount:my-other-app@appspot.gserviceaccount.com", ] }, { "role": "roles/viewer", "members": ["user:sean@example.com"] } ] } For a description of IAM and its features, see the [IAM developer's guide](https://cloud.google.com/iam).
+/// Defines an Identity and Access Management (IAM) policy. It is used to
+/// specify access control policies for Cloud Platform resources.
+/// 
+/// 
+/// A `Policy` consists of a list of `bindings`. A `Binding` binds a list of
+/// `members` to a `role`, where the members can be user accounts, Google groups,
+/// Google domains, and service accounts. A `role` is a named list of permissions
+/// defined by IAM.
+/// 
+/// **Example**
+/// 
+///     {
+///       "bindings": [
+///         {
+///           "role": "roles/owner",
+///           "members": [
+///             "user:mike@example.com",
+///             "group:admins@example.com",
+///             "domain:google.com",
+///             "serviceAccount:my-other-app@appspot.gserviceaccount.com",
+///           ]
+///         },
+///         {
+///           "role": "roles/viewer",
+///           "members": ["user:sean@example.com"]
+///         }
+///       ]
+///     }
+/// 
+/// For a description of IAM and its features, see the
+/// [IAM developer's guide](https://cloud.google.com/iam).
 /// 
 /// # Activities
 /// 
@@ -315,12 +359,23 @@ impl RequestValue for PublishRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Policy {
-    /// Associates a list of `members` to a `role`. Multiple `bindings` must not be specified for the same `role`. `bindings` with no members will result in an error.
+    /// Associates a list of `members` to a `role`.
+    /// Multiple `bindings` must not be specified for the same `role`.
+    /// `bindings` with no members will result in an error.
     pub bindings: Option<Vec<Binding>>,
+    /// `etag` is used for optimistic concurrency control as a way to help
+    /// prevent simultaneous updates of a policy from overwriting each other.
+    /// It is strongly suggested that systems make use of the `etag` in the
+    /// read-modify-write cycle to perform policy updates in order to avoid race
+    /// conditions: An `etag` is returned in the response to `getIamPolicy`, and
+    /// systems are expected to put that etag in the request to `setIamPolicy` to
+    /// ensure that their change will be applied to the same version of the policy.
+    /// 
+    /// If no `etag` is provided in the call to `setIamPolicy`, then the existing
+    /// policy is overwritten blindly.
+    pub etag: Option<String>,
     /// Version of the `Policy`. The default version is 0.
     pub version: Option<i32>,
-    /// `etag` is used for optimistic concurrency control as a way to help prevent simultaneous updates of a policy from overwriting each other. It is strongly suggested that systems make use of the `etag` in the read-modify-write cycle to perform policy updates in order to avoid race conditions: An `etag` is returned in the response to `getIamPolicy`, and systems are expected to put that etag in the request to `setIamPolicy` to ensure that their change will be applied to the same version of the policy. If no `etag` is provided in the call to `setIamPolicy`, then the existing policy is overwritten blindly.
-    pub etag: Option<String>,
 }
 
 impl ResponseResult for Policy {}
@@ -337,7 +392,9 @@ impl ResponseResult for Policy {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListSubscriptionsResponse {
-    /// If not empty, indicates that there may be more subscriptions that match the request; this value should be passed in a new `ListSubscriptionsRequest` to get more subscriptions.
+    /// If not empty, indicates that there may be more subscriptions that match
+    /// the request; this value should be passed in a new
+    /// `ListSubscriptionsRequest` to get more subscriptions.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
     /// The subscriptions that match the request.
@@ -358,7 +415,8 @@ impl ResponseResult for ListSubscriptionsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListTopicsResponse {
-    /// If not empty, indicates that there may be more topics that match the request; this value should be passed in a new `ListTopicsRequest`.
+    /// If not empty, indicates that there may be more topics that match the
+    /// request; this value should be passed in a new `ListTopicsRequest`.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
     /// The resulting topics.
@@ -379,7 +437,12 @@ impl ResponseResult for ListTopicsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ModifyPushConfigRequest {
-    /// The push configuration for future deliveries. An empty `pushConfig` indicates that the Pub/Sub system should stop pushing messages from the given subscription and allow messages to be pulled and acknowledged - effectively pausing the subscription if `Pull` is not called.
+    /// The push configuration for future deliveries.
+    /// 
+    /// An empty `pushConfig` indicates that the Pub/Sub system should
+    /// stop pushing messages from the given subscription and allow
+    /// messages to be pulled and acknowledged - effectively pausing
+    /// the subscription if `Pull` is not called.
     #[serde(rename="pushConfig")]
     pub push_config: Option<PushConfig>,
 }
@@ -387,7 +450,15 @@ pub struct ModifyPushConfigRequest {
 impl RequestValue for ModifyPushConfigRequest {}
 
 
-/// A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); } The JSON representation for `Empty` is empty JSON object `{}`.
+/// A generic empty message that you can re-use to avoid defining duplicated
+/// empty messages in your APIs. A typical example is to use it as the request
+/// or the response type of an API method. For instance:
+/// 
+///     service Foo {
+///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+///     }
+/// 
+/// The JSON representation for `Empty` is empty JSON object `{}`.
 /// 
 /// # Activities
 /// 
@@ -418,7 +489,8 @@ impl ResponseResult for Empty {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TestIamPermissionsResponse {
-    /// A subset of `TestPermissionsRequest.permissions` that the caller is allowed.
+    /// A subset of `TestPermissionsRequest.permissions` that the caller is
+    /// allowed.
     pub permissions: Option<Vec<String>>,
 }
 
@@ -436,10 +508,15 @@ impl ResponseResult for TestIamPermissionsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PullRequest {
-    /// If this is specified as true the system will respond immediately even if it is not able to return a message in the `Pull` response. Otherwise the system is allowed to wait until at least one message is available rather than returning no messages. The client may cancel the request if it does not wish to wait any longer for the response.
+    /// If this is specified as true the system will respond immediately even if
+    /// it is not able to return a message in the `Pull` response. Otherwise the
+    /// system is allowed to wait until at least one message is available rather
+    /// than returning no messages. The client may cancel the request if it does
+    /// not wish to wait any longer for the response.
     #[serde(rename="returnImmediately")]
     pub return_immediately: Option<bool>,
-    /// The maximum number of messages returned for this request. The Pub/Sub system may return fewer than the number specified.
+    /// The maximum number of messages returned for this request. The Pub/Sub
+    /// system may return fewer than the number specified.
     #[serde(rename="maxMessages")]
     pub max_messages: Option<i32>,
 }
@@ -447,19 +524,42 @@ pub struct PullRequest {
 impl RequestValue for PullRequest {}
 
 
-/// Associates `members` with a `role`.
+/// Configuration for a push delivery endpoint.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Binding {
-    /// Role that is assigned to `members`. For example, `roles/viewer`, `roles/editor`, or `roles/owner`. Required
-    pub role: Option<String>,
-    /// Specifies the identities requesting access for a Cloud Platform resource. `members` can have the following values: * `allUsers`: A special identifier that represents anyone who is on the internet; with or without a Google account. * `allAuthenticatedUsers`: A special identifier that represents anyone who is authenticated with a Google account or a service account. * `user:{emailid}`: An email address that represents a specific Google account. For example, `alice@gmail.com` or `joe@example.com`. * `serviceAccount:{emailid}`: An email address that represents a service account. For example, `my-other-app@appspot.gserviceaccount.com`. * `group:{emailid}`: An email address that represents a Google group. For example, `admins@example.com`. * `domain:{domain}`: A Google Apps domain name that represents all the users of that domain. For example, `google.com` or `example.com`.
-    pub members: Option<Vec<String>>,
+pub struct PushConfig {
+    /// Endpoint configuration attributes.
+    /// 
+    /// Every endpoint has a set of API supported attributes that can be used to
+    /// control different aspects of the message delivery.
+    /// 
+    /// The currently supported attribute is `x-goog-version`, which you can
+    /// use to change the format of the push message. This attribute
+    /// indicates the version of the data expected by the endpoint. This
+    /// controls the shape of the envelope (i.e. its fields and metadata).
+    /// The endpoint version is based on the version of the Pub/Sub
+    /// API.
+    /// 
+    /// If not present during the `CreateSubscription` call, it will default to
+    /// the version of the API used to make such call. If not present during a
+    /// `ModifyPushConfig` call, its value will not be changed. `GetSubscription`
+    /// calls will always return a valid version, even if the subscription was
+    /// created without this attribute.
+    /// 
+    /// The possible values for this attribute are:
+    /// 
+    /// * `v1beta1`: uses the push format defined in the v1beta1 Pub/Sub API.
+    /// * `v1` or `v1beta2`: uses the push format defined in the v1 Pub/Sub API.
+    pub attributes: Option<HashMap<String, String>>,
+    /// A URL locating the endpoint to which messages should be pushed.
+    /// For example, a Webhook endpoint might use "https://example.com/push".
+    #[serde(rename="pushEndpoint")]
+    pub push_endpoint: Option<String>,
 }
 
-impl Part for Binding {}
+impl Part for PushConfig {}
 
 
 /// A topic resource.
@@ -474,12 +574,56 @@ impl Part for Binding {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Topic {
-    /// The name of the topic. It must have the format `"projects/{project}/topics/{topic}"`. `{topic}` must start with a letter, and contain only letters (`[A-Za-z]`), numbers (`[0-9]`), dashes (`-`), underscores (`_`), periods (`.`), tildes (`~`), plus (`+`) or percent signs (`%`). It must be between 3 and 255 characters in length, and it must not start with `"goog"`.
+    /// The name of the topic. It must have the format
+    /// `"projects/{project}/topics/{topic}"`. `{topic}` must start with a letter,
+    /// and contain only letters (`[A-Za-z]`), numbers (`[0-9]`), dashes (`-`),
+    /// underscores (`_`), periods (`.`), tildes (`~`), plus (`+`) or percent
+    /// signs (`%`). It must be between 3 and 255 characters in length, and it
+    /// must not start with `"goog"`.
     pub name: Option<String>,
 }
 
 impl RequestValue for Topic {}
 impl ResponseResult for Topic {}
+
+
+/// Associates `members` with a `role`.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Binding {
+    /// Role that is assigned to `members`.
+    /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
+    /// Required
+    pub role: Option<String>,
+    /// Specifies the identities requesting access for a Cloud Platform resource.
+    /// `members` can have the following values:
+    /// 
+    /// * `allUsers`: A special identifier that represents anyone who is
+    ///    on the internet; with or without a Google account.
+    /// 
+    /// * `allAuthenticatedUsers`: A special identifier that represents anyone
+    ///    who is authenticated with a Google account or a service account.
+    /// 
+    /// * `user:{emailid}`: An email address that represents a specific Google
+    ///    account. For example, `alice@gmail.com` or `joe@example.com`.
+    /// 
+    /// 
+    /// * `serviceAccount:{emailid}`: An email address that represents a service
+    ///    account. For example, `my-other-app@appspot.gserviceaccount.com`.
+    /// 
+    /// * `group:{emailid}`: An email address that represents a Google group.
+    ///    For example, `admins@example.com`.
+    /// 
+    /// * `domain:{domain}`: A Google Apps domain name that represents all the
+    ///    users of that domain. For example, `google.com` or `example.com`.
+    /// 
+    /// 
+    pub members: Option<Vec<String>>,
+}
+
+impl Part for Binding {}
 
 
 /// Response for the `Publish` method.
@@ -493,7 +637,9 @@ impl ResponseResult for Topic {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PublishResponse {
-    /// The server-assigned ID of each published message, in the same order as the messages in the request. IDs are guaranteed to be unique within the topic.
+    /// The server-assigned ID of each published message, in the same order as
+    /// the messages in the request. IDs are guaranteed to be unique within
+    /// the topic.
     #[serde(rename="messageIds")]
     pub message_ids: Option<Vec<String>>,
 }
@@ -512,7 +658,10 @@ impl ResponseResult for PublishResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PullResponse {
-    /// Received Pub/Sub messages. The Pub/Sub system will return zero messages if there are no more available in the backlog. The Pub/Sub system may return fewer than the `maxMessages` requested even if there are more messages available in the backlog.
+    /// Received Pub/Sub messages. The Pub/Sub system will return zero messages if
+    /// there are no more available in the backlog. The Pub/Sub system may return
+    /// fewer than the `maxMessages` requested even if there are more messages
+    /// available in the backlog.
     #[serde(rename="receivedMessages")]
     pub received_messages: Option<Vec<ReceivedMessage>>,
 }
@@ -520,7 +669,8 @@ pub struct PullResponse {
 impl ResponseResult for PullResponse {}
 
 
-/// A message data and its attributes. The message payload must not be empty; it must contain either a non-empty data field, or at least one attribute.
+/// A message data and its attributes. The message payload must not be empty;
+/// it must contain either a non-empty data field, or at least one attribute.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -528,33 +678,23 @@ impl ResponseResult for PullResponse {}
 pub struct PubsubMessage {
     /// Optional attributes for this message.
     pub attributes: Option<HashMap<String, String>>,
-    /// The message payload. For JSON requests, the value of this field must be base64-encoded.
+    /// The message payload. For JSON requests, the value of this field must be
+    /// [base64-encoded](https://tools.ietf.org/html/rfc4648).
     pub data: Option<String>,
-    /// The time at which the message was published, populated by the server when it receives the `Publish` call. It must not be populated by the publisher in a `Publish` call.
+    /// The time at which the message was published, populated by the server when
+    /// it receives the `Publish` call. It must not be populated by the
+    /// publisher in a `Publish` call.
     #[serde(rename="publishTime")]
     pub publish_time: Option<String>,
-    /// ID of this message, assigned by the server when the message is published. Guaranteed to be unique within the topic. This value may be read by a subscriber that receives a `PubsubMessage` via a `Pull` call or a push delivery. It must not be populated by the publisher in a `Publish` call.
+    /// ID of this message, assigned by the server when the message is published.
+    /// Guaranteed to be unique within the topic. This value may be read by a
+    /// subscriber that receives a `PubsubMessage` via a `Pull` call or a push
+    /// delivery. It must not be populated by the publisher in a `Publish` call.
     #[serde(rename="messageId")]
     pub message_id: Option<String>,
 }
 
 impl Part for PubsubMessage {}
-
-
-/// Configuration for a push delivery endpoint.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PushConfig {
-    /// Endpoint configuration attributes. Every endpoint has a set of API supported attributes that can be used to control different aspects of the message delivery. The currently supported attribute is `x-goog-version`, which you can use to change the format of the push message. This attribute indicates the version of the data expected by the endpoint. This controls the shape of the envelope (i.e. its fields and metadata). The endpoint version is based on the version of the Pub/Sub API. If not present during the `CreateSubscription` call, it will default to the version of the API used to make such call. If not present during a `ModifyPushConfig` call, its value will not be changed. `GetSubscription` calls will always return a valid version, even if the subscription was created without this attribute. The possible values for this attribute are: * `v1beta1`: uses the push format defined in the v1beta1 Pub/Sub API. * `v1` or `v1beta2`: uses the push format defined in the v1 Pub/Sub API.
-    pub attributes: Option<HashMap<String, String>>,
-    /// A URL locating the endpoint to which messages should be pushed. For example, a Webhook endpoint might use "https://example.com/push".
-    #[serde(rename="pushEndpoint")]
-    pub push_endpoint: Option<String>,
-}
-
-impl Part for PushConfig {}
 
 
 /// A subscription resource.
@@ -569,15 +709,41 @@ impl Part for PushConfig {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Subscription {
-    /// The name of the topic from which this subscription is receiving messages. The value of this field will be `_deleted-topic_` if the topic has been deleted.
+    /// The name of the topic from which this subscription is receiving messages.
+    /// The value of this field will be `_deleted-topic_` if the topic has been
+    /// deleted.
     pub topic: Option<String>,
-    /// This value is the maximum time after a subscriber receives a message before the subscriber should acknowledge the message. After message delivery but before the ack deadline expires and before the message is acknowledged, it is an outstanding message and will not be delivered again during that time (on a best-effort basis). For pull subscriptions, this value is used as the initial value for the ack deadline. To override this value for a given message, call `ModifyAckDeadline` with the corresponding `ack_id` if using pull. For push delivery, this value is also used to set the request timeout for the call to the push endpoint. If the subscriber never acknowledges the message, the Pub/Sub system will eventually redeliver the message. If this parameter is not set, the default value of 10 seconds is used.
+    /// This value is the maximum time after a subscriber receives a message
+    /// before the subscriber should acknowledge the message. After message
+    /// delivery but before the ack deadline expires and before the message is
+    /// acknowledged, it is an outstanding message and will not be delivered
+    /// again during that time (on a best-effort basis).
+    /// 
+    /// For pull subscriptions, this value is used as the initial value for the ack
+    /// deadline. To override this value for a given message, call
+    /// `ModifyAckDeadline` with the corresponding `ack_id` if using pull.
+    /// The maximum custom deadline you can specify is 600 seconds (10 minutes).
+    /// 
+    /// For push delivery, this value is also used to set the request timeout for
+    /// the call to the push endpoint.
+    /// 
+    /// If the subscriber never acknowledges the message, the Pub/Sub
+    /// system will eventually redeliver the message.
+    /// 
+    /// If this parameter is 0, a default value of 10 seconds is used.
     #[serde(rename="ackDeadlineSeconds")]
     pub ack_deadline_seconds: Option<i32>,
-    /// If push delivery is used with this subscription, this field is used to configure it. An empty `pushConfig` signifies that the subscriber will pull and ack messages using API methods.
+    /// If push delivery is used with this subscription, this field is
+    /// used to configure it. An empty `pushConfig` signifies that the subscriber
+    /// will pull and ack messages using API methods.
     #[serde(rename="pushConfig")]
     pub push_config: Option<PushConfig>,
-    /// The name of the subscription. It must have the format `"projects/{project}/subscriptions/{subscription}"`. `{subscription}` must start with a letter, and contain only letters (`[A-Za-z]`), numbers (`[0-9]`), dashes (`-`), underscores (`_`), periods (`.`), tildes (`~`), plus (`+`) or percent signs (`%`). It must be between 3 and 255 characters in length, and it must not start with `"goog"`.
+    /// The name of the subscription. It must have the format
+    /// `"projects/{project}/subscriptions/{subscription}"`. `{subscription}` must
+    /// start with a letter, and contain only letters (`[A-Za-z]`), numbers
+    /// (`[0-9]`), dashes (`-`), underscores (`_`), periods (`.`), tildes (`~`),
+    /// plus (`+`) or percent signs (`%`). It must be between 3 and 255 characters
+    /// in length, and it must not start with `"goog"`.
     pub name: Option<String>,
 }
 
@@ -649,7 +815,10 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Pulls messages from the server. Returns an empty list if there are no messages available in the backlog. The server may return `UNAVAILABLE` if there are too many concurrent pull requests pending for the given subscription.
+    /// Pulls messages from the server. Returns an empty list if there are no
+    /// messages available in the backlog. The server may return `UNAVAILABLE` if
+    /// there are too many concurrent pull requests pending for the given
+    /// subscription.
     /// 
     /// # Arguments
     ///
@@ -673,7 +842,12 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The name of the topic. It must have the format `"projects/{project}/topics/{topic}"`. `{topic}` must start with a letter, and contain only letters (`[A-Za-z]`), numbers (`[0-9]`), dashes (`-`), underscores (`_`), periods (`.`), tildes (`~`), plus (`+`) or percent signs (`%`). It must be between 3 and 255 characters in length, and it must not start with `"goog"`.
+    /// * `name` - The name of the topic. It must have the format
+    ///            `"projects/{project}/topics/{topic}"`. `{topic}` must start with a letter,
+    ///            and contain only letters (`[A-Za-z]`), numbers (`[0-9]`), dashes (`-`),
+    ///            underscores (`_`), periods (`.`), tildes (`~`), plus (`+`) or percent
+    ///            signs (`%`). It must be between 3 and 255 characters in length, and it
+    ///            must not start with `"goog"`.
     pub fn topics_create(&self, request: Topic, name: &str) -> ProjectTopicCreateCall<'a, C, A> {
         ProjectTopicCreateCall {
             hub: self.hub,
@@ -692,7 +866,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `resource` - REQUIRED: The resource for which the policy detail is being requested. `resource` is usually specified as a path, such as `projects/*project*/zones/*zone*/disks/*disk*`. The format for the path specified in this value is resource specific and is specified in the `testIamPermissions` documentation.
+    /// * `resource` - REQUIRED: The resource for which the policy detail is being requested.
+    ///                `resource` is usually specified as a path. For example, a Project
+    ///                resource is specified as `projects/{project}`.
     pub fn topics_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectTopicTestIamPermissionCall<'a, C, A> {
         ProjectTopicTestIamPermissionCall {
             hub: self.hub,
@@ -706,7 +882,12 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Modifies the `PushConfig` for a specified subscription. This may be used to change a push subscription to a pull one (signified by an empty `PushConfig`) or vice versa, or change the endpoint URL and other attributes of a push subscription. Messages will accumulate for delivery continuously through the call regardless of changes to the `PushConfig`.
+    /// Modifies the `PushConfig` for a specified subscription.
+    /// 
+    /// This may be used to change a push subscription to a pull one (signified by
+    /// an empty `PushConfig`) or vice versa, or change the endpoint URL and other
+    /// attributes of a push subscription. Messages will accumulate for delivery
+    /// continuously through the call regardless of changes to the `PushConfig`.
     /// 
     /// # Arguments
     ///
@@ -725,7 +906,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Adds one or more messages to the topic. Returns `NOT_FOUND` if the topic does not exist. The message payload must not be empty; it must contain either a non-empty data field, or at least one attribute.
+    /// Adds one or more messages to the topic. Returns `NOT_FOUND` if the topic
+    /// does not exist. The message payload must not be empty; it must contain
+    ///  either a non-empty data field, or at least one attribute.
     /// 
     /// # Arguments
     ///
@@ -761,11 +944,15 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the access control policy for a `resource`. Returns an empty policy if the resource exists and does not have a policy set.
+    /// Gets the access control policy for a resource.
+    /// Returns an empty policy if the resource exists and does not have a policy
+    /// set.
     /// 
     /// # Arguments
     ///
-    /// * `resource` - REQUIRED: The resource for which the policy is being requested. `resource` is usually specified as a path, such as `projects/*project*/zones/*zone*/disks/*disk*`. The format for the path specified in this value is resource specific and is specified in the `getIamPolicy` documentation.
+    /// * `resource` - REQUIRED: The resource for which the policy is being requested.
+    ///                `resource` is usually specified as a path. For example, a Project
+    ///                resource is specified as `projects/{project}`.
     pub fn topics_get_iam_policy(&self, resource: &str) -> ProjectTopicGetIamPolicyCall<'a, C, A> {
         ProjectTopicGetIamPolicyCall {
             hub: self.hub,
@@ -778,7 +965,11 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Modifies the ack deadline for a specific message. This method is useful to indicate that more time is needed to process a message by the subscriber, or to make the message available for redelivery if the processing was interrupted.
+    /// Modifies the ack deadline for a specific message. This method is useful
+    /// to indicate that more time is needed to process a message by the
+    /// subscriber, or to make the message available for redelivery if the
+    /// processing was interrupted. Note that this does not modify the
+    /// subscription-level `ackDeadlineSeconds` used for subsequent messages.
     /// 
     /// # Arguments
     ///
@@ -797,7 +988,11 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes an existing subscription. All pending messages in the subscription are immediately dropped. Calls to `Pull` after deletion will return `NOT_FOUND`. After a subscription is deleted, a new one may be created with the same name, but the new one has no association with the old subscription, or its topic unless the same topic is specified.
+    /// Deletes an existing subscription. All pending messages in the subscription
+    /// are immediately dropped. Calls to `Pull` after deletion will return
+    /// `NOT_FOUND`. After a subscription is deleted, a new one may be created with
+    /// the same name, but the new one has no association with the old
+    /// subscription, or its topic unless the same topic is specified.
     /// 
     /// # Arguments
     ///
@@ -814,12 +1009,15 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sets the access control policy on the specified resource. Replaces any existing policy.
+    /// Sets the access control policy on the specified resource. Replaces any
+    /// existing policy.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `resource` - REQUIRED: The resource for which the policy is being specified. `resource` is usually specified as a path, such as `projects/*project*/zones/*zone*/disks/*disk*`. The format for the path specified in this value is resource specific and is specified in the `setIamPolicy` documentation.
+    /// * `resource` - REQUIRED: The resource for which the policy is being specified.
+    ///                `resource` is usually specified as a path. For example, a Project
+    ///                resource is specified as `projects/{project}`.
     pub fn topics_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectTopicSetIamPolicyCall<'a, C, A> {
         ProjectTopicSetIamPolicyCall {
             hub: self.hub,
@@ -833,12 +1031,23 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a subscription to a given topic. If the subscription already exists, returns `ALREADY_EXISTS`. If the corresponding topic doesn't exist, returns `NOT_FOUND`. If the name is not provided in the request, the server will assign a random name for this subscription on the same project as the topic.
+    /// Creates a subscription to a given topic.
+    /// If the subscription already exists, returns `ALREADY_EXISTS`.
+    /// If the corresponding topic doesn't exist, returns `NOT_FOUND`.
+    /// 
+    /// If the name is not provided in the request, the server will assign a random
+    /// name for this subscription on the same project as the topic. Note that
+    /// for REST API requests, you must specify a name.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The name of the subscription. It must have the format `"projects/{project}/subscriptions/{subscription}"`. `{subscription}` must start with a letter, and contain only letters (`[A-Za-z]`), numbers (`[0-9]`), dashes (`-`), underscores (`_`), periods (`.`), tildes (`~`), plus (`+`) or percent signs (`%`). It must be between 3 and 255 characters in length, and it must not start with `"goog"`.
+    /// * `name` - The name of the subscription. It must have the format
+    ///            `"projects/{project}/subscriptions/{subscription}"`. `{subscription}` must
+    ///            start with a letter, and contain only letters (`[A-Za-z]`), numbers
+    ///            (`[0-9]`), dashes (`-`), underscores (`_`), periods (`.`), tildes (`~`),
+    ///            plus (`+`) or percent signs (`%`). It must be between 3 and 255 characters
+    ///            in length, and it must not start with `"goog"`.
     pub fn subscriptions_create(&self, request: Subscription, name: &str) -> ProjectSubscriptionCreateCall<'a, C, A> {
         ProjectSubscriptionCreateCall {
             hub: self.hub,
@@ -852,7 +1061,13 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Acknowledges the messages associated with the `ack_ids` in the `AcknowledgeRequest`. The Pub/Sub system can remove the relevant messages from the subscription. Acknowledging a message whose ack deadline has expired may succeed, but such a message may be redelivered later. Acknowledging a message more than once will not result in an error.
+    /// Acknowledges the messages associated with the `ack_ids` in the
+    /// `AcknowledgeRequest`. The Pub/Sub system can remove the relevant messages
+    /// from the subscription.
+    /// 
+    /// Acknowledging a message whose ack deadline has expired may succeed,
+    /// but such a message may be redelivered later. Acknowledging a message more
+    /// than once will not result in an error.
     /// 
     /// # Arguments
     ///
@@ -871,11 +1086,15 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the access control policy for a `resource`. Returns an empty policy if the resource exists and does not have a policy set.
+    /// Gets the access control policy for a resource.
+    /// Returns an empty policy if the resource exists and does not have a policy
+    /// set.
     /// 
     /// # Arguments
     ///
-    /// * `resource` - REQUIRED: The resource for which the policy is being requested. `resource` is usually specified as a path, such as `projects/*project*/zones/*zone*/disks/*disk*`. The format for the path specified in this value is resource specific and is specified in the `getIamPolicy` documentation.
+    /// * `resource` - REQUIRED: The resource for which the policy is being requested.
+    ///                `resource` is usually specified as a path. For example, a Project
+    ///                resource is specified as `projects/{project}`.
     pub fn subscriptions_get_iam_policy(&self, resource: &str) -> ProjectSubscriptionGetIamPolicyCall<'a, C, A> {
         ProjectSubscriptionGetIamPolicyCall {
             hub: self.hub,
@@ -893,7 +1112,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `resource` - REQUIRED: The resource for which the policy detail is being requested. `resource` is usually specified as a path, such as `projects/*project*/zones/*zone*/disks/*disk*`. The format for the path specified in this value is resource specific and is specified in the `testIamPermissions` documentation.
+    /// * `resource` - REQUIRED: The resource for which the policy detail is being requested.
+    ///                `resource` is usually specified as a path. For example, a Project
+    ///                resource is specified as `projects/{project}`.
     pub fn subscriptions_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectSubscriptionTestIamPermissionCall<'a, C, A> {
         ProjectSubscriptionTestIamPermissionCall {
             hub: self.hub,
@@ -907,7 +1128,11 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes the topic with the given name. Returns `NOT_FOUND` if the topic does not exist. After a topic is deleted, a new topic may be created with the same name; this is an entirely new topic with none of the old configuration or subscriptions. Existing subscriptions to this topic are not deleted, but their `topic` field is set to `_deleted-topic_`.
+    /// Deletes the topic with the given name. Returns `NOT_FOUND` if the topic
+    /// does not exist. After a topic is deleted, a new topic may be created with
+    /// the same name; this is an entirely new topic with none of the old
+    /// configuration or subscriptions. Existing subscriptions to this topic are
+    /// not deleted, but their `topic` field is set to `_deleted-topic_`.
     /// 
     /// # Arguments
     ///
@@ -979,12 +1204,15 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sets the access control policy on the specified resource. Replaces any existing policy.
+    /// Sets the access control policy on the specified resource. Replaces any
+    /// existing policy.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `resource` - REQUIRED: The resource for which the policy is being specified. `resource` is usually specified as a path, such as `projects/*project*/zones/*zone*/disks/*disk*`. The format for the path specified in this value is resource specific and is specified in the `setIamPolicy` documentation.
+    /// * `resource` - REQUIRED: The resource for which the policy is being specified.
+    ///                `resource` is usually specified as a path. For example, a Project
+    ///                resource is specified as `projects/{project}`.
     pub fn subscriptions_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectSubscriptionSetIamPolicyCall<'a, C, A> {
         ProjectSubscriptionSetIamPolicyCall {
             hub: self.hub,
@@ -1202,7 +1430,9 @@ impl<'a, C, A> ProjectTopicListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._project = new_value.to_string();
         self
     }
-    /// The value returned by the last `ListTopicsResponse`; indicates that this is a continuation of a prior `ListTopics` call, and that the system should return the next page of data.
+    /// The value returned by the last `ListTopicsResponse`; indicates that this is
+    /// a continuation of a prior `ListTopics` call, and that the system should
+    /// return the next page of data.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ProjectTopicListCall<'a, C, A> {
@@ -1274,7 +1504,10 @@ impl<'a, C, A> ProjectTopicListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 }
 
 
-/// Pulls messages from the server. Returns an empty list if there are no messages available in the backlog. The server may return `UNAVAILABLE` if there are too many concurrent pull requests pending for the given subscription.
+/// Pulls messages from the server. Returns an empty list if there are no
+/// messages available in the backlog. The server may return `UNAVAILABLE` if
+/// there are too many concurrent pull requests pending for the given
+/// subscription.
 ///
 /// A builder for the *subscriptions.pull* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -1758,7 +1991,12 @@ impl<'a, C, A> ProjectTopicCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._request = new_value;
         self
     }
-    /// The name of the topic. It must have the format `"projects/{project}/topics/{topic}"`. `{topic}` must start with a letter, and contain only letters (`[A-Za-z]`), numbers (`[0-9]`), dashes (`-`), underscores (`_`), periods (`.`), tildes (`~`), plus (`+`) or percent signs (`%`). It must be between 3 and 255 characters in length, and it must not start with `"goog"`.
+    /// The name of the topic. It must have the format
+    /// `"projects/{project}/topics/{topic}"`. `{topic}` must start with a letter,
+    /// and contain only letters (`[A-Za-z]`), numbers (`[0-9]`), dashes (`-`),
+    /// underscores (`_`), periods (`.`), tildes (`~`), plus (`+`) or percent
+    /// signs (`%`). It must be between 3 and 255 characters in length, and it
+    /// must not start with `"goog"`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -2034,7 +2272,9 @@ impl<'a, C, A> ProjectTopicTestIamPermissionCall<'a, C, A> where C: BorrowMut<hy
         self._request = new_value;
         self
     }
-    /// REQUIRED: The resource for which the policy detail is being requested. `resource` is usually specified as a path, such as `projects/*project*/zones/*zone*/disks/*disk*`. The format for the path specified in this value is resource specific and is specified in the `testIamPermissions` documentation.
+    /// REQUIRED: The resource for which the policy detail is being requested.
+    /// `resource` is usually specified as a path. For example, a Project
+    /// resource is specified as `projects/{project}`.
     ///
     /// Sets the *resource* path property to the given value.
     ///
@@ -2102,7 +2342,12 @@ impl<'a, C, A> ProjectTopicTestIamPermissionCall<'a, C, A> where C: BorrowMut<hy
 }
 
 
-/// Modifies the `PushConfig` for a specified subscription. This may be used to change a push subscription to a pull one (signified by an empty `PushConfig`) or vice versa, or change the endpoint URL and other attributes of a push subscription. Messages will accumulate for delivery continuously through the call regardless of changes to the `PushConfig`.
+/// Modifies the `PushConfig` for a specified subscription.
+/// 
+/// This may be used to change a push subscription to a pull one (signified by
+/// an empty `PushConfig`) or vice versa, or change the endpoint URL and other
+/// attributes of a push subscription. Messages will accumulate for delivery
+/// continuously through the call regardless of changes to the `PushConfig`.
 ///
 /// A builder for the *subscriptions.modifyPushConfig* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -2378,7 +2623,9 @@ impl<'a, C, A> ProjectSubscriptionModifyPushConfigCall<'a, C, A> where C: Borrow
 }
 
 
-/// Adds one or more messages to the topic. Returns `NOT_FOUND` if the topic does not exist. The message payload must not be empty; it must contain either a non-empty data field, or at least one attribute.
+/// Adds one or more messages to the topic. Returns `NOT_FOUND` if the topic
+/// does not exist. The message payload must not be empty; it must contain
+///  either a non-empty data field, or at least one attribute.
 ///
 /// A builder for the *topics.publish* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -2899,7 +3146,9 @@ impl<'a, C, A> ProjectTopicGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 }
 
 
-/// Gets the access control policy for a `resource`. Returns an empty policy if the resource exists and does not have a policy set.
+/// Gets the access control policy for a resource.
+/// Returns an empty policy if the resource exists and does not have a policy
+/// set.
 ///
 /// A builder for the *topics.getIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -3076,7 +3325,9 @@ impl<'a, C, A> ProjectTopicGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
-    /// REQUIRED: The resource for which the policy is being requested. `resource` is usually specified as a path, such as `projects/*project*/zones/*zone*/disks/*disk*`. The format for the path specified in this value is resource specific and is specified in the `getIamPolicy` documentation.
+    /// REQUIRED: The resource for which the policy is being requested.
+    /// `resource` is usually specified as a path. For example, a Project
+    /// resource is specified as `projects/{project}`.
     ///
     /// Sets the *resource* path property to the given value.
     ///
@@ -3144,7 +3395,11 @@ impl<'a, C, A> ProjectTopicGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
 }
 
 
-/// Modifies the ack deadline for a specific message. This method is useful to indicate that more time is needed to process a message by the subscriber, or to make the message available for redelivery if the processing was interrupted.
+/// Modifies the ack deadline for a specific message. This method is useful
+/// to indicate that more time is needed to process a message by the
+/// subscriber, or to make the message available for redelivery if the
+/// processing was interrupted. Note that this does not modify the
+/// subscription-level `ackDeadlineSeconds` used for subsequent messages.
 ///
 /// A builder for the *subscriptions.modifyAckDeadline* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -3420,7 +3675,11 @@ impl<'a, C, A> ProjectSubscriptionModifyAckDeadlineCall<'a, C, A> where C: Borro
 }
 
 
-/// Deletes an existing subscription. All pending messages in the subscription are immediately dropped. Calls to `Pull` after deletion will return `NOT_FOUND`. After a subscription is deleted, a new one may be created with the same name, but the new one has no association with the old subscription, or its topic unless the same topic is specified.
+/// Deletes an existing subscription. All pending messages in the subscription
+/// are immediately dropped. Calls to `Pull` after deletion will return
+/// `NOT_FOUND`. After a subscription is deleted, a new one may be created with
+/// the same name, but the new one has no association with the old
+/// subscription, or its topic unless the same topic is specified.
 ///
 /// A builder for the *subscriptions.delete* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -3665,7 +3924,8 @@ impl<'a, C, A> ProjectSubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper:
 }
 
 
-/// Sets the access control policy on the specified resource. Replaces any existing policy.
+/// Sets the access control policy on the specified resource. Replaces any
+/// existing policy.
 ///
 /// A builder for the *topics.setIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -3873,7 +4133,9 @@ impl<'a, C, A> ProjectTopicSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
         self._request = new_value;
         self
     }
-    /// REQUIRED: The resource for which the policy is being specified. `resource` is usually specified as a path, such as `projects/*project*/zones/*zone*/disks/*disk*`. The format for the path specified in this value is resource specific and is specified in the `setIamPolicy` documentation.
+    /// REQUIRED: The resource for which the policy is being specified.
+    /// `resource` is usually specified as a path. For example, a Project
+    /// resource is specified as `projects/{project}`.
     ///
     /// Sets the *resource* path property to the given value.
     ///
@@ -3941,7 +4203,13 @@ impl<'a, C, A> ProjectTopicSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
 }
 
 
-/// Creates a subscription to a given topic. If the subscription already exists, returns `ALREADY_EXISTS`. If the corresponding topic doesn't exist, returns `NOT_FOUND`. If the name is not provided in the request, the server will assign a random name for this subscription on the same project as the topic.
+/// Creates a subscription to a given topic.
+/// If the subscription already exists, returns `ALREADY_EXISTS`.
+/// If the corresponding topic doesn't exist, returns `NOT_FOUND`.
+/// 
+/// If the name is not provided in the request, the server will assign a random
+/// name for this subscription on the same project as the topic. Note that
+/// for REST API requests, you must specify a name.
 ///
 /// A builder for the *subscriptions.create* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -4149,7 +4417,12 @@ impl<'a, C, A> ProjectSubscriptionCreateCall<'a, C, A> where C: BorrowMut<hyper:
         self._request = new_value;
         self
     }
-    /// The name of the subscription. It must have the format `"projects/{project}/subscriptions/{subscription}"`. `{subscription}` must start with a letter, and contain only letters (`[A-Za-z]`), numbers (`[0-9]`), dashes (`-`), underscores (`_`), periods (`.`), tildes (`~`), plus (`+`) or percent signs (`%`). It must be between 3 and 255 characters in length, and it must not start with `"goog"`.
+    /// The name of the subscription. It must have the format
+    /// `"projects/{project}/subscriptions/{subscription}"`. `{subscription}` must
+    /// start with a letter, and contain only letters (`[A-Za-z]`), numbers
+    /// (`[0-9]`), dashes (`-`), underscores (`_`), periods (`.`), tildes (`~`),
+    /// plus (`+`) or percent signs (`%`). It must be between 3 and 255 characters
+    /// in length, and it must not start with `"goog"`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -4217,7 +4490,13 @@ impl<'a, C, A> ProjectSubscriptionCreateCall<'a, C, A> where C: BorrowMut<hyper:
 }
 
 
-/// Acknowledges the messages associated with the `ack_ids` in the `AcknowledgeRequest`. The Pub/Sub system can remove the relevant messages from the subscription. Acknowledging a message whose ack deadline has expired may succeed, but such a message may be redelivered later. Acknowledging a message more than once will not result in an error.
+/// Acknowledges the messages associated with the `ack_ids` in the
+/// `AcknowledgeRequest`. The Pub/Sub system can remove the relevant messages
+/// from the subscription.
+/// 
+/// Acknowledging a message whose ack deadline has expired may succeed,
+/// but such a message may be redelivered later. Acknowledging a message more
+/// than once will not result in an error.
 ///
 /// A builder for the *subscriptions.acknowledge* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -4493,7 +4772,9 @@ impl<'a, C, A> ProjectSubscriptionAcknowledgeCall<'a, C, A> where C: BorrowMut<h
 }
 
 
-/// Gets the access control policy for a `resource`. Returns an empty policy if the resource exists and does not have a policy set.
+/// Gets the access control policy for a resource.
+/// Returns an empty policy if the resource exists and does not have a policy
+/// set.
 ///
 /// A builder for the *subscriptions.getIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -4670,7 +4951,9 @@ impl<'a, C, A> ProjectSubscriptionGetIamPolicyCall<'a, C, A> where C: BorrowMut<
     }
 
 
-    /// REQUIRED: The resource for which the policy is being requested. `resource` is usually specified as a path, such as `projects/*project*/zones/*zone*/disks/*disk*`. The format for the path specified in this value is resource specific and is specified in the `getIamPolicy` documentation.
+    /// REQUIRED: The resource for which the policy is being requested.
+    /// `resource` is usually specified as a path. For example, a Project
+    /// resource is specified as `projects/{project}`.
     ///
     /// Sets the *resource* path property to the given value.
     ///
@@ -4946,7 +5229,9 @@ impl<'a, C, A> ProjectSubscriptionTestIamPermissionCall<'a, C, A> where C: Borro
         self._request = new_value;
         self
     }
-    /// REQUIRED: The resource for which the policy detail is being requested. `resource` is usually specified as a path, such as `projects/*project*/zones/*zone*/disks/*disk*`. The format for the path specified in this value is resource specific and is specified in the `testIamPermissions` documentation.
+    /// REQUIRED: The resource for which the policy detail is being requested.
+    /// `resource` is usually specified as a path. For example, a Project
+    /// resource is specified as `projects/{project}`.
     ///
     /// Sets the *resource* path property to the given value.
     ///
@@ -5014,7 +5299,11 @@ impl<'a, C, A> ProjectSubscriptionTestIamPermissionCall<'a, C, A> where C: Borro
 }
 
 
-/// Deletes the topic with the given name. Returns `NOT_FOUND` if the topic does not exist. After a topic is deleted, a new topic may be created with the same name; this is an entirely new topic with none of the old configuration or subscriptions. Existing subscriptions to this topic are not deleted, but their `topic` field is set to `_deleted-topic_`.
+/// Deletes the topic with the given name. Returns `NOT_FOUND` if the topic
+/// does not exist. After a topic is deleted, a new topic may be created with
+/// the same name; this is an entirely new topic with none of the old
+/// configuration or subscriptions. Existing subscriptions to this topic are
+/// not deleted, but their `topic` field is set to `_deleted-topic_`.
 ///
 /// A builder for the *topics.delete* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -5701,7 +5990,9 @@ impl<'a, C, A> ProjectTopicSubscriptionListCall<'a, C, A> where C: BorrowMut<hyp
         self._topic = new_value.to_string();
         self
     }
-    /// The value returned by the last `ListTopicSubscriptionsResponse`; indicates that this is a continuation of a prior `ListTopicSubscriptions` call, and that the system should return the next page of data.
+    /// The value returned by the last `ListTopicSubscriptionsResponse`; indicates
+    /// that this is a continuation of a prior `ListTopicSubscriptions` call, and
+    /// that the system should return the next page of data.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ProjectTopicSubscriptionListCall<'a, C, A> {
@@ -5970,7 +6261,9 @@ impl<'a, C, A> ProjectSubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::C
         self._project = new_value.to_string();
         self
     }
-    /// The value returned by the last `ListSubscriptionsResponse`; indicates that this is a continuation of a prior `ListSubscriptions` call, and that the system should return the next page of data.
+    /// The value returned by the last `ListSubscriptionsResponse`; indicates that
+    /// this is a continuation of a prior `ListSubscriptions` call, and that the
+    /// system should return the next page of data.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ProjectSubscriptionListCall<'a, C, A> {
@@ -6042,7 +6335,8 @@ impl<'a, C, A> ProjectSubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::C
 }
 
 
-/// Sets the access control policy on the specified resource. Replaces any existing policy.
+/// Sets the access control policy on the specified resource. Replaces any
+/// existing policy.
 ///
 /// A builder for the *subscriptions.setIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -6250,7 +6544,9 @@ impl<'a, C, A> ProjectSubscriptionSetIamPolicyCall<'a, C, A> where C: BorrowMut<
         self._request = new_value;
         self
     }
-    /// REQUIRED: The resource for which the policy is being specified. `resource` is usually specified as a path, such as `projects/*project*/zones/*zone*/disks/*disk*`. The format for the path specified in this value is resource specific and is specified in the `setIamPolicy` documentation.
+    /// REQUIRED: The resource for which the policy is being specified.
+    /// `resource` is usually specified as a path. For example, a Project
+    /// resource is specified as `projects/{project}`.
     ///
     /// Sets the *resource* path property to the given value.
     ///

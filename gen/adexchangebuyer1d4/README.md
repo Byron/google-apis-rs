@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-adexchangebuyer1d4` library allows access to all features of the *Google Ad Exchange Buyer* service.
 
-This documentation was generated from *Ad Exchange Buyer* crate version *1.0.0+20160831*, where *20160831* is the exact revision of the *adexchangebuyer:v1.4* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
+This documentation was generated from *Ad Exchange Buyer* crate version *1.0.0+20161020*, where *20161020* is the exact revision of the *adexchangebuyer:v1.4* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
 
 Everything else about the *Ad Exchange Buyer* *v1d4* API can be found at the
 [official documentation site](https://developers.google.com/ad-exchange/buyer-rest).
@@ -20,7 +20,7 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
 * [budget](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d4/struct.Budget.html)
  * [*get*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d4/struct.BudgetGetCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d4/struct.BudgetPatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d4/struct.BudgetUpdateCall.html)
 * [creatives](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d4/struct.Creative.html)
- * [*add deal*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d4/struct.CreativeAddDealCall.html), [*get*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d4/struct.CreativeGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d4/struct.CreativeInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d4/struct.CreativeListCall.html) and [*remove deal*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d4/struct.CreativeRemoveDealCall.html)
+ * [*add deal*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d4/struct.CreativeAddDealCall.html), [*get*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d4/struct.CreativeGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d4/struct.CreativeInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d4/struct.CreativeListCall.html), [*list deals*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d4/struct.CreativeListDealCall.html) and [*remove deal*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d4/struct.CreativeRemoveDealCall.html)
 * marketplacedeals
  * [*delete*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d4/struct.MarketplacedealDeleteCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d4/struct.MarketplacedealInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d4/struct.MarketplacedealListCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d4/struct.MarketplacedealUpdateCall.html)
 * marketplacenotes
@@ -69,12 +69,12 @@ let r = hub.resource().activity(...).doit()
 Or specifically ...
 
 ```ignore
-let r = hub.proposals().update(...).doit()
-let r = hub.proposals().search(...).doit()
-let r = hub.proposals().insert(...).doit()
-let r = hub.proposals().setupcomplete(...).doit()
-let r = hub.proposals().patch(...).doit()
-let r = hub.proposals().get(...).doit()
+let r = hub.creatives().add_deal(...).doit()
+let r = hub.creatives().insert(...).doit()
+let r = hub.creatives().list(...).doit()
+let r = hub.creatives().list_deals(...).doit()
+let r = hub.creatives().remove_deal(...).doit()
+let r = hub.creatives().get(...).doit()
 ```
 
 The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -99,7 +99,6 @@ google-adexchangebuyer1d4 = "*"
 extern crate hyper;
 extern crate yup_oauth2 as oauth2;
 extern crate google_adexchangebuyer1d4 as adexchangebuyer1d4;
-use adexchangebuyer1d4::Proposal;
 use adexchangebuyer1d4::{Result, Error};
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -117,15 +116,16 @@ let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
                               hyper::Client::new(),
                               <MemoryStorage as Default>::default(), None);
 let mut hub = AdExchangeBuyer::new(hyper::Client::new(), auth);
-// As the method needs a request, you would usually fill it with the desired information
-// into the respective structure. Some of the parts shown here might not be applicable !
-// Values shown here are possibly random and not representative !
-let mut req = Proposal::default();
-
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
-let result = hub.proposals().update(req, "proposalId", "revisionNumber", "updateAction")
+let result = hub.creatives().list()
+             .page_token("eirmod")
+             .open_auction_status_filter("sit")
+             .max_results(36)
+             .deals_status_filter("sed")
+             .add_buyer_creative_id("et")
+             .add_account_id(-18)
              .doit();
 
 match result {

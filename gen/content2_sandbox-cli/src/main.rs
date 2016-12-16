@@ -1357,7 +1357,7 @@ fn main() {
     let arg_data = [
         ("orders", "methods: 'acknowledge', 'advancetestorder', 'cancel', 'cancellineitem', 'createtestorder', 'custombatch', 'get', 'getbymerchantorderid', 'gettestordertemplate', 'list', 'refund', 'returnlineitem', 'shiplineitems', 'updatemerchantorderid' and 'updateshipment'", vec![
             ("acknowledge",
-                    Some(r##"Marks an order as acknowledged."##),
+                    Some(r##"Marks an order as acknowledged. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_sandbox_cli/orders_acknowledge",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -1391,7 +1391,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("advancetestorder",
-                    Some(r##"Sandbox only. Moves a test order from state "inProgress" to state "pendingShipment"."##),
+                    Some(r##"Sandbox only. Moves a test order from state "inProgress" to state "pendingShipment". This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_sandbox_cli/orders_advancetestorder",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -1419,7 +1419,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("cancel",
-                    Some(r##"Cancels all line items in an order."##),
+                    Some(r##"Cancels all line items in an order. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_sandbox_cli/orders_cancel",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -1453,7 +1453,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("cancellineitem",
-                    Some(r##"Cancels a line item."##),
+                    Some(r##"Cancels a line item. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_sandbox_cli/orders_cancellineitem",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -1487,7 +1487,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("createtestorder",
-                    Some(r##"Sandbox only. Creates a test order."##),
+                    Some(r##"Sandbox only. Creates a test order. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_sandbox_cli/orders_createtestorder",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -1515,7 +1515,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("custombatch",
-                    Some(r##"Retrieves or modifies multiple orders in a single request."##),
+                    Some(r##"Retrieves or modifies multiple orders in a single request. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_sandbox_cli/orders_custombatch",
                   vec![
                     (Some(r##"kv"##),
@@ -1537,7 +1537,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Retrieves an order from your Merchant Center account."##),
+                    Some(r##"Retrieves an order from your Merchant Center account. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_sandbox_cli/orders_get",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -1565,7 +1565,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("getbymerchantorderid",
-                    Some(r##"Retrieves an order using merchant order id."##),
+                    Some(r##"Retrieves an order using merchant order id. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_sandbox_cli/orders_getbymerchantorderid",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -1593,7 +1593,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("gettestordertemplate",
-                    Some(r##"Sandbox only. Retrieves an order template that can be used to quickly create a new order in sandbox."##),
+                    Some(r##"Sandbox only. Retrieves an order template that can be used to quickly create a new order in sandbox. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_sandbox_cli/orders_gettestordertemplate",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -1621,7 +1621,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Lists the orders in your Merchant Center account."##),
+                    Some(r##"Lists the orders in your Merchant Center account. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_sandbox_cli/orders_list",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -1643,7 +1643,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("refund",
-                    Some(r##"Refund a portion of the order, up to the full amount paid."##),
+                    Some(r##"Refund a portion of the order, up to the full amount paid. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_sandbox_cli/orders_refund",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -1677,7 +1677,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("returnlineitem",
-                    Some(r##"Returns a line item."##),
+                    Some(r##"Returns a line item. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_sandbox_cli/orders_returnlineitem",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -1711,7 +1711,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("shiplineitems",
-                    Some(r##"Marks line item(s) as shipped."##),
+                    Some(r##"Marks line item(s) as shipped. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_sandbox_cli/orders_shiplineitems",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -1745,7 +1745,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("updatemerchantorderid",
-                    Some(r##"Updates the merchant order ID for a given order."##),
+                    Some(r##"Updates the merchant order ID for a given order. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_sandbox_cli/orders_updatemerchantorderid",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -1779,7 +1779,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("updateshipment",
-                    Some(r##"Updates a shipment's status, carrier, and/or tracking ID."##),
+                    Some(r##"Updates a shipment's status, carrier, and/or tracking ID. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_sandbox_cli/orders_updateshipment",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -1818,7 +1818,7 @@ fn main() {
     
     let mut app = App::new("content2-sandbox")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.0+20160905")
+           .version("1.0.0+20161205")
            .about("Manages product items, inventory, and Merchant Center accounts for Google Shopping.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_content2_sandbox_cli")
            .arg(Arg::with_name("url")

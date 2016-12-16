@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *SQL Admin* API at revision *20160907*. The CLI is at version *1.0.0*.
+This documentation was generated from the *SQL Admin* API at revision *20161213*. The CLI is at version *1.0.0*.
 
 ```bash
 sqladmin1-beta4 [options]
@@ -58,6 +58,7 @@ sqladmin1-beta4 [options]
                 restore-backup <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
                 start-replica <project> <instance> [-p <v>]... [-o <out>]
                 stop-replica <project> <instance> [-p <v>]... [-o <out>]
+                truncate-log <project> <instance> <log-type> [-p <v>]... [-o <out>]
                 update <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
         operations
                 get <project> <operation> [-p <v>]... [-o <out>]

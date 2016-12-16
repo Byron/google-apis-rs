@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-identitytoolkit3` library allows access to all features of the *Google Identity Toolkit* service.
 
-This documentation was generated from *Identity Toolkit* crate version *1.0.0+20160812*, where *20160812* is the exact revision of the *identitytoolkit:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
+This documentation was generated from *Identity Toolkit* crate version *1.0.0+20161206*, where *20161206* is the exact revision of the *identitytoolkit:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
 
 Everything else about the *Identity Toolkit* *v3* API can be found at the
 [official documentation site](https://developers.google.com/identity-toolkit/v3/).

@@ -1,19 +1,19 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"C5oy1hgQsABtYOYIOXWcR3BgYqU/2hS1oj5mcs8B_DQH58VCjwk6FdI\"",
+ "etag": "\"tbys6C40o18GZwyMen5GMkdK-3s/FTHpccTXwX59pwtPpjnvwTyvahc\"",
  "discoveryVersion": "v1",
  "id": "toolresults:v1beta3",
  "name": "toolresults",
  "canonicalName": "Tool Results",
  "version": "v1beta3",
- "revision": "20160908",
+ "revision": "20161214",
  "title": "Cloud Tool Results API",
  "description": "Reads and publishes results from Cloud Test Lab.",
  "ownerDomain": "google.com",
  "ownerName": "Google",
  "icons": {
-  "x16": "http://www.google.com/images/icons/product/search-16.gif",
-  "x32": "http://www.google.com/images/icons/product/search-32.gif"
+  "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
+  "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
  },
  "documentationLink": "https://developers.google.com/cloud-test-lab/",
  "protocol": "rest",

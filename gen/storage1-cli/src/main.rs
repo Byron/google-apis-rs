@@ -626,7 +626,6 @@ impl<'n> Engine<'n> {
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "time-created" => Some(("timeCreated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location" => Some(("location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "encryption.default-kms-key-name" => Some(("encryption.default_kms_key_name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "project-number" => Some(("projectNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metageneration" => Some(("metageneration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -637,7 +636,7 @@ impl<'n> Engine<'n> {
                     "versioning.enabled" => Some(("versioning.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "storage-class" => Some(("storageClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["default-kms-key-name", "enabled", "encryption", "entity", "entity-id", "etag", "id", "kind", "location", "log-bucket", "log-object-prefix", "logging", "main-page-suffix", "metageneration", "name", "not-found-page", "owner", "project-number", "self-link", "storage-class", "time-created", "updated", "versioning", "website"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["enabled", "entity", "entity-id", "etag", "id", "kind", "location", "log-bucket", "log-object-prefix", "logging", "main-page-suffix", "metageneration", "name", "not-found-page", "owner", "project-number", "self-link", "storage-class", "time-created", "updated", "versioning", "website"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -804,7 +803,6 @@ impl<'n> Engine<'n> {
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "time-created" => Some(("timeCreated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location" => Some(("location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "encryption.default-kms-key-name" => Some(("encryption.default_kms_key_name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "project-number" => Some(("projectNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metageneration" => Some(("metageneration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -815,7 +813,7 @@ impl<'n> Engine<'n> {
                     "versioning.enabled" => Some(("versioning.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "storage-class" => Some(("storageClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["default-kms-key-name", "enabled", "encryption", "entity", "entity-id", "etag", "id", "kind", "location", "log-bucket", "log-object-prefix", "logging", "main-page-suffix", "metageneration", "name", "not-found-page", "owner", "project-number", "self-link", "storage-class", "time-created", "updated", "versioning", "website"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["enabled", "entity", "entity-id", "etag", "id", "kind", "location", "log-bucket", "log-object-prefix", "logging", "main-page-suffix", "metageneration", "name", "not-found-page", "owner", "project-number", "self-link", "storage-class", "time-created", "updated", "versioning", "website"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -923,7 +921,6 @@ impl<'n> Engine<'n> {
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "time-created" => Some(("timeCreated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location" => Some(("location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "encryption.default-kms-key-name" => Some(("encryption.default_kms_key_name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "project-number" => Some(("projectNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metageneration" => Some(("metageneration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -934,7 +931,7 @@ impl<'n> Engine<'n> {
                     "versioning.enabled" => Some(("versioning.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "storage-class" => Some(("storageClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["default-kms-key-name", "enabled", "encryption", "entity", "entity-id", "etag", "id", "kind", "location", "log-bucket", "log-object-prefix", "logging", "main-page-suffix", "metageneration", "name", "not-found-page", "owner", "project-number", "self-link", "storage-class", "time-created", "updated", "versioning", "website"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["enabled", "entity", "entity-id", "etag", "id", "kind", "location", "log-bucket", "log-object-prefix", "logging", "main-page-suffix", "metageneration", "name", "not-found-page", "owner", "project-number", "self-link", "storage-class", "time-created", "updated", "versioning", "website"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2038,7 +2035,6 @@ impl<'n> Engine<'n> {
                     "destination.generation" => Some(("destination.generation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination.component-count" => Some(("destination.componentCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "destination.media-link" => Some(("destination.mediaLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "destination.kms-key-name" => Some(("destination.kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination.owner.entity-id" => Some(("destination.owner.entityId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination.owner.entity" => Some(("destination.owner.entity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination.cache-control" => Some(("destination.cacheControl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2057,6 +2053,7 @@ impl<'n> Engine<'n> {
                     "destination.customer-encryption.encryption-algorithm" => Some(("destination.customerEncryption.encryptionAlgorithm", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination.customer-encryption.key-sha256" => Some(("destination.customerEncryption.keySha256", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination.metageneration" => Some(("destination.metageneration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "destination.time-storage-class-updated" => Some(("destination.timeStorageClassUpdated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination.kind" => Some(("destination.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination.name" => Some(("destination.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination.bucket" => Some(("destination.bucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2064,7 +2061,7 @@ impl<'n> Engine<'n> {
                     "destination.storage-class" => Some(("destination.storageClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination.self-link" => Some(("destination.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bucket", "cache-control", "component-count", "content-disposition", "content-encoding", "content-language", "content-type", "crc32c", "customer-encryption", "destination", "encryption-algorithm", "entity", "entity-id", "etag", "generation", "id", "key-sha256", "kind", "kms-key-name", "md5-hash", "media-link", "metadata", "metageneration", "name", "owner", "self-link", "size", "storage-class", "time-created", "time-deleted", "updated"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bucket", "cache-control", "component-count", "content-disposition", "content-encoding", "content-language", "content-type", "crc32c", "customer-encryption", "destination", "encryption-algorithm", "entity", "entity-id", "etag", "generation", "id", "key-sha256", "kind", "md5-hash", "media-link", "metadata", "metageneration", "name", "owner", "self-link", "size", "storage-class", "time-created", "time-deleted", "time-storage-class-updated", "updated"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2079,9 +2076,6 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "kms-key-name" => {
-                    call = call.kms_key_name(value.unwrap_or(""));
-                },
                 "if-metageneration-match" => {
                     call = call.if_metageneration_match(value.unwrap_or(""));
                 },
@@ -2107,7 +2101,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["if-metageneration-match", "if-generation-match", "destination-predefined-acl", "kms-key-name"].iter().map(|v|*v));
+                                                                           v.extend(["if-metageneration-match", "if-generation-match", "destination-predefined-acl"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2172,7 +2166,6 @@ impl<'n> Engine<'n> {
                     "generation" => Some(("generation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "component-count" => Some(("componentCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "media-link" => Some(("mediaLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "kms-key-name" => Some(("kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "owner.entity-id" => Some(("owner.entityId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "owner.entity" => Some(("owner.entity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cache-control" => Some(("cacheControl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2191,6 +2184,7 @@ impl<'n> Engine<'n> {
                     "customer-encryption.encryption-algorithm" => Some(("customerEncryption.encryptionAlgorithm", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "customer-encryption.key-sha256" => Some(("customerEncryption.keySha256", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metageneration" => Some(("metageneration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "time-storage-class-updated" => Some(("timeStorageClassUpdated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "bucket" => Some(("bucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2198,7 +2192,7 @@ impl<'n> Engine<'n> {
                     "storage-class" => Some(("storageClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bucket", "cache-control", "component-count", "content-disposition", "content-encoding", "content-language", "content-type", "crc32c", "customer-encryption", "encryption-algorithm", "entity", "entity-id", "etag", "generation", "id", "key-sha256", "kind", "kms-key-name", "md5-hash", "media-link", "metadata", "metageneration", "name", "owner", "self-link", "size", "storage-class", "time-created", "time-deleted", "updated"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bucket", "cache-control", "component-count", "content-disposition", "content-encoding", "content-language", "content-type", "crc32c", "customer-encryption", "encryption-algorithm", "entity", "entity-id", "etag", "generation", "id", "key-sha256", "kind", "md5-hash", "media-link", "metadata", "metageneration", "name", "owner", "self-link", "size", "storage-class", "time-created", "time-deleted", "time-storage-class-updated", "updated"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2467,7 +2461,6 @@ impl<'n> Engine<'n> {
                     "generation" => Some(("generation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "component-count" => Some(("componentCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "media-link" => Some(("mediaLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "kms-key-name" => Some(("kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "owner.entity-id" => Some(("owner.entityId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "owner.entity" => Some(("owner.entity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cache-control" => Some(("cacheControl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2486,6 +2479,7 @@ impl<'n> Engine<'n> {
                     "customer-encryption.encryption-algorithm" => Some(("customerEncryption.encryptionAlgorithm", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "customer-encryption.key-sha256" => Some(("customerEncryption.keySha256", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metageneration" => Some(("metageneration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "time-storage-class-updated" => Some(("timeStorageClassUpdated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "bucket" => Some(("bucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2493,7 +2487,7 @@ impl<'n> Engine<'n> {
                     "storage-class" => Some(("storageClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bucket", "cache-control", "component-count", "content-disposition", "content-encoding", "content-language", "content-type", "crc32c", "customer-encryption", "encryption-algorithm", "entity", "entity-id", "etag", "generation", "id", "key-sha256", "kind", "kms-key-name", "md5-hash", "media-link", "metadata", "metageneration", "name", "owner", "self-link", "size", "storage-class", "time-created", "time-deleted", "updated"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bucket", "cache-control", "component-count", "content-disposition", "content-encoding", "content-language", "content-type", "crc32c", "customer-encryption", "encryption-algorithm", "entity", "entity-id", "etag", "generation", "id", "key-sha256", "kind", "md5-hash", "media-link", "metadata", "metageneration", "name", "owner", "self-link", "size", "storage-class", "time-created", "time-deleted", "time-storage-class-updated", "updated"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2515,9 +2509,6 @@ impl<'n> Engine<'n> {
                 },
                 "name" => {
                     call = call.name(value.unwrap_or(""));
-                },
-                "kms-key-name" => {
-                    call = call.kms_key_name(value.unwrap_or(""));
                 },
                 "if-metageneration-not-match" => {
                     call = call.if_metageneration_not_match(value.unwrap_or(""));
@@ -2547,7 +2538,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["if-generation-match", "projection", "if-metageneration-match", "content-encoding", "if-generation-not-match", "kms-key-name", "predefined-acl", "if-metageneration-not-match", "name"].iter().map(|v|*v));
+                                                                           v.extend(["if-generation-match", "if-generation-not-match", "content-encoding", "if-metageneration-match", "name", "predefined-acl", "if-metageneration-not-match", "projection"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2684,7 +2675,6 @@ impl<'n> Engine<'n> {
                     "generation" => Some(("generation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "component-count" => Some(("componentCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "media-link" => Some(("mediaLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "kms-key-name" => Some(("kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "owner.entity-id" => Some(("owner.entityId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "owner.entity" => Some(("owner.entity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cache-control" => Some(("cacheControl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2703,6 +2693,7 @@ impl<'n> Engine<'n> {
                     "customer-encryption.encryption-algorithm" => Some(("customerEncryption.encryptionAlgorithm", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "customer-encryption.key-sha256" => Some(("customerEncryption.keySha256", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metageneration" => Some(("metageneration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "time-storage-class-updated" => Some(("timeStorageClassUpdated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "bucket" => Some(("bucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2710,7 +2701,7 @@ impl<'n> Engine<'n> {
                     "storage-class" => Some(("storageClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bucket", "cache-control", "component-count", "content-disposition", "content-encoding", "content-language", "content-type", "crc32c", "customer-encryption", "encryption-algorithm", "entity", "entity-id", "etag", "generation", "id", "key-sha256", "kind", "kms-key-name", "md5-hash", "media-link", "metadata", "metageneration", "name", "owner", "self-link", "size", "storage-class", "time-created", "time-deleted", "updated"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bucket", "cache-control", "component-count", "content-disposition", "content-encoding", "content-language", "content-type", "crc32c", "customer-encryption", "encryption-algorithm", "entity", "entity-id", "etag", "generation", "id", "key-sha256", "kind", "md5-hash", "media-link", "metadata", "metageneration", "name", "owner", "self-link", "size", "storage-class", "time-created", "time-deleted", "time-storage-class-updated", "updated"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2818,7 +2809,6 @@ impl<'n> Engine<'n> {
                     "generation" => Some(("generation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "component-count" => Some(("componentCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "media-link" => Some(("mediaLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "kms-key-name" => Some(("kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "owner.entity-id" => Some(("owner.entityId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "owner.entity" => Some(("owner.entity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cache-control" => Some(("cacheControl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2837,6 +2827,7 @@ impl<'n> Engine<'n> {
                     "customer-encryption.encryption-algorithm" => Some(("customerEncryption.encryptionAlgorithm", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "customer-encryption.key-sha256" => Some(("customerEncryption.keySha256", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metageneration" => Some(("metageneration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "time-storage-class-updated" => Some(("timeStorageClassUpdated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "bucket" => Some(("bucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2844,7 +2835,7 @@ impl<'n> Engine<'n> {
                     "storage-class" => Some(("storageClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bucket", "cache-control", "component-count", "content-disposition", "content-encoding", "content-language", "content-type", "crc32c", "customer-encryption", "encryption-algorithm", "entity", "entity-id", "etag", "generation", "id", "key-sha256", "kind", "kms-key-name", "md5-hash", "media-link", "metadata", "metageneration", "name", "owner", "self-link", "size", "storage-class", "time-created", "time-deleted", "updated"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bucket", "cache-control", "component-count", "content-disposition", "content-encoding", "content-language", "content-type", "crc32c", "customer-encryption", "encryption-algorithm", "entity", "entity-id", "etag", "generation", "id", "key-sha256", "kind", "md5-hash", "media-link", "metadata", "metageneration", "name", "owner", "self-link", "size", "storage-class", "time-created", "time-deleted", "time-storage-class-updated", "updated"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2897,9 +2888,6 @@ impl<'n> Engine<'n> {
                 "destination-predefined-acl" => {
                     call = call.destination_predefined_acl(value.unwrap_or(""));
                 },
-                "destination-kms-key-name" => {
-                    call = call.destination_kms_key_name(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2913,7 +2901,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["if-source-generation-match", "if-generation-match", "projection", "if-source-metageneration-not-match", "destination-kms-key-name", "if-metageneration-not-match", "source-generation", "max-bytes-rewritten-per-call", "if-source-generation-not-match", "destination-predefined-acl", "if-source-metageneration-match", "rewrite-token", "if-metageneration-match", "if-generation-not-match"].iter().map(|v|*v));
+                                                                           v.extend(["if-source-generation-match", "if-generation-match", "projection", "if-source-metageneration-not-match", "if-metageneration-not-match", "source-generation", "max-bytes-rewritten-per-call", "if-source-generation-not-match", "destination-predefined-acl", "if-source-metageneration-match", "rewrite-token", "if-metageneration-match", "if-generation-not-match"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2973,7 +2961,6 @@ impl<'n> Engine<'n> {
                     "generation" => Some(("generation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "component-count" => Some(("componentCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "media-link" => Some(("mediaLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "kms-key-name" => Some(("kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "owner.entity-id" => Some(("owner.entityId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "owner.entity" => Some(("owner.entity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cache-control" => Some(("cacheControl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2992,6 +2979,7 @@ impl<'n> Engine<'n> {
                     "customer-encryption.encryption-algorithm" => Some(("customerEncryption.encryptionAlgorithm", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "customer-encryption.key-sha256" => Some(("customerEncryption.keySha256", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metageneration" => Some(("metageneration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "time-storage-class-updated" => Some(("timeStorageClassUpdated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "bucket" => Some(("bucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2999,7 +2987,7 @@ impl<'n> Engine<'n> {
                     "storage-class" => Some(("storageClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bucket", "cache-control", "component-count", "content-disposition", "content-encoding", "content-language", "content-type", "crc32c", "customer-encryption", "encryption-algorithm", "entity", "entity-id", "etag", "generation", "id", "key-sha256", "kind", "kms-key-name", "md5-hash", "media-link", "metadata", "metageneration", "name", "owner", "self-link", "size", "storage-class", "time-created", "time-deleted", "updated"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bucket", "cache-control", "component-count", "content-disposition", "content-encoding", "content-language", "content-type", "crc32c", "customer-encryption", "encryption-algorithm", "entity", "entity-id", "etag", "generation", "id", "key-sha256", "kind", "md5-hash", "media-link", "metadata", "metageneration", "name", "owner", "self-link", "size", "storage-class", "time-created", "time-deleted", "time-storage-class-updated", "updated"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3705,7 +3693,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("patch",
-                    Some(r##"Updates a bucket. This method supports patch semantics."##),
+                    Some(r##"Updates a bucket. Changes to the bucket will be readable immediately after writing, but configuration changes may take time to propagate. This method supports patch semantics."##),
                     "Details at http://byron.github.io/google-apis-rs/google_storage1_cli/buckets_patch",
                   vec![
                     (Some(r##"bucket"##),
@@ -3733,7 +3721,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Updates a bucket."##),
+                    Some(r##"Updates a bucket. Changes to the bucket will be readable immediately after writing, but configuration changes may take time to propagate."##),
                     "Details at http://byron.github.io/google-apis-rs/google_storage1_cli/buckets_update",
                   vec![
                     (Some(r##"bucket"##),
@@ -4494,7 +4482,7 @@ fn main() {
     
     let mut app = App::new("storage1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.0+20160901")
+           .version("1.0.0+20161123")
            .about("Stores and retrieves potentially large, immutable data objects.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_storage1_cli")
            .arg(Arg::with_name("url")

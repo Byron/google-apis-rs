@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *DoubleClick Bid Manager* API at revision *20160608*. The CLI is at version *1.0.0*.
+This documentation was generated from the *DoubleClick Bid Manager* API at revision *20161010*. The CLI is at version *1.0.0*.
 
 ```bash
 doubleclickbidmanager1 [options]
@@ -39,8 +39,8 @@ doubleclickbidmanager1 [options]
                 runquery <query-id> (-r <kv>)... [-p <v>]...
         reports
                 listreports <query-id> [-p <v>]... [-o <out>]
-        rubicon
-                notifyproposalchange (-r <kv>)... [-p <v>]...
+        sdf
+                download (-r <kv>)... [-p <v>]... [-o <out>]
   doubleclickbidmanager1 --help
 
 Configuration:

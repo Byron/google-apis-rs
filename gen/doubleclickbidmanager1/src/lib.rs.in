@@ -122,8 +122,8 @@ impl<'a, C, A> DoubleClickBidManager<C, A>
     pub fn reports(&'a self) -> ReportMethods<'a, C, A> {
         ReportMethods { hub: &self }
     }
-    pub fn rubicon(&'a self) -> RubiconMethods<'a, C, A> {
-        RubiconMethods { hub: &self }
+    pub fn sdf(&'a self) -> SdfMethods<'a, C, A> {
+        SdfMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
@@ -141,32 +141,6 @@ impl<'a, C, A> DoubleClickBidManager<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// NotifyProposalChange request.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [notifyproposalchange rubicon](struct.RubiconNotifyproposalchangeCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct NotifyProposalChangeRequest {
-    /// Action taken by publisher. One of: Accept, Decline, Append
-    pub action: Option<String>,
-    /// Notes from publisher
-    pub notes: Option<Vec<Note>>,
-    /// URL to access proposal detail.
-    pub href: Option<String>,
-    /// Below are contents of notification from Rubicon. Proposal id.
-    pub id: Option<String>,
-    /// Deal token, available when proposal is accepted by publisher.
-    pub token: Option<String>,
-}
-
-impl RequestValue for NotifyProposalChangeRequest {}
-
-
 /// Request to fetch stored line items.
 /// 
 /// # Activities
@@ -230,27 +204,6 @@ pub struct Parameters {
 }
 
 impl Part for Parameters {}
-
-
-/// Publisher comment from Rubicon.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Note {
-    /// Publisher user name.
-    pub username: Option<String>,
-    /// Equals "publisher" for notification from Rubicon.
-    pub source: Option<String>,
-    /// Message from publisher.
-    pub message: Option<String>,
-    /// Note id.
-    pub id: Option<String>,
-    /// Time when the note was added, e.g. "2015-12-16T17:25:35.000-08:00".
-    pub timestamp: Option<String>,
-}
-
-impl Part for Note {}
 
 
 /// Key used to identify a report.
@@ -487,6 +440,33 @@ pub struct ListReportsResponse {
 impl ResponseResult for ListReportsResponse {}
 
 
+/// Request to fetch stored insertion orders, line items, TrueView ad groups and ads.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [download sdf](struct.SdfDownloadCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DownloadRequest {
+    /// File types that will be returned.
+    #[serde(rename="fileTypes")]
+    pub file_types: Option<Vec<String>>,
+    /// SDF Version (column names, types, order) in which the entities will be returned. Default to 3.
+    pub version: Option<String>,
+    /// Filter type used to filter line items to fetch.
+    #[serde(rename="filterType")]
+    pub filter_type: Option<String>,
+    /// The IDs of the specified filter type. This is used to filter entities to fetch. At least one ID must be specified. Only one ID is allowed for the ADVERTISER_ID filter type. For INSERTION_ORDER_ID or LINE_ITEM_ID filter types all IDs must be from the same Advertiser.
+    #[serde(rename="filterIds")]
+    pub filter_ids: Option<Vec<String>>,
+}
+
+impl RequestValue for DownloadRequest {}
+
+
 /// Represents the upload status of a row in the request.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -624,12 +604,39 @@ pub struct UploadStatus {
 impl Part for UploadStatus {}
 
 
+/// Download response.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [download sdf](struct.SdfDownloadCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DownloadResponse {
+    /// Retrieved insertion orders in SDF format.
+    #[serde(rename="insertionOrders")]
+    pub insertion_orders: Option<String>,
+    /// Retrieved line items in SDF format.
+    #[serde(rename="lineItems")]
+    pub line_items: Option<String>,
+    /// Retrieved ads in SDF format.
+    pub ads: Option<String>,
+    /// Retrieved ad groups in SDF format.
+    #[serde(rename="adGroups")]
+    pub ad_groups: Option<String>,
+}
+
+impl ResponseResult for DownloadResponse {}
+
+
 
 // ###################
 // MethodBuilders ###
 // #################
 
-/// A builder providing access to all methods supported on *rubicon* resources.
+/// A builder providing access to all methods supported on *sdf* resources.
 /// It is not used directly, but through the `DoubleClickBidManager` hub.
 ///
 /// # Example
@@ -652,30 +659,30 @@ impl Part for UploadStatus {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = DoubleClickBidManager::new(hyper::Client::new(), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `notifyproposalchange(...)`
+/// // like `download(...)`
 /// // to build up your call.
-/// let rb = hub.rubicon();
+/// let rb = hub.sdf();
 /// # }
 /// ```
-pub struct RubiconMethods<'a, C, A>
+pub struct SdfMethods<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a DoubleClickBidManager<C, A>,
 }
 
-impl<'a, C, A> MethodsBuilder for RubiconMethods<'a, C, A> {}
+impl<'a, C, A> MethodsBuilder for SdfMethods<'a, C, A> {}
 
-impl<'a, C, A> RubiconMethods<'a, C, A> {
+impl<'a, C, A> SdfMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Update proposal upon actions of Rubicon publisher.
+    /// Retrieves entities in SDF format.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn notifyproposalchange(&self, request: NotifyProposalChangeRequest) -> RubiconNotifyproposalchangeCall<'a, C, A> {
-        RubiconNotifyproposalchangeCall {
+    pub fn download(&self, request: DownloadRequest) -> SdfDownloadCall<'a, C, A> {
+        SdfDownloadCall {
             hub: self.hub,
             _request: request,
             _delegate: Default::default(),
@@ -940,10 +947,10 @@ impl<'a, C, A> QueryMethods<'a, C, A> {
 // CallBuilders   ###
 // #################
 
-/// Update proposal upon actions of Rubicon publisher.
+/// Retrieves entities in SDF format.
 ///
-/// A builder for the *notifyproposalchange* method supported by a *rubicon* resource.
-/// It is not used directly, but through a `RubiconMethods` instance.
+/// A builder for the *download* method supported by a *sdf* resource.
+/// It is not used directly, but through a `SdfMethods` instance.
 ///
 /// # Example
 ///
@@ -953,7 +960,7 @@ impl<'a, C, A> QueryMethods<'a, C, A> {
 /// # extern crate hyper;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_doubleclickbidmanager1 as doubleclickbidmanager1;
-/// use doubleclickbidmanager1::NotifyProposalChangeRequest;
+/// use doubleclickbidmanager1::DownloadRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -967,31 +974,31 @@ impl<'a, C, A> QueryMethods<'a, C, A> {
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = NotifyProposalChangeRequest::default();
+/// let mut req = DownloadRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.rubicon().notifyproposalchange(req)
+/// let result = hub.sdf().download(req)
 ///              .doit();
 /// # }
 /// ```
-pub struct RubiconNotifyproposalchangeCall<'a, C, A>
+pub struct SdfDownloadCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a DoubleClickBidManager<C, A>,
-    _request: NotifyProposalChangeRequest,
+    _request: DownloadRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, A> CallBuilder for RubiconNotifyproposalchangeCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for SdfDownloadCall<'a, C, A> {}
 
-impl<'a, C, A> RubiconNotifyproposalchangeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> SdfDownloadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<hyper::client::Response> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, DownloadResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -999,10 +1006,10 @@ impl<'a, C, A> RubiconNotifyproposalchangeCall<'a, C, A> where C: BorrowMut<hype
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "doubleclickbidmanager.rubicon.notifyproposalchange",
+        dlg.begin(MethodInfo { id: "doubleclickbidmanager.sdf.download",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((2 + self._additional_params.len()));
-        for &field in [].iter() {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -1012,8 +1019,9 @@ impl<'a, C, A> RubiconNotifyproposalchangeCall<'a, C, A> where C: BorrowMut<hype
             params.push((&name, value.clone()));
         }
 
+        params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/doubleclickbidmanager/v1/rubicon/notifyproposalchange".to_string();
+        let mut url = "https://www.googleapis.com/doubleclickbidmanager/v1/sdf/download".to_string();
         
         let mut key = self.hub.auth.borrow_mut().api_key();
         if key.is_none() {
@@ -1085,7 +1093,17 @@ impl<'a, C, A> RubiconNotifyproposalchangeCall<'a, C, A> where C: BorrowMut<hype
                             Ok(serr) => Err(Error::BadRequest(serr))
                         }
                     }
-                    let result_value = res;
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
 
                     dlg.finished(true);
                     return Ok(result_value)
@@ -1100,7 +1118,7 @@ impl<'a, C, A> RubiconNotifyproposalchangeCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: NotifyProposalChangeRequest) -> RubiconNotifyproposalchangeCall<'a, C, A> {
+    pub fn request(mut self, new_value: DownloadRequest) -> SdfDownloadCall<'a, C, A> {
         self._request = new_value;
         self
     }
@@ -1110,7 +1128,7 @@ impl<'a, C, A> RubiconNotifyproposalchangeCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RubiconNotifyproposalchangeCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SdfDownloadCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1131,7 +1149,7 @@ impl<'a, C, A> RubiconNotifyproposalchangeCall<'a, C, A> where C: BorrowMut<hype
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RubiconNotifyproposalchangeCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> SdfDownloadCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

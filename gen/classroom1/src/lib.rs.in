@@ -1097,6 +1097,9 @@ pub struct Course {
     /// Enrollment code to use when joining this course. Specifying this field in a course update mask results in an error. Read-only.
     #[serde(rename="enrollmentCode")]
     pub enrollment_code: Option<String>,
+    /// Whether or not guardian notifications are enabled for this course. Read-only.
+    #[serde(rename="guardiansEnabled")]
+    pub guardians_enabled: Option<bool>,
     /// The email address of a Google group containing all members of the course. This group does not accept email and can only be used for permissions. Read-only.
     #[serde(rename="courseGroupEmail")]
     pub course_group_email: Option<String>,
@@ -1562,6 +1565,7 @@ impl<'a, C, A> CourseMethods<'a, C, A> {
             _student_id: Default::default(),
             _page_token: Default::default(),
             _page_size: Default::default(),
+            _course_states: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1954,11 +1958,11 @@ impl<'a, C, A> UserProfileMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns a list of guardians that the requesting user is permitted to view, restricted to those that match the request. This method returns the following error codes: * `PERMISSION_DENIED` if a `student_id` is specified, and the requesting user is not permitted to view guardian information for that student, if guardians are not enabled for the domain in question, if the `invited_email_address` filter is set by a user who is not a domain administrator, or for other access errors. * `INVALID_ARGUMENT` if a `student_id` is specified, but its format cannot be recognized (it is not an email address, nor a `student_id` from the API, nor the literal string `me`). May also be returned if an invalid `page_token` is provided. * `NOT_FOUND` if a `student_id` is specified, and its format can be recognized, but Classroom has no record of that student.
+    /// Returns a list of guardians that the requesting user is permitted to view, restricted to those that match the request. To list guardians for any student that the requesting user may view guardians for, use the literal character `-` for the student ID. This method returns the following error codes: * `PERMISSION_DENIED` if a `student_id` is specified, and the requesting user is not permitted to view guardian information for that student, if `"-"` is specified as the `student_id` and the user is not a domain administrator, if guardians are not enabled for the domain in question, if the `invited_email_address` filter is set by a user who is not a domain administrator, or for other access errors. * `INVALID_ARGUMENT` if a `student_id` is specified, but its format cannot be recognized (it is not an email address, nor a `student_id` from the API, nor the literal string `me`). May also be returned if an invalid `page_token` is provided. * `NOT_FOUND` if a `student_id` is specified, and its format can be recognized, but Classroom has no record of that student.
     /// 
     /// # Arguments
     ///
-    /// * `studentId` - Filter results by the student who the guardian is linked to. The identifier can be one of the following: * the numeric identifier for the user * the email address of the user * the string literal `"me"`, indicating the requesting user
+    /// * `studentId` - Filter results by the student who the guardian is linked to. The identifier can be one of the following: * the numeric identifier for the user * the email address of the user * the string literal `"me"`, indicating the requesting user * the string literal `"-"`, indicating that results should be returned for all students that the requesting user has access to view.
     pub fn guardians_list(&self, student_id: &str) -> UserProfileGuardianListCall<'a, C, A> {
         UserProfileGuardianListCall {
             hub: self.hub,
@@ -1973,11 +1977,11 @@ impl<'a, C, A> UserProfileMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns a list of guardian invitations that the requesting user is permitted to view, filtered by the parameters provided. This method returns the following error codes: * `PERMISSION_DENIED` if a `student_id` is specified, and the requesting user is not permitted to view guardian invitations for that student, if guardians are not enabled for the domain in question, or for other access errors. * `INVALID_ARGUMENT` if a `student_id` is specified, but its format cannot be recognized (it is not an email address, nor a `student_id` from the API, nor the literal string `me`). May also be returned if an invalid `page_token` or `state` is provided. * `NOT_FOUND` if a `student_id` is specified, and its format can be recognized, but Classroom has no record of that student.
+    /// Returns a list of guardian invitations that the requesting user is permitted to view, filtered by the parameters provided. This method returns the following error codes: * `PERMISSION_DENIED` if a `student_id` is specified, and the requesting user is not permitted to view guardian invitations for that student, if `"-"` is specified as the `student_id` and the user is not a domain administrator, if guardians are not enabled for the domain in question, or for other access errors. * `INVALID_ARGUMENT` if a `student_id` is specified, but its format cannot be recognized (it is not an email address, nor a `student_id` from the API, nor the literal string `me`). May also be returned if an invalid `page_token` or `state` is provided. * `NOT_FOUND` if a `student_id` is specified, and its format can be recognized, but Classroom has no record of that student.
     /// 
     /// # Arguments
     ///
-    /// * `studentId` - The ID of the student whose guardian invitations are to be returned. The identifier can be one of the following: * the numeric identifier for the user * the email address of the user * the string literal `"me"`, indicating the requesting user
+    /// * `studentId` - The ID of the student whose guardian invitations are to be returned. The identifier can be one of the following: * the numeric identifier for the user * the email address of the user * the string literal `"me"`, indicating the requesting user * the string literal `"-"`, indicating that results should be returned for all students that the requesting user is permitted to view guardian invitations.
     pub fn guardian_invitations_list(&self, student_id: &str) -> UserProfileGuardianInvitationListCall<'a, C, A> {
         UserProfileGuardianInvitationListCall {
             hub: self.hub,
@@ -5787,6 +5791,7 @@ impl<'a, C, A> CourseCourseWorkCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
 ///              .student_id("eirmod")
 ///              .page_token("sanctus")
 ///              .page_size(-22)
+///              .add_course_states("amet")
 ///              .doit();
 /// # }
 /// ```
@@ -5798,6 +5803,7 @@ pub struct CourseListCall<'a, C, A>
     _student_id: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
+    _course_states: Vec<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -5819,7 +5825,7 @@ impl<'a, C, A> CourseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         };
         dlg.begin(MethodInfo { id: "classroom.courses.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
         if let Some(value) = self._teacher_id {
             params.push(("teacherId", value.to_string()));
         }
@@ -5832,7 +5838,12 @@ impl<'a, C, A> CourseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         if let Some(value) = self._page_size {
             params.push(("pageSize", value.to_string()));
         }
-        for &field in ["alt", "teacherId", "studentId", "pageToken", "pageSize"].iter() {
+        if self._course_states.len() > 0 {
+            for f in self._course_states.iter() {
+                params.push(("courseStates", f.to_string()));
+            }
+        }
+        for &field in ["alt", "teacherId", "studentId", "pageToken", "pageSize", "courseStates"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -5952,6 +5963,14 @@ impl<'a, C, A> CourseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> CourseListCall<'a, C, A> {
         self._page_size = Some(new_value);
+        self
+    }
+    /// Restricts returned courses to those in one of the specified states
+    ///
+    /// Append the given value to the *course states* query property.
+    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
+    pub fn add_course_states(mut self, new_value: &str) -> CourseListCall<'a, C, A> {
+        self._course_states.push(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -6613,7 +6632,7 @@ impl<'a, C, A> CourseAliaseCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.courses().students_create(req, "courseId")
-///              .enrollment_code("sed")
+///              .enrollment_code("dolor")
 ///              .doit();
 /// # }
 /// ```
@@ -7383,8 +7402,8 @@ impl<'a, C, A> CourseCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.courses().students_list("courseId")
-///              .page_token("et")
-///              .page_size(-96)
+///              .page_token("consetetur")
+///              .page_size(-52)
 ///              .doit();
 /// # }
 /// ```
@@ -7895,7 +7914,7 @@ impl<'a, C, A> CourseDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.courses().patch(req, "id")
-///              .update_mask("Lorem")
+///              .update_mask("gubergren")
 ///              .doit();
 /// # }
 /// ```
@@ -8173,8 +8192,8 @@ impl<'a, C, A> CoursePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.courses().aliases_list("courseId")
-///              .page_token("justo")
-///              .page_size(-52)
+///              .page_token("sit")
+///              .page_size(-26)
 ///              .doit();
 /// # }
 /// ```
@@ -10209,7 +10228,7 @@ impl<'a, C, A> UserProfileGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.user_profiles().guardian_invitations_patch(req, "studentId", "invitationId")
-///              .update_mask("clita")
+///              .update_mask("consetetur")
 ///              .doit();
 /// # }
 /// ```
@@ -10681,7 +10700,7 @@ impl<'a, C, A> UserProfileGuardianInvitationGetCall<'a, C, A> where C: BorrowMut
 }
 
 
-/// Returns a list of guardians that the requesting user is permitted to view, restricted to those that match the request. This method returns the following error codes: * `PERMISSION_DENIED` if a `student_id` is specified, and the requesting user is not permitted to view guardian information for that student, if guardians are not enabled for the domain in question, if the `invited_email_address` filter is set by a user who is not a domain administrator, or for other access errors. * `INVALID_ARGUMENT` if a `student_id` is specified, but its format cannot be recognized (it is not an email address, nor a `student_id` from the API, nor the literal string `me`). May also be returned if an invalid `page_token` is provided. * `NOT_FOUND` if a `student_id` is specified, and its format can be recognized, but Classroom has no record of that student.
+/// Returns a list of guardians that the requesting user is permitted to view, restricted to those that match the request. To list guardians for any student that the requesting user may view guardians for, use the literal character `-` for the student ID. This method returns the following error codes: * `PERMISSION_DENIED` if a `student_id` is specified, and the requesting user is not permitted to view guardian information for that student, if `"-"` is specified as the `student_id` and the user is not a domain administrator, if guardians are not enabled for the domain in question, if the `invited_email_address` filter is set by a user who is not a domain administrator, or for other access errors. * `INVALID_ARGUMENT` if a `student_id` is specified, but its format cannot be recognized (it is not an email address, nor a `student_id` from the API, nor the literal string `me`). May also be returned if an invalid `page_token` is provided. * `NOT_FOUND` if a `student_id` is specified, and its format can be recognized, but Classroom has no record of that student.
 ///
 /// A builder for the *guardians.list* method supported by a *userProfile* resource.
 /// It is not used directly, but through a `UserProfileMethods` instance.
@@ -10708,9 +10727,9 @@ impl<'a, C, A> UserProfileGuardianInvitationGetCall<'a, C, A> where C: BorrowMut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.user_profiles().guardians_list("studentId")
-///              .page_token("kasd")
-///              .page_size(-7)
-///              .invited_email_address("takimata")
+///              .page_token("sanctus")
+///              .page_size(-58)
+///              .invited_email_address("At")
 ///              .doit();
 /// # }
 /// ```
@@ -10863,7 +10882,7 @@ impl<'a, C, A> UserProfileGuardianListCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
-    /// Filter results by the student who the guardian is linked to. The identifier can be one of the following: * the numeric identifier for the user * the email address of the user * the string literal `"me"`, indicating the requesting user
+    /// Filter results by the student who the guardian is linked to. The identifier can be one of the following: * the numeric identifier for the user * the email address of the user * the string literal `"me"`, indicating the requesting user * the string literal `"-"`, indicating that results should be returned for all students that the requesting user has access to view.
     ///
     /// Sets the *student id* path property to the given value.
     ///
@@ -10936,7 +10955,7 @@ impl<'a, C, A> UserProfileGuardianListCall<'a, C, A> where C: BorrowMut<hyper::C
 }
 
 
-/// Returns a list of guardian invitations that the requesting user is permitted to view, filtered by the parameters provided. This method returns the following error codes: * `PERMISSION_DENIED` if a `student_id` is specified, and the requesting user is not permitted to view guardian invitations for that student, if guardians are not enabled for the domain in question, or for other access errors. * `INVALID_ARGUMENT` if a `student_id` is specified, but its format cannot be recognized (it is not an email address, nor a `student_id` from the API, nor the literal string `me`). May also be returned if an invalid `page_token` or `state` is provided. * `NOT_FOUND` if a `student_id` is specified, and its format can be recognized, but Classroom has no record of that student.
+/// Returns a list of guardian invitations that the requesting user is permitted to view, filtered by the parameters provided. This method returns the following error codes: * `PERMISSION_DENIED` if a `student_id` is specified, and the requesting user is not permitted to view guardian invitations for that student, if `"-"` is specified as the `student_id` and the user is not a domain administrator, if guardians are not enabled for the domain in question, or for other access errors. * `INVALID_ARGUMENT` if a `student_id` is specified, but its format cannot be recognized (it is not an email address, nor a `student_id` from the API, nor the literal string `me`). May also be returned if an invalid `page_token` or `state` is provided. * `NOT_FOUND` if a `student_id` is specified, and its format can be recognized, but Classroom has no record of that student.
 ///
 /// A builder for the *guardianInvitations.list* method supported by a *userProfile* resource.
 /// It is not used directly, but through a `UserProfileMethods` instance.
@@ -10963,10 +10982,10 @@ impl<'a, C, A> UserProfileGuardianListCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.user_profiles().guardian_invitations_list("studentId")
-///              .add_states("labore")
-///              .page_token("invidunt")
-///              .page_size(-66)
-///              .invited_email_address("sadipscing")
+///              .add_states("invidunt")
+///              .page_token("ea")
+///              .page_size(-95)
+///              .invited_email_address("rebum.")
 ///              .doit();
 /// # }
 /// ```
@@ -11125,7 +11144,7 @@ impl<'a, C, A> UserProfileGuardianInvitationListCall<'a, C, A> where C: BorrowMu
     }
 
 
-    /// The ID of the student whose guardian invitations are to be returned. The identifier can be one of the following: * the numeric identifier for the user * the email address of the user * the string literal `"me"`, indicating the requesting user
+    /// The ID of the student whose guardian invitations are to be returned. The identifier can be one of the following: * the numeric identifier for the user * the email address of the user * the string literal `"me"`, indicating the requesting user * the string literal `"-"`, indicating that results should be returned for all students that the requesting user is permitted to view guardian invitations.
     ///
     /// Sets the *student id* path property to the given value.
     ///
@@ -11705,10 +11724,10 @@ impl<'a, C, A> InvitationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.invitations().list()
-///              .user_id("sed")
-///              .page_token("aliquyam")
-///              .page_size(-53)
-///              .course_id("eirmod")
+///              .user_id("aliquyam")
+///              .page_token("sit")
+///              .page_size(-40)
+///              .course_id("consetetur")
 ///              .doit();
 /// # }
 /// ```

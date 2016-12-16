@@ -4,7 +4,7 @@
 [package]
 
 name = "google-appengine1-cli"
-version = "1.0.0+20160802"
+version = "1.0.0+20161208"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with appengine (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/appengine1-cli"

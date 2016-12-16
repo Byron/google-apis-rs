@@ -4,7 +4,7 @@
 [package]
 
 name = "google-storage1"
-version = "1.0.0+20160901"
+version = "1.0.0+20161123"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with storage (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/storage1"

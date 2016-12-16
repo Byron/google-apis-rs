@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-bigquery2` library allows access to all features of the *Google bigquery* service.
 
-This documentation was generated from *bigquery* crate version *1.0.0+20160903*, where *20160903* is the exact revision of the *bigquery:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
+This documentation was generated from *bigquery* crate version *1.0.0+20161130*, where *20161130* is the exact revision of the *bigquery:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
 
 Everything else about the *bigquery* *v2* API can be found at the
 [official documentation site](https://cloud.google.com/bigquery/).

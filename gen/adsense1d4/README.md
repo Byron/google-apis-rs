@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-adsense1d4` library allows access to all features of the *Google AdSense* service.
 
-This documentation was generated from *AdSense* crate version *1.0.0+20160907*, where *20160907* is the exact revision of the *adsense:v1.4* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
+This documentation was generated from *AdSense* crate version *1.0.0+20161206*, where *20161206* is the exact revision of the *adsense:v1.4* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
 
 Everything else about the *AdSense* *v1d4* API can be found at the
 [official documentation site](https://developers.google.com/adsense/management/).

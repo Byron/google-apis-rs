@@ -1,4 +1,4 @@
-site_name: Cloud Resource Manager v1.0.0+20160617
+site_name: Cloud Resource Manager v1.0.0+20161212
 site_url: http://byron.github.io/google-apis-rs/google-cloudresourcemanager1-cli
 site_description: Write integrating applications with bcore
 
@@ -10,8 +10,15 @@ site_dir: build_html
 pages:
 - ['index.md', 'Home']
 - ['operations_get.md', 'Operations', 'Get']
+- ['organizations_get.md', 'Organizations', 'Get']
+- ['organizations_get-iam-policy.md', 'Organizations', 'Get Iam Policy']
+- ['organizations_search.md', 'Organizations', 'Search']
+- ['organizations_set-iam-policy.md', 'Organizations', 'Set Iam Policy']
+- ['organizations_test-iam-permissions.md', 'Organizations', 'Test Iam Permissions']
+- ['projects_create.md', 'Projects', 'Create']
 - ['projects_delete.md', 'Projects', 'Delete']
 - ['projects_get.md', 'Projects', 'Get']
+- ['projects_get-ancestry.md', 'Projects', 'Get Ancestry']
 - ['projects_get-iam-policy.md', 'Projects', 'Get Iam Policy']
 - ['projects_list.md', 'Projects', 'List']
 - ['projects_set-iam-policy.md', 'Projects', 'Set Iam Policy']

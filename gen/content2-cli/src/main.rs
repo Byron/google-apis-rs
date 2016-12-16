@@ -2466,6 +2466,8 @@ impl<'n> Engine<'n> {
                     "price.currency" => Some(("price.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "price.value" => Some(("price.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "sell-on-google-quantity" => Some(("sellOnGoogleQuantity", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "pickup.pickup-method" => Some(("pickup.pickupMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "pickup.pickup-sla" => Some(("pickup.pickupSla", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "sale-price.currency" => Some(("salePrice.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "sale-price.value" => Some(("salePrice.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "availability" => Some(("availability", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2474,7 +2476,7 @@ impl<'n> Engine<'n> {
                     "loyalty-points.points-value" => Some(("loyaltyPoints.pointsValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "quantity" => Some(("quantity", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["amount", "availability", "currency", "installment", "loyalty-points", "months", "name", "points-value", "price", "quantity", "ratio", "sale-price", "sale-price-effective-date", "sell-on-google-quantity", "value"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["amount", "availability", "currency", "installment", "loyalty-points", "months", "name", "pickup", "pickup-method", "pickup-sla", "points-value", "price", "quantity", "ratio", "sale-price", "sale-price-effective-date", "sell-on-google-quantity", "value"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -5151,7 +5153,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("delete",
-                    Some(r##"Deletes a Merchant Center sub-account."##),
+                    Some(r##"Deletes a Merchant Center sub-account. This method can only be called for multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/accounts_delete",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -5173,7 +5175,7 @@ fn main() {
                      Some(true)),
                   ]),
             ("get",
-                    Some(r##"Retrieves a Merchant Center account."##),
+                    Some(r##"Retrieves a Merchant Center account. This method can only be called for accounts to which the managing account has access: either the managing account itself or sub-accounts if the managing account is a multi-client account."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/accounts_get",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -5201,7 +5203,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("insert",
-                    Some(r##"Creates a Merchant Center sub-account."##),
+                    Some(r##"Creates a Merchant Center sub-account. This method can only be called for multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/accounts_insert",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -5229,7 +5231,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Lists the sub-accounts in your Merchant Center account."##),
+                    Some(r##"Lists the sub-accounts in your Merchant Center account. This method can only be called for multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/accounts_list",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -5251,7 +5253,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("patch",
-                    Some(r##"Updates a Merchant Center account. This method supports patch semantics."##),
+                    Some(r##"Updates a Merchant Center account. This method can only be called for multi-client accounts. This method supports patch semantics."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/accounts_patch",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -5285,7 +5287,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Updates a Merchant Center account."##),
+                    Some(r##"Updates a Merchant Center account. This method can only be called for multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/accounts_update",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -5344,7 +5346,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Retrieves the shipping settings of the account."##),
+                    Some(r##"Retrieves the shipping settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself or sub-accounts if the managing account is a multi-client account."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/accountshipping_get",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -5372,7 +5374,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Lists the shipping settings of the sub-accounts in your Merchant Center account."##),
+                    Some(r##"Lists the shipping settings of the sub-accounts in your Merchant Center account. This method can only be called for multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/accountshipping_list",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -5394,7 +5396,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("patch",
-                    Some(r##"Updates the shipping settings of the account. This method supports patch semantics."##),
+                    Some(r##"Updates the shipping settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself or sub-accounts if the managing account is a multi-client account. This method supports patch semantics."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/accountshipping_patch",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -5428,7 +5430,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Updates the shipping settings of the account."##),
+                    Some(r##"Updates the shipping settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself or sub-accounts if the managing account is a multi-client account."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/accountshipping_update",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -5487,7 +5489,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Retrieves the status of a Merchant Center account."##),
+                    Some(r##"Retrieves the status of a Merchant Center account. This method can only be called for accounts to which the managing account has access: either the managing account itself or sub-accounts if the managing account is a multi-client account."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/accountstatuses_get",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -5515,7 +5517,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Lists the statuses of the sub-accounts in your Merchant Center account."##),
+                    Some(r##"Lists the statuses of the sub-accounts in your Merchant Center account. This method can only be called for multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/accountstatuses_list",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -5562,7 +5564,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Retrieves the tax settings of the account."##),
+                    Some(r##"Retrieves the tax settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself or sub-accounts if the managing account is a multi-client account."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/accounttax_get",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -5590,7 +5592,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Lists the tax settings of the sub-accounts in your Merchant Center account."##),
+                    Some(r##"Lists the tax settings of the sub-accounts in your Merchant Center account. This method can only be called for multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/accounttax_list",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -5612,7 +5614,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("patch",
-                    Some(r##"Updates the tax settings of the account. This method supports patch semantics."##),
+                    Some(r##"Updates the tax settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself or sub-accounts if the managing account is a multi-client account. This method supports patch semantics."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/accounttax_patch",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -5646,7 +5648,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Updates the tax settings of the account."##),
+                    Some(r##"Updates the tax settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself or sub-accounts if the managing account is a multi-client account."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/accounttax_update",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -5705,7 +5707,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("delete",
-                    Some(r##"Deletes a datafeed from your Merchant Center account."##),
+                    Some(r##"Deletes a datafeed from your Merchant Center account. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/datafeeds_delete",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -5727,7 +5729,7 @@ fn main() {
                      Some(true)),
                   ]),
             ("get",
-                    Some(r##"Retrieves a datafeed from your Merchant Center account."##),
+                    Some(r##"Retrieves a datafeed from your Merchant Center account. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/datafeeds_get",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -5755,7 +5757,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("insert",
-                    Some(r##"Registers a datafeed with your Merchant Center account."##),
+                    Some(r##"Registers a datafeed with your Merchant Center account. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/datafeeds_insert",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -5783,7 +5785,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Lists the datafeeds in your Merchant Center account."##),
+                    Some(r##"Lists the datafeeds in your Merchant Center account. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/datafeeds_list",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -5805,7 +5807,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("patch",
-                    Some(r##"Updates a datafeed of your Merchant Center account. This method supports patch semantics."##),
+                    Some(r##"Updates a datafeed of your Merchant Center account. This method can only be called for non-multi-client accounts. This method supports patch semantics."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/datafeeds_patch",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -5839,7 +5841,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Updates a datafeed of your Merchant Center account."##),
+                    Some(r##"Updates a datafeed of your Merchant Center account. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/datafeeds_update",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -5898,7 +5900,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Retrieves the status of a datafeed from your Merchant Center account."##),
+                    Some(r##"Retrieves the status of a datafeed from your Merchant Center account. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/datafeedstatuses_get",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -5926,7 +5928,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Lists the statuses of the datafeeds in your Merchant Center account."##),
+                    Some(r##"Lists the statuses of the datafeeds in your Merchant Center account. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/datafeedstatuses_list",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -5951,7 +5953,7 @@ fn main() {
         
         ("inventory", "methods: 'custombatch' and 'set'", vec![
             ("custombatch",
-                    Some(r##"Updates price and availability for multiple products or stores in a single request. This operation does not update the expiration date of the products."##),
+                    Some(r##"Updates price and availability for multiple products or stores in a single request. This operation does not update the expiration date of the products. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/inventory_custombatch",
                   vec![
                     (Some(r##"kv"##),
@@ -5973,7 +5975,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("set",
-                    Some(r##"Updates price and availability of a product in your Merchant Center account. This operation does not update the expiration date of the product."##),
+                    Some(r##"Updates price and availability of a product in your Merchant Center account. This operation does not update the expiration date of the product. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/inventory_set",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -6016,7 +6018,7 @@ fn main() {
         
         ("orders", "methods: 'acknowledge', 'advancetestorder', 'cancel', 'cancellineitem', 'createtestorder', 'custombatch', 'get', 'getbymerchantorderid', 'gettestordertemplate', 'list', 'refund', 'returnlineitem', 'shiplineitems', 'updatemerchantorderid' and 'updateshipment'", vec![
             ("acknowledge",
-                    Some(r##"Marks an order as acknowledged."##),
+                    Some(r##"Marks an order as acknowledged. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/orders_acknowledge",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -6050,7 +6052,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("advancetestorder",
-                    Some(r##"Sandbox only. Moves a test order from state "inProgress" to state "pendingShipment"."##),
+                    Some(r##"Sandbox only. Moves a test order from state "inProgress" to state "pendingShipment". This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/orders_advancetestorder",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -6078,7 +6080,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("cancel",
-                    Some(r##"Cancels all line items in an order."##),
+                    Some(r##"Cancels all line items in an order. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/orders_cancel",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -6112,7 +6114,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("cancellineitem",
-                    Some(r##"Cancels a line item."##),
+                    Some(r##"Cancels a line item. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/orders_cancellineitem",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -6146,7 +6148,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("createtestorder",
-                    Some(r##"Sandbox only. Creates a test order."##),
+                    Some(r##"Sandbox only. Creates a test order. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/orders_createtestorder",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -6174,7 +6176,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("custombatch",
-                    Some(r##"Retrieves or modifies multiple orders in a single request."##),
+                    Some(r##"Retrieves or modifies multiple orders in a single request. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/orders_custombatch",
                   vec![
                     (Some(r##"kv"##),
@@ -6196,7 +6198,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Retrieves an order from your Merchant Center account."##),
+                    Some(r##"Retrieves an order from your Merchant Center account. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/orders_get",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -6224,7 +6226,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("getbymerchantorderid",
-                    Some(r##"Retrieves an order using merchant order id."##),
+                    Some(r##"Retrieves an order using merchant order id. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/orders_getbymerchantorderid",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -6252,7 +6254,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("gettestordertemplate",
-                    Some(r##"Sandbox only. Retrieves an order template that can be used to quickly create a new order in sandbox."##),
+                    Some(r##"Sandbox only. Retrieves an order template that can be used to quickly create a new order in sandbox. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/orders_gettestordertemplate",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -6280,7 +6282,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Lists the orders in your Merchant Center account."##),
+                    Some(r##"Lists the orders in your Merchant Center account. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/orders_list",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -6302,7 +6304,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("refund",
-                    Some(r##"Refund a portion of the order, up to the full amount paid."##),
+                    Some(r##"Refund a portion of the order, up to the full amount paid. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/orders_refund",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -6336,7 +6338,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("returnlineitem",
-                    Some(r##"Returns a line item."##),
+                    Some(r##"Returns a line item. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/orders_returnlineitem",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -6370,7 +6372,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("shiplineitems",
-                    Some(r##"Marks line item(s) as shipped."##),
+                    Some(r##"Marks line item(s) as shipped. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/orders_shiplineitems",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -6404,7 +6406,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("updatemerchantorderid",
-                    Some(r##"Updates the merchant order ID for a given order."##),
+                    Some(r##"Updates the merchant order ID for a given order. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/orders_updatemerchantorderid",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -6438,7 +6440,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("updateshipment",
-                    Some(r##"Updates a shipment's status, carrier, and/or tracking ID."##),
+                    Some(r##"Updates a shipment's status, carrier, and/or tracking ID. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/orders_updateshipment",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -6475,7 +6477,7 @@ fn main() {
         
         ("products", "methods: 'custombatch', 'delete', 'get', 'insert' and 'list'", vec![
             ("custombatch",
-                    Some(r##"Retrieves, inserts, and deletes multiple products in a single request."##),
+                    Some(r##"Retrieves, inserts, and deletes multiple products in a single request. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/products_custombatch",
                   vec![
                     (Some(r##"kv"##),
@@ -6497,7 +6499,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("delete",
-                    Some(r##"Deletes a product from your Merchant Center account."##),
+                    Some(r##"Deletes a product from your Merchant Center account. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/products_delete",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -6519,7 +6521,7 @@ fn main() {
                      Some(true)),
                   ]),
             ("get",
-                    Some(r##"Retrieves a product from your Merchant Center account."##),
+                    Some(r##"Retrieves a product from your Merchant Center account. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/products_get",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -6547,7 +6549,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("insert",
-                    Some(r##"Uploads a product to your Merchant Center account."##),
+                    Some(r##"Uploads a product to your Merchant Center account. If an item with the same channel, contentLanguage, offerId, and targetCountry already exists, this method updates that entry. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/products_insert",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -6575,7 +6577,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Lists the products in your Merchant Center account."##),
+                    Some(r##"Lists the products in your Merchant Center account. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/products_list",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -6600,7 +6602,7 @@ fn main() {
         
         ("productstatuses", "methods: 'custombatch', 'get' and 'list'", vec![
             ("custombatch",
-                    Some(r##"Gets the statuses of multiple products in a single request."##),
+                    Some(r##"Gets the statuses of multiple products in a single request. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/productstatuses_custombatch",
                   vec![
                     (Some(r##"kv"##),
@@ -6622,7 +6624,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Gets the status of a product from your Merchant Center account."##),
+                    Some(r##"Gets the status of a product from your Merchant Center account. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/productstatuses_get",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -6650,7 +6652,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Lists the statuses of the products in your Merchant Center account."##),
+                    Some(r##"Lists the statuses of the products in your Merchant Center account. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/productstatuses_list",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -6697,7 +6699,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Retrieves the shipping settings of the account."##),
+                    Some(r##"Retrieves the shipping settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself or sub-accounts if the managing account is a multi-client account."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/shippingsettings_get",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -6747,7 +6749,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Lists the shipping settings of the sub-accounts in your Merchant Center account."##),
+                    Some(r##"Lists the shipping settings of the sub-accounts in your Merchant Center account. This method can only be called for multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/shippingsettings_list",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -6769,7 +6771,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("patch",
-                    Some(r##"Updates the shipping settings of the account. This method supports patch semantics."##),
+                    Some(r##"Updates the shipping settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself or sub-accounts if the managing account is a multi-client account. This method supports patch semantics."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/shippingsettings_patch",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -6803,7 +6805,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Updates the shipping settings of the account."##),
+                    Some(r##"Updates the shipping settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself or sub-accounts if the managing account is a multi-client account."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/shippingsettings_update",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -6842,7 +6844,7 @@ fn main() {
     
     let mut app = App::new("content2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.0+20160905")
+           .version("1.0.0+20161205")
            .about("Manages product items, inventory, and Merchant Center accounts for Google Shopping.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_content2_cli")
            .arg(Arg::with_name("url")
