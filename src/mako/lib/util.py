@@ -838,9 +838,6 @@ def gen_crate_dir(name, version, ti):
 def crates_io_url(name, version):
     return "https://crates.io/crates/%s" % library_to_crate_name(library_name(name, version))
 
-def program_download_url(base_url, program_type, program_version, os_name, name, version):
-    return base_url + '/google.rs/%s/%s/%s/%s.tar.gz' % (program_type, program_version, os_name, program_name(name, version))
-
 def program_name(name, version):
     return library_name(name, version).replace('_', '-')
 

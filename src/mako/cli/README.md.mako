@@ -1,5 +1,5 @@
 <%
-    from util import (markdown_comment, new_context, program_download_url)
+    from util import (markdown_comment, new_context)
     from cli import (CONFIG_DIR, CONFIG_DIR_FLAG, SCOPE_FLAG, application_secret_path, DEBUG_FLAG, DEBUG_AUTH_FLAG)
 
     c = new_context(schemas, resources, context.get('methods'))
@@ -21,7 +21,13 @@ Everything else about the *${util.canonical_name()}* API can be found at the
 [official documentation site](${documentationLink}).
 % endif
 
-# Source Code
+# Installation and Source Code
+
+Install the command-line interface with cargo using:
+
+```bash
+cargo install ${util.crate_name()}
+```
 
 Find the source code [on github](${util.github_source_root_url()}).
 

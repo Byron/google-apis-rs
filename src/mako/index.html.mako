@@ -1,7 +1,7 @@
 <%
     import os
     import yaml
-    from util import (gen_crate_dir, api_index, crates_io_url, program_name, program_download_url)
+    from util import (gen_crate_dir, api_index, crates_io_url, program_name)
 
     title = 'Google Service Documentation for Rust'
 
@@ -56,10 +56,6 @@ DO NOT EDIT !
             <a class="mod" href="${api_index(DOC_ROOT, an, v, ad.make)}" title="${ad.make.id.upper()} docs for the ${an} ${v}">${ad.make.id.upper()}</a>
             % if program_type == 'api':
             <a href="${crates_io_url(an, v)}"><img src="${url_info.asset_urls.crates_img}" title="This API on crates.io" height="16" width="16"/></a>
-            % else:
-            % for os_name in make.platforms:
-            <a href="${program_download_url(url_info.download_base_url, program_type, ad.cargo.build_version, os_name, an, v)}"><img src="${url_info.asset_urls.get('%s_img' % os_name)}" title="Download the pre-compiled 64bit program for ${os_name}" height="16" width="16"/></a>
-            % endfor ## each os
             % endif
             % if not loop.last:
 ,           
