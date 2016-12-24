@@ -25,13 +25,15 @@ DO NOT EDIT !
 <head>
 <link rel="stylesheet" href="main.css">
 <style type="text/css">
-.text {
+.lib {
   color: #000000;
-  font-size: 20px
+  font-size: 20px;
+  float: left;
+  width: 300px;
 }
 .mod {
   color: #4d76ae;
-  font-size: 20px
+  font-size: 20px;
 }
 .mono {
   font-family: monospace;
@@ -42,7 +44,15 @@ alertShown = false
 function onClick(button) {
   selectElementContents(button)
   if (document.execCommand('copy') && !alertShown) {
-    alert("Installation script copied to clipboard.\nThis message will not be shown again.")
+    msg = "Installation script copied to clipboard.\n"
+    
+    msg += "\nIt contains no new-lines and will \n"
+    msg += "not execute automatically after\n"
+    msg += "pasting it into a shell so you can\n"
+    msg += "review it beforehand.\n"
+    
+    msg += "\nThis message will not be shown again."
+    alert(msg)
     alertShown = true
   }
 }
@@ -85,7 +95,7 @@ function onCopy(e) {
         % if api_data is None:
             <% continue %>\
         % endif
-        <span class="text">${an} ${v} (
+        <span class="lib">${an} ${v}</span> 
         % for program_type in type_names:
             <% 
               ad = tc[program_type] 
@@ -101,7 +111,7 @@ function onCopy(e) {
 ,           
             % endif
         % endfor # each program type
-        )</span><br/>
+        <br/>
     % endfor # each version
 % endfor # each API
 </ul>
