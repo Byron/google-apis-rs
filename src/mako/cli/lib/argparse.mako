@@ -84,7 +84,7 @@ Configuration:
 <%def name="new(c)" buffered="True">\
 <%
     doc_base_url = cargo.doc_base_url + '/' + os.path.dirname(api_index(cargo.doc_base_url, name,
-                                                                        version, make, check_exists=False))
+                                                                        version, make, cargo, revision, check_exists=False))
     url_info = "All documentation details can be found at " + doc_base_url
 
     # list of tuples

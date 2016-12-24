@@ -1,7 +1,10 @@
 <%
+    import json
     import os
     import yaml
-    from util import (library_name, library_to_crate_name, gen_crate_dir, api_index, crates_io_url, program_name)
+    from util import (api_json_path, library_name, library_to_crate_name,
+                      gen_crate_dir, api_index, crates_io_url, program_name,
+                      crate_version)
 
     title = 'Google Service Documentation for Rust'
 
@@ -66,25 +69,28 @@ function selectElementContents(el) {
 % for an in sorted(api.list.keys()):
     % for v in api.list[an]:
         <% 
-            has_any_index = False
-            type_names = list()
-            for program_type, ad in tc.iteritems():
-                if api_index(DOC_ROOT, an, v, ad.make):
-                    has_any_index = True
-                    type_names.append(program_type)
+            type_names = tc.keys()
+            try:
+              fp = open(api_json_path(directories.api_base, an, v))
+              api_data = json.load(fp)
+            except (ValueError, IOError):
+              api_data = None
             # end for each type
         %>\
-        % if not has_any_index:
+        % if api_data is None:
             <% continue %>\
         % endif
         <span class="text">${an} ${v} (
         % for program_type in type_names:
-            <% ad = tc[program_type] %>
-            <a class="mod" href="${api_index(DOC_ROOT, an, v, ad.make)}" title="${ad.make.id.upper()} docs for the ${an} ${v}">${ad.make.id.upper()}</a>
+            <% 
+              ad = tc[program_type] 
+              revision = api_data.get('revision', None)
+            %>\
+            <a class="mod" href="${api_index(DOC_ROOT, an, v, ad.make, ad.cargo, revision)}" title="${ad.make.id.upper()} docs for the ${an} ${v}">${ad.make.id.upper()}</a>
             % if program_type == 'api':
-            <a href="${crates_io_url(an, v)}"><img src="${url_info.asset_urls.crates_img}" title="This API on crates.io" height="16" width="16"/></a>
+            <a href="${crates_io_url(an, v)}/${crate_version(ad.cargo.build_version, revision)}"><img src="${url_info.asset_urls.crates_img}" title="This API on crates.io" height="16" width="16"/></a>
             % else:
-            , <button class="mono" onclick="onClick(this)">cargo install ${library_to_crate_name(library_name(an, v))}-cli</button>
+            , <button class="mono" onclick="onClick(this)" title="Copy installation script to clipboard">cargo install ${library_to_crate_name(library_name(an, v))}-cli</button>
             % endif
             % if not loop.last:
 ,           

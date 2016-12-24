@@ -74,7 +74,7 @@
 	# source, destination of individual output files
 	sds = [(directories.mako_src + '/' + make.id + '/' + i.source + '.mako', gen_root + '/' +
 		   i.get('output_dir', '') + '/' + i.source.strip('../')) for i in make.templates]
-	api_json = directories.api_base + '/' + an + '/' + version + '/' + an + '-api.json'
+	api_json = util.api_json_path(directories.api_base, an, version)
 	api_meta_dir = os.path.dirname(api_json)
 	api_crate_publish_file = api_meta_dir + '/crates/' + util.crate_version(cargo.build_version +
 			make.aggregated_target_suffix, json.load(open(api_json, 'r')).get('revision', '00000000'))
@@ -136,7 +136,7 @@ publish${agsuffix}: | gen-all${agsuffix} ${space_join(4)}
 gen-all${agsuffix}: ${space_join(0)}
 
 % if global_targets:
-${doc_index}: ${' '.join('docs-' + api_name for api_name in make.types)} ${' '.join(gen_type_cfg_path(api_name) for api_name in make.types)}
+${doc_index}: docs-cli ${gen_type_cfg_path('cli')}
 	$(PYPATH) $(MAKO) --var DOC_ROOT=${doc_root} -io $(MAKO_SRC)/index.html.mako=$@ --data-files $(API_SHARED_INFO) $(API_LIST)
 	@echo Documentation index created at '$@'
 docs-all: ${doc_index}
@@ -174,9 +174,10 @@ help${agsuffix}:
 % for info in apis['items']:
 <%
 	import util
+	import os
 	name = util.normalize_library_name(info['name'])
-	target_dir = directories.api_base + '/' + name + '/' + info['version']
-	target = target_dir + '/' + name + '-api.json'
+	target = util.api_json_path(directories.api_base, name, info['version'])
+	target_dir = os.path.dirname(target)
 	## assure the target never actually exists to force him to wget whenver we ask !
 	fake_target = target + '-force'
 	## Some service urls have $ in them. This may cause the console to treat them as env vars.

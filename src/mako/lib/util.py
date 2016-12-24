@@ -826,12 +826,18 @@ def library_to_crate_name(name, suffix=''):
 
 # return version like 0.1.0+2014031421
 def crate_version(build_version, revision):
-    return '%s+%s' % (build_version, revision)
+    return '%s+%s' % (build_version, isinstance(revision, basestring) and revision or '00000000')
 
 # return a crate name for us in extern crate statements
 def to_extern_crate_name(crate_name):
     return crate_name.replace('-', '_')
 
+def docs_rs_url(base_url, crate_name, version):
+    return base_url + '/' + crate_name + '/' + version
+    
+def crate_name(name, version, make):
+    return library_to_crate_name(library_name(name, version), make.target_suffix)
+    
 def gen_crate_dir(name, version, ti):
     return to_extern_crate_name(library_to_crate_name(library_name(name, version), ti.target_suffix))
 
@@ -841,15 +847,20 @@ def crates_io_url(name, version):
 def program_name(name, version):
     return library_name(name, version).replace('_', '-')
 
-def api_index(DOC_ROOT, name, version, ti, check_exists=True):
+def api_json_path(api_base, name, version):
+    return api_base + '/' + name + '/' + version + '/' + name + '-api.json'
+
+def api_index(DOC_ROOT, name, version, ti, cargo, revision, check_exists=True):
     crate_dir = gen_crate_dir(name, version, ti)
     if ti.documentation_engine == 'rustdoc':
-        index_file_path = crate_dir + '/index.html'
+        semver = crate_version(cargo.build_version, revision)
+        index_file_path = docs_rs_url(cargo.doc_base_url, crate_name(name, version, ti), semver)
+        return index_file_path
     else:
         index_file_path = crate_dir + '/' + 'index.html'
-    if not check_exists or os.path.isfile(os.path.join(DOC_ROOT, index_file_path)):
-        return index_file_path
-    return None
+        if not check_exists or os.path.isfile(os.path.join(DOC_ROOT, index_file_path)):
+            return index_file_path
+        return None
 
 # return type name of a resource method builder, from a resource name
 def rb_type(r):
