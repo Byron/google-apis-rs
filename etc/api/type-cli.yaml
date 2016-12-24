@@ -23,7 +23,6 @@ make:
     - source: main.rs
       output_dir: src
 cargo:
-  build_version: "1.0.0"
   keywords: [cli]
   is_executable: YES
   doc_base_url: http://byron.github.io/google-apis-rs

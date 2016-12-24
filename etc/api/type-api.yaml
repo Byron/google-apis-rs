@@ -25,7 +25,6 @@ make:
     - source: build.rs
       output_dir: src
 cargo:
-  build_version: "1.0.0"
   build_script: src/build.rs
   keywords: [protocol, web, api]
   doc_base_url: https://docs.rs
