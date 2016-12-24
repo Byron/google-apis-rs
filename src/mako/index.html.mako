@@ -7,12 +7,16 @@
                       crate_version)
 
     title = 'Google Service Documentation for Rust'
+    # A poor mans merge, just for what we need right now
+    def merge_required_fields(map):
+      map.cargo.build_version = cargo.build_version
+      return map
 
     # type cache: {'api': type-api.yaml-contents }
     tc = dict()
     for api_type in make.types:
         data = yaml.load_all(open(os.path.join(directories.api_base, 'type-%s.yaml' % api_type)))
-        tc[api_type] = type(directories)(data.next())
+        tc[api_type] = merge_required_fields(type(directories)(data.next()))
     # end for each type to load cache for
 %>\
 <!DOCTYPE html>
