@@ -100,7 +100,7 @@ ${gen_root_stamp}: ${' '.join(i[0] for i in sds)} ${' '.join(lib_files)} ${api_j
 ${api_target}: ${api_common}
 
 ${api_crate_publish_file}:
-	cd ${gen_root} && cargo publish
+	cd ${gen_root} && cargo publish --allow-dirty
 	@mkdir -p ${os.path.dirname(api_crate_publish_file)}
 	touch $@
 
