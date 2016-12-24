@@ -6,7 +6,7 @@
                       find_fattest_resource, build_all_params, pass_through, parts_from_params,
                       REQUEST_MARKER_TRAIT, RESPONSE_MARKER_TRAIT, supports_scopes, to_api_version,
                       to_fqan, METHODS_RESOURCE, ADD_PARAM_MEDIA_EXAMPLE, PROTOCOL_TYPE_INFO, enclose_in,
-                      upload_action_fn, unique_type_name, schema_doc_format, METHODS_BUILDER_MARKER_TRAIT, 
+                      upload_action_fn, unique_type_name, schema_doc_format, METHODS_BUILDER_MARKER_TRAIT,
                       to_extern_crate_name)  
 
     def pretty_name(name):
@@ -30,7 +30,7 @@
     response_trait_url = 'trait.' + RESPONSE_MARKER_TRAIT + '.html'
     part_trait_url = 'trait.' + PART_MARKER_TRAIT + '.html'
 
-    doc_base_url = cargo.doc_base_url + '/' + to_extern_crate_name(util.crate_name()) + '/'
+    doc_base_url = util.doc_base_url() + '/' + to_extern_crate_name(util.crate_name()) + '/'
 
     def link(name, url):
         lf = '[%s](%s)'

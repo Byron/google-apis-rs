@@ -27,6 +27,14 @@ ${util.library_name(name, version)}\
 ${util.library_to_crate_name(util.library_name(name, version), make.target_suffix)}\
 </%def>
 
+<%def name="doc_base_url()" buffered="True">\
+% if make.id == 'cli':
+${cargo.doc_base_url + '/' + util.to_extern_crate_name(self.crate_name())}\
+% else:
+${cargo.doc_base_url + '/' + self.crate_name() + '/' + self.crate_version()}\
+% endif
+</%def>
+
 <%def name="crate_version()" buffered="True">\
 ${util.crate_version(cargo.build_version, revision is UNDEFINED and '00000000' or revision)}\
 </%def>

@@ -83,9 +83,9 @@ Configuration:
 
 <%def name="new(c)" buffered="True">\
 <%
-    doc_url_base = cargo.doc_base_url + '/' + os.path.dirname(api_index(cargo.doc_base_url, name,
+    doc_base_url = cargo.doc_base_url + '/' + os.path.dirname(api_index(cargo.doc_base_url, name,
                                                                         version, make, check_exists=False))
-    url_info = "All documentation details can be found at " + doc_url_base
+    url_info = "All documentation details can be found at " + doc_base_url
 
     # list of tuples
     # (0) = long name
@@ -215,7 +215,7 @@ let arg_data = [
 %>\
     ("${mangle_subcommand(method)}",
             ${rust_optional(mc.m.get('description'))},
-            "Details at ${doc_url_base}/${os.path.splitext(subcommand_md_filename(resource, method))[0]}",
+            "Details at ${doc_base_url}/${os.path.splitext(subcommand_md_filename(resource, method))[0]}",
           vec![
             % for flag, desc, arg_name, required, multi in args:
             (${rust_optional(arg_name)},

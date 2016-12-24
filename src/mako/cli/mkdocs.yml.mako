@@ -7,7 +7,7 @@
 <%namespace name="util" file="../lib/util.mako"/>\
 site_name: ${util.canonical_name()} v${util.crate_version()}
 site_url: ${cargo.doc_base_url}/${util.crate_name()}
-site_description: Write integrating applications with bcore
+site_description: A complete library to interact with ${util.canonical_name()} (protocol ${version})
 
 repo_url: ${util.github_source_root_url()}
 

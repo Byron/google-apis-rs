@@ -75,7 +75,6 @@ cargo:
   # anymore
   <<: *cargo_api
   repo_base_url: https://github.com/Byron/google-apis-rs
-  doc_base_url: http://byron.github.io/google-apis-rs
   authors:
     # don't forget to possibly add them to copyright authors
     - Sebastian Thiel <byronimo@gmail.com>

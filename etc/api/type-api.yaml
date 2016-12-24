@@ -27,5 +27,6 @@ make:
 cargo:
   build_script: src/build.rs
   keywords: [protocol, web, api]
+  doc_base_url: https://docs.rs
   dependencies:
     - url = "= 0.5"

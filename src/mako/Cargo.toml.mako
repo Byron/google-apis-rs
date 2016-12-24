@@ -13,7 +13,7 @@ repository = "${util.github_source_root_url()}"
 % if documentationLink is not UNDEFINED and documentationLink:
 homepage = "${documentationLink}"
 % endif
-documentation = "${cargo.doc_base_url}/${to_extern_crate_name(util.crate_name())}"
+documentation = "${util.doc_base_url()}"
 license = "${copyright.license_abbrev}"
 keywords = ["${name[:20]}", ${", ".join(estr(cargo.keywords))}]
 % if cargo.get('build_script'):
