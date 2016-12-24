@@ -42,7 +42,7 @@ alertShown = false
 function onClick(button) {
   selectElementContents(button)
   if (document.execCommand('copy') && !alertShown) {
-    alert("Copied to clipboard\nThis message will not be shown again.")
+    alert("Installation script copied to clipboard.\nThis message will not be shown again.")
     alertShown = true
   }
 }
@@ -60,6 +60,12 @@ function selectElementContents(el) {
         textRange.select()
     }
 }
+
+function onCopy(e) {
+  installation_script = '{ command -v rustup 2>&1 >/dev/null || curl https://sh.rustup.rs -sSf | sh } && ' + e.target.textContent
+  e.clipboardData.setData('text/plain', installation_script);
+  e.preventDefault()
+}
 </script>
 	<title>${title}</title>
 </head>
@@ -67,15 +73,14 @@ function selectElementContents(el) {
 <H1>${title}</H1>
 <ul>
 % for an in sorted(api.list.keys()):
+    % if an in api.blacklist:
+        <% continue %>\
+    % endif
     % for v in api.list[an]:
         <% 
             type_names = tc.keys()
-            try:
-              fp = open(api_json_path(directories.api_base, an, v))
+            with open(api_json_path(directories.api_base, an, v)) as fp:
               api_data = json.load(fp)
-            except (ValueError, IOError):
-              api_data = None
-            # end for each type
         %>\
         % if api_data is None:
             <% continue %>\
@@ -90,7 +95,7 @@ function selectElementContents(el) {
             % if program_type == 'api':
             <a href="${crates_io_url(an, v)}/${crate_version(ad.cargo.build_version, revision)}"><img src="${url_info.asset_urls.crates_img}" title="This API on crates.io" height="16" width="16"/></a>
             % else:
-            , <button class="mono" onclick="onClick(this)" title="Copy installation script to clipboard">cargo install ${library_to_crate_name(library_name(an, v))}-cli</button>
+            , <button class="mono" onclick="onClick(this)" oncopy="onCopy(event)" title="Copy complete installation script to clipboard">cargo install ${library_to_crate_name(library_name(an, v))}-cli</button>
             % endif
             % if not loop.last:
 ,           
