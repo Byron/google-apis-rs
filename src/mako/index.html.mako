@@ -1,7 +1,7 @@
 <%
     import os
     import yaml
-    from util import (gen_crate_dir, api_index, crates_io_url, program_name)
+    from util import (library_name, library_to_crate_name, gen_crate_dir, api_index, crates_io_url, program_name)
 
     title = 'Google Service Documentation for Rust'
 
@@ -30,7 +30,34 @@ DO NOT EDIT !
   color: #4d76ae;
   font-size: 20px
 }
+.mono {
+  font-family: monospace;
+}
 </style>
+<script type="text/javascript">
+alertShown = false
+function onClick(button) {
+  selectElementContents(button)
+  if (document.execCommand('copy') && !alertShown) {
+    alert("Copied to clipboard\nThis message will not be shown again.")
+    alertShown = true
+  }
+}
+
+function selectElementContents(el) {
+    if (window.getSelection && document.createRange) {
+        var sel = window.getSelection()
+        var range = document.createRange()
+        range.selectNodeContents(el)
+        sel.removeAllRanges()
+        sel.addRange(range)
+    } else if (document.selection && document.body.createTextRange) {
+        var textRange = document.body.createTextRange()
+        textRange.moveToElementText(el)
+        textRange.select()
+    }
+}
+</script>
 	<title>${title}</title>
 </head>
 <body>
@@ -56,6 +83,8 @@ DO NOT EDIT !
             <a class="mod" href="${api_index(DOC_ROOT, an, v, ad.make)}" title="${ad.make.id.upper()} docs for the ${an} ${v}">${ad.make.id.upper()}</a>
             % if program_type == 'api':
             <a href="${crates_io_url(an, v)}"><img src="${url_info.asset_urls.crates_img}" title="This API on crates.io" height="16" width="16"/></a>
+            % else:
+            , <button class="mono" onclick="onClick(this)">cargo install ${library_to_crate_name(library_name(an, v))}-cli</button>
             % endif
             % if not loop.last:
 ,           
