@@ -214,10 +214,6 @@ The last step will update the documentation index to point to the latest program
 For now we assume hosting on GitHub-Pages, but the compiled documentation directory can be
 hosted statically anywhere if required.
 
-Please note that the generated download URLs are based on the `url_info.download_base_url` key in the
-`etc/api/shared.yaml` file, in case you want to host the downloads anywhere else. In the latter case, you may
-want to adjust other base-urls as well.
-
 ```bash
 # This will run rust-doc on all APIs, generate the index html file and run gh-import at the end.
 # The latter might require user-input in case no credentials are setup.
