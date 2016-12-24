@@ -1,6 +1,6 @@
-site_name: reseller v1.0.0+20160329
+site_name: reseller v1.0.1+20160329
 site_url: http://byron.github.io/google-apis-rs/google-reseller1_sandbox-cli
-site_description: Write integrating applications with bcore
+site_description: A complete library to interact with reseller (protocol v1sandbox)
 
 repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/reseller1_sandbox-cli
 

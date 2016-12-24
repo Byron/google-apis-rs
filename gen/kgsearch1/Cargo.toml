@@ -4,12 +4,12 @@
 [package]
 
 name = "google-kgsearch1"
-version = "1.0.0+20151215"
+version = "1.0.1+20151215"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with kgsearch (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/kgsearch1"
 homepage = "https://developers.google.com/knowledge-graph/"
-documentation = "http://byron.github.io/google-apis-rs/google_kgsearch1"
+documentation = "https://docs.rs/google-kgsearch1/1.0.1+20151215"
 license = "MIT"
 keywords = ["kgsearch", "google", "protocol", "web", "api"]
 build = "src/build.rs"

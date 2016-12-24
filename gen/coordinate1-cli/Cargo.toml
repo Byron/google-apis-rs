@@ -4,7 +4,7 @@
 [package]
 
 name = "google-coordinate1-cli"
-version = "1.0.0+20150811"
+version = "1.0.1+20150811"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with coordinate (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/coordinate1-cli"
@@ -38,6 +38,6 @@ serde_codegen = { version = "^ 0.8", optional = true }
 
 [dependencies.google-coordinate1]
 path = "../coordinate1"
-version = "1.0.0"
+version = "1.0.1+20150811"
 optional = true
 default-features = false

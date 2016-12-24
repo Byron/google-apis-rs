@@ -4,12 +4,12 @@
 [package]
 
 name = "google-gamesmanagement1_management"
-version = "1.0.0+20161207"
+version = "1.0.1+20161207"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Games Management (protocol v1management)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/gamesmanagement1_management"
 homepage = "https://developers.google.com/games/services"
-documentation = "http://byron.github.io/google-apis-rs/google_gamesmanagement1_management"
+documentation = "https://docs.rs/google-gamesmanagement1_management/1.0.1+20161207"
 license = "MIT"
 keywords = ["gamesManagement", "google", "protocol", "web", "api"]
 build = "src/build.rs"

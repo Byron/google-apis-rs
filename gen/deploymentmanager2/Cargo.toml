@@ -4,12 +4,12 @@
 [package]
 
 name = "google-deploymentmanager2"
-version = "1.0.0+20161209"
+version = "1.0.1+20161209"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Deployment Manager (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/deploymentmanager2"
 homepage = "https://cloud.google.com/deployment-manager/"
-documentation = "http://byron.github.io/google-apis-rs/google_deploymentmanager2"
+documentation = "https://docs.rs/google-deploymentmanager2/1.0.1+20161209"
 license = "MIT"
 keywords = ["deploymentmanager", "google", "protocol", "web", "api"]
 build = "src/build.rs"

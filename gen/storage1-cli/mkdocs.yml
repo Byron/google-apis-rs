@@ -1,6 +1,6 @@
-site_name: storage v1.0.0+20161123
+site_name: storage v1.0.1+20161123
 site_url: http://byron.github.io/google-apis-rs/google-storage1-cli
-site_description: Write integrating applications with bcore
+site_description: A complete library to interact with storage (protocol v1)
 
 repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/storage1-cli
 

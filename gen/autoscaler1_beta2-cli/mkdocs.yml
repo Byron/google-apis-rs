@@ -1,6 +1,6 @@
-site_name: autoscaler v1.0.0+20150629
+site_name: autoscaler v1.0.1+20150629
 site_url: http://byron.github.io/google-apis-rs/google-autoscaler1_beta2-cli
-site_description: Write integrating applications with bcore
+site_description: A complete library to interact with autoscaler (protocol v1beta2)
 
 repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/autoscaler1_beta2-cli
 

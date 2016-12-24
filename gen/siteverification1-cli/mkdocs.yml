@@ -1,6 +1,6 @@
-site_name: siteVerification v1.0.0+20160228
+site_name: siteVerification v1.0.1+20160228
 site_url: http://byron.github.io/google-apis-rs/google-siteverification1-cli
-site_description: Write integrating applications with bcore
+site_description: A complete library to interact with siteVerification (protocol v1)
 
 repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/siteverification1-cli
 

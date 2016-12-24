@@ -1,6 +1,6 @@
-site_name: Games v1.0.0+20161207
+site_name: Games v1.0.1+20161207
 site_url: http://byron.github.io/google-apis-rs/google-games1-cli
-site_description: Write integrating applications with bcore
+site_description: A complete library to interact with Games (protocol v1)
 
 repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/games1-cli
 

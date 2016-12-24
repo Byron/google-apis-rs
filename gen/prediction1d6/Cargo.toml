@@ -4,12 +4,12 @@
 [package]
 
 name = "google-prediction1d6"
-version = "1.0.0+20160511"
+version = "1.0.1+20160511"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with prediction (protocol v1.6)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/prediction1d6"
 homepage = "https://developers.google.com/prediction/docs/developer-guide"
-documentation = "http://byron.github.io/google-apis-rs/google_prediction1d6"
+documentation = "https://docs.rs/google-prediction1d6/1.0.1+20160511"
 license = "MIT"
 keywords = ["prediction", "google", "protocol", "web", "api"]
 build = "src/build.rs"

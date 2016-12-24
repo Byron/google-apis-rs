@@ -1,6 +1,6 @@
-site_name: plus v1.0.0+20161214
+site_name: plus v1.0.1+20161214
 site_url: http://byron.github.io/google-apis-rs/google-plus1-cli
-site_description: Write integrating applications with bcore
+site_description: A complete library to interact with plus (protocol v1)
 
 repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/plus1-cli
 

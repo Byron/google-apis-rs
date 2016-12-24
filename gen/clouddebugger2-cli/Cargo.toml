@@ -4,7 +4,7 @@
 [package]
 
 name = "google-clouddebugger2-cli"
-version = "1.0.0+20160810"
+version = "1.0.1+20160810"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Debugger (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/clouddebugger2-cli"
@@ -38,6 +38,6 @@ serde_codegen = { version = "^ 0.8", optional = true }
 
 [dependencies.google-clouddebugger2]
 path = "../clouddebugger2"
-version = "1.0.0"
+version = "1.0.1+20160810"
 optional = true
 default-features = false

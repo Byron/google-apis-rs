@@ -1,6 +1,6 @@
-site_name: Slides v1.0.0+20161213
+site_name: Slides v1.0.1+20161213
 site_url: http://byron.github.io/google-apis-rs/google-slides1-cli
-site_description: Write integrating applications with bcore
+site_description: A complete library to interact with Slides (protocol v1)
 
 repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/slides1-cli
 

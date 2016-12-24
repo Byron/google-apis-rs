@@ -1,6 +1,6 @@
-site_name: Firebase Dynamic Links v1.0.0+20161118
+site_name: Firebase Dynamic Links v1.0.1+20161118
 site_url: http://byron.github.io/google-apis-rs/google-firebasedynamiclinks1-cli
-site_description: Write integrating applications with bcore
+site_description: A complete library to interact with Firebase Dynamic Links (protocol v1)
 
 repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/firebasedynamiclinks1-cli
 

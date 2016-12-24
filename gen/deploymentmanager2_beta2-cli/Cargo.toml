@@ -4,7 +4,7 @@
 [package]
 
 name = "google-deploymentmanager2_beta2-cli"
-version = "1.0.0+20160201"
+version = "1.0.1+20160201"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Deployment Manager (protocol v2beta2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/deploymentmanager2_beta2-cli"
@@ -38,6 +38,6 @@ serde_codegen = { version = "^ 0.8", optional = true }
 
 [dependencies.google-deploymentmanager2_beta2]
 path = "../deploymentmanager2_beta2"
-version = "1.0.0"
+version = "1.0.1+20160201"
 optional = true
 default-features = false

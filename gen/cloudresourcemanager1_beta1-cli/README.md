@@ -13,18 +13,19 @@ If data-structures are requested, these will be returned as pretty-printed JSON,
 Everything else about the *Cloud Resource Manager* API can be found at the
 [official documentation site](https://cloud.google.com/resource-manager).
 
-# Downloads
+# Installation and Source Code
 
-You can download the pre-compiled 64bit binaries for the following platforms:
+Install the command-line interface with cargo using:
 
-* ![icon](http://megaicons.net/static/img/icons_sizes/6/140/16/ubuntu-icon.png) [ubuntu](http://dl.byronimo.de/google.rs/cli/1.0.0/ubuntu/cloudresourcemanager1-beta1.tar.gz)
-* ![icon](http://hydra-media.cursecdn.com/wow.gamepedia.com/a/a2/Apple-icon-16x16.png?version=25ddd67ac3dd3b634478e3978b76cb74) [osx](http://dl.byronimo.de/google.rs/cli/1.0.0/osx/cloudresourcemanager1-beta1.tar.gz)
+```bash
+cargo install google-cloudresourcemanager1_beta1-cli
+```
 
 Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/cloudresourcemanager1_beta1-cli).
 
 # Usage
 
-This documentation was generated from the *Cloud Resource Manager* API at revision *20161212*. The CLI is at version *1.0.0*.
+This documentation was generated from the *Cloud Resource Manager* API at revision *20161212*. The CLI is at version *1.0.1*.
 
 ```bash
 cloudresourcemanager1-beta1 [options]

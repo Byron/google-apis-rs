@@ -13,18 +13,19 @@ If data-structures are requested, these will be returned as pretty-printed JSON,
 Everything else about the *Ad Exchange Seller* API can be found at the
 [official documentation site](https://developers.google.com/ad-exchange/seller-rest/).
 
-# Downloads
+# Installation and Source Code
 
-You can download the pre-compiled 64bit binaries for the following platforms:
+Install the command-line interface with cargo using:
 
-* ![icon](http://megaicons.net/static/img/icons_sizes/6/140/16/ubuntu-icon.png) [ubuntu](http://dl.byronimo.de/google.rs/cli/1.0.0/ubuntu/adexchangeseller2.tar.gz)
-* ![icon](http://hydra-media.cursecdn.com/wow.gamepedia.com/a/a2/Apple-icon-16x16.png?version=25ddd67ac3dd3b634478e3978b76cb74) [osx](http://dl.byronimo.de/google.rs/cli/1.0.0/osx/adexchangeseller2.tar.gz)
+```bash
+cargo install google-adexchangeseller2-cli
+```
 
 Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/adexchangeseller2-cli).
 
 # Usage
 
-This documentation was generated from the *Ad Exchange Seller* API at revision *20160805*. The CLI is at version *1.0.0*.
+This documentation was generated from the *Ad Exchange Seller* API at revision *20160805*. The CLI is at version *1.0.1*.
 
 ```bash
 adexchangeseller2 [options]

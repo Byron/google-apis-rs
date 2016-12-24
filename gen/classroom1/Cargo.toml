@@ -4,12 +4,12 @@
 [package]
 
 name = "google-classroom1"
-version = "1.0.0+20161006"
+version = "1.0.1+20161006"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with classroom (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/classroom1"
 homepage = "https://developers.google.com/classroom/"
-documentation = "http://byron.github.io/google-apis-rs/google_classroom1"
+documentation = "https://docs.rs/google-classroom1/1.0.1+20161006"
 license = "MIT"
 keywords = ["classroom", "google", "protocol", "web", "api"]
 build = "src/build.rs"

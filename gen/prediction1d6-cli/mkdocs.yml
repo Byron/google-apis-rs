@@ -1,6 +1,6 @@
-site_name: prediction v1.0.0+20160511
+site_name: prediction v1.0.1+20160511
 site_url: http://byron.github.io/google-apis-rs/google-prediction1d6-cli
-site_description: Write integrating applications with bcore
+site_description: A complete library to interact with prediction (protocol v1.6)
 
 repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/prediction1d6-cli
 

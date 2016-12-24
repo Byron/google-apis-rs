@@ -4,7 +4,7 @@
 [package]
 
 name = "google-gamesconfiguration1_configuration-cli"
-version = "1.0.0+20161207"
+version = "1.0.1+20161207"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Games Configuration (protocol v1configuration)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/gamesconfiguration1_configuration-cli"
@@ -38,6 +38,6 @@ serde_codegen = { version = "^ 0.8", optional = true }
 
 [dependencies.google-gamesconfiguration1_configuration]
 path = "../gamesconfiguration1_configuration"
-version = "1.0.0"
+version = "1.0.1+20161207"
 optional = true
 default-features = false

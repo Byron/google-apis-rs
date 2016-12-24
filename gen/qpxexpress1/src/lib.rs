@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *QPX Express* crate version *1.0.0+20160708*, where *20160708* is the exact revision of the *qpxExpress:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
+//! This documentation was generated from *QPX Express* crate version *1.0.1+20160708*, where *20160708* is the exact revision of the *qpxExpress:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.1*.
 //! 
 //! Everything else about the *QPX Express* *v1* API can be found at the
 //! [official documentation site](http://developers.google.com/qpx-express).
@@ -17,7 +17,7 @@
 //! 
 //! 
 //! 
-//! Not what you are looking for ? Find all other Google APIs in their Rust [documentation index](../index.html).
+//! Not what you are looking for ? Find all other Google APIs in their Rust [documentation index](http://byron.github.io/google-apis-rs).
 //! 
 //! # Structure of this Library
 //! 
@@ -124,7 +124,7 @@
 //! 
 //! All errors produced by the system are provided either as [Result](enum.Result.html) enumeration as return value of 
 //! the doit() methods, or handed as possibly intermediate results to either the 
-//! [Hub Delegate](trait.Delegate.html), or the [Authenticator Delegate](../yup-oauth2/trait.AuthenticatorDelegate.html).
+//! [Hub Delegate](trait.Delegate.html), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 //! 
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.

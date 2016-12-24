@@ -5,24 +5,24 @@ DO NOT EDIT !
 -->
 The `google-deploymentmanager2` library allows access to all features of the *Google Deployment Manager* service.
 
-This documentation was generated from *Deployment Manager* crate version *1.0.0+20161209*, where *20161209* is the exact revision of the *deploymentmanager:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.0*.
+This documentation was generated from *Deployment Manager* crate version *1.0.1+20161209*, where *20161209* is the exact revision of the *deploymentmanager:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.1*.
 
 Everything else about the *Deployment Manager* *v2* API can be found at the
 [official documentation site](https://cloud.google.com/deployment-manager/).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.DeploymentManager.html) ... 
+Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-deploymentmanager2/1.0.1+20161209/google_deploymentmanager2/struct.DeploymentManager.html) ... 
 
-* [deployments](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.Deployment.html)
- * [*cancel preview*](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.DeploymentCancelPreviewCall.html), [*delete*](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.DeploymentDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.DeploymentGetCall.html), [*get iam policy*](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.DeploymentGetIamPolicyCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.DeploymentInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.DeploymentListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.DeploymentPatchCall.html), [*set iam policy*](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.DeploymentSetIamPolicyCall.html), [*stop*](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.DeploymentStopCall.html), [*test iam permissions*](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.DeploymentTestIamPermissionCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.DeploymentUpdateCall.html)
-* [manifests](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.Manifest.html)
- * [*get*](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.ManifestGetCall.html) and [*list*](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.ManifestListCall.html)
-* [operations](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.Operation.html)
- * [*get*](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.OperationGetCall.html) and [*list*](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.OperationListCall.html)
-* [resources](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.ResourceType.html)
- * [*get*](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.ResourceGetCall.html) and [*list*](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.ResourceListCall.html)
-* [types](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.Type.html)
- * [*list*](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.TypeListCall.html)
+* [deployments](https://docs.rs/google-deploymentmanager2/1.0.1+20161209/google_deploymentmanager2/struct.Deployment.html)
+ * [*cancel preview*](https://docs.rs/google-deploymentmanager2/1.0.1+20161209/google_deploymentmanager2/struct.DeploymentCancelPreviewCall.html), [*delete*](https://docs.rs/google-deploymentmanager2/1.0.1+20161209/google_deploymentmanager2/struct.DeploymentDeleteCall.html), [*get*](https://docs.rs/google-deploymentmanager2/1.0.1+20161209/google_deploymentmanager2/struct.DeploymentGetCall.html), [*get iam policy*](https://docs.rs/google-deploymentmanager2/1.0.1+20161209/google_deploymentmanager2/struct.DeploymentGetIamPolicyCall.html), [*insert*](https://docs.rs/google-deploymentmanager2/1.0.1+20161209/google_deploymentmanager2/struct.DeploymentInsertCall.html), [*list*](https://docs.rs/google-deploymentmanager2/1.0.1+20161209/google_deploymentmanager2/struct.DeploymentListCall.html), [*patch*](https://docs.rs/google-deploymentmanager2/1.0.1+20161209/google_deploymentmanager2/struct.DeploymentPatchCall.html), [*set iam policy*](https://docs.rs/google-deploymentmanager2/1.0.1+20161209/google_deploymentmanager2/struct.DeploymentSetIamPolicyCall.html), [*stop*](https://docs.rs/google-deploymentmanager2/1.0.1+20161209/google_deploymentmanager2/struct.DeploymentStopCall.html), [*test iam permissions*](https://docs.rs/google-deploymentmanager2/1.0.1+20161209/google_deploymentmanager2/struct.DeploymentTestIamPermissionCall.html) and [*update*](https://docs.rs/google-deploymentmanager2/1.0.1+20161209/google_deploymentmanager2/struct.DeploymentUpdateCall.html)
+* [manifests](https://docs.rs/google-deploymentmanager2/1.0.1+20161209/google_deploymentmanager2/struct.Manifest.html)
+ * [*get*](https://docs.rs/google-deploymentmanager2/1.0.1+20161209/google_deploymentmanager2/struct.ManifestGetCall.html) and [*list*](https://docs.rs/google-deploymentmanager2/1.0.1+20161209/google_deploymentmanager2/struct.ManifestListCall.html)
+* [operations](https://docs.rs/google-deploymentmanager2/1.0.1+20161209/google_deploymentmanager2/struct.Operation.html)
+ * [*get*](https://docs.rs/google-deploymentmanager2/1.0.1+20161209/google_deploymentmanager2/struct.OperationGetCall.html) and [*list*](https://docs.rs/google-deploymentmanager2/1.0.1+20161209/google_deploymentmanager2/struct.OperationListCall.html)
+* [resources](https://docs.rs/google-deploymentmanager2/1.0.1+20161209/google_deploymentmanager2/struct.ResourceType.html)
+ * [*get*](https://docs.rs/google-deploymentmanager2/1.0.1+20161209/google_deploymentmanager2/struct.ResourceGetCall.html) and [*list*](https://docs.rs/google-deploymentmanager2/1.0.1+20161209/google_deploymentmanager2/struct.ResourceListCall.html)
+* [types](https://docs.rs/google-deploymentmanager2/1.0.1+20161209/google_deploymentmanager2/struct.Type.html)
+ * [*list*](https://docs.rs/google-deploymentmanager2/1.0.1+20161209/google_deploymentmanager2/struct.TypeListCall.html)
 
 
 
@@ -31,17 +31,17 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
 
 The API is structured into the following primary items:
 
-* **[Hub](http://byron.github.io/google-apis-rs/google_deploymentmanager2/struct.DeploymentManager.html)**
+* **[Hub](https://docs.rs/google-deploymentmanager2/1.0.1+20161209/google_deploymentmanager2/struct.DeploymentManager.html)**
     * a central object to maintain state and allow accessing all *Activities*
-    * creates [*Method Builders*](http://byron.github.io/google-apis-rs/google_deploymentmanager2/trait.MethodsBuilder.html) which in turn
-      allow access to individual [*Call Builders*](http://byron.github.io/google-apis-rs/google_deploymentmanager2/trait.CallBuilder.html)
-* **[Resources](http://byron.github.io/google-apis-rs/google_deploymentmanager2/trait.Resource.html)**
+    * creates [*Method Builders*](https://docs.rs/google-deploymentmanager2/1.0.1+20161209/google_deploymentmanager2/trait.MethodsBuilder.html) which in turn
+      allow access to individual [*Call Builders*](https://docs.rs/google-deploymentmanager2/1.0.1+20161209/google_deploymentmanager2/trait.CallBuilder.html)
+* **[Resources](https://docs.rs/google-deploymentmanager2/1.0.1+20161209/google_deploymentmanager2/trait.Resource.html)**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
-    * **[Parts](http://byron.github.io/google-apis-rs/google_deploymentmanager2/trait.Part.html)**
+    * **[Parts](https://docs.rs/google-deploymentmanager2/1.0.1+20161209/google_deploymentmanager2/trait.Part.html)**
         * a collection of properties
         * never directly used in *Activities*
-* **[Activities](http://byron.github.io/google-apis-rs/google_deploymentmanager2/trait.CallBuilder.html)**
+* **[Activities](https://docs.rs/google-deploymentmanager2/1.0.1+20161209/google_deploymentmanager2/trait.CallBuilder.html)**
     * operations to apply to *Resources*
 
 All *structures* are marked with applicable traits to further categorize them and ease browsing.
@@ -142,17 +142,17 @@ match result {
 ```
 ## Handling Errors
 
-All errors produced by the system are provided either as [Result](http://byron.github.io/google-apis-rs/google_deploymentmanager2/enum.Result.html) enumeration as return value of 
+All errors produced by the system are provided either as [Result](https://docs.rs/google-deploymentmanager2/1.0.1+20161209/google_deploymentmanager2/enum.Result.html) enumeration as return value of 
 the doit() methods, or handed as possibly intermediate results to either the 
-[Hub Delegate](http://byron.github.io/google-apis-rs/google_deploymentmanager2/trait.Delegate.html), or the [Authenticator Delegate](http://byron.github.io/google-apis-rs/google_deploymentmanager2/../yup-oauth2/trait.AuthenticatorDelegate.html).
+[Hub Delegate](https://docs.rs/google-deploymentmanager2/1.0.1+20161209/google_deploymentmanager2/trait.Delegate.html), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
-If a method supports downloads, the response body, which is part of the [Result](http://byron.github.io/google-apis-rs/google_deploymentmanager2/enum.Result.html), should be
+If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-deploymentmanager2/1.0.1+20161209/google_deploymentmanager2/enum.Result.html), should be
 read by you to obtain the media.
-If such a method also supports a [Response Result](http://byron.github.io/google-apis-rs/google_deploymentmanager2/trait.ResponseResult.html), it will return that by default.
+If such a method also supports a [Response Result](https://docs.rs/google-deploymentmanager2/1.0.1+20161209/google_deploymentmanager2/trait.ResponseResult.html), it will return that by default.
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
@@ -162,29 +162,29 @@ Methods supporting uploads can do so using up to 2 different protocols:
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](http://byron.github.io/google-apis-rs/google_deploymentmanager2/trait.Delegate.html) to the 
-[Method Builder](http://byron.github.io/google-apis-rs/google_deploymentmanager2/trait.CallBuilder.html) before making the final `doit()` call. 
+You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-deploymentmanager2/1.0.1+20161209/google_deploymentmanager2/trait.Delegate.html) to the 
+[Method Builder](https://docs.rs/google-deploymentmanager2/1.0.1+20161209/google_deploymentmanager2/trait.CallBuilder.html) before making the final `doit()` call. 
 Respective methods will be called to provide progress information, as well as determine whether the system should 
 retry on failure.
 
-The [delegate trait](http://byron.github.io/google-apis-rs/google_deploymentmanager2/trait.Delegate.html) is default-implemented, allowing you to customize it with minimal effort.
+The [delegate trait](https://docs.rs/google-deploymentmanager2/1.0.1+20161209/google_deploymentmanager2/trait.Delegate.html) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [enocodable](http://byron.github.io/google-apis-rs/google_deploymentmanager2/trait.RequestValue.html) and 
-[decodable](http://byron.github.io/google-apis-rs/google_deploymentmanager2/trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be [enocodable](https://docs.rs/google-deploymentmanager2/1.0.1+20161209/google_deploymentmanager2/trait.RequestValue.html) and 
+[decodable](https://docs.rs/google-deploymentmanager2/1.0.1+20161209/google_deploymentmanager2/trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
 are valid.
-Most optionals are are considered [Parts](http://byron.github.io/google-apis-rs/google_deploymentmanager2/trait.Part.html) which are identifiable by name, which will be sent to 
+Most optionals are are considered [Parts](https://docs.rs/google-deploymentmanager2/1.0.1+20161209/google_deploymentmanager2/trait.Part.html) which are identifiable by name, which will be sent to 
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
 
-Using [method builders](http://byron.github.io/google-apis-rs/google_deploymentmanager2/trait.CallBuilder.html), you are able to prepare an action call by repeatedly calling it's methods.
+Using [method builders](https://docs.rs/google-deploymentmanager2/1.0.1+20161209/google_deploymentmanager2/trait.CallBuilder.html), you are able to prepare an action call by repeatedly calling it's methods.
 These will always take a single argument, for which the following statements are true.
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](http://byron.github.io/google-apis-rs/google_deploymentmanager2/trait.RequestValue.html) are moved
+* [request values](https://docs.rs/google-deploymentmanager2/1.0.1+20161209/google_deploymentmanager2/trait.RequestValue.html) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 

@@ -1,6 +1,6 @@
-site_name: dfareporting v1.0.0+20161027
+site_name: dfareporting v1.0.1+20161027
 site_url: http://byron.github.io/google-apis-rs/google-dfareporting2d6-cli
-site_description: Write integrating applications with bcore
+site_description: A complete library to interact with dfareporting (protocol v2.6)
 
 repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/dfareporting2d6-cli
 

@@ -4,7 +4,7 @@
 [package]
 
 name = "google-taskqueue1_beta2-cli"
-version = "1.0.0+20160428"
+version = "1.0.1+20160428"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with taskqueue (protocol v1beta2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/taskqueue1_beta2-cli"
@@ -38,6 +38,6 @@ serde_codegen = { version = "^ 0.8", optional = true }
 
 [dependencies.google-taskqueue1_beta2]
 path = "../taskqueue1_beta2"
-version = "1.0.0"
+version = "1.0.1+20160428"
 optional = true
 default-features = false

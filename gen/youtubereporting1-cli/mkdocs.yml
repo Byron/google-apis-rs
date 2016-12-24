@@ -1,6 +1,6 @@
-site_name: YouTube Reporting v1.0.0+20160719
+site_name: YouTube Reporting v1.0.1+20160719
 site_url: http://byron.github.io/google-apis-rs/google-youtubereporting1-cli
-site_description: Write integrating applications with bcore
+site_description: A complete library to interact with YouTube Reporting (protocol v1)
 
 repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/youtubereporting1-cli
 

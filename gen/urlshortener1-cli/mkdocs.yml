@@ -1,6 +1,6 @@
-site_name: urlshortener v1.0.0+20150519
+site_name: urlshortener v1.0.1+20150519
 site_url: http://byron.github.io/google-apis-rs/google-urlshortener1-cli
-site_description: Write integrating applications with bcore
+site_description: A complete library to interact with urlshortener (protocol v1)
 
 repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/urlshortener1-cli
 

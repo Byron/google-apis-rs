@@ -4,7 +4,7 @@
 [package]
 
 name = "google-groupssettings1-cli"
-version = "1.0.0+20160525"
+version = "1.0.1+20160525"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with groupssettings (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/groupssettings1-cli"
@@ -38,6 +38,6 @@ serde_codegen = { version = "^ 0.8", optional = true }
 
 [dependencies.google-groupssettings1]
 path = "../groupssettings1"
-version = "1.0.0"
+version = "1.0.1+20160525"
 optional = true
 default-features = false

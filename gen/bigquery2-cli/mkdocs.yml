@@ -1,6 +1,6 @@
-site_name: bigquery v1.0.0+20161130
+site_name: bigquery v1.0.1+20161130
 site_url: http://byron.github.io/google-apis-rs/google-bigquery2-cli
-site_description: Write integrating applications with bcore
+site_description: A complete library to interact with bigquery (protocol v2)
 
 repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/bigquery2-cli
 

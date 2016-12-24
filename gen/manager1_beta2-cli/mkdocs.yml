@@ -1,6 +1,6 @@
-site_name: manager v1.0.0+20140915
+site_name: manager v1.0.1+20140915
 site_url: http://byron.github.io/google-apis-rs/google-manager1_beta2-cli
-site_description: Write integrating applications with bcore
+site_description: A complete library to interact with manager (protocol v1beta2)
 
 repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/manager1_beta2-cli
 

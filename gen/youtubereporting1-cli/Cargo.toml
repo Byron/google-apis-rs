@@ -4,7 +4,7 @@
 [package]
 
 name = "google-youtubereporting1-cli"
-version = "1.0.0+20160719"
+version = "1.0.1+20160719"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with YouTube Reporting (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/youtubereporting1-cli"
@@ -38,6 +38,6 @@ serde_codegen = { version = "^ 0.8", optional = true }
 
 [dependencies.google-youtubereporting1]
 path = "../youtubereporting1"
-version = "1.0.0"
+version = "1.0.1+20160719"
 optional = true
 default-features = false

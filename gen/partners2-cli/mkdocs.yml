@@ -1,6 +1,6 @@
-site_name: partners v1.0.0+20151009
+site_name: partners v1.0.1+20151009
 site_url: http://byron.github.io/google-apis-rs/google-partners2-cli
-site_description: Write integrating applications with bcore
+site_description: A complete library to interact with partners (protocol v2)
 
 repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/partners2-cli
 

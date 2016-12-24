@@ -4,12 +4,12 @@
 [package]
 
 name = "google-youtubeanalytics1"
-version = "1.0.0+20161213"
+version = "1.0.1+20161213"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with YouTube Analytics (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/youtubeanalytics1"
 homepage = "http://developers.google.com/youtube/analytics/"
-documentation = "http://byron.github.io/google-apis-rs/google_youtubeanalytics1"
+documentation = "https://docs.rs/google-youtubeanalytics1/1.0.1+20161213"
 license = "MIT"
 keywords = ["youtubeAnalytics", "google", "protocol", "web", "api"]
 build = "src/build.rs"

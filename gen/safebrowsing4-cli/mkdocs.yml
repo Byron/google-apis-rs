@@ -1,6 +1,6 @@
-site_name: safebrowsing v1.0.0+20160520
+site_name: safebrowsing v1.0.1+20160520
 site_url: http://byron.github.io/google-apis-rs/google-safebrowsing4-cli
-site_description: Write integrating applications with bcore
+site_description: A complete library to interact with safebrowsing (protocol v4)
 
 repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/safebrowsing4-cli
 

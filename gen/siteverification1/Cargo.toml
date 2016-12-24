@@ -4,12 +4,12 @@
 [package]
 
 name = "google-siteverification1"
-version = "1.0.0+20160228"
+version = "1.0.1+20160228"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with siteVerification (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/siteverification1"
 homepage = "https://developers.google.com/site-verification/"
-documentation = "http://byron.github.io/google-apis-rs/google_siteverification1"
+documentation = "https://docs.rs/google-siteverification1/1.0.1+20160228"
 license = "MIT"
 keywords = ["siteVerification", "google", "protocol", "web", "api"]
 build = "src/build.rs"

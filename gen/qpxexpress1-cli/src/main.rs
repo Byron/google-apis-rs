@@ -264,7 +264,7 @@ fn main() {
     
     let mut app = App::new("qpxexpress1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.0+20160708")
+           .version("1.0.1+20160708")
            .about("Finds the least expensive flights between an origin and a destination.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_qpxexpress1_cli")
            .arg(Arg::with_name("folder")

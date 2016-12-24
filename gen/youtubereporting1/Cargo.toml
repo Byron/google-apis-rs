@@ -4,12 +4,12 @@
 [package]
 
 name = "google-youtubereporting1"
-version = "1.0.0+20160719"
+version = "1.0.1+20160719"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with YouTube Reporting (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/youtubereporting1"
 homepage = "https://developers.google.com/youtube/reporting/v1/reports/"
-documentation = "http://byron.github.io/google-apis-rs/google_youtubereporting1"
+documentation = "https://docs.rs/google-youtubereporting1/1.0.1+20160719"
 license = "MIT"
 keywords = ["youtubereporting", "google", "protocol", "web", "api"]
 build = "src/build.rs"

@@ -1,6 +1,6 @@
-site_name: groupssettings v1.0.0+20160525
+site_name: groupssettings v1.0.1+20160525
 site_url: http://byron.github.io/google-apis-rs/google-groupssettings1-cli
-site_description: Write integrating applications with bcore
+site_description: A complete library to interact with groupssettings (protocol v1)
 
 repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/groupssettings1-cli
 

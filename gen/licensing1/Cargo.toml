@@ -4,12 +4,12 @@
 [package]
 
 name = "google-licensing1"
-version = "1.0.0+20150901"
+version = "1.0.1+20150901"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with licensing (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/licensing1"
 homepage = "https://developers.google.com/google-apps/licensing/"
-documentation = "http://byron.github.io/google-apis-rs/google_licensing1"
+documentation = "https://docs.rs/google-licensing1/1.0.1+20150901"
 license = "MIT"
 keywords = ["licensing", "google", "protocol", "web", "api"]
 build = "src/build.rs"

@@ -1,6 +1,6 @@
-site_name: QPX Express v1.0.0+20160708
+site_name: QPX Express v1.0.1+20160708
 site_url: http://byron.github.io/google-apis-rs/google-qpxexpress1-cli
-site_description: Write integrating applications with bcore
+site_description: A complete library to interact with QPX Express (protocol v1)
 
 repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/qpxexpress1-cli
 

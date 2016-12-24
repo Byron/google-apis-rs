@@ -4,12 +4,12 @@
 [package]
 
 name = "google-qpxexpress1"
-version = "1.0.0+20160708"
+version = "1.0.1+20160708"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with QPX Express (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/qpxexpress1"
 homepage = "http://developers.google.com/qpx-express"
-documentation = "http://byron.github.io/google-apis-rs/google_qpxexpress1"
+documentation = "https://docs.rs/google-qpxexpress1/1.0.1+20160708"
 license = "MIT"
 keywords = ["qpxExpress", "google", "protocol", "web", "api"]
 build = "src/build.rs"

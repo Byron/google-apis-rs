@@ -1,6 +1,6 @@
-site_name: Ad Exchange Buyer v1.0.0+20161020
+site_name: Ad Exchange Buyer v1.0.1+20161020
 site_url: http://byron.github.io/google-apis-rs/google-adexchangebuyer1d4-cli
-site_description: Write integrating applications with bcore
+site_description: A complete library to interact with Ad Exchange Buyer (protocol v1.4)
 
 repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/adexchangebuyer1d4-cli
 

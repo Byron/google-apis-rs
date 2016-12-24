@@ -1,6 +1,6 @@
-site_name: Service Registry v1.0.0+20160401
+site_name: Service Registry v1.0.1+20160401
 site_url: http://byron.github.io/google-apis-rs/google-serviceregistryalpha-cli
-site_description: Write integrating applications with bcore
+site_description: A complete library to interact with Service Registry (protocol alpha)
 
 repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/serviceregistryalpha-cli
 

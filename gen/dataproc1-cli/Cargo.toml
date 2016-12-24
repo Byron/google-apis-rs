@@ -4,7 +4,7 @@
 [package]
 
 name = "google-dataproc1-cli"
-version = "1.0.0+20161102"
+version = "1.0.1+20161102"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with dataproc (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/dataproc1-cli"
@@ -38,6 +38,6 @@ serde_codegen = { version = "^ 0.8", optional = true }
 
 [dependencies.google-dataproc1]
 path = "../dataproc1"
-version = "1.0.0"
+version = "1.0.1+20161102"
 optional = true
 default-features = false

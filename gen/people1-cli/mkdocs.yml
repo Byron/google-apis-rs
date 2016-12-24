@@ -1,6 +1,6 @@
-site_name: people v1.0.0+20160210
+site_name: people v1.0.1+20160210
 site_url: http://byron.github.io/google-apis-rs/google-people1-cli
-site_description: Write integrating applications with bcore
+site_description: A complete library to interact with people (protocol v1)
 
 repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/people1-cli
 

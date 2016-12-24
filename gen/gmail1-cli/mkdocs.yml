@@ -1,6 +1,6 @@
-site_name: gmail v1.0.0+20161206
+site_name: gmail v1.0.1+20161206
 site_url: http://byron.github.io/google-apis-rs/google-gmail1-cli
-site_description: Write integrating applications with bcore
+site_description: A complete library to interact with gmail (protocol v1)
 
 repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/gmail1-cli
 

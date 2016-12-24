@@ -1,6 +1,6 @@
-site_name: Android Enterprise v1.0.0+20161207
+site_name: Android Enterprise v1.0.1+20161207
 site_url: http://byron.github.io/google-apis-rs/google-androidenterprise1-cli
-site_description: Write integrating applications with bcore
+site_description: A complete library to interact with Android Enterprise (protocol v1)
 
 repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/androidenterprise1-cli
 

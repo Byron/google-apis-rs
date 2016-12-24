@@ -1,6 +1,6 @@
-site_name: Android Publisher v1.0.0+20161212
+site_name: Android Publisher v1.0.1+20161212
 site_url: http://byron.github.io/google-apis-rs/google-androidpublisher2-cli
-site_description: Write integrating applications with bcore
+site_description: A complete library to interact with Android Publisher (protocol v2)
 
 repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/androidpublisher2-cli
 

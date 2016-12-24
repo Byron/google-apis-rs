@@ -1,6 +1,6 @@
-site_name: appsactivity v1.0.0+20161202
+site_name: appsactivity v1.0.1+20161202
 site_url: http://byron.github.io/google-apis-rs/google-appsactivity1-cli
-site_description: Write integrating applications with bcore
+site_description: A complete library to interact with appsactivity (protocol v1)
 
 repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/appsactivity1-cli
 

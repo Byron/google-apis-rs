@@ -1,6 +1,6 @@
-site_name: Ad Exchange Seller v1.0.0+20160805
+site_name: Ad Exchange Seller v1.0.1+20160805
 site_url: http://byron.github.io/google-apis-rs/google-adexchangeseller2-cli
-site_description: Write integrating applications with bcore
+site_description: A complete library to interact with Ad Exchange Seller (protocol v2.0)
 
 repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/adexchangeseller2-cli
 

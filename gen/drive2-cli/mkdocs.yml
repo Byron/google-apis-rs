@@ -1,6 +1,6 @@
-site_name: drive v1.0.0+20161212
+site_name: drive v1.0.1+20161212
 site_url: http://byron.github.io/google-apis-rs/google-drive2-cli
-site_description: Write integrating applications with bcore
+site_description: A complete library to interact with drive (protocol v2)
 
 repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/drive2-cli
 

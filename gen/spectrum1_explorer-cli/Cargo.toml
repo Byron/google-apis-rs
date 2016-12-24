@@ -4,7 +4,7 @@
 [package]
 
 name = "google-spectrum1_explorer-cli"
-version = "1.0.0+20161116"
+version = "1.0.1+20161116"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with spectrum (protocol v1explorer)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/spectrum1_explorer-cli"
@@ -38,6 +38,6 @@ serde_codegen = { version = "^ 0.8", optional = true }
 
 [dependencies.google-spectrum1_explorer]
 path = "../spectrum1_explorer"
-version = "1.0.0"
+version = "1.0.1+20161116"
 optional = true
 default-features = false

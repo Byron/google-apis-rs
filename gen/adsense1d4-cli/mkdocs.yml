@@ -1,6 +1,6 @@
-site_name: AdSense v1.0.0+20161206
+site_name: AdSense v1.0.1+20161206
 site_url: http://byron.github.io/google-apis-rs/google-adsense1d4-cli
-site_description: Write integrating applications with bcore
+site_description: A complete library to interact with AdSense (protocol v1.4)
 
 repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/adsense1d4-cli
 

@@ -1,6 +1,6 @@
-site_name: Cloud Machine Learning v1.0.0+20161212
+site_name: Cloud Machine Learning v1.0.1+20161212
 site_url: http://byron.github.io/google-apis-rs/google-ml1_beta1-cli
-site_description: Write integrating applications with bcore
+site_description: A complete library to interact with Cloud Machine Learning (protocol v1beta1)
 
 repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/ml1_beta1-cli
 

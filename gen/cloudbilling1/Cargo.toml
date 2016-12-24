@@ -4,12 +4,12 @@
 [package]
 
 name = "google-cloudbilling1"
-version = "1.0.0+20151222"
+version = "1.0.1+20151222"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with cloudbilling (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/cloudbilling1"
 homepage = "https://cloud.google.com/billing/"
-documentation = "http://byron.github.io/google-apis-rs/google_cloudbilling1"
+documentation = "https://docs.rs/google-cloudbilling1/1.0.1+20151222"
 license = "MIT"
 keywords = ["cloudbilling", "google", "protocol", "web", "api"]
 build = "src/build.rs"

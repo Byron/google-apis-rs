@@ -1,6 +1,6 @@
-site_name: spectrum v1.0.0+20161116
+site_name: spectrum v1.0.1+20161116
 site_url: http://byron.github.io/google-apis-rs/google-spectrum1_explorer-cli
-site_description: Write integrating applications with bcore
+site_description: A complete library to interact with spectrum (protocol v1explorer)
 
 repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/spectrum1_explorer-cli
 

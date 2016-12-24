@@ -1,6 +1,6 @@
-site_name: analytics v1.0.0+20161004
+site_name: analytics v1.0.1+20161004
 site_url: http://byron.github.io/google-apis-rs/google-analytics3-cli
-site_description: Write integrating applications with bcore
+site_description: A complete library to interact with analytics (protocol v3)
 
 repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/analytics3-cli
 

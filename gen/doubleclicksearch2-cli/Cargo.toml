@@ -4,7 +4,7 @@
 [package]
 
 name = "google-doubleclicksearch2-cli"
-version = "1.0.0+20161108"
+version = "1.0.1+20161108"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with doubleclicksearch (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/doubleclicksearch2-cli"
@@ -38,6 +38,6 @@ serde_codegen = { version = "^ 0.8", optional = true }
 
 [dependencies.google-doubleclicksearch2]
 path = "../doubleclicksearch2"
-version = "1.0.0"
+version = "1.0.1+20161108"
 optional = true
 default-features = false

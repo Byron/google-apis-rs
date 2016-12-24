@@ -1,6 +1,6 @@
-site_name: proximitybeacon v1.0.0+20160429
+site_name: proximitybeacon v1.0.1+20160429
 site_url: http://byron.github.io/google-apis-rs/google-proximitybeacon1_beta1-cli
-site_description: Write integrating applications with bcore
+site_description: A complete library to interact with proximitybeacon (protocol v1beta1)
 
 repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/proximitybeacon1_beta1-cli
 

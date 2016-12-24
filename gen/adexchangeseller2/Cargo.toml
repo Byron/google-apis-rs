@@ -4,12 +4,12 @@
 [package]
 
 name = "google-adexchangeseller2"
-version = "1.0.0+20160805"
+version = "1.0.1+20160805"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Ad Exchange Seller (protocol v2.0)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/adexchangeseller2"
 homepage = "https://developers.google.com/ad-exchange/seller-rest/"
-documentation = "http://byron.github.io/google-apis-rs/google_adexchangeseller2"
+documentation = "https://docs.rs/google-adexchangeseller2/1.0.1+20160805"
 license = "MIT"
 keywords = ["adexchangeseller", "google", "protocol", "web", "api"]
 build = "src/build.rs"

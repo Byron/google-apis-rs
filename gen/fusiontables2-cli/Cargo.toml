@@ -4,7 +4,7 @@
 [package]
 
 name = "google-fusiontables2-cli"
-version = "1.0.0+20160526"
+version = "1.0.1+20160526"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with fusiontables (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/fusiontables2-cli"
@@ -38,6 +38,6 @@ serde_codegen = { version = "^ 0.8", optional = true }
 
 [dependencies.google-fusiontables2]
 path = "../fusiontables2"
-version = "1.0.0"
+version = "1.0.1+20160526"
 optional = true
 default-features = false

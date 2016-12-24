@@ -1,6 +1,6 @@
-site_name: Play Movies v1.0.0+20160518
+site_name: Play Movies v1.0.1+20160518
 site_url: http://byron.github.io/google-apis-rs/google-playmoviespartner1-cli
-site_description: Write integrating applications with bcore
+site_description: A complete library to interact with Play Movies (protocol v1)
 
 repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/playmoviespartner1-cli
 
