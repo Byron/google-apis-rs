@@ -1,4 +1,4 @@
-.PHONY: help deps regen-apis license ubuntu-build wheezy-build clean
+.PHONY: help deps regen-apis license clean
 .SUFFIXES:
 
 VENV = .virtualenv/virtualenv.py
@@ -9,8 +9,6 @@ MAKO_RENDER := etc/bin/mako-render
 API_VERSION_GEN := etc/bin/api_version_to_yaml.py
 TPL := $(PYTHON) $(MAKO_RENDER)
 MKDOCS := $(shell pwd)/$(VENV_DIR)/bin/mkdocs
-WHEEZY_IMAGE := byron/rust-binaries.nightly.debian-wheezy
-WHEEZY_BUILD_OUTPUT := build/wheezy-x64
 
 MAKO_SRC = src/mako
 RUST_SRC = src/rust
@@ -42,7 +40,6 @@ help:
 	$(info help-cli       -   show all cli targets to build individually)
 	$(info docs-all       -   cargo-doc on all APIs and associates, assemble them together and generate index)
 	$(info docs-all-clean -   remove the entire set of generated documentation)
-	$(info wheezy-build   -   build --release all CLI on ubuntu using docker)
 	$(info github-pages   -   invoke ghp-import on all documentation)
 	$(info regen-apis     -   clear out all generated apis, and regenerate them)
 	$(info license        -   regenerate the main license file)
@@ -78,11 +75,6 @@ LICENSE.md: $(MAKO_SRC)/LICENSE.md.mako $(API_SHARED_INFO) $(MAKO_RENDER)
 	$(PYPATH) $(MAKO) -io $<=$@ --data-files $(API_SHARED_INFO)
 
 license: LICENSE.md
-
-wheezy-build:
-	@-rm -Rf WHEEZY_BUILD_OUTPUT
-	@mkdir -p $(WHEEZY_BUILD_OUTPUT)
-	docker run -v $(PWD):/source -v $(PWD)/$(WHEEZY_BUILD_OUTPUT):/build-result $(WHEEZY_IMAGE) /source/src/bash/docker-build-cli.bash
 
 regen-apis: | clean-all-api clean-all-cli gen-all-api gen-all-cli license
 

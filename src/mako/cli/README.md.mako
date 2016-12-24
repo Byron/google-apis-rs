@@ -21,13 +21,7 @@ Everything else about the *${util.canonical_name()}* API can be found at the
 [official documentation site](${documentationLink}).
 % endif
 
-# Downloads
-
-You can download the pre-compiled 64bit binaries for the following platforms:
-
-% for os_name in make.platforms:
-* ![icon](${url_info.asset_urls.get('%s_img' % os_name)}) [${os_name}](${program_download_url(url_info.download_base_url, 'cli', cargo.build_version, os_name, name, version)})
-% endfor
+# Source Code
 
 Find the source code [on github](${util.github_source_root_url()}).
 
