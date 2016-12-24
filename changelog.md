@@ -1,4 +1,21 @@
-<a name="api-v0.1.14:cli-v0.3.6"></a>
+<a name="api-v1.0.1:cli-v1.0.1"></a>
+## api-v1.0.1:cli-v1.0.1 (2016-12-24)
+
+
+#### Bug Fixes
+
+* **cli:**  try to depend on major version of api ([b68b2a6b](https://github.com/Byron/google-apis-rs/commit/b68b2a6bf5786327afad1d95bceffa1111400e0a))
+* **discovery:**  handle discovery urls with $ ([0ba9535a](https://github.com/Byron/google-apis-rs/commit/0ba9535a1150750b80e862c8fc197819f0f25954))
+* **license:**  correct link to license on github ([f3d0ef45](https://github.com/Byron/google-apis-rs/commit/f3d0ef45d26baaafa3b9120bebe371bce424309c))
+* **versions:**  cli + api use a single base version ([5e28a06d](https://github.com/Byron/google-apis-rs/commit/5e28a06dc0dfafd414765738fff35d019a903cab))
+
+#### Features
+
+* **binaries:**  remove download information ([e6468981](https://github.com/Byron/google-apis-rs/commit/e646898137de3897cdabdb65d2ad553e45c772c1))
+
+
+
+<a name="api-v1.0.0:cli-v1.0.0"></a>
 ## api-v1.0.0:cli-v1.0.0 (2016-10-29)
 
 *Stability for everyone !*
