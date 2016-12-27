@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Android Enterprise* crate version *1.0.1+20161207*, where *20161207* is the exact revision of the *androidenterprise:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.1*.
+//! This documentation was generated from *Android Enterprise* crate version *1.0.2+20161207*, where *20161207* is the exact revision of the *androidenterprise:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.2*.
 //! 
 //! Everything else about the *Android Enterprise* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/android/work/play/emm-api).

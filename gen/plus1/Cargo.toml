@@ -4,12 +4,12 @@
 [package]
 
 name = "google-plus1"
-version = "1.0.1+20161214"
+version = "1.0.2+20161214"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with plus (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/plus1"
 homepage = "https://developers.google.com/+/api/"
-documentation = "https://docs.rs/google-plus1/1.0.1+20161214"
+documentation = "https://docs.rs/google-plus1/1.0.2+20161214"
 license = "MIT"
 keywords = ["plus", "google", "protocol", "web", "api"]
 build = "src/build.rs"

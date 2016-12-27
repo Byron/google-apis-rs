@@ -4,7 +4,7 @@
 [package]
 
 name = "google-safebrowsing4-cli"
-version = "1.0.1+20160520"
+version = "1.0.2+20160520"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with safebrowsing (protocol v4)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/safebrowsing4-cli"
@@ -38,6 +38,6 @@ serde_codegen = { version = "^ 0.8", optional = true }
 
 [dependencies.google-safebrowsing4]
 path = "../safebrowsing4"
-version = "1.0.1+20160520"
+version = "1.0.2+20160520"
 optional = true
 default-features = false

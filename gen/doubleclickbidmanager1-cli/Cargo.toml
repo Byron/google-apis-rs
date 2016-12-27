@@ -4,7 +4,7 @@
 [package]
 
 name = "google-doubleclickbidmanager1-cli"
-version = "1.0.1+20161010"
+version = "1.0.2+20161010"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with DoubleClick Bid Manager (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/doubleclickbidmanager1-cli"
@@ -38,6 +38,6 @@ serde_codegen = { version = "^ 0.8", optional = true }
 
 [dependencies.google-doubleclickbidmanager1]
 path = "../doubleclickbidmanager1"
-version = "1.0.1+20161010"
+version = "1.0.2+20161010"
 optional = true
 default-features = false

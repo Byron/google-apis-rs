@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *siteVerification* crate version *1.0.1+20160228*, where *20160228* is the exact revision of the *siteVerification:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.1*.
+//! This documentation was generated from *siteVerification* crate version *1.0.2+20160228*, where *20160228* is the exact revision of the *siteVerification:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.2*.
 //! 
 //! Everything else about the *siteVerification* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/site-verification/).

@@ -4,7 +4,7 @@
 [package]
 
 name = "google-dfareporting2d2-cli"
-version = "1.0.1+20160803"
+version = "1.0.2+20160803"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with dfareporting (protocol v2.2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/dfareporting2d2-cli"
@@ -38,6 +38,6 @@ serde_codegen = { version = "^ 0.8", optional = true }
 
 [dependencies.google-dfareporting2d2]
 path = "../dfareporting2d2"
-version = "1.0.1+20160803"
+version = "1.0.2+20160803"
 optional = true
 default-features = false

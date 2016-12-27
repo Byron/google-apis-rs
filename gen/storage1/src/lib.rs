@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *storage* crate version *1.0.1+20161123*, where *20161123* is the exact revision of the *storage:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.1*.
+//! This documentation was generated from *storage* crate version *1.0.2+20161123*, where *20161123* is the exact revision of the *storage:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.2*.
 //! 
 //! Everything else about the *storage* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/storage/docs/json_api/).

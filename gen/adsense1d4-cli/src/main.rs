@@ -3480,7 +3480,7 @@ fn main() {
     
     let mut app = App::new("adsense1d4")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.1+20161206")
+           .version("1.0.2+20161206")
            .about("Accesses AdSense publishers' inventory and generates performance reports.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_adsense1d4_cli")
            .arg(Arg::with_name("url")

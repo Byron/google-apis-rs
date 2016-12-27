@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *discovery* crate version *1.0.1+00000000*, where *00000000* is the exact revision of the *discovery:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.1*.
+//! This documentation was generated from *discovery* crate version *1.0.2+00000000*, where *00000000* is the exact revision of the *discovery:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.2*.
 //! 
 //! Everything else about the *discovery* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/discovery/).

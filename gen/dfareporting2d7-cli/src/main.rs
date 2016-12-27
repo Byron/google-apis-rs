@@ -23629,7 +23629,7 @@ fn main() {
     
     let mut app = App::new("dfareporting2d7")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.1+20161027")
+           .version("1.0.2+20161027")
            .about("Manages your DoubleClick Campaign Manager ad campaigns and reports.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_dfareporting2d7_cli")
            .arg(Arg::with_name("url")

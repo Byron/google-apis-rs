@@ -4,12 +4,12 @@
 [package]
 
 name = "google-partners2"
-version = "1.0.1+20151009"
+version = "1.0.2+20151009"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with partners (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/partners2"
 homepage = "https://developers.google.com/partners/"
-documentation = "https://docs.rs/google-partners2/1.0.1+20151009"
+documentation = "https://docs.rs/google-partners2/1.0.2+20151009"
 license = "MIT"
 keywords = ["partners", "google", "protocol", "web", "api"]
 build = "src/build.rs"

@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *genomics* API at revision *20160928*. The CLI is at version *1.0.1*.
+This documentation was generated from the *genomics* API at revision *20160928*. The CLI is at version *1.0.2*.
 
 ```bash
 genomics1 [options]

@@ -4,7 +4,7 @@
 [package]
 
 name = "google-autoscaler1_beta2-cli"
-version = "1.0.1+20150629"
+version = "1.0.2+20150629"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with autoscaler (protocol v1beta2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/autoscaler1_beta2-cli"
@@ -38,6 +38,6 @@ serde_codegen = { version = "^ 0.8", optional = true }
 
 [dependencies.google-autoscaler1_beta2]
 path = "../autoscaler1_beta2"
-version = "1.0.1+20150629"
+version = "1.0.2+20150629"
 optional = true
 default-features = false

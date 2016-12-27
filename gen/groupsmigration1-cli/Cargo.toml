@@ -4,7 +4,7 @@
 [package]
 
 name = "google-groupsmigration1-cli"
-version = "1.0.1+20140416"
+version = "1.0.2+20140416"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Groups Migration (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/groupsmigration1-cli"
@@ -38,6 +38,6 @@ serde_codegen = { version = "^ 0.8", optional = true }
 
 [dependencies.google-groupsmigration1]
 path = "../groupsmigration1"
-version = "1.0.1+20140416"
+version = "1.0.2+20140416"
 optional = true
 default-features = false

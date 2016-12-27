@@ -4,7 +4,7 @@
 [package]
 
 name = "google-cloudlatencytest2-cli"
-version = "1.0.1+20160309"
+version = "1.0.2+20160309"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with cloudlatencytest (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/cloudlatencytest2-cli"
@@ -37,6 +37,6 @@ serde_codegen = { version = "^ 0.8", optional = true }
 
 [dependencies.google-cloudlatencytest2]
 path = "../cloudlatencytest2"
-version = "1.0.1+20160309"
+version = "1.0.2+20160309"
 optional = true
 default-features = false

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Groups Migration* crate version *1.0.1+20140416*, where *20140416* is the exact revision of the *groupsmigration:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.1*.
+//! This documentation was generated from *Groups Migration* crate version *1.0.2+20140416*, where *20140416* is the exact revision of the *groupsmigration:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.2*.
 //! 
 //! Everything else about the *Groups Migration* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/google-apps/groups-migration/).

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *partners* crate version *1.0.1+20151009*, where *20151009* is the exact revision of the *partners:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.1*.
+//! This documentation was generated from *partners* crate version *1.0.2+20151009*, where *20151009* is the exact revision of the *partners:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.2*.
 //! 
 //! Everything else about the *partners* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/partners/).

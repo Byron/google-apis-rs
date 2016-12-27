@@ -4,7 +4,7 @@
 [package]
 
 name = "google-logging2_beta1-cli"
-version = "1.0.1+20161206"
+version = "1.0.2+20161206"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Logging (protocol v2beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/logging2_beta1-cli"
@@ -38,6 +38,6 @@ serde_codegen = { version = "^ 0.8", optional = true }
 
 [dependencies.google-logging2_beta1]
 path = "../logging2_beta1"
-version = "1.0.1+20161206"
+version = "1.0.2+20161206"
 optional = true
 default-features = false

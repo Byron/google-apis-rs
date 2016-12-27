@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *siteVerification* API at revision *20160228*. The CLI is at version *1.0.1*.
+This documentation was generated from the *siteVerification* API at revision *20160228*. The CLI is at version *1.0.2*.
 
 ```bash
 siteverification1 [options]

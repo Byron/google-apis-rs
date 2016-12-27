@@ -4,12 +4,12 @@
 [package]
 
 name = "google-people1"
-version = "1.0.1+20160210"
+version = "1.0.2+20160210"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with people (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/people1"
 homepage = "https://developers.google.com/people/"
-documentation = "https://docs.rs/google-people1/1.0.1+20160210"
+documentation = "https://docs.rs/google-people1/1.0.2+20160210"
 license = "MIT"
 keywords = ["people", "google", "protocol", "web", "api"]
 build = "src/build.rs"

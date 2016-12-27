@@ -4,7 +4,7 @@
 [package]
 
 name = "google-cloudbilling1-cli"
-version = "1.0.1+20151222"
+version = "1.0.2+20151222"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with cloudbilling (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/cloudbilling1-cli"
@@ -38,6 +38,6 @@ serde_codegen = { version = "^ 0.8", optional = true }
 
 [dependencies.google-cloudbilling1]
 path = "../cloudbilling1"
-version = "1.0.1+20151222"
+version = "1.0.2+20151222"
 optional = true
 default-features = false

@@ -4,7 +4,7 @@
 [package]
 
 name = "google-androidpublisher2-cli"
-version = "1.0.1+20161212"
+version = "1.0.2+20161212"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Android Publisher (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/androidpublisher2-cli"
@@ -38,6 +38,6 @@ serde_codegen = { version = "^ 0.8", optional = true }
 
 [dependencies.google-androidpublisher2]
 path = "../androidpublisher2"
-version = "1.0.1+20161212"
+version = "1.0.2+20161212"
 optional = true
 default-features = false

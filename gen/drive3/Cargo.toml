@@ -4,12 +4,12 @@
 [package]
 
 name = "google-drive3"
-version = "1.0.1+20161212"
+version = "1.0.2+20161212"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with drive (protocol v3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/drive3"
 homepage = "https://developers.google.com/drive/"
-documentation = "https://docs.rs/google-drive3/1.0.1+20161212"
+documentation = "https://docs.rs/google-drive3/1.0.2+20161212"
 license = "MIT"
 keywords = ["drive", "google", "protocol", "web", "api"]
 build = "src/build.rs"

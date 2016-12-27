@@ -1789,7 +1789,7 @@ fn main() {
     
     let mut app = App::new("dataproc1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.1+20161102")
+           .version("1.0.2+20161102")
            .about("An API for managing Hadoop-based clusters and jobs on Google Cloud Platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_dataproc1_cli")
            .arg(Arg::with_name("url")

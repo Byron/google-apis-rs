@@ -1,4 +1,4 @@
-site_name: replicapoolupdater v1.0.1+20161003
+site_name: replicapoolupdater v1.0.2+20161003
 site_url: http://byron.github.io/google-apis-rs/google-replicapoolupdater1_beta1-cli
 site_description: A complete library to interact with replicapoolupdater (protocol v1beta1)
 

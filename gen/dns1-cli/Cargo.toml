@@ -4,7 +4,7 @@
 [package]
 
 name = "google-dns1-cli"
-version = "1.0.1+20161130"
+version = "1.0.2+20161130"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with dns (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/dns1-cli"
@@ -38,6 +38,6 @@ serde_codegen = { version = "^ 0.8", optional = true }
 
 [dependencies.google-dns1]
 path = "../dns1"
-version = "1.0.1+20161130"
+version = "1.0.2+20161130"
 optional = true
 default-features = false

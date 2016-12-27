@@ -4505,7 +4505,7 @@ fn main() {
     
     let mut app = App::new("sqladmin1-beta4")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.1+20161213")
+           .version("1.0.2+20161213")
            .about("Creates and configures Cloud SQL instances, which provide fully-managed MySQL databases.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_sqladmin1_beta4_cli")
            .arg(Arg::with_name("url")

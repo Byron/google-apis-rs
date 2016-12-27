@@ -4,7 +4,7 @@
 [package]
 
 name = "google-manufacturers1-cli"
-version = "1.0.1+20161028"
+version = "1.0.2+20161028"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Manufacturer Center (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/manufacturers1-cli"
@@ -38,6 +38,6 @@ serde_codegen = { version = "^ 0.8", optional = true }
 
 [dependencies.google-manufacturers1]
 path = "../manufacturers1"
-version = "1.0.1+20161028"
+version = "1.0.2+20161028"
 optional = true
 default-features = false

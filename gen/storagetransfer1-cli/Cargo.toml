@@ -4,7 +4,7 @@
 [package]
 
 name = "google-storagetransfer1-cli"
-version = "1.0.1+20150811"
+version = "1.0.2+20150811"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with storagetransfer (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/storagetransfer1-cli"
@@ -38,6 +38,6 @@ serde_codegen = { version = "^ 0.8", optional = true }
 
 [dependencies.google-storagetransfer1]
 path = "../storagetransfer1"
-version = "1.0.1+20150811"
+version = "1.0.2+20150811"
 optional = true
 default-features = false

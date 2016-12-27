@@ -4,7 +4,7 @@
 [package]
 
 name = "google-adexchangeseller2-cli"
-version = "1.0.1+20160805"
+version = "1.0.2+20160805"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Ad Exchange Seller (protocol v2.0)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/adexchangeseller2-cli"
@@ -38,6 +38,6 @@ serde_codegen = { version = "^ 0.8", optional = true }
 
 [dependencies.google-adexchangeseller2]
 path = "../adexchangeseller2"
-version = "1.0.1+20160805"
+version = "1.0.2+20160805"
 optional = true
 default-features = false

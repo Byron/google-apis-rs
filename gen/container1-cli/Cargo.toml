@@ -4,7 +4,7 @@
 [package]
 
 name = "google-container1-cli"
-version = "1.0.1+20160421"
+version = "1.0.2+20160421"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with container (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/container1-cli"
@@ -38,6 +38,6 @@ serde_codegen = { version = "^ 0.8", optional = true }
 
 [dependencies.google-container1]
 path = "../container1"
-version = "1.0.1+20160421"
+version = "1.0.2+20160421"
 optional = true
 default-features = false

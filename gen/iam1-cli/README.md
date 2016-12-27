@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *iam* API at revision *20160915*. The CLI is at version *1.0.1*.
+This documentation was generated from the *iam* API at revision *20160915*. The CLI is at version *1.0.2*.
 
 ```bash
 iam1 [options]

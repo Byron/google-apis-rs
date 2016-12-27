@@ -1347,7 +1347,7 @@ fn main() {
     
     let mut app = App::new("adexchangeseller2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.1+20160805")
+           .version("1.0.2+20160805")
            .about("Accesses the inventory of Ad Exchange seller users and generates reports.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_adexchangeseller2_cli")
            .arg(Arg::with_name("url")

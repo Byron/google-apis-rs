@@ -885,7 +885,7 @@ fn main() {
     
     let mut app = App::new("licensing1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.1+20150901")
+           .version("1.0.2+20150901")
            .about("Licensing API to view and manage license for your domain.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_licensing1_cli")
            .arg(Arg::with_name("url")

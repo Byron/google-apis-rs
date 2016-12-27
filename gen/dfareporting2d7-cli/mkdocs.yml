@@ -1,4 +1,4 @@
-site_name: dfareporting v1.0.1+20161027
+site_name: dfareporting v1.0.2+20161027
 site_url: http://byron.github.io/google-apis-rs/google-dfareporting2d7-cli
 site_description: A complete library to interact with dfareporting (protocol v2.7)
 

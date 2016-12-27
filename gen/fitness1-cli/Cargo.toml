@@ -4,7 +4,7 @@
 [package]
 
 name = "google-fitness1-cli"
-version = "1.0.1+20161128"
+version = "1.0.2+20161128"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with fitness (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/fitness1-cli"
@@ -38,6 +38,6 @@ serde_codegen = { version = "^ 0.8", optional = true }
 
 [dependencies.google-fitness1]
 path = "../fitness1"
-version = "1.0.1+20161128"
+version = "1.0.2+20161128"
 optional = true
 default-features = false

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *YouTube Analytics* crate version *1.0.1+20161213*, where *20161213* is the exact revision of the *youtubeAnalytics:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.1*.
+//! This documentation was generated from *YouTube Analytics* crate version *1.0.2+20161213*, where *20161213* is the exact revision of the *youtubeAnalytics:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.2*.
 //! 
 //! Everything else about the *YouTube Analytics* *v1* API can be found at the
 //! [official documentation site](http://developers.google.com/youtube/analytics/).

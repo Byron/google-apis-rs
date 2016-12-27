@@ -4,7 +4,7 @@
 [package]
 
 name = "google-plusdomains1-cli"
-version = "1.0.1+20161214"
+version = "1.0.2+20161214"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with plusDomains (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/plusdomains1-cli"
@@ -38,6 +38,6 @@ serde_codegen = { version = "^ 0.8", optional = true }
 
 [dependencies.google-plusdomains1]
 path = "../plusdomains1"
-version = "1.0.1+20161214"
+version = "1.0.2+20161214"
 optional = true
 default-features = false

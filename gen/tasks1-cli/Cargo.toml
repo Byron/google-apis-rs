@@ -4,7 +4,7 @@
 [package]
 
 name = "google-tasks1-cli"
-version = "1.0.1+20141121"
+version = "1.0.2+20141121"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with tasks (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/tasks1-cli"
@@ -38,6 +38,6 @@ serde_codegen = { version = "^ 0.8", optional = true }
 
 [dependencies.google-tasks1]
 path = "../tasks1"
-version = "1.0.1+20141121"
+version = "1.0.2+20141121"
 optional = true
 default-features = false

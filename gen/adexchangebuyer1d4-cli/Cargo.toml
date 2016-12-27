@@ -4,7 +4,7 @@
 [package]
 
 name = "google-adexchangebuyer1d4-cli"
-version = "1.0.1+20161020"
+version = "1.0.2+20161020"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Ad Exchange Buyer (protocol v1.4)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/adexchangebuyer1d4-cli"
@@ -38,6 +38,6 @@ serde_codegen = { version = "^ 0.8", optional = true }
 
 [dependencies.google-adexchangebuyer1d4]
 path = "../adexchangebuyer1d4"
-version = "1.0.1+20161020"
+version = "1.0.2+20161020"
 optional = true
 default-features = false

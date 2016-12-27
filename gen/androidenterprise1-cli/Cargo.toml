@@ -4,7 +4,7 @@
 [package]
 
 name = "google-androidenterprise1-cli"
-version = "1.0.1+20161207"
+version = "1.0.2+20161207"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Android Enterprise (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/androidenterprise1-cli"
@@ -38,6 +38,6 @@ serde_codegen = { version = "^ 0.8", optional = true }
 
 [dependencies.google-androidenterprise1]
 path = "../androidenterprise1"
-version = "1.0.1+20161207"
+version = "1.0.2+20161207"
 optional = true
 default-features = false

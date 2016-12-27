@@ -597,7 +597,7 @@ fn main() {
     
     let mut app = App::new("cloudbilling1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.1+20151222")
+           .version("1.0.2+20151222")
            .about("Retrieves Google Developers Console billing accounts and associates them with projects.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudbilling1_cli")
            .arg(Arg::with_name("url")
