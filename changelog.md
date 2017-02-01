@@ -1,3 +1,10 @@
+<a name="api-v1.0.3:cli-v1.0.3"></a>
+## api-v1.0.3:cli-v1.0.3 (2017-2-1)
+
+Uprade to hyper v0.10, and use hyper-rustls instead of openssl for
+all communication.
+Please note that authentication is still performed using openssl.
+
 <a name="api-v1.0.1:cli-v1.0.1"></a>
 ## api-v1.0.1:cli-v1.0.1 (2016-12-24)
 
