@@ -157,10 +157,10 @@ impl<'n> Engine<'n> {
 <%def name="_debug_client(flag_name)" buffered="True">\
 if opt.is_present("${flag_name}") {
     hyper::Client::with_connector(mock::TeeConnector {
-            connector: hyper::net::HttpsConnector::<hyper::net::Openssl>::default()
+            connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
         })
 } else {
-    hyper::Client::new()
+    hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
 }\
 </%def>
 
