@@ -4,19 +4,19 @@
 [package]
 
 name = "google-adsense1d4"
-version = "1.0.2+20161206"
+version = "1.0.3+20161206"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with AdSense (protocol v1.4)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/adsense1d4"
 homepage = "https://developers.google.com/adsense/management/"
-documentation = "https://docs.rs/google-adsense1d4/1.0.2+20161206"
+documentation = "https://docs.rs/google-adsense1d4/1.0.3+20161206"
 license = "MIT"
 keywords = ["adsense", "google", "protocol", "web", "api"]
 build = "src/build.rs"
 
 
 [dependencies]
-hyper = "^ 0.9"
+hyper = "^ 0.10"
 mime = "^ 0.2.0"
 serde = "^ 0.8"
 serde_json = "^ 0.8"

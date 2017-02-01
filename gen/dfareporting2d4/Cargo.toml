@@ -4,19 +4,19 @@
 [package]
 
 name = "google-dfareporting2d4"
-version = "1.0.2+20160803"
+version = "1.0.3+20160803"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with dfareporting (protocol v2.4)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/dfareporting2d4"
 homepage = "https://developers.google.com/doubleclick-advertisers/reporting/"
-documentation = "https://docs.rs/google-dfareporting2d4/1.0.2+20160803"
+documentation = "https://docs.rs/google-dfareporting2d4/1.0.3+20160803"
 license = "MIT"
 keywords = ["dfareporting", "google", "protocol", "web", "api"]
 build = "src/build.rs"
 
 
 [dependencies]
-hyper = "^ 0.9"
+hyper = "^ 0.10"
 mime = "^ 0.2.0"
 serde = "^ 0.8"
 serde_json = "^ 0.8"

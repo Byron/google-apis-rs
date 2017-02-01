@@ -4,19 +4,19 @@
 [package]
 
 name = "google-manufacturers1"
-version = "1.0.2+20161028"
+version = "1.0.3+20161028"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Manufacturer Center (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/manufacturers1"
 homepage = "https://developers.google.com/manufacturers/"
-documentation = "https://docs.rs/google-manufacturers1/1.0.2+20161028"
+documentation = "https://docs.rs/google-manufacturers1/1.0.3+20161028"
 license = "MIT"
 keywords = ["manufacturers", "google", "protocol", "web", "api"]
 build = "src/build.rs"
 
 
 [dependencies]
-hyper = "^ 0.9"
+hyper = "^ 0.10"
 mime = "^ 0.2.0"
 serde = "^ 0.8"
 serde_json = "^ 0.8"

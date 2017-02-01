@@ -4,7 +4,7 @@
 [package]
 
 name = "google-groupsmigration1-cli"
-version = "1.0.2+20140416"
+version = "1.0.3+20140416"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Groups Migration (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/groupsmigration1-cli"
@@ -17,14 +17,15 @@ keywords = ["groupsmigration", "google", "cli"]
 name = "groupsmigration1"
 
 [dependencies]
-hyper = "^ 0.9"
+hyper = "^ 0.10"
 mime = "^ 0.2.0"
 serde = "^ 0.8"
 serde_json = "^ 0.8"
 yup-oauth2 = { version = "^ 1.0", optional = true, default-features = false }
 serde_derive = { version = "^ 0.8", optional = true }
 strsim = "^0.5"
-yup-hyper-mock = "^1.0"
+hyper-rustls = "^0.3"
+yup-hyper-mock = "^2.0"
 clap = "^2.0"
 
 [features]
@@ -38,6 +39,6 @@ serde_codegen = { version = "^ 0.8", optional = true }
 
 [dependencies.google-groupsmigration1]
 path = "../groupsmigration1"
-version = "1.0.2+20140416"
+version = "1.0.3+20140416"
 optional = true
 default-features = false

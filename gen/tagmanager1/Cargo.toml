@@ -4,19 +4,19 @@
 [package]
 
 name = "google-tagmanager1"
-version = "1.0.2+20160310"
+version = "1.0.3+20160310"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Tag Manager (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/tagmanager1"
 homepage = "https://developers.google.com/tag-manager/api/v1/"
-documentation = "https://docs.rs/google-tagmanager1/1.0.2+20160310"
+documentation = "https://docs.rs/google-tagmanager1/1.0.3+20160310"
 license = "MIT"
 keywords = ["tagmanager", "google", "protocol", "web", "api"]
 build = "src/build.rs"
 
 
 [dependencies]
-hyper = "^ 0.9"
+hyper = "^ 0.10"
 mime = "^ 0.2.0"
 serde = "^ 0.8"
 serde_json = "^ 0.8"

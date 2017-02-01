@@ -4,19 +4,19 @@
 [package]
 
 name = "google-cloudresourcemanager1"
-version = "1.0.2+20161212"
+version = "1.0.3+20161212"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Resource Manager (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/cloudresourcemanager1"
 homepage = "https://cloud.google.com/resource-manager"
-documentation = "https://docs.rs/google-cloudresourcemanager1/1.0.2+20161212"
+documentation = "https://docs.rs/google-cloudresourcemanager1/1.0.3+20161212"
 license = "MIT"
 keywords = ["cloudresourcemanager", "google", "protocol", "web", "api"]
 build = "src/build.rs"
 
 
 [dependencies]
-hyper = "^ 0.9"
+hyper = "^ 0.10"
 mime = "^ 0.2.0"
 serde = "^ 0.8"
 serde_json = "^ 0.8"

@@ -4,19 +4,19 @@
 [package]
 
 name = "google-slides1"
-version = "1.0.2+20161213"
+version = "1.0.3+20161213"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Slides (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/slides1"
 homepage = "https://developers.google.com/slides/"
-documentation = "https://docs.rs/google-slides1/1.0.2+20161213"
+documentation = "https://docs.rs/google-slides1/1.0.3+20161213"
 license = "MIT"
 keywords = ["slides", "google", "protocol", "web", "api"]
 build = "src/build.rs"
 
 
 [dependencies]
-hyper = "^ 0.9"
+hyper = "^ 0.10"
 mime = "^ 0.2.0"
 serde = "^ 0.8"
 serde_json = "^ 0.8"

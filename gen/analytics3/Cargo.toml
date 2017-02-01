@@ -4,19 +4,19 @@
 [package]
 
 name = "google-analytics3"
-version = "1.0.2+20161004"
+version = "1.0.3+20161004"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with analytics (protocol v3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/analytics3"
 homepage = "https://developers.google.com/analytics/"
-documentation = "https://docs.rs/google-analytics3/1.0.2+20161004"
+documentation = "https://docs.rs/google-analytics3/1.0.3+20161004"
 license = "MIT"
 keywords = ["analytics", "google", "protocol", "web", "api"]
 build = "src/build.rs"
 
 
 [dependencies]
-hyper = "^ 0.9"
+hyper = "^ 0.10"
 mime = "^ 0.2.0"
 serde = "^ 0.8"
 serde_json = "^ 0.8"

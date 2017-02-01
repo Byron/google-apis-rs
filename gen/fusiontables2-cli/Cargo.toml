@@ -4,7 +4,7 @@
 [package]
 
 name = "google-fusiontables2-cli"
-version = "1.0.2+20160526"
+version = "1.0.3+20160526"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with fusiontables (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/fusiontables2-cli"
@@ -17,14 +17,15 @@ keywords = ["fusiontables", "google", "cli"]
 name = "fusiontables2"
 
 [dependencies]
-hyper = "^ 0.9"
+hyper = "^ 0.10"
 mime = "^ 0.2.0"
 serde = "^ 0.8"
 serde_json = "^ 0.8"
 yup-oauth2 = { version = "^ 1.0", optional = true, default-features = false }
 serde_derive = { version = "^ 0.8", optional = true }
 strsim = "^0.5"
-yup-hyper-mock = "^1.0"
+hyper-rustls = "^0.3"
+yup-hyper-mock = "^2.0"
 clap = "^2.0"
 
 [features]
@@ -38,6 +39,6 @@ serde_codegen = { version = "^ 0.8", optional = true }
 
 [dependencies.google-fusiontables2]
 path = "../fusiontables2"
-version = "1.0.2+20160526"
+version = "1.0.3+20160526"
 optional = true
 default-features = false

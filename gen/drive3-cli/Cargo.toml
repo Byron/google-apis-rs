@@ -4,7 +4,7 @@
 [package]
 
 name = "google-drive3-cli"
-version = "1.0.2+20161212"
+version = "1.0.3+20161212"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with drive (protocol v3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/drive3-cli"
@@ -17,14 +17,15 @@ keywords = ["drive", "google", "cli"]
 name = "drive3"
 
 [dependencies]
-hyper = "^ 0.9"
+hyper = "^ 0.10"
 mime = "^ 0.2.0"
 serde = "^ 0.8"
 serde_json = "^ 0.8"
 yup-oauth2 = { version = "^ 1.0", optional = true, default-features = false }
 serde_derive = { version = "^ 0.8", optional = true }
 strsim = "^0.5"
-yup-hyper-mock = "^1.0"
+hyper-rustls = "^0.3"
+yup-hyper-mock = "^2.0"
 clap = "^2.0"
 
 [features]
@@ -38,6 +39,6 @@ serde_codegen = { version = "^ 0.8", optional = true }
 
 [dependencies.google-drive3]
 path = "../drive3"
-version = "1.0.2+20161212"
+version = "1.0.3+20161212"
 optional = true
 default-features = false

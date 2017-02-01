@@ -1,4 +1,4 @@
-site_name: blogger v1.0.2+20150422
+site_name: blogger v1.0.3+20150422
 site_url: http://byron.github.io/google-apis-rs/google-blogger3-cli
 site_description: A complete library to interact with blogger (protocol v3)
 

@@ -4,7 +4,7 @@
 [package]
 
 name = "google-coordinate1-cli"
-version = "1.0.2+20150811"
+version = "1.0.3+20150811"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with coordinate (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/coordinate1-cli"
@@ -17,14 +17,15 @@ keywords = ["coordinate", "google", "cli"]
 name = "coordinate1"
 
 [dependencies]
-hyper = "^ 0.9"
+hyper = "^ 0.10"
 mime = "^ 0.2.0"
 serde = "^ 0.8"
 serde_json = "^ 0.8"
 yup-oauth2 = { version = "^ 1.0", optional = true, default-features = false }
 serde_derive = { version = "^ 0.8", optional = true }
 strsim = "^0.5"
-yup-hyper-mock = "^1.0"
+hyper-rustls = "^0.3"
+yup-hyper-mock = "^2.0"
 clap = "^2.0"
 
 [features]
@@ -38,6 +39,6 @@ serde_codegen = { version = "^ 0.8", optional = true }
 
 [dependencies.google-coordinate1]
 path = "../coordinate1"
-version = "1.0.2+20150811"
+version = "1.0.3+20150811"
 optional = true
 default-features = false

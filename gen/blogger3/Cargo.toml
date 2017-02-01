@@ -4,19 +4,19 @@
 [package]
 
 name = "google-blogger3"
-version = "1.0.2+20150422"
+version = "1.0.3+20150422"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with blogger (protocol v3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/blogger3"
 homepage = "https://developers.google.com/blogger/docs/3.0/getting_started"
-documentation = "https://docs.rs/google-blogger3/1.0.2+20150422"
+documentation = "https://docs.rs/google-blogger3/1.0.3+20150422"
 license = "MIT"
 keywords = ["blogger", "google", "protocol", "web", "api"]
 build = "src/build.rs"
 
 
 [dependencies]
-hyper = "^ 0.9"
+hyper = "^ 0.10"
 mime = "^ 0.2.0"
 serde = "^ 0.8"
 serde_json = "^ 0.8"

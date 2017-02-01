@@ -4,19 +4,19 @@
 [package]
 
 name = "google-gmail1"
-version = "1.0.2+20161206"
+version = "1.0.3+20161206"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with gmail (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/gmail1"
 homepage = "https://developers.google.com/gmail/api/"
-documentation = "https://docs.rs/google-gmail1/1.0.2+20161206"
+documentation = "https://docs.rs/google-gmail1/1.0.3+20161206"
 license = "MIT"
 keywords = ["gmail", "google", "protocol", "web", "api"]
 build = "src/build.rs"
 
 
 [dependencies]
-hyper = "^ 0.9"
+hyper = "^ 0.10"
 mime = "^ 0.2.0"
 serde = "^ 0.8"
 serde_json = "^ 0.8"

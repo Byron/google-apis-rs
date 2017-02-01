@@ -4,18 +4,18 @@
 [package]
 
 name = "google-surveys2"
-version = "1.0.2+20161103"
+version = "1.0.3+20161103"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Surveys (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/surveys2"
-documentation = "https://docs.rs/google-surveys2/1.0.2+20161103"
+documentation = "https://docs.rs/google-surveys2/1.0.3+20161103"
 license = "MIT"
 keywords = ["surveys", "google", "protocol", "web", "api"]
 build = "src/build.rs"
 
 
 [dependencies]
-hyper = "^ 0.9"
+hyper = "^ 0.10"
 mime = "^ 0.2.0"
 serde = "^ 0.8"
 serde_json = "^ 0.8"

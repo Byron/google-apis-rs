@@ -4,19 +4,19 @@
 [package]
 
 name = "google-coordinate1"
-version = "1.0.2+20150811"
+version = "1.0.3+20150811"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with coordinate (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/coordinate1"
 homepage = "https://developers.google.com/coordinate/"
-documentation = "https://docs.rs/google-coordinate1/1.0.2+20150811"
+documentation = "https://docs.rs/google-coordinate1/1.0.3+20150811"
 license = "MIT"
 keywords = ["coordinate", "google", "protocol", "web", "api"]
 build = "src/build.rs"
 
 
 [dependencies]
-hyper = "^ 0.9"
+hyper = "^ 0.10"
 mime = "^ 0.2.0"
 serde = "^ 0.8"
 serde_json = "^ 0.8"

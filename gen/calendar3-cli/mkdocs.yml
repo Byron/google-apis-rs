@@ -1,4 +1,4 @@
-site_name: calendar v1.0.2+20161211
+site_name: calendar v1.0.3+20161211
 site_url: http://byron.github.io/google-apis-rs/google-calendar3-cli
 site_description: A complete library to interact with calendar (protocol v3)
 

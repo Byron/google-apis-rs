@@ -1,4 +1,4 @@
-site_name: urlshortener v1.0.2+20150519
+site_name: urlshortener v1.0.3+20150519
 site_url: http://byron.github.io/google-apis-rs/google-urlshortener1-cli
 site_description: A complete library to interact with urlshortener (protocol v1)
 

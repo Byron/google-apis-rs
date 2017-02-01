@@ -1,4 +1,4 @@
-site_name: gan v1.0.2+20130205
+site_name: gan v1.0.3+20130205
 site_url: http://byron.github.io/google-apis-rs/google-gan1_beta1-cli
 site_description: A complete library to interact with gan (protocol v1beta1)
 

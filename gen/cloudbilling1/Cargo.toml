@@ -4,19 +4,19 @@
 [package]
 
 name = "google-cloudbilling1"
-version = "1.0.2+20151222"
+version = "1.0.3+20151222"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with cloudbilling (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/cloudbilling1"
 homepage = "https://cloud.google.com/billing/"
-documentation = "https://docs.rs/google-cloudbilling1/1.0.2+20151222"
+documentation = "https://docs.rs/google-cloudbilling1/1.0.3+20151222"
 license = "MIT"
 keywords = ["cloudbilling", "google", "protocol", "web", "api"]
 build = "src/build.rs"
 
 
 [dependencies]
-hyper = "^ 0.9"
+hyper = "^ 0.10"
 mime = "^ 0.2.0"
 serde = "^ 0.8"
 serde_json = "^ 0.8"

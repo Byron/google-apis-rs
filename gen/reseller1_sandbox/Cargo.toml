@@ -4,19 +4,19 @@
 [package]
 
 name = "google-reseller1_sandbox"
-version = "1.0.2+20160329"
+version = "1.0.3+20160329"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with reseller (protocol v1sandbox)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/reseller1_sandbox"
 homepage = "https://developers.google.com/google-apps/reseller/"
-documentation = "https://docs.rs/google-reseller1_sandbox/1.0.2+20160329"
+documentation = "https://docs.rs/google-reseller1_sandbox/1.0.3+20160329"
 license = "MIT"
 keywords = ["reseller", "google", "protocol", "web", "api"]
 build = "src/build.rs"
 
 
 [dependencies]
-hyper = "^ 0.9"
+hyper = "^ 0.10"
 mime = "^ 0.2.0"
 serde = "^ 0.8"
 serde_json = "^ 0.8"

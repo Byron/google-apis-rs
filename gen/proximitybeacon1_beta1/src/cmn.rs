@@ -303,7 +303,7 @@ impl Display for Error {
                 writeln!(f, "It is used as there are no Scopes defined for this method.")
             },
             Error::BadRequest(ref err) => {
-                try!(writeln!(f, "Bad Requst ({}): {}", err.error.code, err.error.message));
+                try!(writeln!(f, "Bad Request ({}): {}", err.error.code, err.error.message));
                 for err in err.error.errors.iter() {
                     try!(writeln!(f, "    {}: {}, {}{}",
                                             err.domain,

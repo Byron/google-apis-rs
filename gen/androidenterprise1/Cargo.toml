@@ -4,19 +4,19 @@
 [package]
 
 name = "google-androidenterprise1"
-version = "1.0.2+20161207"
+version = "1.0.3+20161207"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Android Enterprise (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/androidenterprise1"
 homepage = "https://developers.google.com/android/work/play/emm-api"
-documentation = "https://docs.rs/google-androidenterprise1/1.0.2+20161207"
+documentation = "https://docs.rs/google-androidenterprise1/1.0.3+20161207"
 license = "MIT"
 keywords = ["androidenterprise", "google", "protocol", "web", "api"]
 build = "src/build.rs"
 
 
 [dependencies]
-hyper = "^ 0.9"
+hyper = "^ 0.10"
 mime = "^ 0.2.0"
 serde = "^ 0.8"
 serde_json = "^ 0.8"

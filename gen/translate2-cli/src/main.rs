@@ -7,6 +7,7 @@
 extern crate clap;
 extern crate yup_oauth2 as oauth2;
 extern crate yup_hyper_mock as mock;
+extern crate hyper_rustls;
 extern crate serde;
 extern crate serde_json;
 extern crate hyper;
@@ -278,10 +279,10 @@ impl<'n> Engine<'n> {
         let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
                                         if opt.is_present("debug-auth") {
                                             hyper::Client::with_connector(mock::TeeConnector {
-                                                    connector: hyper::net::HttpsConnector::<hyper::net::Openssl>::default()
+                                                    connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
                                                 })
                                         } else {
-                                            hyper::Client::new()
+                                            hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
                                         },
                                         JsonTokenStorage {
                                           program_name: "translate2",
@@ -291,10 +292,10 @@ impl<'n> Engine<'n> {
         let client =
             if opt.is_present("debug") {
                 hyper::Client::with_connector(mock::TeeConnector {
-                        connector: hyper::net::HttpsConnector::<hyper::net::Openssl>::default()
+                        connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
                     })
             } else {
-                hyper::Client::new()
+                hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
             };
         let engine = Engine {
             opt: opt,
@@ -405,7 +406,7 @@ fn main() {
     
     let mut app = App::new("translate2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.2+20160627")
+           .version("1.0.3+20160627")
            .about("Translates text from one language to another.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_translate2_cli")
            .arg(Arg::with_name("folder")

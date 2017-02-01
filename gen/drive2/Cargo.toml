@@ -4,19 +4,19 @@
 [package]
 
 name = "google-drive2"
-version = "1.0.2+20161212"
+version = "1.0.3+20161212"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with drive (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/drive2"
 homepage = "https://developers.google.com/drive/"
-documentation = "https://docs.rs/google-drive2/1.0.2+20161212"
+documentation = "https://docs.rs/google-drive2/1.0.3+20161212"
 license = "MIT"
 keywords = ["drive", "google", "protocol", "web", "api"]
 build = "src/build.rs"
 
 
 [dependencies]
-hyper = "^ 0.9"
+hyper = "^ 0.10"
 mime = "^ 0.2.0"
 serde = "^ 0.8"
 serde_json = "^ 0.8"

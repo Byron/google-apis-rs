@@ -4,19 +4,19 @@
 [package]
 
 name = "google-fusiontables2"
-version = "1.0.2+20160526"
+version = "1.0.3+20160526"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with fusiontables (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/fusiontables2"
 homepage = "https://developers.google.com/fusiontables"
-documentation = "https://docs.rs/google-fusiontables2/1.0.2+20160526"
+documentation = "https://docs.rs/google-fusiontables2/1.0.3+20160526"
 license = "MIT"
 keywords = ["fusiontables", "google", "protocol", "web", "api"]
 build = "src/build.rs"
 
 
 [dependencies]
-hyper = "^ 0.9"
+hyper = "^ 0.10"
 mime = "^ 0.2.0"
 serde = "^ 0.8"
 serde_json = "^ 0.8"

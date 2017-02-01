@@ -4,19 +4,19 @@
 [package]
 
 name = "google-groupsmigration1"
-version = "1.0.2+20140416"
+version = "1.0.3+20140416"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Groups Migration (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/groupsmigration1"
 homepage = "https://developers.google.com/google-apps/groups-migration/"
-documentation = "https://docs.rs/google-groupsmigration1/1.0.2+20140416"
+documentation = "https://docs.rs/google-groupsmigration1/1.0.3+20140416"
 license = "MIT"
 keywords = ["groupsmigration", "google", "protocol", "web", "api"]
 build = "src/build.rs"
 
 
 [dependencies]
-hyper = "^ 0.9"
+hyper = "^ 0.10"
 mime = "^ 0.2.0"
 serde = "^ 0.8"
 serde_json = "^ 0.8"
