@@ -660,7 +660,7 @@ else {
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
             {
-                let mut value = json::value::to_value(&self.${property(REQUEST_VALUE_PROPERTY_NAME)});
+                let mut value = json::value::to_value(&self.${property(REQUEST_VALUE_PROPERTY_NAME)}).expect("serde to work");
                 remove_json_null_values(&mut value);
                 let mut dst = io::Cursor::new(Vec::with_capacity(128));
                 json::to_writer(&mut dst, &value).unwrap();

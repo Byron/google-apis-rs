@@ -18,14 +18,9 @@ make:
     - source: README.md
     - source: ../LICENSE.md
     - source: ../Cargo.toml
-    - source: lib.rs.in
-      output_dir: src
     - source: lib.rs
       output_dir: src
-    - source: build.rs
-      output_dir: src
 cargo:
-  build_script: src/build.rs
   keywords: [protocol, web, api]
   doc_base_url: https://docs.rs
   dependencies:

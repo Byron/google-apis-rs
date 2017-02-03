@@ -20,7 +20,7 @@ clap = "*"
 hyper = "*"
 mime = "*"
 rustc-serialize = "*"
-yup-oauth2 = { version = "*", features = ["nightly"], default-features = false }
+yup-oauth2 = "*"
 serde = "*"
 serde_json = "*"
 serde_macros = "*"

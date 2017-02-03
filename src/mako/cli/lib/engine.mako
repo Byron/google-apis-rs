@@ -323,7 +323,7 @@ if dry_run {
             if !download_mode {
             % endif
             % if mc.response_schema:
-            let mut value = json::value::to_value(&output_schema);
+            let mut value = json::value::to_value(&output_schema).expect("serde to work");
             remove_json_null_values(&mut value);
             json::to_writer_pretty(&mut ostream, &value).unwrap();
             ostream.flush().unwrap();
