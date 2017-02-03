@@ -265,11 +265,11 @@ impl FieldCursor {
                             JsonType::Boolean =>
                                     Value::Bool(arg_from_str(value, err, &field, "boolean")),
                             JsonType::Int =>
-                                    Value::I64(arg_from_str(value, err, &field, "int")),
+                                    Value::Number(json::Number::from_f64(arg_from_str(value, err, &field, "int")).expect("valid f64")),
                             JsonType::Uint =>
-                                    Value::U64(arg_from_str(value, err, &field, "uint")),
+                                    Value::Number(json::Number::from_f64(arg_from_str(value, err, &field, "uint")).expect("valid f64")),
                             JsonType::Float =>
-                                    Value::F64(arg_from_str(value, err, &field, "float")),
+                                    Value::Number(json::Number::from_f64(arg_from_str(value, err, &field, "float")).expect("valid f64")),
                             JsonType::String =>
                                     Value::String(value.to_owned()),
                         }
