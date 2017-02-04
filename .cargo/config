@@ -1,3 +1,2 @@
-paths = ["/Users/byron/dev/yup-oauth2"]
 [build]
 target-dir = "./target"
