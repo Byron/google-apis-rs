@@ -131,6 +131,16 @@ impl From<&'static str> for FieldCursor {
     }
 }
 
+fn assure_entry<'a>(m: &'a mut json::Map<String, Value>, k: &'a String) -> &'a mut Value {
+    match m.get_mut(k) {
+        Some(v) => v,
+        None => {
+            m.insert(k.to_owned(), Value::Object(Default::default()));
+            m.get_mut(k).expect("value to exist")
+        }
+    }
+}
+
 impl FieldCursor {
     pub fn set(&mut self, value: &str) -> Result<(), CLIError> {
         if value.len() == 0 {
@@ -247,9 +257,7 @@ impl FieldCursor {
             object =
                 match *tmp {
                     Value::Object(ref mut mapping) => {
-                        mapping.entry(field.to_owned()).or_insert(
-                                                    Value::Object(Default::default())
-                                                        )
+                        assure_entry(mapping, &field)
                     },
                     _ => panic!("We don't expect non-object Values here ...")
                 };
@@ -282,8 +290,7 @@ impl FieldCursor {
                         }
                     },
                     ComplexType::Vec => {
-                        match *mapping.entry(field.to_owned())
-                                      .or_insert(Value::Array(Default::default())) {
+                        match *assure_entry(mapping, field) {
                             Value::Array(ref mut values) => values.push(to_jval(value, type_info.jtype, err)),
                             _ => unreachable!()
                         }
@@ -292,8 +299,8 @@ impl FieldCursor {
                         let (key, value) = parse_kv_arg(value, err, true);
                         let jval = to_jval(value.unwrap_or(""), type_info.jtype, err);
 
-                        match *mapping.entry(field.to_owned())
-                                      .or_insert(Value::Object(Default::default())) {
+                        match *assure_entry(mapping, &field) {
+                              
                             Value::Object(ref mut value_map) => {
                                 if value_map.insert(key.to_owned(), jval).is_some() {
                                     err.issues.push(CLIError::Field(FieldError::Duplicate(orig_cursor.to_string())));
