@@ -131,14 +131,12 @@ impl From<&'static str> for FieldCursor {
     }
 }
 
-fn assure_entry<'a>(m: &'a mut json::Map<String, Value>, k: &'a String) -> &'a mut Value {
-    match m.get_mut(k) {
-        Some(v) => v,
-        None => {
-            m.insert(k.to_owned(), Value::Object(Default::default()));
-            m.get_mut(k).expect("value to exist")
-        }
+fn assure_entry<'a, 'b>(m: &'a mut json::Map<String, Value>, k: &'b String) -> &'a mut Value {
+    if m.contains_key(k) {
+        return m.get_mut(k).expect("value to exist")
     }
+    m.insert(k.to_owned(), Value::Object(Default::default()));
+    m.get_mut(k).expect("value to exist")
 }
 
 impl FieldCursor {
@@ -282,7 +280,7 @@ impl FieldCursor {
                                     Value::String(value.to_owned()),
                         }
                     };
-
+    
                 match type_info.ctype {
                     ComplexType::Pod => {
                         if mapping.insert(field.to_owned(), to_jval(value, type_info.jtype, err)).is_some() {
@@ -298,7 +296,7 @@ impl FieldCursor {
                     ComplexType::Map => {
                         let (key, value) = parse_kv_arg(value, err, true);
                         let jval = to_jval(value.unwrap_or(""), type_info.jtype, err);
-
+    
                         match *assure_entry(mapping, &field) {
                               
                             Value::Object(ref mut value_map) => {
@@ -314,7 +312,7 @@ impl FieldCursor {
             _ => unreachable!()
         }
     }
-
+    
     pub fn num_fields(&self) -> usize {
         self.0.len()
     }

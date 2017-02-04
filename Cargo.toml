@@ -23,7 +23,7 @@ rustc-serialize = "*"
 yup-oauth2 = "*"
 serde = "*"
 serde_json = "*"
-serde_macros = "*"
+serde_derive = "*"
 strsim = "*"
 
 [dev-dependencies]
