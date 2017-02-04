@@ -179,7 +179,7 @@ impl<'n> Engine<'n> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema);
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
@@ -316,7 +316,7 @@ fn main() {
     
     let mut app = App::new("customsearch1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.3+20160411")
+           .version("1.0.4+20160411")
            .about("Lets you search over a website or collection of websites")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_customsearch1_cli")
            .arg(Arg::with_name("folder")

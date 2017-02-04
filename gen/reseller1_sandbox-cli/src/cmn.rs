@@ -10,6 +10,7 @@ use strsim;
 use std::fs;
 use std::env;
 use std::io;
+use std::error::Error as StdError;
 use std::fmt;
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
@@ -132,6 +133,14 @@ impl From<&'static str> for FieldCursor {
     }
 }
 
+fn assure_entry<'a, 'b>(m: &'a mut json::Map<String, Value>, k: &'b String) -> &'a mut Value {
+    if m.contains_key(k) {
+        return m.get_mut(k).expect("value to exist")
+    }
+    m.insert(k.to_owned(), Value::Object(Default::default()));
+    m.get_mut(k).expect("value to exist")
+}
+
 impl FieldCursor {
     pub fn set(&mut self, value: &str) -> Result<(), CLIError> {
         if value.len() == 0 {
@@ -248,9 +257,7 @@ impl FieldCursor {
             object =
                 match *tmp {
                     Value::Object(ref mut mapping) => {
-                        mapping.entry(field.to_owned()).or_insert(
-                                                    Value::Object(Default::default())
-                                                        )
+                        assure_entry(mapping, &field)
                     },
                     _ => panic!("We don't expect non-object Values here ...")
                 };
@@ -266,16 +273,16 @@ impl FieldCursor {
                             JsonType::Boolean =>
                                     Value::Bool(arg_from_str(value, err, &field, "boolean")),
                             JsonType::Int =>
-                                    Value::I64(arg_from_str(value, err, &field, "int")),
+                                    Value::Number(json::Number::from_f64(arg_from_str(value, err, &field, "int")).expect("valid f64")),
                             JsonType::Uint =>
-                                    Value::U64(arg_from_str(value, err, &field, "uint")),
+                                    Value::Number(json::Number::from_f64(arg_from_str(value, err, &field, "uint")).expect("valid f64")),
                             JsonType::Float =>
-                                    Value::F64(arg_from_str(value, err, &field, "float")),
+                                    Value::Number(json::Number::from_f64(arg_from_str(value, err, &field, "float")).expect("valid f64")),
                             JsonType::String =>
                                     Value::String(value.to_owned()),
                         }
                     };
-
+    
                 match type_info.ctype {
                     ComplexType::Pod => {
                         if mapping.insert(field.to_owned(), to_jval(value, type_info.jtype, err)).is_some() {
@@ -283,8 +290,7 @@ impl FieldCursor {
                         }
                     },
                     ComplexType::Vec => {
-                        match *mapping.entry(field.to_owned())
-                                      .or_insert(Value::Array(Default::default())) {
+                        match *assure_entry(mapping, field) {
                             Value::Array(ref mut values) => values.push(to_jval(value, type_info.jtype, err)),
                             _ => unreachable!()
                         }
@@ -292,9 +298,9 @@ impl FieldCursor {
                     ComplexType::Map => {
                         let (key, value) = parse_kv_arg(value, err, true);
                         let jval = to_jval(value.unwrap_or(""), type_info.jtype, err);
-
-                        match *mapping.entry(field.to_owned())
-                                      .or_insert(Value::Object(Default::default())) {
+    
+                        match *assure_entry(mapping, &field) {
+                              
                             Value::Object(ref mut value_map) => {
                                 if value_map.insert(key.to_owned(), jval).is_some() {
                                     err.issues.push(CLIError::Field(FieldError::Duplicate(orig_cursor.to_string())));
@@ -308,7 +314,7 @@ impl FieldCursor {
             _ => unreachable!()
         }
     }
-
+    
     pub fn num_fields(&self) -> usize {
         self.0.len()
     }
@@ -403,18 +409,43 @@ impl JsonTokenStorage {
     }
 }
 
+
+#[derive(Debug)]
+pub enum TokenStorageError {
+    Json(json::Error),
+    Io(io::Error),
+}
+
+impl fmt::Display for TokenStorageError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
+        match *self {
+            TokenStorageError::Json(ref err)
+                => writeln!(f, "Could not serialize secrets: {}", err),
+            TokenStorageError::Io(ref err)
+                => writeln!(f, "Failed to write secret token: {}", err),
+        }
+    }
+}
+
+impl StdError for TokenStorageError {
+    fn description(&self) -> &str {
+        "Failure when getting or setting the token storage"
+    }
+}
+
+
 impl TokenStorage for JsonTokenStorage {
-    type Error = json::Error;
+    type Error = TokenStorageError;
 
     // NOTE: logging might be interesting, currently we swallow all errors
-    fn set(&mut self, scope_hash: u64, _: &Vec<&str>, token: Option<Token>) -> Result<(), json::Error> {
+    fn set(&mut self, scope_hash: u64, _: &Vec<&str>, token: Option<Token>) -> Result<(), TokenStorageError> {
         match token {
             None => {
                 match fs::remove_file(self.path(scope_hash)) {
                     Err(err) =>
                         match err.kind() {
                             io::ErrorKind::NotFound => Ok(()),
-                            _ => Err(json::Error::Io(err))
+                            _ => Err(TokenStorageError::Io(err))
                         },
                     Ok(_) => Ok(()),
                 }
@@ -424,27 +455,27 @@ impl TokenStorage for JsonTokenStorage {
                     Ok(mut f) => {
                         match json::to_writer_pretty(&mut f, &token) {
                             Ok(_) => Ok(()),
-                            Err(serde_err) => Err(serde_err),
+                            Err(serde_err) => Err(TokenStorageError::Json(serde_err)),
                         }
                     },
-                    Err(io_err) => Err(json::Error::Io(io_err))
+                    Err(io_err) => Err(TokenStorageError::Io(io_err))
                 }
             }
         }
     }
 
-    fn get(&self, scope_hash: u64, _: &Vec<&str>) -> Result<Option<Token>, json::Error> {
+    fn get(&self, scope_hash: u64, _: &Vec<&str>) -> Result<Option<Token>, TokenStorageError> {
         match fs::File::open(&self.path(scope_hash)) {
             Ok(f) => {
                 match json::de::from_reader(f) {
                     Ok(token) => Ok(Some(token)),
-                    Err(err)  => Err(err),
+                    Err(err)  => Err(TokenStorageError::Json(err)),
                 }
             },
             Err(io_err) => {
                 match io_err.kind() {
                     io::ErrorKind::NotFound => Ok(None),
-                    _ => Err(json::Error::Io(io_err))
+                    _ => Err(TokenStorageError::Io(io_err))
                 }
             }
         }
@@ -682,10 +713,7 @@ pub fn application_secret_from_directory(dir: &str,
                             let console_secret: ConsoleApplicationSecret
                                             = json::from_str(json_console_secret).unwrap();
                             match json::to_writer_pretty(&mut f, &console_secret) {
-                                Err(serde_err) => match serde_err {
-                                    json::Error::Io(err) => err,
-                                    _ => panic!("Unexpected serde error: {:#?}", serde_err)
-                                },
+                                Err(serde_err) => panic!("Unexpected serde error: {:#?}", serde_err),
                                 Ok(_) => continue,
                             }
                         }
@@ -696,8 +724,6 @@ pub fn application_secret_from_directory(dir: &str,
             },
             Ok(f) => {
                 match json::de::from_reader::<_, ConsoleApplicationSecret>(f) {
-                    Err(json::Error::Io(err)) =>
-                        return secret_io_error(err),
                     Err(json_err) =>
                         return Err(CLIError::Configuration(
                             ConfigurationError::Secret(

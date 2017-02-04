@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *translate* API at revision *20160627*. The CLI is at version *1.0.3*.
+This documentation was generated from the *translate* API at revision *20160627*. The CLI is at version *1.0.4*.
 
 ```bash
 translate2 [options]

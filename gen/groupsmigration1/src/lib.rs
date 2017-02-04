@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Groups Migration* crate version *1.0.3+20140416*, where *20140416* is the exact revision of the *groupsmigration:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.3*.
+//! This documentation was generated from *Groups Migration* crate version *1.0.4+20140416*, where *20140416* is the exact revision of the *groupsmigration:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
 //! 
 //! Everything else about the *Groups Migration* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/google-apps/groups-migration/).
@@ -177,11 +177,596 @@
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
 // Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
 // unused imports in fully featured APIs. Same with unused_mut ... .
-#![cfg_attr(feature = "nightly", feature(proc_macro))]
 #![allow(unused_imports, unused_mut, dead_code)]
 
-#[cfg(feature = "nightly")]
-include!("lib.rs.in");
+// DO NOT EDIT !
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
+// DO NOT EDIT !
 
-#[cfg(feature = "with-serde-codegen")]
-include!(concat!(env!("OUT_DIR"), "/lib.rs"));
+#[macro_use]
+extern crate serde_derive;
+
+extern crate hyper;
+extern crate serde;
+extern crate serde_json;
+extern crate yup_oauth2 as oauth2;
+extern crate mime;
+extern crate url;
+
+mod cmn;
+
+use std::collections::HashMap;
+use std::cell::RefCell;
+use std::borrow::BorrowMut;
+use std::default::Default;
+use std::collections::BTreeMap;
+use serde_json as json;
+use std::io;
+use std::fs;
+use std::thread::sleep;
+use std::time::Duration;
+
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
+              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
+              Resource, ErrorResponse, remove_json_null_values};
+
+
+// ##############
+// UTILITIES ###
+// ############
+
+/// Identifies the an OAuth2 authorization scope.
+/// A scope is needed when requesting an
+/// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
+#[derive(PartialEq, Eq, Hash)]
+pub enum Scope {
+    /// Manage messages in groups on your domain
+    AppGroupMigration,
+}
+
+impl AsRef<str> for Scope {
+    fn as_ref(&self) -> &str {
+        match *self {
+            Scope::AppGroupMigration => "https://www.googleapis.com/auth/apps.groups.migration",
+        }
+    }
+}
+
+impl Default for Scope {
+    fn default() -> Scope {
+        Scope::AppGroupMigration
+    }
+}
+
+
+
+// ########
+// HUB ###
+// ######
+
+/// Central instance to access all GroupsMigration related resource activities
+///
+/// # Examples
+///
+/// Instantiate a new hub
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_groupsmigration1 as groupsmigration1;
+/// use groupsmigration1::{Result, Error};
+/// use std::fs;
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// use groupsmigration1::GroupsMigration;
+/// 
+/// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
+/// // `client_secret`, among other things.
+/// let secret: ApplicationSecret = Default::default();
+/// // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
+/// // unless you replace  `None` with the desired Flow.
+/// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
+/// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
+/// // retrieve them from storage.
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = GroupsMigration::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `upload(...)`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.archive().insert("groupId")
+///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
+/// 
+/// match result {
+///     Err(e) => match e {
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///          Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken(_)
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::BadRequest(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_, _) => println!("{}", e),
+///     },
+///     Ok(res) => println!("Success: {:?}", res),
+/// }
+/// # }
+/// ```
+pub struct GroupsMigration<C, A> {
+    client: RefCell<C>,
+    auth: RefCell<A>,
+    _user_agent: String,
+}
+
+impl<'a, C, A> Hub for GroupsMigration<C, A> {}
+
+impl<'a, C, A> GroupsMigration<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+    pub fn new(client: C, authenticator: A) -> GroupsMigration<C, A> {
+        GroupsMigration {
+            client: RefCell::new(client),
+            auth: RefCell::new(authenticator),
+            _user_agent: "google-api-rust-client/1.0.4".to_string(),
+        }
+    }
+
+    pub fn archive(&'a self) -> ArchiveMethods<'a, C, A> {
+        ArchiveMethods { hub: &self }
+    }
+
+    /// Set the user-agent header field to use in all requests to the server.
+    /// It defaults to `google-api-rust-client/1.0.4`.
+    ///
+    /// Returns the previously set user-agent.
+    pub fn user_agent(&mut self, agent_name: String) -> String {
+        let prev = self._user_agent.clone();
+        self._user_agent = agent_name;
+        prev
+    }
+}
+
+
+// ############
+// SCHEMAS ###
+// ##########
+/// JSON response template for groups migration API.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [insert archive](struct.ArchiveInsertCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Groups {
+    /// The kind of insert resource this is.
+    pub kind: Option<String>,
+    /// The status of the insert request.
+    #[serde(rename="responseCode")]
+    pub response_code: Option<String>,
+}
+
+impl ResponseResult for Groups {}
+
+
+
+// ###################
+// MethodBuilders ###
+// #################
+
+/// A builder providing access to all methods supported on *archive* resources.
+/// It is not used directly, but through the `GroupsMigration` hub.
+///
+/// # Example
+///
+/// Instantiate a resource builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_groupsmigration1 as groupsmigration1;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// use groupsmigration1::GroupsMigration;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = GroupsMigration::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
+/// // like `insert(...)`
+/// // to build up your call.
+/// let rb = hub.archive();
+/// # }
+/// ```
+pub struct ArchiveMethods<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a GroupsMigration<C, A>,
+}
+
+impl<'a, C, A> MethodsBuilder for ArchiveMethods<'a, C, A> {}
+
+impl<'a, C, A> ArchiveMethods<'a, C, A> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Inserts a new mail into the archive of the Google group.
+    /// 
+    /// # Arguments
+    ///
+    /// * `groupId` - The group ID
+    pub fn insert(&self, group_id: &str) -> ArchiveInsertCall<'a, C, A> {
+        ArchiveInsertCall {
+            hub: self.hub,
+            _group_id: group_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+}
+
+
+
+
+
+// ###################
+// CallBuilders   ###
+// #################
+
+/// Inserts a new mail into the archive of the Google group.
+///
+/// A builder for the *insert* method supported by a *archive* resource.
+/// It is not used directly, but through a `ArchiveMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_groupsmigration1 as groupsmigration1;
+/// use std::fs;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use groupsmigration1::GroupsMigration;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = GroupsMigration::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `upload(...)`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.archive().insert("groupId")
+///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
+/// # }
+/// ```
+pub struct ArchiveInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a GroupsMigration<C, A>,
+    _group_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ArchiveInsertCall<'a, C, A> {}
+
+impl<'a, C, A> ArchiveInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    fn doit<RS>(mut self, mut reader: RS, reader_mime_type: mime::Mime, protocol: &'static str) -> Result<(hyper::client::Response, Groups)>
+		where RS: ReadSeek {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "groupsmigration.archive.insert",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        params.push(("groupId", self._group_id.to_string()));
+        for &field in ["alt", "groupId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let (mut url, upload_type) =
+            if protocol == "simple" {
+                ("https://www.googleapis.com/upload/groups/v1/groups/{groupId}/archive".to_string(), "multipart")
+            } else if protocol == "resumable" {
+                ("https://www.googleapis.com/resumable/upload/groups/v1/groups/{groupId}/archive".to_string(), "resumable")
+            } else {
+                unreachable!()
+            };
+        params.push(("uploadType", upload_type.to_string()));
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::AppGroupMigration.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{groupId}", "groupId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["groupId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+        let mut should_ask_dlg_for_url = false;
+        let mut upload_url_from_server;
+        let mut upload_url: Option<String> = None;
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
+                    should_ask_dlg_for_url = false;
+                    upload_url_from_server = false;
+                    let url = upload_url.as_ref().and_then(|s| Some(hyper::Url::parse(s).unwrap())).unwrap();
+                    hyper::client::Response::new(url, Box::new(cmn::DummyNetworkStream)).and_then(|mut res| {
+                        res.status = hyper::status::StatusCode::Ok;
+                        res.headers.set(Location(upload_url.as_ref().unwrap().clone()));
+                        Ok(res)
+                    })
+                } else {
+                    let mut client = &mut *self.hub.client.borrow_mut();
+                    let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                        .header(UserAgent(self.hub._user_agent.clone()))
+                        .header(auth_header.clone());
+                    if protocol == "simple" {
+                        let size = reader.seek(io::SeekFrom::End(0)).unwrap();
+                    reader.seek(io::SeekFrom::Start(0)).unwrap();
+                    if size > 16777216 {
+                    	return Err(Error::UploadSizeLimitExceeded(size, 16777216))
+                    }
+                        req = req.header(ContentType(reader_mime_type.clone()))
+                                 .header(ContentLength(size))
+                                 .body(&mut reader);
+                    }
+                    upload_url_from_server = true;
+                    if protocol == "resumable" {
+                        req = req.header(cmn::XUploadContentType(reader_mime_type.clone()));
+                    }
+    
+                    dlg.pre_request();
+                    req.send()
+                }
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    if protocol == "resumable" {
+                        let size = reader.seek(io::SeekFrom::End(0)).unwrap();
+                        reader.seek(io::SeekFrom::Start(0)).unwrap();
+                        if size > 16777216 {
+                        	return Err(Error::UploadSizeLimitExceeded(size, 16777216))
+                        }
+                        let mut client = &mut *self.hub.client.borrow_mut();
+                        let upload_result = {
+                            let url_str = &res.headers.get::<Location>().expect("Location header is part of protocol").0;
+                            if upload_url_from_server {
+                                dlg.store_upload_url(Some(url_str));
+                            }
+
+                            cmn::ResumableUploadHelper {
+                                client: &mut client.borrow_mut(),
+                                delegate: dlg,
+                                start_at: if upload_url_from_server { Some(0) } else { None },
+                                auth: &mut *self.hub.auth.borrow_mut(),
+                                user_agent: &self.hub._user_agent,
+                                auth_header: auth_header.clone(),
+                                url: url_str,
+                                reader: &mut reader,
+                                media_type: reader_mime_type.clone(),
+                                content_length: size
+                            }.upload()
+                        };
+                        match upload_result {
+                            None => {
+                                dlg.finished(false);
+                                return Err(Error::Cancelled)
+                            }
+                            Some(Err(err)) => {
+                                dlg.finished(false);
+                                return Err(Error::HttpError(err))
+                            }
+                            Some(Ok(upload_result)) => {
+                                res = upload_result;
+                                if !res.status.is_success() {
+                                    dlg.store_upload_url(None);
+                                    dlg.finished(false);
+                                    return Err(Error::Failure(res))
+                                }
+                            }
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+    /// Upload media all at once.
+    /// If the upload fails for whichever reason, all progress is lost.
+    ///
+    /// * *max size*: 16MB
+    /// * *multipart*: yes
+    /// * *valid mime types*: 'message/rfc822'
+    pub fn upload<RS>(self, stream: RS, mime_type: mime::Mime) -> Result<(hyper::client::Response, Groups)>
+                where RS: ReadSeek {
+        self.doit(stream, mime_type, "simple")
+    }
+    /// Upload media in a resumable fashion.
+    /// Even if the upload fails or is interrupted, it can be resumed for a
+    /// certain amount of time as the server maintains state temporarily.
+    /// 
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL
+    /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
+    /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
+    /// `cancel_chunk_upload(...)`.
+    ///
+    /// * *max size*: 16MB
+    /// * *multipart*: yes
+    /// * *valid mime types*: 'message/rfc822'
+    pub fn upload_resumable<RS>(self, resumeable_stream: RS, mime_type: mime::Mime) -> Result<(hyper::client::Response, Groups)>
+                where RS: ReadSeek {
+        self.doit(resumeable_stream, mime_type, "resumable")
+    }
+
+    /// The group ID
+    ///
+    /// Sets the *group id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn group_id(mut self, new_value: &str) -> ArchiveInsertCall<'a, C, A> {
+        self._group_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ArchiveInsertCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> ArchiveInsertCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AppGroupMigration`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> ArchiveInsertCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+

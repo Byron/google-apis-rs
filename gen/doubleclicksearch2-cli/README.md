@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *doubleclicksearch* API at revision *20161108*. The CLI is at version *1.0.3*.
+This documentation was generated from the *doubleclicksearch* API at revision *20161108*. The CLI is at version *1.0.4*.
 
 ```bash
 doubleclicksearch2 [options]

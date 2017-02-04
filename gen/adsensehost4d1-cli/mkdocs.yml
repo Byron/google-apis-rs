@@ -1,4 +1,4 @@
-site_name: AdSense Host v1.0.3+20161206
+site_name: AdSense Host v1.0.4+20161206
 site_url: http://byron.github.io/google-apis-rs/google-adsensehost4d1-cli
 site_description: A complete library to interact with AdSense Host (protocol v4.1)
 

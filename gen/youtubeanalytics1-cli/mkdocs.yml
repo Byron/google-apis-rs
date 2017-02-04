@@ -1,4 +1,4 @@
-site_name: YouTube Analytics v1.0.3+20161213
+site_name: YouTube Analytics v1.0.4+20161213
 site_url: http://byron.github.io/google-apis-rs/google-youtubeanalytics1-cli
 site_description: A complete library to interact with YouTube Analytics (protocol v1)
 

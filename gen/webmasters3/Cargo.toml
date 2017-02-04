@@ -4,31 +4,25 @@
 [package]
 
 name = "google-webmasters3"
-version = "1.0.3+20160317"
+version = "1.0.4+20160317"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with webmasters (protocol v3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/webmasters3"
 homepage = "https://developers.google.com/webmaster-tools/"
-documentation = "https://docs.rs/google-webmasters3/1.0.3+20160317"
+documentation = "https://docs.rs/google-webmasters3/1.0.4+20160317"
 license = "MIT"
 keywords = ["webmasters", "google", "protocol", "web", "api"]
-build = "src/build.rs"
 
 
 [dependencies]
 hyper = "^ 0.10"
 mime = "^ 0.2.0"
-serde = "^ 0.8"
-serde_json = "^ 0.8"
-yup-oauth2 = { version = "^ 1.0", optional = true, default-features = false }
-serde_derive = { version = "^ 0.8", optional = true }
+serde = "^ 0.9"
+serde_json = "^ 0.9"
+serde_derive = "^ 0.9"
+yup-oauth2 = "^ 1.0"
 url = "= 0.5"
 
 [features]
-default = ["with-serde-codegen"]
-nightly = ["serde_derive","yup-oauth2/nightly"]
-with-serde-codegen = ["serde_codegen","yup-oauth2/with-serde-codegen"]
 
-[build-dependencies]
-serde_codegen = { version = "^ 0.8", optional = true }
 

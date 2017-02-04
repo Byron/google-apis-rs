@@ -121,7 +121,7 @@ impl<'n> Engine<'n> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema);
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
@@ -205,7 +205,7 @@ impl<'n> Engine<'n> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema);
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
@@ -310,7 +310,7 @@ impl<'n> Engine<'n> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema);
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
@@ -400,7 +400,7 @@ impl<'n> Engine<'n> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema);
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
@@ -449,7 +449,7 @@ impl<'n> Engine<'n> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema);
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
@@ -575,7 +575,7 @@ impl<'n> Engine<'n> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema);
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
@@ -660,7 +660,7 @@ impl<'n> Engine<'n> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema);
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
@@ -1018,7 +1018,7 @@ fn main() {
     
     let mut app = App::new("doubleclickbidmanager1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.3+20161010")
+           .version("1.0.4+20161010")
            .about("API for viewing and managing your reports in DoubleClick Bid Manager.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_doubleclickbidmanager1_cli")
            .arg(Arg::with_name("folder")

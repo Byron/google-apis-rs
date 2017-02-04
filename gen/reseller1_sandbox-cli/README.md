@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *reseller* API at revision *20160329*. The CLI is at version *1.0.3*.
+This documentation was generated from the *reseller* API at revision *20160329*. The CLI is at version *1.0.4*.
 
 ```bash
 reseller1-sandbox [options]

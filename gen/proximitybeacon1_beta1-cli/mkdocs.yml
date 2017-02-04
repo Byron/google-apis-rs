@@ -1,4 +1,4 @@
-site_name: proximitybeacon v1.0.3+20160429
+site_name: proximitybeacon v1.0.4+20160429
 site_url: http://byron.github.io/google-apis-rs/google-proximitybeacon1_beta1-cli
 site_description: A complete library to interact with proximitybeacon (protocol v1beta1)
 
