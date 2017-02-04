@@ -1,3 +1,8 @@
+<a name="api-v1.0.4:cli-v1.0.4"></a>
+## api-v1.0.4:cli-v1.0.4 (2017-2-1)
+
+Upgrade to serde 0.9, which removes a lot of complexity and the need for nighly.
+
 <a name="api-v1.0.3:cli-v1.0.3"></a>
 ## api-v1.0.3:cli-v1.0.3 (2017-2-1)
 
