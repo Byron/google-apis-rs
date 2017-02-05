@@ -101,20 +101,6 @@ rm -f .api.deps .cli.deps && make update-json -j8
 
 This is still a difficult topic in Rust, and even though in theory it's possible to do that on a single system without virutalization, it's difficult to achieve when you are not a pure Rust program. Therefore using VMs is the only option, and we are trying to make this as easy as possible.
 
-### Linux AMD-64 from OSX
-
-This setup is based on Docker, which comes with a *virtual-box*-based linux VM. To use it, just install [boot2docker](http://boot2docker.io/).
-
-The following commands should do the job:
-
-```bash
-boot2docker up
-# export listed variables to prepare your shell
-make wheezy-build
-```
-
-You will find your *release* build in the *build/* subdirectory of the project's root.
-
 # Deployment
 
 The deployment process is not very automated, but this paragraph shall document the steps required
@@ -172,37 +158,7 @@ Please apply the following script to your build-systems. Currently it differenti
 # or cargo interfering with itself. You might have to run this multiple times, thus -k
 # Also adjust -j to suit the capabilities of your machine.
 $ make cargo-cli ARGS="build --release" -j4 -k
-
-# Finally, gather the build result by executing the respective utility script,
-# depending on the platform you build on
-$ src/bash/linux-deploy.bash ... # OR
-
-$ src/bash/osx-deploy.bash ...
 ```
-
-At the end of this step, you will have `tar` files which contain all build-artifacts for deployment
-on a CDN.
-
-## Deploy Build-Artifacts on CDN
-
-Here we copy the tar files onto the CDN or VPS you are using, and apply a script to place it
-at the right spot for the download.
-
-```bash
-$ scp *.tar.gz user@your-cdn-or-vps.org
-```
-
-On the CDN, you want to execute the deployment script - the following example assumes a valid login
-with sufficient rights to write the files.
-
-```bash
-# This script requires you to type in information already contained in the tar file - it's easy to
-# do though ;).
-$ src/bash/linux-deployment-to-downloads.bash ...
-```
-
-Now the programs have been placed in the right spot to be downloadable from the documentation index
-which is built next.
 
 ## Build Documentation and post it onto GitHub
 
