@@ -27,8 +27,11 @@ DO NOT EDIT !
 -->
 <html>
 <head>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" crossorigin="anonymous">
-<script type="text/javascript">
+  <link rel="stylesheet" 
+    href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" 
+    integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+    crossorigin="anonymous">
+  <script type="text/javascript">
 alertShown = false
 function onClick(button) {
   selectElementContents(button)
@@ -65,8 +68,8 @@ function onCopy(e) {
   e.clipboardData.setData('text/plain', installation_script);
   e.preventDefault()
 }
-</script>
-	<title>${title}</title>
+  </script>
+  <title>${title}</title>
 </head>
 <body>
   <div class="container">
@@ -98,20 +101,18 @@ function onCopy(e) {
                 continue
 
             api_data = tc["api"]
-            api_revision = api_data.get('revision', None)
+            revision = metadata.get('revision', None)
 
-            # TODO: Find out why the api link always ends in +00000 instead of +20161020
             api_link = api_index(DOC_ROOT, name, version, api_data['make'], 
-                api_data['cargo'], api_revision)
+                api_data['cargo'], revision)
 
             crates_link = crates_io_url(name, version)
             crates_link += "/"
-            crates_link += crate_version(api_data.cargo.build_version, api_revision)
+            crates_link += crate_version(api_data.cargo.build_version, revision)
 
             cli_data = tc["cli"]
-            cli_revision = cli_data.get('revision', None)
             cli_link = api_index(DOC_ROOT, name, version, cli_data['make'], 
-                                 cli_data['cargo'], cli_revision)
+                                 cli_data['cargo'], revision)
         %>\
         <td>${name} (${version})</td> 
           <td>
