@@ -85,40 +85,66 @@ function onCopy(e) {
 </head>
 <body>
 <h1>${title}</h1>
-<ul>
-% for name in sorted(api.list.keys()):
-    % if name in api.blacklist:
-        <% continue %>\
-    % endif
-    % for version in api.list[name]:
-        <% 
-            type_names = tc.keys()
-            with open(api_json_path(directories.api_base, name, version)) as fp:
-              api_data = json.load(fp)
-        %>\
-        <t>${name}</t>
-        % if api_data is None:
+<table>
+    <thead>
+        <tr>
+            <th>API Name</th>
+            <th>API Docs</th>
+            <th>CLI Docs</th>
+            <th>Install</th>
+        </tr>
+    </thead>
+    <tbody>
+    % for name in sorted(api.list.keys()):
+        % if name in api.blacklist:
             <% continue %>\
         % endif
-        <span class="lib">${name} ${version}</span> 
-        % for program_type in type_names:
+        % for version in api.list[name]:
+        <tr>
             <% 
-              ad = tc[program_type] 
-              revision = api_data.get('revision', None)
+                # We know type_names is just ["api", "cli"]
+                type_names = tc.keys()
+                type_names = ["api", "cli"]
+                with open(api_json_path(directories.api_base, name, version)) as fp:
+                    api_data = json.load(fp)
             %>\
-            <a class="mod" href="${api_index(DOC_ROOT, name, version, ad.make, ad.cargo, revision)}" title="${ad.make.id.upper()} docs for the ${name} ${version}">${ad.make.id.upper()}</a>
-            % if program_type == 'api':
-            <a href="${crates_io_url(name, version)}/${crate_version(ad.cargo.build_version, revision)}"><img src="${url_info.asset_urls.crates_img}" title="This API on crates.io" height="16" width="16"/></a>
-            % else:
-            , <button class="mono" onclick="onClick(this)" oncopy="onCopy(event)" title="Copy complete installation script to clipboard">cargo install ${library_to_crate_name(library_name(name, version))}-cli</button>
+            % if api_data is None:
+                <% continue %>\
             % endif
-            % if not loop.last:
-,           
-            % endif
-        % endfor # each program type
-        <br/>
-    % endfor # each version
-% endfor # each API
-</ul>
+            <td>${name} (${version})</td> 
+            <td>
+                <% 
+                api_data = tc["api"] 
+                revision = api_data.get('revision', None)
+                %>\
+                <a class="mod" 
+                    href="${api_index(DOC_ROOT, name, version, api_data.make, api_data.cargo, revision)}" 
+                    title="${api_data.make.id.upper()} docs for the ${name} ${version}">
+                    ${api_data.make.id.upper()}
+                </a>
+                <a href="${crates_io_url(name, version)}/${crate_version(api_data.cargo.build_version, revision)}"><img src="${url_info.asset_urls.crates_img}" title="This API on crates.io" height="16" width="16"/></a>
+            </td>
+            <td>
+                <% 
+                api_data = tc["cli"] 
+                revision = api_data.get('revision', None)
+                %>\
+                <a href="${api_index(DOC_ROOT, name, version, api_data.make, api_data.cargo, revision)}" 
+                    title="${api_data.make.id.upper()} docs for the ${name} ${version}">
+                    ${api_data.make.id.upper()}
+                </a>
+            </td>
+            <td>
+                <button class="mono" onclick="onClick(this)" 
+                    oncopy="onCopy(event)" 
+                    title="Copy complete installation script to clipboard">
+                    cargo install ${library_to_crate_name(library_name(name, version))}-cli
+                </button>
+            </td>
+        </tr>
+        % endfor # each version
+    % endfor # each API
+</tbody>
+</table>
 </body>
 </html>
