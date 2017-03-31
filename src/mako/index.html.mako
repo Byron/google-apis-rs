@@ -27,22 +27,7 @@ DO NOT EDIT !
 -->
 <html>
 <head>
-<link rel="stylesheet" href="main.css">
-<style type="text/css">
-## .lib {
-##   color: #000000;
-##   font-size: 20px;
-##   float: left;
-##   width: 300px;
-## }
-## .mod {
-##   color: #4d76ae;
-##   font-size: 20px;
-## }
-## .mono {
-##   font-family: monospace;
-## }
-</style>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" crossorigin="anonymous">
 <script type="text/javascript">
 alertShown = false
 function onClick(button) {
@@ -84,8 +69,9 @@ function onCopy(e) {
 	<title>${title}</title>
 </head>
 <body>
+    <div class="container">
 <h1>${title}</h1>
-<table>
+<table class="table table-hover">
     <thead>
         <tr>
             <th>API Name</th>
@@ -103,7 +89,7 @@ function onCopy(e) {
         <tr>
             <% 
                 # We know type_names is just ["api", "cli"]
-                type_names = tc.keys()
+                #type_names = tc.keys()
                 type_names = ["api", "cli"]
                 with open(api_json_path(directories.api_base, name, version)) as fp:
                     metadata = json.load(fp)
@@ -113,18 +99,21 @@ function onCopy(e) {
 
                 api_data = tc["api"]
                 api_revision = api_data.get('revision', None)
+
                 # TODO: Find out why the api link always ends in +00000 instead of +20161020
                 api_link = api_index(DOC_ROOT, name, version, api_data['make'], 
                     api_data['cargo'], api_revision)
 
-                crates_link = (crates_io_url(name, version) + 
-                    "/" + 
-                    crate_version(api_data.cargo.build_version, api_revision))
+                crates_link = crates_io_url(name, version) + "/" + crate_version(api_data.cargo.build_version, api_revision)
 
                 cli_data = tc["cli"]
                 cli_revision = cli_data.get('revision', None)
-                cli_link = api_index(DOC_ROOT, name, version, cli_data['make'], 
-                    cli_data['cargo'], cli_revision)
+                cli_link = api_index(DOC_ROOT, 
+                                     name, 
+                                     version, 
+                                     cli_data['make'], 
+                                     cli_data['cargo'], 
+                                     cli_revision)
             %>\
             <td>${name} (${version})</td> 
             <td>
@@ -137,10 +126,6 @@ function onCopy(e) {
                 </a>
             </td>
             <td>
-                <% 
-                api_data = tc["cli"] 
-                revision = api_data.get('revision', None)
-                %>\
                 <a href="${cli_link}" title="CLI docs for the ${name} ${version}">
                     CLI
                 </a>
@@ -157,5 +142,6 @@ function onCopy(e) {
     % endfor # each API
 </tbody>
 </table>
+</div>
 </body>
 </html>
