@@ -106,32 +106,43 @@ function onCopy(e) {
                 type_names = tc.keys()
                 type_names = ["api", "cli"]
                 with open(api_json_path(directories.api_base, name, version)) as fp:
-                    api_data = json.load(fp)
+                    metadata = json.load(fp)
+
+                if metadata is None:
+                    continue
+
+                api_data = tc["api"]
+                api_revision = api_data.get('revision', None)
+                # TODO: Find out why the api link always ends in +00000 instead of +20161020
+                api_link = api_index(DOC_ROOT, name, version, api_data['make'], 
+                    api_data['cargo'], api_revision)
+
+                crates_link = (crates_io_url(name, version) + 
+                    "/" + 
+                    crate_version(api_data.cargo.build_version, api_revision))
+
+                cli_data = tc["cli"]
+                cli_revision = cli_data.get('revision', None)
+                cli_link = api_index(DOC_ROOT, name, version, cli_data['make'], 
+                    cli_data['cargo'], cli_revision)
             %>\
-            % if api_data is None:
-                <% continue %>\
-            % endif
             <td>${name} (${version})</td> 
             <td>
-                <% 
-                api_data = tc["api"] 
-                revision = api_data.get('revision', None)
-                %>\
-                <a class="mod" 
-                    href="${api_index(DOC_ROOT, name, version, api_data.make, api_data.cargo, revision)}" 
-                    title="${api_data.make.id.upper()} docs for the ${name} ${version}">
-                    ${api_data.make.id.upper()}
+                <a href="${api_link}" title="API docs for the ${name} ${version}">
+                    API
                 </a>
-                <a href="${crates_io_url(name, version)}/${crate_version(api_data.cargo.build_version, revision)}"><img src="${url_info.asset_urls.crates_img}" title="This API on crates.io" height="16" width="16"/></a>
+                <a href="${crates_link}">
+                    <img src="${url_info.asset_urls.crates_img}" 
+                    title="This API on crates.io" height="16" width="16"/>
+                </a>
             </td>
             <td>
                 <% 
                 api_data = tc["cli"] 
                 revision = api_data.get('revision', None)
                 %>\
-                <a href="${api_index(DOC_ROOT, name, version, api_data.make, api_data.cargo, revision)}" 
-                    title="${api_data.make.id.upper()} docs for the ${name} ${version}">
-                    ${api_data.make.id.upper()}
+                <a href="${cli_link}" title="CLI docs for the ${name} ${version}">
+                    CLI
                 </a>
             </td>
             <td>
