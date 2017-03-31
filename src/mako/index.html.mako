@@ -29,19 +29,19 @@ DO NOT EDIT !
 <head>
 <link rel="stylesheet" href="main.css">
 <style type="text/css">
-.lib {
-  color: #000000;
-  font-size: 20px;
-  float: left;
-  width: 300px;
-}
-.mod {
-  color: #4d76ae;
-  font-size: 20px;
-}
-.mono {
-  font-family: monospace;
-}
+## .lib {
+##   color: #000000;
+##   font-size: 20px;
+##   float: left;
+##   width: 300px;
+## }
+## .mod {
+##   color: #4d76ae;
+##   font-size: 20px;
+## }
+## .mono {
+##   font-family: monospace;
+## }
 </style>
 <script type="text/javascript">
 alertShown = false
@@ -84,32 +84,33 @@ function onCopy(e) {
 	<title>${title}</title>
 </head>
 <body>
-<H1>${title}</H1>
+<h1>${title}</h1>
 <ul>
-% for an in sorted(api.list.keys()):
-    % if an in api.blacklist:
+% for name in sorted(api.list.keys()):
+    % if name in api.blacklist:
         <% continue %>\
     % endif
-    % for v in api.list[an]:
+    % for version in api.list[name]:
         <% 
             type_names = tc.keys()
-            with open(api_json_path(directories.api_base, an, v)) as fp:
+            with open(api_json_path(directories.api_base, name, version)) as fp:
               api_data = json.load(fp)
         %>\
+        <t>${name}</t>
         % if api_data is None:
             <% continue %>\
         % endif
-        <span class="lib">${an} ${v}</span> 
+        <span class="lib">${name} ${version}</span> 
         % for program_type in type_names:
             <% 
               ad = tc[program_type] 
               revision = api_data.get('revision', None)
             %>\
-            <a class="mod" href="${api_index(DOC_ROOT, an, v, ad.make, ad.cargo, revision)}" title="${ad.make.id.upper()} docs for the ${an} ${v}">${ad.make.id.upper()}</a>
+            <a class="mod" href="${api_index(DOC_ROOT, name, version, ad.make, ad.cargo, revision)}" title="${ad.make.id.upper()} docs for the ${name} ${version}">${ad.make.id.upper()}</a>
             % if program_type == 'api':
-            <a href="${crates_io_url(an, v)}/${crate_version(ad.cargo.build_version, revision)}"><img src="${url_info.asset_urls.crates_img}" title="This API on crates.io" height="16" width="16"/></a>
+            <a href="${crates_io_url(name, version)}/${crate_version(ad.cargo.build_version, revision)}"><img src="${url_info.asset_urls.crates_img}" title="This API on crates.io" height="16" width="16"/></a>
             % else:
-            , <button class="mono" onclick="onClick(this)" oncopy="onCopy(event)" title="Copy complete installation script to clipboard">cargo install ${library_to_crate_name(library_name(an, v))}-cli</button>
+            , <button class="mono" onclick="onClick(this)" oncopy="onCopy(event)" title="Copy complete installation script to clipboard">cargo install ${library_to_crate_name(library_name(name, version))}-cli</button>
             % endif
             % if not loop.last:
 ,           
