@@ -69,79 +69,75 @@ function onCopy(e) {
 	<title>${title}</title>
 </head>
 <body>
-    <div class="container">
-<h1>${title}</h1>
-<table class="table table-hover">
+  <div class="container">
+  <h1>${title}</h1>
+  <table class="table table-hover">
     <thead>
-        <tr>
-            <th>API Name</th>
-            <th>API Docs</th>
-            <th>CLI Docs</th>
-            <th>Install</th>
-        </tr>
+      <tr>
+        <th>API Name</th>
+        <th>API Docs</th>
+        <th>CLI Docs</th>
+        <th>Install</th>
+      </tr>
     </thead>
     <tbody>
     % for name in sorted(api.list.keys()):
-        % if name in api.blacklist:
-            <% continue %>\
-        % endif
-        % for version in api.list[name]:
-        <tr>
-            <% 
-                # We know type_names is just ["api", "cli"]
-                #type_names = tc.keys()
-                type_names = ["api", "cli"]
-                with open(api_json_path(directories.api_base, name, version)) as fp:
-                    metadata = json.load(fp)
+      % if name in api.blacklist:
+        <% continue %>\
+      % endif
+    % for version in api.list[name]:
+      <tr>
+        <% 
+            # We know type_names is just ["api", "cli"]
+            #type_names = tc.keys()
+            type_names = ["api", "cli"]
+            with open(api_json_path(directories.api_base, name, version)) as fp:
+                metadata = json.load(fp)
 
-                if metadata is None:
-                    continue
+            if metadata is None:
+                continue
 
-                api_data = tc["api"]
-                api_revision = api_data.get('revision', None)
+            api_data = tc["api"]
+            api_revision = api_data.get('revision', None)
 
-                # TODO: Find out why the api link always ends in +00000 instead of +20161020
-                api_link = api_index(DOC_ROOT, name, version, api_data['make'], 
-                    api_data['cargo'], api_revision)
+            # TODO: Find out why the api link always ends in +00000 instead of +20161020
+            api_link = api_index(DOC_ROOT, name, version, api_data['make'], 
+                api_data['cargo'], api_revision)
 
-                crates_link = crates_io_url(name, version) + "/" + crate_version(api_data.cargo.build_version, api_revision)
+            crates_link = crates_io_url(name, version)
+            crates_link += "/"
+            crates_link += crate_version(api_data.cargo.build_version, api_revision)
 
-                cli_data = tc["cli"]
-                cli_revision = cli_data.get('revision', None)
-                cli_link = api_index(DOC_ROOT, 
-                                     name, 
-                                     version, 
-                                     cli_data['make'], 
-                                     cli_data['cargo'], 
-                                     cli_revision)
-            %>\
-            <td>${name} (${version})</td> 
-            <td>
-                <a href="${api_link}" title="API docs for the ${name} ${version}">
-                    API
-                </a>
-                <a href="${crates_link}">
-                    <img src="${url_info.asset_urls.crates_img}" 
-                    title="This API on crates.io" height="16" width="16"/>
-                </a>
-            </td>
-            <td>
-                <a href="${cli_link}" title="CLI docs for the ${name} ${version}">
-                    CLI
-                </a>
-            </td>
-            <td>
-                <button class="mono" onclick="onClick(this)" 
-                    oncopy="onCopy(event)" 
-                    title="Copy complete installation script to clipboard">
-                    cargo install ${library_to_crate_name(library_name(name, version))}-cli
-                </button>
-            </td>
+            cli_data = tc["cli"]
+            cli_revision = cli_data.get('revision', None)
+            cli_link = api_index(DOC_ROOT, name, version, cli_data['make'], 
+                                 cli_data['cargo'], cli_revision)
+        %>\
+        <td>${name} (${version})</td> 
+          <td>
+            <a href="${api_link}" title="API docs for the ${name} ${version}">API</a>
+            <a href="${crates_link}">
+              <img src="${url_info.asset_urls.crates_img}" 
+                title="This API on crates.io" height="16" width="16"/>
+            </a>
+          </td>
+          <td>
+            <a href="${cli_link}" title="CLI docs for the ${name} ${version}">
+              CLI
+            </a>
+          </td>
+          <td>
+            <button class="mono" onclick="onClick(this)" 
+              oncopy="onCopy(event)" 
+              title="Copy complete installation script to clipboard">
+              cargo install ${library_to_crate_name(library_name(name, version))}-cli
+            </button>
+          </td>
         </tr>
-        % endfor # each version
-    % endfor # each API
-</tbody>
-</table>
-</div>
+      % endfor # each version
+      % endfor # each API
+      </tbody>
+    </table>
+  </div>
 </body>
 </html>
