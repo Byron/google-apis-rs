@@ -27,23 +27,11 @@ DO NOT EDIT !
 -->
 <html>
 <head>
-<link rel="stylesheet" href="main.css">
-<style type="text/css">
-.lib {
-  color: #000000;
-  font-size: 20px;
-  float: left;
-  width: 300px;
-}
-.mod {
-  color: #4d76ae;
-  font-size: 20px;
-}
-.mono {
-  font-family: monospace;
-}
-</style>
-<script type="text/javascript">
+  <link rel="stylesheet" 
+    href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" 
+    integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+    crossorigin="anonymous">
+  <script type="text/javascript">
 alertShown = false
 function onClick(button) {
   selectElementContents(button)
@@ -80,44 +68,77 @@ function onCopy(e) {
   e.clipboardData.setData('text/plain', installation_script);
   e.preventDefault()
 }
-</script>
-	<title>${title}</title>
+  </script>
+  <title>${title}</title>
 </head>
 <body>
-<H1>${title}</H1>
-<ul>
-% for an in sorted(api.list.keys()):
-    % if an in api.blacklist:
+  <div class="container">
+  <h1>${title}</h1>
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>API Name</th>
+        <th>API Docs</th>
+        <th>CLI Docs</th>
+        <th>Install</th>
+      </tr>
+    </thead>
+    <tbody>
+    % for name in sorted(api.list.keys()):
+      % if name in api.blacklist:
         <% continue %>\
-    % endif
-    % for v in api.list[an]:
+      % endif
+    % for version in api.list[name]:
+      <tr>
         <% 
-            type_names = tc.keys()
-            with open(api_json_path(directories.api_base, an, v)) as fp:
-              api_data = json.load(fp)
+            type_names = ["api", "cli"]
+            assert set(type_names) == set(tc.keys()), "The type cache has changed, make sure to update the documentation accordingly"
+
+            with open(api_json_path(directories.api_base, name, version)) as fp:
+                metadata = json.load(fp)
+
+            if metadata is None:
+                continue
+
+            api_data = tc["api"]
+            revision = metadata.get('revision', None)
+
+            api_link = api_index(DOC_ROOT, name, version, api_data['make'], 
+                api_data['cargo'], revision)
+
+            crates_link = crates_io_url(name, version)
+            crates_link += "/"
+            crates_link += crate_version(api_data.cargo.build_version, revision)
+
+            cli_data = tc["cli"]
+            cli_link = api_index(DOC_ROOT, name, version, cli_data['make'], 
+                                 cli_data['cargo'], revision)
         %>\
-        % if api_data is None:
-            <% continue %>\
-        % endif
-        <span class="lib">${an} ${v}</span> 
-        % for program_type in type_names:
-            <% 
-              ad = tc[program_type] 
-              revision = api_data.get('revision', None)
-            %>\
-            <a class="mod" href="${api_index(DOC_ROOT, an, v, ad.make, ad.cargo, revision)}" title="${ad.make.id.upper()} docs for the ${an} ${v}">${ad.make.id.upper()}</a>
-            % if program_type == 'api':
-            <a href="${crates_io_url(an, v)}/${crate_version(ad.cargo.build_version, revision)}"><img src="${url_info.asset_urls.crates_img}" title="This API on crates.io" height="16" width="16"/></a>
-            % else:
-            , <button class="mono" onclick="onClick(this)" oncopy="onCopy(event)" title="Copy complete installation script to clipboard">cargo install ${library_to_crate_name(library_name(an, v))}-cli</button>
-            % endif
-            % if not loop.last:
-,           
-            % endif
-        % endfor # each program type
-        <br/>
-    % endfor # each version
-% endfor # each API
-</ul>
+        <td>${name} (${version})</td> 
+          <td>
+            <a href="${api_link}" title="API docs for the ${name} ${version}">API</a>
+            <a href="${crates_link}">
+              <img src="${url_info.asset_urls.crates_img}" 
+                title="This API on crates.io" height="16" width="16"/>
+            </a>
+          </td>
+          <td>
+            <a href="${cli_link}" title="CLI docs for the ${name} ${version}">
+              CLI
+            </a>
+          </td>
+          <td>
+            <button class="mono" onclick="onClick(this)" 
+              oncopy="onCopy(event)" 
+              title="Copy complete installation script to clipboard">
+              cargo install ${library_to_crate_name(library_name(name, version))}-cli
+            </button>
+          </td>
+        </tr>
+      % endfor # each version
+      % endfor # each API
+      </tbody>
+    </table>
+  </div>
 </body>
 </html>
