@@ -91,9 +91,9 @@ function onCopy(e) {
     % for version in api.list[name]:
       <tr>
         <% 
-            # We know type_names is just ["api", "cli"]
-            #type_names = tc.keys()
             type_names = ["api", "cli"]
+            assert set(type_names) == set(tc.keys()), "The type cache has changed, make sure to update the documentation accordingly"
+
             with open(api_json_path(directories.api_base, name, version)) as fp:
                 metadata = json.load(fp)
 
