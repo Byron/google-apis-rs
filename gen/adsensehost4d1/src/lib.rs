@@ -198,7 +198,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -330,6 +330,8 @@ pub struct AdSenseHost<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
+    _base_url: String,
+    _root_url: String,
 }
 
 impl<'a, C, A> Hub for AdSenseHost<C, A> {}
@@ -342,6 +344,8 @@ impl<'a, C, A> AdSenseHost<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
+            _base_url: "https://www.googleapis.com/adsensehost/v4.1/".to_string(),
+            _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
@@ -371,6 +375,26 @@ impl<'a, C, A> AdSenseHost<C, A>
     pub fn user_agent(&mut self, agent_name: String) -> String {
         let prev = self._user_agent.clone();
         self._user_agent = agent_name;
+        prev
+    }
+
+    /// Set the base url to use in all requests to the server.
+    /// It defaults to `https://www.googleapis.com/adsensehost/v4.1/`.
+    ///
+    /// Returns the previously set base url.
+    pub fn base_url(&mut self, new_base_url: String) -> String {
+        let prev = self._base_url.clone();
+        self._base_url = new_base_url;
+        prev
+    }
+
+    /// Set the root url to use in all requests to the server.
+    /// It defaults to `https://www.googleapis.com/`.
+    ///
+    /// Returns the previously set root url.
+    pub fn root_url(&mut self, new_root_url: String) -> String {
+        let prev = self._root_url.clone();
+        self._root_url = new_root_url;
         prev
     }
 }
@@ -1757,7 +1781,7 @@ impl<'a, C, A> UrlchannelInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/adsensehost/v4.1/adclients/{adClientId}/urlchannels".to_string();
+        let mut url = self.hub._base_url.clone() + "adclients/{adClientId}/urlchannels";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -2018,7 +2042,7 @@ impl<'a, C, A> UrlchannelDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/adsensehost/v4.1/adclients/{adClientId}/urlchannels/{urlChannelId}".to_string();
+        let mut url = self.hub._base_url.clone() + "adclients/{adClientId}/urlchannels/{urlChannelId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -2273,7 +2297,7 @@ impl<'a, C, A> UrlchannelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/adsensehost/v4.1/adclients/{adClientId}/urlchannels".to_string();
+        let mut url = self.hub._base_url.clone() + "adclients/{adClientId}/urlchannels";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -2530,7 +2554,7 @@ impl<'a, C, A> AdclientListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/adsensehost/v4.1/adclients".to_string();
+        let mut url = self.hub._base_url.clone() + "adclients";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -2748,7 +2772,7 @@ impl<'a, C, A> AdclientGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/adsensehost/v4.1/adclients/{adClientId}".to_string();
+        let mut url = self.hub._base_url.clone() + "adclients/{adClientId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -2999,7 +3023,7 @@ impl<'a, C, A> AssociationsessionStartCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/adsensehost/v4.1/associationsessions/start".to_string();
+        let mut url = self.hub._base_url.clone() + "associationsessions/start";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -3238,7 +3262,7 @@ impl<'a, C, A> AssociationsessionVerifyCall<'a, C, A> where C: BorrowMut<hyper::
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/adsensehost/v4.1/associationsessions/verify".to_string();
+        let mut url = self.hub._base_url.clone() + "associationsessions/verify";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -3497,7 +3521,7 @@ impl<'a, C, A> ReportGenerateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/adsensehost/v4.1/reports".to_string();
+        let mut url = self.hub._base_url.clone() + "reports";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -3791,7 +3815,7 @@ impl<'a, C, A> AccountAdunitListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/adsensehost/v4.1/accounts/{accountId}/adclients/{adClientId}/adunits".to_string();
+        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/adclients/{adClientId}/adunits";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -4061,7 +4085,7 @@ impl<'a, C, A> AccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/adsensehost/v4.1/accounts".to_string();
+        let mut url = self.hub._base_url.clone() + "accounts";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -4287,7 +4311,7 @@ impl<'a, C, A> AccountAdunitGetAdCodeCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/adsensehost/v4.1/accounts/{accountId}/adclients/{adClientId}/adunits/{adUnitId}/adcode".to_string();
+        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/adclients/{adClientId}/adunits/{adUnitId}/adcode";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -4597,7 +4621,7 @@ impl<'a, C, A> AccountReportGenerateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/adsensehost/v4.1/accounts/{accountId}/reports".to_string();
+        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/reports";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -4909,7 +4933,7 @@ impl<'a, C, A> AccountAdunitDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/adsensehost/v4.1/accounts/{accountId}/adclients/{adClientId}/adunits/{adUnitId}".to_string();
+        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/adclients/{adClientId}/adunits/{adUnitId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -5174,7 +5198,7 @@ impl<'a, C, A> AccountAdclientListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/adsensehost/v4.1/accounts/{accountId}/adclients".to_string();
+        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/adclients";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -5434,7 +5458,7 @@ impl<'a, C, A> AccountAdunitPatchCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/adsensehost/v4.1/accounts/{accountId}/adclients/{adClientId}/adunits".to_string();
+        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/adclients/{adClientId}/adunits";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -5715,7 +5739,7 @@ impl<'a, C, A> AccountAdclientGetCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/adsensehost/v4.1/accounts/{accountId}/adclients/{adClientId}".to_string();
+        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/adclients/{adClientId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -5960,7 +5984,7 @@ impl<'a, C, A> AccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/adsensehost/v4.1/accounts/{accountId}".to_string();
+        let mut url = self.hub._base_url.clone() + "accounts/{accountId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -6204,7 +6228,7 @@ impl<'a, C, A> AccountAdunitInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/adsensehost/v4.1/accounts/{accountId}/adclients/{adClientId}/adunits".to_string();
+        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/adclients/{adClientId}/adunits";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -6477,7 +6501,7 @@ impl<'a, C, A> AccountAdunitGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/adsensehost/v4.1/accounts/{accountId}/adclients/{adClientId}/adunits/{adUnitId}".to_string();
+        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/adclients/{adClientId}/adunits/{adUnitId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -6741,7 +6765,7 @@ impl<'a, C, A> AccountAdunitUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/adsensehost/v4.1/accounts/{accountId}/adclients/{adClientId}/adunits".to_string();
+        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/adclients/{adClientId}/adunits";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -7012,7 +7036,7 @@ impl<'a, C, A> CustomchannelGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/adsensehost/v4.1/adclients/{adClientId}/customchannels/{customChannelId}".to_string();
+        let mut url = self.hub._base_url.clone() + "adclients/{adClientId}/customchannels/{customChannelId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -7259,7 +7283,7 @@ impl<'a, C, A> CustomchannelDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/adsensehost/v4.1/adclients/{adClientId}/customchannels/{customChannelId}".to_string();
+        let mut url = self.hub._base_url.clone() + "adclients/{adClientId}/customchannels/{customChannelId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -7511,7 +7535,7 @@ impl<'a, C, A> CustomchannelUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/adsensehost/v4.1/adclients/{adClientId}/customchannels".to_string();
+        let mut url = self.hub._base_url.clone() + "adclients/{adClientId}/customchannels";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -7780,7 +7804,7 @@ impl<'a, C, A> CustomchannelListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/adsensehost/v4.1/adclients/{adClientId}/customchannels".to_string();
+        let mut url = self.hub._base_url.clone() + "adclients/{adClientId}/customchannels";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -8038,7 +8062,7 @@ impl<'a, C, A> CustomchannelPatchCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/adsensehost/v4.1/adclients/{adClientId}/customchannels".to_string();
+        let mut url = self.hub._base_url.clone() + "adclients/{adClientId}/customchannels";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -8314,7 +8338,7 @@ impl<'a, C, A> CustomchannelInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/adsensehost/v4.1/adclients/{adClientId}/customchannels".to_string();
+        let mut url = self.hub._base_url.clone() + "adclients/{adClientId}/customchannels";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -8501,6 +8525,5 @@ impl<'a, C, A> CustomchannelInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self
     }
 }
-
 
 

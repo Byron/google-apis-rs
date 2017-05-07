@@ -191,7 +191,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -342,6 +342,8 @@ pub struct Analytics<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
+    _base_url: String,
+    _root_url: String,
 }
 
 impl<'a, C, A> Hub for Analytics<C, A> {}
@@ -354,6 +356,8 @@ impl<'a, C, A> Analytics<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
+            _base_url: "https://www.googleapis.com/analytics/v3/".to_string(),
+            _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
@@ -377,6 +381,26 @@ impl<'a, C, A> Analytics<C, A>
     pub fn user_agent(&mut self, agent_name: String) -> String {
         let prev = self._user_agent.clone();
         self._user_agent = agent_name;
+        prev
+    }
+
+    /// Set the base url to use in all requests to the server.
+    /// It defaults to `https://www.googleapis.com/analytics/v3/`.
+    ///
+    /// Returns the previously set base url.
+    pub fn base_url(&mut self, new_base_url: String) -> String {
+        let prev = self._base_url.clone();
+        self._base_url = new_base_url;
+        prev
+    }
+
+    /// Set the root url to use in all requests to the server.
+    /// It defaults to `https://www.googleapis.com/`.
+    ///
+    /// Returns the previously set root url.
+    pub fn root_url(&mut self, new_root_url: String) -> String {
+        let prev = self._root_url.clone();
+        self._root_url = new_root_url;
         prev
     }
 }
@@ -5572,7 +5596,7 @@ impl<'a, C, A> ManagementWebpropertyInsertCall<'a, C, A> where C: BorrowMut<hype
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
@@ -5835,7 +5859,7 @@ impl<'a, C, A> ManagementProfileGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -6098,7 +6122,7 @@ impl<'a, C, A> ManagementAccountListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -6329,7 +6353,7 @@ impl<'a, C, A> ManagementProfileFilterLinkPatchCall<'a, C, A> where C: BorrowMut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/profileFilterLinks/{linkId}".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/profileFilterLinks/{linkId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
@@ -6621,7 +6645,7 @@ impl<'a, C, A> ManagementWebpropertyUserLinkDeleteCall<'a, C, A> where C: Borrow
         }
 
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/entityUserLinks/{linkId}".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/entityUserLinks/{linkId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ManageUser.as_ref().to_string(), ());
         }
@@ -6871,7 +6895,7 @@ impl<'a, C, A> ManagementProfileUserLinkDeleteCall<'a, C, A> where C: BorrowMut<
         }
 
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/entityUserLinks/{linkId}".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/entityUserLinks/{linkId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ManageUser.as_ref().to_string(), ());
         }
@@ -7139,7 +7163,7 @@ impl<'a, C, A> ManagementProfileUserLinkUpdateCall<'a, C, A> where C: BorrowMut<
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/entityUserLinks/{linkId}".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/entityUserLinks/{linkId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ManageUser.as_ref().to_string(), ());
         }
@@ -7435,7 +7459,7 @@ impl<'a, C, A> ManagementFilterInsertCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/filters".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/filters";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
@@ -7703,7 +7727,7 @@ impl<'a, C, A> ManagementAccountUserLinkUpdateCall<'a, C, A> where C: BorrowMut<
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/entityUserLinks/{linkId}".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/entityUserLinks/{linkId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ManageUser.as_ref().to_string(), ());
         }
@@ -7978,7 +8002,7 @@ impl<'a, C, A> ManagementProfileFilterLinkGetCall<'a, C, A> where C: BorrowMut<h
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/profileFilterLinks/{linkId}".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/profileFilterLinks/{linkId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -8254,7 +8278,7 @@ impl<'a, C, A> ManagementWebpropertyUserLinkUpdateCall<'a, C, A> where C: Borrow
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/entityUserLinks/{linkId}".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/entityUserLinks/{linkId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ManageUser.as_ref().to_string(), ());
         }
@@ -8544,7 +8568,7 @@ impl<'a, C, A> ManagementUnsampledReportInsertCall<'a, C, A> where C: BorrowMut<
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/unsampledReports".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/unsampledReports";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -8828,7 +8852,7 @@ impl<'a, C, A> ManagementProfileFilterLinkDeleteCall<'a, C, A> where C: BorrowMu
         }
 
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/profileFilterLinks/{linkId}".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/profileFilterLinks/{linkId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
@@ -9094,7 +9118,7 @@ impl<'a, C, A> ManagementRemarketingAudienceUpdateCall<'a, C, A> where C: Borrow
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/remarketingAudiences/{remarketingAudienceId}".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/remarketingAudiences/{remarketingAudienceId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
@@ -9377,7 +9401,7 @@ impl<'a, C, A> ManagementCustomMetricGetCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/customMetrics/{customMetricId}".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/customMetrics/{customMetricId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -9638,7 +9662,7 @@ impl<'a, C, A> ManagementUploadGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/customDataSources/{customDataSourceId}/uploads/{uploadId}".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/customDataSources/{customDataSourceId}/uploads/{uploadId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -9916,7 +9940,7 @@ impl<'a, C, A> ManagementExperimentPatchCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/experiments/{experimentId}".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/experiments/{experimentId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -10217,7 +10241,7 @@ impl<'a, C, A> ManagementWebpropertyUserLinkListCall<'a, C, A> where C: BorrowMu
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/entityUserLinks".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/entityUserLinks";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ManageUserReadonly.as_ref().to_string(), ());
         }
@@ -10489,7 +10513,7 @@ impl<'a, C, A> ManagementProfileFilterLinkUpdateCall<'a, C, A> where C: BorrowMu
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/profileFilterLinks/{linkId}".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/profileFilterLinks/{linkId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
@@ -10784,7 +10808,7 @@ impl<'a, C, A> ManagementExperimentGetCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/experiments/{experimentId}".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/experiments/{experimentId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -11065,7 +11089,7 @@ impl<'a, C, A> ManagementCustomDimensionUpdateCall<'a, C, A> where C: BorrowMut<
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/customDimensions/{customDimensionId}".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/customDimensions/{customDimensionId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
@@ -11357,7 +11381,7 @@ impl<'a, C, A> ManagementUnsampledReportGetCall<'a, C, A> where C: BorrowMut<hyp
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/unsampledReports/{unsampledReportId}".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/unsampledReports/{unsampledReportId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -11633,7 +11657,7 @@ impl<'a, C, A> ManagementProfileFilterLinkInsertCall<'a, C, A> where C: BorrowMu
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/profileFilterLinks".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/profileFilterLinks";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
@@ -11921,7 +11945,7 @@ impl<'a, C, A> ManagementFilterUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/filters/{filterId}".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/filters/{filterId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
@@ -12198,9 +12222,9 @@ impl<'a, C, A> ManagementUploadUploadDataCall<'a, C, A> where C: BorrowMut<hyper
 
         let (mut url, upload_type) =
             if protocol == "simple" {
-                ("https://www.googleapis.com/upload/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/customDataSources/{customDataSourceId}/uploads".to_string(), "multipart")
+                (self.hub._root_url.clone() + "/upload/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/customDataSources/{customDataSourceId}/uploads", "multipart")
             } else if protocol == "resumable" {
-                ("https://www.googleapis.com/resumable/upload/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/customDataSources/{customDataSourceId}/uploads".to_string(), "resumable")
+                (self.hub._root_url.clone() + "/resumable/upload/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/customDataSources/{customDataSourceId}/uploads", "resumable")
             } else {
                 unreachable!()
             };
@@ -12570,7 +12594,7 @@ impl<'a, C, A> ManagementWebPropertyAdWordsLinkListCall<'a, C, A> where C: Borro
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/entityAdWordsLinks".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/entityAdWordsLinks";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -12840,7 +12864,7 @@ impl<'a, C, A> ManagementExperimentInsertCall<'a, C, A> where C: BorrowMut<hyper
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/experiments".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/experiments";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -13127,7 +13151,7 @@ impl<'a, C, A> ManagementSegmentListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/segments".to_string();
+        let mut url = self.hub._base_url.clone() + "management/segments";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -13348,7 +13372,7 @@ impl<'a, C, A> ManagementProfileDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
         }
 
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
@@ -13606,7 +13630,7 @@ impl<'a, C, A> ManagementGoalPatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/goals/{goalId}".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/goals/{goalId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
@@ -13911,7 +13935,7 @@ impl<'a, C, A> ManagementCustomDimensionPatchCall<'a, C, A> where C: BorrowMut<h
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/customDimensions/{customDimensionId}".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/customDimensions/{customDimensionId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
@@ -14201,7 +14225,7 @@ impl<'a, C, A> ManagementWebPropertyAdWordsLinkGetCall<'a, C, A> where C: Borrow
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/entityAdWordsLinks/{webPropertyAdWordsLinkId}".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/entityAdWordsLinks/{webPropertyAdWordsLinkId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -14470,7 +14494,7 @@ impl<'a, C, A> ManagementExperimentListCall<'a, C, A> where C: BorrowMut<hyper::
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/experiments".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/experiments";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -14751,7 +14775,7 @@ impl<'a, C, A> ManagementProfileListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/profiles";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -15024,7 +15048,7 @@ impl<'a, C, A> ManagementGoalListCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/goals".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/goals";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -15304,7 +15328,7 @@ impl<'a, C, A> ManagementGoalInsertCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/goals".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/goals";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
@@ -15599,7 +15623,7 @@ impl<'a, C, A> ManagementCustomMetricPatchCall<'a, C, A> where C: BorrowMut<hype
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/customMetrics/{customMetricId}".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/customMetrics/{customMetricId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
@@ -15899,7 +15923,7 @@ impl<'a, C, A> ManagementProfileFilterLinkListCall<'a, C, A> where C: BorrowMut<
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/profileFilterLinks".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/profileFilterLinks";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -16175,7 +16199,7 @@ impl<'a, C, A> ManagementAccountUserLinkInsertCall<'a, C, A> where C: BorrowMut<
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/entityUserLinks".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/entityUserLinks";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ManageUser.as_ref().to_string(), ());
         }
@@ -16443,7 +16467,7 @@ impl<'a, C, A> ManagementWebpropertyUserLinkInsertCall<'a, C, A> where C: Borrow
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/entityUserLinks".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/entityUserLinks";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ManageUser.as_ref().to_string(), ());
         }
@@ -16721,7 +16745,7 @@ impl<'a, C, A> ManagementCustomMetricInsertCall<'a, C, A> where C: BorrowMut<hyp
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/customMetrics".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/customMetrics";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
@@ -16995,7 +17019,7 @@ impl<'a, C, A> ManagementUnsampledReportDeleteCall<'a, C, A> where C: BorrowMut<
         }
 
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/unsampledReports/{unsampledReportId}".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/unsampledReports/{unsampledReportId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
@@ -17261,7 +17285,7 @@ impl<'a, C, A> ManagementProfilePatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
@@ -17542,7 +17566,7 @@ impl<'a, C, A> ManagementFilterGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/filters/{filterId}".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/filters/{filterId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -17795,7 +17819,7 @@ impl<'a, C, A> ManagementAccountSummaryListCall<'a, C, A> where C: BorrowMut<hyp
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accountSummaries".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accountSummaries";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -18025,7 +18049,7 @@ impl<'a, C, A> ManagementCustomDimensionListCall<'a, C, A> where C: BorrowMut<hy
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/customDimensions".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/customDimensions";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -18298,7 +18322,7 @@ impl<'a, C, A> ManagementUploadListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/customDataSources/{customDataSourceId}/uploads".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/customDataSources/{customDataSourceId}/uploads";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -18581,7 +18605,7 @@ impl<'a, C, A> ManagementProfileUserLinkListCall<'a, C, A> where C: BorrowMut<hy
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/entityUserLinks".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/entityUserLinks";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ManageUserReadonly.as_ref().to_string(), ());
         }
@@ -18859,7 +18883,7 @@ impl<'a, C, A> ManagementRemarketingAudienceInsertCall<'a, C, A> where C: Borrow
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/remarketingAudiences".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/remarketingAudiences";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
@@ -19131,7 +19155,7 @@ impl<'a, C, A> ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, A> where C: Bor
         }
 
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/entityAdWordsLinks/{webPropertyAdWordsLinkId}".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/entityAdWordsLinks/{webPropertyAdWordsLinkId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
@@ -19386,7 +19410,7 @@ impl<'a, C, A> ManagementUploadDeleteUploadDataCall<'a, C, A> where C: BorrowMut
         }
 
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/customDataSources/{customDataSourceId}/deleteUploadData".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/customDataSources/{customDataSourceId}/deleteUploadData";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -19664,7 +19688,7 @@ impl<'a, C, A> ManagementWebPropertyAdWordsLinkInsertCall<'a, C, A> where C: Bor
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/entityAdWordsLinks".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/entityAdWordsLinks";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
@@ -19938,7 +19962,7 @@ impl<'a, C, A> ManagementExperimentDeleteCall<'a, C, A> where C: BorrowMut<hyper
         }
 
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/experiments/{experimentId}".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/experiments/{experimentId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -20206,7 +20230,7 @@ impl<'a, C, A> ManagementGoalUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/goals/{goalId}".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/goals/{goalId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
@@ -20507,7 +20531,7 @@ impl<'a, C, A> ManagementCustomDataSourceListCall<'a, C, A> where C: BorrowMut<h
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/customDataSources".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/customDataSources";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -20778,7 +20802,7 @@ impl<'a, C, A> ManagementCustomMetricListCall<'a, C, A> where C: BorrowMut<hyper
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/customMetrics".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/customMetrics";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -21051,7 +21075,7 @@ impl<'a, C, A> ManagementUnsampledReportListCall<'a, C, A> where C: BorrowMut<hy
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/unsampledReports".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/unsampledReports";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -21322,7 +21346,7 @@ impl<'a, C, A> ManagementWebpropertyGetCall<'a, C, A> where C: BorrowMut<hyper::
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -21578,7 +21602,7 @@ impl<'a, C, A> ManagementProfileUpdateCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
@@ -21861,7 +21885,7 @@ impl<'a, C, A> ManagementCustomDimensionGetCall<'a, C, A> where C: BorrowMut<hyp
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/customDimensions/{customDimensionId}".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/customDimensions/{customDimensionId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -22120,7 +22144,7 @@ impl<'a, C, A> ManagementRemarketingAudienceGetCall<'a, C, A> where C: BorrowMut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/remarketingAudiences/{remarketingAudienceId}".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/remarketingAudiences/{remarketingAudienceId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -22384,7 +22408,7 @@ impl<'a, C, A> ManagementWebpropertyPatchCall<'a, C, A> where C: BorrowMut<hyper
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
@@ -22662,7 +22686,7 @@ impl<'a, C, A> ManagementWebpropertyUpdateCall<'a, C, A> where C: BorrowMut<hype
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
@@ -22940,7 +22964,7 @@ impl<'a, C, A> ManagementCustomDimensionInsertCall<'a, C, A> where C: BorrowMut<
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/customDimensions".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/customDimensions";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
@@ -23210,7 +23234,7 @@ impl<'a, C, A> ManagementAccountUserLinkDeleteCall<'a, C, A> where C: BorrowMut<
         }
 
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/entityUserLinks/{linkId}".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/entityUserLinks/{linkId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ManageUser.as_ref().to_string(), ());
         }
@@ -23456,7 +23480,7 @@ impl<'a, C, A> ManagementProfileUserLinkInsertCall<'a, C, A> where C: BorrowMut<
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/entityUserLinks".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/entityUserLinks";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ManageUser.as_ref().to_string(), ());
         }
@@ -23748,7 +23772,7 @@ impl<'a, C, A> ManagementExperimentUpdateCall<'a, C, A> where C: BorrowMut<hyper
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/experiments/{experimentId}".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/experiments/{experimentId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -24047,7 +24071,7 @@ impl<'a, C, A> ManagementWebpropertyListCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -24307,7 +24331,7 @@ impl<'a, C, A> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, A> where C: Borr
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/entityAdWordsLinks/{webPropertyAdWordsLinkId}".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/entityAdWordsLinks/{webPropertyAdWordsLinkId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
@@ -24592,7 +24616,7 @@ impl<'a, C, A> ManagementGoalGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/goals/{goalId}".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/goals/{goalId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -24873,7 +24897,7 @@ impl<'a, C, A> ManagementCustomMetricUpdateCall<'a, C, A> where C: BorrowMut<hyp
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/customMetrics/{customMetricId}".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/customMetrics/{customMetricId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
@@ -25170,7 +25194,7 @@ impl<'a, C, A> ManagementRemarketingAudiencePatchCall<'a, C, A> where C: BorrowM
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/remarketingAudiences/{remarketingAudienceId}".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/remarketingAudiences/{remarketingAudienceId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
@@ -25460,7 +25484,7 @@ impl<'a, C, A> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, A> where C: Bor
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/entityAdWordsLinks/{webPropertyAdWordsLinkId}".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/entityAdWordsLinks/{webPropertyAdWordsLinkId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
@@ -25748,7 +25772,7 @@ impl<'a, C, A> ManagementFilterPatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/filters/{filterId}".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/filters/{filterId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
@@ -26027,7 +26051,7 @@ impl<'a, C, A> ManagementFilterListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/filters".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/filters";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -26278,7 +26302,7 @@ impl<'a, C, A> ManagementFilterDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/filters/{filterId}".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/filters/{filterId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
@@ -26532,7 +26556,7 @@ impl<'a, C, A> ManagementProfileInsertCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/profiles";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
@@ -26811,7 +26835,7 @@ impl<'a, C, A> ManagementAccountUserLinkListCall<'a, C, A> where C: BorrowMut<hy
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/entityUserLinks".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/entityUserLinks";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ManageUserReadonly.as_ref().to_string(), ());
         }
@@ -27077,7 +27101,7 @@ impl<'a, C, A> ManagementRemarketingAudienceListCall<'a, C, A> where C: BorrowMu
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/remarketingAudiences".to_string();
+        let mut url = self.hub._base_url.clone() + "management/accounts/{accountId}/webproperties/{webPropertyId}/remarketingAudiences";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -27378,7 +27402,7 @@ impl<'a, C, A> DataMcfGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/data/mcf".to_string();
+        let mut url = self.hub._base_url.clone() + "data/mcf";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -27715,7 +27739,7 @@ impl<'a, C, A> DataGaGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/data/ga".to_string();
+        let mut url = self.hub._base_url.clone() + "data/ga";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -28044,7 +28068,7 @@ impl<'a, C, A> DataRealtimeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/data/realtime".to_string();
+        let mut url = self.hub._base_url.clone() + "data/realtime";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -28301,7 +28325,7 @@ impl<'a, C, A> ProvisioningCreateAccountTicketCall<'a, C, A> where C: BorrowMut<
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/provisioning/createAccountTicket".to_string();
+        let mut url = self.hub._base_url.clone() + "provisioning/createAccountTicket";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Provision.as_ref().to_string(), ());
         }
@@ -28529,7 +28553,7 @@ impl<'a, C, A> MetadataColumnListCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/analytics/v3/metadata/{reportType}/columns".to_string();
+        let mut url = self.hub._base_url.clone() + "metadata/{reportType}/columns";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -28692,6 +28716,5 @@ impl<'a, C, A> MetadataColumnListCall<'a, C, A> where C: BorrowMut<hyper::Client
         self
     }
 }
-
 
 

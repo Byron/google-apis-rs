@@ -185,7 +185,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -324,6 +324,8 @@ pub struct Appengine<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
+    _base_url: String,
+    _root_url: String,
 }
 
 impl<'a, C, A> Hub for Appengine<C, A> {}
@@ -336,6 +338,8 @@ impl<'a, C, A> Appengine<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
+            _base_url: "https://appengine.googleapis.com/".to_string(),
+            _root_url: "https://appengine.googleapis.com/".to_string(),
         }
     }
 
@@ -350,6 +354,26 @@ impl<'a, C, A> Appengine<C, A>
     pub fn user_agent(&mut self, agent_name: String) -> String {
         let prev = self._user_agent.clone();
         self._user_agent = agent_name;
+        prev
+    }
+
+    /// Set the base url to use in all requests to the server.
+    /// It defaults to `https://appengine.googleapis.com/`.
+    ///
+    /// Returns the previously set base url.
+    pub fn base_url(&mut self, new_base_url: String) -> String {
+        let prev = self._base_url.clone();
+        self._base_url = new_base_url;
+        prev
+    }
+
+    /// Set the root url to use in all requests to the server.
+    /// It defaults to `https://appengine.googleapis.com/`.
+    ///
+    /// Returns the previously set root url.
+    pub fn root_url(&mut self, new_root_url: String) -> String {
+        let prev = self._root_url.clone();
+        self._root_url = new_root_url;
         prev
     }
 }
@@ -1842,7 +1866,7 @@ impl<'a, C, A> AppServiceVersionInstanceListCall<'a, C, A> where C: BorrowMut<hy
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://appengine.googleapis.com/v1beta5/apps/{appsId}/services/{servicesId}/versions/{versionsId}/instances".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta5/apps/{appsId}/services/{servicesId}/versions/{versionsId}/instances";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Admin.as_ref().to_string(), ());
         }
@@ -2126,7 +2150,7 @@ impl<'a, C, A> AppServiceVersionCreateCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://appengine.googleapis.com/v1beta5/apps/{appsId}/services/{servicesId}/versions".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta5/apps/{appsId}/services/{servicesId}/versions";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -2413,7 +2437,7 @@ impl<'a, C, A> AppPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://appengine.googleapis.com/v1beta5/apps/{appsId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta5/apps/{appsId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -2698,7 +2722,7 @@ impl<'a, C, A> AppServiceVersionInstanceDebugCall<'a, C, A> where C: BorrowMut<h
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://appengine.googleapis.com/v1beta5/apps/{appsId}/services/{servicesId}/versions/{versionsId}/instances/{instancesId}:debug".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta5/apps/{appsId}/services/{servicesId}/versions/{versionsId}/instances/{instancesId}:debug";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -2995,7 +3019,7 @@ impl<'a, C, A> AppServiceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://appengine.googleapis.com/v1beta5/apps/{appsId}/services/{servicesId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta5/apps/{appsId}/services/{servicesId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Admin.as_ref().to_string(), ());
         }
@@ -3252,7 +3276,7 @@ impl<'a, C, A> AppServiceVersionInstanceDeleteCall<'a, C, A> where C: BorrowMut<
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://appengine.googleapis.com/v1beta5/apps/{appsId}/services/{servicesId}/versions/{versionsId}/instances/{instancesId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta5/apps/{appsId}/services/{servicesId}/versions/{versionsId}/instances/{instancesId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -3539,7 +3563,7 @@ impl<'a, C, A> AppServiceVersionPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://appengine.googleapis.com/v1beta5/apps/{appsId}/services/{servicesId}/versions/{versionsId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta5/apps/{appsId}/services/{servicesId}/versions/{versionsId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -3848,7 +3872,7 @@ impl<'a, C, A> AppServiceVersionListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://appengine.googleapis.com/v1beta5/apps/{appsId}/services/{servicesId}/versions".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta5/apps/{appsId}/services/{servicesId}/versions";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Admin.as_ref().to_string(), ());
         }
@@ -4122,7 +4146,7 @@ impl<'a, C, A> AppOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://appengine.googleapis.com/v1beta5/apps/{appsId}/operations/{operationsId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta5/apps/{appsId}/operations/{operationsId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Admin.as_ref().to_string(), ());
         }
@@ -4383,7 +4407,7 @@ impl<'a, C, A> AppServiceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://appengine.googleapis.com/v1beta5/apps/{appsId}/services".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta5/apps/{appsId}/services";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Admin.as_ref().to_string(), ());
         }
@@ -4653,7 +4677,7 @@ impl<'a, C, A> AppLocationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://appengine.googleapis.com/v1beta5/apps/{appsId}/locations".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta5/apps/{appsId}/locations";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Admin.as_ref().to_string(), ());
         }
@@ -4921,7 +4945,7 @@ impl<'a, C, A> AppServiceVersionInstanceGetCall<'a, C, A> where C: BorrowMut<hyp
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://appengine.googleapis.com/v1beta5/apps/{appsId}/services/{servicesId}/versions/{versionsId}/instances/{instancesId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta5/apps/{appsId}/services/{servicesId}/versions/{versionsId}/instances/{instancesId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Admin.as_ref().to_string(), ());
         }
@@ -5207,7 +5231,7 @@ impl<'a, C, A> AppOperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://appengine.googleapis.com/v1beta5/apps/{appsId}/operations".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta5/apps/{appsId}/operations";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Admin.as_ref().to_string(), ());
         }
@@ -5473,7 +5497,7 @@ impl<'a, C, A> AppServiceVersionDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://appengine.googleapis.com/v1beta5/apps/{appsId}/services/{servicesId}/versions/{versionsId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta5/apps/{appsId}/services/{servicesId}/versions/{versionsId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5736,7 +5760,7 @@ impl<'a, C, A> AppLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://appengine.googleapis.com/v1beta5/apps/{appsId}/locations/{locationsId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta5/apps/{appsId}/locations/{locationsId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Admin.as_ref().to_string(), ());
         }
@@ -6006,7 +6030,7 @@ impl<'a, C, A> AppServicePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://appengine.googleapis.com/v1beta5/apps/{appsId}/services/{servicesId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta5/apps/{appsId}/services/{servicesId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -6300,7 +6324,7 @@ impl<'a, C, A> AppGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://appengine.googleapis.com/v1beta5/apps/{appsId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta5/apps/{appsId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -6550,7 +6574,7 @@ impl<'a, C, A> AppServiceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://appengine.googleapis.com/v1beta5/apps/{appsId}/services/{servicesId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta5/apps/{appsId}/services/{servicesId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -6806,7 +6830,7 @@ impl<'a, C, A> AppCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://appengine.googleapis.com/v1beta5/apps".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta5/apps";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -7049,7 +7073,7 @@ impl<'a, C, A> AppServiceVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://appengine.googleapis.com/v1beta5/apps/{appsId}/services/{servicesId}/versions/{versionsId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta5/apps/{appsId}/services/{servicesId}/versions/{versionsId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Admin.as_ref().to_string(), ());
         }
@@ -7245,6 +7269,5 @@ impl<'a, C, A> AppServiceVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self
     }
 }
-
 
 

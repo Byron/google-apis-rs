@@ -197,7 +197,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -369,6 +369,8 @@ pub struct Gmail<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
+    _base_url: String,
+    _root_url: String,
 }
 
 impl<'a, C, A> Hub for Gmail<C, A> {}
@@ -381,6 +383,8 @@ impl<'a, C, A> Gmail<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
+            _base_url: "https://www.googleapis.com/gmail/v1/users/".to_string(),
+            _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
@@ -395,6 +399,26 @@ impl<'a, C, A> Gmail<C, A>
     pub fn user_agent(&mut self, agent_name: String) -> String {
         let prev = self._user_agent.clone();
         self._user_agent = agent_name;
+        prev
+    }
+
+    /// Set the base url to use in all requests to the server.
+    /// It defaults to `https://www.googleapis.com/gmail/v1/users/`.
+    ///
+    /// Returns the previously set base url.
+    pub fn base_url(&mut self, new_base_url: String) -> String {
+        let prev = self._base_url.clone();
+        self._base_url = new_base_url;
+        prev
+    }
+
+    /// Set the root url to use in all requests to the server.
+    /// It defaults to `https://www.googleapis.com/`.
+    ///
+    /// Returns the previously set root url.
+    pub fn root_url(&mut self, new_root_url: String) -> String {
+        let prev = self._root_url.clone();
+        self._root_url = new_root_url;
         prev
     }
 }
@@ -2546,7 +2570,7 @@ impl<'a, C, A> UserSettingUpdateVacationCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/settings/vacation".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/settings/vacation";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::SettingBasic.as_ref().to_string(), ());
         }
@@ -2812,7 +2836,7 @@ impl<'a, C, A> UserLabelCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/labels".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/labels";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Gmai.as_ref().to_string(), ());
         }
@@ -3071,7 +3095,7 @@ impl<'a, C, A> UserSettingSendAListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/settings/sendAs".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/settings/sendAs";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -3306,7 +3330,7 @@ impl<'a, C, A> UserSettingGetImapCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/settings/imap".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/settings/imap";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -3572,9 +3596,9 @@ impl<'a, C, A> UserMessageImportCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         let (mut url, upload_type) =
             if protocol == "simple" {
-                ("https://www.googleapis.com/upload/gmail/v1/users/{userId}/messages/import".to_string(), "multipart")
+                (self.hub._root_url.clone() + "/upload/gmail/v1/users/{userId}/messages/import", "multipart")
             } else if protocol == "resumable" {
-                ("https://www.googleapis.com/resumable/upload/gmail/v1/users/{userId}/messages/import".to_string(), "resumable")
+                (self.hub._root_url.clone() + "/resumable/upload/gmail/v1/users/{userId}/messages/import", "resumable")
             } else {
                 unreachable!()
             };
@@ -3969,7 +3993,7 @@ impl<'a, C, A> UserSettingFilterListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/settings/filters".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/settings/filters";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -4206,7 +4230,7 @@ impl<'a, C, A> UserSettingForwardingAddresseGetCall<'a, C, A> where C: BorrowMut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/settings/forwardingAddresses/{forwardingEmail}".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/settings/forwardingAddresses/{forwardingEmail}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -4471,7 +4495,7 @@ impl<'a, C, A> UserHistoryListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/history".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/history";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -4745,9 +4769,9 @@ impl<'a, C, A> UserDraftCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         let (mut url, upload_type) =
             if protocol == "simple" {
-                ("https://www.googleapis.com/upload/gmail/v1/users/{userId}/drafts".to_string(), "multipart")
+                (self.hub._root_url.clone() + "/upload/gmail/v1/users/{userId}/drafts", "multipart")
             } else if protocol == "resumable" {
-                ("https://www.googleapis.com/resumable/upload/gmail/v1/users/{userId}/drafts".to_string(), "resumable")
+                (self.hub._root_url.clone() + "/resumable/upload/gmail/v1/users/{userId}/drafts", "resumable")
             } else {
                 unreachable!()
             };
@@ -5116,7 +5140,7 @@ impl<'a, C, A> UserSettingSendAGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/settings/sendAs/{sendAsEmail}".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/settings/sendAs/{sendAsEmail}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -5362,7 +5386,7 @@ impl<'a, C, A> UserLabelDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         }
 
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/labels/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/labels/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Gmai.as_ref().to_string(), ());
         }
@@ -5599,7 +5623,7 @@ impl<'a, C, A> UserLabelGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/labels/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/labels/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -5844,7 +5868,7 @@ impl<'a, C, A> UserLabelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/labels".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/labels";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -6090,9 +6114,9 @@ impl<'a, C, A> UserDraftSendCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         let (mut url, upload_type) =
             if protocol == "simple" {
-                ("https://www.googleapis.com/upload/gmail/v1/users/{userId}/drafts/send".to_string(), "multipart")
+                (self.hub._root_url.clone() + "/upload/gmail/v1/users/{userId}/drafts/send", "multipart")
             } else if protocol == "resumable" {
-                ("https://www.googleapis.com/resumable/upload/gmail/v1/users/{userId}/drafts/send".to_string(), "resumable")
+                (self.hub._root_url.clone() + "/resumable/upload/gmail/v1/users/{userId}/drafts/send", "resumable")
             } else {
                 unreachable!()
             };
@@ -6461,7 +6485,7 @@ impl<'a, C, A> UserMessageUntrashCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/messages/{id}/untrash".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/messages/{id}/untrash";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Gmai.as_ref().to_string(), ());
         }
@@ -6706,7 +6730,7 @@ impl<'a, C, A> UserSettingGetPopCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/settings/pop".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/settings/pop";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -6948,7 +6972,7 @@ impl<'a, C, A> UserSettingUpdatePopCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/settings/pop".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/settings/pop";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::SettingBasic.as_ref().to_string(), ());
         }
@@ -7207,7 +7231,7 @@ impl<'a, C, A> UserSettingGetVacationCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/settings/vacation".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/settings/vacation";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -7448,7 +7472,7 @@ impl<'a, C, A> UserMessageBatchDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
         }
 
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/messages/batchDelete".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/messages/batchDelete";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Gmai.as_ref().to_string(), ());
         }
@@ -7698,7 +7722,7 @@ impl<'a, C, A> UserMessageDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
         }
 
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/messages/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/messages/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Gmai.as_ref().to_string(), ());
         }
@@ -7940,7 +7964,7 @@ impl<'a, C, A> UserDraftGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/drafts/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/drafts/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -8205,9 +8229,9 @@ impl<'a, C, A> UserDraftUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         let (mut url, upload_type) =
             if protocol == "simple" {
-                ("https://www.googleapis.com/upload/gmail/v1/users/{userId}/drafts/{id}".to_string(), "multipart")
+                (self.hub._root_url.clone() + "/upload/gmail/v1/users/{userId}/drafts/{id}", "multipart")
             } else if protocol == "resumable" {
-                ("https://www.googleapis.com/resumable/upload/gmail/v1/users/{userId}/drafts/{id}".to_string(), "resumable")
+                (self.hub._root_url.clone() + "/resumable/upload/gmail/v1/users/{userId}/drafts/{id}", "resumable")
             } else {
                 unreachable!()
             };
@@ -8593,7 +8617,7 @@ impl<'a, C, A> UserLabelUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/labels/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/labels/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Gmai.as_ref().to_string(), ());
         }
@@ -8889,7 +8913,7 @@ impl<'a, C, A> UserThreadListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/threads".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/threads";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -9162,7 +9186,7 @@ impl<'a, C, A> UserSettingFilterGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/settings/filters/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/settings/filters/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -9413,7 +9437,7 @@ impl<'a, C, A> UserMessageBatchModifyCall<'a, C, A> where C: BorrowMut<hyper::Cl
         }
 
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/messages/batchModify".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/messages/batchModify";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Gmai.as_ref().to_string(), ());
         }
@@ -9671,7 +9695,7 @@ impl<'a, C, A> UserLabelPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/labels/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/labels/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Gmai.as_ref().to_string(), ());
         }
@@ -9941,7 +9965,7 @@ impl<'a, C, A> UserDraftDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         }
 
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/drafts/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/drafts/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Gmai.as_ref().to_string(), ());
         }
@@ -10183,7 +10207,7 @@ impl<'a, C, A> UserSettingSendACreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/settings/sendAs".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/settings/sendAs";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::SettingSharing.as_ref().to_string(), ());
         }
@@ -10449,7 +10473,7 @@ impl<'a, C, A> UserSettingUpdateAutoForwardingCall<'a, C, A> where C: BorrowMut<
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/settings/autoForwarding".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/settings/autoForwarding";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::SettingSharing.as_ref().to_string(), ());
         }
@@ -10710,7 +10734,7 @@ impl<'a, C, A> UserThreadUntrashCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/threads/{id}/untrash".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/threads/{id}/untrash";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Gmai.as_ref().to_string(), ());
         }
@@ -10964,7 +10988,7 @@ impl<'a, C, A> UserSettingSendAPatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/settings/sendAs/{sendAsEmail}".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/settings/sendAs/{sendAsEmail}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::SettingBasic.as_ref().to_string(), ());
         }
@@ -11242,7 +11266,7 @@ impl<'a, C, A> UserThreadModifyCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/threads/{id}/modify".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/threads/{id}/modify";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Gmai.as_ref().to_string(), ());
         }
@@ -11512,7 +11536,7 @@ impl<'a, C, A> UserThreadDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         }
 
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/threads/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/threads/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Gmai.as_ref().to_string(), ());
         }
@@ -11747,7 +11771,7 @@ impl<'a, C, A> UserSettingForwardingAddresseListCall<'a, C, A> where C: BorrowMu
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/settings/forwardingAddresses".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/settings/forwardingAddresses";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -11986,7 +12010,7 @@ impl<'a, C, A> UserMessageAttachmentGetCall<'a, C, A> where C: BorrowMut<hyper::
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/messages/{messageId}/attachments/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/messages/{messageId}/attachments/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -12250,7 +12274,7 @@ impl<'a, C, A> UserMessageModifyCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/messages/{id}/modify".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/messages/{id}/modify";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Gmai.as_ref().to_string(), ());
         }
@@ -12533,7 +12557,7 @@ impl<'a, C, A> UserMessageGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/messages/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/messages/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -12800,7 +12824,7 @@ impl<'a, C, A> UserWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/watch".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/watch";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Gmai.as_ref().to_string(), ());
         }
@@ -13060,7 +13084,7 @@ impl<'a, C, A> UserSettingFilterDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
         }
 
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/settings/filters/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/settings/filters/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::SettingBasic.as_ref().to_string(), ());
         }
@@ -13315,7 +13339,7 @@ impl<'a, C, A> UserDraftListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/drafts".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/drafts";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -13585,7 +13609,7 @@ impl<'a, C, A> UserSettingUpdateImapCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/settings/imap".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/settings/imap";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::SettingBasic.as_ref().to_string(), ());
         }
@@ -13855,9 +13879,9 @@ impl<'a, C, A> UserMessageSendCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         let (mut url, upload_type) =
             if protocol == "simple" {
-                ("https://www.googleapis.com/upload/gmail/v1/users/{userId}/messages/send".to_string(), "multipart")
+                (self.hub._root_url.clone() + "/upload/gmail/v1/users/{userId}/messages/send", "multipart")
             } else if protocol == "resumable" {
-                ("https://www.googleapis.com/resumable/upload/gmail/v1/users/{userId}/messages/send".to_string(), "resumable")
+                (self.hub._root_url.clone() + "/resumable/upload/gmail/v1/users/{userId}/messages/send", "resumable")
             } else {
                 unreachable!()
             };
@@ -14226,7 +14250,7 @@ impl<'a, C, A> UserThreadTrashCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/threads/{id}/trash".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/threads/{id}/trash";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Gmai.as_ref().to_string(), ());
         }
@@ -14470,7 +14494,7 @@ impl<'a, C, A> UserStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         }
 
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/stop".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/stop";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Gmai.as_ref().to_string(), ());
         }
@@ -14702,7 +14726,7 @@ impl<'a, C, A> UserSettingForwardingAddresseCreateCall<'a, C, A> where C: Borrow
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/settings/forwardingAddresses".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/settings/forwardingAddresses";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::SettingSharing.as_ref().to_string(), ());
         }
@@ -14988,7 +15012,7 @@ impl<'a, C, A> UserMessageListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/messages".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/messages";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -15268,7 +15292,7 @@ impl<'a, C, A> UserSettingSendAUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/settings/sendAs/{sendAsEmail}".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/settings/sendAs/{sendAsEmail}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::SettingBasic.as_ref().to_string(), ());
         }
@@ -15544,7 +15568,7 @@ impl<'a, C, A> UserSettingFilterCreateCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/settings/filters".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/settings/filters";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::SettingBasic.as_ref().to_string(), ());
         }
@@ -15805,7 +15829,7 @@ impl<'a, C, A> UserMessageTrashCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/messages/{id}/trash".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/messages/{id}/trash";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Gmai.as_ref().to_string(), ());
         }
@@ -16050,7 +16074,7 @@ impl<'a, C, A> UserGetProfileCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/profile".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/profile";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -16299,7 +16323,7 @@ impl<'a, C, A> UserThreadGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/threads/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/threads/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -16560,7 +16584,7 @@ impl<'a, C, A> UserSettingSendAVerifyCall<'a, C, A> where C: BorrowMut<hyper::Cl
         }
 
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/settings/sendAs/{sendAsEmail}/verify".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/settings/sendAs/{sendAsEmail}/verify";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::SettingSharing.as_ref().to_string(), ());
         }
@@ -16816,9 +16840,9 @@ impl<'a, C, A> UserMessageInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         let (mut url, upload_type) =
             if protocol == "simple" {
-                ("https://www.googleapis.com/upload/gmail/v1/users/{userId}/messages".to_string(), "multipart")
+                (self.hub._root_url.clone() + "/upload/gmail/v1/users/{userId}/messages", "multipart")
             } else if protocol == "resumable" {
-                ("https://www.googleapis.com/resumable/upload/gmail/v1/users/{userId}/messages".to_string(), "resumable")
+                (self.hub._root_url.clone() + "/resumable/upload/gmail/v1/users/{userId}/messages", "resumable")
             } else {
                 unreachable!()
             };
@@ -17199,7 +17223,7 @@ impl<'a, C, A> UserSettingGetAutoForwardingCall<'a, C, A> where C: BorrowMut<hyp
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/settings/autoForwarding".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/settings/autoForwarding";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -17435,7 +17459,7 @@ impl<'a, C, A> UserSettingSendADeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
         }
 
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/settings/sendAs/{sendAsEmail}".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/settings/sendAs/{sendAsEmail}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::SettingSharing.as_ref().to_string(), ());
         }
@@ -17671,7 +17695,7 @@ impl<'a, C, A> UserSettingForwardingAddresseDeleteCall<'a, C, A> where C: Borrow
         }
 
 
-        let mut url = "https://www.googleapis.com/gmail/v1/users/{userId}/settings/forwardingAddresses/{forwardingEmail}".to_string();
+        let mut url = self.hub._base_url.clone() + "{userId}/settings/forwardingAddresses/{forwardingEmail}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::SettingSharing.as_ref().to_string(), ());
         }
@@ -17834,6 +17858,5 @@ impl<'a, C, A> UserSettingForwardingAddresseDeleteCall<'a, C, A> where C: Borrow
         self
     }
 }
-
 
 

@@ -182,7 +182,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -291,6 +291,8 @@ pub struct Safebrowsing<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
+    _base_url: String,
+    _root_url: String,
 }
 
 impl<'a, C, A> Hub for Safebrowsing<C, A> {}
@@ -303,6 +305,8 @@ impl<'a, C, A> Safebrowsing<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
+            _base_url: "https://safebrowsing.googleapis.com/".to_string(),
+            _root_url: "https://safebrowsing.googleapis.com/".to_string(),
         }
     }
 
@@ -326,6 +330,26 @@ impl<'a, C, A> Safebrowsing<C, A>
     pub fn user_agent(&mut self, agent_name: String) -> String {
         let prev = self._user_agent.clone();
         self._user_agent = agent_name;
+        prev
+    }
+
+    /// Set the base url to use in all requests to the server.
+    /// It defaults to `https://safebrowsing.googleapis.com/`.
+    ///
+    /// Returns the previously set base url.
+    pub fn base_url(&mut self, new_base_url: String) -> String {
+        let prev = self._base_url.clone();
+        self._base_url = new_base_url;
+        prev
+    }
+
+    /// Set the root url to use in all requests to the server.
+    /// It defaults to `https://safebrowsing.googleapis.com/`.
+    ///
+    /// Returns the previously set root url.
+    pub fn root_url(&mut self, new_root_url: String) -> String {
+        let prev = self._root_url.clone();
+        self._root_url = new_root_url;
         prev
     }
 }
@@ -1087,7 +1111,7 @@ impl<'a, C, A> ThreatListListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://safebrowsing.googleapis.com/v4/threatLists".to_string();
+        let mut url = self.hub._base_url.clone() + "v4/threatLists";
         
         let mut key = self.hub.auth.borrow_mut().api_key();
         if key.is_none() {
@@ -1280,7 +1304,7 @@ impl<'a, C, A> ThreatMatcheFindCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://safebrowsing.googleapis.com/v4/threatMatches:find".to_string();
+        let mut url = self.hub._base_url.clone() + "v4/threatMatches:find";
         
         let mut key = self.hub.auth.borrow_mut().api_key();
         if key.is_none() {
@@ -1497,7 +1521,7 @@ impl<'a, C, A> ThreatListUpdateFetchCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://safebrowsing.googleapis.com/v4/threatListUpdates:fetch".to_string();
+        let mut url = self.hub._base_url.clone() + "v4/threatListUpdates:fetch";
         
         let mut key = self.hub.auth.borrow_mut().api_key();
         if key.is_none() {
@@ -1714,7 +1738,7 @@ impl<'a, C, A> FullHasheFindCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://safebrowsing.googleapis.com/v4/fullHashes:find".to_string();
+        let mut url = self.hub._base_url.clone() + "v4/fullHashes:find";
         
         let mut key = self.hub.auth.borrow_mut().api_key();
         if key.is_none() {
@@ -1855,6 +1879,5 @@ impl<'a, C, A> FullHasheFindCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 }
-
 
 

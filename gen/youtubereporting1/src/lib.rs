@@ -189,7 +189,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -324,6 +324,8 @@ pub struct YouTubeReporting<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
+    _base_url: String,
+    _root_url: String,
 }
 
 impl<'a, C, A> Hub for YouTubeReporting<C, A> {}
@@ -336,6 +338,8 @@ impl<'a, C, A> YouTubeReporting<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
+            _base_url: "https://youtubereporting.googleapis.com/".to_string(),
+            _root_url: "https://youtubereporting.googleapis.com/".to_string(),
         }
     }
 
@@ -356,6 +360,26 @@ impl<'a, C, A> YouTubeReporting<C, A>
     pub fn user_agent(&mut self, agent_name: String) -> String {
         let prev = self._user_agent.clone();
         self._user_agent = agent_name;
+        prev
+    }
+
+    /// Set the base url to use in all requests to the server.
+    /// It defaults to `https://youtubereporting.googleapis.com/`.
+    ///
+    /// Returns the previously set base url.
+    pub fn base_url(&mut self, new_base_url: String) -> String {
+        let prev = self._base_url.clone();
+        self._base_url = new_base_url;
+        prev
+    }
+
+    /// Set the root url to use in all requests to the server.
+    /// It defaults to `https://youtubereporting.googleapis.com/`.
+    ///
+    /// Returns the previously set root url.
+    pub fn root_url(&mut self, new_root_url: String) -> String {
+        let prev = self._root_url.clone();
+        self._root_url = new_root_url;
         prev
     }
 }
@@ -935,7 +959,7 @@ impl<'a, C, A> MediaDownloadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             params.push(("alt", "json".to_string()));
         }
 
-        let mut url = "https://youtubereporting.googleapis.com/v1/media/{+resourceName}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/media/{+resourceName}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::YtAnalyticMonetaryReadonly.as_ref().to_string(), ());
         }
@@ -1197,7 +1221,7 @@ impl<'a, C, A> ReportTypeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://youtubereporting.googleapis.com/v1/reportTypes".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/reportTypes";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::YtAnalyticMonetaryReadonly.as_ref().to_string(), ());
         }
@@ -1440,7 +1464,7 @@ impl<'a, C, A> JobDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://youtubereporting.googleapis.com/v1/jobs/{jobId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/jobs/{jobId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::YtAnalyticMonetaryReadonly.as_ref().to_string(), ());
         }
@@ -1695,7 +1719,7 @@ impl<'a, C, A> JobReportGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://youtubereporting.googleapis.com/v1/jobs/{jobId}/reports/{reportId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/jobs/{jobId}/reports/{reportId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::YtAnalyticMonetaryReadonly.as_ref().to_string(), ());
         }
@@ -1958,7 +1982,7 @@ impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://youtubereporting.googleapis.com/v1/jobs/{jobId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/jobs/{jobId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::YtAnalyticMonetaryReadonly.as_ref().to_string(), ());
         }
@@ -2236,7 +2260,7 @@ impl<'a, C, A> JobReportListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://youtubereporting.googleapis.com/v1/jobs/{jobId}/reports".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/jobs/{jobId}/reports";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::YtAnalyticMonetaryReadonly.as_ref().to_string(), ());
         }
@@ -2537,7 +2561,7 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://youtubereporting.googleapis.com/v1/jobs".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/jobs";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::YtAnalyticMonetaryReadonly.as_ref().to_string(), ());
         }
@@ -2785,7 +2809,7 @@ impl<'a, C, A> JobCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://youtubereporting.googleapis.com/v1/jobs".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/jobs";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::YtAnalyticMonetaryReadonly.as_ref().to_string(), ());
         }
@@ -2954,6 +2978,5 @@ impl<'a, C, A> JobCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self
     }
 }
-
 
 

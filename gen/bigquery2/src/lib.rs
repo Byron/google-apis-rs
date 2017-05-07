@@ -193,7 +193,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -348,6 +348,8 @@ pub struct Bigquery<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
+    _base_url: String,
+    _root_url: String,
 }
 
 impl<'a, C, A> Hub for Bigquery<C, A> {}
@@ -360,6 +362,8 @@ impl<'a, C, A> Bigquery<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
+            _base_url: "https://www.googleapis.com/bigquery/v2/".to_string(),
+            _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
@@ -386,6 +390,26 @@ impl<'a, C, A> Bigquery<C, A>
     pub fn user_agent(&mut self, agent_name: String) -> String {
         let prev = self._user_agent.clone();
         self._user_agent = agent_name;
+        prev
+    }
+
+    /// Set the base url to use in all requests to the server.
+    /// It defaults to `https://www.googleapis.com/bigquery/v2/`.
+    ///
+    /// Returns the previously set base url.
+    pub fn base_url(&mut self, new_base_url: String) -> String {
+        let prev = self._base_url.clone();
+        self._base_url = new_base_url;
+        prev
+    }
+
+    /// Set the root url to use in all requests to the server.
+    /// It defaults to `https://www.googleapis.com/`.
+    ///
+    /// Returns the previously set root url.
+    pub fn root_url(&mut self, new_root_url: String) -> String {
+        let prev = self._root_url.clone();
+        self._root_url = new_root_url;
         prev
     }
 }
@@ -2686,7 +2710,7 @@ impl<'a, C, A> TableUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/bigquery/v2/projects/{projectId}/datasets/{datasetId}/tables/{tableId}".to_string();
+        let mut url = self.hub._base_url.clone() + "projects/{projectId}/datasets/{datasetId}/tables/{tableId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -2974,7 +2998,7 @@ impl<'a, C, A> TableInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/bigquery/v2/projects/{projectId}/datasets/{datasetId}/tables".to_string();
+        let mut url = self.hub._base_url.clone() + "projects/{projectId}/datasets/{datasetId}/tables";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -3255,7 +3279,7 @@ impl<'a, C, A> TableListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/bigquery/v2/projects/{projectId}/datasets/{datasetId}/tables".to_string();
+        let mut url = self.hub._base_url.clone() + "projects/{projectId}/datasets/{datasetId}/tables";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -3517,7 +3541,7 @@ impl<'a, C, A> TableDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         }
 
 
-        let mut url = "https://www.googleapis.com/bigquery/v2/projects/{projectId}/datasets/{datasetId}/tables/{tableId}".to_string();
+        let mut url = self.hub._base_url.clone() + "projects/{projectId}/datasets/{datasetId}/tables/{tableId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -3766,7 +3790,7 @@ impl<'a, C, A> TableGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/bigquery/v2/projects/{projectId}/datasets/{datasetId}/tables/{tableId}".to_string();
+        let mut url = self.hub._base_url.clone() + "projects/{projectId}/datasets/{datasetId}/tables/{tableId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -4032,7 +4056,7 @@ impl<'a, C, A> TablePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/bigquery/v2/projects/{projectId}/datasets/{datasetId}/tables/{tableId}".to_string();
+        let mut url = self.hub._base_url.clone() + "projects/{projectId}/datasets/{datasetId}/tables/{tableId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -4320,7 +4344,7 @@ impl<'a, C, A> DatasetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/bigquery/v2/projects/{projectId}/datasets/{datasetId}".to_string();
+        let mut url = self.hub._base_url.clone() + "projects/{projectId}/datasets/{datasetId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -4591,7 +4615,7 @@ impl<'a, C, A> DatasetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/bigquery/v2/projects/{projectId}/datasets/{datasetId}".to_string();
+        let mut url = self.hub._base_url.clone() + "projects/{projectId}/datasets/{datasetId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -4856,7 +4880,7 @@ impl<'a, C, A> DatasetListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/bigquery/v2/projects/{projectId}/datasets".to_string();
+        let mut url = self.hub._base_url.clone() + "projects/{projectId}/datasets";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -5128,7 +5152,7 @@ impl<'a, C, A> DatasetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/bigquery/v2/projects/{projectId}/datasets/{datasetId}".to_string();
+        let mut url = self.hub._base_url.clone() + "projects/{projectId}/datasets/{datasetId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -5403,7 +5427,7 @@ impl<'a, C, A> DatasetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         }
 
 
-        let mut url = "https://www.googleapis.com/bigquery/v2/projects/{projectId}/datasets/{datasetId}".to_string();
+        let mut url = self.hub._base_url.clone() + "projects/{projectId}/datasets/{datasetId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -5652,7 +5676,7 @@ impl<'a, C, A> DatasetInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/bigquery/v2/projects/{projectId}/datasets".to_string();
+        let mut url = self.hub._base_url.clone() + "projects/{projectId}/datasets";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -5913,7 +5937,7 @@ impl<'a, C, A> JobCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/bigquery/v2/projects/{projectId}/jobs/{jobId}/cancel".to_string();
+        let mut url = self.hub._base_url.clone() + "projects/{projectId}/jobs/{jobId}/cancel";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -6165,7 +6189,7 @@ impl<'a, C, A> JobQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/bigquery/v2/projects/{projectId}/queries".to_string();
+        let mut url = self.hub._base_url.clone() + "projects/{projectId}/queries";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -6446,7 +6470,7 @@ impl<'a, C, A> JobGetQueryResultCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/bigquery/v2/projects/{projectId}/queries/{jobId}".to_string();
+        let mut url = self.hub._base_url.clone() + "projects/{projectId}/queries/{jobId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -6746,7 +6770,7 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/bigquery/v2/projects/{projectId}/jobs".to_string();
+        let mut url = self.hub._base_url.clone() + "projects/{projectId}/jobs";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -7019,7 +7043,7 @@ impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/bigquery/v2/projects/{projectId}/jobs/{jobId}".to_string();
+        let mut url = self.hub._base_url.clone() + "projects/{projectId}/jobs/{jobId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -7275,9 +7299,9 @@ impl<'a, C, A> JobInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         let (mut url, upload_type) =
             if protocol == "simple" {
-                ("https://www.googleapis.com/upload/bigquery/v2/projects/{projectId}/jobs".to_string(), "multipart")
+                (self.hub._root_url.clone() + "/upload/bigquery/v2/projects/{projectId}/jobs", "multipart")
             } else if protocol == "resumable" {
-                ("https://www.googleapis.com/resumable/upload/bigquery/v2/projects/{projectId}/jobs".to_string(), "resumable")
+                (self.hub._root_url.clone() + "/resumable/upload/bigquery/v2/projects/{projectId}/jobs", "resumable")
             } else {
                 unreachable!()
             };
@@ -7651,7 +7675,7 @@ impl<'a, C, A> TabledataInsertAllCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/bigquery/v2/projects/{projectId}/datasets/{datasetId}/tables/{tableId}/insertAll".to_string();
+        let mut url = self.hub._base_url.clone() + "projects/{projectId}/datasets/{datasetId}/tables/{tableId}/insertAll";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -7949,7 +7973,7 @@ impl<'a, C, A> TabledataListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/bigquery/v2/projects/{projectId}/datasets/{datasetId}/tables/{tableId}/data".to_string();
+        let mut url = self.hub._base_url.clone() + "projects/{projectId}/datasets/{datasetId}/tables/{tableId}/data";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -8233,7 +8257,7 @@ impl<'a, C, A> ProjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/bigquery/v2/projects".to_string();
+        let mut url = self.hub._base_url.clone() + "projects";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -8379,6 +8403,5 @@ impl<'a, C, A> ProjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self
     }
 }
-
 
 

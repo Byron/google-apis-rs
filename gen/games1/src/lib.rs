@@ -208,7 +208,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -344,6 +344,8 @@ pub struct Games<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
+    _base_url: String,
+    _root_url: String,
 }
 
 impl<'a, C, A> Hub for Games<C, A> {}
@@ -356,6 +358,8 @@ impl<'a, C, A> Games<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
+            _base_url: "https://www.googleapis.com/games/v1/".to_string(),
+            _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
@@ -412,6 +416,26 @@ impl<'a, C, A> Games<C, A>
     pub fn user_agent(&mut self, agent_name: String) -> String {
         let prev = self._user_agent.clone();
         self._user_agent = agent_name;
+        prev
+    }
+
+    /// Set the base url to use in all requests to the server.
+    /// It defaults to `https://www.googleapis.com/games/v1/`.
+    ///
+    /// Returns the previously set base url.
+    pub fn base_url(&mut self, new_base_url: String) -> String {
+        let prev = self._base_url.clone();
+        self._base_url = new_base_url;
+        prev
+    }
+
+    /// Set the root url to use in all requests to the server.
+    /// It defaults to `https://www.googleapis.com/`.
+    ///
+    /// Returns the previously set root url.
+    pub fn root_url(&mut self, new_root_url: String) -> String {
+        let prev = self._root_url.clone();
+        self._root_url = new_root_url;
         prev
     }
 }
@@ -4918,7 +4942,7 @@ impl<'a, C, A> AchievementListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/games/v1/players/{playerId}/achievements".to_string();
+        let mut url = self.hub._base_url.clone() + "players/{playerId}/achievements";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -5200,7 +5224,7 @@ impl<'a, C, A> AchievementIncrementCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/games/v1/achievements/{achievementId}/increment".to_string();
+        let mut url = self.hub._base_url.clone() + "achievements/{achievementId}/increment";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -5466,7 +5490,7 @@ impl<'a, C, A> AchievementSetStepsAtLeastCall<'a, C, A> where C: BorrowMut<hyper
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/games/v1/achievements/{achievementId}/setStepsAtLeast".to_string();
+        let mut url = self.hub._base_url.clone() + "achievements/{achievementId}/setStepsAtLeast";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -5728,7 +5752,7 @@ impl<'a, C, A> AchievementUpdateMultipleCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/games/v1/achievements/updateMultiple".to_string();
+        let mut url = self.hub._base_url.clone() + "achievements/updateMultiple";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -5968,7 +5992,7 @@ impl<'a, C, A> AchievementRevealCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/games/v1/achievements/{achievementId}/reveal".to_string();
+        let mut url = self.hub._base_url.clone() + "achievements/{achievementId}/reveal";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -6215,7 +6239,7 @@ impl<'a, C, A> AchievementUnlockCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/games/v1/achievements/{achievementId}/unlock".to_string();
+        let mut url = self.hub._base_url.clone() + "achievements/{achievementId}/unlock";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -6467,7 +6491,7 @@ impl<'a, C, A> LeaderboardGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/games/v1/leaderboards/{leaderboardId}".to_string();
+        let mut url = self.hub._base_url.clone() + "leaderboards/{leaderboardId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -6734,7 +6758,7 @@ impl<'a, C, A> LeaderboardListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/games/v1/leaderboards".to_string();
+        let mut url = self.hub._base_url.clone() + "leaderboards";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -6988,7 +7012,7 @@ impl<'a, C, A> MetagameListCategoriesByPlayerCall<'a, C, A> where C: BorrowMut<h
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/games/v1/players/{playerId}/categories/{collection}".to_string();
+        let mut url = self.hub._base_url.clone() + "players/{playerId}/categories/{collection}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -7264,7 +7288,7 @@ impl<'a, C, A> MetagameGetMetagameConfigCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/games/v1/metagameConfig".to_string();
+        let mut url = self.hub._base_url.clone() + "metagameConfig";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -7495,7 +7519,7 @@ impl<'a, C, A> PlayerListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/games/v1/players/me/players/{collection}".to_string();
+        let mut url = self.hub._base_url.clone() + "players/me/players/{collection}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -7768,7 +7792,7 @@ impl<'a, C, A> PlayerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/games/v1/players/{playerId}".to_string();
+        let mut url = self.hub._base_url.clone() + "players/{playerId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -8027,7 +8051,7 @@ impl<'a, C, A> QuestAcceptCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/games/v1/quests/{questId}/accept".to_string();
+        let mut url = self.hub._base_url.clone() + "quests/{questId}/accept";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -8296,7 +8320,7 @@ impl<'a, C, A> QuestListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/games/v1/players/{playerId}/quests".to_string();
+        let mut url = self.hub._base_url.clone() + "players/{playerId}/quests";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -8569,7 +8593,7 @@ impl<'a, C, A> SnapshotGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/games/v1/snapshots/{snapshotId}".to_string();
+        let mut url = self.hub._base_url.clone() + "snapshots/{snapshotId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
         }
@@ -8838,7 +8862,7 @@ impl<'a, C, A> SnapshotListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/games/v1/players/{playerId}/snapshots".to_string();
+        let mut url = self.hub._base_url.clone() + "players/{playerId}/snapshots";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
         }
@@ -9105,7 +9129,7 @@ impl<'a, C, A> TurnBasedMatcheDismisCall<'a, C, A> where C: BorrowMut<hyper::Cli
         }
 
 
-        let mut url = "https://www.googleapis.com/games/v1/turnbasedmatches/{matchId}/dismiss".to_string();
+        let mut url = self.hub._base_url.clone() + "turnbasedmatches/{matchId}/dismiss";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -9365,7 +9389,7 @@ impl<'a, C, A> TurnBasedMatcheSyncCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/games/v1/turnbasedmatches/sync".to_string();
+        let mut url = self.hub._base_url.clone() + "turnbasedmatches/sync";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -9621,7 +9645,7 @@ impl<'a, C, A> TurnBasedMatcheDeclineCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/games/v1/turnbasedmatches/{matchId}/decline".to_string();
+        let mut url = self.hub._base_url.clone() + "turnbasedmatches/{matchId}/decline";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -9885,7 +9909,7 @@ impl<'a, C, A> TurnBasedMatcheGetCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/games/v1/turnbasedmatches/{matchId}".to_string();
+        let mut url = self.hub._base_url.clone() + "turnbasedmatches/{matchId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -10156,7 +10180,7 @@ impl<'a, C, A> TurnBasedMatcheCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/games/v1/turnbasedmatches/create".to_string();
+        let mut url = self.hub._base_url.clone() + "turnbasedmatches/create";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -10408,7 +10432,7 @@ impl<'a, C, A> TurnBasedMatcheJoinCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/games/v1/turnbasedmatches/{matchId}/join".to_string();
+        let mut url = self.hub._base_url.clone() + "turnbasedmatches/{matchId}/join";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -10674,7 +10698,7 @@ impl<'a, C, A> TurnBasedMatcheLeaveTurnCall<'a, C, A> where C: BorrowMut<hyper::
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/games/v1/turnbasedmatches/{matchId}/leaveTurn".to_string();
+        let mut url = self.hub._base_url.clone() + "turnbasedmatches/{matchId}/leaveTurn";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -10944,7 +10968,7 @@ impl<'a, C, A> TurnBasedMatcheCancelCall<'a, C, A> where C: BorrowMut<hyper::Cli
         }
 
 
-        let mut url = "https://www.googleapis.com/games/v1/turnbasedmatches/{matchId}/cancel".to_string();
+        let mut url = self.hub._base_url.clone() + "turnbasedmatches/{matchId}/cancel";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -11193,7 +11217,7 @@ impl<'a, C, A> TurnBasedMatcheFinishCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/games/v1/turnbasedmatches/{matchId}/finish".to_string();
+        let mut url = self.hub._base_url.clone() + "turnbasedmatches/{matchId}/finish";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -11476,7 +11500,7 @@ impl<'a, C, A> TurnBasedMatcheLeaveCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/games/v1/turnbasedmatches/{matchId}/leave".to_string();
+        let mut url = self.hub._base_url.clone() + "turnbasedmatches/{matchId}/leave";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -11753,7 +11777,7 @@ impl<'a, C, A> TurnBasedMatcheListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/games/v1/turnbasedmatches".to_string();
+        let mut url = self.hub._base_url.clone() + "turnbasedmatches";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -12016,7 +12040,7 @@ impl<'a, C, A> TurnBasedMatcheTakeTurnCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/games/v1/turnbasedmatches/{matchId}/turn".to_string();
+        let mut url = self.hub._base_url.clone() + "turnbasedmatches/{matchId}/turn";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -12304,7 +12328,7 @@ impl<'a, C, A> TurnBasedMatcheRematchCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/games/v1/turnbasedmatches/{matchId}/rematch".to_string();
+        let mut url = self.hub._base_url.clone() + "turnbasedmatches/{matchId}/rematch";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -12565,7 +12589,7 @@ impl<'a, C, A> ApplicationVerifyCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/games/v1/applications/{applicationId}/verify".to_string();
+        let mut url = self.hub._base_url.clone() + "applications/{applicationId}/verify";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -12822,7 +12846,7 @@ impl<'a, C, A> ApplicationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/games/v1/applications/{applicationId}".to_string();
+        let mut url = self.hub._base_url.clone() + "applications/{applicationId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -13080,7 +13104,7 @@ impl<'a, C, A> ApplicationPlayedCall<'a, C, A> where C: BorrowMut<hyper::Client>
         }
 
 
-        let mut url = "https://www.googleapis.com/games/v1/applications/played".to_string();
+        let mut url = self.hub._base_url.clone() + "applications/played";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -13291,7 +13315,7 @@ impl<'a, C, A> RoomGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/games/v1/rooms/{roomId}".to_string();
+        let mut url = self.hub._base_url.clone() + "rooms/{roomId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -13557,7 +13581,7 @@ impl<'a, C, A> RoomLeaveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/games/v1/rooms/{roomId}/leave".to_string();
+        let mut url = self.hub._base_url.clone() + "rooms/{roomId}/leave";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -13848,7 +13872,7 @@ impl<'a, C, A> RoomListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/games/v1/rooms".to_string();
+        let mut url = self.hub._base_url.clone() + "rooms";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -14097,7 +14121,7 @@ impl<'a, C, A> RoomReportStatuCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/games/v1/rooms/{roomId}/reportstatus".to_string();
+        let mut url = self.hub._base_url.clone() + "rooms/{roomId}/reportstatus";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -14385,7 +14409,7 @@ impl<'a, C, A> RoomCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/games/v1/rooms/create".to_string();
+        let mut url = self.hub._base_url.clone() + "rooms/create";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -14637,7 +14661,7 @@ impl<'a, C, A> RoomDeclineCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/games/v1/rooms/{roomId}/decline".to_string();
+        let mut url = self.hub._base_url.clone() + "rooms/{roomId}/decline";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -14890,7 +14914,7 @@ impl<'a, C, A> RoomDismisCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         }
 
 
-        let mut url = "https://www.googleapis.com/games/v1/rooms/{roomId}/dismiss".to_string();
+        let mut url = self.hub._base_url.clone() + "rooms/{roomId}/dismiss";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -15139,7 +15163,7 @@ impl<'a, C, A> RoomJoinCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/games/v1/rooms/{roomId}/join".to_string();
+        let mut url = self.hub._base_url.clone() + "rooms/{roomId}/join";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -15429,7 +15453,7 @@ impl<'a, C, A> ScoreSubmitCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/games/v1/leaderboards/{leaderboardId}/scores".to_string();
+        let mut url = self.hub._base_url.clone() + "leaderboards/{leaderboardId}/scores";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -15719,7 +15743,7 @@ impl<'a, C, A> ScoreListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/games/v1/leaderboards/{leaderboardId}/scores/{collection}".to_string();
+        let mut url = self.hub._base_url.clone() + "leaderboards/{leaderboardId}/scores/{collection}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -16032,7 +16056,7 @@ impl<'a, C, A> ScoreGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/games/v1/players/{playerId}/leaderboards/{leaderboardId}/scores/{timeSpan}".to_string();
+        let mut url = self.hub._base_url.clone() + "players/{playerId}/leaderboards/{leaderboardId}/scores/{timeSpan}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -16337,7 +16361,7 @@ impl<'a, C, A> ScoreSubmitMultipleCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/games/v1/leaderboards/scores".to_string();
+        let mut url = self.hub._base_url.clone() + "leaderboards/scores";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -16613,7 +16637,7 @@ impl<'a, C, A> ScoreListWindowCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/games/v1/leaderboards/{leaderboardId}/window/{collection}".to_string();
+        let mut url = self.hub._base_url.clone() + "leaderboards/{leaderboardId}/window/{collection}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -16919,7 +16943,7 @@ impl<'a, C, A> PushtokenRemoveCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         }
 
 
-        let mut url = "https://www.googleapis.com/games/v1/pushtokens/remove".to_string();
+        let mut url = self.hub._base_url.clone() + "pushtokens/remove";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -17153,7 +17177,7 @@ impl<'a, C, A> PushtokenUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         }
 
 
-        let mut url = "https://www.googleapis.com/games/v1/pushtokens".to_string();
+        let mut url = self.hub._base_url.clone() + "pushtokens";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -17383,7 +17407,7 @@ impl<'a, C, A> RevisionCheckCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/games/v1/revisions/check".to_string();
+        let mut url = self.hub._base_url.clone() + "revisions/check";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -17627,7 +17651,7 @@ impl<'a, C, A> EventListDefinitionCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/games/v1/eventDefinitions".to_string();
+        let mut url = self.hub._base_url.clone() + "eventDefinitions";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -17874,7 +17898,7 @@ impl<'a, C, A> EventRecordCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/games/v1/events".to_string();
+        let mut url = self.hub._base_url.clone() + "events";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -18134,7 +18158,7 @@ impl<'a, C, A> EventListByPlayerCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/games/v1/events".to_string();
+        let mut url = self.hub._base_url.clone() + "events";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -18374,7 +18398,7 @@ impl<'a, C, A> QuestMilestoneClaimCall<'a, C, A> where C: BorrowMut<hyper::Clien
         }
 
 
-        let mut url = "https://www.googleapis.com/games/v1/quests/{questId}/milestones/{milestoneId}/claim".to_string();
+        let mut url = self.hub._base_url.clone() + "quests/{questId}/milestones/{milestoneId}/claim";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -18644,7 +18668,7 @@ impl<'a, C, A> AchievementDefinitionListCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/games/v1/achievements".to_string();
+        let mut url = self.hub._base_url.clone() + "achievements";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -18804,6 +18828,5 @@ impl<'a, C, A> AchievementDefinitionListCall<'a, C, A> where C: BorrowMut<hyper:
         self
     }
 }
-
 
 

@@ -173,7 +173,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -304,6 +304,8 @@ pub struct Cloudlatencytest<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
+    _base_url: String,
+    _root_url: String,
 }
 
 impl<'a, C, A> Hub for Cloudlatencytest<C, A> {}
@@ -316,6 +318,8 @@ impl<'a, C, A> Cloudlatencytest<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
+            _base_url: "https://cloudlatencytest-pa.googleapis.com/v2/statscollection/".to_string(),
+            _root_url: "https://cloudlatencytest-pa.googleapis.com/".to_string(),
         }
     }
 
@@ -330,6 +334,26 @@ impl<'a, C, A> Cloudlatencytest<C, A>
     pub fn user_agent(&mut self, agent_name: String) -> String {
         let prev = self._user_agent.clone();
         self._user_agent = agent_name;
+        prev
+    }
+
+    /// Set the base url to use in all requests to the server.
+    /// It defaults to `https://cloudlatencytest-pa.googleapis.com/v2/statscollection/`.
+    ///
+    /// Returns the previously set base url.
+    pub fn base_url(&mut self, new_base_url: String) -> String {
+        let prev = self._base_url.clone();
+        self._base_url = new_base_url;
+        prev
+    }
+
+    /// Set the root url to use in all requests to the server.
+    /// It defaults to `https://cloudlatencytest-pa.googleapis.com/`.
+    ///
+    /// Returns the previously set root url.
+    pub fn root_url(&mut self, new_root_url: String) -> String {
+        let prev = self._root_url.clone();
+        self._root_url = new_root_url;
         prev
     }
 }
@@ -627,7 +651,7 @@ impl<'a, C, A> StatscollectionUpdateaggregatedstatCall<'a, C, A> where C: Borrow
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://cloudlatencytest-pa.googleapis.com/v2/statscollection/updateaggregatedstats".to_string();
+        let mut url = self.hub._base_url.clone() + "updateaggregatedstats";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::MonitoringReadonly.as_ref().to_string(), ());
         }
@@ -860,7 +884,7 @@ impl<'a, C, A> StatscollectionUpdatestatCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://cloudlatencytest-pa.googleapis.com/v2/statscollection/updatestats".to_string();
+        let mut url = self.hub._base_url.clone() + "updatestats";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::MonitoringReadonly.as_ref().to_string(), ());
         }
@@ -1016,6 +1040,5 @@ impl<'a, C, A> StatscollectionUpdatestatCall<'a, C, A> where C: BorrowMut<hyper:
         self
     }
 }
-
 
 

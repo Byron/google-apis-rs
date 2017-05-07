@@ -192,7 +192,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -321,6 +321,8 @@ pub struct Proximitybeacon<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
+    _base_url: String,
+    _root_url: String,
 }
 
 impl<'a, C, A> Hub for Proximitybeacon<C, A> {}
@@ -333,6 +335,8 @@ impl<'a, C, A> Proximitybeacon<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
+            _base_url: "https://proximitybeacon.googleapis.com/".to_string(),
+            _root_url: "https://proximitybeacon.googleapis.com/".to_string(),
         }
     }
 
@@ -356,6 +360,26 @@ impl<'a, C, A> Proximitybeacon<C, A>
     pub fn user_agent(&mut self, agent_name: String) -> String {
         let prev = self._user_agent.clone();
         self._user_agent = agent_name;
+        prev
+    }
+
+    /// Set the base url to use in all requests to the server.
+    /// It defaults to `https://proximitybeacon.googleapis.com/`.
+    ///
+    /// Returns the previously set base url.
+    pub fn base_url(&mut self, new_base_url: String) -> String {
+        let prev = self._base_url.clone();
+        self._base_url = new_base_url;
+        prev
+    }
+
+    /// Set the root url to use in all requests to the server.
+    /// It defaults to `https://proximitybeacon.googleapis.com/`.
+    ///
+    /// Returns the previously set root url.
+    pub fn root_url(&mut self, new_root_url: String) -> String {
+        let prev = self._root_url.clone();
+        self._root_url = new_root_url;
         prev
     }
 }
@@ -1360,7 +1384,7 @@ impl<'a, C, A> BeaconAttachmentListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://proximitybeacon.googleapis.com/v1beta1/{+beaconName}/attachments".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+beaconName}/attachments";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::UserlocationBeaconRegistry.as_ref().to_string(), ());
         }
@@ -1624,7 +1648,7 @@ impl<'a, C, A> BeaconGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://proximitybeacon.googleapis.com/v1beta1/{+beaconName}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+beaconName}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::UserlocationBeaconRegistry.as_ref().to_string(), ());
         }
@@ -1890,7 +1914,7 @@ impl<'a, C, A> BeaconAttachmentCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://proximitybeacon.googleapis.com/v1beta1/{+beaconName}/attachments".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+beaconName}/attachments";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::UserlocationBeaconRegistry.as_ref().to_string(), ());
         }
@@ -2171,7 +2195,7 @@ impl<'a, C, A> BeaconDecommissionCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://proximitybeacon.googleapis.com/v1beta1/{+beaconName}:decommission".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+beaconName}:decommission";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::UserlocationBeaconRegistry.as_ref().to_string(), ());
         }
@@ -2428,7 +2452,7 @@ impl<'a, C, A> BeaconActivateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://proximitybeacon.googleapis.com/v1beta1/{+beaconName}:activate".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+beaconName}:activate";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::UserlocationBeaconRegistry.as_ref().to_string(), ());
         }
@@ -2697,7 +2721,7 @@ impl<'a, C, A> BeaconListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://proximitybeacon.googleapis.com/v1beta1/beacons".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta1/beacons";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::UserlocationBeaconRegistry.as_ref().to_string(), ());
         }
@@ -2948,7 +2972,7 @@ impl<'a, C, A> BeaconUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://proximitybeacon.googleapis.com/v1beta1/{+beaconName}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+beaconName}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::UserlocationBeaconRegistry.as_ref().to_string(), ());
         }
@@ -3229,7 +3253,7 @@ impl<'a, C, A> BeaconAttachmentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://proximitybeacon.googleapis.com/v1beta1/{+attachmentName}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+attachmentName}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::UserlocationBeaconRegistry.as_ref().to_string(), ());
         }
@@ -3486,7 +3510,7 @@ impl<'a, C, A> BeaconDeactivateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://proximitybeacon.googleapis.com/v1beta1/{+beaconName}:deactivate".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+beaconName}:deactivate";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::UserlocationBeaconRegistry.as_ref().to_string(), ());
         }
@@ -3747,7 +3771,7 @@ impl<'a, C, A> BeaconRegisterCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://proximitybeacon.googleapis.com/v1beta1/beacons:register".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta1/beacons:register";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::UserlocationBeaconRegistry.as_ref().to_string(), ());
         }
@@ -4009,7 +4033,7 @@ impl<'a, C, A> BeaconDiagnosticListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://proximitybeacon.googleapis.com/v1beta1/{+beaconName}/diagnostics".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+beaconName}/diagnostics";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::UserlocationBeaconRegistry.as_ref().to_string(), ());
         }
@@ -4292,7 +4316,7 @@ impl<'a, C, A> BeaconAttachmentBatchDeleteCall<'a, C, A> where C: BorrowMut<hype
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://proximitybeacon.googleapis.com/v1beta1/{+beaconName}/attachments:batchDelete".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+beaconName}/attachments:batchDelete";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::UserlocationBeaconRegistry.as_ref().to_string(), ());
         }
@@ -4554,7 +4578,7 @@ impl<'a, C, A> BeaconinfoGetforobservedCall<'a, C, A> where C: BorrowMut<hyper::
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://proximitybeacon.googleapis.com/v1beta1/beaconinfo:getforobserved".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta1/beaconinfo:getforobserved";
         
         let mut key = self.hub.auth.borrow_mut().api_key();
         if key.is_none() {
@@ -4765,7 +4789,7 @@ impl<'a, C, A> MethodGetEidparamCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://proximitybeacon.googleapis.com/v1beta1/eidparams".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta1/eidparams";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::UserlocationBeaconRegistry.as_ref().to_string(), ());
         }
@@ -4978,7 +5002,7 @@ impl<'a, C, A> NamespaceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://proximitybeacon.googleapis.com/v1beta1/namespaces".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta1/namespaces";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::UserlocationBeaconRegistry.as_ref().to_string(), ());
         }
@@ -5208,7 +5232,7 @@ impl<'a, C, A> NamespaceUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://proximitybeacon.googleapis.com/v1beta1/{+namespaceName}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+namespaceName}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::UserlocationBeaconRegistry.as_ref().to_string(), ());
         }
@@ -5411,6 +5435,5 @@ impl<'a, C, A> NamespaceUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self
     }
 }
-
 
 

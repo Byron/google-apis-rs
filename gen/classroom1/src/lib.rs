@@ -205,7 +205,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -383,6 +383,8 @@ pub struct Classroom<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
+    _base_url: String,
+    _root_url: String,
 }
 
 impl<'a, C, A> Hub for Classroom<C, A> {}
@@ -395,6 +397,8 @@ impl<'a, C, A> Classroom<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
+            _base_url: "https://classroom.googleapis.com/".to_string(),
+            _root_url: "https://classroom.googleapis.com/".to_string(),
         }
     }
 
@@ -415,6 +419,26 @@ impl<'a, C, A> Classroom<C, A>
     pub fn user_agent(&mut self, agent_name: String) -> String {
         let prev = self._user_agent.clone();
         self._user_agent = agent_name;
+        prev
+    }
+
+    /// Set the base url to use in all requests to the server.
+    /// It defaults to `https://classroom.googleapis.com/`.
+    ///
+    /// Returns the previously set base url.
+    pub fn base_url(&mut self, new_base_url: String) -> String {
+        let prev = self._base_url.clone();
+        self._base_url = new_base_url;
+        prev
+    }
+
+    /// Set the root url to use in all requests to the server.
+    /// It defaults to `https://classroom.googleapis.com/`.
+    ///
+    /// Returns the previously set root url.
+    pub fn root_url(&mut self, new_root_url: String) -> String {
+        let prev = self._root_url.clone();
+        self._root_url = new_root_url;
         prev
     }
 }
@@ -2443,7 +2467,7 @@ impl<'a, C, A> CourseCourseWorkStudentSubmissionPatchCall<'a, C, A> where C: Bor
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://classroom.googleapis.com/v1/courses/{courseId}/courseWork/{courseWorkId}/studentSubmissions/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/courseWork/{courseWorkId}/studentSubmissions/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CourseworkMe.as_ref().to_string(), ());
         }
@@ -2764,7 +2788,7 @@ impl<'a, C, A> CourseCourseWorkStudentSubmissionListCall<'a, C, A> where C: Borr
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://classroom.googleapis.com/v1/courses/{courseId}/courseWork/{courseWorkId}/studentSubmissions".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/courseWork/{courseWorkId}/studentSubmissions";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CourseworkMeReadonly.as_ref().to_string(), ());
         }
@@ -3051,7 +3075,7 @@ impl<'a, C, A> CourseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://classroom.googleapis.com/v1/courses/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/courses/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CourseReadonly.as_ref().to_string(), ());
         }
@@ -3299,7 +3323,7 @@ impl<'a, C, A> CourseUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://classroom.googleapis.com/v1/courses/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/courses/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Course.as_ref().to_string(), ());
         }
@@ -3566,7 +3590,7 @@ impl<'a, C, A> CourseStudentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://classroom.googleapis.com/v1/courses/{courseId}/students/{userId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/students/{userId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Roster.as_ref().to_string(), ());
         }
@@ -3819,7 +3843,7 @@ impl<'a, C, A> CourseTeacherGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://classroom.googleapis.com/v1/courses/{courseId}/teachers/{userId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/teachers/{userId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::RosterReadonly.as_ref().to_string(), ());
         }
@@ -4092,7 +4116,7 @@ impl<'a, C, A> CourseCourseWorkListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://classroom.googleapis.com/v1/courses/{courseId}/courseWork".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/courseWork";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CourseWorkReadonly.as_ref().to_string(), ());
         }
@@ -4372,7 +4396,7 @@ impl<'a, C, A> CourseTeacherListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://classroom.googleapis.com/v1/courses/{courseId}/teachers".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/teachers";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::RosterReadonly.as_ref().to_string(), ());
         }
@@ -4638,7 +4662,7 @@ impl<'a, C, A> CourseCourseWorkStudentSubmissionTurnInCall<'a, C, A> where C: Bo
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://classroom.googleapis.com/v1/courses/{courseId}/courseWork/{courseWorkId}/studentSubmissions/{id}:turnIn".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/courseWork/{courseWorkId}/studentSubmissions/{id}:turnIn";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CourseworkMe.as_ref().to_string(), ());
         }
@@ -4934,7 +4958,7 @@ impl<'a, C, A> CourseCourseWorkStudentSubmissionModifyAttachmentCall<'a, C, A> w
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://classroom.googleapis.com/v1/courses/{courseId}/courseWork/{courseWorkId}/studentSubmissions/{id}:modifyAttachments".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/courseWork/{courseWorkId}/studentSubmissions/{id}:modifyAttachments";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CourseworkMe.as_ref().to_string(), ());
         }
@@ -5230,7 +5254,7 @@ impl<'a, C, A> CourseCourseWorkStudentSubmissionReturnCall<'a, C, A> where C: Bo
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://classroom.googleapis.com/v1/courses/{courseId}/courseWork/{courseWorkId}/studentSubmissions/{id}:return".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/courseWork/{courseWorkId}/studentSubmissions/{id}:return";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CourseworkStudent.as_ref().to_string(), ());
         }
@@ -5517,7 +5541,7 @@ impl<'a, C, A> CourseCourseWorkGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://classroom.googleapis.com/v1/courses/{courseId}/courseWork/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/courseWork/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CourseWorkReadonly.as_ref().to_string(), ());
         }
@@ -5775,7 +5799,7 @@ impl<'a, C, A> CourseCourseWorkCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://classroom.googleapis.com/v1/courses/{courseId}/courseWork".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/courseWork";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CourseworkStudent.as_ref().to_string(), ());
         }
@@ -6065,7 +6089,7 @@ impl<'a, C, A> CourseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://classroom.googleapis.com/v1/courses".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/courses";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CourseReadonly.as_ref().to_string(), ());
         }
@@ -6322,7 +6346,7 @@ impl<'a, C, A> CourseCourseWorkStudentSubmissionReclaimCall<'a, C, A> where C: B
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://classroom.googleapis.com/v1/courses/{courseId}/courseWork/{courseWorkId}/studentSubmissions/{id}:reclaim".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/courseWork/{courseWorkId}/studentSubmissions/{id}:reclaim";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CourseworkMe.as_ref().to_string(), ());
         }
@@ -6614,7 +6638,7 @@ impl<'a, C, A> CourseAliaseCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://classroom.googleapis.com/v1/courses/{courseId}/aliases".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/aliases";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Course.as_ref().to_string(), ());
         }
@@ -6891,7 +6915,7 @@ impl<'a, C, A> CourseStudentCreateCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://classroom.googleapis.com/v1/courses/{courseId}/students".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/students";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ProfileEmail.as_ref().to_string(), ());
         }
@@ -7165,7 +7189,7 @@ impl<'a, C, A> CourseAliaseDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://classroom.googleapis.com/v1/courses/{courseId}/aliases/{alias}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/aliases/{alias}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Course.as_ref().to_string(), ());
         }
@@ -7421,7 +7445,7 @@ impl<'a, C, A> CourseCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://classroom.googleapis.com/v1/courses".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/courses";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Course.as_ref().to_string(), ());
         }
@@ -7665,7 +7689,7 @@ impl<'a, C, A> CourseStudentListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://classroom.googleapis.com/v1/courses/{courseId}/students".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/students";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::RosterReadonly.as_ref().to_string(), ());
         }
@@ -7920,7 +7944,7 @@ impl<'a, C, A> CourseDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://classroom.googleapis.com/v1/courses/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/courses/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Course.as_ref().to_string(), ());
         }
@@ -8173,7 +8197,7 @@ impl<'a, C, A> CoursePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://classroom.googleapis.com/v1/courses/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/courses/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Course.as_ref().to_string(), ());
         }
@@ -8455,7 +8479,7 @@ impl<'a, C, A> CourseAliaseListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://classroom.googleapis.com/v1/courses/{courseId}/aliases".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/aliases";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CourseReadonly.as_ref().to_string(), ());
         }
@@ -8712,7 +8736,7 @@ impl<'a, C, A> CourseTeacherDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://classroom.googleapis.com/v1/courses/{courseId}/teachers/{userId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/teachers/{userId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Roster.as_ref().to_string(), ());
         }
@@ -8970,7 +8994,7 @@ impl<'a, C, A> CourseTeacherCreateCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://classroom.googleapis.com/v1/courses/{courseId}/teachers".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/teachers";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ProfileEmail.as_ref().to_string(), ());
         }
@@ -9239,7 +9263,7 @@ impl<'a, C, A> CourseCourseWorkStudentSubmissionGetCall<'a, C, A> where C: Borro
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://classroom.googleapis.com/v1/courses/{courseId}/courseWork/{courseWorkId}/studentSubmissions/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/courseWork/{courseWorkId}/studentSubmissions/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CourseworkMeReadonly.as_ref().to_string(), ());
         }
@@ -9502,7 +9526,7 @@ impl<'a, C, A> CourseStudentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://classroom.googleapis.com/v1/courses/{courseId}/students/{userId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/students/{userId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::RosterReadonly.as_ref().to_string(), ());
         }
@@ -9754,7 +9778,7 @@ impl<'a, C, A> UserProfileGuardianGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://classroom.googleapis.com/v1/userProfiles/{studentId}/guardians/{guardianId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/userProfiles/{studentId}/guardians/{guardianId}";
         
         let mut key = self.hub.auth.borrow_mut().api_key();
         if key.is_none() {
@@ -9990,7 +10014,7 @@ impl<'a, C, A> UserProfileGuardianInvitationCreateCall<'a, C, A> where C: Borrow
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://classroom.googleapis.com/v1/userProfiles/{studentId}/guardianInvitations".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/userProfiles/{studentId}/guardianInvitations";
         
         let mut key = self.hub.auth.borrow_mut().api_key();
         if key.is_none() {
@@ -10234,7 +10258,7 @@ impl<'a, C, A> UserProfileGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://classroom.googleapis.com/v1/userProfiles/{userId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/userProfiles/{userId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::RosterReadonly.as_ref().to_string(), ());
         }
@@ -10488,7 +10512,7 @@ impl<'a, C, A> UserProfileGuardianInvitationPatchCall<'a, C, A> where C: BorrowM
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://classroom.googleapis.com/v1/userProfiles/{studentId}/guardianInvitations/{invitationId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/userProfiles/{studentId}/guardianInvitations/{invitationId}";
         
         let mut key = self.hub.auth.borrow_mut().api_key();
         if key.is_none() {
@@ -10750,7 +10774,7 @@ impl<'a, C, A> UserProfileGuardianInvitationGetCall<'a, C, A> where C: BorrowMut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://classroom.googleapis.com/v1/userProfiles/{studentId}/guardianInvitations/{invitationId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/userProfiles/{studentId}/guardianInvitations/{invitationId}";
         
         let mut key = self.hub.auth.borrow_mut().api_key();
         if key.is_none() {
@@ -10994,7 +11018,7 @@ impl<'a, C, A> UserProfileGuardianListCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://classroom.googleapis.com/v1/userProfiles/{studentId}/guardians".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/userProfiles/{studentId}/guardians";
         
         let mut key = self.hub.auth.borrow_mut().api_key();
         if key.is_none() {
@@ -11256,7 +11280,7 @@ impl<'a, C, A> UserProfileGuardianInvitationListCall<'a, C, A> where C: BorrowMu
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://classroom.googleapis.com/v1/userProfiles/{studentId}/guardianInvitations".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/userProfiles/{studentId}/guardianInvitations";
         
         let mut key = self.hub.auth.borrow_mut().api_key();
         if key.is_none() {
@@ -11506,7 +11530,7 @@ impl<'a, C, A> UserProfileGuardianDeleteCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://classroom.googleapis.com/v1/userProfiles/{studentId}/guardians/{guardianId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/userProfiles/{studentId}/guardians/{guardianId}";
         
         let mut key = self.hub.auth.borrow_mut().api_key();
         if key.is_none() {
@@ -11736,7 +11760,7 @@ impl<'a, C, A> InvitationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://classroom.googleapis.com/v1/invitations/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/invitations/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Roster.as_ref().to_string(), ());
         }
@@ -11995,7 +12019,7 @@ impl<'a, C, A> InvitationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://classroom.googleapis.com/v1/invitations".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/invitations";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::RosterReadonly.as_ref().to_string(), ());
         }
@@ -12238,7 +12262,7 @@ impl<'a, C, A> InvitationCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://classroom.googleapis.com/v1/invitations".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/invitations";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Roster.as_ref().to_string(), ());
         }
@@ -12472,7 +12496,7 @@ impl<'a, C, A> InvitationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://classroom.googleapis.com/v1/invitations/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/invitations/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::RosterReadonly.as_ref().to_string(), ());
         }
@@ -12713,7 +12737,7 @@ impl<'a, C, A> InvitationAcceptCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://classroom.googleapis.com/v1/invitations/{id}:accept".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/invitations/{id}:accept";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Roster.as_ref().to_string(), ());
         }
@@ -12882,6 +12906,5 @@ impl<'a, C, A> InvitationAcceptCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self
     }
 }
-
 
 

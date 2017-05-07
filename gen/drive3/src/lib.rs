@@ -225,7 +225,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -390,6 +390,8 @@ pub struct Drive<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
+    _base_url: String,
+    _root_url: String,
 }
 
 impl<'a, C, A> Hub for Drive<C, A> {}
@@ -402,6 +404,8 @@ impl<'a, C, A> Drive<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
+            _base_url: "https://www.googleapis.com/drive/v3/".to_string(),
+            _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
@@ -437,6 +441,26 @@ impl<'a, C, A> Drive<C, A>
     pub fn user_agent(&mut self, agent_name: String) -> String {
         let prev = self._user_agent.clone();
         self._user_agent = agent_name;
+        prev
+    }
+
+    /// Set the base url to use in all requests to the server.
+    /// It defaults to `https://www.googleapis.com/drive/v3/`.
+    ///
+    /// Returns the previously set base url.
+    pub fn base_url(&mut self, new_base_url: String) -> String {
+        let prev = self._base_url.clone();
+        self._base_url = new_base_url;
+        prev
+    }
+
+    /// Set the root url to use in all requests to the server.
+    /// It defaults to `https://www.googleapis.com/`.
+    ///
+    /// Returns the previously set root url.
+    pub fn root_url(&mut self, new_root_url: String) -> String {
+        let prev = self._root_url.clone();
+        self._root_url = new_root_url;
         prev
     }
 }
@@ -2436,9 +2460,9 @@ impl<'a, C, A> FileUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         let (mut url, upload_type) =
             if protocol == "simple" {
-                ("https://www.googleapis.com/upload/drive/v3/files/{fileId}".to_string(), "multipart")
+                (self.hub._root_url.clone() + "/upload/drive/v3/files/{fileId}", "multipart")
             } else if protocol == "resumable" {
-                ("https://www.googleapis.com/resumable/upload/drive/v3/files/{fileId}".to_string(), "resumable")
+                (self.hub._root_url.clone() + "/resumable/upload/drive/v3/files/{fileId}", "resumable")
             } else {
                 unreachable!()
             };
@@ -2873,7 +2897,7 @@ impl<'a, C, A> FileWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             params.push(("alt", "json".to_string()));
         }
 
-        let mut url = "https://www.googleapis.com/drive/v3/files/{fileId}/watch".to_string();
+        let mut url = self.hub._base_url.clone() + "files/{fileId}/watch";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -3161,7 +3185,7 @@ impl<'a, C, A> FileCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/drive/v3/files/{fileId}/copy".to_string();
+        let mut url = self.hub._base_url.clone() + "files/{fileId}/copy";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -3445,7 +3469,7 @@ impl<'a, C, A> FileExportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         }
 
 
-        let mut url = "https://www.googleapis.com/drive/v3/files/{fileId}/export".to_string();
+        let mut url = self.hub._base_url.clone() + "files/{fileId}/export";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -3677,7 +3701,7 @@ impl<'a, C, A> FileEmptyTrashCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         }
 
 
-        let mut url = "https://www.googleapis.com/drive/v3/files/trash".to_string();
+        let mut url = self.hub._base_url.clone() + "files/trash";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -3899,7 +3923,7 @@ impl<'a, C, A> FileListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/drive/v3/files".to_string();
+        let mut url = self.hub._base_url.clone() + "files";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string(), ());
         }
@@ -4153,7 +4177,7 @@ impl<'a, C, A> FileGenerateIdCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/drive/v3/files/generateIds".to_string();
+        let mut url = self.hub._base_url.clone() + "files/generateIds";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -4400,9 +4424,9 @@ impl<'a, C, A> FileCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         let (mut url, upload_type) =
             if protocol == "simple" {
-                ("https://www.googleapis.com/upload/drive/v3/files".to_string(), "multipart")
+                (self.hub._root_url.clone() + "/upload/drive/v3/files", "multipart")
             } else if protocol == "resumable" {
-                ("https://www.googleapis.com/resumable/upload/drive/v3/files".to_string(), "resumable")
+                (self.hub._root_url.clone() + "/resumable/upload/drive/v3/files", "resumable")
             } else {
                 unreachable!()
             };
@@ -4765,7 +4789,7 @@ impl<'a, C, A> FileDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         }
 
 
-        let mut url = "https://www.googleapis.com/drive/v3/files/{fileId}".to_string();
+        let mut url = self.hub._base_url.clone() + "files/{fileId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -5016,7 +5040,7 @@ impl<'a, C, A> FileGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
             params.push(("alt", "json".to_string()));
         }
 
-        let mut url = "https://www.googleapis.com/drive/v3/files/{fileId}".to_string();
+        let mut url = self.hub._base_url.clone() + "files/{fileId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string(), ());
         }
@@ -5256,7 +5280,7 @@ impl<'a, C, A> AboutGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/drive/v3/about".to_string();
+        let mut url = self.hub._base_url.clone() + "about";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string(), ());
         }
@@ -5461,7 +5485,7 @@ impl<'a, C, A> CommentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         }
 
 
-        let mut url = "https://www.googleapis.com/drive/v3/files/{fileId}/comments/{commentId}".to_string();
+        let mut url = self.hub._base_url.clone() + "files/{fileId}/comments/{commentId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -5703,7 +5727,7 @@ impl<'a, C, A> CommentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/drive/v3/files/{fileId}/comments/{commentId}".to_string();
+        let mut url = self.hub._base_url.clone() + "files/{fileId}/comments/{commentId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -5964,7 +5988,7 @@ impl<'a, C, A> CommentUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/drive/v3/files/{fileId}/comments/{commentId}".to_string();
+        let mut url = self.hub._base_url.clone() + "files/{fileId}/comments/{commentId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -6240,7 +6264,7 @@ impl<'a, C, A> CommentCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/drive/v3/files/{fileId}/comments".to_string();
+        let mut url = self.hub._base_url.clone() + "files/{fileId}/comments";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -6519,7 +6543,7 @@ impl<'a, C, A> CommentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/drive/v3/files/{fileId}/comments".to_string();
+        let mut url = self.hub._base_url.clone() + "files/{fileId}/comments";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -6786,7 +6810,7 @@ impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         }
 
 
-        let mut url = "https://www.googleapis.com/drive/v3/channels/stop".to_string();
+        let mut url = self.hub._base_url.clone() + "channels/stop";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -7013,7 +7037,7 @@ impl<'a, C, A> ReplyCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/drive/v3/files/{fileId}/comments/{commentId}/replies".to_string();
+        let mut url = self.hub._base_url.clone() + "files/{fileId}/comments/{commentId}/replies";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -7285,7 +7309,7 @@ impl<'a, C, A> ReplyDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         }
 
 
-        let mut url = "https://www.googleapis.com/drive/v3/files/{fileId}/comments/{commentId}/replies/{replyId}".to_string();
+        let mut url = self.hub._base_url.clone() + "files/{fileId}/comments/{commentId}/replies/{replyId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -7547,7 +7571,7 @@ impl<'a, C, A> ReplyListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/drive/v3/files/{fileId}/comments/{commentId}/replies".to_string();
+        let mut url = self.hub._base_url.clone() + "files/{fileId}/comments/{commentId}/replies";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -7822,7 +7846,7 @@ impl<'a, C, A> ReplyGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/drive/v3/files/{fileId}/comments/{commentId}/replies/{replyId}".to_string();
+        let mut url = self.hub._base_url.clone() + "files/{fileId}/comments/{commentId}/replies/{replyId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -8095,7 +8119,7 @@ impl<'a, C, A> ReplyUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/drive/v3/files/{fileId}/comments/{commentId}/replies/{replyId}".to_string();
+        let mut url = self.hub._base_url.clone() + "files/{fileId}/comments/{commentId}/replies/{replyId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -8383,7 +8407,7 @@ impl<'a, C, A> RevisionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/drive/v3/files/{fileId}/revisions/{revisionId}".to_string();
+        let mut url = self.hub._base_url.clone() + "files/{fileId}/revisions/{revisionId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -8680,7 +8704,7 @@ impl<'a, C, A> RevisionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             params.push(("alt", "json".to_string()));
         }
 
-        let mut url = "https://www.googleapis.com/drive/v3/files/{fileId}/revisions/{revisionId}".to_string();
+        let mut url = self.hub._base_url.clone() + "files/{fileId}/revisions/{revisionId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string(), ());
         }
@@ -8933,7 +8957,7 @@ impl<'a, C, A> RevisionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         }
 
 
-        let mut url = "https://www.googleapis.com/drive/v3/files/{fileId}/revisions/{revisionId}".to_string();
+        let mut url = self.hub._base_url.clone() + "files/{fileId}/revisions/{revisionId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -9178,7 +9202,7 @@ impl<'a, C, A> RevisionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/drive/v3/files/{fileId}/revisions".to_string();
+        let mut url = self.hub._base_url.clone() + "files/{fileId}/revisions";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string(), ());
         }
@@ -9425,7 +9449,7 @@ impl<'a, C, A> ChangeGetStartPageTokenCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/drive/v3/changes/startPageToken".to_string();
+        let mut url = self.hub._base_url.clone() + "changes/startPageToken";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string(), ());
         }
@@ -9656,7 +9680,7 @@ impl<'a, C, A> ChangeWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/drive/v3/changes/watch".to_string();
+        let mut url = self.hub._base_url.clone() + "changes/watch";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -9942,7 +9966,7 @@ impl<'a, C, A> ChangeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/drive/v3/changes".to_string();
+        let mut url = self.hub._base_url.clone() + "changes";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string(), ());
         }
@@ -10185,7 +10209,7 @@ impl<'a, C, A> PermissionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         }
 
 
-        let mut url = "https://www.googleapis.com/drive/v3/files/{fileId}/permissions/{permissionId}".to_string();
+        let mut url = self.hub._base_url.clone() + "files/{fileId}/permissions/{permissionId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -10420,7 +10444,7 @@ impl<'a, C, A> PermissionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/drive/v3/files/{fileId}/permissions".to_string();
+        let mut url = self.hub._base_url.clone() + "files/{fileId}/permissions";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string(), ());
         }
@@ -10674,7 +10698,7 @@ impl<'a, C, A> PermissionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/drive/v3/files/{fileId}/permissions/{permissionId}".to_string();
+        let mut url = self.hub._base_url.clone() + "files/{fileId}/permissions/{permissionId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -10959,7 +10983,7 @@ impl<'a, C, A> PermissionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/drive/v3/files/{fileId}/permissions/{permissionId}".to_string();
+        let mut url = self.hub._base_url.clone() + "files/{fileId}/permissions/{permissionId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string(), ());
         }
@@ -11226,7 +11250,7 @@ impl<'a, C, A> PermissionCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/drive/v3/files/{fileId}/permissions".to_string();
+        let mut url = self.hub._base_url.clone() + "files/{fileId}/permissions";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -11434,6 +11458,5 @@ impl<'a, C, A> PermissionCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self
     }
 }
-
 
 

@@ -195,7 +195,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -327,6 +327,8 @@ pub struct AndroidPublisher<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
+    _base_url: String,
+    _root_url: String,
 }
 
 impl<'a, C, A> Hub for AndroidPublisher<C, A> {}
@@ -339,6 +341,8 @@ impl<'a, C, A> AndroidPublisher<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
+            _base_url: "https://www.googleapis.com/androidpublisher/v2/applications/".to_string(),
+            _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
@@ -365,6 +369,26 @@ impl<'a, C, A> AndroidPublisher<C, A>
     pub fn user_agent(&mut self, agent_name: String) -> String {
         let prev = self._user_agent.clone();
         self._user_agent = agent_name;
+        prev
+    }
+
+    /// Set the base url to use in all requests to the server.
+    /// It defaults to `https://www.googleapis.com/androidpublisher/v2/applications/`.
+    ///
+    /// Returns the previously set base url.
+    pub fn base_url(&mut self, new_base_url: String) -> String {
+        let prev = self._base_url.clone();
+        self._base_url = new_base_url;
+        prev
+    }
+
+    /// Set the root url to use in all requests to the server.
+    /// It defaults to `https://www.googleapis.com/`.
+    ///
+    /// Returns the previously set root url.
+    pub fn root_url(&mut self, new_root_url: String) -> String {
+        let prev = self._root_url.clone();
+        self._root_url = new_root_url;
         prev
     }
 }
@@ -3209,7 +3233,7 @@ impl<'a, C, A> EntitlementListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/entitlements".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/entitlements";
         
         let mut key = self.hub.auth.borrow_mut().api_key();
         if key.is_none() {
@@ -3451,7 +3475,7 @@ impl<'a, C, A> PurchaseSubscriptionRevokeCall<'a, C, A> where C: BorrowMut<hyper
         }
 
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/purchases/subscriptions/{subscriptionId}/tokens/{token}:revoke".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/purchases/subscriptions/{subscriptionId}/tokens/{token}:revoke";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -3700,7 +3724,7 @@ impl<'a, C, A> PurchaseProductGetCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/purchases/products/{productId}/tokens/{token}".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/purchases/products/{productId}/tokens/{token}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -3959,7 +3983,7 @@ impl<'a, C, A> PurchaseSubscriptionGetCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/purchases/subscriptions/{subscriptionId}/tokens/{token}".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/purchases/subscriptions/{subscriptionId}/tokens/{token}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -4239,7 +4263,7 @@ impl<'a, C, A> PurchaseVoidedpurchaseListCall<'a, C, A> where C: BorrowMut<hyper
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/purchases/voidedpurchases".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/purchases/voidedpurchases";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -4509,7 +4533,7 @@ impl<'a, C, A> PurchaseSubscriptionCancelCall<'a, C, A> where C: BorrowMut<hyper
         }
 
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/purchases/subscriptions/{subscriptionId}/tokens/{token}:cancel".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/purchases/subscriptions/{subscriptionId}/tokens/{token}:cancel";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -4757,7 +4781,7 @@ impl<'a, C, A> PurchaseSubscriptionRefundCall<'a, C, A> where C: BorrowMut<hyper
         }
 
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/purchases/subscriptions/{subscriptionId}/tokens/{token}:refund".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/purchases/subscriptions/{subscriptionId}/tokens/{token}:refund";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -5013,7 +5037,7 @@ impl<'a, C, A> PurchaseSubscriptionDeferCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/purchases/subscriptions/{subscriptionId}/tokens/{token}:defer".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/purchases/subscriptions/{subscriptionId}/tokens/{token}:defer";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -5302,9 +5326,9 @@ impl<'a, C, A> EditDeobfuscationfileUploadCall<'a, C, A> where C: BorrowMut<hype
 
         let (mut url, upload_type) =
             if protocol == "simple" {
-                ("https://www.googleapis.com/upload/androidpublisher/v2/applications/{packageName}/edits/{editId}/apks/{apkVersionCode}/deobfuscationFiles/{deobfuscationFileType}".to_string(), "multipart")
+                (self.hub._root_url.clone() + "/upload/androidpublisher/v2/applications/{packageName}/edits/{editId}/apks/{apkVersionCode}/deobfuscationFiles/{deobfuscationFileType}", "multipart")
             } else if protocol == "resumable" {
-                ("https://www.googleapis.com/resumable/upload/androidpublisher/v2/applications/{packageName}/edits/{editId}/apks/{apkVersionCode}/deobfuscationFiles/{deobfuscationFileType}".to_string(), "resumable")
+                (self.hub._root_url.clone() + "/resumable/upload/androidpublisher/v2/applications/{packageName}/edits/{editId}/apks/{apkVersionCode}/deobfuscationFiles/{deobfuscationFileType}", "resumable")
             } else {
                 unreachable!()
             };
@@ -5681,9 +5705,9 @@ impl<'a, C, A> EditImageUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         let (mut url, upload_type) =
             if protocol == "simple" {
-                ("https://www.googleapis.com/upload/androidpublisher/v2/applications/{packageName}/edits/{editId}/listings/{language}/{imageType}".to_string(), "multipart")
+                (self.hub._root_url.clone() + "/upload/androidpublisher/v2/applications/{packageName}/edits/{editId}/listings/{language}/{imageType}", "multipart")
             } else if protocol == "resumable" {
-                ("https://www.googleapis.com/resumable/upload/androidpublisher/v2/applications/{packageName}/edits/{editId}/listings/{language}/{imageType}".to_string(), "resumable")
+                (self.hub._root_url.clone() + "/resumable/upload/androidpublisher/v2/applications/{packageName}/edits/{editId}/listings/{language}/{imageType}", "resumable")
             } else {
                 unreachable!()
             };
@@ -6063,7 +6087,7 @@ impl<'a, C, A> EditExpansionfileUpdateCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/edits/{editId}/apks/{apkVersionCode}/expansionFiles/{expansionFileType}".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/apks/{apkVersionCode}/expansionFiles/{expansionFileType}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -6353,7 +6377,7 @@ impl<'a, C, A> EditDetailGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/edits/{editId}/details".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/details";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -6599,7 +6623,7 @@ impl<'a, C, A> EditListingDeleteallCall<'a, C, A> where C: BorrowMut<hyper::Clie
         }
 
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/edits/{editId}/listings".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/listings";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -6843,7 +6867,7 @@ impl<'a, C, A> EditApkAddexternallyhostedCall<'a, C, A> where C: BorrowMut<hyper
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/edits/{editId}/apks/externallyHosted".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/apks/externallyHosted";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -7115,7 +7139,7 @@ impl<'a, C, A> EditApklistingDeleteallCall<'a, C, A> where C: BorrowMut<hyper::C
         }
 
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/edits/{editId}/apks/{apkVersionCode}/listings".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/apks/{apkVersionCode}/listings";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -7369,7 +7393,7 @@ impl<'a, C, A> EditDetailUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/edits/{editId}/details".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/details";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -7642,7 +7666,7 @@ impl<'a, C, A> EditTrackGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/edits/{editId}/tracks/{track}".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/tracks/{track}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -7910,7 +7934,7 @@ impl<'a, C, A> EditExpansionfilePatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/edits/{editId}/apks/{apkVersionCode}/expansionFiles/{expansionFileType}".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/apks/{apkVersionCode}/expansionFiles/{expansionFileType}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -8204,7 +8228,7 @@ impl<'a, C, A> EditImageListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/edits/{editId}/listings/{language}/{imageType}".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/listings/{language}/{imageType}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -8479,7 +8503,7 @@ impl<'a, C, A> EditTrackUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/edits/{editId}/tracks/{track}".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/tracks/{track}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -8769,7 +8793,7 @@ impl<'a, C, A> EditListingPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/edits/{editId}/listings/{language}".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/listings/{language}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -9050,7 +9074,7 @@ impl<'a, C, A> EditGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/edits/{editId}".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -9302,7 +9326,7 @@ impl<'a, C, A> EditImageDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         }
 
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/edits/{editId}/listings/{language}/{imageType}/{imageId}".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/listings/{language}/{imageType}/{imageId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -9570,9 +9594,9 @@ impl<'a, C, A> EditApkUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         let (mut url, upload_type) =
             if protocol == "simple" {
-                ("https://www.googleapis.com/upload/androidpublisher/v2/applications/{packageName}/edits/{editId}/apks".to_string(), "multipart")
+                (self.hub._root_url.clone() + "/upload/androidpublisher/v2/applications/{packageName}/edits/{editId}/apks", "multipart")
             } else if protocol == "resumable" {
-                ("https://www.googleapis.com/resumable/upload/androidpublisher/v2/applications/{packageName}/edits/{editId}/apks".to_string(), "resumable")
+                (self.hub._root_url.clone() + "/resumable/upload/androidpublisher/v2/applications/{packageName}/edits/{editId}/apks", "resumable")
             } else {
                 unreachable!()
             };
@@ -9933,7 +9957,7 @@ impl<'a, C, A> EditApklistingUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/edits/{editId}/apks/{apkVersionCode}/listings/{language}".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/apks/{apkVersionCode}/listings/{language}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -10222,7 +10246,7 @@ impl<'a, C, A> EditApkListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/edits/{editId}/apks".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/apks";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -10480,7 +10504,7 @@ impl<'a, C, A> EditApklistingPatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/edits/{editId}/apks/{apkVersionCode}/listings/{language}".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/apks/{apkVersionCode}/listings/{language}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -10773,7 +10797,7 @@ impl<'a, C, A> EditListingGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/edits/{editId}/listings/{language}".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/listings/{language}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -11033,7 +11057,7 @@ impl<'a, C, A> EditApklistingDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clie
         }
 
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/edits/{editId}/apks/{apkVersionCode}/listings/{language}".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/apks/{apkVersionCode}/listings/{language}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -11290,7 +11314,7 @@ impl<'a, C, A> EditTesterGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/edits/{editId}/testers/{track}".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/testers/{track}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -11545,7 +11569,7 @@ impl<'a, C, A> EditDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         }
 
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/edits/{editId}".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -11790,9 +11814,9 @@ impl<'a, C, A> EditExpansionfileUploadCall<'a, C, A> where C: BorrowMut<hyper::C
 
         let (mut url, upload_type) =
             if protocol == "simple" {
-                ("https://www.googleapis.com/upload/androidpublisher/v2/applications/{packageName}/edits/{editId}/apks/{apkVersionCode}/expansionFiles/{expansionFileType}".to_string(), "multipart")
+                (self.hub._root_url.clone() + "/upload/androidpublisher/v2/applications/{packageName}/edits/{editId}/apks/{apkVersionCode}/expansionFiles/{expansionFileType}", "multipart")
             } else if protocol == "resumable" {
-                ("https://www.googleapis.com/resumable/upload/androidpublisher/v2/applications/{packageName}/edits/{editId}/apks/{apkVersionCode}/expansionFiles/{expansionFileType}".to_string(), "resumable")
+                (self.hub._root_url.clone() + "/resumable/upload/androidpublisher/v2/applications/{packageName}/edits/{editId}/apks/{apkVersionCode}/expansionFiles/{expansionFileType}", "resumable")
             } else {
                 unreachable!()
             };
@@ -12166,7 +12190,7 @@ impl<'a, C, A> EditInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/edits".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/edits";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -12427,7 +12451,7 @@ impl<'a, C, A> EditListingListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/edits/{editId}/listings".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/listings";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -12681,7 +12705,7 @@ impl<'a, C, A> EditTesterPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/edits/{editId}/testers/{track}".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/testers/{track}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -12961,7 +12985,7 @@ impl<'a, C, A> EditCommitCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/edits/{editId}:commit".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}:commit";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -13208,7 +13232,7 @@ impl<'a, C, A> EditTrackListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/edits/{editId}/tracks".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/tracks";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -13455,7 +13479,7 @@ impl<'a, C, A> EditValidateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/edits/{editId}:validate".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}:validate";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -13711,7 +13735,7 @@ impl<'a, C, A> EditListingUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/edits/{editId}/listings/{language}".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/listings/{language}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -13996,7 +14020,7 @@ impl<'a, C, A> EditExpansionfileGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/edits/{editId}/apks/{apkVersionCode}/expansionFiles/{expansionFileType}".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/apks/{apkVersionCode}/expansionFiles/{expansionFileType}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -14266,7 +14290,7 @@ impl<'a, C, A> EditImageDeleteallCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/edits/{editId}/listings/{language}/{imageType}".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/listings/{language}/{imageType}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -14539,7 +14563,7 @@ impl<'a, C, A> EditDetailPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/edits/{editId}/details".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/details";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -14819,7 +14843,7 @@ impl<'a, C, A> EditTrackPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/edits/{editId}/tracks/{track}".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/tracks/{track}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -15101,7 +15125,7 @@ impl<'a, C, A> EditListingDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
         }
 
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/edits/{editId}/listings/{language}".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/listings/{language}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -15352,7 +15376,7 @@ impl<'a, C, A> EditApklistingGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/edits/{editId}/apks/{apkVersionCode}/listings/{language}".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/apks/{apkVersionCode}/listings/{language}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -15626,7 +15650,7 @@ impl<'a, C, A> EditTesterUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/edits/{editId}/testers/{track}".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/testers/{track}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -15908,7 +15932,7 @@ impl<'a, C, A> EditApklistingListCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/edits/{editId}/apks/{apkVersionCode}/listings".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/apks/{apkVersionCode}/listings";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -16172,7 +16196,7 @@ impl<'a, C, A> ReviewReplyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/reviews/{reviewId}:reply".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/reviews/{reviewId}:reply";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -16447,7 +16471,7 @@ impl<'a, C, A> ReviewGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/reviews/{reviewId}".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/reviews/{reviewId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -16717,7 +16741,7 @@ impl<'a, C, A> ReviewListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/reviews".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/reviews";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -16979,7 +17003,7 @@ impl<'a, C, A> InappproductBatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/inappproducts/batch".to_string();
+        let mut url = self.hub._base_url.clone() + "inappproducts/batch";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -17222,7 +17246,7 @@ impl<'a, C, A> InappproductListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/inappproducts".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/inappproducts";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -17487,7 +17511,7 @@ impl<'a, C, A> InappproductInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/inappproducts".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/inappproducts";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -17754,7 +17778,7 @@ impl<'a, C, A> InappproductDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
         }
 
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/inappproducts/{sku}".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/inappproducts/{sku}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -17991,7 +18015,7 @@ impl<'a, C, A> InappproductGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/inappproducts/{sku}".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/inappproducts/{sku}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -18249,7 +18273,7 @@ impl<'a, C, A> InappproductUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/inappproducts/{sku}".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/inappproducts/{sku}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -18539,7 +18563,7 @@ impl<'a, C, A> InappproductPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/inappproducts/{sku}".to_string();
+        let mut url = self.hub._base_url.clone() + "{packageName}/inappproducts/{sku}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -18743,6 +18767,5 @@ impl<'a, C, A> InappproductPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self
     }
 }
-
 
 

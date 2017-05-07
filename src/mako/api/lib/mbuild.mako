@@ -577,7 +577,7 @@ match result {
 else if \
             % endif
 protocol == "${mp.protocol}" {
-                ("${join_url(rootUrl, mp.path)}".to_string(), "${upload_type_map.get(mp.protocol, mp.protocol)}")
+                (self.hub._root_url.clone() + "${mp.path}", "${upload_type_map.get(mp.protocol, mp.protocol)}")
             } \
             % endfor
 else {
@@ -585,7 +585,7 @@ else {
             };
         params.push(("uploadType", upload_type.to_string()));
         % else:
-        let mut url = "${baseUrl}${m.path}".to_string();
+        let mut url = self.hub._base_url.clone() + "${m.path}";
         % endif
         % if not default_scope:
         % if no_auth is UNDEFINED:

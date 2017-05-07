@@ -225,7 +225,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -385,6 +385,8 @@ pub struct Storage<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
+    _base_url: String,
+    _root_url: String,
 }
 
 impl<'a, C, A> Hub for Storage<C, A> {}
@@ -397,6 +399,8 @@ impl<'a, C, A> Storage<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
+            _base_url: "https://www.googleapis.com/storage/v1/".to_string(),
+            _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
@@ -426,6 +430,26 @@ impl<'a, C, A> Storage<C, A>
     pub fn user_agent(&mut self, agent_name: String) -> String {
         let prev = self._user_agent.clone();
         self._user_agent = agent_name;
+        prev
+    }
+
+    /// Set the base url to use in all requests to the server.
+    /// It defaults to `https://www.googleapis.com/storage/v1/`.
+    ///
+    /// Returns the previously set base url.
+    pub fn base_url(&mut self, new_base_url: String) -> String {
+        let prev = self._base_url.clone();
+        self._base_url = new_base_url;
+        prev
+    }
+
+    /// Set the root url to use in all requests to the server.
+    /// It defaults to `https://www.googleapis.com/`.
+    ///
+    /// Returns the previously set root url.
+    pub fn root_url(&mut self, new_root_url: String) -> String {
+        let prev = self._root_url.clone();
+        self._root_url = new_root_url;
         prev
     }
 }
@@ -2299,7 +2323,7 @@ impl<'a, C, A> DefaultObjectAccessControlInsertCall<'a, C, A> where C: BorrowMut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/defaultObjectAcl".to_string();
+        let mut url = self.hub._base_url.clone() + "b/{bucket}/defaultObjectAcl";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -2567,7 +2591,7 @@ impl<'a, C, A> DefaultObjectAccessControlUpdateCall<'a, C, A> where C: BorrowMut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/defaultObjectAcl/{entity}".to_string();
+        let mut url = self.hub._base_url.clone() + "b/{bucket}/defaultObjectAcl/{entity}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -2846,7 +2870,7 @@ impl<'a, C, A> DefaultObjectAccessControlListCall<'a, C, A> where C: BorrowMut<h
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/defaultObjectAcl".to_string();
+        let mut url = self.hub._base_url.clone() + "b/{bucket}/defaultObjectAcl";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -3104,7 +3128,7 @@ impl<'a, C, A> DefaultObjectAccessControlPatchCall<'a, C, A> where C: BorrowMut<
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/defaultObjectAcl/{entity}".to_string();
+        let mut url = self.hub._base_url.clone() + "b/{bucket}/defaultObjectAcl/{entity}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -3374,7 +3398,7 @@ impl<'a, C, A> DefaultObjectAccessControlDeleteCall<'a, C, A> where C: BorrowMut
         }
 
 
-        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/defaultObjectAcl/{entity}".to_string();
+        let mut url = self.hub._base_url.clone() + "b/{bucket}/defaultObjectAcl/{entity}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -3611,7 +3635,7 @@ impl<'a, C, A> DefaultObjectAccessControlGetCall<'a, C, A> where C: BorrowMut<hy
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/defaultObjectAcl/{entity}".to_string();
+        let mut url = self.hub._base_url.clone() + "b/{bucket}/defaultObjectAcl/{entity}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -3865,7 +3889,7 @@ impl<'a, C, A> BucketAccessControlPatchCall<'a, C, A> where C: BorrowMut<hyper::
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/acl/{entity}".to_string();
+        let mut url = self.hub._base_url.clone() + "b/{bucket}/acl/{entity}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -4135,7 +4159,7 @@ impl<'a, C, A> BucketAccessControlDeleteCall<'a, C, A> where C: BorrowMut<hyper:
         }
 
 
-        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/acl/{entity}".to_string();
+        let mut url = self.hub._base_url.clone() + "b/{bucket}/acl/{entity}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -4377,7 +4401,7 @@ impl<'a, C, A> BucketAccessControlInsertCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/acl".to_string();
+        let mut url = self.hub._base_url.clone() + "b/{bucket}/acl";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -4638,7 +4662,7 @@ impl<'a, C, A> BucketAccessControlGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/acl/{entity}".to_string();
+        let mut url = self.hub._base_url.clone() + "b/{bucket}/acl/{entity}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -4892,7 +4916,7 @@ impl<'a, C, A> BucketAccessControlUpdateCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/acl/{entity}".to_string();
+        let mut url = self.hub._base_url.clone() + "b/{bucket}/acl/{entity}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5161,7 +5185,7 @@ impl<'a, C, A> BucketAccessControlListCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/acl".to_string();
+        let mut url = self.hub._base_url.clone() + "b/{bucket}/acl";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5400,7 +5424,7 @@ impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         }
 
 
-        let mut url = "https://www.googleapis.com/storage/v1/channels/stop".to_string();
+        let mut url = self.hub._base_url.clone() + "channels/stop";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5696,7 +5720,7 @@ impl<'a, C, A> ObjectRewriteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/storage/v1/b/{sourceBucket}/o/{sourceObject}/rewriteTo/b/{destinationBucket}/o/{destinationObject}".to_string();
+        let mut url = self.hub._base_url.clone() + "b/{sourceBucket}/o/{sourceObject}/rewriteTo/b/{destinationBucket}/o/{destinationObject}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -6129,7 +6153,7 @@ impl<'a, C, A> ObjectGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             params.push(("alt", "json".to_string()));
         }
 
-        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/o/{object}".to_string();
+        let mut url = self.hub._base_url.clone() + "b/{bucket}/o/{object}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -6481,7 +6505,7 @@ impl<'a, C, A> ObjectUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             params.push(("alt", "json".to_string()));
         }
 
-        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/o/{object}".to_string();
+        let mut url = self.hub._base_url.clone() + "b/{bucket}/o/{object}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -6836,7 +6860,7 @@ impl<'a, C, A> ObjectWatchAllCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/o/watch".to_string();
+        let mut url = self.hub._base_url.clone() + "b/{bucket}/o/watch";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -7209,9 +7233,9 @@ impl<'a, C, A> ObjectInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         let (mut url, upload_type) =
             if protocol == "simple" {
-                ("https://www.googleapis.com/upload/storage/v1/b/{bucket}/o".to_string(), "multipart")
+                (self.hub._root_url.clone() + "/upload/storage/v1/b/{bucket}/o", "multipart")
             } else if protocol == "resumable" {
-                ("https://www.googleapis.com/resumable/upload/storage/v1/b/{bucket}/o".to_string(), "resumable")
+                (self.hub._root_url.clone() + "/resumable/upload/storage/v1/b/{bucket}/o", "resumable")
             } else {
                 unreachable!()
             };
@@ -7675,7 +7699,7 @@ impl<'a, C, A> ObjectComposeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             params.push(("alt", "json".to_string()));
         }
 
-        let mut url = "https://www.googleapis.com/storage/v1/b/{destinationBucket}/o/{destinationObject}/compose".to_string();
+        let mut url = self.hub._base_url.clone() + "b/{destinationBucket}/o/{destinationObject}/compose";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -7991,7 +8015,7 @@ impl<'a, C, A> ObjectDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         }
 
 
-        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/o/{object}".to_string();
+        let mut url = self.hub._base_url.clone() + "b/{bucket}/o/{object}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -8291,7 +8315,7 @@ impl<'a, C, A> ObjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/o".to_string();
+        let mut url = self.hub._base_url.clone() + "b/{bucket}/o";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -8657,7 +8681,7 @@ impl<'a, C, A> ObjectCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             params.push(("alt", "json".to_string()));
         }
 
-        let mut url = "https://www.googleapis.com/storage/v1/b/{sourceBucket}/o/{sourceObject}/copyTo/b/{destinationBucket}/o/{destinationObject}".to_string();
+        let mut url = self.hub._base_url.clone() + "b/{sourceBucket}/o/{sourceObject}/copyTo/b/{destinationBucket}/o/{destinationObject}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -9067,7 +9091,7 @@ impl<'a, C, A> ObjectPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/o/{object}".to_string();
+        let mut url = self.hub._base_url.clone() + "b/{bucket}/o/{object}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -9399,7 +9423,7 @@ impl<'a, C, A> ObjectAccessControlInsertCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/o/{object}/acl".to_string();
+        let mut url = self.hub._base_url.clone() + "b/{bucket}/o/{object}/acl";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -9691,7 +9715,7 @@ impl<'a, C, A> ObjectAccessControlPatchCall<'a, C, A> where C: BorrowMut<hyper::
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/o/{object}/acl/{entity}".to_string();
+        let mut url = self.hub._base_url.clone() + "b/{bucket}/o/{object}/acl/{entity}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -9984,7 +10008,7 @@ impl<'a, C, A> ObjectAccessControlListCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/o/{object}/acl".to_string();
+        let mut url = self.hub._base_url.clone() + "b/{bucket}/o/{object}/acl";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -10244,7 +10268,7 @@ impl<'a, C, A> ObjectAccessControlDeleteCall<'a, C, A> where C: BorrowMut<hyper:
         }
 
 
-        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/o/{object}/acl/{entity}".to_string();
+        let mut url = self.hub._base_url.clone() + "b/{bucket}/o/{object}/acl/{entity}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -10505,7 +10529,7 @@ impl<'a, C, A> ObjectAccessControlGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/o/{object}/acl/{entity}".to_string();
+        let mut url = self.hub._base_url.clone() + "b/{bucket}/o/{object}/acl/{entity}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -10783,7 +10807,7 @@ impl<'a, C, A> ObjectAccessControlUpdateCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/o/{object}/acl/{entity}".to_string();
+        let mut url = self.hub._base_url.clone() + "b/{bucket}/o/{object}/acl/{entity}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -11101,7 +11125,7 @@ impl<'a, C, A> BucketUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}".to_string();
+        let mut url = self.hub._base_url.clone() + "b/{bucket}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -11410,7 +11434,7 @@ impl<'a, C, A> BucketGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}".to_string();
+        let mut url = self.hub._base_url.clone() + "b/{bucket}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -11675,7 +11699,7 @@ impl<'a, C, A> BucketDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         }
 
 
-        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}".to_string();
+        let mut url = self.hub._base_url.clone() + "b/{bucket}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -11936,7 +11960,7 @@ impl<'a, C, A> BucketInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/storage/v1/b".to_string();
+        let mut url = self.hub._base_url.clone() + "b";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -12227,7 +12251,7 @@ impl<'a, C, A> BucketPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}".to_string();
+        let mut url = self.hub._base_url.clone() + "b/{bucket}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -12541,7 +12565,7 @@ impl<'a, C, A> BucketListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/storage/v1/b".to_string();
+        let mut url = self.hub._base_url.clone() + "b";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -12711,6 +12735,5 @@ impl<'a, C, A> BucketListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self
     }
 }
-
 
 

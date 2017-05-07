@@ -201,7 +201,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -336,6 +336,8 @@ pub struct Mirror<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
+    _base_url: String,
+    _root_url: String,
 }
 
 impl<'a, C, A> Hub for Mirror<C, A> {}
@@ -348,6 +350,8 @@ impl<'a, C, A> Mirror<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
+            _base_url: "https://www.googleapis.com/mirror/v1/".to_string(),
+            _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
@@ -377,6 +381,26 @@ impl<'a, C, A> Mirror<C, A>
     pub fn user_agent(&mut self, agent_name: String) -> String {
         let prev = self._user_agent.clone();
         self._user_agent = agent_name;
+        prev
+    }
+
+    /// Set the base url to use in all requests to the server.
+    /// It defaults to `https://www.googleapis.com/mirror/v1/`.
+    ///
+    /// Returns the previously set base url.
+    pub fn base_url(&mut self, new_base_url: String) -> String {
+        let prev = self._base_url.clone();
+        self._base_url = new_base_url;
+        prev
+    }
+
+    /// Set the root url to use in all requests to the server.
+    /// It defaults to `https://www.googleapis.com/`.
+    ///
+    /// Returns the previously set root url.
+    pub fn root_url(&mut self, new_root_url: String) -> String {
+        let prev = self._root_url.clone();
+        self._root_url = new_root_url;
         prev
     }
 }
@@ -1758,7 +1782,7 @@ impl<'a, C, A> SubscriptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/mirror/v1/subscriptions".to_string();
+        let mut url = self.hub._base_url.clone() + "subscriptions";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::GlasTimeline.as_ref().to_string(), ());
         }
@@ -1985,7 +2009,7 @@ impl<'a, C, A> SubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
         }
 
 
-        let mut url = "https://www.googleapis.com/mirror/v1/subscriptions/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "subscriptions/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::GlasTimeline.as_ref().to_string(), ());
         }
@@ -2217,7 +2241,7 @@ impl<'a, C, A> SubscriptionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/mirror/v1/subscriptions/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "subscriptions/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::GlasTimeline.as_ref().to_string(), ());
         }
@@ -2474,7 +2498,7 @@ impl<'a, C, A> SubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/mirror/v1/subscriptions".to_string();
+        let mut url = self.hub._base_url.clone() + "subscriptions";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::GlasTimeline.as_ref().to_string(), ());
         }
@@ -2678,7 +2702,7 @@ impl<'a, C, A> TimelineAttachmentListCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/mirror/v1/timeline/{itemId}/attachments".to_string();
+        let mut url = self.hub._base_url.clone() + "timeline/{itemId}/attachments";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::GlasTimeline.as_ref().to_string(), ());
         }
@@ -2922,9 +2946,9 @@ impl<'a, C, A> TimelineInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         let (mut url, upload_type) =
             if protocol == "simple" {
-                ("https://www.googleapis.com/upload/mirror/v1/timeline".to_string(), "multipart")
+                (self.hub._root_url.clone() + "/upload/mirror/v1/timeline", "multipart")
             } else if protocol == "resumable" {
-                ("https://www.googleapis.com/resumable/upload/mirror/v1/timeline".to_string(), "resumable")
+                (self.hub._root_url.clone() + "/resumable/upload/mirror/v1/timeline", "resumable")
             } else {
                 unreachable!()
             };
@@ -3267,7 +3291,7 @@ impl<'a, C, A> TimelinePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/mirror/v1/timeline/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "timeline/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::GlasLocation.as_ref().to_string(), ());
         }
@@ -3559,7 +3583,7 @@ impl<'a, C, A> TimelineListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/mirror/v1/timeline".to_string();
+        let mut url = self.hub._base_url.clone() + "timeline";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::GlasLocation.as_ref().to_string(), ());
         }
@@ -3816,9 +3840,9 @@ impl<'a, C, A> TimelineAttachmentInsertCall<'a, C, A> where C: BorrowMut<hyper::
 
         let (mut url, upload_type) =
             if protocol == "simple" {
-                ("https://www.googleapis.com/upload/mirror/v1/timeline/{itemId}/attachments".to_string(), "multipart")
+                (self.hub._root_url.clone() + "/upload/mirror/v1/timeline/{itemId}/attachments", "multipart")
             } else if protocol == "resumable" {
-                ("https://www.googleapis.com/resumable/upload/mirror/v1/timeline/{itemId}/attachments".to_string(), "resumable")
+                (self.hub._root_url.clone() + "/resumable/upload/mirror/v1/timeline/{itemId}/attachments", "resumable")
             } else {
                 unreachable!()
             };
@@ -4157,7 +4181,7 @@ impl<'a, C, A> TimelineAttachmentDeleteCall<'a, C, A> where C: BorrowMut<hyper::
         }
 
 
-        let mut url = "https://www.googleapis.com/mirror/v1/timeline/{itemId}/attachments/{attachmentId}".to_string();
+        let mut url = self.hub._base_url.clone() + "timeline/{itemId}/attachments/{attachmentId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::GlasTimeline.as_ref().to_string(), ());
         }
@@ -4391,7 +4415,7 @@ impl<'a, C, A> TimelineDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         }
 
 
-        let mut url = "https://www.googleapis.com/mirror/v1/timeline/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "timeline/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::GlasLocation.as_ref().to_string(), ());
         }
@@ -4627,9 +4651,9 @@ impl<'a, C, A> TimelineUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         let (mut url, upload_type) =
             if protocol == "simple" {
-                ("https://www.googleapis.com/upload/mirror/v1/timeline/{id}".to_string(), "multipart")
+                (self.hub._root_url.clone() + "/upload/mirror/v1/timeline/{id}", "multipart")
             } else if protocol == "resumable" {
-                ("https://www.googleapis.com/resumable/upload/mirror/v1/timeline/{id}".to_string(), "resumable")
+                (self.hub._root_url.clone() + "/resumable/upload/mirror/v1/timeline/{id}", "resumable")
             } else {
                 unreachable!()
             };
@@ -5019,7 +5043,7 @@ impl<'a, C, A> TimelineAttachmentGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
             params.push(("alt", "json".to_string()));
         }
 
-        let mut url = "https://www.googleapis.com/mirror/v1/timeline/{itemId}/attachments/{attachmentId}".to_string();
+        let mut url = self.hub._base_url.clone() + "timeline/{itemId}/attachments/{attachmentId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::GlasTimeline.as_ref().to_string(), ());
         }
@@ -5264,7 +5288,7 @@ impl<'a, C, A> TimelineGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/mirror/v1/timeline/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "timeline/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::GlasLocation.as_ref().to_string(), ());
         }
@@ -5499,7 +5523,7 @@ impl<'a, C, A> SettingGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/mirror/v1/settings/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "settings/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::GlasTimeline.as_ref().to_string(), ());
         }
@@ -5736,7 +5760,7 @@ impl<'a, C, A> LocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/mirror/v1/locations/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "locations/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::GlasLocation.as_ref().to_string(), ());
         }
@@ -5969,7 +5993,7 @@ impl<'a, C, A> LocationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/mirror/v1/locations".to_string();
+        let mut url = self.hub._base_url.clone() + "locations";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::GlasLocation.as_ref().to_string(), ());
         }
@@ -6183,7 +6207,7 @@ impl<'a, C, A> AccountInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/mirror/v1/accounts/{userToken}/{accountType}/{accountName}".to_string();
+        let mut url = self.hub._base_url.clone() + "accounts/{userToken}/{accountType}/{accountName}";
         
         let mut key = self.hub.auth.borrow_mut().api_key();
         if key.is_none() {
@@ -6441,7 +6465,7 @@ impl<'a, C, A> ContactGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/mirror/v1/contacts/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "contacts/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::GlasTimeline.as_ref().to_string(), ());
         }
@@ -6675,7 +6699,7 @@ impl<'a, C, A> ContactDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         }
 
 
-        let mut url = "https://www.googleapis.com/mirror/v1/contacts/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "contacts/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::GlasTimeline.as_ref().to_string(), ());
         }
@@ -6905,7 +6929,7 @@ impl<'a, C, A> ContactInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/mirror/v1/contacts".to_string();
+        let mut url = self.hub._base_url.clone() + "contacts";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::GlasTimeline.as_ref().to_string(), ());
         }
@@ -7140,7 +7164,7 @@ impl<'a, C, A> ContactPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/mirror/v1/contacts/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "contacts/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::GlasTimeline.as_ref().to_string(), ());
         }
@@ -7397,7 +7421,7 @@ impl<'a, C, A> ContactListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/mirror/v1/contacts".to_string();
+        let mut url = self.hub._base_url.clone() + "contacts";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::GlasTimeline.as_ref().to_string(), ());
         }
@@ -7608,7 +7632,7 @@ impl<'a, C, A> ContactUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/mirror/v1/contacts/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "contacts/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::GlasTimeline.as_ref().to_string(), ());
         }
@@ -7795,6 +7819,5 @@ impl<'a, C, A> ContactUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self
     }
 }
-
 
 
