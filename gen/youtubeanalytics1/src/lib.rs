@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *YouTube Analytics* crate version *1.0.4+20161213*, where *20161213* is the exact revision of the *youtubeAnalytics:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
+//! This documentation was generated from *YouTube Analytics* crate version *1.0.4+20170517*, where *20170517* is the exact revision of the *youtubeAnalytics:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
 //! 
 //! Everything else about the *YouTube Analytics* *v1* API can be found at the
 //! [official documentation site](http://developers.google.com/youtube/analytics/).
@@ -635,6 +635,7 @@ impl<'a, C, A> ReportMethods<'a, C, A> {
             _start_index: Default::default(),
             _sort: Default::default(),
             _max_results: Default::default(),
+            _include_historical_channel_data: Default::default(),
             _filters: Default::default(),
             _dimensions: Default::default(),
             _currency: Default::default(),
@@ -889,8 +890,9 @@ impl<'a, C, A> GroupMethods<'a, C, A> {
 ///              .start_index(-61)
 ///              .sort("sadipscing")
 ///              .max_results(-31)
-///              .filters("ea")
-///              .dimensions("no")
+///              .include_historical_channel_data(false)
+///              .filters("no")
+///              .dimensions("justo")
 ///              .currency("justo")
 ///              .doit();
 /// # }
@@ -906,6 +908,7 @@ pub struct ReportQueryCall<'a, C, A>
     _start_index: Option<i32>,
     _sort: Option<String>,
     _max_results: Option<i32>,
+    _include_historical_channel_data: Option<bool>,
     _filters: Option<String>,
     _dimensions: Option<String>,
     _currency: Option<String>,
@@ -930,7 +933,7 @@ impl<'a, C, A> ReportQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         };
         dlg.begin(MethodInfo { id: "youtubeAnalytics.reports.query",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((12 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((13 + self._additional_params.len()));
         params.push(("ids", self._ids.to_string()));
         params.push(("start-date", self._start_date.to_string()));
         params.push(("end-date", self._end_date.to_string()));
@@ -944,6 +947,9 @@ impl<'a, C, A> ReportQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         if let Some(value) = self._max_results {
             params.push(("max-results", value.to_string()));
         }
+        if let Some(value) = self._include_historical_channel_data {
+            params.push(("include-historical-channel-data", value.to_string()));
+        }
         if let Some(value) = self._filters {
             params.push(("filters", value.to_string()));
         }
@@ -953,7 +959,7 @@ impl<'a, C, A> ReportQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         if let Some(value) = self._currency {
             params.push(("currency", value.to_string()));
         }
-        for &field in ["alt", "ids", "start-date", "end-date", "metrics", "start-index", "sort", "max-results", "filters", "dimensions", "currency"].iter() {
+        for &field in ["alt", "ids", "start-date", "end-date", "metrics", "start-index", "sort", "max-results", "include-historical-channel-data", "filters", "dimensions", "currency"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -1110,6 +1116,13 @@ impl<'a, C, A> ReportQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._max_results = Some(new_value);
         self
     }
+    /// If set to true historical data (i.e. channel data from before the linking of the channel to the content owner) will be retrieved.
+    ///
+    /// Sets the *include-historical-channel-data* query property to the given value.
+    pub fn include_historical_channel_data(mut self, new_value: bool) -> ReportQueryCall<'a, C, A> {
+        self._include_historical_channel_data = Some(new_value);
+        self
+    }
     /// A list of filters that should be applied when retrieving YouTube Analytics data. The Available Reports document identifies the dimensions that can be used to filter each report, and the Dimensions document defines those dimensions. If a request uses multiple filters, join them together with a semicolon (;), and the returned result table will satisfy both filters. For example, a filters parameter value of video==dMH0bHeiRNg;country==IT restricts the result set to include data for the given video in Italy.
     ///
     /// Sets the *filters* query property to the given value.
@@ -1216,7 +1229,7 @@ impl<'a, C, A> ReportQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.group_items().insert(req)
-///              .on_behalf_of_content_owner("justo")
+///              .on_behalf_of_content_owner("et")
 ///              .doit();
 /// # }
 /// ```
@@ -1457,7 +1470,7 @@ impl<'a, C, A> GroupItemInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.group_items().list("groupId")
-///              .on_behalf_of_content_owner("et")
+///              .on_behalf_of_content_owner("diam")
 ///              .doit();
 /// # }
 /// ```
@@ -1685,7 +1698,7 @@ impl<'a, C, A> GroupItemListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.group_items().delete("id")
-///              .on_behalf_of_content_owner("ipsum")
+///              .on_behalf_of_content_owner("Lorem")
 ///              .doit();
 /// # }
 /// ```
@@ -1902,7 +1915,7 @@ impl<'a, C, A> GroupItemDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.groups().delete("id")
-///              .on_behalf_of_content_owner("et")
+///              .on_behalf_of_content_owner("duo")
 ///              .doit();
 /// # }
 /// ```
@@ -2125,7 +2138,7 @@ impl<'a, C, A> GroupDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.groups().insert(req)
-///              .on_behalf_of_content_owner("duo")
+///              .on_behalf_of_content_owner("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -2366,10 +2379,10 @@ impl<'a, C, A> GroupInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.groups().list()
-///              .page_token("aliquyam")
-///              .on_behalf_of_content_owner("sea")
+///              .page_token("sea")
+///              .on_behalf_of_content_owner("Lorem")
 ///              .mine(false)
-///              .id("eos")
+///              .id("erat")
 ///              .doit();
 /// # }
 /// ```
@@ -2624,7 +2637,7 @@ impl<'a, C, A> GroupListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.groups().update(req)
-///              .on_behalf_of_content_owner("erat")
+///              .on_behalf_of_content_owner("sadipscing")
 ///              .doit();
 /// # }
 /// ```

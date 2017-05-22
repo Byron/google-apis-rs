@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *directory* crate version *1.0.4+20161124*, where *20161124* is the exact revision of the *admin:directory_v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
+//! This documentation was generated from *directory* crate version *1.0.4+20170419*, where *20170419* is the exact revision of the *admin:directory_v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
 //! 
 //! Everything else about the *directory* *v1_directory* API can be found at the
 //! [official documentation site](https://developers.google.com/admin-sdk/directory/).
@@ -1320,7 +1320,7 @@ pub struct ChromeOsDevice {
     /// Chromebook serial number (Read-only)
     #[serde(rename="serialNumber")]
     pub serial_number: Option<String>,
-    /// Date and time the device was last synchronized with the policy settings in the Google Apps administrator control panel (Read-only)
+    /// Date and time the device was last synchronized with the policy settings in the G Suite administrator control panel (Read-only)
     #[serde(rename="lastSync")]
     pub last_sync: Option<String>,
     /// Chromebook order number (Read-only)
@@ -1417,7 +1417,12 @@ pub struct User {
     /// no description provided
     pub addresses: Option<String>,
     /// no description provided
+    #[serde(rename="posixAccounts")]
+    pub posix_accounts: Option<String>,
+    /// no description provided
     pub phones: Option<String>,
+    /// no description provided
+    pub locations: Option<String>,
     /// Boolean indicating if the user is delegated admin (Read-only)
     #[serde(rename="isDelegatedAdmin")]
     pub is_delegated_admin: Option<bool>,
@@ -1445,14 +1450,17 @@ pub struct User {
     /// Photo Url of the user (Read-only)
     #[serde(rename="thumbnailPhotoUrl")]
     pub thumbnail_photo_url: Option<String>,
-    /// Boolean indicating if the user is admin (Read-only)
-    #[serde(rename="isAdmin")]
-    pub is_admin: Option<bool>,
-    /// no description provided
-    pub relations: Option<String>,
+    /// Is enrolled in 2-step verification (Read-only)
+    #[serde(rename="isEnrolledIn2Sv")]
+    pub is_enrolled_in2_sv: Option<bool>,
     /// Boolean indicating if user is included in Global Address List
     #[serde(rename="includeInGlobalAddressList")]
     pub include_in_global_address_list: Option<bool>,
+    /// no description provided
+    pub relations: Option<String>,
+    /// Boolean indicating if the user is admin (Read-only)
+    #[serde(rename="isAdmin")]
+    pub is_admin: Option<bool>,
     /// ETag of the resource.
     pub etag: Option<String>,
     /// User's last login time. (Read-only)
@@ -1470,8 +1478,14 @@ pub struct User {
     /// Boolean indicating if ip is whitelisted
     #[serde(rename="ipWhitelisted")]
     pub ip_whitelisted: Option<bool>,
+    /// no description provided
+    #[serde(rename="sshPublicKeys")]
+    pub ssh_public_keys: Option<String>,
     /// Kind of resource this is.
     pub kind: Option<String>,
+    /// Is 2-step verification enforced (Read-only)
+    #[serde(rename="isEnforcedIn2Sv")]
+    pub is_enforced_in2_sv: Option<bool>,
     /// Is mailbox setup (Read-only)
     #[serde(rename="isMailboxSetup")]
     pub is_mailbox_setup: Option<bool>,
@@ -1491,7 +1505,7 @@ pub struct User {
     pub name: Option<UserName>,
     /// no description provided
     pub notes: Option<String>,
-    /// User's Google account creation time. (Read-only)
+    /// User's G Suite account creation time. (Read-only)
     #[serde(rename="creationTime")]
     pub creation_time: Option<String>,
     /// no description provided
@@ -1579,6 +1593,29 @@ impl NestedType for MobileDeviceApplications {}
 impl Part for MobileDeviceApplications {}
 
 
+/// JSON response template to list aliases in Directory API.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [aliases list users](struct.UserAliaseListCall.html) (response)
+/// * [aliases list groups](struct.GroupAliaseListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Aliases {
+    /// Kind of resource this is.
+    pub kind: Option<String>,
+    /// ETag of the resource.
+    pub etag: Option<String>,
+    /// List of alias objects.
+    pub aliases: Option<Vec<String>>,
+}
+
+impl ResponseResult for Aliases {}
+
+
 /// JSON response template for List Members operation in Directory API.
 /// 
 /// # Activities
@@ -1638,7 +1675,7 @@ pub struct Customer {
     /// The customer's postal address information.
     #[serde(rename="postalAddress")]
     pub postal_address: Option<CustomerPostalAddress>,
-    /// The unique ID for the customer's Google account. (Readonly)
+    /// The unique ID for the customer's G Suite account. (Readonly)
     pub id: Option<String>,
 }
 
@@ -1781,6 +1818,35 @@ pub struct VerificationCodes {
 impl ResponseResult for VerificationCodes {}
 
 
+/// JSON template for Alias object in Directory API.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [aliases insert users](struct.UserAliaseInsertCall.html) (request|response)
+/// * [aliases insert groups](struct.GroupAliaseInsertCall.html) (request|response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Alias {
+    /// A alias email
+    pub alias: Option<String>,
+    /// Kind of resource this is.
+    pub kind: Option<String>,
+    /// ETag of the resource.
+    pub etag: Option<String>,
+    /// Group's primary email (Read-only) User's primary email (Read-only)
+    #[serde(rename="primaryEmail")]
+    pub primary_email: Option<String>,
+    /// Unique id of the group (Read-only) Unique id of the user (Read-only)
+    pub id: Option<String>,
+}
+
+impl RequestValue for Alias {}
+impl ResponseResult for Alias {}
+
+
 /// JSON response template for List Mobile Devices operation in Directory API.
 /// 
 /// # Activities
@@ -1806,21 +1872,26 @@ pub struct MobileDevices {
 impl ResponseResult for MobileDevices {}
 
 
-/// List of active time ranges (Read-only)
+/// JSON response template to list Domains in Directory API.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list domains](struct.DomainListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ChromeOsDeviceActiveTimeRanges {
-    /// Date of usage
-    pub date: Option<String>,
-    /// Duration in milliseconds
-    #[serde(rename="activeTime")]
-    pub active_time: Option<i32>,
+pub struct Domains2 {
+    /// List of domain objects.
+    pub domains: Option<Vec<Domains>>,
+    /// Kind of resource this is.
+    pub kind: Option<String>,
+    /// ETag of the resource.
+    pub etag: Option<String>,
 }
 
-impl NestedType for ChromeOsDeviceActiveTimeRanges {}
-impl Part for ChromeOsDeviceActiveTimeRanges {}
+impl ResponseResult for Domains2 {}
 
 
 /// JSON template for Photo object in Directory API.
@@ -1924,35 +1995,6 @@ pub struct Users {
 impl ResponseResult for Users {}
 
 
-/// JSON template for Alias object in Directory API.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [aliases insert users](struct.UserAliaseInsertCall.html) (request|response)
-/// * [aliases insert groups](struct.GroupAliaseInsertCall.html) (request|response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Alias {
-    /// A alias email
-    pub alias: Option<String>,
-    /// Kind of resource this is.
-    pub kind: Option<String>,
-    /// ETag of the resource.
-    pub etag: Option<String>,
-    /// Group's primary email (Read-only) User's primary email (Read-only)
-    #[serde(rename="primaryEmail")]
-    pub primary_email: Option<String>,
-    /// Unique id of the group (Read-only) Unique id of the user (Read-only)
-    pub id: Option<String>,
-}
-
-impl RequestValue for Alias {}
-impl ResponseResult for Alias {}
-
-
 /// JSON template for Mobile Device resource in Directory API.
 /// 
 /// # Activities
@@ -1964,7 +2006,7 @@ impl ResponseResult for Alias {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MobileDevice {
-    /// Date and time the device was last synchronized with the policy settings in the Google Apps administrator control panel (Read-only)
+    /// Date and time the device was last synchronized with the policy settings in the G Suite administrator control panel (Read-only)
     #[serde(rename="lastSync")]
     pub last_sync: Option<String>,
     /// Mobile Device compromised status (Read-only)
@@ -1981,7 +2023,7 @@ pub struct MobileDevice {
     /// Mobile Device user agent
     #[serde(rename="userAgent")]
     pub user_agent: Option<String>,
-    /// Date and time the device was first synchronized with the policy settings in the Google Apps administrator control panel (Read-only)
+    /// Date and time the device was first synchronized with the policy settings in the G Suite administrator control panel (Read-only)
     #[serde(rename="firstSync")]
     pub first_sync: Option<String>,
     /// List of accounts added on device (Read-only)
@@ -2076,28 +2118,6 @@ impl Resource for MobileDevice {}
 impl ResponseResult for MobileDevice {}
 
 
-/// JSON response template to list Domains in Directory API.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list domains](struct.DomainListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Domains2 {
-    /// List of domain objects.
-    pub domains: Option<Vec<Domains>>,
-    /// Kind of resource this is.
-    pub kind: Option<String>,
-    /// ETag of the resource.
-    pub etag: Option<String>,
-}
-
-impl ResponseResult for Domains2 {}
-
-
 /// JSON template for token resource in Directory API.
 /// 
 /// # Activities
@@ -2181,6 +2201,23 @@ impl Resource for OrgUnit {}
 impl ResponseResult for OrgUnit {}
 
 
+/// List of active time ranges (Read-only)
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ChromeOsDeviceActiveTimeRanges {
+    /// Date of usage
+    pub date: Option<String>,
+    /// Duration in milliseconds
+    #[serde(rename="activeTime")]
+    pub active_time: Option<i32>,
+}
+
+impl NestedType for ChromeOsDeviceActiveTimeRanges {}
+impl Part for ChromeOsDeviceActiveTimeRanges {}
+
+
 /// JSON template for verification codes in Directory API.
 /// 
 /// # Activities
@@ -2248,27 +2285,26 @@ impl NestedType for SchemaFieldSpecNumericIndexingSpec {}
 impl Part for SchemaFieldSpecNumericIndexingSpec {}
 
 
-/// JSON response template to list aliases in Directory API.
+/// JSON response template for List Schema operation in Directory API.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [aliases list users](struct.UserAliaseListCall.html) (response)
-/// * [aliases list groups](struct.GroupAliaseListCall.html) (response)
+/// * [list schemas](struct.SchemaListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Aliases {
+pub struct Schemas {
     /// Kind of resource this is.
     pub kind: Option<String>,
     /// ETag of the resource.
     pub etag: Option<String>,
-    /// List of alias objects.
-    pub aliases: Option<Vec<String>>,
+    /// List of UserSchema objects.
+    pub schemas: Option<Vec<Schema>>,
 }
 
-impl ResponseResult for Aliases {}
+impl ResponseResult for Schemas {}
 
 
 /// JSON template for Calendar Resource List Response object in Directory API.
@@ -2294,28 +2330,6 @@ pub struct CalendarResources {
 }
 
 impl ResponseResult for CalendarResources {}
-
-
-/// JSON response template for List Schema operation in Directory API.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list schemas](struct.SchemaListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Schemas {
-    /// Kind of resource this is.
-    pub kind: Option<String>,
-    /// ETag of the resource.
-    pub etag: Option<String>,
-    /// List of UserSchema objects.
-    pub schemas: Option<Vec<Schema>>,
-}
-
-impl ResponseResult for Schemas {}
 
 
 
@@ -2555,7 +2569,7 @@ impl<'a, C, A> OrgunitMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `customerId` - Immutable id of the Google Apps account
+    /// * `customerId` - Immutable ID of the G Suite account
     pub fn list(&self, customer_id: &str) -> OrgunitListCall<'a, C, A> {
         OrgunitListCall {
             hub: self.hub,
@@ -2575,7 +2589,7 @@ impl<'a, C, A> OrgunitMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `customerId` - Immutable id of the Google Apps account
+    /// * `customerId` - Immutable ID of the G Suite account
     pub fn insert(&self, request: OrgUnit, customer_id: &str) -> OrgunitInsertCall<'a, C, A> {
         OrgunitInsertCall {
             hub: self.hub,
@@ -2594,7 +2608,7 @@ impl<'a, C, A> OrgunitMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `customerId` - Immutable id of the Google Apps account
+    /// * `customerId` - Immutable ID of the G Suite account
     /// * `orgUnitPath` - Full path of the organization unit or its Id
     pub fn update(&self, request: OrgUnit, customer_id: &str, org_unit_path: &Vec<String>) -> OrgunitUpdateCall<'a, C, A> {
         OrgunitUpdateCall {
@@ -2614,7 +2628,7 @@ impl<'a, C, A> OrgunitMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `customerId` - Immutable id of the Google Apps account
+    /// * `customerId` - Immutable ID of the G Suite account
     /// * `orgUnitPath` - Full path of the organization unit or its Id
     pub fn delete(&self, customer_id: &str, org_unit_path: &Vec<String>) -> OrgunitDeleteCall<'a, C, A> {
         OrgunitDeleteCall {
@@ -2633,7 +2647,7 @@ impl<'a, C, A> OrgunitMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `customerId` - Immutable id of the Google Apps account
+    /// * `customerId` - Immutable ID of the G Suite account
     /// * `orgUnitPath` - Full path of the organization unit or its Id
     pub fn get(&self, customer_id: &str, org_unit_path: &Vec<String>) -> OrgunitGetCall<'a, C, A> {
         OrgunitGetCall {
@@ -2653,7 +2667,7 @@ impl<'a, C, A> OrgunitMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `customerId` - Immutable id of the Google Apps account
+    /// * `customerId` - Immutable ID of the G Suite account
     /// * `orgUnitPath` - Full path of the organization unit or its Id
     pub fn patch(&self, request: OrgUnit, customer_id: &str, org_unit_path: &Vec<String>) -> OrgunitPatchCall<'a, C, A> {
         OrgunitPatchCall {
@@ -2875,7 +2889,7 @@ impl<'a, C, A> RoleMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `customer` - Immutable ID of the Google Apps account.
+    /// * `customer` - Immutable ID of the G Suite account.
     /// * `roleId` - Immutable ID of the role.
     pub fn update(&self, request: Role, customer: &str, role_id: &str) -> RoleUpdateCall<'a, C, A> {
         RoleUpdateCall {
@@ -2895,7 +2909,7 @@ impl<'a, C, A> RoleMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `customer` - Immutable ID of the Google Apps account.
+    /// * `customer` - Immutable ID of the G Suite account.
     /// * `roleId` - Immutable ID of the role.
     pub fn get(&self, customer: &str, role_id: &str) -> RoleGetCall<'a, C, A> {
         RoleGetCall {
@@ -2914,7 +2928,7 @@ impl<'a, C, A> RoleMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `customer` - Immutable ID of the Google Apps account.
+    /// * `customer` - Immutable ID of the G Suite account.
     /// * `roleId` - Immutable ID of the role.
     pub fn delete(&self, customer: &str, role_id: &str) -> RoleDeleteCall<'a, C, A> {
         RoleDeleteCall {
@@ -2934,7 +2948,7 @@ impl<'a, C, A> RoleMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `customer` - Immutable ID of the Google Apps account.
+    /// * `customer` - Immutable ID of the G Suite account.
     /// * `roleId` - Immutable ID of the role.
     pub fn patch(&self, request: Role, customer: &str, role_id: &str) -> RolePatchCall<'a, C, A> {
         RolePatchCall {
@@ -2955,7 +2969,7 @@ impl<'a, C, A> RoleMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `customer` - Immutable ID of the Google Apps account.
+    /// * `customer` - Immutable ID of the G Suite account.
     pub fn insert(&self, request: Role, customer: &str) -> RoleInsertCall<'a, C, A> {
         RoleInsertCall {
             hub: self.hub,
@@ -2973,7 +2987,7 @@ impl<'a, C, A> RoleMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `customer` - Immutable id of the Google Apps account.
+    /// * `customer` - Immutable ID of the G Suite account.
     pub fn list(&self, customer: &str) -> RoleListCall<'a, C, A> {
         RoleListCall {
             hub: self.hub,
@@ -3033,7 +3047,7 @@ impl<'a, C, A> NotificationMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `customer` - The unique ID for the customer's Google account.
+    /// * `customer` - The unique ID for the customer's G Suite account.
     pub fn list(&self, customer: &str) -> NotificationListCall<'a, C, A> {
         NotificationListCall {
             hub: self.hub,
@@ -3054,7 +3068,7 @@ impl<'a, C, A> NotificationMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `customer` - The unique ID for the customer's Google account.
+    /// * `customer` - The unique ID for the customer's G Suite account.
     /// * `notificationId` - The unique ID of the notification.
     pub fn update(&self, request: Notification, customer: &str, notification_id: &str) -> NotificationUpdateCall<'a, C, A> {
         NotificationUpdateCall {
@@ -3074,7 +3088,7 @@ impl<'a, C, A> NotificationMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `customer` - The unique ID for the customer's Google account. The customerId is also returned as part of the Users resource.
+    /// * `customer` - The unique ID for the customer's G Suite account. The customerId is also returned as part of the Users resource.
     /// * `notificationId` - The unique ID of the notification.
     pub fn delete(&self, customer: &str, notification_id: &str) -> NotificationDeleteCall<'a, C, A> {
         NotificationDeleteCall {
@@ -3093,7 +3107,7 @@ impl<'a, C, A> NotificationMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `customer` - The unique ID for the customer's Google account. The customerId is also returned as part of the Users resource.
+    /// * `customer` - The unique ID for the customer's G Suite account. The customerId is also returned as part of the Users resource.
     /// * `notificationId` - The unique ID of the notification.
     pub fn get(&self, customer: &str, notification_id: &str) -> NotificationGetCall<'a, C, A> {
         NotificationGetCall {
@@ -3113,7 +3127,7 @@ impl<'a, C, A> NotificationMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `customer` - The unique ID for the customer's Google account.
+    /// * `customer` - The unique ID for the customer's G Suite account.
     /// * `notificationId` - The unique ID of the notification.
     pub fn patch(&self, request: Notification, customer: &str, notification_id: &str) -> NotificationPatchCall<'a, C, A> {
         NotificationPatchCall {
@@ -3174,7 +3188,7 @@ impl<'a, C, A> PrivilegeMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `customer` - Immutable ID of the Google Apps account.
+    /// * `customer` - Immutable ID of the G Suite account.
     pub fn list(&self, customer: &str) -> PrivilegeListCall<'a, C, A> {
         PrivilegeListCall {
             hub: self.hub,
@@ -3290,8 +3304,8 @@ impl<'a, C, A> MobiledeviceMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `customerId` - Immutable id of the Google Apps account
-    /// * `resourceId` - Immutable id of Mobile Device
+    /// * `customerId` - Immutable ID of the G Suite account
+    /// * `resourceId` - Immutable ID of Mobile Device
     pub fn get(&self, customer_id: &str, resource_id: &str) -> MobiledeviceGetCall<'a, C, A> {
         MobiledeviceGetCall {
             hub: self.hub,
@@ -3310,7 +3324,7 @@ impl<'a, C, A> MobiledeviceMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `customerId` - Immutable id of the Google Apps account
+    /// * `customerId` - Immutable ID of the G Suite account
     pub fn list(&self, customer_id: &str) -> MobiledeviceListCall<'a, C, A> {
         MobiledeviceListCall {
             hub: self.hub,
@@ -3333,8 +3347,8 @@ impl<'a, C, A> MobiledeviceMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `customerId` - Immutable id of the Google Apps account
-    /// * `resourceId` - Immutable id of Mobile Device
+    /// * `customerId` - Immutable ID of the G Suite account
+    /// * `resourceId` - Immutable ID of Mobile Device
     pub fn delete(&self, customer_id: &str, resource_id: &str) -> MobiledeviceDeleteCall<'a, C, A> {
         MobiledeviceDeleteCall {
             hub: self.hub,
@@ -3353,8 +3367,8 @@ impl<'a, C, A> MobiledeviceMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `customerId` - Immutable id of the Google Apps account
-    /// * `resourceId` - Immutable id of Mobile Device
+    /// * `customerId` - Immutable ID of the G Suite account
+    /// * `resourceId` - Immutable ID of Mobile Device
     pub fn action(&self, request: MobileDeviceAction, customer_id: &str, resource_id: &str) -> MobiledeviceActionCall<'a, C, A> {
         MobiledeviceActionCall {
             hub: self.hub,
@@ -3511,7 +3525,7 @@ impl<'a, C, A> RoleAssignmentMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `customer` - Immutable ID of the Google Apps account.
+    /// * `customer` - Immutable ID of the G Suite account.
     pub fn insert(&self, request: RoleAssignment, customer: &str) -> RoleAssignmentInsertCall<'a, C, A> {
         RoleAssignmentInsertCall {
             hub: self.hub,
@@ -3529,7 +3543,7 @@ impl<'a, C, A> RoleAssignmentMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `customer` - Immutable ID of the Google Apps account.
+    /// * `customer` - Immutable ID of the G Suite account.
     /// * `roleAssignmentId` - Immutable ID of the role assignment.
     pub fn get(&self, customer: &str, role_assignment_id: &str) -> RoleAssignmentGetCall<'a, C, A> {
         RoleAssignmentGetCall {
@@ -3548,7 +3562,7 @@ impl<'a, C, A> RoleAssignmentMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `customer` - Immutable ID of the Google Apps account.
+    /// * `customer` - Immutable ID of the G Suite account.
     /// * `roleAssignmentId` - Immutable ID of the role assignment.
     pub fn delete(&self, customer: &str, role_assignment_id: &str) -> RoleAssignmentDeleteCall<'a, C, A> {
         RoleAssignmentDeleteCall {
@@ -3567,7 +3581,7 @@ impl<'a, C, A> RoleAssignmentMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `customer` - Immutable ID of the Google Apps account.
+    /// * `customer` - Immutable ID of the G Suite account.
     pub fn list(&self, customer: &str) -> RoleAssignmentListCall<'a, C, A> {
         RoleAssignmentListCall {
             hub: self.hub,
@@ -3629,7 +3643,7 @@ impl<'a, C, A> ChromeosdeviceMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `customerId` - Immutable id of the Google Apps account
+    /// * `customerId` - Immutable ID of the G Suite account
     pub fn list(&self, customer_id: &str) -> ChromeosdeviceListCall<'a, C, A> {
         ChromeosdeviceListCall {
             hub: self.hub,
@@ -3653,8 +3667,8 @@ impl<'a, C, A> ChromeosdeviceMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `customerId` - Immutable id of the Google Apps account
-    /// * `deviceId` - Immutable id of Chrome OS Device
+    /// * `customerId` - Immutable ID of the G Suite account
+    /// * `deviceId` - Immutable ID of Chrome OS Device
     pub fn patch(&self, request: ChromeOsDevice, customer_id: &str, device_id: &str) -> ChromeosdevicePatchCall<'a, C, A> {
         ChromeosdevicePatchCall {
             hub: self.hub,
@@ -3675,8 +3689,8 @@ impl<'a, C, A> ChromeosdeviceMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `customerId` - Immutable id of the Google Apps account
-    /// * `deviceId` - Immutable id of Chrome OS Device
+    /// * `customerId` - Immutable ID of the G Suite account
+    /// * `deviceId` - Immutable ID of Chrome OS Device
     pub fn update(&self, request: ChromeOsDevice, customer_id: &str, device_id: &str) -> ChromeosdeviceUpdateCall<'a, C, A> {
         ChromeosdeviceUpdateCall {
             hub: self.hub,
@@ -3696,8 +3710,8 @@ impl<'a, C, A> ChromeosdeviceMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `customerId` - Immutable id of the Google Apps account
-    /// * `deviceId` - Immutable id of Chrome OS Device
+    /// * `customerId` - Immutable ID of the G Suite account
+    /// * `deviceId` - Immutable ID of Chrome OS Device
     pub fn get(&self, customer_id: &str, device_id: &str) -> ChromeosdeviceGetCall<'a, C, A> {
         ChromeosdeviceGetCall {
             hub: self.hub,
@@ -3717,8 +3731,8 @@ impl<'a, C, A> ChromeosdeviceMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `customerId` - Immutable id of the Google Apps account
-    /// * `resourceId` - Immutable id of Chrome OS Device
+    /// * `customerId` - Immutable ID of the G Suite account
+    /// * `resourceId` - Immutable ID of Chrome OS Device
     pub fn action(&self, request: ChromeOsDeviceAction, customer_id: &str, resource_id: &str) -> ChromeosdeviceActionCall<'a, C, A> {
         ChromeosdeviceActionCall {
             hub: self.hub,
@@ -4076,7 +4090,7 @@ impl<'a, C, A> DomainMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `customer` - Immutable id of the Google Apps account.
+    /// * `customer` - Immutable ID of the G Suite account.
     pub fn list(&self, customer: &str) -> DomainListCall<'a, C, A> {
         DomainListCall {
             hub: self.hub,
@@ -4093,7 +4107,7 @@ impl<'a, C, A> DomainMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `customer` - Immutable id of the Google Apps account.
+    /// * `customer` - Immutable ID of the G Suite account.
     /// * `domainName` - Name of domain to be retrieved
     pub fn get(&self, customer: &str, domain_name: &str) -> DomainGetCall<'a, C, A> {
         DomainGetCall {
@@ -4113,7 +4127,7 @@ impl<'a, C, A> DomainMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `customer` - Immutable id of the Google Apps account.
+    /// * `customer` - Immutable ID of the G Suite account.
     pub fn insert(&self, request: Domains, customer: &str) -> DomainInsertCall<'a, C, A> {
         DomainInsertCall {
             hub: self.hub,
@@ -4131,7 +4145,7 @@ impl<'a, C, A> DomainMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `customer` - Immutable id of the Google Apps account.
+    /// * `customer` - Immutable ID of the G Suite account.
     /// * `domainName` - Name of domain to be deleted
     pub fn delete(&self, customer: &str, domain_name: &str) -> DomainDeleteCall<'a, C, A> {
         DomainDeleteCall {
@@ -4192,7 +4206,7 @@ impl<'a, C, A> DomainAliaseMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `customer` - Immutable id of the Google Apps account.
+    /// * `customer` - Immutable ID of the G Suite account.
     pub fn insert(&self, request: DomainAlias, customer: &str) -> DomainAliaseInsertCall<'a, C, A> {
         DomainAliaseInsertCall {
             hub: self.hub,
@@ -4210,7 +4224,7 @@ impl<'a, C, A> DomainAliaseMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `customer` - Immutable id of the Google Apps account.
+    /// * `customer` - Immutable ID of the G Suite account.
     /// * `domainAliasName` - Name of domain alias to be retrieved.
     pub fn get(&self, customer: &str, domain_alias_name: &str) -> DomainAliaseGetCall<'a, C, A> {
         DomainAliaseGetCall {
@@ -4229,7 +4243,7 @@ impl<'a, C, A> DomainAliaseMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `customer` - Immutable id of the Google Apps account.
+    /// * `customer` - Immutable ID of the G Suite account.
     pub fn list(&self, customer: &str) -> DomainAliaseListCall<'a, C, A> {
         DomainAliaseListCall {
             hub: self.hub,
@@ -4247,7 +4261,7 @@ impl<'a, C, A> DomainAliaseMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `customer` - Immutable id of the Google Apps account.
+    /// * `customer` - Immutable ID of the G Suite account.
     /// * `domainAliasName` - Name of domain alias to be retrieved.
     pub fn delete(&self, customer: &str, domain_alias_name: &str) -> DomainAliaseDeleteCall<'a, C, A> {
         DomainAliaseDeleteCall {
@@ -4307,7 +4321,7 @@ impl<'a, C, A> SchemaMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `customerId` - Immutable id of the Google Apps account
+    /// * `customerId` - Immutable ID of the G Suite account
     /// * `schemaKey` - Name or immutable Id of the schema
     pub fn get(&self, customer_id: &str, schema_key: &str) -> SchemaGetCall<'a, C, A> {
         SchemaGetCall {
@@ -4327,7 +4341,7 @@ impl<'a, C, A> SchemaMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `customerId` - Immutable id of the Google Apps account
+    /// * `customerId` - Immutable ID of the G Suite account
     /// * `schemaKey` - Name or immutable Id of the schema.
     pub fn update(&self, request: Schema, customer_id: &str, schema_key: &str) -> SchemaUpdateCall<'a, C, A> {
         SchemaUpdateCall {
@@ -4347,7 +4361,7 @@ impl<'a, C, A> SchemaMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `customerId` - Immutable id of the Google Apps account
+    /// * `customerId` - Immutable ID of the G Suite account
     pub fn list(&self, customer_id: &str) -> SchemaListCall<'a, C, A> {
         SchemaListCall {
             hub: self.hub,
@@ -4365,7 +4379,7 @@ impl<'a, C, A> SchemaMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `customerId` - Immutable id of the Google Apps account
+    /// * `customerId` - Immutable ID of the G Suite account
     /// * `schemaKey` - Name or immutable Id of the schema.
     pub fn patch(&self, request: Schema, customer_id: &str, schema_key: &str) -> SchemaPatchCall<'a, C, A> {
         SchemaPatchCall {
@@ -4385,7 +4399,7 @@ impl<'a, C, A> SchemaMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `customerId` - Immutable id of the Google Apps account
+    /// * `customerId` - Immutable ID of the G Suite account
     /// * `schemaKey` - Name or immutable Id of the schema
     pub fn delete(&self, customer_id: &str, schema_key: &str) -> SchemaDeleteCall<'a, C, A> {
         SchemaDeleteCall {
@@ -4405,7 +4419,7 @@ impl<'a, C, A> SchemaMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `customerId` - Immutable id of the Google Apps account
+    /// * `customerId` - Immutable ID of the G Suite account
     pub fn insert(&self, request: Schema, customer_id: &str) -> SchemaInsertCall<'a, C, A> {
         SchemaInsertCall {
             hub: self.hub,
@@ -4464,7 +4478,7 @@ impl<'a, C, A> ResourceMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `customer` - The unique ID for the customer's Google account. As an account administrator, you can also use the my_customer alias to represent your account's customer ID.
+    /// * `customer` - The unique ID for the customer's G Suite account. As an account administrator, you can also use the my_customer alias to represent your account's customer ID.
     pub fn calendars_list(&self, customer: &str) -> ResourceCalendarListCall<'a, C, A> {
         ResourceCalendarListCall {
             hub: self.hub,
@@ -4483,7 +4497,7 @@ impl<'a, C, A> ResourceMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `customer` - The unique ID for the customer's Google account. As an account administrator, you can also use the my_customer alias to represent your account's customer ID.
+    /// * `customer` - The unique ID for the customer's G Suite account. As an account administrator, you can also use the my_customer alias to represent your account's customer ID.
     /// * `calendarResourceId` - The unique ID of the calendar resource to retrieve.
     pub fn calendars_get(&self, customer: &str, calendar_resource_id: &str) -> ResourceCalendarGetCall<'a, C, A> {
         ResourceCalendarGetCall {
@@ -4503,7 +4517,7 @@ impl<'a, C, A> ResourceMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `customer` - The unique ID for the customer's Google account. As an account administrator, you can also use the my_customer alias to represent your account's customer ID.
+    /// * `customer` - The unique ID for the customer's G Suite account. As an account administrator, you can also use the my_customer alias to represent your account's customer ID.
     pub fn calendars_insert(&self, request: CalendarResource, customer: &str) -> ResourceCalendarInsertCall<'a, C, A> {
         ResourceCalendarInsertCall {
             hub: self.hub,
@@ -4522,7 +4536,7 @@ impl<'a, C, A> ResourceMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `customer` - The unique ID for the customer's Google account. As an account administrator, you can also use the my_customer alias to represent your account's customer ID.
+    /// * `customer` - The unique ID for the customer's G Suite account. As an account administrator, you can also use the my_customer alias to represent your account's customer ID.
     /// * `calendarResourceId` - The unique ID of the calendar resource to update.
     pub fn calendars_patch(&self, request: CalendarResource, customer: &str, calendar_resource_id: &str) -> ResourceCalendarPatchCall<'a, C, A> {
         ResourceCalendarPatchCall {
@@ -4543,7 +4557,7 @@ impl<'a, C, A> ResourceMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `customer` - The unique ID for the customer's Google account. As an account administrator, you can also use the my_customer alias to represent your account's customer ID.
+    /// * `customer` - The unique ID for the customer's G Suite account. As an account administrator, you can also use the my_customer alias to represent your account's customer ID.
     /// * `calendarResourceId` - The unique ID of the calendar resource to update.
     pub fn calendars_update(&self, request: CalendarResource, customer: &str, calendar_resource_id: &str) -> ResourceCalendarUpdateCall<'a, C, A> {
         ResourceCalendarUpdateCall {
@@ -4563,7 +4577,7 @@ impl<'a, C, A> ResourceMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `customer` - The unique ID for the customer's Google account. As an account administrator, you can also use the my_customer alias to represent your account's customer ID.
+    /// * `customer` - The unique ID for the customer's G Suite account. As an account administrator, you can also use the my_customer alias to represent your account's customer ID.
     /// * `calendarResourceId` - The unique ID of the calendar resource to delete.
     pub fn calendars_delete(&self, customer: &str, calendar_resource_id: &str) -> ResourceCalendarDeleteCall<'a, C, A> {
         ResourceCalendarDeleteCall {
@@ -6590,7 +6604,7 @@ impl<'a, C, A> OrgunitListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
-    /// Immutable id of the Google Apps account
+    /// Immutable ID of the G Suite account
     ///
     /// Sets the *customer id* path property to the given value.
     ///
@@ -6870,7 +6884,7 @@ impl<'a, C, A> OrgunitInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._request = new_value;
         self
     }
-    /// Immutable id of the Google Apps account
+    /// Immutable ID of the G Suite account
     ///
     /// Sets the *customer id* path property to the given value.
     ///
@@ -7142,7 +7156,7 @@ impl<'a, C, A> OrgunitUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._request = new_value;
         self
     }
-    /// Immutable id of the Google Apps account
+    /// Immutable ID of the G Suite account
     ///
     /// Sets the *customer id* path property to the given value.
     ///
@@ -7383,7 +7397,7 @@ impl<'a, C, A> OrgunitDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
-    /// Immutable id of the Google Apps account
+    /// Immutable ID of the G Suite account
     ///
     /// Sets the *customer id* path property to the given value.
     ///
@@ -7635,7 +7649,7 @@ impl<'a, C, A> OrgunitGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
-    /// Immutable id of the Google Apps account
+    /// Immutable ID of the G Suite account
     ///
     /// Sets the *customer id* path property to the given value.
     ///
@@ -7918,7 +7932,7 @@ impl<'a, C, A> OrgunitPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._request = new_value;
         self
     }
-    /// Immutable id of the Google Apps account
+    /// Immutable ID of the G Suite account
     ///
     /// Sets the *customer id* path property to the given value.
     ///
@@ -9773,7 +9787,7 @@ impl<'a, C, A> RoleUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._request = new_value;
         self
     }
-    /// Immutable ID of the Google Apps account.
+    /// Immutable ID of the G Suite account.
     ///
     /// Sets the *customer* path property to the given value.
     ///
@@ -10020,7 +10034,7 @@ impl<'a, C, A> RoleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     }
 
 
-    /// Immutable ID of the Google Apps account.
+    /// Immutable ID of the G Suite account.
     ///
     /// Sets the *customer* path property to the given value.
     ///
@@ -10256,7 +10270,7 @@ impl<'a, C, A> RoleDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
-    /// Immutable ID of the Google Apps account.
+    /// Immutable ID of the G Suite account.
     ///
     /// Sets the *customer* path property to the given value.
     ///
@@ -10534,7 +10548,7 @@ impl<'a, C, A> RolePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._request = new_value;
         self
     }
-    /// Immutable ID of the Google Apps account.
+    /// Immutable ID of the G Suite account.
     ///
     /// Sets the *customer* path property to the given value.
     ///
@@ -10810,7 +10824,7 @@ impl<'a, C, A> RoleInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._request = new_value;
         self
     }
-    /// Immutable ID of the Google Apps account.
+    /// Immutable ID of the G Suite account.
     ///
     /// Sets the *customer* path property to the given value.
     ///
@@ -11055,7 +11069,7 @@ impl<'a, C, A> RoleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
 
-    /// Immutable id of the Google Apps account.
+    /// Immutable ID of the G Suite account.
     ///
     /// Sets the *customer* path property to the given value.
     ///
@@ -11319,7 +11333,7 @@ impl<'a, C, A> NotificationListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
-    /// The unique ID for the customer's Google account.
+    /// The unique ID for the customer's G Suite account.
     ///
     /// Sets the *customer* path property to the given value.
     ///
@@ -11608,7 +11622,7 @@ impl<'a, C, A> NotificationUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._request = new_value;
         self
     }
-    /// The unique ID for the customer's Google account.
+    /// The unique ID for the customer's G Suite account.
     ///
     /// Sets the *customer* path property to the given value.
     ///
@@ -11844,7 +11858,7 @@ impl<'a, C, A> NotificationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
-    /// The unique ID for the customer's Google account. The customerId is also returned as part of the Users resource.
+    /// The unique ID for the customer's G Suite account. The customerId is also returned as part of the Users resource.
     ///
     /// Sets the *customer* path property to the given value.
     ///
@@ -12091,7 +12105,7 @@ impl<'a, C, A> NotificationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
-    /// The unique ID for the customer's Google account. The customerId is also returned as part of the Users resource.
+    /// The unique ID for the customer's G Suite account. The customerId is also returned as part of the Users resource.
     ///
     /// Sets the *customer* path property to the given value.
     ///
@@ -12369,7 +12383,7 @@ impl<'a, C, A> NotificationPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._request = new_value;
         self
     }
-    /// The unique ID for the customer's Google account.
+    /// The unique ID for the customer's G Suite account.
     ///
     /// Sets the *customer* path property to the given value.
     ///
@@ -12614,7 +12628,7 @@ impl<'a, C, A> PrivilegeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
-    /// Immutable ID of the Google Apps account.
+    /// Immutable ID of the G Suite account.
     ///
     /// Sets the *customer* path property to the given value.
     ///
@@ -13078,7 +13092,7 @@ impl<'a, C, A> MobiledeviceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
-    /// Immutable id of the Google Apps account
+    /// Immutable ID of the G Suite account
     ///
     /// Sets the *customer id* path property to the given value.
     ///
@@ -13088,7 +13102,7 @@ impl<'a, C, A> MobiledeviceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._customer_id = new_value.to_string();
         self
     }
-    /// Immutable id of Mobile Device
+    /// Immutable ID of Mobile Device
     ///
     /// Sets the *resource id* path property to the given value.
     ///
@@ -13360,7 +13374,7 @@ impl<'a, C, A> MobiledeviceListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
-    /// Immutable id of the Google Apps account
+    /// Immutable ID of the G Suite account
     ///
     /// Sets the *customer id* path property to the given value.
     ///
@@ -13628,7 +13642,7 @@ impl<'a, C, A> MobiledeviceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
-    /// Immutable id of the Google Apps account
+    /// Immutable ID of the G Suite account
     ///
     /// Sets the *customer id* path property to the given value.
     ///
@@ -13638,7 +13652,7 @@ impl<'a, C, A> MobiledeviceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._customer_id = new_value.to_string();
         self
     }
-    /// Immutable id of Mobile Device
+    /// Immutable ID of Mobile Device
     ///
     /// Sets the *resource id* path property to the given value.
     ///
@@ -13895,7 +13909,7 @@ impl<'a, C, A> MobiledeviceActionCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._request = new_value;
         self
     }
-    /// Immutable id of the Google Apps account
+    /// Immutable ID of the G Suite account
     ///
     /// Sets the *customer id* path property to the given value.
     ///
@@ -13905,7 +13919,7 @@ impl<'a, C, A> MobiledeviceActionCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._customer_id = new_value.to_string();
         self
     }
-    /// Immutable id of Mobile Device
+    /// Immutable ID of Mobile Device
     ///
     /// Sets the *resource id* path property to the given value.
     ///
@@ -14889,7 +14903,7 @@ impl<'a, C, A> RoleAssignmentInsertCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._request = new_value;
         self
     }
-    /// Immutable ID of the Google Apps account.
+    /// Immutable ID of the G Suite account.
     ///
     /// Sets the *customer* path property to the given value.
     ///
@@ -15126,7 +15140,7 @@ impl<'a, C, A> RoleAssignmentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
-    /// Immutable ID of the Google Apps account.
+    /// Immutable ID of the G Suite account.
     ///
     /// Sets the *customer* path property to the given value.
     ///
@@ -15362,7 +15376,7 @@ impl<'a, C, A> RoleAssignmentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
-    /// Immutable ID of the Google Apps account.
+    /// Immutable ID of the G Suite account.
     ///
     /// Sets the *customer* path property to the given value.
     ///
@@ -15627,7 +15641,7 @@ impl<'a, C, A> RoleAssignmentListCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
-    /// Immutable ID of the Google Apps account.
+    /// Immutable ID of the G Suite account.
     ///
     /// Sets the *customer* path property to the given value.
     ///
@@ -15920,7 +15934,7 @@ impl<'a, C, A> ChromeosdeviceListCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
-    /// Immutable id of the Google Apps account
+    /// Immutable ID of the G Suite account
     ///
     /// Sets the *customer id* path property to the given value.
     ///
@@ -16235,7 +16249,7 @@ impl<'a, C, A> ChromeosdevicePatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self._request = new_value;
         self
     }
-    /// Immutable id of the Google Apps account
+    /// Immutable ID of the G Suite account
     ///
     /// Sets the *customer id* path property to the given value.
     ///
@@ -16245,7 +16259,7 @@ impl<'a, C, A> ChromeosdevicePatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self._customer_id = new_value.to_string();
         self
     }
-    /// Immutable id of Chrome OS Device
+    /// Immutable ID of Chrome OS Device
     ///
     /// Sets the *device id* path property to the given value.
     ///
@@ -16525,7 +16539,7 @@ impl<'a, C, A> ChromeosdeviceUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._request = new_value;
         self
     }
-    /// Immutable id of the Google Apps account
+    /// Immutable ID of the G Suite account
     ///
     /// Sets the *customer id* path property to the given value.
     ///
@@ -16535,7 +16549,7 @@ impl<'a, C, A> ChromeosdeviceUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._customer_id = new_value.to_string();
         self
     }
-    /// Immutable id of Chrome OS Device
+    /// Immutable ID of Chrome OS Device
     ///
     /// Sets the *device id* path property to the given value.
     ///
@@ -16784,7 +16798,7 @@ impl<'a, C, A> ChromeosdeviceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
-    /// Immutable id of the Google Apps account
+    /// Immutable ID of the G Suite account
     ///
     /// Sets the *customer id* path property to the given value.
     ///
@@ -16794,7 +16808,7 @@ impl<'a, C, A> ChromeosdeviceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._customer_id = new_value.to_string();
         self
     }
-    /// Immutable id of Chrome OS Device
+    /// Immutable ID of Chrome OS Device
     ///
     /// Sets the *device id* path property to the given value.
     ///
@@ -17058,7 +17072,7 @@ impl<'a, C, A> ChromeosdeviceActionCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._request = new_value;
         self
     }
-    /// Immutable id of the Google Apps account
+    /// Immutable ID of the G Suite account
     ///
     /// Sets the *customer id* path property to the given value.
     ///
@@ -17068,7 +17082,7 @@ impl<'a, C, A> ChromeosdeviceActionCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._customer_id = new_value.to_string();
         self
     }
-    /// Immutable id of Chrome OS Device
+    /// Immutable ID of Chrome OS Device
     ///
     /// Sets the *resource id* path property to the given value.
     ///
@@ -17557,7 +17571,7 @@ impl<'a, C, A> GroupListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._domain = Some(new_value.to_string());
         self
     }
-    /// Immutable id of the Google Apps account. In case of multi-domain, to fetch all groups for a customer, fill this field instead of domain.
+    /// Immutable ID of the G Suite account. In case of multi-domain, to fetch all groups for a customer, fill this field instead of domain.
     ///
     /// Sets the *customer* query property to the given value.
     pub fn customer(mut self, new_value: &str) -> GroupListCall<'a, C, A> {
@@ -20244,7 +20258,7 @@ impl<'a, C, A> DomainListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
-    /// Immutable id of the Google Apps account.
+    /// Immutable ID of the G Suite account.
     ///
     /// Sets the *customer* path property to the given value.
     ///
@@ -20481,7 +20495,7 @@ impl<'a, C, A> DomainGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
-    /// Immutable id of the Google Apps account.
+    /// Immutable ID of the G Suite account.
     ///
     /// Sets the *customer* path property to the given value.
     ///
@@ -20757,7 +20771,7 @@ impl<'a, C, A> DomainInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._request = new_value;
         self
     }
-    /// Immutable id of the Google Apps account.
+    /// Immutable ID of the G Suite account.
     ///
     /// Sets the *customer* path property to the given value.
     ///
@@ -20983,7 +20997,7 @@ impl<'a, C, A> DomainDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
-    /// Immutable id of the Google Apps account.
+    /// Immutable ID of the G Suite account.
     ///
     /// Sets the *customer* path property to the given value.
     ///
@@ -21259,7 +21273,7 @@ impl<'a, C, A> DomainAliaseInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._request = new_value;
         self
     }
-    /// Immutable id of the Google Apps account.
+    /// Immutable ID of the G Suite account.
     ///
     /// Sets the *customer* path property to the given value.
     ///
@@ -21496,7 +21510,7 @@ impl<'a, C, A> DomainAliaseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
-    /// Immutable id of the Google Apps account.
+    /// Immutable ID of the G Suite account.
     ///
     /// Sets the *customer* path property to the given value.
     ///
@@ -21746,7 +21760,7 @@ impl<'a, C, A> DomainAliaseListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
-    /// Immutable id of the Google Apps account.
+    /// Immutable ID of the G Suite account.
     ///
     /// Sets the *customer* path property to the given value.
     ///
@@ -21979,7 +21993,7 @@ impl<'a, C, A> DomainAliaseDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
-    /// Immutable id of the Google Apps account.
+    /// Immutable ID of the G Suite account.
     ///
     /// Sets the *customer* path property to the given value.
     ///
@@ -22226,7 +22240,7 @@ impl<'a, C, A> SchemaGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
-    /// Immutable id of the Google Apps account
+    /// Immutable ID of the G Suite account
     ///
     /// Sets the *customer id* path property to the given value.
     ///
@@ -22504,7 +22518,7 @@ impl<'a, C, A> SchemaUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._request = new_value;
         self
     }
-    /// Immutable id of the Google Apps account
+    /// Immutable ID of the G Suite account
     ///
     /// Sets the *customer id* path property to the given value.
     ///
@@ -22749,7 +22763,7 @@ impl<'a, C, A> SchemaListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
-    /// Immutable id of the Google Apps account
+    /// Immutable ID of the G Suite account
     ///
     /// Sets the *customer id* path property to the given value.
     ///
@@ -23017,7 +23031,7 @@ impl<'a, C, A> SchemaPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._request = new_value;
         self
     }
-    /// Immutable id of the Google Apps account
+    /// Immutable ID of the G Suite account
     ///
     /// Sets the *customer id* path property to the given value.
     ///
@@ -23253,7 +23267,7 @@ impl<'a, C, A> SchemaDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
-    /// Immutable id of the Google Apps account
+    /// Immutable ID of the G Suite account
     ///
     /// Sets the *customer id* path property to the given value.
     ///
@@ -23529,7 +23543,7 @@ impl<'a, C, A> SchemaInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._request = new_value;
         self
     }
-    /// Immutable id of the Google Apps account
+    /// Immutable ID of the G Suite account
     ///
     /// Sets the *customer id* path property to the given value.
     ///
@@ -23774,7 +23788,7 @@ impl<'a, C, A> ResourceCalendarListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
-    /// The unique ID for the customer's Google account. As an account administrator, you can also use the my_customer alias to represent your account's customer ID.
+    /// The unique ID for the customer's G Suite account. As an account administrator, you can also use the my_customer alias to represent your account's customer ID.
     ///
     /// Sets the *customer* path property to the given value.
     ///
@@ -24025,7 +24039,7 @@ impl<'a, C, A> ResourceCalendarGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
-    /// The unique ID for the customer's Google account. As an account administrator, you can also use the my_customer alias to represent your account's customer ID.
+    /// The unique ID for the customer's G Suite account. As an account administrator, you can also use the my_customer alias to represent your account's customer ID.
     ///
     /// Sets the *customer* path property to the given value.
     ///
@@ -24301,7 +24315,7 @@ impl<'a, C, A> ResourceCalendarInsertCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._request = new_value;
         self
     }
-    /// The unique ID for the customer's Google account. As an account administrator, you can also use the my_customer alias to represent your account's customer ID.
+    /// The unique ID for the customer's G Suite account. As an account administrator, you can also use the my_customer alias to represent your account's customer ID.
     ///
     /// Sets the *customer* path property to the given value.
     ///
@@ -24569,7 +24583,7 @@ impl<'a, C, A> ResourceCalendarPatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
         self._request = new_value;
         self
     }
-    /// The unique ID for the customer's Google account. As an account administrator, you can also use the my_customer alias to represent your account's customer ID.
+    /// The unique ID for the customer's G Suite account. As an account administrator, you can also use the my_customer alias to represent your account's customer ID.
     ///
     /// Sets the *customer* path property to the given value.
     ///
@@ -24847,7 +24861,7 @@ impl<'a, C, A> ResourceCalendarUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._request = new_value;
         self
     }
-    /// The unique ID for the customer's Google account. As an account administrator, you can also use the my_customer alias to represent your account's customer ID.
+    /// The unique ID for the customer's G Suite account. As an account administrator, you can also use the my_customer alias to represent your account's customer ID.
     ///
     /// Sets the *customer* path property to the given value.
     ///
@@ -25083,7 +25097,7 @@ impl<'a, C, A> ResourceCalendarDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
-    /// The unique ID for the customer's Google account. As an account administrator, you can also use the my_customer alias to represent your account's customer ID.
+    /// The unique ID for the customer's G Suite account. As an account administrator, you can also use the my_customer alias to represent your account's customer ID.
     ///
     /// Sets the *customer* path property to the given value.
     ///
@@ -26988,7 +27002,7 @@ impl<'a, C, A> UserWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._domain = Some(new_value.to_string());
         self
     }
-    /// Immutable id of the Google Apps account. In case of multi-domain, to fetch all users for a customer, fill this field instead of domain.
+    /// Immutable ID of the G Suite account. In case of multi-domain, to fetch all users for a customer, fill this field instead of domain.
     ///
     /// Sets the *customer* query property to the given value.
     pub fn customer(mut self, new_value: &str) -> UserWatchCall<'a, C, A> {
@@ -27835,7 +27849,7 @@ impl<'a, C, A> UserListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         self._domain = Some(new_value.to_string());
         self
     }
-    /// Immutable id of the Google Apps account. In case of multi-domain, to fetch all users for a customer, fill this field instead of domain.
+    /// Immutable ID of the G Suite account. In case of multi-domain, to fetch all users for a customer, fill this field instead of domain.
     ///
     /// Sets the *customer* query property to the given value.
     pub fn customer(mut self, new_value: &str) -> UserListCall<'a, C, A> {

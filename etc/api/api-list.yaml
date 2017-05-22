@@ -59,6 +59,8 @@ api:
     - v2
     clouderrorreporting:
     - v1beta1
+    cloudkms:
+    - v1beta1
     cloudlatencytest:
     - v2
     cloudmonitoring:
@@ -205,6 +207,8 @@ api:
     safebrowsing:
     - v4
     script:
+    - v1
+    searchconsole:
     - v1
     servicecontrol:
     - v1

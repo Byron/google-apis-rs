@@ -785,7 +785,19 @@ fn main() {
     let arg_data = [
         ("controller", "methods: 'debuggees-breakpoints-list', 'debuggees-breakpoints-update' and 'debuggees-register'", vec![
             ("debuggees-breakpoints-list",
-                    Some(r##"Returns the list of all active breakpoints for the debuggee. The breakpoint specification (location, condition, and expression fields) is semantically immutable, although the field values may change. For example, an agent may update the location line number to reflect the actual line where the breakpoint was set, but this doesn't change the breakpoint semantics. This means that an agent does not need to check if a breakpoint has changed when it encounters the same breakpoint on a successive call. Moreover, an agent should remember the breakpoints that are completed until the controller removes them from the active list to avoid setting those breakpoints again."##),
+                    Some(r##"Returns the list of all active breakpoints for the debuggee.
+        
+        The breakpoint specification (location, condition, and expression
+        fields) is semantically immutable, although the field values may
+        change. For example, an agent may update the location line number
+        to reflect the actual line where the breakpoint was set, but this
+        doesn't change the breakpoint semantics.
+        
+        This means that an agent does not need to check if a breakpoint has changed
+        when it encounters the same breakpoint on a successive call.
+        Moreover, an agent should remember the breakpoints that are completed
+        until the controller removes them from the active list to avoid
+        setting those breakpoints again."##),
                     "Details at http://byron.github.io/google-apis-rs/google_clouddebugger2_cli/controller_debuggees-breakpoints-list",
                   vec![
                     (Some(r##"debuggee-id"##),
@@ -807,7 +819,15 @@ fn main() {
                      Some(false)),
                   ]),
             ("debuggees-breakpoints-update",
-                    Some(r##"Updates the breakpoint state or mutable fields. The entire Breakpoint message must be sent back to the controller service. Updates to active breakpoint fields are only allowed if the new value does not change the breakpoint specification. Updates to the `location`, `condition` and `expression` fields should not alter the breakpoint semantics. These may only make changes such as canonicalizing a value or snapping the location to the correct line of code."##),
+                    Some(r##"Updates the breakpoint state or mutable fields.
+        The entire Breakpoint message must be sent back to the controller
+        service.
+        
+        Updates to active breakpoint fields are only allowed if the new value
+        does not change the breakpoint specification. Updates to the `location`,
+        `condition` and `expression` fields should not alter the breakpoint
+        semantics. These may only make changes such as canonicalizing a value
+        or snapping the location to the correct line of code."##),
                     "Details at http://byron.github.io/google-apis-rs/google_clouddebugger2_cli/controller_debuggees-breakpoints-update",
                   vec![
                     (Some(r##"debuggee-id"##),
@@ -841,7 +861,16 @@ fn main() {
                      Some(false)),
                   ]),
             ("debuggees-register",
-                    Some(r##"Registers the debuggee with the controller service. All agents attached to the same application should call this method with the same request content to get back the same stable `debuggee_id`. Agents should call this method again whenever `google.rpc.Code.NOT_FOUND` is returned from any controller method. This allows the controller service to disable the agent or recover from any data loss. If the debuggee is disabled by the server, the response will have `is_disabled` set to `true`."##),
+                    Some(r##"Registers the debuggee with the controller service.
+        
+        All agents attached to the same application should call this method with
+        the same request content to get back the same stable `debuggee_id`. Agents
+        should call this method again whenever `google.rpc.Code.NOT_FOUND` is
+        returned from any controller method.
+        
+        This allows the controller service to disable the agent or recover from any
+        data loss. If the debuggee is disabled by the server, the response will
+        have `is_disabled` set to `true`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_clouddebugger2_cli/controller_debuggees-register",
                   vec![
                     (Some(r##"kv"##),
@@ -993,8 +1022,9 @@ fn main() {
     
     let mut app = App::new("clouddebugger2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.4+20160810")
-           .about("Examines the call stack and variables of a running application without stopping or slowing it down.")
+           .version("1.0.4+20170413")
+           .about("Examines the call stack and variables of a running application without stopping or slowing it down.
+           ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_clouddebugger2_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

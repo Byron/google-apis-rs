@@ -223,7 +223,7 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
 #[derive(PartialEq, Eq, Hash)]
 pub enum Scope {
-    /// View and manage the settings of a Google Apps Group
+    /// View and manage the settings of a G Suite group
     AppGroupSetting,
 }
 

@@ -28,6 +28,6 @@ cargo:
   doc_base_url: http://byron.github.io/google-apis-rs
   dependencies:
     - strsim = "^0.5"
-    - hyper-rustls = "^0.3"
+    - hyper-rustls = "^0.6"
     - yup-hyper-mock = "^2.0"
     - clap = "^2.0"

@@ -1,4 +1,4 @@
-site_name: gmail v1.0.4+20161206
+site_name: gmail v1.0.4+20170510
 site_url: http://byron.github.io/google-apis-rs/google-gmail1-cli
 site_description: A complete library to interact with gmail (protocol v1)
 
@@ -52,6 +52,11 @@ pages:
 - ['users_settings-send-as-get.md', 'Users', 'Settings Send As Get']
 - ['users_settings-send-as-list.md', 'Users', 'Settings Send As List']
 - ['users_settings-send-as-patch.md', 'Users', 'Settings Send As Patch']
+- ['users_settings-send-as-smime-info-delete.md', 'Users', 'Settings Send As Smime Info Delete']
+- ['users_settings-send-as-smime-info-get.md', 'Users', 'Settings Send As Smime Info Get']
+- ['users_settings-send-as-smime-info-insert.md', 'Users', 'Settings Send As Smime Info Insert']
+- ['users_settings-send-as-smime-info-list.md', 'Users', 'Settings Send As Smime Info List']
+- ['users_settings-send-as-smime-info-set-default.md', 'Users', 'Settings Send As Smime Info Set Default']
 - ['users_settings-send-as-update.md', 'Users', 'Settings Send As Update']
 - ['users_settings-send-as-verify.md', 'Users', 'Settings Send As Verify']
 - ['users_settings-update-auto-forwarding.md', 'Users', 'Settings Update Auto Forwarding']

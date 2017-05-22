@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Debugger* crate version *1.0.4+20160810*, where *20160810* is the exact revision of the *clouddebugger:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
+//! This documentation was generated from *Cloud Debugger* crate version *1.0.4+20170413*, where *20170413* is the exact revision of the *clouddebugger:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
 //! 
 //! Everything else about the *Cloud Debugger* *v2* API can be found at the
 //! [official documentation site](http://cloud.google.com/debugger).
@@ -352,7 +352,8 @@ impl<'a, C, A> CloudDebugger<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// An ExtendedSourceContext is a SourceContext combined with additional details describing the context.
+/// An ExtendedSourceContext is a SourceContext combined with additional
+/// details describing the context.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -378,10 +379,14 @@ impl Part for ExtendedSourceContext {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListBreakpointsResponse {
-    /// A wait token that can be used in the next call to `list` (REST) or `ListBreakpoints` (RPC) to block until the list of breakpoints has changes.
+    /// A wait token that can be used in the next call to `list` (REST) or
+    /// `ListBreakpoints` (RPC) to block until the list of breakpoints has changes.
     #[serde(rename="nextWaitToken")]
     pub next_wait_token: Option<String>,
-    /// List of all breakpoints with complete state. The fields `id` and `location` are guaranteed to be set on each breakpoint.
+    /// List of breakpoints matching the request.
+    /// The fields `id` and `location` are guaranteed to be set on each breakpoint.
+    /// The fields: `stack_frames`, `evaluated_expressions` and `variable_table`
+    /// are cleared on each breakpoint regardless of it's status.
     pub breakpoints: Option<Vec<Breakpoint>>,
 }
 
@@ -394,7 +399,8 @@ impl ResponseResult for ListBreakpointsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CloudWorkspaceSourceContext {
-    /// The ID of the snapshot. An empty snapshot_id refers to the most recent snapshot.
+    /// The ID of the snapshot.
+    /// An empty snapshot_id refers to the most recent snapshot.
     #[serde(rename="snapshotId")]
     pub snapshot_id: Option<String>,
     /// The ID of the workspace.
@@ -413,12 +419,14 @@ impl Part for CloudWorkspaceSourceContext {}
 pub struct StackFrame {
     /// Demangled function name at the call site.
     pub function: Option<String>,
+    /// Set of arguments passed to this function.
+    /// Note that this might not be populated for all stack frames.
+    pub arguments: Option<Vec<Variable>>,
+    /// Set of local variables at the stack frame location.
+    /// Note that this might not be populated for all stack frames.
+    pub locals: Option<Vec<Variable>>,
     /// Source location of the call site.
     pub location: Option<SourceLocation>,
-    /// Set of local variables at the stack frame location. Note that this might not be populated for all stack frames.
-    pub locals: Option<Vec<Variable>>,
-    /// Set of arguments passed to this function. Note that this might not be populated for all stack frames.
-    pub arguments: Option<Vec<Variable>>,
 }
 
 impl Part for StackFrame {}
@@ -435,7 +443,11 @@ impl Part for StackFrame {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListDebuggeesResponse {
-    /// List of debuggees accessible to the calling user. Note that the `description` field is the only human readable field that should be displayed to the user. The fields `debuggee.id` and `description` fields are guaranteed to be set on each debuggee.
+    /// List of debuggees accessible to the calling user.
+    /// Note that the `description` field is the only human readable field
+    /// that should be displayed to the user.
+    /// The fields `debuggee.id` and  `description` fields are guaranteed to be
+    /// set on each debuggee.
     pub debuggees: Option<Vec<Debuggee>>,
 }
 
@@ -453,14 +465,17 @@ impl ResponseResult for ListDebuggeesResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RegisterDebuggeeRequest {
-    /// Debuggee information to register. The fields `project`, `uniquifier`, `description` and `agent_version` of the debuggee must be set.
+    /// Debuggee information to register.
+    /// The fields `project`, `uniquifier`, `description` and `agent_version`
+    /// of the debuggee must be set.
     pub debuggee: Option<Debuggee>,
 }
 
 impl RequestValue for RegisterDebuggeeRequest {}
 
 
-/// Response for updating an active breakpoint. The message is defined to allow future extensions.
+/// Response for updating an active breakpoint.
+/// The message is defined to allow future extensions.
 /// 
 /// # Activities
 /// 
@@ -475,7 +490,8 @@ pub struct UpdateActiveBreakpointResponse { _never_set: Option<bool> }
 impl ResponseResult for UpdateActiveBreakpointResponse {}
 
 
-/// Selects a repo using a Google Cloud Platform project ID (e.g. winged-cargo-31) and a repo name within that project.
+/// Selects a repo using a Google Cloud Platform project ID
+/// (e.g. winged-cargo-31) and a repo name within that project.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -518,20 +534,24 @@ impl Part for AliasContext {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListActiveBreakpointsResponse {
-    /// The `wait_expired` field is set to true by the server when the request times out and the field `success_on_timeout` is set to true.
+    /// The `wait_expired` field is set to true by the server when the
+    /// request times out and the field `success_on_timeout` is set to true.
     #[serde(rename="waitExpired")]
     pub wait_expired: Option<bool>,
-    /// A wait token that can be used in the next method call to block until the list of breakpoints changes.
+    /// A wait token that can be used in the next method call to block until
+    /// the list of breakpoints changes.
     #[serde(rename="nextWaitToken")]
     pub next_wait_token: Option<String>,
-    /// List of all active breakpoints. The fields `id` and `location` are guaranteed to be set on each breakpoint.
+    /// List of all active breakpoints.
+    /// The fields `id` and `location` are guaranteed to be set on each breakpoint.
     pub breakpoints: Option<Vec<Breakpoint>>,
 }
 
 impl ResponseResult for ListActiveBreakpointsResponse {}
 
 
-/// A CloudRepoSourceContext denotes a particular revision in a cloud repo (a repo hosted by the Google Cloud Platform).
+/// A CloudRepoSourceContext denotes a particular revision in a cloud
+/// repo (a repo hosted by the Google Cloud Platform).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -570,7 +590,15 @@ pub struct RepoId {
 impl Part for RepoId {}
 
 
-/// A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); } The JSON representation for `Empty` is empty JSON object `{}`.
+/// A generic empty message that you can re-use to avoid defining duplicated
+/// empty messages in your APIs. A typical example is to use it as the request
+/// or the response type of an API method. For instance:
+/// 
+///     service Foo {
+///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+///     }
+/// 
+/// The JSON representation for `Empty` is empty JSON object `{}`.
 /// 
 /// # Activities
 /// 
@@ -597,15 +625,17 @@ pub struct GerritSourceContext {
     /// A revision (commit) ID.
     #[serde(rename="revisionId")]
     pub revision_id: Option<String>,
+    /// The full project name within the host. Projects may be nested, so
+    /// "project/subproject" is a valid project name.
+    /// The "repo name" is hostURI/project.
+    #[serde(rename="gerritProject")]
+    pub gerrit_project: Option<String>,
     /// The URI of a running Gerrit instance.
     #[serde(rename="hostUri")]
     pub host_uri: Option<String>,
     /// The name of an alias (branch, tag, etc.).
     #[serde(rename="aliasName")]
     pub alias_name: Option<String>,
-    /// The full project name within the host. Projects may be nested, so "project/subproject" is a valid project name. The "repo name" is hostURI/project.
-    #[serde(rename="gerritProject")]
-    pub gerrit_project: Option<String>,
 }
 
 impl Part for GerritSourceContext {}
@@ -622,14 +652,16 @@ impl Part for GerritSourceContext {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RegisterDebuggeeResponse {
-    /// Debuggee resource. The field `id` is guranteed to be set (in addition to the echoed fields).
+    /// Debuggee resource.
+    /// The field `id` is guranteed to be set (in addition to the echoed fields).
     pub debuggee: Option<Debuggee>,
 }
 
 impl ResponseResult for RegisterDebuggeeResponse {}
 
 
-/// A SourceContext is a reference to a tree of files. A SourceContext together with a path point to a unique revision of a single file or directory.
+/// A SourceContext is a reference to a tree of files. A SourceContext together
+/// with a path point to a unique revision of a single file or directory.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -661,7 +693,8 @@ impl Part for SourceContext {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UpdateActiveBreakpointRequest {
-    /// Updated breakpoint information. The field 'id' must be set.
+    /// Updated breakpoint information.
+    /// The field 'id' must be set.
     pub breakpoint: Option<Breakpoint>,
 }
 
@@ -683,35 +716,61 @@ pub struct SourceLocation {
 impl Part for SourceLocation {}
 
 
-/// Represents the application to debug. The application may include one or more replicated processes executing the same code. Each of these processes is attached with a debugger agent, carrying out the debugging commands. The agents attached to the same debuggee are identified by using exactly the same field values when registering.
+/// Represents the application to debug. The application may include one or more
+/// replicated processes executing the same code. Each of these processes is
+/// attached with a debugger agent, carrying out the debugging commands.
+/// The agents attached to the same debuggee are identified by using exactly the
+/// same field values when registering.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Debuggee {
-    /// Human readable message to be displayed to the user about this debuggee. Absence of this field indicates no status. The message can be either informational or an error status.
+    /// Human readable message to be displayed to the user about this debuggee.
+    /// Absence of this field indicates no status. The message can be either
+    /// informational or an error status.
     pub status: Option<StatusMessage>,
-    /// Human readable description of the debuggee. Including a human-readable project name, environment name and version information is recommended.
+    /// Human readable description of the debuggee.
+    /// Including a human-readable project name, environment name and version
+    /// information is recommended.
     pub description: Option<String>,
-    /// If set to `true`, indicates that the agent should disable itself and detach from the debuggee.
+    /// If set to `true`, indicates that the agent should disable itself and
+    /// detach from the debuggee.
     #[serde(rename="isDisabled")]
     pub is_disabled: Option<bool>,
-    /// A set of custom debuggee properties, populated by the agent, to be displayed to the user.
+    /// A set of custom debuggee properties, populated by the agent, to be
+    /// displayed to the user.
     pub labels: Option<HashMap<String, String>>,
-    /// Debuggee uniquifier within the project. Any string that identifies the application within the project can be used. Including environment and version or build IDs is recommended.
+    /// Debuggee uniquifier within the project.
+    /// Any string that identifies the application within the project can be used.
+    /// Including environment and version or build IDs is recommended.
     pub uniquifier: Option<String>,
-    /// Project the debuggee is associated with. Use the project number when registering a Google Cloud Platform project.
+    /// Project the debuggee is associated with.
+    /// Use the project number when registering a Google Cloud Platform project.
     pub project: Option<String>,
-    /// References to the locations and revisions of the source code used in the deployed application. NOTE: This field is deprecated. Consumers should use `ext_source_contexts` if it is not empty. Debug agents should populate both this field and `ext_source_contexts`.
+    /// References to the locations and revisions of the source code used in the
+    /// deployed application.
+    /// 
+    /// NOTE: This field is deprecated. Consumers should use
+    /// `ext_source_contexts` if it is not empty. Debug agents should populate
+    /// both this field and `ext_source_contexts`.
     #[serde(rename="sourceContexts")]
     pub source_contexts: Option<Vec<SourceContext>>,
-    /// References to the locations and revisions of the source code used in the deployed application. Contexts describing a remote repo related to the source code have a `category` label of `remote_repo`. Source snapshot source contexts have a `category` of `snapshot`.
+    /// References to the locations and revisions of the source code used in the
+    /// deployed application.
+    /// 
+    /// Contexts describing a remote repo related to the source code
+    /// have a `category` label of `remote_repo`. Source snapshot source
+    /// contexts have a `category` of `snapshot`.
     #[serde(rename="extSourceContexts")]
     pub ext_source_contexts: Option<Vec<ExtendedSourceContext>>,
-    /// Version ID of the agent release. The version ID is structured as following: `domain/type/vmajor.minor` (for example `google.com/gcp-java/v1.1`).
+    /// Version ID of the agent release. The version ID is structured as
+    /// following: `domain/type/vmajor.minor` (for example
+    /// `google.com/gcp-java/v1.1`).
     #[serde(rename="agentVersion")]
     pub agent_version: Option<String>,
-    /// If set to `true`, indicates that the debuggee is considered as inactive by the Controller service.
+    /// If set to `true`, indicates that the debuggee is considered as inactive by
+    /// the Controller service.
     #[serde(rename="isInactive")]
     pub is_inactive: Option<bool>,
     /// Unique identifier for the debuggee generated by the controller service.
@@ -729,14 +788,23 @@ impl Part for Debuggee {}
 pub struct FormatMessage {
     /// Optional parameters to be embedded into the message.
     pub parameters: Option<Vec<String>>,
-    /// Format template for the message. The `format` uses placeholders `$0`, `$1`, etc. to reference parameters. `$$` can be used to denote the `$` character. Examples: * `Failed to load '$0' which helps debug $1 the first time it is loaded. Again, $0 is very important.` * `Please pay $$10 to use $0 instead of $1.`
+    /// Format template for the message. The `format` uses placeholders `$0`,
+    /// `$1`, etc. to reference parameters. `$$` can be used to denote the `$`
+    /// character.
+    /// 
+    /// Examples:
+    /// 
+    /// *   `Failed to load '$0' which helps debug $1 the first time it
+    ///     is loaded.  Again, $0 is very important.`
+    /// *   `Please pay $$10 to use $0 instead of $1.`
     pub format: Option<String>,
 }
 
 impl Part for FormatMessage {}
 
 
-/// A GitSourceContext denotes a particular revision in a third party Git repository (e.g. GitHub).
+/// A GitSourceContext denotes a particular revision in a third party Git
+/// repository (e.g. GitHub).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -744,7 +812,8 @@ impl Part for FormatMessage {}
 pub struct GitSourceContext {
     /// Git repository URL.
     pub url: Option<String>,
-    /// Git commit hash. required.
+    /// Git commit hash.
+    /// required.
     #[serde(rename="revisionId")]
     pub revision_id: Option<String>,
 }
@@ -752,7 +821,9 @@ pub struct GitSourceContext {
 impl Part for GitSourceContext {}
 
 
-/// A CloudWorkspaceId is a unique identifier for a cloud workspace. A cloud workspace is a place associated with a repo where modified files can be stored before they are committed.
+/// A CloudWorkspaceId is a unique identifier for a cloud workspace.
+/// A cloud workspace is a place associated with a repo where modified files
+/// can be stored before they are committed.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -761,7 +832,8 @@ pub struct CloudWorkspaceId {
     /// The ID of the repo containing the workspace.
     #[serde(rename="repoId")]
     pub repo_id: Option<RepoId>,
-    /// The unique name of the workspace within the repo. This is the name chosen by the client in the Source API's CreateWorkspace method.
+    /// The unique name of the workspace within the repo.  This is the name
+    /// chosen by the client in the Source API's CreateWorkspace method.
     pub name: Option<String>,
 }
 
@@ -779,9 +851,34 @@ impl Part for CloudWorkspaceId {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Breakpoint {
-    /// Breakpoint status. The status includes an error flag and a human readable message. This field is usually unset. The message can be either informational or an error message. Regardless, clients should always display the text message back to the user. Error status indicates complete failure of the breakpoint. Example (non-final state): `Still loading symbols...` Examples (final state): * `Invalid line number` referring to location * `Field f not found in class C` referring to condition
+    /// Breakpoint status.
+    /// 
+    /// The status includes an error flag and a human readable message.
+    /// This field is usually unset. The message can be either
+    /// informational or an error message. Regardless, clients should always
+    /// display the text message back to the user.
+    /// 
+    /// Error status indicates complete failure of the breakpoint.
+    /// 
+    /// Example (non-final state): `Still loading symbols...`
+    /// 
+    /// Examples (final state):
+    /// 
+    /// *   `Invalid line number` referring to location
+    /// *   `Field f not found in class C` referring to condition
     pub status: Option<StatusMessage>,
-    /// The `variable_table` exists to aid with computation, memory and network traffic optimization. It enables storing a variable once and reference it from multiple variables, including variables stored in the `variable_table` itself. For example, the same `this` object, which may appear at many levels of the stack, can have all of its data stored once in this table. The stack frame variables then would hold only a reference to it. The variable `var_table_index` field is an index into this repeated field. The stored objects are nameless and get their name from the referencing variable. The effective variable is a merge of the referencing variable and the referenced variable.
+    /// The `variable_table` exists to aid with computation, memory and network
+    /// traffic optimization.  It enables storing a variable once and reference
+    /// it from multiple variables, including variables stored in the
+    /// `variable_table` itself.
+    /// For example, the same `this` object, which may appear at many levels of
+    /// the stack, can have all of its data stored once in this table.  The
+    /// stack frame variables then would hold only a reference to it.
+    /// 
+    /// The variable `var_table_index` field is an index into this repeated field.
+    /// The stored objects are nameless and get their name from the referencing
+    /// variable. The effective variable is a merge of the referencing variable
+    /// and the referenced variable.
     #[serde(rename="variableTable")]
     pub variable_table: Option<Vec<Variable>>,
     /// E-mail address of the user that created this breakpoint
@@ -790,24 +887,44 @@ pub struct Breakpoint {
     /// Indicates the severity of the log. Only relevant when action is `LOG`.
     #[serde(rename="logLevel")]
     pub log_level: Option<String>,
-    /// A set of custom breakpoint properties, populated by the agent, to be displayed to the user.
+    /// A set of custom breakpoint properties, populated by the agent, to be
+    /// displayed to the user.
     pub labels: Option<HashMap<String, String>>,
-    /// Time this breakpoint was finalized as seen by the server in seconds resolution.
+    /// Time this breakpoint was finalized as seen by the server in seconds
+    /// resolution.
     #[serde(rename="finalTime")]
     pub final_time: Option<String>,
     /// The stack at breakpoint time.
     #[serde(rename="stackFrames")]
     pub stack_frames: Option<Vec<StackFrame>>,
-    /// List of read-only expressions to evaluate at the breakpoint location. The expressions are composed using expressions in the programming language at the source location. If the breakpoint action is `LOG`, the evaluated expressions are included in log statements.
+    /// List of read-only expressions to evaluate at the breakpoint location.
+    /// The expressions are composed using expressions in the programming language
+    /// at the source location. If the breakpoint action is `LOG`, the evaluated
+    /// expressions are included in log statements.
     pub expressions: Option<Vec<String>>,
-    /// Values of evaluated expressions at breakpoint time. The evaluated expressions appear in exactly the same order they are listed in the `expressions` field. The `name` field holds the original expression text, the `value` or `members` field holds the result of the evaluated expression. If the expression cannot be evaluated, the `status` inside the `Variable` will indicate an error and contain the error text.
+    /// Values of evaluated expressions at breakpoint time.
+    /// The evaluated expressions appear in exactly the same order they
+    /// are listed in the `expressions` field.
+    /// The `name` field holds the original expression text, the `value` or
+    /// `members` field holds the result of the evaluated expression.
+    /// If the expression cannot be evaluated, the `status` inside the `Variable`
+    /// will indicate an error and contain the error text.
     #[serde(rename="evaluatedExpressions")]
     pub evaluated_expressions: Option<Vec<Variable>>,
     /// Breakpoint identifier, unique in the scope of the debuggee.
     pub id: Option<String>,
-    /// Condition that triggers the breakpoint. The condition is a compound boolean expression composed using expressions in a programming language at the source location.
+    /// Condition that triggers the breakpoint.
+    /// The condition is a compound boolean expression composed using expressions
+    /// in a programming language at the source location.
     pub condition: Option<String>,
-    /// Only relevant when action is `LOG`. Defines the message to log when the breakpoint hits. The message may include parameter placeholders `$0`, `$1`, etc. These placeholders are replaced with the evaluated value of the appropriate expression. Expressions not referenced in `log_message_format` are not logged. Example: `Message received, id = $0, count = $1` with `expressions` = `[ message.id, message.count ]`.
+    /// Only relevant when action is `LOG`. Defines the message to log when
+    /// the breakpoint hits. The message may include parameter placeholders `$0`,
+    /// `$1`, etc. These placeholders are replaced with the evaluated value
+    /// of the appropriate expression. Expressions not referenced in
+    /// `log_message_format` are not logged.
+    /// 
+    /// Example: `Message received, id = $0, count = $1` with
+    /// `expressions` = `[ message.id, message.count ]`.
     #[serde(rename="logMessageFormat")]
     pub log_message_format: Option<String>,
     /// Time this breakpoint was created by the server in seconds resolution.
@@ -815,9 +932,11 @@ pub struct Breakpoint {
     pub create_time: Option<String>,
     /// Breakpoint source location.
     pub location: Option<SourceLocation>,
-    /// Action that the agent should perform when the code at the breakpoint location is hit.
+    /// Action that the agent should perform when the code at the
+    /// breakpoint location is hit.
     pub action: Option<String>,
-    /// When true, indicates that this is a final result and the breakpoint state will not change from here on.
+    /// When true, indicates that this is a final result and the
+    /// breakpoint state will not change from here on.
     #[serde(rename="isFinalState")]
     pub is_final_state: Option<bool>,
 }
@@ -825,21 +944,151 @@ pub struct Breakpoint {
 impl RequestValue for Breakpoint {}
 
 
-/// Represents a variable or an argument possibly of a compound object type. Note how the following variables are represented: 1) A simple variable: int x = 5 { name: "x", value: "5", type: "int" } // Captured variable 2) A compound object: struct T { int m1; int m2; }; T x = { 3, 7 }; { // Captured variable name: "x", type: "T", members { name: "m1", value: "3", type: "int" }, members { name: "m2", value: "7", type: "int" } } 3) A pointer where the pointee was captured: T x = { 3, 7 }; T* p = &x; { // Captured variable name: "p", type: "T*", value: "0x00500500", members { name: "m1", value: "3", type: "int" }, members { name: "m2", value: "7", type: "int" } } 4) A pointer where the pointee was not captured: T* p = new T; { // Captured variable name: "p", type: "T*", value: "0x00400400" status { is_error: true, description { format: "unavailable" } } } The status should describe the reason for the missing value, such as ``, ``, `
-/// `. Note that a null pointer should not have members. 5) An unnamed value: int* p = new int(7); { // Captured variable name: "p", value: "0x00500500", type: "int*", members { value: "7", type: "int" } } 6) An unnamed pointer where the pointee was not captured: int* p = new int(7); int** pp = &p; { // Captured variable name: "pp", value: "0x00500500", type: "int**", members { value: "0x00400400", type: "int*" status { is_error: true, description: { format: "unavailable" } } } } } To optimize computation, memory and network traffic, variables that repeat in the output multiple times can be stored once in a shared variable table and be referenced using the `var_table_index` field. The variables stored in the shared table are nameless and are essentially a partition of the complete variable. To reconstruct the complete variable, merge the referencing variable with the referenced variable. When using the shared variable table, the following variables: T x = { 3, 7 }; T* p = &x; T& r = x; { name: "x", var_table_index: 3, type: "T" } // Captured variables { name: "p", value "0x00500500", type="T*", var_table_index: 3 } { name: "r", type="T&", var_table_index: 3 } { // Shared variable table entry #3: members { name: "m1", value: "3", type: "int" }, members { name: "m2", value: "7", type: "int" } } Note that the pointer address is stored with the referencing variable and not with the referenced variable. This allows the referenced variable to be shared between pointers and references. The type field is optional. The debugger agent may or may not support it.
+/// Represents a variable or an argument possibly of a compound object type.
+/// Note how the following variables are represented:
+/// 
+/// 1) A simple variable:
+/// 
+///     int x = 5
+/// 
+///     { name: "x", value: "5", type: "int" }  // Captured variable
+/// 
+/// 2) A compound object:
+/// 
+///     struct T {
+///         int m1;
+///         int m2;
+///     };
+///     T x = { 3, 7 };
+/// 
+///     {  // Captured variable
+///         name: "x",
+///         type: "T",
+///         members { name: "m1", value: "3", type: "int" },
+///         members { name: "m2", value: "7", type: "int" }
+///     }
+/// 
+/// 3) A pointer where the pointee was captured:
+/// 
+///     T x = { 3, 7 };
+///     T* p = &x;
+/// 
+///     {   // Captured variable
+///         name: "p",
+///         type: "T*",
+///         value: "0x00500500",
+///         members { name: "m1", value: "3", type: "int" },
+///         members { name: "m2", value: "7", type: "int" }
+///     }
+/// 
+/// 4) A pointer where the pointee was not captured:
+/// 
+///     T* p = new T;
+/// 
+///     {   // Captured variable
+///         name: "p",
+///         type: "T*",
+///         value: "0x00400400"
+///         status { is_error: true, description { format: "unavailable" } }
+///     }
+/// 
+/// The status should describe the reason for the missing value,
+/// such as `<optimized out>`, `<inaccessible>`, `<pointers limit reached>`.
+/// 
+/// Note that a null pointer should not have members.
+/// 
+/// 5) An unnamed value:
+/// 
+///     int* p = new int(7);
+/// 
+///     {   // Captured variable
+///         name: "p",
+///         value: "0x00500500",
+///         type: "int*",
+///         members { value: "7", type: "int" } }
+/// 
+/// 6) An unnamed pointer where the pointee was not captured:
+/// 
+///     int* p = new int(7);
+///     int** pp = &p;
+/// 
+///     {  // Captured variable
+///         name: "pp",
+///         value: "0x00500500",
+///         type: "int**",
+///         members {
+///             value: "0x00400400",
+///             type: "int*"
+///             status {
+///                 is_error: true,
+///                 description: { format: "unavailable" } }
+///             }
+///         }
+///     }
+/// 
+/// To optimize computation, memory and network traffic, variables that
+/// repeat in the output multiple times can be stored once in a shared
+/// variable table and be referenced using the `var_table_index` field.  The
+/// variables stored in the shared table are nameless and are essentially
+/// a partition of the complete variable. To reconstruct the complete
+/// variable, merge the referencing variable with the referenced variable.
+/// 
+/// When using the shared variable table, the following variables:
+/// 
+///     T x = { 3, 7 };
+///     T* p = &x;
+///     T& r = x;
+/// 
+///     { name: "x", var_table_index: 3, type: "T" }  // Captured variables
+///     { name: "p", value "0x00500500", type="T*", var_table_index: 3 }
+///     { name: "r", type="T&", var_table_index: 3 }
+/// 
+///     {  // Shared variable table entry #3:
+///         members { name: "m1", value: "3", type: "int" },
+///         members { name: "m2", value: "7", type: "int" }
+///     }
+/// 
+/// Note that the pointer address is stored with the referencing variable
+/// and not with the referenced variable. This allows the referenced variable
+/// to be shared between pointers and references.
+/// 
+/// The type field is optional. The debugger agent may or may not support it.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Variable {
-    /// Status associated with the variable. This field will usually stay unset. A status of a single variable only applies to that variable or expression. The rest of breakpoint data still remains valid. Variables might be reported in error state even when breakpoint is not in final state. The message may refer to variable name with `refers_to` set to `VARIABLE_NAME`. Alternatively `refers_to` will be set to `VARIABLE_VALUE`. In either case variable value and members will be unset. Example of error message applied to name: `Invalid expression syntax`. Example of information message applied to value: `Not captured`. Examples of error message applied to value: * `Malformed string`, * `Field f not found in class C` * `Null pointer dereference`
+    /// Status associated with the variable. This field will usually stay
+    /// unset. A status of a single variable only applies to that variable or
+    /// expression. The rest of breakpoint data still remains valid. Variables
+    /// might be reported in error state even when breakpoint is not in final
+    /// state.
+    /// 
+    /// The message may refer to variable name with `refers_to` set to
+    /// `VARIABLE_NAME`. Alternatively `refers_to` will be set to `VARIABLE_VALUE`.
+    /// In either case variable value and members will be unset.
+    /// 
+    /// Example of error message applied to name: `Invalid expression syntax`.
+    /// 
+    /// Example of information message applied to value: `Not captured`.
+    /// 
+    /// Examples of error message applied to value:
+    /// 
+    /// *   `Malformed string`,
+    /// *   `Field f not found in class C`
+    /// *   `Null pointer dereference`
     pub status: Option<StatusMessage>,
     /// Name of the variable, if any.
     pub name: Option<String>,
-    /// Reference to a variable in the shared variable table. More than one variable can reference the same variable in the table. The `var_table_index` field is an index into `variable_table` in Breakpoint.
+    /// Reference to a variable in the shared variable table. More than
+    /// one variable can reference the same variable in the table. The
+    /// `var_table_index` field is an index into `variable_table` in Breakpoint.
     #[serde(rename="varTableIndex")]
     pub var_table_index: Option<i32>,
-    /// Variable type (e.g. `MyClass`). If the variable is split with `var_table_index`, `type` goes next to `value`. The interpretation of a type is agent specific. It is recommended to include the dynamic type rather than a static type of an object.
+    /// Variable type (e.g. `MyClass`). If the variable is split with
+    /// `var_table_index`, `type` goes next to `value`. The interpretation of
+    /// a type is agent specific. It is recommended to include the dynamic type
+    /// rather than a static type of an object.
     #[serde(rename="type")]
     pub type_: Option<String>,
     /// Members contained or pointed to by the variable.
@@ -862,14 +1111,19 @@ impl Part for Variable {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SetBreakpointResponse {
-    /// Breakpoint resource. The field `id` is guaranteed to be set (in addition to the echoed fileds).
+    /// Breakpoint resource.
+    /// The field `id` is guaranteed to be set (in addition to the echoed fileds).
     pub breakpoint: Option<Breakpoint>,
 }
 
 impl ResponseResult for SetBreakpointResponse {}
 
 
-/// Represents a contextual status message. The message can indicate an error or informational status, and refer to specific parts of the containing object. For example, the `Breakpoint.status` field can indicate an error referring to the `BREAKPOINT_SOURCE_LOCATION` with the message `Location not found`.
+/// Represents a contextual status message.
+/// The message can indicate an error or informational status, and refer to
+/// specific parts of the containing object.
+/// For example, the `Breakpoint.status` field can indicate an error referring
+/// to the `BREAKPOINT_SOURCE_LOCATION` with the message `Location not found`.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -899,7 +1153,8 @@ impl Part for StatusMessage {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GetBreakpointResponse {
-    /// Complete breakpoint state. The fields `id` and `location` are guaranteed to be set.
+    /// Complete breakpoint state.
+    /// The fields `id` and `location` are guaranteed to be set.
     pub breakpoint: Option<Breakpoint>,
 }
 
@@ -951,7 +1206,15 @@ impl<'a, C, A> ControllerMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the breakpoint state or mutable fields. The entire Breakpoint message must be sent back to the controller service. Updates to active breakpoint fields are only allowed if the new value does not change the breakpoint specification. Updates to the `location`, `condition` and `expression` fields should not alter the breakpoint semantics. These may only make changes such as canonicalizing a value or snapping the location to the correct line of code.
+    /// Updates the breakpoint state or mutable fields.
+    /// The entire Breakpoint message must be sent back to the controller
+    /// service.
+    /// 
+    /// Updates to active breakpoint fields are only allowed if the new value
+    /// does not change the breakpoint specification. Updates to the `location`,
+    /// `condition` and `expression` fields should not alter the breakpoint
+    /// semantics. These may only make changes such as canonicalizing a value
+    /// or snapping the location to the correct line of code.
     /// 
     /// # Arguments
     ///
@@ -972,7 +1235,16 @@ impl<'a, C, A> ControllerMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Registers the debuggee with the controller service. All agents attached to the same application should call this method with the same request content to get back the same stable `debuggee_id`. Agents should call this method again whenever `google.rpc.Code.NOT_FOUND` is returned from any controller method. This allows the controller service to disable the agent or recover from any data loss. If the debuggee is disabled by the server, the response will have `is_disabled` set to `true`.
+    /// Registers the debuggee with the controller service.
+    /// 
+    /// All agents attached to the same application should call this method with
+    /// the same request content to get back the same stable `debuggee_id`. Agents
+    /// should call this method again whenever `google.rpc.Code.NOT_FOUND` is
+    /// returned from any controller method.
+    /// 
+    /// This allows the controller service to disable the agent or recover from any
+    /// data loss. If the debuggee is disabled by the server, the response will
+    /// have `is_disabled` set to `true`.
     /// 
     /// # Arguments
     ///
@@ -989,7 +1261,19 @@ impl<'a, C, A> ControllerMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns the list of all active breakpoints for the debuggee. The breakpoint specification (location, condition, and expression fields) is semantically immutable, although the field values may change. For example, an agent may update the location line number to reflect the actual line where the breakpoint was set, but this doesn't change the breakpoint semantics. This means that an agent does not need to check if a breakpoint has changed when it encounters the same breakpoint on a successive call. Moreover, an agent should remember the breakpoints that are completed until the controller removes them from the active list to avoid setting those breakpoints again.
+    /// Returns the list of all active breakpoints for the debuggee.
+    /// 
+    /// The breakpoint specification (location, condition, and expression
+    /// fields) is semantically immutable, although the field values may
+    /// change. For example, an agent may update the location line number
+    /// to reflect the actual line where the breakpoint was set, but this
+    /// doesn't change the breakpoint semantics.
+    /// 
+    /// This means that an agent does not need to check if a breakpoint has changed
+    /// when it encounters the same breakpoint on a successive call.
+    /// Moreover, an agent should remember the breakpoints that are completed
+    /// until the controller removes them from the active list to avoid
+    /// setting those breakpoints again.
     /// 
     /// # Arguments
     ///
@@ -1154,7 +1438,15 @@ impl<'a, C, A> DebuggerMethods<'a, C, A> {
 // CallBuilders   ###
 // #################
 
-/// Updates the breakpoint state or mutable fields. The entire Breakpoint message must be sent back to the controller service. Updates to active breakpoint fields are only allowed if the new value does not change the breakpoint specification. Updates to the `location`, `condition` and `expression` fields should not alter the breakpoint semantics. These may only make changes such as canonicalizing a value or snapping the location to the correct line of code.
+/// Updates the breakpoint state or mutable fields.
+/// The entire Breakpoint message must be sent back to the controller
+/// service.
+/// 
+/// Updates to active breakpoint fields are only allowed if the new value
+/// does not change the breakpoint specification. Updates to the `location`,
+/// `condition` and `expression` fields should not alter the breakpoint
+/// semantics. These may only make changes such as canonicalizing a value
+/// or snapping the location to the correct line of code.
 ///
 /// A builder for the *debuggees.breakpoints.update* method supported by a *controller* resource.
 /// It is not used directly, but through a `ControllerMethods` instance.
@@ -1405,12 +1697,12 @@ impl<'a, C, A> ControllerDebuggeeBreakpointUpdateCall<'a, C, A> where C: BorrowM
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ControllerDebuggeeBreakpointUpdateCall<'a, C, A>
@@ -1438,7 +1730,16 @@ impl<'a, C, A> ControllerDebuggeeBreakpointUpdateCall<'a, C, A> where C: BorrowM
 }
 
 
-/// Registers the debuggee with the controller service. All agents attached to the same application should call this method with the same request content to get back the same stable `debuggee_id`. Agents should call this method again whenever `google.rpc.Code.NOT_FOUND` is returned from any controller method. This allows the controller service to disable the agent or recover from any data loss. If the debuggee is disabled by the server, the response will have `is_disabled` set to `true`.
+/// Registers the debuggee with the controller service.
+/// 
+/// All agents attached to the same application should call this method with
+/// the same request content to get back the same stable `debuggee_id`. Agents
+/// should call this method again whenever `google.rpc.Code.NOT_FOUND` is
+/// returned from any controller method.
+/// 
+/// This allows the controller service to disable the agent or recover from any
+/// data loss. If the debuggee is disabled by the server, the response will
+/// have `is_disabled` set to `true`.
 ///
 /// A builder for the *debuggees.register* method supported by a *controller* resource.
 /// It is not used directly, but through a `ControllerMethods` instance.
@@ -1644,12 +1945,12 @@ impl<'a, C, A> ControllerDebuggeeRegisterCall<'a, C, A> where C: BorrowMut<hyper
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ControllerDebuggeeRegisterCall<'a, C, A>
@@ -1677,7 +1978,19 @@ impl<'a, C, A> ControllerDebuggeeRegisterCall<'a, C, A> where C: BorrowMut<hyper
 }
 
 
-/// Returns the list of all active breakpoints for the debuggee. The breakpoint specification (location, condition, and expression fields) is semantically immutable, although the field values may change. For example, an agent may update the location line number to reflect the actual line where the breakpoint was set, but this doesn't change the breakpoint semantics. This means that an agent does not need to check if a breakpoint has changed when it encounters the same breakpoint on a successive call. Moreover, an agent should remember the breakpoints that are completed until the controller removes them from the active list to avoid setting those breakpoints again.
+/// Returns the list of all active breakpoints for the debuggee.
+/// 
+/// The breakpoint specification (location, condition, and expression
+/// fields) is semantically immutable, although the field values may
+/// change. For example, an agent may update the location line number
+/// to reflect the actual line where the breakpoint was set, but this
+/// doesn't change the breakpoint semantics.
+/// 
+/// This means that an agent does not need to check if a breakpoint has changed
+/// when it encounters the same breakpoint on a successive call.
+/// Moreover, an agent should remember the breakpoints that are completed
+/// until the controller removes them from the active list to avoid
+/// setting those breakpoints again.
 ///
 /// A builder for the *debuggees.breakpoints.list* method supported by a *controller* resource.
 /// It is not used directly, but through a `ControllerMethods` instance.
@@ -1870,14 +2183,21 @@ impl<'a, C, A> ControllerDebuggeeBreakpointListCall<'a, C, A> where C: BorrowMut
         self._debuggee_id = new_value.to_string();
         self
     }
-    /// A wait token that, if specified, blocks the method call until the list of active breakpoints has changed, or a server selected timeout has expired. The value should be set from the last returned response.
+    /// A wait token that, if specified, blocks the method call until the list
+    /// of active breakpoints has changed, or a server selected timeout has
+    /// expired.  The value should be set from the last returned response.
     ///
     /// Sets the *wait token* query property to the given value.
     pub fn wait_token(mut self, new_value: &str) -> ControllerDebuggeeBreakpointListCall<'a, C, A> {
         self._wait_token = Some(new_value.to_string());
         self
     }
-    /// If set to `true`, returns `google.rpc.Code.OK` status and sets the `wait_expired` response field to `true` when the server-selected timeout has expired (recommended). If set to `false`, returns `google.rpc.Code.ABORTED` status when the server-selected timeout has expired (deprecated).
+    /// If set to `true`, returns `google.rpc.Code.OK` status and sets the
+    /// `wait_expired` response field to `true` when the server-selected timeout
+    /// has expired (recommended).
+    /// 
+    /// If set to `false`, returns `google.rpc.Code.ABORTED` status when the
+    /// server-selected timeout has expired (deprecated).
     ///
     /// Sets the *success on timeout* query property to the given value.
     pub fn success_on_timeout(mut self, new_value: bool) -> ControllerDebuggeeBreakpointListCall<'a, C, A> {
@@ -1909,12 +2229,12 @@ impl<'a, C, A> ControllerDebuggeeBreakpointListCall<'a, C, A> where C: BorrowMut
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ControllerDebuggeeBreakpointListCall<'a, C, A>
@@ -2142,7 +2462,8 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointGetCall<'a, C, A> where C: BorrowMut<hy
         self._breakpoint_id = new_value.to_string();
         self
     }
-    /// The client version making the call. Following: `domain/type/version` (e.g., `google.com/intellij/v1`).
+    /// The client version making the call.
+    /// Following: `domain/type/version` (e.g., `google.com/intellij/v1`).
     ///
     /// Sets the *client version* query property to the given value.
     pub fn client_version(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointGetCall<'a, C, A> {
@@ -2174,12 +2495,12 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointGetCall<'a, C, A> where C: BorrowMut<hy
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> DebuggerDebuggeeBreakpointGetCall<'a, C, A>
@@ -2407,7 +2728,8 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointDeleteCall<'a, C, A> where C: BorrowMut
         self._breakpoint_id = new_value.to_string();
         self
     }
-    /// The client version making the call. Following: `domain/type/version` (e.g., `google.com/intellij/v1`).
+    /// The client version making the call.
+    /// Following: `domain/type/version` (e.g., `google.com/intellij/v1`).
     ///
     /// Sets the *client version* query property to the given value.
     pub fn client_version(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointDeleteCall<'a, C, A> {
@@ -2439,12 +2761,12 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointDeleteCall<'a, C, A> where C: BorrowMut
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> DebuggerDebuggeeBreakpointDeleteCall<'a, C, A>
@@ -2644,14 +2966,16 @@ impl<'a, C, A> DebuggerDebuggeeListCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._project = Some(new_value.to_string());
         self
     }
-    /// When set to `true`, the result includes all debuggees. Otherwise, the result includes only debuggees that are active.
+    /// When set to `true`, the result includes all debuggees. Otherwise, the
+    /// result includes only debuggees that are active.
     ///
     /// Sets the *include inactive* query property to the given value.
     pub fn include_inactive(mut self, new_value: bool) -> DebuggerDebuggeeListCall<'a, C, A> {
         self._include_inactive = Some(new_value);
         self
     }
-    /// The client version making the call. Following: `domain/type/version` (e.g., `google.com/intellij/v1`).
+    /// The client version making the call.
+    /// Following: `domain/type/version` (e.g., `google.com/intellij/v1`).
     ///
     /// Sets the *client version* query property to the given value.
     pub fn client_version(mut self, new_value: &str) -> DebuggerDebuggeeListCall<'a, C, A> {
@@ -2683,12 +3007,12 @@ impl<'a, C, A> DebuggerDebuggeeListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> DebuggerDebuggeeListCall<'a, C, A>
@@ -2935,7 +3259,8 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointSetCall<'a, C, A> where C: BorrowMut<hy
         self._debuggee_id = new_value.to_string();
         self
     }
-    /// The client version making the call. Following: `domain/type/version` (e.g., `google.com/intellij/v1`).
+    /// The client version making the call.
+    /// Following: `domain/type/version` (e.g., `google.com/intellij/v1`).
     ///
     /// Sets the *client version* query property to the given value.
     pub fn client_version(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointSetCall<'a, C, A> {
@@ -2967,12 +3292,12 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointSetCall<'a, C, A> where C: BorrowMut<hy
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> DebuggerDebuggeeBreakpointSetCall<'a, C, A>
@@ -3213,35 +3538,43 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointListCall<'a, C, A> where C: BorrowMut<h
         self._debuggee_id = new_value.to_string();
         self
     }
-    /// A wait token that, if specified, blocks the call until the breakpoints list has changed, or a server selected timeout has expired. The value should be set from the last response. The error code `google.rpc.Code.ABORTED` (RPC) is returned on wait timeout, which should be called again with the same `wait_token`.
+    /// A wait token that, if specified, blocks the call until the breakpoints
+    /// list has changed, or a server selected timeout has expired.  The value
+    /// should be set from the last response. The error code
+    /// `google.rpc.Code.ABORTED` (RPC) is returned on wait timeout, which
+    /// should be called again with the same `wait_token`.
     ///
     /// Sets the *wait token* query property to the given value.
     pub fn wait_token(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointListCall<'a, C, A> {
         self._wait_token = Some(new_value.to_string());
         self
     }
-    /// When set to `true`, the response breakpoints are stripped of the results fields: `stack_frames`, `evaluated_expressions` and `variable_table`.
+    /// This field is deprecated. The following fields are always stripped out of
+    /// the result: `stack_frames`, `evaluated_expressions` and `variable_table`.
     ///
     /// Sets the *strip results* query property to the given value.
     pub fn strip_results(mut self, new_value: bool) -> DebuggerDebuggeeBreakpointListCall<'a, C, A> {
         self._strip_results = Some(new_value);
         self
     }
-    /// When set to `true`, the response includes active and inactive breakpoints. Otherwise, it includes only active breakpoints.
+    /// When set to `true`, the response includes active and inactive
+    /// breakpoints. Otherwise, it includes only active breakpoints.
     ///
     /// Sets the *include inactive* query property to the given value.
     pub fn include_inactive(mut self, new_value: bool) -> DebuggerDebuggeeBreakpointListCall<'a, C, A> {
         self._include_inactive = Some(new_value);
         self
     }
-    /// When set to `true`, the response includes the list of breakpoints set by any user. Otherwise, it includes only breakpoints set by the caller.
+    /// When set to `true`, the response includes the list of breakpoints set by
+    /// any user. Otherwise, it includes only breakpoints set by the caller.
     ///
     /// Sets the *include all users* query property to the given value.
     pub fn include_all_users(mut self, new_value: bool) -> DebuggerDebuggeeBreakpointListCall<'a, C, A> {
         self._include_all_users = Some(new_value);
         self
     }
-    /// The client version making the call. Following: `domain/type/version` (e.g., `google.com/intellij/v1`).
+    /// The client version making the call.
+    /// Following: `domain/type/version` (e.g., `google.com/intellij/v1`).
     ///
     /// Sets the *client version* query property to the given value.
     pub fn client_version(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointListCall<'a, C, A> {
@@ -3280,12 +3613,12 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointListCall<'a, C, A> where C: BorrowMut<h
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> DebuggerDebuggeeBreakpointListCall<'a, C, A>

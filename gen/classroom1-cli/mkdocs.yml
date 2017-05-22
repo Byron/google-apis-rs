@@ -1,4 +1,4 @@
-site_name: classroom v1.0.4+20161006
+site_name: classroom v1.0.4+20170510
 site_url: http://byron.github.io/google-apis-rs/google-classroom1-cli
 site_description: A complete library to interact with classroom (protocol v1)
 
@@ -13,8 +13,10 @@ pages:
 - ['courses_aliases-delete.md', 'Courses', 'Aliases Delete']
 - ['courses_aliases-list.md', 'Courses', 'Aliases List']
 - ['courses_course-work-create.md', 'Courses', 'Course Work Create']
+- ['courses_course-work-delete.md', 'Courses', 'Course Work Delete']
 - ['courses_course-work-get.md', 'Courses', 'Course Work Get']
 - ['courses_course-work-list.md', 'Courses', 'Course Work List']
+- ['courses_course-work-patch.md', 'Courses', 'Course Work Patch']
 - ['courses_course-work-student-submissions-get.md', 'Courses', 'Course Work Student Submissions Get']
 - ['courses_course-work-student-submissions-list.md', 'Courses', 'Course Work Student Submissions List']
 - ['courses_course-work-student-submissions-modify-attachments.md', 'Courses', 'Course Work Student Submissions Modify Attachments']

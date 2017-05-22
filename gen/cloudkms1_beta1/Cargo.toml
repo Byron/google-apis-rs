@@ -1,0 +1,28 @@
+# DO NOT EDIT !
+# This file was generated automatically from 'src/mako/Cargo.toml.mako'
+# DO NOT EDIT !
+[package]
+
+name = "google-cloudkms1_beta1"
+version = "1.0.4+20170515"
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
+description = "A complete library to interact with Cloud KMS (protocol v1beta1)"
+repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/cloudkms1_beta1"
+homepage = "https://cloud.google.com/kms/"
+documentation = "https://docs.rs/google-cloudkms1_beta1/1.0.4+20170515"
+license = "MIT"
+keywords = ["cloudkms", "google", "protocol", "web", "api"]
+
+
+[dependencies]
+hyper = "^ 0.10"
+mime = "^ 0.2.0"
+serde = "^ 0.9"
+serde_json = "^ 0.9"
+serde_derive = "^ 0.9"
+yup-oauth2 = "^ 1.0"
+url = "= 0.5"
+
+[features]
+
+

@@ -34,6 +34,8 @@ api:
     - consumersurveys
     - script
     - oauth2
+    # Recursive type - we don't handle cycles yet it appears
+    - slides
   terms:
     # how to actually do something with the API
     action: doit

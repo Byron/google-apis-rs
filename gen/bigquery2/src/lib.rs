@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *bigquery* crate version *1.0.4+20161130*, where *20161130* is the exact revision of the *bigquery:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
+//! This documentation was generated from *bigquery* crate version *1.0.4+20170511*, where *20170511* is the exact revision of the *bigquery:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
 //! 
 //! Everything else about the *bigquery* *v2* API can be found at the
 //! [official documentation site](https://cloud.google.com/bigquery/).
@@ -444,7 +444,7 @@ pub struct QueryRequest {
     /// [Optional] If set to true, BigQuery doesn't run the job. Instead, if the query is valid, BigQuery returns statistics about the job such as how many bytes would be processed. If the query is invalid, an error returns. The default value is false.
     #[serde(rename="dryRun")]
     pub dry_run: Option<bool>,
-    /// [Experimental] Standard SQL only. Whether to use positional (?) or named (@myparam) query parameters in this query.
+    /// Standard SQL only. Set to POSITIONAL to use positional (?) query parameters or to NAMED to use named (@myparam) query parameters in this query.
     #[serde(rename="parameterMode")]
     pub parameter_mode: Option<String>,
     /// [Optional] Whether to look for the result in the query cache. The query cache is a best-effort cache that will be flushed whenever tables in the query are modified. The default value is true.
@@ -459,7 +459,7 @@ pub struct QueryRequest {
     /// [Optional] The maximum number of rows of data to return per page of results. Setting this flag to a small value such as 1000 and then paging through results might improve reliability when the query result set is large. In addition to this limit, responses are also limited to 10 MB. By default, there is no maximum row count, and only the byte limit applies.
     #[serde(rename="maxResults")]
     pub max_results: Option<u32>,
-    /// [Experimental] Query parameters for Standard SQL queries.
+    /// Query parameters for Standard SQL queries.
     #[serde(rename="queryParameters")]
     pub query_parameters: Option<Vec<QueryParameter>>,
     /// [Required] A query string, following the BigQuery query syntax, of the query to execute. Example: "SELECT count(f1) FROM [myProjectId:myDatasetId.myTableId]".
@@ -478,7 +478,7 @@ impl RequestValue for QueryRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobStatistics2 {
-    /// [Output-only, Experimental] Describes execution plan for the query.
+    /// [Output-only] Describes execution plan for the query.
     #[serde(rename="queryPlan")]
     pub query_plan: Option<Vec<ExplainQueryStage>>,
     /// [Output-only, Experimental] The type of query statement, if valid.
@@ -502,7 +502,7 @@ pub struct JobStatistics2 {
     /// [Output-only] Billing tier for the job.
     #[serde(rename="billingTier")]
     pub billing_tier: Option<i32>,
-    /// [Output-only, Experimental] The number of rows affected by a DML statement. Present only for DML statements INSERT, UPDATE or DELETE.
+    /// [Output-only] The number of rows affected by a DML statement. Present only for DML statements INSERT, UPDATE or DELETE.
     #[serde(rename="numDmlAffectedRows")]
     pub num_dml_affected_rows: Option<String>,
     /// [Output-only, Experimental] The schema of the results. Present only for successful dry run of non-legacy SQL queries.
@@ -533,6 +533,21 @@ pub struct JobStatistics3 {
 }
 
 impl Part for JobStatistics3 {}
+
+
+/// Additional details for a view.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TableListTablesView {
+    /// True if view is defined in legacy SQL dialect, false if in standard SQL.
+    #[serde(rename="useLegacySql")]
+    pub use_legacy_sql: Option<bool>,
+}
+
+impl NestedType for TableListTablesView {}
+impl Part for TableListTablesView {}
 
 
 /// Represents a single JSON object.
@@ -581,7 +596,7 @@ impl ResponseResult for ProjectList {}
 pub struct TableFieldSchema {
     /// [Optional] Describes the nested schema fields if the type property is set to RECORD.
     pub fields: Option<Vec<TableFieldSchema>>,
-    /// [Optional] The field description. The maximum length is 16K characters.
+    /// [Optional] The field description. The maximum length is 512 characters.
     pub description: Option<String>,
     /// [Required] The field data type. Possible values include STRING, BYTES, INTEGER, INT64 (same as INTEGER), FLOAT, FLOAT64 (same as FLOAT), BOOLEAN, BOOL (same as BOOLEAN), TIMESTAMP, DATE, TIME, DATETIME, RECORD (where RECORD indicates that the field contains a nested schema) or STRUCT (same as RECORD).
     #[serde(rename="type")]
@@ -758,6 +773,8 @@ impl Part for JobReference {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExplainQueryStage {
+    /// Current status for the stage.
+    pub status: Option<String>,
     /// Relative amount of time the slowest shard spent on CPU-bound tasks.
     #[serde(rename="computeRatioMax")]
     pub compute_ratio_max: Option<f64>,
@@ -810,7 +827,7 @@ pub struct DatasetListDatasets {
     pub friendly_name: Option<String>,
     /// The resource type. This property always returns the value "bigquery#dataset".
     pub kind: Option<String>,
-    /// [Experimental] The labels associated with this dataset. You can use these to organize and group your datasets.
+    /// The labels associated with this dataset. You can use these to organize and group your datasets.
     pub labels: Option<HashMap<String, String>>,
     /// The fully-qualified, unique, opaque ID of the dataset.
     pub id: Option<String>,
@@ -868,6 +885,8 @@ impl Part for UserDefinedFunctionResource {}
 pub struct TableListTables {
     /// The resource type.
     pub kind: Option<String>,
+    /// Additional details for a view.
+    pub view: Option<TableListTablesView>,
     /// The user-friendly name for this table.
     #[serde(rename="friendlyName")]
     pub friendly_name: Option<String>,
@@ -1060,7 +1079,7 @@ pub struct JobConfigurationLoad {
     /// [Optional] The number of rows at the top of a CSV file that BigQuery will skip when loading the data. The default value is 0. This property is useful if you have header rows in the file that should be skipped.
     #[serde(rename="skipLeadingRows")]
     pub skip_leading_rows: Option<i32>,
-    /// [Experimental] Indicates if we should automatically infer the options and schema for CSV and JSON sources.
+    /// Indicates if we should automatically infer the options and schema for CSV and JSON sources.
     pub autodetect: Option<bool>,
     /// [Required] The destination table to load the data into.
     #[serde(rename="destinationTable")]
@@ -1068,10 +1087,10 @@ pub struct JobConfigurationLoad {
     /// [Required] The fully-qualified URIs that point to your data in Google Cloud Storage. Each URI can contain one '*' wildcard character and it must come after the 'bucket' name.
     #[serde(rename="sourceUris")]
     pub source_uris: Option<Vec<String>>,
-    /// [Optional] This string will be interpreted as a null value when it appears in a CSV file. The default value is the empty string. Please refer to the documentation for further information.
+    /// [Optional] Specifies a string that represents a null value in a CSV file. For example, if you specify "\N", BigQuery interprets "\N" as a null value when loading a CSV file. The default value is the empty string. If you set this property to a custom value, BigQuery throws an error if an empty string is present for all data types except for STRING and BYTE. For STRING and BYTE columns, BigQuery interprets the empty string as an empty value.
     #[serde(rename="nullMarker")]
     pub null_marker: Option<String>,
-    /// [Experimental] If sourceFormat is set to "DATASTORE_BACKUP", indicates which entity properties to load into BigQuery from a Cloud Datastore backup. Property names are case sensitive and must be top-level properties. If no properties are specified, BigQuery loads all properties. If any named property isn't found in the Cloud Datastore backup, an invalid error is returned in the job result.
+    /// If sourceFormat is set to "DATASTORE_BACKUP", indicates which entity properties to load into BigQuery from a Cloud Datastore backup. Property names are case sensitive and must be top-level properties. If no properties are specified, BigQuery loads all properties. If any named property isn't found in the Cloud Datastore backup, an invalid error is returned in the job result.
     #[serde(rename="projectionFields")]
     pub projection_fields: Option<Vec<String>>,
     /// Indicates if BigQuery should allow quoted data sections that contain newline characters in a CSV file. The default value is false.
@@ -1209,7 +1228,7 @@ pub struct GetQueryResultsResponse {
     pub etag: Option<String>,
     /// An object with as many results as can be contained within the maximum permitted reply size. To get any additional rows, you can call GetQueryResults and specify the jobReference returned above. Present only when the query completes successfully.
     pub rows: Option<Vec<TableRow>>,
-    /// [Output-only, Experimental] The number of rows affected by a DML statement. Present only for DML statements INSERT, UPDATE or DELETE.
+    /// [Output-only] The number of rows affected by a DML statement. Present only for DML statements INSERT, UPDATE or DELETE.
     #[serde(rename="numDmlAffectedRows")]
     pub num_dml_affected_rows: Option<String>,
     /// The schema of the results. Present only when the query completes successfully.
@@ -1277,7 +1296,7 @@ pub struct ExternalDataConfiguration {
     /// Additional properties to set if sourceFormat is set to CSV.
     #[serde(rename="csvOptions")]
     pub csv_options: Option<CsvOptions>,
-    /// [Experimental] Try to detect schema and format options automatically. Any option specified explicitly will be honored.
+    /// Try to detect schema and format options automatically. Any option specified explicitly will be honored.
     pub autodetect: Option<bool>,
     /// [Optional] The maximum number of bad records that BigQuery can ignore when reading data. If the number of bad records exceeds this value, an invalid error is returned in the job result. The default value is 0, which requires that all records are valid. This setting is ignored for Google Cloud Bigtable, Google Cloud Datastore backups and Avro formats.
     #[serde(rename="maxBadRecords")]
@@ -1291,7 +1310,7 @@ pub struct ExternalDataConfiguration {
     /// [Optional] Additional options if sourceFormat is set to BIGTABLE.
     #[serde(rename="bigtableOptions")]
     pub bigtable_options: Option<BigtableOptions>,
-    /// [Required] The data format. For CSV files, specify "CSV". For Google sheets, specify "GOOGLE_SHEETS". For newline-delimited JSON, specify "NEWLINE_DELIMITED_JSON". For Avro files, specify "AVRO". For Google Cloud Datastore backups, specify "DATASTORE_BACKUP". [Experimental] For Google Cloud Bigtable, specify "BIGTABLE". Please note that reading from Google Cloud Bigtable is experimental and has to be enabled for your project. Please contact Google Cloud Support to enable this for your project.
+    /// [Required] The data format. For CSV files, specify "CSV". For Google sheets, specify "GOOGLE_SHEETS". For newline-delimited JSON, specify "NEWLINE_DELIMITED_JSON". For Avro files, specify "AVRO". For Google Cloud Datastore backups, specify "DATASTORE_BACKUP". [Beta] For Google Cloud Bigtable, specify "BIGTABLE".
     #[serde(rename="sourceFormat")]
     pub source_format: Option<String>,
     /// [Optional] Additional options if sourceFormat is set to GOOGLE_SHEETS.
@@ -1350,7 +1369,7 @@ pub struct ViewDefinition {
     /// Specifies whether to use BigQuery's legacy SQL for this view. The default value is true. If set to false, the view will use BigQuery's standard SQL: https://cloud.google.com/bigquery/sql-reference/ Queries and views that reference this view must use the same flag value.
     #[serde(rename="useLegacySql")]
     pub use_legacy_sql: Option<bool>,
-    /// [Experimental] Describes user-defined function resources used in the query.
+    /// Describes user-defined function resources used in the query.
     #[serde(rename="userDefinedFunctionResources")]
     pub user_defined_function_resources: Option<Vec<UserDefinedFunctionResource>>,
 }
@@ -1542,7 +1561,7 @@ impl Part for JobStatistics {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobConfigurationQuery {
-    /// [Optional] Flattens all nested and repeated fields in the query results. The default value is true. allowLargeResults must be true if this is set to false.
+    /// [Optional] If true and query uses legacy SQL dialect, flattens all nested and repeated fields in the query results. allowLargeResults must be true if this is set to false. For standard SQL queries, this flag is ignored and results are never flattened.
     #[serde(rename="flattenResults")]
     pub flatten_results: Option<bool>,
     /// [Optional] Whether to look for the result in the query cache. The query cache is a best-effort cache that will be flushed whenever tables in the query are modified. Moreover, the query cache is only available when a query does not have a destination table specified. The default value is true.
@@ -1554,7 +1573,7 @@ pub struct JobConfigurationQuery {
     /// Query parameters for standard SQL queries.
     #[serde(rename="queryParameters")]
     pub query_parameters: Option<Vec<QueryParameter>>,
-    /// [Required] BigQuery SQL query to execute.
+    /// [Required] SQL query text to execute. The useLegacySql field can be used to indicate whether the query uses legacy SQL or standard SQL.
     pub query: Option<String>,
     /// [Deprecated] This property is deprecated.
     #[serde(rename="preserveNulls")]
@@ -1565,7 +1584,7 @@ pub struct JobConfigurationQuery {
     /// [Optional] Limits the billing tier for this job. Queries that have resource usage beyond this tier will fail (without incurring a charge). If unspecified, this will be set to your project default.
     #[serde(rename="maximumBillingTier")]
     pub maximum_billing_tier: Option<i32>,
-    /// [Experimental] Standard SQL only. Whether to use positional (?) or named (@myparam) query parameters in this query.
+    /// Standard SQL only. Set to POSITIONAL to use positional (?) query parameters or to NAMED to use named (@myparam) query parameters in this query.
     #[serde(rename="parameterMode")]
     pub parameter_mode: Option<String>,
     /// [Optional] Specifies the default dataset to use for unqualified table names in the query.
@@ -1582,13 +1601,13 @@ pub struct JobConfigurationQuery {
     /// [Optional] Specifies the action that occurs if the destination table already exists. The following values are supported: WRITE_TRUNCATE: If the table already exists, BigQuery overwrites the table data. WRITE_APPEND: If the table already exists, BigQuery appends the data to the table. WRITE_EMPTY: If the table already exists and contains data, a 'duplicate' error is returned in the job result. The default value is WRITE_EMPTY. Each action is atomic and only occurs if BigQuery is able to complete the job successfully. Creation, truncation and append actions occur as one atomic update upon job completion.
     #[serde(rename="writeDisposition")]
     pub write_disposition: Option<String>,
-    /// If true, allows the query to produce arbitrarily large result tables at a slight cost in performance. Requires destinationTable to be set.
+    /// [Optional] If true and query uses legacy SQL dialect, allows the query to produce arbitrarily large result tables at a slight cost in performance. Requires destinationTable to be set. For standard SQL queries, this flag is ignored and large results are always allowed.
     #[serde(rename="allowLargeResults")]
     pub allow_large_results: Option<bool>,
     /// [Optional] Specifies whether the job is allowed to create new tables. The following values are supported: CREATE_IF_NEEDED: If the table does not exist, BigQuery creates the table. CREATE_NEVER: The table must already exist. If it does not, a 'notFound' error is returned in the job result. The default value is CREATE_IF_NEEDED. Creation, truncation and append actions occur as one atomic update upon job completion.
     #[serde(rename="createDisposition")]
     pub create_disposition: Option<String>,
-    /// [Experimental] Describes user-defined function resources used in the query.
+    /// Describes user-defined function resources used in the query.
     #[serde(rename="userDefinedFunctionResources")]
     pub user_defined_function_resources: Option<Vec<UserDefinedFunctionResource>>,
     /// [Optional] If querying an external data source outside of BigQuery, describes the data format, location and other properties of the data source. By defining these properties, the data source can then be queried as if it were a standard BigQuery table.
@@ -1644,7 +1663,7 @@ pub struct JobConfiguration {
     pub dry_run: Option<bool>,
     /// [Pick one] Configures a query job.
     pub query: Option<JobConfigurationQuery>,
-    /// [Experimental] The labels associated with this job. You can use these to organize and group your jobs. Label keys and values can be no longer than 63 characters, can only contain letters, numeric characters, underscores and dashes. International characters are allowed. Label values are optional. Label keys must start with a letter and must be unique within a dataset. Both keys and values are additionally constrained to be <= 128 bytes in size.
+    /// [Experimental] The labels associated with this job. You can use these to organize and group your jobs. Label keys and values can be no longer than 63 characters, can only contain lowercase letters, numeric characters, underscores and dashes. International characters are allowed. Label values are optional. Label keys must start with a letter and each label in the list must have a different key.
     pub labels: Option<HashMap<String, String>>,
     /// [Pick one] Configures an extract job.
     pub extract: Option<JobConfigurationExtract>,
@@ -1721,7 +1740,7 @@ pub struct Dataset {
     /// [Required] A reference that identifies the dataset.
     #[serde(rename="datasetReference")]
     pub dataset_reference: Option<DatasetReference>,
-    /// [Experimental] The labels associated with this dataset. You can use these to organize and group your datasets. You can set this property when inserting or updating a dataset. See Labeling Datasets for more information.
+    /// The labels associated with this dataset. You can use these to organize and group your datasets. You can set this property when inserting or updating a dataset. See Labeling Datasets for more information.
     pub labels: Option<HashMap<String, String>>,
     /// [Output-only] The time when this dataset was created, in milliseconds since the epoch.
     #[serde(rename="creationTime")]
@@ -1733,7 +1752,7 @@ pub struct Dataset {
     pub default_table_expiration_ms: Option<String>,
     /// [Output-only] A hash of the resource.
     pub etag: Option<String>,
-    /// [Experimental] The geographic location where the dataset should reside. Possible values include EU and US. The default value is US.
+    /// The geographic location where the dataset should reside. Possible values include EU and US. The default value is US.
     pub location: Option<String>,
     /// [Optional] A descriptive name for the dataset.
     #[serde(rename="friendlyName")]
@@ -1793,7 +1812,7 @@ pub struct Table {
     /// [Output-only] The time when this table was created, in milliseconds since the epoch.
     #[serde(rename="creationTime")]
     pub creation_time: Option<String>,
-    /// [Experimental] The labels associated with this table. You can use these to organize and group your tables. Label keys and values can be no longer than 63 characters, can only contain letters, numeric characters, underscores and dashes. International characters are allowed. Label values are optional. Label keys must start with a letter and must be unique within a dataset. Both keys and values are additionally constrained to be <= 128 bytes in size.
+    /// [Experimental] The labels associated with this table. You can use these to organize and group your tables. Label keys and values can be no longer than 63 characters, can only contain lowercase letters, numeric characters, underscores and dashes. International characters are allowed. Label values are optional. Label keys must start with a letter and each label in the list must have a different key.
     pub labels: Option<HashMap<String, String>>,
     /// [Output-only] The size of this table in bytes, excluding any data in the streaming buffer.
     #[serde(rename="numBytes")]
@@ -1906,7 +1925,7 @@ pub struct QueryResponse {
     pub page_token: Option<String>,
     /// An object with as many results as can be contained within the maximum permitted reply size. To get any additional rows, you can call GetQueryResults and specify the jobReference returned above.
     pub rows: Option<Vec<TableRow>>,
-    /// [Output-only, Experimental] The number of rows affected by a DML statement. Present only for DML statements INSERT, UPDATE or DELETE.
+    /// [Output-only] The number of rows affected by a DML statement. Present only for DML statements INSERT, UPDATE or DELETE.
     #[serde(rename="numDmlAffectedRows")]
     pub num_dml_affected_rows: Option<String>,
     /// The schema of the results. Present only when the query completes successfully.
@@ -2100,6 +2119,7 @@ impl<'a, C, A> TableMethods<'a, C, A> {
             _project_id: project_id.to_string(),
             _dataset_id: dataset_id.to_string(),
             _table_id: table_id.to_string(),
+            _selected_fields: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2533,6 +2553,7 @@ impl<'a, C, A> TabledataMethods<'a, C, A> {
             _dataset_id: dataset_id.to_string(),
             _table_id: table_id.to_string(),
             _start_index: Default::default(),
+            _selected_fields: Default::default(),
             _page_token: Default::default(),
             _max_results: Default::default(),
             _delegate: Default::default(),
@@ -3719,6 +3740,7 @@ impl<'a, C, A> TableDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.tables().get("projectId", "datasetId", "tableId")
+///              .selected_fields("et")
 ///              .doit();
 /// # }
 /// ```
@@ -3729,6 +3751,7 @@ pub struct TableGetCall<'a, C, A>
     _project_id: String,
     _dataset_id: String,
     _table_id: String,
+    _selected_fields: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -3750,11 +3773,14 @@ impl<'a, C, A> TableGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         };
         dlg.begin(MethodInfo { id: "bigquery.tables.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("projectId", self._project_id.to_string()));
         params.push(("datasetId", self._dataset_id.to_string()));
         params.push(("tableId", self._table_id.to_string()));
-        for &field in ["alt", "projectId", "datasetId", "tableId"].iter() {
+        if let Some(value) = self._selected_fields {
+            params.push(("selectedFields", value.to_string()));
+        }
+        for &field in ["alt", "projectId", "datasetId", "tableId", "selectedFields"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -3897,6 +3923,13 @@ impl<'a, C, A> TableGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     /// we provide this method for API completeness.
     pub fn table_id(mut self, new_value: &str) -> TableGetCall<'a, C, A> {
         self._table_id = new_value.to_string();
+        self
+    }
+    /// List of fields to return (comma-separated). If unspecified, all fields are returned
+    ///
+    /// Sets the *selected fields* query property to the given value.
+    pub fn selected_fields(mut self, new_value: &str) -> TableGetCall<'a, C, A> {
+        self._selected_fields = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -4793,10 +4826,10 @@ impl<'a, C, A> DatasetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.datasets().list("projectId")
-///              .page_token("Lorem")
-///              .max_results(26)
-///              .filter("erat")
-///              .all(false)
+///              .page_token("eos")
+///              .max_results(20)
+///              .filter("sadipscing")
+///              .all(true)
 ///              .doit();
 /// # }
 /// ```
@@ -5354,7 +5387,7 @@ impl<'a, C, A> DatasetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.datasets().delete("projectId", "datasetId")
-///              .delete_contents(false)
+///              .delete_contents(true)
 ///              .doit();
 /// # }
 /// ```
@@ -6381,10 +6414,10 @@ impl<'a, C, A> JobQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.jobs().get_query_results("projectId", "jobId")
-///              .timeout_ms(45)
-///              .start_index("sea")
-///              .page_token("et")
-///              .max_results(31)
+///              .timeout_ms(92)
+///              .start_index("et")
+///              .page_token("duo")
+///              .max_results(80)
 ///              .doit();
 /// # }
 /// ```
@@ -6676,10 +6709,10 @@ impl<'a, C, A> JobGetQueryResultCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.jobs().list("projectId")
-///              .add_state_filter("eirmod")
-///              .projection("sanctus")
-///              .page_token("et")
-///              .max_results(55)
+///              .add_state_filter("sanctus")
+///              .projection("et")
+///              .page_token("amet")
+///              .max_results(78)
 ///              .all_users(true)
 ///              .doit();
 /// # }
@@ -7887,9 +7920,10 @@ impl<'a, C, A> TabledataInsertAllCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.tabledata().list("projectId", "datasetId", "tableId")
-///              .start_index("amet.")
-///              .page_token("voluptua.")
-///              .max_results(45)
+///              .start_index("voluptua.")
+///              .selected_fields("Lorem")
+///              .page_token("gubergren")
+///              .max_results(81)
 ///              .doit();
 /// # }
 /// ```
@@ -7901,6 +7935,7 @@ pub struct TabledataListCall<'a, C, A>
     _dataset_id: String,
     _table_id: String,
     _start_index: Option<String>,
+    _selected_fields: Option<String>,
     _page_token: Option<String>,
     _max_results: Option<u32>,
     _delegate: Option<&'a mut Delegate>,
@@ -7924,12 +7959,15 @@ impl<'a, C, A> TabledataListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "bigquery.tabledata.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((9 + self._additional_params.len()));
         params.push(("projectId", self._project_id.to_string()));
         params.push(("datasetId", self._dataset_id.to_string()));
         params.push(("tableId", self._table_id.to_string()));
         if let Some(value) = self._start_index {
             params.push(("startIndex", value.to_string()));
+        }
+        if let Some(value) = self._selected_fields {
+            params.push(("selectedFields", value.to_string()));
         }
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -7937,7 +7975,7 @@ impl<'a, C, A> TabledataListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         if let Some(value) = self._max_results {
             params.push(("maxResults", value.to_string()));
         }
-        for &field in ["alt", "projectId", "datasetId", "tableId", "startIndex", "pageToken", "maxResults"].iter() {
+        for &field in ["alt", "projectId", "datasetId", "tableId", "startIndex", "selectedFields", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -8089,6 +8127,13 @@ impl<'a, C, A> TabledataListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._start_index = Some(new_value.to_string());
         self
     }
+    /// List of fields to return (comma-separated). If unspecified, all fields are returned
+    ///
+    /// Sets the *selected fields* query property to the given value.
+    pub fn selected_fields(mut self, new_value: &str) -> TabledataListCall<'a, C, A> {
+        self._selected_fields = Some(new_value.to_string());
+        self
+    }
     /// Page token, returned by a previous call, identifying the result set
     ///
     /// Sets the *page token* query property to the given value.
@@ -8182,8 +8227,8 @@ impl<'a, C, A> TabledataListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().list()
-///              .page_token("gubergren")
-///              .max_results(81)
+///              .page_token("sit")
+///              .max_results(75)
 ///              .doit();
 /// # }
 /// ```

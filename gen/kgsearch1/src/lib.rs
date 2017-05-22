@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *kgsearch* crate version *1.0.4+20151215*, where *20151215* is the exact revision of the *kgsearch:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
+//! This documentation was generated from *kgsearch* crate version *1.0.4+20170109*, where *20170109* is the exact revision of the *kgsearch:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
 //! 
 //! Everything else about the *kgsearch* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/knowledge-graph/).
@@ -321,7 +321,8 @@ impl<'a, C, A> Kgsearch<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// Response message includes the context and a list of matching results which contain the detail of associated entities.
+/// Response message includes the context and a list of matching results
+/// which contain the detail of associated entities.
 /// 
 /// # Activities
 /// 
@@ -332,14 +333,14 @@ impl<'a, C, A> Kgsearch<C, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SearchResponse {
-    /// The schema type of top-level JSON-LD object, e.g. ItemList.
-    #[serde(rename="type")]
-    pub type_: Option<String>,
+    /// The local context applicable for the response. See more details at
+    /// http://www.w3.org/TR/json-ld/#context-definitions.
+    pub @context: Option<String>,
     /// The item list of search results.
     #[serde(rename="itemListElement")]
     pub item_list_element: Option<Vec<String>>,
-    /// The local context applicable for the response. See more details at http://www.w3.org/TR/json-ld/#context-definitions.
-    pub context: Option<String>,
+    /// The schema type of top-level JSON-LD object, e.g. ItemList.
+    pub @type: Option<String>,
 }
 
 impl ResponseResult for SearchResponse {}
@@ -390,7 +391,9 @@ impl<'a, C, A> EntityMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Searches Knowledge Graph for entities that match the constraints. A list of matched entities will be returned in response, which will be in JSON-LD format and compatible with http://schema.org
+    /// Searches Knowledge Graph for entities that match the constraints.
+    /// A list of matched entities will be returned in response, which will be in
+    /// JSON-LD format and compatible with http://schema.org
     pub fn search(&self) -> EntitySearchCall<'a, C, A> {
         EntitySearchCall {
             hub: self.hub,
@@ -415,7 +418,9 @@ impl<'a, C, A> EntityMethods<'a, C, A> {
 // CallBuilders   ###
 // #################
 
-/// Searches Knowledge Graph for entities that match the constraints. A list of matched entities will be returned in response, which will be in JSON-LD format and compatible with http://schema.org
+/// Searches Knowledge Graph for entities that match the constraints.
+/// A list of matched entities will be returned in response, which will be in
+/// JSON-LD format and compatible with http://schema.org
 ///
 /// A builder for the *search* method supported by a *entity* resource.
 /// It is not used directly, but through a `EntityMethods` instance.
@@ -600,7 +605,9 @@ impl<'a, C, A> EntitySearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
-    /// Restricts returned entities with these types, e.g. Person (as defined in http://schema.org/Person).
+    /// Restricts returned entities with these types, e.g. Person
+    /// (as defined in http://schema.org/Person). If multiple types are specified,
+    /// returned entities will contain one or more of these types.
     ///
     /// Append the given value to the *types* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
@@ -629,7 +636,8 @@ impl<'a, C, A> EntitySearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._limit = Some(new_value);
         self
     }
-    /// The list of language codes (defined in ISO 693) to run the query with, e.g. 'en'.
+    /// The list of language codes (defined in ISO 693) to run the query with,
+    /// e.g. 'en'.
     ///
     /// Append the given value to the *languages* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
@@ -645,6 +653,8 @@ impl<'a, C, A> EntitySearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self
     }
     /// The list of entity id to be used for search instead of query string.
+    /// To specify multiple ids in the HTTP request, repeat the parameter in the
+    /// URL as in ...?ids=A&ids=B
     ///
     /// Append the given value to the *ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
@@ -677,12 +687,12 @@ impl<'a, C, A> EntitySearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EntitySearchCall<'a, C, A>

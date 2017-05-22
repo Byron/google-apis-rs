@@ -1,4 +1,4 @@
-site_name: analytics v1.0.4+20161004
+site_name: analytics v1.0.4+20170321
 site_url: http://byron.github.io/google-apis-rs/google-analytics3-cli
 site_description: A complete library to interact with analytics (protocol v3)
 
@@ -62,6 +62,7 @@ pages:
 - ['management_profiles-list.md', 'Management', 'Profiles List']
 - ['management_profiles-patch.md', 'Management', 'Profiles Patch']
 - ['management_profiles-update.md', 'Management', 'Profiles Update']
+- ['management_remarketing-audience-delete.md', 'Management', 'Remarketing Audience Delete']
 - ['management_remarketing-audience-get.md', 'Management', 'Remarketing Audience Get']
 - ['management_remarketing-audience-insert.md', 'Management', 'Remarketing Audience Insert']
 - ['management_remarketing-audience-list.md', 'Management', 'Remarketing Audience List']

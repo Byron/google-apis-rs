@@ -25,22 +25,17 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Shopping Content* API at revision *20161205*. The CLI is at version *1.0.4*.
+This documentation was generated from the *Shopping Content* API at revision *20170519*. The CLI is at version *1.0.4*.
 
 ```bash
 content2 [options]
         accounts
                 authinfo [-p <v>]... [-o <out>]
+                claimwebsite <merchant-id> <account-id> [-p <v>]... [-o <out>]
                 custombatch (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <merchant-id> <account-id> [-p <v>]...
                 get <merchant-id> <account-id> [-p <v>]... [-o <out>]
                 insert <merchant-id> (-r <kv>)... [-p <v>]... [-o <out>]
-                list <merchant-id> [-p <v>]... [-o <out>]
-                patch <merchant-id> <account-id> (-r <kv>)... [-p <v>]... [-o <out>]
-                update <merchant-id> <account-id> (-r <kv>)... [-p <v>]... [-o <out>]
-        accountshipping
-                custombatch (-r <kv>)... [-p <v>]... [-o <out>]
-                get <merchant-id> <account-id> [-p <v>]... [-o <out>]
                 list <merchant-id> [-p <v>]... [-o <out>]
                 patch <merchant-id> <account-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 update <merchant-id> <account-id> (-r <kv>)... [-p <v>]... [-o <out>]

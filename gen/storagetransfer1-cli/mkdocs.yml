@@ -1,4 +1,4 @@
-site_name: storagetransfer v1.0.4+20150811
+site_name: storagetransfer v1.0.4+20170515
 site_url: http://byron.github.io/google-apis-rs/google-storagetransfer1-cli
 site_description: A complete library to interact with storagetransfer (protocol v1)
 
@@ -10,7 +10,6 @@ site_dir: build_html
 pages:
 - ['index.md', 'Home']
 - ['google-service-accounts_get.md', 'Google Service Accounts', 'Get']
-- ['methods_get-google-service-account.md', 'Methods', 'Get Google Service Account']
 - ['transfer-jobs_create.md', 'Transfer Jobs', 'Create']
 - ['transfer-jobs_get.md', 'Transfer Jobs', 'Get']
 - ['transfer-jobs_list.md', 'Transfer Jobs', 'List']

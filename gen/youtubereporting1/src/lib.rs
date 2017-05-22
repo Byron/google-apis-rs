@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *YouTube Reporting* crate version *1.0.4+20160719*, where *20160719* is the exact revision of the *youtubereporting:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
+//! This documentation was generated from *YouTube Reporting* crate version *1.0.4+20170520*, where *20170520* is the exact revision of the *youtubereporting:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
 //! 
 //! Everything else about the *YouTube Reporting* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/youtube/reporting/v1/reports/).
@@ -375,7 +375,11 @@ impl<'a, C, A> YouTubeReporting<C, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListReportTypesResponse {
-    /// A token to retrieve next page of results. Pass this value in the ListReportTypesRequest.page_token field in the subsequent call to `ListReportTypes` method to retrieve the next page of results.
+    /// A token to retrieve next page of results.
+    /// Pass this value in the
+    /// ListReportTypesRequest.page_token
+    /// field in the subsequent call to `ListReportTypes` method to retrieve the next
+    /// page of results.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
     /// The list of report types.
@@ -416,7 +420,11 @@ impl ResponseResult for Media {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListJobsResponse {
-    /// A token to retrieve next page of results. Pass this value in the ListJobsRequest.page_token field in the subsequent call to `ListJobs` method to retrieve the next page of results.
+    /// A token to retrieve next page of results.
+    /// Pass this value in the
+    /// ListJobsRequest.page_token
+    /// field in the subsequent call to `ListJobs` method to retrieve the next
+    /// page of results.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
     /// The list of jobs.
@@ -442,15 +450,18 @@ impl ResponseResult for ListJobsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Job {
-    /// The date/time when this job will expire/expired. After a job expired, no new reports are generated.
+    /// The date/time when this job will expire/expired. After a job expired, no
+    /// new reports are generated.
     #[serde(rename="expireTime")]
     pub expire_time: Option<String>,
-    /// The type of reports this job creates. Corresponds to the ID of a ReportType.
+    /// The type of reports this job creates. Corresponds to the ID of a
+    /// ReportType.
     #[serde(rename="reportTypeId")]
     pub report_type_id: Option<String>,
     /// The name of the job (max. 100 characters).
     pub name: Option<String>,
-    /// True if this a system-managed job that cannot be modified by the user; otherwise false.
+    /// True if this a system-managed job that cannot be modified by the user;
+    /// otherwise false.
     #[serde(rename="systemManaged")]
     pub system_managed: Option<bool>,
     /// The creation date/time of the job.
@@ -476,7 +487,11 @@ impl ResponseResult for Job {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListReportsResponse {
-    /// A token to retrieve next page of results. Pass this value in the ListReportsRequest.page_token field in the subsequent call to `ListReports` method to retrieve the next page of results.
+    /// A token to retrieve next page of results.
+    /// Pass this value in the
+    /// ListReportsRequest.page_token
+    /// field in the subsequent call to `ListReports` method to retrieve the next
+    /// page of results.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
     /// The list of report types.
@@ -497,7 +512,9 @@ impl ResponseResult for ListReportsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReportType {
-    /// True if this a system-managed report type; otherwise false. Reporting jobs for system-managed report types are created automatically and can thus not be used in the `CreateJob` method.
+    /// True if this a system-managed report type; otherwise false. Reporting jobs
+    /// for system-managed report types are created automatically and can thus not
+    /// be used in the `CreateJob` method.
     #[serde(rename="systemManaged")]
     pub system_managed: Option<bool>,
     /// The ID of the report type (max. 100 characters).
@@ -512,7 +529,8 @@ pub struct ReportType {
 impl Resource for ReportType {}
 
 
-/// A report's metadata including the URL from which the report itself can be downloaded.
+/// A report's metadata including the URL from which the report itself can be
+/// downloaded.
 /// 
 /// # Activities
 /// 
@@ -529,12 +547,14 @@ pub struct Report {
     /// The date/time when the job this report belongs to will expire/expired.
     #[serde(rename="jobExpireTime")]
     pub job_expire_time: Option<String>,
-    /// The start of the time period that the report instance covers. The value is inclusive.
+    /// The start of the time period that the report instance covers. The value is
+    /// inclusive.
     #[serde(rename="startTime")]
     pub start_time: Option<String>,
     /// The server-generated ID of the report.
     pub id: Option<String>,
-    /// The end of the time period that the report instance covers. The value is exclusive.
+    /// The end of the time period that the report instance covers. The value is
+    /// exclusive.
     #[serde(rename="endTime")]
     pub end_time: Option<String>,
     /// The date/time when this report was created.
@@ -548,7 +568,15 @@ pub struct Report {
 impl ResponseResult for Report {}
 
 
-/// A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); } The JSON representation for `Empty` is empty JSON object `{}`.
+/// A generic empty message that you can re-use to avoid defining duplicated
+/// empty messages in your APIs. A typical example is to use it as the request
+/// or the response type of an API method. For instance:
+/// 
+///     service Foo {
+///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+///     }
+/// 
+/// The JSON representation for `Empty` is empty JSON object `{}`.
 /// 
 /// # Activities
 /// 
@@ -608,11 +636,13 @@ impl<'a, C, A> MediaMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Method for media download. Download is supported on the URI `/v1/media/{+name}?alt=media`.
+    /// Method for media download. Download is supported
+    /// on the URI `/v1/media/{+name}?alt=media`.
     /// 
     /// # Arguments
     ///
-    /// * `resourceName` - Name of the media that is being downloaded. See ReadRequest.resource_name.
+    /// * `resourceName` - Name of the media that is being downloaded.  See
+    ///                    ReadRequest.resource_name.
     pub fn download(&self, resource_name: &str) -> MediaDownloadCall<'a, C, A> {
         MediaDownloadCall {
             hub: self.hub,
@@ -779,7 +809,8 @@ impl<'a, C, A> JobMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists reports created by a specific job. Returns NOT_FOUND if the job does not exist.
+    /// Lists reports created by a specific job.
+    /// Returns NOT_FOUND if the job does not exist.
     /// 
     /// # Arguments
     ///
@@ -843,7 +874,8 @@ impl<'a, C, A> JobMethods<'a, C, A> {
 // CallBuilders   ###
 // #################
 
-/// Method for media download. Download is supported on the URI `/v1/media/{+name}?alt=media`.
+/// Method for media download. Download is supported
+/// on the URI `/v1/media/{+name}?alt=media`.
 ///
 /// This method supports **media download**. To enable it, adjust the builder like this:
 /// `.param("alt", "media")`.
@@ -1041,7 +1073,8 @@ impl<'a, C, A> MediaDownloadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
-    /// Name of the media that is being downloaded. See ReadRequest.resource_name.
+    /// Name of the media that is being downloaded.  See
+    /// ReadRequest.resource_name.
     ///
     /// Sets the *resource name* path property to the given value.
     ///
@@ -1076,12 +1109,12 @@ impl<'a, C, A> MediaDownloadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> MediaDownloadCall<'a, C, A>
@@ -1279,28 +1312,35 @@ impl<'a, C, A> ReportTypeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
-    /// A token identifying a page of results the server should return. Typically, this is the value of ListReportTypesResponse.next_page_token returned in response to the previous call to the `ListReportTypes` method.
+    /// A token identifying a page of results the server should return. Typically,
+    /// this is the value of
+    /// ListReportTypesResponse.next_page_token
+    /// returned in response to the previous call to the `ListReportTypes` method.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ReportTypeListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Requested page size. Server may return fewer report types than requested. If unspecified, server will pick an appropriate default.
+    /// Requested page size. Server may return fewer report types than requested.
+    /// If unspecified, server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> ReportTypeListCall<'a, C, A> {
         self._page_size = Some(new_value);
         self
     }
-    /// The content owner's external ID on which behalf the user is acting on. If not set, the user is acting for himself (his own channel).
+    /// The content owner's external ID on which behalf the user is acting on. If
+    /// not set, the user is acting for himself (his own channel).
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ReportTypeListCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
-    /// If set to true, also system-managed report types will be returned; otherwise only the report types that can be used to create new reporting jobs will be returned.
+    /// If set to true, also system-managed report types will be returned;
+    /// otherwise only the report types that can be used to create new reporting
+    /// jobs will be returned.
     ///
     /// Sets the *include system managed* query property to the given value.
     pub fn include_system_managed(mut self, new_value: bool) -> ReportTypeListCall<'a, C, A> {
@@ -1332,12 +1372,12 @@ impl<'a, C, A> ReportTypeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ReportTypeListCall<'a, C, A>
@@ -1553,7 +1593,8 @@ impl<'a, C, A> JobDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._job_id = new_value.to_string();
         self
     }
-    /// The content owner's external ID on which behalf the user is acting on. If not set, the user is acting for himself (his own channel).
+    /// The content owner's external ID on which behalf the user is acting on. If
+    /// not set, the user is acting for himself (his own channel).
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> JobDeleteCall<'a, C, A> {
@@ -1585,12 +1626,12 @@ impl<'a, C, A> JobDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> JobDeleteCall<'a, C, A>
@@ -1818,7 +1859,8 @@ impl<'a, C, A> JobReportGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._report_id = new_value.to_string();
         self
     }
-    /// The content owner's external ID on which behalf the user is acting on. If not set, the user is acting for himself (his own channel).
+    /// The content owner's external ID on which behalf the user is acting on. If
+    /// not set, the user is acting for himself (his own channel).
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> JobReportGetCall<'a, C, A> {
@@ -1850,12 +1892,12 @@ impl<'a, C, A> JobReportGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> JobReportGetCall<'a, C, A>
@@ -2071,7 +2113,8 @@ impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
         self._job_id = new_value.to_string();
         self
     }
-    /// The content owner's external ID on which behalf the user is acting on. If not set, the user is acting for himself (his own channel).
+    /// The content owner's external ID on which behalf the user is acting on. If
+    /// not set, the user is acting for himself (his own channel).
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> JobGetCall<'a, C, A> {
@@ -2103,12 +2146,12 @@ impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> JobGetCall<'a, C, A>
@@ -2136,7 +2179,8 @@ impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
 }
 
 
-/// Lists reports created by a specific job. Returns NOT_FOUND if the job does not exist.
+/// Lists reports created by a specific job.
+/// Returns NOT_FOUND if the job does not exist.
 ///
 /// A builder for the *reports.list* method supported by a *job* resource.
 /// It is not used directly, but through a `JobMethods` instance.
@@ -2349,35 +2393,42 @@ impl<'a, C, A> JobReportListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._job_id = new_value.to_string();
         self
     }
-    /// If set, only reports whose start time is smaller than the specified date/time are returned.
+    /// If set, only reports whose start time is smaller than the specified
+    /// date/time are returned.
     ///
     /// Sets the *start time before* query property to the given value.
     pub fn start_time_before(mut self, new_value: &str) -> JobReportListCall<'a, C, A> {
         self._start_time_before = Some(new_value.to_string());
         self
     }
-    /// If set, only reports whose start time is greater than or equal the specified date/time are returned.
+    /// If set, only reports whose start time is greater than or equal the
+    /// specified date/time are returned.
     ///
     /// Sets the *start time at or after* query property to the given value.
     pub fn start_time_at_or_after(mut self, new_value: &str) -> JobReportListCall<'a, C, A> {
         self._start_time_at_or_after = Some(new_value.to_string());
         self
     }
-    /// A token identifying a page of results the server should return. Typically, this is the value of ListReportsResponse.next_page_token returned in response to the previous call to the `ListReports` method.
+    /// A token identifying a page of results the server should return. Typically,
+    /// this is the value of
+    /// ListReportsResponse.next_page_token
+    /// returned in response to the previous call to the `ListReports` method.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> JobReportListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Requested page size. Server may return fewer report types than requested. If unspecified, server will pick an appropriate default.
+    /// Requested page size. Server may return fewer report types than requested.
+    /// If unspecified, server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> JobReportListCall<'a, C, A> {
         self._page_size = Some(new_value);
         self
     }
-    /// The content owner's external ID on which behalf the user is acting on. If not set, the user is acting for himself (his own channel).
+    /// The content owner's external ID on which behalf the user is acting on. If
+    /// not set, the user is acting for himself (his own channel).
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> JobReportListCall<'a, C, A> {
@@ -2416,12 +2467,12 @@ impl<'a, C, A> JobReportListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> JobReportListCall<'a, C, A>
@@ -2619,28 +2670,35 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     }
 
 
-    /// A token identifying a page of results the server should return. Typically, this is the value of ListReportTypesResponse.next_page_token returned in response to the previous call to the `ListJobs` method.
+    /// A token identifying a page of results the server should return. Typically,
+    /// this is the value of
+    /// ListReportTypesResponse.next_page_token
+    /// returned in response to the previous call to the `ListJobs` method.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> JobListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Requested page size. Server may return fewer jobs than requested. If unspecified, server will pick an appropriate default.
+    /// Requested page size. Server may return fewer jobs than requested.
+    /// If unspecified, server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> JobListCall<'a, C, A> {
         self._page_size = Some(new_value);
         self
     }
-    /// The content owner's external ID on which behalf the user is acting on. If not set, the user is acting for himself (his own channel).
+    /// The content owner's external ID on which behalf the user is acting on. If
+    /// not set, the user is acting for himself (his own channel).
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> JobListCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
-    /// If set to true, also system-managed jobs will be returned; otherwise only user-created jobs will be returned. System-managed jobs can neither be modified nor deleted.
+    /// If set to true, also system-managed jobs will be returned; otherwise only
+    /// user-created jobs will be returned. System-managed jobs can neither be
+    /// modified nor deleted.
     ///
     /// Sets the *include system managed* query property to the given value.
     pub fn include_system_managed(mut self, new_value: bool) -> JobListCall<'a, C, A> {
@@ -2672,12 +2730,12 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> JobListCall<'a, C, A>
@@ -2891,7 +2949,8 @@ impl<'a, C, A> JobCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._request = new_value;
         self
     }
-    /// The content owner's external ID on which behalf the user is acting on. If not set, the user is acting for himself (his own channel).
+    /// The content owner's external ID on which behalf the user is acting on. If
+    /// not set, the user is acting for himself (his own channel).
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> JobCreateCall<'a, C, A> {
@@ -2923,12 +2982,12 @@ impl<'a, C, A> JobCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> JobCreateCall<'a, C, A>

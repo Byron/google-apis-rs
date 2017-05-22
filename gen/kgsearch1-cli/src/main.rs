@@ -221,7 +221,9 @@ fn main() {
     let arg_data = [
         ("entities", "methods: 'search'", vec![
             ("search",
-                    Some(r##"Searches Knowledge Graph for entities that match the constraints. A list of matched entities will be returned in response, which will be in JSON-LD format and compatible with http://schema.org"##),
+                    Some(r##"Searches Knowledge Graph for entities that match the constraints.
+        A list of matched entities will be returned in response, which will be in
+        JSON-LD format and compatible with http://schema.org"##),
                     "Details at http://byron.github.io/google-apis-rs/google_kgsearch1_cli/entities_search",
                   vec![
                     (Some(r##"v"##),
@@ -242,8 +244,8 @@ fn main() {
     
     let mut app = App::new("kgsearch1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.4+20151215")
-           .about("Knowledge Graph Search API allows developers to search the Google Knowledge Graph for entities.")
+           .version("1.0.4+20170109")
+           .about("Searches the Google Knowledge Graph for entities.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_kgsearch1_cli")
            .arg(Arg::with_name("folder")
                    .long("config-dir")

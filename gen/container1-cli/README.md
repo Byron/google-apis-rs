@@ -25,21 +25,29 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *container* API at revision *20160421*. The CLI is at version *1.0.4*.
+This documentation was generated from the *container* API at revision *20170430*. The CLI is at version *1.0.4*.
 
 ```bash
 container1 [options]
         projects
+                zones-clusters-complete-ip-rotation <project-id> <zone> <cluster-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 zones-clusters-create <project-id> <zone> (-r <kv>)... [-p <v>]... [-o <out>]
                 zones-clusters-delete <project-id> <zone> <cluster-id> [-p <v>]... [-o <out>]
                 zones-clusters-get <project-id> <zone> <cluster-id> [-p <v>]... [-o <out>]
+                zones-clusters-legacy-abac <project-id> <zone> <cluster-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 zones-clusters-list <project-id> <zone> [-p <v>]... [-o <out>]
                 zones-clusters-node-pools-create <project-id> <zone> <cluster-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 zones-clusters-node-pools-delete <project-id> <zone> <cluster-id> <node-pool-id> [-p <v>]... [-o <out>]
                 zones-clusters-node-pools-get <project-id> <zone> <cluster-id> <node-pool-id> [-p <v>]... [-o <out>]
                 zones-clusters-node-pools-list <project-id> <zone> <cluster-id> [-p <v>]... [-o <out>]
+                zones-clusters-node-pools-rollback <project-id> <zone> <cluster-id> <node-pool-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                zones-clusters-node-pools-set-management <project-id> <zone> <cluster-id> <node-pool-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                zones-clusters-resource-labels <project-id> <zone> <cluster-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                zones-clusters-set-master-auth <project-id> <zone> <cluster-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                zones-clusters-start-ip-rotation <project-id> <zone> <cluster-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 zones-clusters-update <project-id> <zone> <cluster-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 zones-get-serverconfig <project-id> <zone> [-p <v>]... [-o <out>]
+                zones-operations-cancel <project-id> <zone> <operation-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 zones-operations-get <project-id> <zone> <operation-id> [-p <v>]... [-o <out>]
                 zones-operations-list <project-id> <zone> [-p <v>]... [-o <out>]
   container1 --help

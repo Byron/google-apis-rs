@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *iam* crate version *1.0.4+20160915*, where *20160915* is the exact revision of the *iam:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
+//! This documentation was generated from *iam* crate version *1.0.4+20170515*, where *20170515* is the exact revision of the *iam:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
 //! 
 //! Everything else about the *iam* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/iam/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.Iam.html) ... 
 //! 
 //! * projects
-//!  * [*service accounts create*](struct.ProjectServiceAccountCreateCall.html), [*service accounts delete*](struct.ProjectServiceAccountDeleteCall.html), [*service accounts get*](struct.ProjectServiceAccountGetCall.html), [*service accounts get iam policy*](struct.ProjectServiceAccountGetIamPolicyCall.html), [*service accounts keys create*](struct.ProjectServiceAccountKeyCreateCall.html), [*service accounts keys delete*](struct.ProjectServiceAccountKeyDeleteCall.html), [*service accounts keys get*](struct.ProjectServiceAccountKeyGetCall.html), [*service accounts keys list*](struct.ProjectServiceAccountKeyListCall.html), [*service accounts list*](struct.ProjectServiceAccountListCall.html), [*service accounts set iam policy*](struct.ProjectServiceAccountSetIamPolicyCall.html), [*service accounts sign blob*](struct.ProjectServiceAccountSignBlobCall.html), [*service accounts test iam permissions*](struct.ProjectServiceAccountTestIamPermissionCall.html) and [*service accounts update*](struct.ProjectServiceAccountUpdateCall.html)
+//!  * [*service accounts create*](struct.ProjectServiceAccountCreateCall.html), [*service accounts delete*](struct.ProjectServiceAccountDeleteCall.html), [*service accounts get*](struct.ProjectServiceAccountGetCall.html), [*service accounts get iam policy*](struct.ProjectServiceAccountGetIamPolicyCall.html), [*service accounts keys create*](struct.ProjectServiceAccountKeyCreateCall.html), [*service accounts keys delete*](struct.ProjectServiceAccountKeyDeleteCall.html), [*service accounts keys get*](struct.ProjectServiceAccountKeyGetCall.html), [*service accounts keys list*](struct.ProjectServiceAccountKeyListCall.html), [*service accounts list*](struct.ProjectServiceAccountListCall.html), [*service accounts set iam policy*](struct.ProjectServiceAccountSetIamPolicyCall.html), [*service accounts sign blob*](struct.ProjectServiceAccountSignBlobCall.html), [*service accounts sign jwt*](struct.ProjectServiceAccountSignJwtCall.html), [*service accounts test iam permissions*](struct.ProjectServiceAccountTestIamPermissionCall.html) and [*service accounts update*](struct.ProjectServiceAccountUpdateCall.html)
 //! * [roles](struct.Role.html)
 //!  * [*query grantable roles*](struct.RoleQueryGrantableRoleCall.html)
 //! 
@@ -359,7 +359,10 @@ impl<'a, C, A> Iam<C, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TestIamPermissionsRequest {
-    /// The set of permissions to check for the `resource`. Permissions with wildcards (such as '*' or 'storage.*') are not allowed. For more information see [IAM Overview](https://cloud.google.com/iam/docs/overview#permissions).
+    /// The set of permissions to check for the `resource`. Permissions with
+    /// wildcards (such as '*' or 'storage.*') are not allowed. For more
+    /// information see
+    /// [IAM Overview](https://cloud.google.com/iam/docs/overview#permissions).
     pub permissions: Option<Vec<String>>,
 }
 
@@ -377,7 +380,10 @@ impl RequestValue for TestIamPermissionsRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SetIamPolicyRequest {
-    /// REQUIRED: The complete policy to be applied to the `resource`. The size of the policy is limited to a few 10s of KB. An empty policy is a valid policy but certain Cloud Platform services (such as Projects) might reject them.
+    /// REQUIRED: The complete policy to be applied to the `resource`. The size of
+    /// the policy is limited to a few 10s of KB. An empty policy is a
+    /// valid policy but certain Cloud Platform services (such as Projects)
+    /// might reject them.
     pub policy: Option<Policy>,
 }
 
@@ -402,7 +408,41 @@ pub struct ListServiceAccountKeysResponse {
 impl ResponseResult for ListServiceAccountKeysResponse {}
 
 
-/// A service account in the Identity and Access Management API. To create a service account, specify the `project_id` and the `account_id` for the account. The `account_id` is unique within the project, and is used to generate the service account email address and a stable `unique_id`. If the account already exists, the account's resource name is returned in util::Status's ResourceInfo.resource_name in the format of projects/{project}/serviceAccounts/{email}. The caller can use the name in other methods to access the account. All other methods can identify the service account using the format `projects/{project}/serviceAccounts/{account}`. Using `-` as a wildcard for the project will infer the project from the account. The `account` value can be the `email` address or the `unique_id` of the service account.
+/// The service account sign JWT request.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [service accounts sign jwt projects](struct.ProjectServiceAccountSignJwtCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SignJwtRequest {
+    /// The JWT payload to sign, a JSON JWT Claim set.
+    pub payload: Option<String>,
+}
+
+impl RequestValue for SignJwtRequest {}
+
+
+/// A service account in the Identity and Access Management API.
+/// 
+/// To create a service account, specify the `project_id` and the `account_id`
+/// for the account.  The `account_id` is unique within the project, and is used
+/// to generate the service account email address and a stable
+/// `unique_id`.
+/// 
+/// If the account already exists, the account's resource name is returned
+/// in util::Status's ResourceInfo.resource_name in the format of
+/// projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}. The caller can
+/// use the name in other methods to access the account.
+/// 
+/// All other methods can identify the service account using the format
+/// `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
+/// Using `-` as a wildcard for the project will infer the project from
+/// the account. The `account` value can be the `email` address or the
+/// `unique_id` of the service account.
 /// 
 /// # Activities
 /// 
@@ -415,15 +455,26 @@ impl ResponseResult for ListServiceAccountKeysResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ServiceAccount {
-    /// @OutputOnly. The OAuth2 client id for the service account. This is used in conjunction with the OAuth2 clientconfig API to make three legged OAuth2 (3LO) flows to access the data of Google users.
+    /// @OutputOnly. The OAuth2 client id for the service account.
+    /// This is used in conjunction with the OAuth2 clientconfig API to make
+    /// three legged OAuth2 (3LO) flows to access the data of Google users.
     #[serde(rename="oauth2ClientId")]
     pub oauth2_client_id: Option<String>,
     /// Used to perform a consistent read-modify-write.
     pub etag: Option<String>,
-    /// Optional. A user-specified description of the service account. Must be fewer than 100 UTF-8 bytes.
+    /// Optional. A user-specified description of the service account.  Must be
+    /// fewer than 100 UTF-8 bytes.
     #[serde(rename="displayName")]
     pub display_name: Option<String>,
-    /// The resource name of the service account in the following format: `projects/{project}/serviceAccounts/{account}`. Requests using `-` as a wildcard for the project will infer the project from the `account` and the `account` value can be the `email` address or the `unique_id` of the service account. In responses the resource name will always be in the format `projects/{project}/serviceAccounts/{email}`.
+    /// The resource name of the service account in the following format:
+    /// `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
+    /// 
+    /// Requests using `-` as a wildcard for the project will infer the project
+    /// from the `account` and the `account` value can be the `email` address or
+    /// the `unique_id` of the service account.
+    /// 
+    /// In responses the resource name will always be in the format
+    /// `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
     pub name: Option<String>,
     /// @OutputOnly The unique and stable id of the service account.
     #[serde(rename="uniqueId")]
@@ -450,6 +501,10 @@ impl ResponseResult for ServiceAccount {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct QueryGrantableRolesResponse {
+    /// To retrieve the next page of results, set
+    /// `QueryGrantableRolesRequest.page_token` to this value.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
     /// The list of matching roles.
     pub roles: Option<Vec<Role>>,
 }
@@ -468,12 +523,19 @@ impl ResponseResult for QueryGrantableRolesResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Role {
-    /// Optional. A human-readable title for the role. Typically this is limited to 100 UTF-8 bytes.
-    pub title: Option<String>,
-    /// Optional. A human-readable description for the role.
+    /// Optional.  A human-readable description for the role.
     pub description: Option<String>,
-    /// The name of the role. When Role is used in CreateRole, the role name must not be set. When Role is used in output and other input such as UpdateRole, the role name is the complete path, e.g., roles/logging.viewer for curated roles and organizations/{organization-id}/roles/logging.viewer for custom roles.
+    /// The name of the role.
+    /// 
+    /// When Role is used in CreateRole, the role name must not be set.
+    /// 
+    /// When Role is used in output and other input such as UpdateRole, the role
+    /// name is the complete path, e.g., roles/logging.viewer for curated roles
+    /// and organizations/{ORGANIZATION_ID}/roles/logging.viewer for custom roles.
     pub name: Option<String>,
+    /// Optional.  A human-readable title for the role.  Typically this
+    /// is limited to 100 UTF-8 bytes.
+    pub title: Option<String>,
 }
 
 impl Resource for Role {}
@@ -509,7 +571,9 @@ impl RequestValue for SignBlobRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListServiceAccountsResponse {
-    /// To retrieve the next page of results, set ListServiceAccountsRequest.page_token to this value.
+    /// To retrieve the next page of results, set
+    /// ListServiceAccountsRequest.page_token
+    /// to this value.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
     /// The list of matching service accounts.
@@ -519,7 +583,37 @@ pub struct ListServiceAccountsResponse {
 impl ResponseResult for ListServiceAccountsResponse {}
 
 
-/// Defines an Identity and Access Management (IAM) policy. It is used to specify access control policies for Cloud Platform resources. A `Policy` consists of a list of `bindings`. A `Binding` binds a list of `members` to a `role`, where the members can be user accounts, Google groups, Google domains, and service accounts. A `role` is a named list of permissions defined by IAM. **Example** { "bindings": [ { "role": "roles/owner", "members": [ "user:mike@example.com", "group:admins@example.com", "domain:google.com", "serviceAccount:my-other-app@appspot.gserviceaccount.com", ] }, { "role": "roles/viewer", "members": ["user:sean@example.com"] } ] } For a description of IAM and its features, see the [IAM developer's guide](https://cloud.google.com/iam).
+/// Defines an Identity and Access Management (IAM) policy. It is used to
+/// specify access control policies for Cloud Platform resources.
+/// 
+/// 
+/// A `Policy` consists of a list of `bindings`. A `Binding` binds a list of
+/// `members` to a `role`, where the members can be user accounts, Google groups,
+/// Google domains, and service accounts. A `role` is a named list of permissions
+/// defined by IAM.
+/// 
+/// **Example**
+/// 
+///     {
+///       "bindings": [
+///         {
+///           "role": "roles/owner",
+///           "members": [
+///             "user:mike@example.com",
+///             "group:admins@example.com",
+///             "domain:google.com",
+///             "serviceAccount:my-other-app@appspot.gserviceaccount.com",
+///           ]
+///         },
+///         {
+///           "role": "roles/viewer",
+///           "members": ["user:sean@example.com"]
+///         }
+///       ]
+///     }
+/// 
+/// For a description of IAM and its features, see the
+/// [IAM developer's guide](https://cloud.google.com/iam).
 /// 
 /// # Activities
 /// 
@@ -531,12 +625,23 @@ impl ResponseResult for ListServiceAccountsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Policy {
-    /// Associates a list of `members` to a `role`. Multiple `bindings` must not be specified for the same `role`. `bindings` with no members will result in an error.
+    /// Associates a list of `members` to a `role`.
+    /// Multiple `bindings` must not be specified for the same `role`.
+    /// `bindings` with no members will result in an error.
     pub bindings: Option<Vec<Binding>>,
+    /// `etag` is used for optimistic concurrency control as a way to help
+    /// prevent simultaneous updates of a policy from overwriting each other.
+    /// It is strongly suggested that systems make use of the `etag` in the
+    /// read-modify-write cycle to perform policy updates in order to avoid race
+    /// conditions: An `etag` is returned in the response to `getIamPolicy`, and
+    /// systems are expected to put that etag in the request to `setIamPolicy` to
+    /// ensure that their change will be applied to the same version of the policy.
+    /// 
+    /// If no `etag` is provided in the call to `setIamPolicy`, then the existing
+    /// policy is overwritten blindly.
+    pub etag: Option<String>,
     /// Version of the `Policy`. The default version is 0.
     pub version: Option<i32>,
-    /// `etag` is used for optimistic concurrency control as a way to help prevent simultaneous updates of a policy from overwriting each other. It is strongly suggested that systems make use of the `etag` in the read-modify-write cycle to perform policy updates in order to avoid race conditions: An `etag` is returned in the response to `getIamPolicy`, and systems are expected to put that etag in the request to `setIamPolicy` to ensure that their change will be applied to the same version of the policy. If no `etag` is provided in the call to `setIamPolicy`, then the existing policy is overwritten blindly.
-    pub etag: Option<String>,
 }
 
 impl ResponseResult for Policy {}
@@ -553,15 +658,34 @@ impl ResponseResult for Policy {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct QueryGrantableRolesRequest {
-    /// Required. The full resource name to query from the list of grantable roles. The name follows the Google Cloud Platform resource format. For example, a Cloud Platform project with id `my-project` will be named `//cloudresourcemanager.googleapis.com/projects/my-project`.
+    /// Optional pagination token returned in an earlier
+    /// QueryGrantableRolesResponse.
+    #[serde(rename="pageToken")]
+    pub page_token: Option<String>,
+    /// Required. The full resource name to query from the list of grantable roles.
+    /// 
+    /// The name follows the Google Cloud Platform resource format.
+    /// For example, a Cloud Platform project with id `my-project` will be named
+    /// `//cloudresourcemanager.googleapis.com/projects/my-project`.
     #[serde(rename="fullResourceName")]
     pub full_resource_name: Option<String>,
+    /// Optional limit on the number of roles to include in the response.
+    #[serde(rename="pageSize")]
+    pub page_size: Option<i32>,
 }
 
 impl RequestValue for QueryGrantableRolesRequest {}
 
 
-/// A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); } The JSON representation for `Empty` is empty JSON object `{}`.
+/// A generic empty message that you can re-use to avoid defining duplicated
+/// empty messages in your APIs. A typical example is to use it as the request
+/// or the response type of an API method. For instance:
+/// 
+///     service Foo {
+///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+///     }
+/// 
+/// The JSON representation for `Empty` is empty JSON object `{}`.
 /// 
 /// # Activities
 /// 
@@ -588,11 +712,34 @@ impl ResponseResult for Empty {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TestIamPermissionsResponse {
-    /// A subset of `TestPermissionsRequest.permissions` that the caller is allowed.
+    /// A subset of `TestPermissionsRequest.permissions` that the caller is
+    /// allowed.
     pub permissions: Option<Vec<String>>,
 }
 
 impl ResponseResult for TestIamPermissionsResponse {}
+
+
+/// The service account sign JWT response.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [service accounts sign jwt projects](struct.ProjectServiceAccountSignJwtCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SignJwtResponse {
+    /// The id of the key used to sign the JWT.
+    #[serde(rename="keyId")]
+    pub key_id: Option<String>,
+    /// The signed JWT.
+    #[serde(rename="signedJwt")]
+    pub signed_jwt: Option<String>,
+}
+
+impl ResponseResult for SignJwtResponse {}
 
 
 /// Associates `members` with a `role`.
@@ -601,16 +748,56 @@ impl ResponseResult for TestIamPermissionsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Binding {
-    /// Role that is assigned to `members`. For example, `roles/viewer`, `roles/editor`, or `roles/owner`. Required
+    /// Role that is assigned to `members`.
+    /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
+    /// Required
     pub role: Option<String>,
-    /// Specifies the identities requesting access for a Cloud Platform resource. `members` can have the following values: * `allUsers`: A special identifier that represents anyone who is on the internet; with or without a Google account. * `allAuthenticatedUsers`: A special identifier that represents anyone who is authenticated with a Google account or a service account. * `user:{emailid}`: An email address that represents a specific Google account. For example, `alice@gmail.com` or `joe@example.com`. * `serviceAccount:{emailid}`: An email address that represents a service account. For example, `my-other-app@appspot.gserviceaccount.com`. * `group:{emailid}`: An email address that represents a Google group. For example, `admins@example.com`. * `domain:{domain}`: A Google Apps domain name that represents all the users of that domain. For example, `google.com` or `example.com`.
+    /// Specifies the identities requesting access for a Cloud Platform resource.
+    /// `members` can have the following values:
+    /// 
+    /// * `allUsers`: A special identifier that represents anyone who is
+    ///    on the internet; with or without a Google account.
+    /// 
+    /// * `allAuthenticatedUsers`: A special identifier that represents anyone
+    ///    who is authenticated with a Google account or a service account.
+    /// 
+    /// * `user:{emailid}`: An email address that represents a specific Google
+    ///    account. For example, `alice@gmail.com` or `joe@example.com`.
+    /// 
+    /// 
+    /// * `serviceAccount:{emailid}`: An email address that represents a service
+    ///    account. For example, `my-other-app@appspot.gserviceaccount.com`.
+    /// 
+    /// * `group:{emailid}`: An email address that represents a Google group.
+    ///    For example, `admins@example.com`.
+    /// 
+    /// 
+    /// * `domain:{domain}`: A Google Apps domain name that represents all the
+    ///    users of that domain. For example, `google.com` or `example.com`.
+    /// 
+    /// 
     pub members: Option<Vec<String>>,
 }
 
 impl Part for Binding {}
 
 
-/// Represents a service account key. A service account has two sets of key-pairs: user-managed, and system-managed. User-managed key-pairs can be created and deleted by users. Users are responsible for rotating these keys periodically to ensure security of their service accounts. Users retain the private key of these key-pairs, and Google retains ONLY the public key. System-managed key-pairs are managed automatically by Google, and rotated daily without user intervention. The private key never leaves Google's servers to maximize security. Public keys for all service accounts are also published at the OAuth2 Service Account API.
+/// Represents a service account key.
+/// 
+/// A service account has two sets of key-pairs: user-managed, and
+/// system-managed.
+/// 
+/// User-managed key-pairs can be created and deleted by users.  Users are
+/// responsible for rotating these keys periodically to ensure security of
+/// their service accounts.  Users retain the private key of these key-pairs,
+/// and Google retains ONLY the public key.
+/// 
+/// System-managed key-pairs are managed automatically by Google, and rotated
+/// daily without user intervention.  The private key never leaves Google's
+/// servers to maximize security.
+/// 
+/// Public keys for all service accounts are also published at the OAuth2
+/// Service Account API.
 /// 
 /// # Activities
 /// 
@@ -622,16 +809,22 @@ impl Part for Binding {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ServiceAccountKey {
+    /// The private key data. Only provided in `CreateServiceAccountKey`
+    /// responses.
+    #[serde(rename="privateKeyData")]
+    pub private_key_data: Option<String>,
+    /// The resource name of the service account key in the following format
+    /// `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}/keys/{key}`.
+    pub name: Option<String>,
     /// Specifies the algorithm (and possibly key size) for the key.
     #[serde(rename="keyAlgorithm")]
     pub key_algorithm: Option<String>,
-    /// The key can be used after this timestamp.
-    #[serde(rename="validAfterTime")]
-    pub valid_after_time: Option<String>,
-    /// The private key data. Only provided in `CreateServiceAccountKey` responses.
-    #[serde(rename="privateKeyData")]
-    pub private_key_data: Option<String>,
-    /// The output format for the private key. Only provided in `CreateServiceAccountKey` responses, not in `GetServiceAccountKey` or `ListServiceAccountKey` responses. Google never exposes system-managed private keys, and never retains user-managed private keys.
+    /// The output format for the private key.
+    /// Only provided in `CreateServiceAccountKey` responses, not
+    /// in `GetServiceAccountKey` or `ListServiceAccountKey` responses.
+    /// 
+    /// Google never exposes system-managed private keys, and never retains
+    /// user-managed private keys.
     #[serde(rename="privateKeyType")]
     pub private_key_type: Option<String>,
     /// The key can be used before this timestamp.
@@ -640,8 +833,9 @@ pub struct ServiceAccountKey {
     /// The public key data. Only provided in `GetServiceAccountKey` responses.
     #[serde(rename="publicKeyData")]
     pub public_key_data: Option<String>,
-    /// The resource name of the service account key in the following format `projects/{project}/serviceAccounts/{account}/keys/{key}`.
-    pub name: Option<String>,
+    /// The key can be used after this timestamp.
+    #[serde(rename="validAfterTime")]
+    pub valid_after_time: Option<String>,
 }
 
 impl ResponseResult for ServiceAccountKey {}
@@ -679,10 +873,16 @@ impl ResponseResult for SignBlobResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreateServiceAccountKeyRequest {
-    /// The output format of the private key. `GOOGLE_CREDENTIALS_FILE` is the default output format.
+    /// The output format of the private key. `GOOGLE_CREDENTIALS_FILE` is the
+    /// default output format.
     #[serde(rename="privateKeyType")]
     pub private_key_type: Option<String>,
-    /// Which type of key and algorithm to use for the key. The default is currently a 4K RSA key. However this may change in the future.
+    /// no description provided
+    #[serde(rename="includePublicKeyData")]
+    pub include_public_key_data: Option<bool>,
+    /// Which type of key and algorithm to use for the key.
+    /// The default is currently a 2K RSA key.  However this may change in the
+    /// future.
     #[serde(rename="keyAlgorithm")]
     pub key_algorithm: Option<String>,
 }
@@ -701,10 +901,15 @@ impl RequestValue for CreateServiceAccountKeyRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreateServiceAccountRequest {
-    /// The ServiceAccount resource to create. Currently, only the following values are user assignable: `display_name` .
+    /// The ServiceAccount resource to create.
+    /// Currently, only the following values are user assignable:
+    /// `display_name` .
     #[serde(rename="serviceAccount")]
     pub service_account: Option<ServiceAccount>,
-    /// Required. The account id that is used to generate the service account email address and a stable unique id. It is unique within a project, must be 6-30 characters long, and match the regular expression `[a-z]([-a-z0-9]*[a-z0-9])` to comply with RFC1035.
+    /// Required. The account id that is used to generate the service account
+    /// email address and a stable unique id. It is unique within a project,
+    /// must be 6-30 characters long, and match the regular expression
+    /// `[a-z]([-a-z0-9]*[a-z0-9])` to comply with RFC1035.
     #[serde(rename="accountId")]
     pub account_id: Option<String>,
 }
@@ -757,7 +962,9 @@ impl<'a, C, A> RoleMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Queries roles that can be granted on a particular resource. A role is grantable if it can be used as the role in a binding for a policy for that resource.
+    /// Queries roles that can be granted on a particular resource.
+    /// A role is grantable if it can be used as the role in a binding for a policy
+    /// for that resource.
     /// 
     /// # Arguments
     ///
@@ -798,7 +1005,7 @@ impl<'a, C, A> RoleMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Iam::new(hyper::Client::new(), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `service_accounts_create(...)`, `service_accounts_delete(...)`, `service_accounts_get(...)`, `service_accounts_get_iam_policy(...)`, `service_accounts_keys_create(...)`, `service_accounts_keys_delete(...)`, `service_accounts_keys_get(...)`, `service_accounts_keys_list(...)`, `service_accounts_list(...)`, `service_accounts_set_iam_policy(...)`, `service_accounts_sign_blob(...)`, `service_accounts_test_iam_permissions(...)` and `service_accounts_update(...)`
+/// // like `service_accounts_create(...)`, `service_accounts_delete(...)`, `service_accounts_get(...)`, `service_accounts_get_iam_policy(...)`, `service_accounts_keys_create(...)`, `service_accounts_keys_delete(...)`, `service_accounts_keys_get(...)`, `service_accounts_keys_list(...)`, `service_accounts_list(...)`, `service_accounts_set_iam_policy(...)`, `service_accounts_sign_blob(...)`, `service_accounts_sign_jwt(...)`, `service_accounts_test_iam_permissions(...)` and `service_accounts_update(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -819,7 +1026,11 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The resource name of the service account in the following format: `projects/{project}/serviceAccounts/{account}`. Using `-` as a wildcard for the project, will infer the project from the account. The `account` value can be the `email` address or the `unique_id` of the service account.
+    /// * `name` - The resource name of the service account in the following format:
+    ///            `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
+    ///            Using `-` as a wildcard for the project, will infer the project from
+    ///            the account. The `account` value can be the `email` address or the
+    ///            `unique_id` of the service account.
     pub fn service_accounts_keys_list(&self, name: &str) -> ProjectServiceAccountKeyListCall<'a, C, A> {
         ProjectServiceAccountKeyListCall {
             hub: self.hub,
@@ -833,12 +1044,14 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sets the IAM access control policy for a ServiceAccount.
+    /// Sets the IAM access control policy for a
+    /// ServiceAccount.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `resource` - REQUIRED: The resource for which the policy is being specified. `resource` is usually specified as a path. For example, a Project resource is specified as `projects/{project}`.
+    /// * `resource` - REQUIRED: The resource for which the policy is being specified.
+    ///                See the operation documentation for the appropriate value for this field.
     pub fn service_accounts_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectServiceAccountSetIamPolicyCall<'a, C, A> {
         ProjectServiceAccountSetIamPolicyCall {
             hub: self.hub,
@@ -856,7 +1069,11 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The resource name of the service account key in the following format: `projects/{project}/serviceAccounts/{account}/keys/{key}`. Using `-` as a wildcard for the project will infer the project from the account. The `account` value can be the `email` address or the `unique_id` of the service account.
+    /// * `name` - The resource name of the service account key in the following format:
+    ///            `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}/keys/{key}`.
+    ///            Using `-` as a wildcard for the project will infer the project from
+    ///            the account. The `account` value can be the `email` address or the
+    ///            `unique_id` of the service account.
     pub fn service_accounts_keys_delete(&self, name: &str) -> ProjectServiceAccountKeyDeleteCall<'a, C, A> {
         ProjectServiceAccountKeyDeleteCall {
             hub: self.hub,
@@ -869,12 +1086,17 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a ServiceAccountKey and returns it.
+    /// Creates a ServiceAccountKey
+    /// and returns it.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The resource name of the service account in the following format: `projects/{project}/serviceAccounts/{account}`. Using `-` as a wildcard for the project will infer the project from the account. The `account` value can be the `email` address or the `unique_id` of the service account.
+    /// * `name` - The resource name of the service account in the following format:
+    ///            `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
+    ///            Using `-` as a wildcard for the project will infer the project from
+    ///            the account. The `account` value can be the `email` address or the
+    ///            `unique_id` of the service account.
     pub fn service_accounts_keys_create(&self, request: CreateServiceAccountKeyRequest, name: &str) -> ProjectServiceAccountKeyCreateCall<'a, C, A> {
         ProjectServiceAccountKeyCreateCall {
             hub: self.hub,
@@ -893,7 +1115,11 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The resource name of the service account in the following format: `projects/{project}/serviceAccounts/{account}`. Using `-` as a wildcard for the project will infer the project from the account. The `account` value can be the `email` address or the `unique_id` of the service account.
+    /// * `name` - The resource name of the service account in the following format:
+    ///            `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
+    ///            Using `-` as a wildcard for the project will infer the project from
+    ///            the account. The `account` value can be the `email` address or the
+    ///            `unique_id` of the service account.
     pub fn service_accounts_sign_blob(&self, request: SignBlobRequest, name: &str) -> ProjectServiceAccountSignBlobCall<'a, C, A> {
         ProjectServiceAccountSignBlobCall {
             hub: self.hub,
@@ -907,12 +1133,22 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a ServiceAccount. Currently, only the following fields are updatable: `display_name` . The `etag` is mandatory.
+    /// Updates a ServiceAccount.
+    /// 
+    /// Currently, only the following fields are updatable:
+    /// `display_name` .
+    /// The `etag` is mandatory.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The resource name of the service account in the following format: `projects/{project}/serviceAccounts/{account}`. Requests using `-` as a wildcard for the project will infer the project from the `account` and the `account` value can be the `email` address or the `unique_id` of the service account. In responses the resource name will always be in the format `projects/{project}/serviceAccounts/{email}`.
+    /// * `name` - The resource name of the service account in the following format:
+    ///            `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
+    ///            Requests using `-` as a wildcard for the project will infer the project
+    ///            from the `account` and the `account` value can be the `email` address or
+    ///            the `unique_id` of the service account.
+    ///            In responses the resource name will always be in the format
+    ///            `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
     pub fn service_accounts_update(&self, request: ServiceAccount, name: &str) -> ProjectServiceAccountUpdateCall<'a, C, A> {
         ProjectServiceAccountUpdateCall {
             hub: self.hub,
@@ -930,7 +1166,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - Required. The resource name of the project associated with the service accounts, such as `projects/my-project-123`.
+    /// * `name` - Required. The resource name of the project associated with the service
+    ///            accounts, such as `projects/my-project-123`.
     pub fn service_accounts_list(&self, name: &str) -> ProjectServiceAccountListCall<'a, C, A> {
         ProjectServiceAccountListCall {
             hub: self.hub,
@@ -949,7 +1186,11 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The resource name of the service account in the following format: `projects/{project}/serviceAccounts/{account}`. Using `-` as a wildcard for the project will infer the project from the account. The `account` value can be the `email` address or the `unique_id` of the service account.
+    /// * `name` - The resource name of the service account in the following format:
+    ///            `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
+    ///            Using `-` as a wildcard for the project will infer the project from
+    ///            the account. The `account` value can be the `email` address or the
+    ///            `unique_id` of the service account.
     pub fn service_accounts_delete(&self, name: &str) -> ProjectServiceAccountDeleteCall<'a, C, A> {
         ProjectServiceAccountDeleteCall {
             hub: self.hub,
@@ -962,11 +1203,16 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the ServiceAccountKey by key id.
+    /// Gets the ServiceAccountKey
+    /// by key id.
     /// 
     /// # Arguments
     ///
-    /// * `name` - The resource name of the service account key in the following format: `projects/{project}/serviceAccounts/{account}/keys/{key}`. Using `-` as a wildcard for the project will infer the project from the account. The `account` value can be the `email` address or the `unique_id` of the service account.
+    /// * `name` - The resource name of the service account key in the following format:
+    ///            `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}/keys/{key}`.
+    ///            Using `-` as a wildcard for the project will infer the project from
+    ///            the account. The `account` value can be the `email` address or the
+    ///            `unique_id` of the service account.
     pub fn service_accounts_keys_get(&self, name: &str) -> ProjectServiceAccountKeyGetCall<'a, C, A> {
         ProjectServiceAccountKeyGetCall {
             hub: self.hub,
@@ -980,11 +1226,13 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns the IAM access control policy for a ServiceAccount.
+    /// Returns the IAM access control policy for a
+    /// ServiceAccount.
     /// 
     /// # Arguments
     ///
-    /// * `resource` - REQUIRED: The resource for which the policy is being requested. `resource` is usually specified as a path. For example, a Project resource is specified as `projects/{project}`.
+    /// * `resource` - REQUIRED: The resource for which the policy is being requested.
+    ///                See the operation documentation for the appropriate value for this field.
     pub fn service_accounts_get_iam_policy(&self, resource: &str) -> ProjectServiceAccountGetIamPolicyCall<'a, C, A> {
         ProjectServiceAccountGetIamPolicyCall {
             hub: self.hub,
@@ -997,12 +1245,14 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Tests the specified permissions against the IAM access control policy for a ServiceAccount.
+    /// Tests the specified permissions against the IAM access control policy
+    /// for a ServiceAccount.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `resource` - REQUIRED: The resource for which the policy detail is being requested. `resource` is usually specified as a path. For example, a Project resource is specified as `projects/{project}`.
+    /// * `resource` - REQUIRED: The resource for which the policy detail is being requested.
+    ///                See the operation documentation for the appropriate value for this field.
     pub fn service_accounts_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectServiceAccountTestIamPermissionCall<'a, C, A> {
         ProjectServiceAccountTestIamPermissionCall {
             hub: self.hub,
@@ -1016,14 +1266,43 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a ServiceAccount and returns it.
+    /// Creates a ServiceAccount
+    /// and returns it.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Required. The resource name of the project associated with the service accounts, such as `projects/my-project-123`.
+    /// * `name` - Required. The resource name of the project associated with the service
+    ///            accounts, such as `projects/my-project-123`.
     pub fn service_accounts_create(&self, request: CreateServiceAccountRequest, name: &str) -> ProjectServiceAccountCreateCall<'a, C, A> {
         ProjectServiceAccountCreateCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Signs a JWT using a service account's system-managed private key.
+    /// 
+    /// If no expiry time (`exp`) is provided in the `SignJwtRequest`, IAM sets an
+    /// an expiry time of one hour by default. If you request an expiry time of
+    /// more than one hour, the request will fail.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - The resource name of the service account in the following format:
+    ///            `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
+    ///            Using `-` as a wildcard for the project will infer the project from
+    ///            the account. The `account` value can be the `email` address or the
+    ///            `unique_id` of the service account.
+    pub fn service_accounts_sign_jwt(&self, request: SignJwtRequest, name: &str) -> ProjectServiceAccountSignJwtCall<'a, C, A> {
+        ProjectServiceAccountSignJwtCall {
             hub: self.hub,
             _request: request,
             _name: name.to_string(),
@@ -1039,7 +1318,11 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The resource name of the service account in the following format: `projects/{project}/serviceAccounts/{account}`. Using `-` as a wildcard for the project will infer the project from the account. The `account` value can be the `email` address or the `unique_id` of the service account.
+    /// * `name` - The resource name of the service account in the following format:
+    ///            `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
+    ///            Using `-` as a wildcard for the project will infer the project from
+    ///            the account. The `account` value can be the `email` address or the
+    ///            `unique_id` of the service account.
     pub fn service_accounts_get(&self, name: &str) -> ProjectServiceAccountGetCall<'a, C, A> {
         ProjectServiceAccountGetCall {
             hub: self.hub,
@@ -1059,7 +1342,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 // CallBuilders   ###
 // #################
 
-/// Queries roles that can be granted on a particular resource. A role is grantable if it can be used as the role in a binding for a policy for that resource.
+/// Queries roles that can be granted on a particular resource.
+/// A role is grantable if it can be used as the role in a binding for a policy
+/// for that resource.
 ///
 /// A builder for the *queryGrantableRoles* method supported by a *role* resource.
 /// It is not used directly, but through a `RoleMethods` instance.
@@ -1265,12 +1550,12 @@ impl<'a, C, A> RoleQueryGrantableRoleCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> RoleQueryGrantableRoleCall<'a, C, A>
@@ -1482,7 +1767,12 @@ impl<'a, C, A> ProjectServiceAccountKeyListCall<'a, C, A> where C: BorrowMut<hyp
     }
 
 
-    /// The resource name of the service account in the following format: `projects/{project}/serviceAccounts/{account}`. Using `-` as a wildcard for the project, will infer the project from the account. The `account` value can be the `email` address or the `unique_id` of the service account.
+    /// The resource name of the service account in the following format:
+    /// `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
+    /// 
+    /// Using `-` as a wildcard for the project, will infer the project from
+    /// the account. The `account` value can be the `email` address or the
+    /// `unique_id` of the service account.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -1492,7 +1782,9 @@ impl<'a, C, A> ProjectServiceAccountKeyListCall<'a, C, A> where C: BorrowMut<hyp
         self._name = new_value.to_string();
         self
     }
-    /// Filters the types of keys the user wants to include in the list response. Duplicate key types are not allowed. If no key type is provided, all keys are returned.
+    /// Filters the types of keys the user wants to include in the list
+    /// response. Duplicate key types are not allowed. If no key type
+    /// is provided, all keys are returned.
     ///
     /// Append the given value to the *key types* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
@@ -1525,12 +1817,12 @@ impl<'a, C, A> ProjectServiceAccountKeyListCall<'a, C, A> where C: BorrowMut<hyp
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceAccountKeyListCall<'a, C, A>
@@ -1558,7 +1850,8 @@ impl<'a, C, A> ProjectServiceAccountKeyListCall<'a, C, A> where C: BorrowMut<hyp
 }
 
 
-/// Sets the IAM access control policy for a ServiceAccount.
+/// Sets the IAM access control policy for a
+/// ServiceAccount.
 ///
 /// A builder for the *serviceAccounts.setIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -1766,7 +2059,8 @@ impl<'a, C, A> ProjectServiceAccountSetIamPolicyCall<'a, C, A> where C: BorrowMu
         self._request = new_value;
         self
     }
-    /// REQUIRED: The resource for which the policy is being specified. `resource` is usually specified as a path. For example, a Project resource is specified as `projects/{project}`.
+    /// REQUIRED: The resource for which the policy is being specified.
+    /// See the operation documentation for the appropriate value for this field.
     ///
     /// Sets the *resource* path property to the given value.
     ///
@@ -1801,12 +2095,12 @@ impl<'a, C, A> ProjectServiceAccountSetIamPolicyCall<'a, C, A> where C: BorrowMu
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceAccountSetIamPolicyCall<'a, C, A>
@@ -2011,7 +2305,11 @@ impl<'a, C, A> ProjectServiceAccountKeyDeleteCall<'a, C, A> where C: BorrowMut<h
     }
 
 
-    /// The resource name of the service account key in the following format: `projects/{project}/serviceAccounts/{account}/keys/{key}`. Using `-` as a wildcard for the project will infer the project from the account. The `account` value can be the `email` address or the `unique_id` of the service account.
+    /// The resource name of the service account key in the following format:
+    /// `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}/keys/{key}`.
+    /// Using `-` as a wildcard for the project will infer the project from
+    /// the account. The `account` value can be the `email` address or the
+    /// `unique_id` of the service account.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -2046,12 +2344,12 @@ impl<'a, C, A> ProjectServiceAccountKeyDeleteCall<'a, C, A> where C: BorrowMut<h
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceAccountKeyDeleteCall<'a, C, A>
@@ -2079,7 +2377,8 @@ impl<'a, C, A> ProjectServiceAccountKeyDeleteCall<'a, C, A> where C: BorrowMut<h
 }
 
 
-/// Creates a ServiceAccountKey and returns it.
+/// Creates a ServiceAccountKey
+/// and returns it.
 ///
 /// A builder for the *serviceAccounts.keys.create* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -2287,7 +2586,11 @@ impl<'a, C, A> ProjectServiceAccountKeyCreateCall<'a, C, A> where C: BorrowMut<h
         self._request = new_value;
         self
     }
-    /// The resource name of the service account in the following format: `projects/{project}/serviceAccounts/{account}`. Using `-` as a wildcard for the project will infer the project from the account. The `account` value can be the `email` address or the `unique_id` of the service account.
+    /// The resource name of the service account in the following format:
+    /// `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
+    /// Using `-` as a wildcard for the project will infer the project from
+    /// the account. The `account` value can be the `email` address or the
+    /// `unique_id` of the service account.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -2322,12 +2625,12 @@ impl<'a, C, A> ProjectServiceAccountKeyCreateCall<'a, C, A> where C: BorrowMut<h
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceAccountKeyCreateCall<'a, C, A>
@@ -2563,7 +2866,11 @@ impl<'a, C, A> ProjectServiceAccountSignBlobCall<'a, C, A> where C: BorrowMut<hy
         self._request = new_value;
         self
     }
-    /// The resource name of the service account in the following format: `projects/{project}/serviceAccounts/{account}`. Using `-` as a wildcard for the project will infer the project from the account. The `account` value can be the `email` address or the `unique_id` of the service account.
+    /// The resource name of the service account in the following format:
+    /// `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
+    /// Using `-` as a wildcard for the project will infer the project from
+    /// the account. The `account` value can be the `email` address or the
+    /// `unique_id` of the service account.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -2598,12 +2905,12 @@ impl<'a, C, A> ProjectServiceAccountSignBlobCall<'a, C, A> where C: BorrowMut<hy
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceAccountSignBlobCall<'a, C, A>
@@ -2631,7 +2938,11 @@ impl<'a, C, A> ProjectServiceAccountSignBlobCall<'a, C, A> where C: BorrowMut<hy
 }
 
 
-/// Updates a ServiceAccount. Currently, only the following fields are updatable: `display_name` . The `etag` is mandatory.
+/// Updates a ServiceAccount.
+/// 
+/// Currently, only the following fields are updatable:
+/// `display_name` .
+/// The `etag` is mandatory.
 ///
 /// A builder for the *serviceAccounts.update* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -2839,7 +3150,15 @@ impl<'a, C, A> ProjectServiceAccountUpdateCall<'a, C, A> where C: BorrowMut<hype
         self._request = new_value;
         self
     }
-    /// The resource name of the service account in the following format: `projects/{project}/serviceAccounts/{account}`. Requests using `-` as a wildcard for the project will infer the project from the `account` and the `account` value can be the `email` address or the `unique_id` of the service account. In responses the resource name will always be in the format `projects/{project}/serviceAccounts/{email}`.
+    /// The resource name of the service account in the following format:
+    /// `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
+    /// 
+    /// Requests using `-` as a wildcard for the project will infer the project
+    /// from the `account` and the `account` value can be the `email` address or
+    /// the `unique_id` of the service account.
+    /// 
+    /// In responses the resource name will always be in the format
+    /// `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -2874,12 +3193,12 @@ impl<'a, C, A> ProjectServiceAccountUpdateCall<'a, C, A> where C: BorrowMut<hype
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceAccountUpdateCall<'a, C, A>
@@ -3094,7 +3413,8 @@ impl<'a, C, A> ProjectServiceAccountListCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
-    /// Required. The resource name of the project associated with the service accounts, such as `projects/my-project-123`.
+    /// Required. The resource name of the project associated with the service
+    /// accounts, such as `projects/my-project-123`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -3104,14 +3424,18 @@ impl<'a, C, A> ProjectServiceAccountListCall<'a, C, A> where C: BorrowMut<hyper:
         self._name = new_value.to_string();
         self
     }
-    /// Optional pagination token returned in an earlier ListServiceAccountsResponse.next_page_token.
+    /// Optional pagination token returned in an earlier
+    /// ListServiceAccountsResponse.next_page_token.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ProjectServiceAccountListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Optional limit on the number of service accounts to include in the response. Further accounts can subsequently be obtained by including the ListServiceAccountsResponse.next_page_token in a subsequent request.
+    /// Optional limit on the number of service accounts to include in the
+    /// response. Further accounts can subsequently be obtained by including the
+    /// ListServiceAccountsResponse.next_page_token
+    /// in a subsequent request.
     ///
     /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> ProjectServiceAccountListCall<'a, C, A> {
@@ -3143,12 +3467,12 @@ impl<'a, C, A> ProjectServiceAccountListCall<'a, C, A> where C: BorrowMut<hyper:
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceAccountListCall<'a, C, A>
@@ -3353,7 +3677,11 @@ impl<'a, C, A> ProjectServiceAccountDeleteCall<'a, C, A> where C: BorrowMut<hype
     }
 
 
-    /// The resource name of the service account in the following format: `projects/{project}/serviceAccounts/{account}`. Using `-` as a wildcard for the project will infer the project from the account. The `account` value can be the `email` address or the `unique_id` of the service account.
+    /// The resource name of the service account in the following format:
+    /// `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
+    /// Using `-` as a wildcard for the project will infer the project from
+    /// the account. The `account` value can be the `email` address or the
+    /// `unique_id` of the service account.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -3388,12 +3716,12 @@ impl<'a, C, A> ProjectServiceAccountDeleteCall<'a, C, A> where C: BorrowMut<hype
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceAccountDeleteCall<'a, C, A>
@@ -3421,7 +3749,8 @@ impl<'a, C, A> ProjectServiceAccountDeleteCall<'a, C, A> where C: BorrowMut<hype
 }
 
 
-/// Gets the ServiceAccountKey by key id.
+/// Gets the ServiceAccountKey
+/// by key id.
 ///
 /// A builder for the *serviceAccounts.keys.get* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -3603,7 +3932,12 @@ impl<'a, C, A> ProjectServiceAccountKeyGetCall<'a, C, A> where C: BorrowMut<hype
     }
 
 
-    /// The resource name of the service account key in the following format: `projects/{project}/serviceAccounts/{account}/keys/{key}`. Using `-` as a wildcard for the project will infer the project from the account. The `account` value can be the `email` address or the `unique_id` of the service account.
+    /// The resource name of the service account key in the following format:
+    /// `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}/keys/{key}`.
+    /// 
+    /// Using `-` as a wildcard for the project will infer the project from
+    /// the account. The `account` value can be the `email` address or the
+    /// `unique_id` of the service account.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -3613,7 +3947,8 @@ impl<'a, C, A> ProjectServiceAccountKeyGetCall<'a, C, A> where C: BorrowMut<hype
         self._name = new_value.to_string();
         self
     }
-    /// The output format of the public key requested. X509_PEM is the default output format.
+    /// The output format of the public key requested.
+    /// X509_PEM is the default output format.
     ///
     /// Sets the *public key type* query property to the given value.
     pub fn public_key_type(mut self, new_value: &str) -> ProjectServiceAccountKeyGetCall<'a, C, A> {
@@ -3645,12 +3980,12 @@ impl<'a, C, A> ProjectServiceAccountKeyGetCall<'a, C, A> where C: BorrowMut<hype
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceAccountKeyGetCall<'a, C, A>
@@ -3678,7 +4013,8 @@ impl<'a, C, A> ProjectServiceAccountKeyGetCall<'a, C, A> where C: BorrowMut<hype
 }
 
 
-/// Returns the IAM access control policy for a ServiceAccount.
+/// Returns the IAM access control policy for a
+/// ServiceAccount.
 ///
 /// A builder for the *serviceAccounts.getIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -3855,7 +4191,8 @@ impl<'a, C, A> ProjectServiceAccountGetIamPolicyCall<'a, C, A> where C: BorrowMu
     }
 
 
-    /// REQUIRED: The resource for which the policy is being requested. `resource` is usually specified as a path. For example, a Project resource is specified as `projects/{project}`.
+    /// REQUIRED: The resource for which the policy is being requested.
+    /// See the operation documentation for the appropriate value for this field.
     ///
     /// Sets the *resource* path property to the given value.
     ///
@@ -3890,12 +4227,12 @@ impl<'a, C, A> ProjectServiceAccountGetIamPolicyCall<'a, C, A> where C: BorrowMu
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceAccountGetIamPolicyCall<'a, C, A>
@@ -3923,7 +4260,8 @@ impl<'a, C, A> ProjectServiceAccountGetIamPolicyCall<'a, C, A> where C: BorrowMu
 }
 
 
-/// Tests the specified permissions against the IAM access control policy for a ServiceAccount.
+/// Tests the specified permissions against the IAM access control policy
+/// for a ServiceAccount.
 ///
 /// A builder for the *serviceAccounts.testIamPermissions* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -4131,7 +4469,8 @@ impl<'a, C, A> ProjectServiceAccountTestIamPermissionCall<'a, C, A> where C: Bor
         self._request = new_value;
         self
     }
-    /// REQUIRED: The resource for which the policy detail is being requested. `resource` is usually specified as a path. For example, a Project resource is specified as `projects/{project}`.
+    /// REQUIRED: The resource for which the policy detail is being requested.
+    /// See the operation documentation for the appropriate value for this field.
     ///
     /// Sets the *resource* path property to the given value.
     ///
@@ -4166,12 +4505,12 @@ impl<'a, C, A> ProjectServiceAccountTestIamPermissionCall<'a, C, A> where C: Bor
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceAccountTestIamPermissionCall<'a, C, A>
@@ -4199,7 +4538,8 @@ impl<'a, C, A> ProjectServiceAccountTestIamPermissionCall<'a, C, A> where C: Bor
 }
 
 
-/// Creates a ServiceAccount and returns it.
+/// Creates a ServiceAccount
+/// and returns it.
 ///
 /// A builder for the *serviceAccounts.create* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -4407,7 +4747,8 @@ impl<'a, C, A> ProjectServiceAccountCreateCall<'a, C, A> where C: BorrowMut<hype
         self._request = new_value;
         self
     }
-    /// Required. The resource name of the project associated with the service accounts, such as `projects/my-project-123`.
+    /// Required. The resource name of the project associated with the service
+    /// accounts, such as `projects/my-project-123`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -4442,12 +4783,12 @@ impl<'a, C, A> ProjectServiceAccountCreateCall<'a, C, A> where C: BorrowMut<hype
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceAccountCreateCall<'a, C, A>
@@ -4468,6 +4809,290 @@ impl<'a, C, A> ProjectServiceAccountCreateCall<'a, C, A> where C: BorrowMut<hype
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ProjectServiceAccountCreateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+/// Signs a JWT using a service account's system-managed private key.
+/// 
+/// If no expiry time (`exp`) is provided in the `SignJwtRequest`, IAM sets an
+/// an expiry time of one hour by default. If you request an expiry time of
+/// more than one hour, the request will fail.
+///
+/// A builder for the *serviceAccounts.signJwt* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_iam1 as iam1;
+/// use iam1::SignJwtRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use iam1::Iam;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Iam::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = SignJwtRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().service_accounts_sign_jwt(req, "name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectServiceAccountSignJwtCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Iam<C, A>,
+    _request: SignJwtRequest,
+    _name: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectServiceAccountSignJwtCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectServiceAccountSignJwtCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, SignJwtResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "iam.projects.serviceAccounts.signJwt",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://iam.googleapis.com/v1/{+name}:signJwt".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: SignJwtRequest) -> ProjectServiceAccountSignJwtCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The resource name of the service account in the following format:
+    /// `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
+    /// Using `-` as a wildcard for the project will infer the project from
+    /// the account. The `account` value can be the `email` address or the
+    /// `unique_id` of the service account.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectServiceAccountSignJwtCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectServiceAccountSignJwtCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceAccountSignJwtCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectServiceAccountSignJwtCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4652,7 +5277,11 @@ impl<'a, C, A> ProjectServiceAccountGetCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
-    /// The resource name of the service account in the following format: `projects/{project}/serviceAccounts/{account}`. Using `-` as a wildcard for the project will infer the project from the account. The `account` value can be the `email` address or the `unique_id` of the service account.
+    /// The resource name of the service account in the following format:
+    /// `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
+    /// Using `-` as a wildcard for the project will infer the project from
+    /// the account. The `account` value can be the `email` address or the
+    /// `unique_id` of the service account.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -4687,12 +5316,12 @@ impl<'a, C, A> ProjectServiceAccountGetCall<'a, C, A> where C: BorrowMut<hyper::
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceAccountGetCall<'a, C, A>

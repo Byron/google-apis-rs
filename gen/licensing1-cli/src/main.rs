@@ -371,11 +371,13 @@ impl<'n> Engine<'n> {
                     "sku-id" => Some(("skuId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-id" => Some(("userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "product-name" => Some(("productName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sku-name" => Some(("skuName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etags" => Some(("etags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "product-id" => Some(("productId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etags", "kind", "product-id", "self-link", "sku-id", "user-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etags", "kind", "product-id", "product-name", "self-link", "sku-id", "sku-name", "user-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -461,11 +463,13 @@ impl<'n> Engine<'n> {
                     "sku-id" => Some(("skuId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-id" => Some(("userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "product-name" => Some(("productName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sku-name" => Some(("skuName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etags" => Some(("etags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "product-id" => Some(("productId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etags", "kind", "product-id", "self-link", "sku-id", "user-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etags", "kind", "product-id", "product-name", "self-link", "sku-id", "sku-name", "user-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -886,8 +890,8 @@ fn main() {
     
     let mut app = App::new("licensing1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.4+20150901")
-           .about("Licensing API to view and manage license for your domain.")
+           .version("1.0.4+20170213")
+           .about("Views and manages licenses for your domain.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_licensing1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

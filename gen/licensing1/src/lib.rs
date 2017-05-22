@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *licensing* crate version *1.0.4+20150901*, where *20150901* is the exact revision of the *licensing:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
+//! This documentation was generated from *licensing* crate version *1.0.4+20170213*, where *20170213* is the exact revision of the *licensing:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
 //! 
 //! Everything else about the *licensing* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/google-apps/licensing/).
@@ -223,7 +223,7 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
 #[derive(PartialEq, Eq, Hash)]
 pub enum Scope {
-    /// View and manage Google Apps licenses for your domain
+    /// View and manage G Suite licenses for your domain
     AppLicensing,
 }
 
@@ -356,20 +356,26 @@ impl<'a, C, A> Licensing<C, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LicenseAssignment {
-    /// Name of the sku of the product.
+    /// Id of the sku of the product.
     #[serde(rename="skuId")]
     pub sku_id: Option<String>,
     /// Identifies the resource as a LicenseAssignment.
     pub kind: Option<String>,
-    /// ETag of the resource.
-    pub etags: Option<String>,
     /// Email id of the user.
     #[serde(rename="userId")]
     pub user_id: Option<String>,
+    /// Display Name of the product.
+    #[serde(rename="productName")]
+    pub product_name: Option<String>,
+    /// Display Name of the sku of the product.
+    #[serde(rename="skuName")]
+    pub sku_name: Option<String>,
+    /// ETag of the resource.
+    pub etags: Option<String>,
     /// Link to this page.
     #[serde(rename="selfLink")]
     pub self_link: Option<String>,
-    /// Name of the product.
+    /// Id of the product.
     #[serde(rename="productId")]
     pub product_id: Option<String>,
 }

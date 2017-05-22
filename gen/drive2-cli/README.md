@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *drive* API at revision *20161212*. The CLI is at version *1.0.4*.
+This documentation was generated from the *drive* API at revision *20170512*. The CLI is at version *1.0.4*.
 
 ```bash
 drive2 [options]
@@ -36,6 +36,7 @@ drive2 [options]
                 list [-p <v>]... [-o <out>]
         changes
                 get <change-id> [-p <v>]... [-o <out>]
+                get-start-page-token [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]
                 watch (-r <kv>)... [-p <v>]... [-o <out>]
         channels
@@ -103,6 +104,12 @@ drive2 [options]
                 list <file-id> [-p <v>]... [-o <out>]
                 patch <file-id> <revision-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 update <file-id> <revision-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        teamdrives
+                delete <team-drive-id> [-p <v>]...
+                get <team-drive-id> [-p <v>]... [-o <out>]
+                insert <request-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+                update <team-drive-id> (-r <kv>)... [-p <v>]... [-o <out>]
   drive2 --help
 
 Configuration:

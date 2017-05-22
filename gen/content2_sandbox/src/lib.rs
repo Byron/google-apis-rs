@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Shopping Content* crate version *1.0.4+20161205*, where *20161205* is the exact revision of the *content:v2sandbox* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
+//! This documentation was generated from *Shopping Content* crate version *1.0.4+20170519*, where *20170519* is the exact revision of the *content:v2sandbox* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
 //! 
 //! Everything else about the *Shopping Content* *v2_sandbox* API can be found at the
 //! [official documentation site](https://developers.google.com/shopping-content).
@@ -2052,7 +2052,7 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Cancels a line item. This method can only be called for non-multi-client accounts.
+    /// Cancels a line item, making a full refund. This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -2113,7 +2113,7 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Cancels all line items in an order. This method can only be called for non-multi-client accounts.
+    /// Cancels all line items in an order, making a full refund. This method can only be called for non-multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -4838,7 +4838,7 @@ impl<'a, C, A> OrderCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 }
 
 
-/// Cancels a line item. This method can only be called for non-multi-client accounts.
+/// Cancels a line item, making a full refund. This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *cancellineitem* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
@@ -5641,7 +5641,7 @@ impl<'a, C, A> OrderAcknowledgeCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 }
 
 
-/// Cancels all line items in an order. This method can only be called for non-multi-client accounts.
+/// Cancels all line items in an order, making a full refund. This method can only be called for non-multi-client accounts.
 ///
 /// A builder for the *cancel* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.

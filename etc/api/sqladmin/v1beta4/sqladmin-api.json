@@ -1,12 +1,12 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"tbys6C40o18GZwyMen5GMkdK-3s/zyhp6b48ey3HpDh3VFAj4lFLBFo\"",
+ "etag": "\"YWOzh2SDasdU84ArJnpYek-OMdg/vS6rayCgu04tWkxAcCer7mqEHaA\"",
  "discoveryVersion": "v1",
  "id": "sqladmin:v1beta4",
  "name": "sqladmin",
  "canonicalName": "SQL Admin",
  "version": "v1beta4",
- "revision": "20161213",
+ "revision": "20170502",
  "title": "Cloud SQL Administration API",
  "description": "Creates and configures Cloud SQL instances, which provide fully-managed MySQL databases.",
  "ownerDomain": "google.com",
@@ -736,6 +736,17 @@
     }
    }
   },
+  "InstancesTruncateLogRequest": {
+   "id": "InstancesTruncateLogRequest",
+   "type": "object",
+   "description": "Instance truncate log request.",
+   "properties": {
+    "truncateLogContext": {
+     "$ref": "TruncateLogContext",
+     "description": "Contains details about the truncate log operation."
+    }
+   }
+  },
   "IpConfiguration": {
    "id": "IpConfiguration",
    "type": "object",
@@ -775,6 +786,21 @@
     "type": {
      "type": "string",
      "description": "The type of this IP address. A PRIMARY address is an address that can accept incoming connections. An OUTGOING address is the source address of connections originating from the instance, if supported."
+    }
+   }
+  },
+  "Labels": {
+   "id": "Labels",
+   "type": "object",
+   "description": "Reserved for future use.",
+   "properties": {
+    "key": {
+     "type": "string",
+     "description": "Reserved for future use."
+    },
+    "value": {
+     "type": "string",
+     "description": "Reserved for future use."
     }
    }
   },
@@ -951,8 +977,7 @@
      "description": "Name of the database instance related to this operation."
     },
     "targetLink": {
-     "type": "string",
-     "description": "The URI of the instance related to the operation."
+     "type": "string"
     },
     "targetProject": {
      "type": "string",
@@ -1088,6 +1113,10 @@
       "type": "string"
      }
     },
+    "availabilityType": {
+     "type": "string",
+     "description": "Reserved for future use."
+    },
     "backupConfiguration": {
      "$ref": "BackupConfiguration",
      "description": "The daily backup configuration for the instance."
@@ -1125,6 +1154,13 @@
      "description": "This is always sql#settings.",
      "default": "sql#settings"
     },
+    "labels": {
+     "type": "array",
+     "description": "Reserved for future use.",
+     "items": {
+      "$ref": "Labels"
+     }
+    },
     "locationPreference": {
      "$ref": "LocationPreference",
      "description": "The location preference settings. This allows the instance to be located as near as possible to either an App Engine app or GCE zone for better performance. App Engine co-location is only applicable to First Generation instances."
@@ -1154,6 +1190,11 @@
     "storageAutoResize": {
      "type": "boolean",
      "description": "Configuration to increase storage size automatically. The default value is false. Applies only to Second Generation instances."
+    },
+    "storageAutoResizeLimit": {
+     "type": "string",
+     "description": "The maximum size to which storage capacity can be automatically increased. The default value is 0, which specifies that there is no limit. Applies only to Second Generation instances.",
+     "format": "int64"
     },
     "tier": {
      "type": "string",
@@ -1342,6 +1383,22 @@
      "type": "string",
      "description": "This is always sql#tiersList.",
      "default": "sql#tiersList"
+    }
+   }
+  },
+  "TruncateLogContext": {
+   "id": "TruncateLogContext",
+   "type": "object",
+   "description": "Database Instance truncate log context.",
+   "properties": {
+    "kind": {
+     "type": "string",
+     "description": "This is always sql#truncateLogContext.",
+     "default": "sql#truncateLogContext"
+    },
+    "logType": {
+     "type": "string",
+     "description": "The type of log to truncate. Valid values are MYSQL_GENERAL_TABLE and MYSQL_SLOW_TABLE."
     }
    }
   },
@@ -1798,6 +1855,13 @@
      "path": "flags",
      "httpMethod": "GET",
      "description": "List all available database flags for Google Cloud SQL instances.",
+     "parameters": {
+      "databaseVersion": {
+       "type": "string",
+       "description": "Database version for flag retrieval. Flags are specific to the database version.",
+       "location": "query"
+      }
+     },
      "response": {
       "$ref": "FlagsListResponse"
      },
@@ -2039,6 +2103,11 @@
      "httpMethod": "GET",
      "description": "Lists instances under a given project in the alphabetical order of the instance name.",
      "parameters": {
+      "filter": {
+       "type": "string",
+       "description": "Reserved for future use.",
+       "location": "query"
+      },
       "maxResults": {
        "type": "integer",
        "description": "The maximum number of results to return per response.",
@@ -2303,20 +2372,6 @@
        "required": true,
        "location": "path"
       },
-      "logType": {
-       "type": "string",
-       "description": "The type of Log Table to truncate. Valid values are MYSQL_GENERAL_TABLE and MYSQL_SLOW_TABLE",
-       "required": true,
-       "enum": [
-        "MYSQL_GENERAL_TABLE",
-        "MYSQL_SLOW_TABLE"
-       ],
-       "enumDescriptions": [
-        "Truncate mysql.general_log table",
-        "Truncate mysql.slow_log table"
-       ],
-       "location": "query"
-      },
       "project": {
        "type": "string",
        "description": "Project ID of the Cloud SQL project.",
@@ -2326,9 +2381,11 @@
      },
      "parameterOrder": [
       "project",
-      "instance",
-      "logType"
+      "instance"
      ],
+     "request": {
+      "$ref": "InstancesTruncateLogRequest"
+     },
      "response": {
       "$ref": "Operation"
      },

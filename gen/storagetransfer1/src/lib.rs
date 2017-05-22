@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *storagetransfer* crate version *1.0.4+20150811*, where *20150811* is the exact revision of the *storagetransfer:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
+//! This documentation was generated from *storagetransfer* crate version *1.0.4+20170515*, where *20170515* is the exact revision of the *storagetransfer:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
 //! 
 //! Everything else about the *storagetransfer* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/storage/transfer).
@@ -18,9 +18,6 @@
 //! * [transfer operations](struct.TransferOperation.html)
 //!  * [*cancel*](struct.TransferOperationCancelCall.html), [*delete*](struct.TransferOperationDeleteCall.html), [*get*](struct.TransferOperationGetCall.html), [*list*](struct.TransferOperationListCall.html), [*pause*](struct.TransferOperationPauseCall.html) and [*resume*](struct.TransferOperationResumeCall.html)
 //! 
-//! Other activities are ...
-//! 
-//! * [get google service account](struct.MethodGetGoogleServiceAccountCall.html)
 //! 
 //! 
 //! 
@@ -331,9 +328,6 @@ impl<'a, C, A> Storagetransfer<C, A>
     pub fn google_service_accounts(&'a self) -> GoogleServiceAccountMethods<'a, C, A> {
         GoogleServiceAccountMethods { hub: &self }
     }
-    pub fn methods(&'a self) -> MethodMethods<'a, C, A> {
-        MethodMethods { hub: &self }
-    }
     pub fn transfer_jobs(&'a self) -> TransferJobMethods<'a, C, A> {
         TransferJobMethods { hub: &self }
     }
@@ -356,6 +350,21 @@ impl<'a, C, A> Storagetransfer<C, A>
 // ############
 // SCHEMAS ###
 // ##########
+/// Request passed to PauseTransferOperation.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [pause transfer operations](struct.TransferOperationPauseCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PauseTransferOperationRequest { _never_set: Option<bool> }
+
+impl RequestValue for PauseTransferOperationRequest {}
+
+
 /// Configuration for running a transfer.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -365,10 +374,14 @@ pub struct TransferSpec {
     /// An HTTP URL data source.
     #[serde(rename="httpDataSource")]
     pub http_data_source: Option<HttpData>,
-    /// If the option `deleteObjectsUniqueInSink` is `true`, object conditions based on objects' `lastModificationTime` are ignored and do not exclude objects in a data source or a data sink.
+    /// If the option `deleteObjectsUniqueInSink` is `true`, object conditions
+    /// based on objects' `lastModificationTime` are ignored and do not exclude
+    /// objects in a data source or a data sink.
     #[serde(rename="transferOptions")]
     pub transfer_options: Option<TransferOptions>,
-    /// Only objects that satisfy these object conditions are included in the set of data source and data sink objects. Object conditions based on objects' `lastModificationTime` do not exclude objects in a data sink.
+    /// Only objects that satisfy these object conditions are included in the set
+    /// of data source and data sink objects.  Object conditions based on
+    /// objects' `lastModificationTime` do not exclude objects in a data sink.
     #[serde(rename="objectConditions")]
     pub object_conditions: Option<ObjectConditions>,
     /// A Google Cloud Storage data source.
@@ -385,31 +398,19 @@ pub struct TransferSpec {
 impl Part for TransferSpec {}
 
 
-/// Request passed to PauseTransferOperation.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [pause transfer operations](struct.TransferOperationPauseCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PauseTransferOperationRequest { _never_set: Option<bool> }
-
-impl RequestValue for PauseTransferOperationRequest {}
-
-
-/// AWS access key (see [AWS Security Credentials](http://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html)).
+/// AWS access key (see
+/// [AWS Security Credentials](http://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html)).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AwsAccessKey {
-    /// AWS secret access key. This field is not returned in RPC responses. Required.
+    /// AWS secret access key. This field is not returned in RPC responses.
+    /// Required.
     #[serde(rename="secretAccessKey")]
     pub secret_access_key: Option<String>,
-    /// AWS access key ID. Required.
+    /// AWS access key ID.
+    /// Required.
     #[serde(rename="accessKeyId")]
     pub access_key_id: Option<String>,
 }
@@ -423,16 +424,58 @@ impl Part for AwsAccessKey {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ObjectConditions {
-    /// `maxTimeElapsedSinceLastModification` is the complement to `minTimeElapsedSinceLastModification`.
+    /// `maxTimeElapsedSinceLastModification` is the complement to
+    /// `minTimeElapsedSinceLastModification`.
     #[serde(rename="maxTimeElapsedSinceLastModification")]
     pub max_time_elapsed_since_last_modification: Option<String>,
-    /// If `includePrefixes` is specified, objects that satisfy the object conditions must have names that start with one of the `includePrefixes` and that do not start with any of the `excludePrefixes`. If `includePrefixes` is not specified, all objects except those that have names starting with one of the `excludePrefixes` must satisfy the object conditions. Requirements: * Each include-prefix and exclude-prefix can contain any sequence of Unicode characters, of max length 1024 bytes when UTF8-encoded, and must not contain Carriage Return or Line Feed characters. Wildcard matching and regular expression matching are not supported. * None of the include-prefix or the exclude-prefix values can be empty, if specified. * Each include-prefix must include a distinct portion of the object namespace, i.e., no include-prefix may be a prefix of another include-prefix. * Each exclude-prefix must exclude a distinct portion of the object namespace, i.e., no exclude-prefix may be a prefix of another exclude-prefix. * If `includePrefixes` is specified, then each exclude-prefix must start with the value of a path explicitly included by `includePrefixes`. The max size of `includePrefixes` is 20.
+    /// If `includePrefixes` is specified, objects that satisfy the object
+    /// conditions must have names that start with one of the `includePrefixes`
+    /// and that do not start with any of the `excludePrefixes`. If `includePrefixes`
+    /// is not specified, all objects except those that have names starting with
+    /// one of the `excludePrefixes` must satisfy the object conditions.
+    /// 
+    /// Requirements:
+    /// 
+    ///   * Each include-prefix and exclude-prefix can contain any sequence of
+    ///     Unicode characters, of max length 1024 bytes when UTF8-encoded, and
+    ///     must not contain Carriage Return or Line Feed characters.  Wildcard
+    ///     matching and regular expression matching are not supported.
+    /// 
+    ///   * Each include-prefix and exclude-prefix must omit the leading slash.
+    ///     For example, to include the `requests.gz` object in a transfer from
+    ///     `s3://my-aws-bucket/logs/y=2015/requests.gz`, specify the include
+    ///     prefix as `logs/y=2015/requests.gz`.
+    /// 
+    ///   * None of the include-prefix or the exclude-prefix values can be empty,
+    ///     if specified.
+    /// 
+    ///   * Each include-prefix must include a distinct portion of the object
+    ///     namespace, i.e., no include-prefix may be a prefix of another
+    ///     include-prefix.
+    /// 
+    ///   * Each exclude-prefix must exclude a distinct portion of the object
+    ///     namespace, i.e., no exclude-prefix may be a prefix of another
+    ///     exclude-prefix.
+    /// 
+    ///   * If `includePrefixes` is specified, then each exclude-prefix must start
+    ///     with the value of a path explicitly included by `includePrefixes`.
+    /// 
+    /// The max size of `includePrefixes` is 1000.
     #[serde(rename="includePrefixes")]
     pub include_prefixes: Option<Vec<String>>,
-    /// `excludePrefixes` must follow the requirements described for `includePrefixes`. The max size of `excludePrefixes` is 20.
+    /// `excludePrefixes` must follow the requirements described for
+    /// `includePrefixes`.
+    /// 
+    /// The max size of `excludePrefixes` is 1000.
     #[serde(rename="excludePrefixes")]
     pub exclude_prefixes: Option<Vec<String>>,
-    /// If unspecified, `minTimeElapsedSinceLastModification` takes a zero value and `maxTimeElapsedSinceLastModification` takes the maximum possible value of Duration. Objects that satisfy the object conditions must either have a `lastModificationTime` greater or equal to `NOW` - `maxTimeElapsedSinceLastModification` and less than `NOW` - `minTimeElapsedSinceLastModification`, or not have a `lastModificationTime`.
+    /// If unspecified, `minTimeElapsedSinceLastModification` takes a zero value
+    /// and `maxTimeElapsedSinceLastModification` takes the maximum possible
+    /// value of Duration. Objects that satisfy the object conditions
+    /// must either have a `lastModificationTime` greater or equal to
+    /// `NOW` - `maxTimeElapsedSinceLastModification` and less than
+    /// `NOW` - `minTimeElapsedSinceLastModification`, or not have a
+    /// `lastModificationTime`.
     #[serde(rename="minTimeElapsedSinceLastModification")]
     pub min_time_elapsed_since_last_modification: Option<String>,
 }
@@ -446,10 +489,13 @@ impl Part for ObjectConditions {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TransferCounters {
-    /// Bytes in the data source that are not transferred because they already exist in the data sink.
+    /// Bytes in the data source that are not transferred because they already
+    /// exist in the data sink.
     #[serde(rename="bytesFromSourceSkippedBySync")]
     pub bytes_from_source_skipped_by_sync: Option<String>,
-    /// Objects found in the data source that are scheduled to be transferred, which will be copied, excluded based on conditions, or skipped due to failures.
+    /// Objects found in the data source that are scheduled to be transferred,
+    /// which will be copied, excluded based on conditions, or skipped due to
+    /// failures.
     #[serde(rename="objectsFoundFromSource")]
     pub objects_found_from_source: Option<String>,
     /// Bytes that failed to be deleted from the data sink.
@@ -461,13 +507,16 @@ pub struct TransferCounters {
     /// Objects found only in the data sink that are scheduled to be deleted.
     #[serde(rename="objectsFoundOnlyFromSink")]
     pub objects_found_only_from_sink: Option<String>,
-    /// Objects in the data source that are not transferred because they already exist in the data sink.
+    /// Objects in the data source that are not transferred because they already
+    /// exist in the data sink.
     #[serde(rename="objectsFromSourceSkippedBySync")]
     pub objects_from_source_skipped_by_sync: Option<String>,
     /// Bytes that are copied to the data sink.
     #[serde(rename="bytesCopiedToSink")]
     pub bytes_copied_to_sink: Option<String>,
-    /// Bytes found in the data source that are scheduled to be transferred, which will be copied, excluded based on conditions, or skipped due to failures.
+    /// Bytes found in the data source that are scheduled to be transferred,
+    /// which will be copied, excluded based on conditions, or skipped due to
+    /// failures.
     #[serde(rename="bytesFoundFromSource")]
     pub bytes_found_from_source: Option<String>,
     /// Objects that are deleted from the data source.
@@ -515,7 +564,8 @@ impl Part for TransferCounters {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TransferOperation {
-    /// Transfer specification. Required.
+    /// Transfer specification.
+    /// Required.
     #[serde(rename="transferSpec")]
     pub transfer_spec: Option<TransferSpec>,
     /// Status of the transfer operation.
@@ -525,7 +575,8 @@ pub struct TransferOperation {
     pub transfer_job_name: Option<String>,
     /// A globally unique ID assigned by the system.
     pub name: Option<String>,
-    /// The ID of the Google Developers Console project that owns the operation. Required.
+    /// The ID of the Google Cloud Platform Console project that owns the operation.
+    /// Required.
     #[serde(rename="projectId")]
     pub project_id: Option<String>,
     /// Summarizes errors encountered with sample error log entries.
@@ -544,16 +595,22 @@ pub struct TransferOperation {
 impl Resource for TransferOperation {}
 
 
-/// An AwsS3Data can be a data source, but not a data sink. In an AwsS3Data, an object's name is the S3 object's key name.
+/// An AwsS3Data can be a data source, but not a data sink.
+/// In an AwsS3Data, an object's name is the S3 object's key name.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AwsS3Data {
-    /// AWS access key used to sign the API requests to the AWS S3 bucket. Permissions on the bucket must be granted to the access ID of the AWS access key. Required.
+    /// AWS access key used to sign the API requests to the AWS S3 bucket.
+    /// Permissions on the bucket must be granted to the access ID of the
+    /// AWS access key.
+    /// Required.
     #[serde(rename="awsAccessKey")]
     pub aws_access_key: Option<AwsAccessKey>,
-    /// S3 Bucket name (see [Creating a bucket](http://docs.aws.amazon.com/AmazonS3/latest/dev/create-bucket-get-location-example.html)). Required.
+    /// S3 Bucket name (see
+    /// [Creating a bucket](http://docs.aws.amazon.com/AmazonS3/latest/dev/create-bucket-get-location-example.html)).
+    /// Required.
     #[serde(rename="bucketName")]
     pub bucket_name: Option<String>,
 }
@@ -567,7 +624,9 @@ impl Part for AwsS3Data {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ErrorLogEntry {
-    /// A URL that refers to the target (a data source, a data sink, or an object) with which the error is associated. Required.
+    /// A URL that refers to the target (a data source, a data sink,
+    /// or an object) with which the error is associated.
+    /// Required.
     pub url: Option<String>,
     /// A list of messages that carry the error details.
     #[serde(rename="errorDetails")]
@@ -577,13 +636,17 @@ pub struct ErrorLogEntry {
 impl Part for ErrorLogEntry {}
 
 
-/// In a GcsData, an object's name is the Google Cloud Storage object's name and its `lastModificationTime` refers to the object's updated time, which changes when the content or the metadata of the object is updated.
+/// In a GcsData, an object's name is the Google Cloud Storage object's name and
+/// its `lastModificationTime` refers to the object's updated time, which changes
+/// when the content or the metadata of the object is updated.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GcsData {
-    /// Google Cloud Storage bucket name (see [Bucket Name Requirements](https://cloud.google.com/storage/docs/bucket-naming#requirements)). Required.
+    /// Google Cloud Storage bucket name (see
+    /// [Bucket Name Requirements](https://cloud.google.com/storage/docs/bucket-naming#requirements)).
+    /// Required.
     #[serde(rename="bucketName")]
     pub bucket_name: Option<String>,
 }
@@ -591,13 +654,56 @@ pub struct GcsData {
 impl Part for GcsData {}
 
 
-/// An HttpData specifies a list of objects on the web to be transferred over HTTP. The information of the objects to be transferred is contained in a file referenced by a URL. The first line in the file must be "TsvHttpData-1.0", which specifies the format of the file. Subsequent lines specify the information of the list of objects, one object per list entry. Each entry has the following tab-delimited fields: * HTTP URL * Length * MD5 - This field is a base64-encoded MD5 hash of the object An HTTP URL that points to the object to be transferred. It must be a valid URL with URL scheme HTTP or HTTPS. When an object with URL `http(s)://hostname:port/` is transferred to the data sink, the name of the object at the data sink is `/`. Length and MD5 provide the size and the base64-encoded MD5 hash of the object. If Length does not match the actual length of the object fetched, the object will not be transferred. If MD5 does not match the MD5 computed from the transferred bytes, the object transfer will fail. `lastModificationTime` is not available in HttpData objects. The objects that the URL list points to must allow public access. Storage Transfer Service obeys `robots.txt` rules and requires the HTTP server to support Range requests and to return a Content-Length header in each response.
+/// An HttpData specifies a list of objects on the web to be transferred over
+/// HTTP.  The information of the objects to be transferred is contained in a
+/// file referenced by a URL. The first line in the file must be
+/// "TsvHttpData-1.0", which specifies the format of the file.  Subsequent lines
+/// specify the information of the list of objects, one object per list entry.
+/// Each entry has the following tab-delimited fields:
+/// 
+/// * HTTP URL - The location of the object.
+/// 
+/// * Length - The size of the object in bytes.
+/// 
+/// * MD5 - The base64-encoded MD5 hash of the object.
+/// 
+/// For an example of a valid TSV file, see
+/// [Transferring data from URLs](https://cloud.google.com/storage/transfer/#urls)
+/// 
+/// When transferring data based on a URL list, keep the following in mind:
+/// 
+/// * When an object located at `http(s)://hostname:port/<URL-path>` is transferred
+/// to a data sink, the name of the object at the data sink is
+/// `<hostname>/<URL-path>`.
+/// 
+/// * If the specified size of an object does not match the actual size of the
+/// object fetched, the object will not be transferred.
+/// 
+/// * If the specified MD5 does not match the MD5 computed from the transferred
+/// bytes, the object transfer will fail. For more information, see
+/// [Generating MD5 hashes](https://cloud.google.com/storage/transfer/#md5)
+/// 
+/// * Ensure that each URL you specify is publicly accessible. For
+/// example, in Google Cloud Storage you can
+/// [share an object publicly]
+/// (https://cloud.google.com/storage/docs/cloud-console#_sharingdata) and get
+/// a link to it.
+/// 
+/// * Storage Transfer Service obeys `robots.txt` rules and requires the source
+/// HTTP server to support `Range` requests and to return a `Content-Length`
+/// header in each response.
+/// 
+/// * [ObjectConditions](#ObjectConditions) have no effect when filtering objects
+/// to transfer.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct HttpData {
-    /// The URL that points to the file that stores the object list entries. This file must allow public access. Currently, only URLs with HTTP and HTTPS schemes are supported. Required.
+    /// The URL that points to the file that stores the object list entries.
+    /// This file must allow public access.  Currently, only URLs with HTTP and
+    /// HTTPS schemes are supported.
+    /// Required.
     #[serde(rename="listUrl")]
     pub list_url: Option<String>,
 }
@@ -605,26 +711,38 @@ pub struct HttpData {
 impl Part for HttpData {}
 
 
-/// Represents a time of day. The date and time zone are either not significant or are specified elsewhere. An API may chose to allow leap seconds. Related types are [google.type.Date][google.type.Date] and `google.protobuf.Timestamp`.
+/// Represents a time of day. The date and time zone are either not significant
+/// or are specified elsewhere. An API may choose to allow leap seconds. Related
+/// types are google.type.Date and `google.protobuf.Timestamp`.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TimeOfDay {
-    /// Hours of day in 24 hour format. Should be from 0 to 23. An API may choose to allow the value "24:00:00" for scenarios like business closing time.
+    /// Hours of day in 24 hour format. Should be from 0 to 23. An API may choose
+    /// to allow the value "24:00:00" for scenarios like business closing time.
     pub hours: Option<i32>,
-    /// Seconds of minutes of the time. Must normally be from 0 to 59. An API may allow the value 60 if it allows leap-seconds.
-    pub seconds: Option<i32>,
-    /// Minutes of hour of day. Must be from 0 to 59.
-    pub minutes: Option<i32>,
     /// Fractions of seconds in nanoseconds. Must be from 0 to 999,999,999.
     pub nanos: Option<i32>,
+    /// Minutes of hour of day. Must be from 0 to 59.
+    pub minutes: Option<i32>,
+    /// Seconds of minutes of the time. Must normally be from 0 to 59. An API may
+    /// allow the value 60 if it allows leap-seconds.
+    pub seconds: Option<i32>,
 }
 
 impl Part for TimeOfDay {}
 
 
-/// A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); } The JSON representation for `Empty` is empty JSON object `{}`.
+/// A generic empty message that you can re-use to avoid defining duplicated
+/// empty messages in your APIs. A typical example is to use it as the request
+/// or the response type of an API method. For instance:
+/// 
+///     service Foo {
+///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+///     }
+/// 
+/// The JSON representation for `Empty` is empty JSON object `{}`.
 /// 
 /// # Activities
 /// 
@@ -642,17 +760,71 @@ pub struct Empty { _never_set: Option<bool> }
 impl ResponseResult for Empty {}
 
 
-/// The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). The error model is designed to be: - Simple to use and understand for most users - Flexible enough to meet unexpected needs # Overview The `Status` message contains three pieces of data: error code, error message, and error details. The error code should be an enum value of [google.rpc.Code][google.rpc.Code], but it may accept additional error codes if needed. The error message should be a developer-facing English message that helps developers *understand* and *resolve* the error. If a localized user-facing error message is needed, put the localized message in the error details or localize it in the client. The optional error details may contain arbitrary information about the error. There is a predefined set of error detail types in the package `google.rpc` which can be used for common error conditions. # Language mapping The `Status` message is the logical representation of the error model, but it is not necessarily the actual wire format. When the `Status` message is exposed in different client libraries and different wire protocols, it can be mapped differently. For example, it will likely be mapped to some exceptions in Java, but more likely mapped to some error codes in C. # Other uses The error model and the `Status` message can be used in a variety of environments, either with or without APIs, to provide a consistent developer experience across different environments. Example uses of this error model include: - Partial errors. If a service needs to return partial errors to the client, it may embed the `Status` in the normal response to indicate the partial errors. - Workflow errors. A typical workflow has multiple steps. Each step may have a `Status` message for error reporting purpose. - Batch operations. If a client uses batch request and batch response, the `Status` message should be used directly inside batch response, one for each error sub-response. - Asynchronous operations. If an API call embeds asynchronous operation results in its response, the status of those operations should be represented directly using the `Status` message. - Logging. If some API errors are stored in logs, the message `Status` could be used directly after any stripping needed for security/privacy reasons.
+/// The `Status` type defines a logical error model that is suitable for different
+/// programming environments, including REST APIs and RPC APIs. It is used by
+/// [gRPC](https://github.com/grpc). The error model is designed to be:
+/// 
+/// - Simple to use and understand for most users
+/// - Flexible enough to meet unexpected needs
+/// 
+/// # Overview
+/// 
+/// The `Status` message contains three pieces of data: error code, error message,
+/// and error details. The error code should be an enum value of
+/// google.rpc.Code, but it may accept additional error codes if needed.  The
+/// error message should be a developer-facing English message that helps
+/// developers *understand* and *resolve* the error. If a localized user-facing
+/// error message is needed, put the localized message in the error details or
+/// localize it in the client. The optional error details may contain arbitrary
+/// information about the error. There is a predefined set of error detail types
+/// in the package `google.rpc` that can be used for common error conditions.
+/// 
+/// # Language mapping
+/// 
+/// The `Status` message is the logical representation of the error model, but it
+/// is not necessarily the actual wire format. When the `Status` message is
+/// exposed in different client libraries and different wire protocols, it can be
+/// mapped differently. For example, it will likely be mapped to some exceptions
+/// in Java, but more likely mapped to some error codes in C.
+/// 
+/// # Other uses
+/// 
+/// The error model and the `Status` message can be used in a variety of
+/// environments, either with or without APIs, to provide a
+/// consistent developer experience across different environments.
+/// 
+/// Example uses of this error model include:
+/// 
+/// - Partial errors. If a service needs to return partial errors to the client,
+///     it may embed the `Status` in the normal response to indicate the partial
+///     errors.
+/// 
+/// - Workflow errors. A typical workflow has multiple steps. Each step may
+///     have a `Status` message for error reporting.
+/// 
+/// - Batch operations. If a client uses batch request and batch response, the
+///     `Status` message should be used directly inside batch response, one for
+///     each error sub-response.
+/// 
+/// - Asynchronous operations. If an API call embeds asynchronous operation
+///     results in its response, the status of those operations should be
+///     represented directly using the `Status` message.
+/// 
+/// - Logging. If some API errors are stored in logs, the message `Status` could
+///     be used directly after any stripping needed for security/privacy reasons.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Status {
-    /// A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the [google.rpc.Status.details][google.rpc.Status.details] field, or localized by the client.
+    /// A developer-facing error message, which should be in English. Any
+    /// user-facing error message should be localized and sent in the
+    /// google.rpc.Status.details field, or localized by the client.
     pub message: Option<String>,
-    /// The status code, which should be an enum value of [google.rpc.Code][google.rpc.Code].
+    /// The status code, which should be an enum value of google.rpc.Code.
     pub code: Option<i32>,
-    /// A list of messages that carry the error details. There will be a common set of message types for APIs to use.
+    /// A list of messages that carry the error details.  There will be a
+    /// common set of message types for APIs to use.
     pub details: Option<Vec<HashMap<String, String>>>,
 }
 
@@ -666,7 +838,6 @@ impl Part for Status {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [get google service account](struct.MethodGetGoogleServiceAccountCall.html) (response)
 /// * [get google service accounts](struct.GoogleServiceAccountGetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -680,7 +851,7 @@ impl Resource for GoogleServiceAccount {}
 impl ResponseResult for GoogleServiceAccount {}
 
 
-/// The response message for [Operations.ListOperations][google.longrunning.Operations.ListOperations].
+/// The response message for Operations.ListOperations.
 /// 
 /// # Activities
 /// 
@@ -707,13 +878,24 @@ impl ResponseResult for ListOperationsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Schedule {
-    /// The first day the recurring transfer is scheduled to run. Required.
-    #[serde(rename="scheduleStartDate")]
-    pub schedule_start_date: Option<Date>,
-    /// The time in UTC at which the transfer will be scheduled to start in a day. Transfers may start later than this time. If not specified, transfers are scheduled to start at midnight UTC.
+    /// The time in UTC at which the transfer will be scheduled to start in a day.
+    /// Transfers may start later than this time. If not specified, recurring and
+    /// one-time transfers that are scheduled to run today will run immediately;
+    /// recurring transfers that are scheduled to run on a future date will start
+    /// at approximately midnight UTC on that date. Note that when configuring a
+    /// transfer with the Cloud Platform Console, the transfer's start time in a
+    /// day is specified in your local timezone.
     #[serde(rename="startTimeOfDay")]
     pub start_time_of_day: Option<TimeOfDay>,
-    /// The last day the recurring transfer will be run. If `scheduleEndDate` is the same as `scheduleStartDate`, the transfer will be executed only once.
+    /// The first day the recurring transfer is scheduled to run. If
+    /// `scheduleStartDate` is in the past, the transfer will run for the first
+    /// time on the following day.
+    /// Required.
+    #[serde(rename="scheduleStartDate")]
+    pub schedule_start_date: Option<Date>,
+    /// The last day the recurring transfer will be run. If `scheduleEndDate`
+    /// is the same as `scheduleStartDate`, the transfer will be executed only
+    /// once.
     #[serde(rename="scheduleEndDate")]
     pub schedule_end_date: Option<Date>,
 }
@@ -721,7 +903,8 @@ pub struct Schedule {
 impl Part for Schedule {}
 
 
-/// A summary of errors by error code, plus a count and sample error log entries.
+/// A summary of errors by error code, plus a count and sample error log
+/// entries.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -733,7 +916,8 @@ pub struct ErrorSummary {
     /// Error samples.
     #[serde(rename="errorLogEntries")]
     pub error_log_entries: Option<Vec<ErrorLogEntry>>,
-    /// Count of this type of error. Required.
+    /// Count of this type of error.
+    /// Required.
     #[serde(rename="errorCount")]
     pub error_count: Option<i64>,
 }
@@ -767,13 +951,20 @@ impl RequestValue for ResumeTransferOperationRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UpdateTransferJobRequest {
-    /// The ID of the Google Developers Console project that owns the job. Required.
+    /// The ID of the Google Cloud Platform Console project that owns the job.
+    /// Required.
     #[serde(rename="projectId")]
     pub project_id: Option<String>,
-    /// The field mask of the fields in `transferJob` that are to be updated in this request. Fields in `transferJob` that can be updated are: `description`, `transferSpec`, and `status`. To update the `transferSpec` of the job, a complete transfer specification has to be provided. An incomplete specification which misses any required fields will be rejected with the error `INVALID_ARGUMENT`.
+    /// The field mask of the fields in `transferJob` that are to be updated in
+    /// this request.  Fields in `transferJob` that can be updated are:
+    /// `description`, `transferSpec`, and `status`.  To update the `transferSpec`
+    /// of the job, a complete transfer specification has to be provided. An
+    /// incomplete specification which misses any required fields will be rejected
+    /// with the error `INVALID_ARGUMENT`.
     #[serde(rename="updateTransferJobFieldMask")]
     pub update_transfer_job_field_mask: Option<String>,
-    /// The job to update. Required.
+    /// The job to update.
+    /// Required.
     #[serde(rename="transferJob")]
     pub transfer_job: Option<TransferJob>,
 }
@@ -803,7 +994,8 @@ pub struct ListTransferJobsResponse {
 impl ResponseResult for ListTransferJobsResponse {}
 
 
-/// TransferOptions uses three boolean parameters to define the actions to be performed on objects in a transfer.
+/// TransferOptions uses three boolean parameters to define the actions
+/// to be performed on objects in a transfer.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -812,7 +1004,8 @@ pub struct TransferOptions {
     /// Whether overwriting objects that already exist in the sink is allowed.
     #[serde(rename="overwriteObjectsAlreadyExistingInSink")]
     pub overwrite_objects_already_existing_in_sink: Option<bool>,
-    /// Whether objects should be deleted from the source after they are transferred to the sink.
+    /// Whether objects should be deleted from the source after they are
+    /// transferred to the sink.
     #[serde(rename="deleteObjectsFromSourceAfterTransfer")]
     pub delete_objects_from_source_after_transfer: Option<bool>,
     /// Whether objects that exist only in the sink should be deleted.
@@ -823,7 +1016,8 @@ pub struct TransferOptions {
 impl Part for TransferOptions {}
 
 
-/// This resource represents the configuration of a transfer job that runs periodically.
+/// This resource represents the configuration of a transfer job that runs
+/// periodically.
 /// 
 /// # Activities
 /// 
@@ -837,19 +1031,26 @@ impl Part for TransferOptions {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TransferJob {
-    /// Transfer specification. Required.
+    /// Transfer specification.
+    /// Required.
     #[serde(rename="transferSpec")]
     pub transfer_spec: Option<TransferSpec>,
-    /// Status of the job. This value MUST be specified for `CreateTransferJobRequests`. NOTE: The effect of the new job status takes place during a subsequent job run. For example, if you change the job status from `ENABLED` to `DISABLED`, and an operation spawned by the transfer is running, the status change would not affect the current operation.
+    /// Status of the job. This value MUST be specified for
+    /// `CreateTransferJobRequests`.
+    /// 
+    /// NOTE: The effect of the new job status takes place during a subsequent job
+    /// run. For example, if you change the job status from `ENABLED` to
+    /// `DISABLED`, and an operation spawned by the transfer is running, the status
+    /// change would not affect the current operation.
     pub status: Option<String>,
     /// This field cannot be changed by user requests.
     #[serde(rename="deletionTime")]
     pub deletion_time: Option<String>,
-    /// A description provided by the user for the job. Its max length is 1024 bytes when Unicode-encoded.
-    pub description: Option<String>,
-    /// Schedule specification. Required.
+    /// Schedule specification.
+    /// Required.
     pub schedule: Option<Schedule>,
-    /// The ID of the Google Developers Console project that owns the job. Required.
+    /// The ID of the Google Cloud Platform Console project that owns the job.
+    /// Required.
     #[serde(rename="projectId")]
     pub project_id: Option<String>,
     /// This field cannot be changed by user requests.
@@ -858,8 +1059,14 @@ pub struct TransferJob {
     /// This field cannot be changed by user requests.
     #[serde(rename="creationTime")]
     pub creation_time: Option<String>,
-    /// A globally unique name assigned by Storage Transfer Service when the job is created. This field should be left empty in requests to create a new transfer job; otherwise, the requests result in an `INVALID_ARGUMENT` error.
+    /// A globally unique name assigned by Storage Transfer Service when the
+    /// job is created. This field should be left empty in requests to create a new
+    /// transfer job; otherwise, the requests result in an `INVALID_ARGUMENT`
+    /// error.
     pub name: Option<String>,
+    /// A description provided by the user for the job. Its max length is 1024
+    /// bytes when Unicode-encoded.
+    pub description: Option<String>,
 }
 
 impl RequestValue for TransferJob {}
@@ -867,24 +1074,33 @@ impl Resource for TransferJob {}
 impl ResponseResult for TransferJob {}
 
 
-/// Represents a whole calendar date, e.g. date of birth. The time of day and time zone are either specified elsewhere or are not significant. The date is relative to the Proleptic Gregorian Calendar. The day may be 0 to represent a year and month where the day is not significant, e.g. credit card expiration date. The year may be 0 to represent a month and day independent of year, e.g. anniversary date. Related types are [google.type.TimeOfDay][google.type.TimeOfDay] and `google.protobuf.Timestamp`.
+/// Represents a whole calendar date, e.g. date of birth. The time of day and
+/// time zone are either specified elsewhere or are not significant. The date
+/// is relative to the Proleptic Gregorian Calendar. The day may be 0 to
+/// represent a year and month where the day is not significant, e.g. credit card
+/// expiration date. The year may be 0 to represent a month and day independent
+/// of year, e.g. anniversary date. Related types are google.type.TimeOfDay
+/// and `google.protobuf.Timestamp`.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Date {
-    /// Year of date. Must be from 1 to 9,999, or 0 if specifying a date without a year.
+    /// Year of date. Must be from 1 to 9999, or 0 if specifying a date without
+    /// a year.
     pub year: Option<i32>,
-    /// Day of month. Must be from 1 to 31 and valid for the year and month, or 0 if specifying a year/month where the day is not sigificant.
+    /// Day of month. Must be from 1 to 31 and valid for the year and month, or 0
+    /// if specifying a year/month where the day is not significant.
     pub day: Option<i32>,
-    /// Month of year of date. Must be from 1 to 12.
+    /// Month of year. Must be from 1 to 12.
     pub month: Option<i32>,
 }
 
 impl Part for Date {}
 
 
-/// This resource represents a long-running operation that is the result of a network API call.
+/// This resource represents a long-running operation that is the result of a
+/// network API call.
 /// 
 /// # Activities
 /// 
@@ -895,16 +1111,25 @@ impl Part for Date {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Operation {
+    /// The error result of the operation in case of failure or cancellation.
+    pub error: Option<Status>,
+    /// If the value is `false`, it means the operation is still in progress.
+    /// If true, the operation is completed, and either `error` or `response` is
+    /// available.
+    pub done: Option<bool>,
+    /// The normal response of the operation in case of success.  If the original
+    /// method returns no data on success, such as `Delete`, the response is
+    /// `google.protobuf.Empty`.  If the original method is standard
+    /// `Get`/`Create`/`Update`, the response should be the resource.  For other
+    /// methods, the response should have the type `XxxResponse`, where `Xxx`
+    /// is the original method name.  For example, if the original method name
+    /// is `TakeSnapshot()`, the inferred response type is
+    /// `TakeSnapshotResponse`.
+    pub response: Option<HashMap<String, String>>,
+    /// The server-assigned name, which is only unique within the same service that originally returns it. If you use the default HTTP mapping, the `name` should have the format of `transferOperations/some/unique/name`.
+    pub name: Option<String>,
     /// Represents the transfer operation object.
     pub metadata: Option<HashMap<String, String>>,
-    /// If the value is `false`, it means the operation is still in progress. If true, the operation is completed and the `result` is available.
-    pub done: Option<bool>,
-    /// The normal response of the operation in case of success. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.
-    pub response: Option<HashMap<String, String>>,
-    /// The server-assigned name, which is only unique within the same service that originally returns it. If you use the default HTTP mapping above, the `name` should have the format of `operations/some/unique/name`.
-    pub name: Option<String>,
-    /// The error result of the operation in case of failure.
-    pub error: Option<Status>,
 }
 
 impl ResponseResult for Operation {}
@@ -960,7 +1185,8 @@ impl<'a, C, A> TransferOperationMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The name of the transfer operation. Required.
+    /// * `name` - The name of the transfer operation.
+    ///            Required.
     pub fn pause(&self, request: PauseTransferOperationRequest, name: &str) -> TransferOperationPauseCall<'a, C, A> {
         TransferOperationPauseCall {
             hub: self.hub,
@@ -979,28 +1205,12 @@ impl<'a, C, A> TransferOperationMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The name of the transfer operation. Required.
+    /// * `name` - The name of the transfer operation.
+    ///            Required.
     pub fn resume(&self, request: ResumeTransferOperationRequest, name: &str) -> TransferOperationResumeCall<'a, C, A> {
         TransferOperationResumeCall {
             hub: self.hub,
             _request: request,
-            _name: name.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Gets the latest state of a long-running operation. Clients can use this method to poll the operation result at intervals as recommended by the API service.
-    /// 
-    /// # Arguments
-    ///
-    /// * `name` - The name of the operation resource.
-    pub fn get(&self, name: &str) -> TransferOperationGetCall<'a, C, A> {
-        TransferOperationGetCall {
-            hub: self.hub,
             _name: name.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -1027,7 +1237,30 @@ impl<'a, C, A> TransferOperationMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding below allows API services to override the binding to use different resource name schemes, such as `users/*/operations`.
+    /// Gets the latest state of a long-running operation.  Clients can use this
+    /// method to poll the operation result at intervals as recommended by the API
+    /// service.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - The name of the operation resource.
+    pub fn get(&self, name: &str) -> TransferOperationGetCall<'a, C, A> {
+        TransferOperationGetCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Lists operations that match the specified filter in the request. If the
+    /// server doesn't support this method, it returns `UNIMPLEMENTED`.
+    /// 
+    /// NOTE: the `name` binding below allows API services to override the binding
+    /// to use different resource name schemes, such as `users/*/operations`.
     /// 
     /// # Arguments
     ///
@@ -1105,11 +1338,20 @@ impl<'a, C, A> GoogleServiceAccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns the Google service account that is used by Storage Transfer Service to access buckets in the project where transfers run or in other projects. Each Google service account is associated with one Google Developers Console project. Users should add this service account to the Google Cloud Storage bucket ACLs to grant access to Storage Transfer Service. This service account is created and owned by Storage Transfer Service and can only be used by Storage Transfer Service.
+    /// Returns the Google service account that is used by Storage Transfer
+    /// Service to access buckets in the project where transfers
+    /// run or in other projects. Each Google service account is associated
+    /// with one Google Cloud Platform Console project. Users
+    /// should add this service account to the Google Cloud Storage bucket
+    /// ACLs to grant access to Storage Transfer Service. This service
+    /// account is created and owned by Storage Transfer Service and can
+    /// only be used by Storage Transfer Service.
     /// 
     /// # Arguments
     ///
-    /// * `projectId` - The ID of the Google Developers Console project that the Google service account is associated with. Required.
+    /// * `projectId` - The ID of the Google Cloud Platform Console project that the Google service
+    ///                 account is associated with.
+    ///                 Required.
     pub fn get(&self, project_id: &str) -> GoogleServiceAccountGetCall<'a, C, A> {
         GoogleServiceAccountGetCall {
             hub: self.hub,
@@ -1178,17 +1420,39 @@ impl<'a, C, A> TransferJobMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a transfer job. Updating a job's transfer spec does not affect transfer operations that are running already. Updating the scheduling of a job is not allowed.
+    /// Updates a transfer job. Updating a job's transfer spec does not affect
+    /// transfer operations that are running already. Updating the scheduling
+    /// of a job is not allowed.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `jobName` - The name of job to update. Required.
+    /// * `jobName` - The name of job to update.
+    ///               Required.
     pub fn patch(&self, request: UpdateTransferJobRequest, job_name: &str) -> TransferJobPatchCall<'a, C, A> {
         TransferJobPatchCall {
             hub: self.hub,
             _request: request,
             _job_name: job_name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets a transfer job.
+    /// 
+    /// # Arguments
+    ///
+    /// * `jobName` - The job to get.
+    ///               Required.
+    pub fn get(&self, job_name: &str) -> TransferJobGetCall<'a, C, A> {
+        TransferJobGetCall {
+            hub: self.hub,
+            _job_name: job_name.to_string(),
+            _project_id: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1206,78 +1470,6 @@ impl<'a, C, A> TransferJobMethods<'a, C, A> {
         TransferJobCreateCall {
             hub: self.hub,
             _request: request,
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Gets a transfer job.
-    /// 
-    /// # Arguments
-    ///
-    /// * `jobName` - The job to get. Required.
-    pub fn get(&self, job_name: &str) -> TransferJobGetCall<'a, C, A> {
-        TransferJobGetCall {
-            hub: self.hub,
-            _job_name: job_name.to_string(),
-            _project_id: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-}
-
-
-
-/// A builder providing access to all free methods, which are not associated with a particular resource.
-/// It is not used directly, but through the `Storagetransfer` hub.
-///
-/// # Example
-///
-/// Instantiate a resource builder
-///
-/// ```test_harness,no_run
-/// extern crate hyper;
-/// extern crate yup_oauth2 as oauth2;
-/// extern crate google_storagetransfer1 as storagetransfer1;
-/// 
-/// # #[test] fn egal() {
-/// use std::default::Default;
-/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// use storagetransfer1::Storagetransfer;
-/// 
-/// let secret: ApplicationSecret = Default::default();
-/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-///                               hyper::Client::new(),
-///                               <MemoryStorage as Default>::default(), None);
-/// let mut hub = Storagetransfer::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `get_google_service_account(...)`
-/// // to build up your call.
-/// let rb = hub.methods();
-/// # }
-/// ```
-pub struct MethodMethods<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Storagetransfer<C, A>,
-}
-
-impl<'a, C, A> MethodsBuilder for MethodMethods<'a, C, A> {}
-
-impl<'a, C, A> MethodMethods<'a, C, A> {
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Returns the Google service account that is used by Storage Transfer Service to access buckets in the project where transfers run or in other projects. Each Google service account is associated with one Google Developers Console project. Users should add this service account to the Google Cloud Storage bucket ACLs to grant access to Storage Transfer Service. This service account is created and owned by Storage Transfer Service and can only be used by Storage Transfer Service.
-    pub fn get_google_service_account(&self) -> MethodGetGoogleServiceAccountCall<'a, C, A> {
-        MethodGetGoogleServiceAccountCall {
-            hub: self.hub,
-            _project_id: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1501,7 +1693,8 @@ impl<'a, C, A> TransferOperationPauseCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._request = new_value;
         self
     }
-    /// The name of the transfer operation. Required.
+    /// The name of the transfer operation.
+    /// Required.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -1536,12 +1729,12 @@ impl<'a, C, A> TransferOperationPauseCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> TransferOperationPauseCall<'a, C, A>
@@ -1777,7 +1970,8 @@ impl<'a, C, A> TransferOperationResumeCall<'a, C, A> where C: BorrowMut<hyper::C
         self._request = new_value;
         self
     }
-    /// The name of the transfer operation. Required.
+    /// The name of the transfer operation.
+    /// Required.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -1812,12 +2006,12 @@ impl<'a, C, A> TransferOperationResumeCall<'a, C, A> where C: BorrowMut<hyper::C
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> TransferOperationResumeCall<'a, C, A>
@@ -1838,251 +2032,6 @@ impl<'a, C, A> TransferOperationResumeCall<'a, C, A> where C: BorrowMut<hyper::C
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> TransferOperationResumeCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._scopes.insert(scope.as_ref().to_string(), ());
-        self
-    }
-}
-
-
-/// Gets the latest state of a long-running operation. Clients can use this method to poll the operation result at intervals as recommended by the API service.
-///
-/// A builder for the *get* method supported by a *transferOperation* resource.
-/// It is not used directly, but through a `TransferOperationMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_storagetransfer1 as storagetransfer1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use storagetransfer1::Storagetransfer;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::new(),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Storagetransfer::new(hyper::Client::new(), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.transfer_operations().get("name")
-///              .doit();
-/// # }
-/// ```
-pub struct TransferOperationGetCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Storagetransfer<C, A>,
-    _name: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for TransferOperationGetCall<'a, C, A> {}
-
-impl<'a, C, A> TransferOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "storagetransfer.transferOperations.get",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
-        params.push(("name", self._name.to_string()));
-        for &field in ["alt", "name"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = "https://storagetransfer.googleapis.com/v1/{+name}".to_string();
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{+name}", "name")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
-            }
-            url = url.replace(find_this, &replace_with);
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["name"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The name of the operation resource.
-    ///
-    /// Sets the *name* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> TransferOperationGetCall<'a, C, A> {
-        self._name = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TransferOperationGetCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> TransferOperationGetCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TransferOperationGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2302,12 +2251,12 @@ impl<'a, C, A> TransferOperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> TransferOperationDeleteCall<'a, C, A>
@@ -2335,7 +2284,258 @@ impl<'a, C, A> TransferOperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
 }
 
 
-/// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding below allows API services to override the binding to use different resource name schemes, such as `users/*/operations`.
+/// Gets the latest state of a long-running operation.  Clients can use this
+/// method to poll the operation result at intervals as recommended by the API
+/// service.
+///
+/// A builder for the *get* method supported by a *transferOperation* resource.
+/// It is not used directly, but through a `TransferOperationMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storagetransfer1 as storagetransfer1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use storagetransfer1::Storagetransfer;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Storagetransfer::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.transfer_operations().get("name")
+///              .doit();
+/// # }
+/// ```
+pub struct TransferOperationGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Storagetransfer<C, A>,
+    _name: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for TransferOperationGetCall<'a, C, A> {}
+
+impl<'a, C, A> TransferOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "storagetransfer.transferOperations.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://storagetransfer.googleapis.com/v1/{+name}".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The name of the operation resource.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> TransferOperationGetCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TransferOperationGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> TransferOperationGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> TransferOperationGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+/// Lists operations that match the specified filter in the request. If the
+/// server doesn't support this method, it returns `UNIMPLEMENTED`.
+/// 
+/// NOTE: the `name` binding below allows API services to override the binding
+/// to use different resource name schemes, such as `users/*/operations`.
 ///
 /// A builder for the *list* method supported by a *transferOperation* resource.
 /// It is not used directly, but through a `TransferOperationMethods` instance.
@@ -2537,21 +2737,21 @@ impl<'a, C, A> TransferOperationListCall<'a, C, A> where C: BorrowMut<hyper::Cli
         self._name = new_value.to_string();
         self
     }
-    /// The standard list page token.
+    /// The list page token.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> TransferOperationListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// The standard list page size.
+    /// The list page size. The max allowed value is 256.
     ///
     /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> TransferOperationListCall<'a, C, A> {
         self._page_size = Some(new_value);
         self
     }
-    /// The standard list filter.
+    /// A list of query parameters specified as JSON text in the form of {\"project_id\" : \"my_project_id\", \"job_names\" : [\"jobid1\", \"jobid2\",...], \"operation_names\" : [\"opid1\", \"opid2\",...], \"transfer_statuses\":[\"status1\", \"status2\",...]}. Since `job_names`, `operation_names`, and `transfer_statuses` support multiple values, they must be specified with array notation. `job_names`, `operation_names`, and `transfer_statuses` are optional.
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> TransferOperationListCall<'a, C, A> {
@@ -2583,12 +2783,12 @@ impl<'a, C, A> TransferOperationListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> TransferOperationListCall<'a, C, A>
@@ -2828,12 +3028,12 @@ impl<'a, C, A> TransferOperationCancelCall<'a, C, A> where C: BorrowMut<hyper::C
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> TransferOperationCancelCall<'a, C, A>
@@ -2861,7 +3061,14 @@ impl<'a, C, A> TransferOperationCancelCall<'a, C, A> where C: BorrowMut<hyper::C
 }
 
 
-/// Returns the Google service account that is used by Storage Transfer Service to access buckets in the project where transfers run or in other projects. Each Google service account is associated with one Google Developers Console project. Users should add this service account to the Google Cloud Storage bucket ACLs to grant access to Storage Transfer Service. This service account is created and owned by Storage Transfer Service and can only be used by Storage Transfer Service.
+/// Returns the Google service account that is used by Storage Transfer
+/// Service to access buckets in the project where transfers
+/// run or in other projects. Each Google service account is associated
+/// with one Google Cloud Platform Console project. Users
+/// should add this service account to the Google Cloud Storage bucket
+/// ACLs to grant access to Storage Transfer Service. This service
+/// account is created and owned by Storage Transfer Service and can
+/// only be used by Storage Transfer Service.
 ///
 /// A builder for the *get* method supported by a *googleServiceAccount* resource.
 /// It is not used directly, but through a `GoogleServiceAccountMethods` instance.
@@ -3034,7 +3241,9 @@ impl<'a, C, A> GoogleServiceAccountGetCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
-    /// The ID of the Google Developers Console project that the Google service account is associated with. Required.
+    /// The ID of the Google Cloud Platform Console project that the Google service
+    /// account is associated with.
+    /// Required.
     ///
     /// Sets the *project id* path property to the given value.
     ///
@@ -3069,12 +3278,12 @@ impl<'a, C, A> GoogleServiceAccountGetCall<'a, C, A> where C: BorrowMut<hyper::C
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> GoogleServiceAccountGetCall<'a, C, A>
@@ -3281,7 +3490,14 @@ impl<'a, C, A> TransferJobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._page_size = Some(new_value);
         self
     }
-    /// A list of query parameters specified as JSON text in the form of {"`project_id`":"my_project_id", "`job_names`":["jobid1","jobid2",...], "`job_statuses`":["status1","status2",...]}. Since `job_names` and `job_statuses` support multiple values, their values must be specified with array notation. `project_id` is required. `job_names` and `job_statuses` are optional. The valid values for `job_statuses` are case-insensitive: `ENABLED`, `DISABLED`, and `DELETED`.
+    /// A list of query parameters specified as JSON text in the form of
+    /// {"project_id":"my_project_id",
+    /// "job_names":["jobid1","jobid2",...],
+    /// "job_statuses":["status1","status2",...]}.
+    /// Since `job_names` and `job_statuses` support multiple values, their values
+    /// must be specified with array notation. `project_id` is required. `job_names`
+    /// and `job_statuses` are optional.  The valid values for `job_statuses` are
+    /// case-insensitive: `ENABLED`, `DISABLED`, and `DELETED`.
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> TransferJobListCall<'a, C, A> {
@@ -3313,12 +3529,12 @@ impl<'a, C, A> TransferJobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> TransferJobListCall<'a, C, A>
@@ -3346,7 +3562,9 @@ impl<'a, C, A> TransferJobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 }
 
 
-/// Updates a transfer job. Updating a job's transfer spec does not affect transfer operations that are running already. Updating the scheduling of a job is not allowed.
+/// Updates a transfer job. Updating a job's transfer spec does not affect
+/// transfer operations that are running already. Updating the scheduling
+/// of a job is not allowed.
 ///
 /// A builder for the *patch* method supported by a *transferJob* resource.
 /// It is not used directly, but through a `TransferJobMethods` instance.
@@ -3554,7 +3772,8 @@ impl<'a, C, A> TransferJobPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._request = new_value;
         self
     }
-    /// The name of job to update. Required.
+    /// The name of job to update.
+    /// Required.
     ///
     /// Sets the *job name* path property to the given value.
     ///
@@ -3589,12 +3808,12 @@ impl<'a, C, A> TransferJobPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> TransferJobPatchCall<'a, C, A>
@@ -3615,6 +3834,265 @@ impl<'a, C, A> TransferJobPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> TransferJobPatchCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+/// Gets a transfer job.
+///
+/// A builder for the *get* method supported by a *transferJob* resource.
+/// It is not used directly, but through a `TransferJobMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storagetransfer1 as storagetransfer1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use storagetransfer1::Storagetransfer;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Storagetransfer::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.transfer_jobs().get("jobName")
+///              .project_id("Lorem")
+///              .doit();
+/// # }
+/// ```
+pub struct TransferJobGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Storagetransfer<C, A>,
+    _job_name: String,
+    _project_id: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for TransferJobGetCall<'a, C, A> {}
+
+impl<'a, C, A> TransferJobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, TransferJob)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "storagetransfer.transferJobs.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        params.push(("jobName", self._job_name.to_string()));
+        if let Some(value) = self._project_id {
+            params.push(("projectId", value.to_string()));
+        }
+        for &field in ["alt", "jobName", "projectId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://storagetransfer.googleapis.com/v1/{+jobName}".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+jobName}", "jobName")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["jobName"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The job to get.
+    /// Required.
+    ///
+    /// Sets the *job name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn job_name(mut self, new_value: &str) -> TransferJobGetCall<'a, C, A> {
+        self._job_name = new_value.to_string();
+        self
+    }
+    /// The ID of the Google Cloud Platform Console project that owns the job.
+    /// Required.
+    ///
+    /// Sets the *project id* query property to the given value.
+    pub fn project_id(mut self, new_value: &str) -> TransferJobGetCall<'a, C, A> {
+        self._project_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TransferJobGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> TransferJobGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> TransferJobGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3828,12 +4306,12 @@ impl<'a, C, A> TransferJobCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> TransferJobCreateCall<'a, C, A>
@@ -3854,483 +4332,6 @@ impl<'a, C, A> TransferJobCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> TransferJobCreateCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._scopes.insert(scope.as_ref().to_string(), ());
-        self
-    }
-}
-
-
-/// Gets a transfer job.
-///
-/// A builder for the *get* method supported by a *transferJob* resource.
-/// It is not used directly, but through a `TransferJobMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_storagetransfer1 as storagetransfer1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use storagetransfer1::Storagetransfer;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::new(),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Storagetransfer::new(hyper::Client::new(), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.transfer_jobs().get("jobName")
-///              .project_id("Lorem")
-///              .doit();
-/// # }
-/// ```
-pub struct TransferJobGetCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Storagetransfer<C, A>,
-    _job_name: String,
-    _project_id: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for TransferJobGetCall<'a, C, A> {}
-
-impl<'a, C, A> TransferJobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, TransferJob)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "storagetransfer.transferJobs.get",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
-        params.push(("jobName", self._job_name.to_string()));
-        if let Some(value) = self._project_id {
-            params.push(("projectId", value.to_string()));
-        }
-        for &field in ["alt", "jobName", "projectId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = "https://storagetransfer.googleapis.com/v1/{+jobName}".to_string();
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{+jobName}", "jobName")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
-            }
-            url = url.replace(find_this, &replace_with);
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["jobName"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The job to get. Required.
-    ///
-    /// Sets the *job name* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn job_name(mut self, new_value: &str) -> TransferJobGetCall<'a, C, A> {
-        self._job_name = new_value.to_string();
-        self
-    }
-    /// The ID of the Google Developers Console project that owns the job. Required.
-    ///
-    /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> TransferJobGetCall<'a, C, A> {
-        self._project_id = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TransferJobGetCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> TransferJobGetCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TransferJobGetCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._scopes.insert(scope.as_ref().to_string(), ());
-        self
-    }
-}
-
-
-/// Returns the Google service account that is used by Storage Transfer Service to access buckets in the project where transfers run or in other projects. Each Google service account is associated with one Google Developers Console project. Users should add this service account to the Google Cloud Storage bucket ACLs to grant access to Storage Transfer Service. This service account is created and owned by Storage Transfer Service and can only be used by Storage Transfer Service.
-///
-/// A builder for the *getGoogleServiceAccount* method.
-/// It is not used directly, but through a `MethodMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_storagetransfer1 as storagetransfer1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use storagetransfer1::Storagetransfer;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::new(),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Storagetransfer::new(hyper::Client::new(), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.methods().get_google_service_account()
-///              .project_id("et")
-///              .doit();
-/// # }
-/// ```
-pub struct MethodGetGoogleServiceAccountCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Storagetransfer<C, A>,
-    _project_id: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for MethodGetGoogleServiceAccountCall<'a, C, A> {}
-
-impl<'a, C, A> MethodGetGoogleServiceAccountCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleServiceAccount)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "storagetransfer.getGoogleServiceAccount",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
-        if let Some(value) = self._project_id {
-            params.push(("projectId", value.to_string()));
-        }
-        for &field in ["alt", "projectId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = "https://storagetransfer.googleapis.com/v1:getGoogleServiceAccount".to_string();
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
-        }
-
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The ID of the Google Developers Console project that the Google service account is associated with. Required.
-    ///
-    /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> MethodGetGoogleServiceAccountCall<'a, C, A> {
-        self._project_id = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MethodGetGoogleServiceAccountCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> MethodGetGoogleServiceAccountCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> MethodGetGoogleServiceAccountCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

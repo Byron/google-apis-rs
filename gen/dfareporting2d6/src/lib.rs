@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *dfareporting* crate version *1.0.4+20161027*, where *20161027* is the exact revision of the *dfareporting:v2.6* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
+//! This documentation was generated from *dfareporting* crate version *1.0.4+20170428*, where *20170428* is the exact revision of the *dfareporting:v2.6* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
 //! 
 //! Everything else about the *dfareporting* *v2d6* API can be found at the
 //! [official documentation site](https://developers.google.com/doubleclick-advertisers/).
@@ -1032,10 +1032,10 @@ impl ResponseResult for AccountActiveAdSummary {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LookbackConfiguration {
-    /// Lookback window, in days, from the last time a given user clicked on one of your ads. If you enter 0, clicks will not be considered as triggering events for floodlight tracking. If you leave this field blank, the default value for your account will be used.
+    /// Lookback window, in days, from the last time a given user clicked on one of your ads. If you enter 0, clicks will not be considered as triggering events for floodlight tracking. If you leave this field blank, the default value for your account will be used. Acceptable values are 0 to 90, inclusive.
     #[serde(rename="clickDuration")]
     pub click_duration: Option<i32>,
-    /// Lookback window, in days, from the last time a given user viewed one of your ads. If you enter 0, impressions will not be considered as triggering events for floodlight tracking. If you leave this field blank, the default value for your account will be used.
+    /// Lookback window, in days, from the last time a given user viewed one of your ads. If you enter 0, impressions will not be considered as triggering events for floodlight tracking. If you leave this field blank, the default value for your account will be used. Acceptable values are 0 to 90, inclusive.
     #[serde(rename="postImpressionActivitiesDuration")]
     pub post_impression_activities_duration: Option<i32>,
 }
@@ -1381,7 +1381,7 @@ impl Part for ListPopulationRule {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Account {
-    /// File size limit in kilobytes of Rich Media teaser creatives. Must be between 1 and 10240.
+    /// File size limit in kilobytes of Rich Media teaser creatives. Acceptable values are 1 to 10240, inclusive.
     #[serde(rename="teaserSizeLimit")]
     pub teaser_size_limit: Option<String>,
     /// User role permissions available to the user roles of this account.
@@ -1428,7 +1428,7 @@ pub struct Account {
     pub country_id: Option<String>,
     /// Name of this account. This is a required field, and must be less than 128 characters long and be globally unique.
     pub name: Option<String>,
-    /// Maximum image size allowed for this account.
+    /// Maximum image size allowed for this account, in kilobytes. Value must be greater than or equal to 1.
     #[serde(rename="maximumImageSize")]
     pub maximum_image_size: Option<String>,
     /// Whether campaigns created in this account will be enabled for Nielsen OCR reach ratings by default.
@@ -1488,7 +1488,8 @@ pub struct Account {
     /// - "45" for RUB 
     /// - "46" for AED 
     /// - "47" for BGN 
-    /// - "48" for HRK
+    /// - "48" for HRK 
+    /// - "49" for MXN
     #[serde(rename="currencyId")]
     pub currency_id: Option<String>,
     /// Reporting configuration of this account.
@@ -1522,7 +1523,7 @@ pub struct DayPartTargeting {
     /// - "SATURDAY"
     #[serde(rename="daysOfWeek")]
     pub days_of_week: Option<Vec<String>>,
-    /// Hours of the day when the ad will serve. Must be an integer between 0 and 23 (inclusive), where 0 is midnight to 1 AM, and 23 is 11 PM to midnight. Can be specified with days of week, in which case the ad would serve during these hours on the specified days. For example, if Monday, Wednesday, Friday are the days of week specified and 9-10am, 3-5pm (hours 9, 15, and 16) is specified, the ad would serve Monday, Wednesdays, and Fridays at 9-10am and 3-5pm.
+    /// Hours of the day when the ad will serve, where 0 is midnight to 1 AM and 23 is 11 PM to midnight. Can be specified with days of week, in which case the ad would serve during these hours on the specified days. For example if Monday, Wednesday, Friday are the days of week specified and 9-10am, 3-5pm (hours 9, 15, and 16) is specified, the ad would serve Monday, Wednesdays, and Fridays at 9-10am and 3-5pm. Acceptable values are 0 to 23, inclusive.
     #[serde(rename="hoursOfDay")]
     pub hours_of_day: Option<Vec<i32>>,
     /// Whether or not to use the user's local time. If false, the America/New York time zone applies.
@@ -1772,7 +1773,7 @@ impl ResponseResult for FloodlightActivityGroup {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AudienceSegment {
-    /// Weight allocated to this segment. Must be between 1 and 1000. The weight assigned will be understood in proportion to the weights assigned to other segments in the same segment group.
+    /// Weight allocated to this segment. The weight assigned will be understood in proportion to the weights assigned to other segments in the same segment group. Acceptable values are 1 to 1000, inclusive.
     pub allocation: Option<i32>,
     /// ID of this audience segment. This is a read-only, auto-generated field.
     pub id: Option<String>,
@@ -2086,6 +2087,8 @@ pub struct Placement {
     /// - "PLACEMENT_TAG_INTERSTITIAL_JAVASCRIPT"
     /// - "PLACEMENT_TAG_CLICK_COMMANDS"
     /// - "PLACEMENT_TAG_INSTREAM_VIDEO_PREFETCH"
+    /// - "PLACEMENT_TAG_INSTREAM_VIDEO_PREFETCH_VAST_3"
+    /// - "PLACEMENT_TAG_INSTREAM_VIDEO_PREFETCH_VAST_4"
     /// - "PLACEMENT_TAG_TRACKING"
     /// - "PLACEMENT_TAG_TRACKING_IFRAME"
     /// - "PLACEMENT_TAG_TRACKING_JAVASCRIPT"
@@ -2244,7 +2247,7 @@ pub struct OptimizationActivity {
     /// Dimension value for the ID of the floodlight activity. This is a read-only, auto-generated field.
     #[serde(rename="floodlightActivityIdDimensionValue")]
     pub floodlight_activity_id_dimension_value: Option<DimensionValue>,
-    /// Weight associated with this optimization. Must be greater than 1. The weight assigned will be understood in proportion to the weights assigned to the other optimization activities.
+    /// Weight associated with this optimization. The weight assigned will be understood in proportion to the weights assigned to the other optimization activities. Value must be greater than or equal to 1.
     pub weight: Option<i32>,
 }
 
@@ -2337,9 +2340,9 @@ impl Part for CompanionClickThroughOverride {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FrequencyCap {
-    /// Duration of time, in seconds, for this frequency cap. The maximum duration is 90 days in seconds, or 7,776,000.
+    /// Duration of time, in seconds, for this frequency cap. The maximum duration is 90 days. Acceptable values are 1 to 7776000, inclusive.
     pub duration: Option<String>,
-    /// Number of times an individual user can be served the ad within the specified duration. The maximum allowed is 15.
+    /// Number of times an individual user can be served the ad within the specified duration. Acceptable values are 1 to 15, inclusive.
     pub impressions: Option<String>,
 }
 
@@ -2607,15 +2610,16 @@ impl Part for DirectorySiteContactAssignment {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreativeAssignment {
-    /// Weight of the creative assignment, applicable when the rotation type is CREATIVE_ROTATION_TYPE_RANDOM.
+    /// Weight of the creative assignment, applicable when the rotation type is CREATIVE_ROTATION_TYPE_RANDOM. Value must be greater than or equal to 1.
     pub weight: Option<i32>,
-    /// Sequence number of the creative assignment, applicable when the rotation type is CREATIVE_ROTATION_TYPE_SEQUENTIAL.
+    /// Sequence number of the creative assignment, applicable when the rotation type is CREATIVE_ROTATION_TYPE_SEQUENTIAL. Acceptable values are 1 to 65535, inclusive.
     pub sequence: Option<i32>,
     /// Click-through URL of the creative assignment.
     #[serde(rename="clickThroughUrl")]
     pub click_through_url: Option<ClickThroughUrl>,
     /// Rich media exit overrides for this creative assignment.
     /// Applicable when the creative type is any of the following: 
+    /// - DISPLAY
     /// - RICH_MEDIA_INPAGE
     /// - RICH_MEDIA_INPAGE_FLOATING
     /// - RICH_MEDIA_IM_EXPAND
@@ -2624,7 +2628,6 @@ pub struct CreativeAssignment {
     /// - RICH_MEDIA_MOBILE_IN_APP
     /// - RICH_MEDIA_MULTI_FLOATING
     /// - RICH_MEDIA_PEEL_DOWN
-    /// - ADVANCED_BANNER
     /// - VPAID_LINEAR
     /// - VPAID_NON_LINEAR
     #[serde(rename="richMediaExitOverrides")]
@@ -3001,7 +3004,7 @@ pub struct CreativeAsset {
     /// List of companion creatives assigned to an in-stream video creative asset. Acceptable values include IDs of existing flash and image creatives. Applicable to INSTREAM_VIDEO creative type with dynamicAssetSelection set to true.
     #[serde(rename="companionCreativeIds")]
     pub companion_creative_ids: Option<Vec<String>>,
-    /// Duration in seconds for which an asset will be displayed. Applicable to the following creative types: INSTREAM_VIDEO and VPAID_LINEAR_VIDEO.
+    /// Duration in seconds for which an asset will be displayed. Applicable to the following creative types: INSTREAM_VIDEO and VPAID_LINEAR_VIDEO. Value must be greater than or equal to 1.
     pub duration: Option<i32>,
     /// Offset top unit for an asset. This is a read-only field if the asset displayType is ASSET_DISPLAY_TYPE_OVERLAY. Applicable to the following creative types: all RICH_MEDIA.
     #[serde(rename="positionTopUnit")]
@@ -3074,7 +3077,7 @@ pub struct CreativeAsset {
     /// Streaming URL for video asset. This is a read-only field. Applicable to the following creative types: INSTREAM_VIDEO and all VPAID.
     #[serde(rename="streamingServingUrl")]
     pub streaming_serving_url: Option<String>,
-    /// zIndex value of an asset. This is a read-only field. Applicable to the following creative types: all RICH_MEDIA.Additionally, only applicable to assets whose displayType is NOT one of the following types: ASSET_DISPLAY_TYPE_INPAGE or ASSET_DISPLAY_TYPE_OVERLAY.
+    /// zIndex value of an asset. Applicable to the following creative types: all RICH_MEDIA.Additionally, only applicable to assets whose displayType is NOT one of the following types: ASSET_DISPLAY_TYPE_INPAGE or ASSET_DISPLAY_TYPE_OVERLAY. Acceptable values are -999999999 to 999999999, inclusive.
     #[serde(rename="zIndex")]
     pub z_index: Option<i32>,
     /// Rich media child asset type. This is a read-only field. Applicable to the following creative types: all VPAID.
@@ -3086,7 +3089,7 @@ pub struct CreativeAsset {
     /// Whether ActionScript3 is enabled for the flash asset. This is a read-only field. Applicable to the following creative type: FLASH_INPAGE. Applicable to DISPLAY when the primary asset type is not HTML_IMAGE.
     #[serde(rename="actionScript3")]
     pub action_script3: Option<bool>,
-    /// Pushdown duration in seconds for an asset. Must be between 0 and 9.99. Applicable to the following creative types: all RICH_MEDIA.Additionally, only applicable when the asset pushdown field is true, the offsets are 0, the collapsedSize.width matches size.width, and the collapsedSize.height is less than size.height.
+    /// Pushdown duration in seconds for an asset. Applicable to the following creative types: all RICH_MEDIA.Additionally, only applicable when the asset pushdown field is true, the offsets are 0, the collapsedSize.width matches size.width, and the collapsedSize.height is less than size.height. Acceptable values are 0 to 9.99, inclusive.
     #[serde(rename="pushdownDuration")]
     pub pushdown_duration: Option<f32>,
     /// Identifier of this asset. This is the same identifier returned during creative asset insert operation. This is a required field. Applicable to all but the following creative types: all REDIRECT and TRACKING_TEXT.
@@ -3099,7 +3102,7 @@ pub struct CreativeAsset {
     pub ssl_compliant: Option<bool>,
     /// Offset position for an asset. Applicable to the following creative types: all RICH_MEDIA.
     pub position: Option<OffsetPosition>,
-    /// Custom start time in seconds for making the asset visible. Applicable to the following creative types: all RICH_MEDIA.
+    /// Custom start time in seconds for making the asset visible. Applicable to the following creative types: all RICH_MEDIA. Value must be greater than or equal to 0.
     #[serde(rename="customStartTimeValue")]
     pub custom_start_time_value: Option<i32>,
     /// File name of zip file. This is a read-only field. Applicable to the following creative types: HTML5_BANNER.
@@ -3344,14 +3347,14 @@ impl Part for OrderContact {}
 pub struct DirectorySite {
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#directorySite".
     pub kind: Option<String>,
-    /// Country ID of this directory site.
+    /// Country ID of this directory site. This is a read-only field.
     #[serde(rename="countryId")]
     pub country_id: Option<String>,
-    /// Description of this directory site.
+    /// Description of this directory site. This is a read-only field.
     pub description: Option<String>,
     /// Directory site settings.
     pub settings: Option<DirectorySiteSettings>,
-    /// Currency ID of this directory site.
+    /// Currency ID of this directory site. This is a read-only field.
     /// Possible values are: 
     /// - "1" for USD 
     /// - "2" for GBP 
@@ -3399,7 +3402,8 @@ pub struct DirectorySite {
     /// - "45" for RUB 
     /// - "46" for AED 
     /// - "47" for BGN 
-    /// - "48" for HRK
+    /// - "48" for HRK 
+    /// - "49" for MXN
     #[serde(rename="currencyId")]
     pub currency_id: Option<String>,
     /// Tag types for regular placements.
@@ -3485,10 +3489,7 @@ pub struct CreativeGroup {
     pub subaccount_id: Option<String>,
     /// Name of this creative group. This is a required field and must be less than 256 characters long and unique among creative groups of the same advertiser.
     pub name: Option<String>,
-    /// Subgroup of the creative group. Assign your creative groups to one of the following subgroups in order to filter or manage them more easily. This field is required on insertion and is read-only after insertion.
-    /// Acceptable values are: 
-    /// - 1
-    /// - 2
+    /// Subgroup of the creative group. Assign your creative groups to a subgroup in order to filter or manage them more easily. This field is required on insertion and is read-only after insertion. Acceptable values are 1 to 2, inclusive.
     #[serde(rename="groupNumber")]
     pub group_number: Option<i32>,
     /// Advertiser ID of this creative group. This is a required field on insertion.
@@ -4397,7 +4398,7 @@ pub struct DeliverySchedule {
     /// Limit on the number of times an individual user can be served the ad within a specified period of time.
     #[serde(rename="frequencyCap")]
     pub frequency_cap: Option<FrequencyCap>,
-    /// Impression ratio for this ad. This ratio determines how often each ad is served relative to the others. For example, if ad A has an impression ratio of 1 and ad B has an impression ratio of 3, then DCM will serve ad B three times as often as ad A. Must be between 1 and 10.
+    /// Impression ratio for this ad. This ratio determines how often each ad is served relative to the others. For example, if ad A has an impression ratio of 1 and ad B has an impression ratio of 3, then DCM will serve ad B three times as often as ad A. Acceptable values are 1 to 10, inclusive.
     #[serde(rename="impressionRatio")]
     pub impression_ratio: Option<String>,
 }
@@ -4771,10 +4772,10 @@ pub struct TagData {
     /// Tag string for serving an ad.
     #[serde(rename="impressionTag")]
     pub impression_tag: Option<String>,
-    /// Creative associated with this placement tag.
+    /// Creative associated with this placement tag. Applicable only when format is PLACEMENT_TAG_TRACKING.
     #[serde(rename="creativeId")]
     pub creative_id: Option<String>,
-    /// Ad associated with this placement tag.
+    /// Ad associated with this placement tag. Applicable only when format is PLACEMENT_TAG_TRACKING.
     #[serde(rename="adId")]
     pub ad_id: Option<String>,
     /// TagData tag format of this tag.
@@ -4953,7 +4954,7 @@ pub struct RemarketingList {
     /// Number of users currently in the list. This is a read-only field.
     #[serde(rename="listSize")]
     pub list_size: Option<String>,
-    /// Number of days that a user should remain in the remarketing list without an impression.
+    /// Number of days that a user should remain in the remarketing list without an impression. Acceptable values are 1 to 540, inclusive.
     #[serde(rename="lifeSpan")]
     pub life_span: Option<String>,
     /// Dimension value for the advertiser ID that owns this remarketing list. This is a required field.
@@ -5009,7 +5010,7 @@ pub struct FloodlightActivity {
     /// Advertiser ID of this floodlight activity. If this field is left blank, the value will be copied over either from the activity group's advertiser or the existing activity's advertiser.
     #[serde(rename="advertiserId")]
     pub advertiser_id: Option<String>,
-    /// Code type used for cache busting in the generated tag.
+    /// Code type used for cache busting in the generated tag. Applicable only when floodlightActivityGroupType is COUNTER and countingMethod is STANDARD_COUNTING or UNIQUE_COUNTING.
     #[serde(rename="cacheBustingType")]
     pub cache_busting_type: Option<String>,
     /// Dimension value for the ID of the advertiser. This is a read-only, auto-generated field.
@@ -5509,11 +5510,11 @@ impl ResponseResult for LandingPage {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Size {
-    /// Width of this size.
+    /// Width of this size. Acceptable values are 0 to 32767, inclusive.
     pub width: Option<i32>,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#size".
     pub kind: Option<String>,
-    /// Height of this size.
+    /// Height of this size. Acceptable values are 0 to 32767, inclusive.
     pub height: Option<i32>,
     /// ID of this size. This is a read-only, auto-generated field.
     pub id: Option<String>,
@@ -6405,7 +6406,7 @@ impl Part for ReportFloodlightCriteriaReportProperties {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ConversionsBatchInsertResponse {
-    /// The status of each conversion's insertion status. The status is returned in the same order that conversions are inserted.
+    /// The insert status of each conversion. Statuses are returned in the same order that conversions are inserted.
     pub status: Option<Vec<ConversionStatus>>,
     /// Indicates that some or all conversions failed to insert.
     #[serde(rename="hasFailures")]
@@ -6910,12 +6911,12 @@ impl ResponseResult for Ad {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PricingSchedulePricingPeriod {
-    /// Units of this pricing period.
+    /// Units of this pricing period. Acceptable values are 0 to 10000000000, inclusive.
     pub units: Option<String>,
     /// Pricing period start date. This date must be later than, or the same day as, the placement start date. The hours, minutes, and seconds of the start date should not be set, as doing so will result in an error.
     #[serde(rename="startDate")]
     pub start_date: Option<String>,
-    /// Rate or cost of this pricing period.
+    /// Rate or cost of this pricing period in nanos (i.e., multipled by 1000000000). Acceptable values are 0 to 1000000000000000000, inclusive.
     #[serde(rename="rateOrCostNanos")]
     pub rate_or_cost_nanos: Option<String>,
     /// Pricing period end date. This date must be later than, or the same day as, the pricing period start date, but not later than the placement end date. The period end date can be the same date as the period start date. If, for example, you set 6/25/2015 as both the start and end dates, the effective pricing period date is just that day only, 6/25/2015. The hours, minutes, and seconds of the end date should not be set, as doing so will result in an error.
@@ -15716,7 +15717,7 @@ impl<'a, C, A> OrderDocumentListCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._project_id = new_value.to_string();
         self
     }
-    /// Order of sorted results, default is ASCENDING.
+    /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> OrderDocumentListCall<'a, C, A> {
@@ -16322,7 +16323,7 @@ impl<'a, C, A> CreativeFieldListCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._profile_id = new_value.to_string();
         self
     }
-    /// Order of sorted results, default is ASCENDING.
+    /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> CreativeFieldListCall<'a, C, A> {
@@ -18977,7 +18978,7 @@ impl<'a, C, A> UserRoleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._subaccount_id = Some(new_value.to_string());
         self
     }
-    /// Order of sorted results, default is ASCENDING.
+    /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> UserRoleListCall<'a, C, A> {
@@ -22041,7 +22042,7 @@ impl<'a, C, A> CampaignCreativeAssociationListCall<'a, C, A> where C: BorrowMut<
         self._campaign_id = new_value.to_string();
         self
     }
-    /// Order of sorted results, default is ASCENDING.
+    /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> CampaignCreativeAssociationListCall<'a, C, A> {
@@ -27023,7 +27024,7 @@ impl<'a, C, A> AdvertiserListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._status = Some(new_value.to_string());
         self
     }
-    /// Order of sorted results, default is ASCENDING.
+    /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> AdvertiserListCall<'a, C, A> {
@@ -28713,7 +28714,7 @@ impl<'a, C, A> FloodlightActivityGroupListCall<'a, C, A> where C: BorrowMut<hype
         self._type_ = Some(new_value.to_string());
         self
     }
-    /// Order of sorted results, default is ASCENDING.
+    /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> FloodlightActivityGroupListCall<'a, C, A> {
@@ -29823,7 +29824,7 @@ impl<'a, C, A> OrderListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._project_id = new_value.to_string();
         self
     }
-    /// Order of sorted results, default is ASCENDING.
+    /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> OrderListCall<'a, C, A> {
@@ -30889,7 +30890,7 @@ impl<'a, C, A> DirectorySiteContactListCall<'a, C, A> where C: BorrowMut<hyper::
         self._profile_id = new_value.to_string();
         self
     }
-    /// Order of sorted results, default is ASCENDING.
+    /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> DirectorySiteContactListCall<'a, C, A> {
@@ -32318,7 +32319,7 @@ impl<'a, C, A> AdListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
         self._ssl_compliant = Some(new_value);
         self
     }
-    /// Order of sorted results, default is ASCENDING.
+    /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> AdListCall<'a, C, A> {
@@ -34228,7 +34229,7 @@ impl<'a, C, A> TargetableRemarketingListListCall<'a, C, A> where C: BorrowMut<hy
         self._advertiser_id = new_value.to_string();
         self
     }
-    /// Order of sorted results, default is ASCENDING.
+    /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> TargetableRemarketingListListCall<'a, C, A> {
@@ -35031,7 +35032,7 @@ impl<'a, C, A> AdvertiserGroupListCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self._profile_id = new_value.to_string();
         self
     }
-    /// Order of sorted results, default is ASCENDING.
+    /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> AdvertiserGroupListCall<'a, C, A> {
@@ -36963,7 +36964,7 @@ impl<'a, C, A> SiteListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         self._subaccount_id = Some(new_value.to_string());
         self
     }
-    /// Order of sorted results, default is ASCENDING.
+    /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> SiteListCall<'a, C, A> {
@@ -38159,7 +38160,7 @@ impl<'a, C, A> FloodlightActivityListCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._tag_string = Some(new_value.to_string());
         self
     }
-    /// Order of sorted results, default is ASCENDING.
+    /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> FloodlightActivityListCall<'a, C, A> {
@@ -40831,7 +40832,7 @@ impl<'a, C, A> CreativeGroupListCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._profile_id = new_value.to_string();
         self
     }
-    /// Order of sorted results, default is ASCENDING.
+    /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> CreativeGroupListCall<'a, C, A> {
@@ -41717,7 +41718,7 @@ impl<'a, C, A> TargetingTemplateListCall<'a, C, A> where C: BorrowMut<hyper::Cli
         self._profile_id = new_value.to_string();
         self
     }
-    /// Order of sorted results, default is ASCENDING.
+    /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> TargetingTemplateListCall<'a, C, A> {
@@ -43623,7 +43624,7 @@ impl<'a, C, A> SubaccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._profile_id = new_value.to_string();
         self
     }
-    /// Order of sorted results, default is ASCENDING.
+    /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> SubaccountListCall<'a, C, A> {
@@ -46827,7 +46828,7 @@ impl<'a, C, A> PlacementGroupListCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._profile_id = new_value.to_string();
         self
     }
-    /// Order of sorted results, default is ASCENDING.
+    /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> PlacementGroupListCall<'a, C, A> {
@@ -48330,7 +48331,7 @@ impl<'a, C, A> InventoryItemListCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._type_ = Some(new_value.to_string());
         self
     }
-    /// Order of sorted results, default is ASCENDING.
+    /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> InventoryItemListCall<'a, C, A> {
@@ -49894,7 +49895,7 @@ impl<'a, C, A> ContentCategoryListCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self._profile_id = new_value.to_string();
         self
     }
-    /// Order of sorted results, default is ASCENDING.
+    /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> ContentCategoryListCall<'a, C, A> {
@@ -52351,7 +52352,7 @@ impl<'a, C, A> CreativeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._studio_creative_id = Some(new_value.to_string());
         self
     }
-    /// Order of sorted results, default is ASCENDING.
+    /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> CreativeListCall<'a, C, A> {
@@ -54128,7 +54129,7 @@ impl<'a, C, A> CampaignListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._subaccount_id = Some(new_value.to_string());
         self
     }
-    /// Order of sorted results, default is ASCENDING.
+    /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> CampaignListCall<'a, C, A> {
@@ -54741,7 +54742,7 @@ impl<'a, C, A> EventTagListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._profile_id = new_value.to_string();
         self
     }
-    /// Order of sorted results, default is ASCENDING.
+    /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> EventTagListCall<'a, C, A> {
@@ -56665,7 +56666,7 @@ impl<'a, C, A> RemarketingListListCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self._advertiser_id = new_value.to_string();
         self
     }
-    /// Order of sorted results, default is ASCENDING.
+    /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> RemarketingListListCall<'a, C, A> {
@@ -58330,7 +58331,7 @@ impl<'a, C, A> PlacementStrategyListCall<'a, C, A> where C: BorrowMut<hyper::Cli
         self._profile_id = new_value.to_string();
         self
     }
-    /// Order of sorted results, default is ASCENDING.
+    /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> PlacementStrategyListCall<'a, C, A> {
@@ -59427,7 +59428,7 @@ impl<'a, C, A> ProjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._profile_id = new_value.to_string();
         self
     }
-    /// Order of sorted results, default is ASCENDING.
+    /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> ProjectListCall<'a, C, A> {
@@ -60293,7 +60294,7 @@ impl<'a, C, A> DirectorySiteListCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._profile_id = new_value.to_string();
         self
     }
-    /// Order of sorted results, default is ASCENDING.
+    /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> DirectorySiteListCall<'a, C, A> {
@@ -63052,7 +63053,7 @@ impl<'a, C, A> AccountUserProfileListCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._subaccount_id = Some(new_value.to_string());
         self
     }
-    /// Order of sorted results, default is ASCENDING.
+    /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> AccountUserProfileListCall<'a, C, A> {
@@ -66007,7 +66008,7 @@ impl<'a, C, A> CreativeFieldValueListCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._creative_field_id = new_value.to_string();
         self
     }
-    /// Order of sorted results, default is ASCENDING.
+    /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> CreativeFieldValueListCall<'a, C, A> {
@@ -67286,7 +67287,7 @@ impl<'a, C, A> AccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._profile_id = new_value.to_string();
         self
     }
-    /// Order of sorted results, default is ASCENDING.
+    /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> AccountListCall<'a, C, A> {
@@ -68525,7 +68526,7 @@ impl<'a, C, A> PlacementListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._profile_id = new_value.to_string();
         self
     }
-    /// Order of sorted results, default is ASCENDING.
+    /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> PlacementListCall<'a, C, A> {

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *reports* crate version *1.0.4+20160704*, where *20160704* is the exact revision of the *admin:reports_v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
+//! This documentation was generated from *reports* crate version *1.0.4+20170320*, where *20170320* is the exact revision of the *admin:reports_v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
 //! 
 //! Everything else about the *reports* *v1_reports* API can be found at the
 //! [official documentation site](https://developers.google.com/admin-sdk/reports/).
@@ -241,10 +241,10 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
 #[derive(PartialEq, Eq, Hash)]
 pub enum Scope {
-    /// View audit reports of Google Apps for your domain
+    /// View audit reports for your G Suite domain
     ReportAuditReadonly,
 
-    /// View usage reports of Google Apps for your domain
+    /// View usage reports for your G Suite domain
     ReportUsageReadonly,
 }
 
@@ -1485,7 +1485,7 @@ impl<'a, C, A> ActivityWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._application_name = new_value.to_string();
         self
     }
-    /// Return events which occured at or after this time.
+    /// Return events which occurred at or after this time.
     ///
     /// Sets the *start time* query property to the given value.
     pub fn start_time(mut self, new_value: &str) -> ActivityWatchCall<'a, C, A> {
@@ -1520,7 +1520,7 @@ impl<'a, C, A> ActivityWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._event_name = Some(new_value.to_string());
         self
     }
-    /// Return events which occured at or before this time.
+    /// Return events which occurred at or before this time.
     ///
     /// Sets the *end time* query property to the given value.
     pub fn end_time(mut self, new_value: &str) -> ActivityWatchCall<'a, C, A> {
@@ -1828,7 +1828,7 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._application_name = new_value.to_string();
         self
     }
-    /// Return events which occured at or after this time.
+    /// Return events which occurred at or after this time.
     ///
     /// Sets the *start time* query property to the given value.
     pub fn start_time(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
@@ -1863,7 +1863,7 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._event_name = Some(new_value.to_string());
         self
     }
-    /// Return events which occured at or before this time.
+    /// Return events which occurred at or before this time.
     ///
     /// Sets the *end time* query property to the given value.
     pub fn end_time(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {

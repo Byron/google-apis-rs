@@ -1,12 +1,12 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"tbys6C40o18GZwyMen5GMkdK-3s/9lrbPxfnfcTzLSOgIxD2Vj83GmI\"",
+ "etag": "\"YWOzh2SDasdU84ArJnpYek-OMdg/mRP2pwjx8HZNSfXtE0G7azflT_U\"",
  "discoveryVersion": "v1",
  "id": "identitytoolkit:v3",
  "name": "identitytoolkit",
  "canonicalName": "Identity Toolkit",
  "version": "v3",
- "revision": "20161206",
+ "revision": "20170425",
  "title": "Google Identity Toolkit API",
  "description": "Help the third party sites to implement federated login.",
  "ownerDomain": "google.com",
@@ -138,7 +138,7 @@
   "DownloadAccountResponse": {
    "id": "DownloadAccountResponse",
    "type": "object",
-   "description": "Respone of downloading accounts in batch.",
+   "description": "Response of downloading accounts in batch.",
    "properties": {
     "kind": {
      "type": "string",
@@ -717,6 +717,10 @@
      "type": "string",
      "description": "Instance id token of the app."
     },
+    "localId": {
+     "type": "string",
+     "description": "Privileged caller can create user with specified user id."
+    },
     "password": {
      "type": "string",
      "description": "The new password of the user."
@@ -787,6 +791,10 @@
    "type": "object",
    "description": "Request to verify the IDP assertion.",
    "properties": {
+    "autoCreate": {
+     "type": "boolean",
+     "description": "When it's true, automatically creates a new account if the user doesn't exist. When it's false, allows existing user to sign in normally and throws exception if the user doesn't exist."
+    },
     "delegatedProjectNumber": {
      "type": "string",
      "description": "GCP project number of the requesting delegated app. Currently only intended for Firebase V1 migration.",
@@ -938,6 +946,22 @@
    "type": "object",
    "description": "Request of getting a code for user confirmation (reset password, change email etc.)",
    "properties": {
+    "androidInstallApp": {
+     "type": "boolean",
+     "description": "whether or not to install the android app on the device where the link is opened"
+    },
+    "androidMinimumVersion": {
+     "type": "string",
+     "description": "minimum version of the app. if the version on the device is lower than this version then the user is taken to the play store to upgrade the app"
+    },
+    "androidPackageName": {
+     "type": "string",
+     "description": "android package name of the android app to handle the action code"
+    },
+    "canHandleCodeInApp": {
+     "type": "boolean",
+     "description": "whether or not the app can handle the oob code without first going to web"
+    },
     "captchaResp": {
      "type": "string",
      "description": "The recaptcha response from the user."
@@ -946,9 +970,21 @@
      "type": "string",
      "description": "The recaptcha challenge presented to the user."
     },
+    "continueUrl": {
+     "type": "string",
+     "description": "The url to continue to the Gitkit app"
+    },
     "email": {
      "type": "string",
      "description": "The email of the user."
+    },
+    "iOSAppStoreId": {
+     "type": "string",
+     "description": "iOS app store id to download the app if it's not already installed"
+    },
+    "iOSBundleId": {
+     "type": "string",
+     "description": "the iOS bundle id of iOS app to handle the action code"
     },
     "idToken": {
      "type": "string",
@@ -1009,6 +1045,10 @@
     "email": {
      "type": "string",
      "description": "The email of the user."
+    },
+    "emailVerified": {
+     "type": "boolean",
+     "description": "If email has been verified."
     },
     "expiresIn": {
      "type": "string",
@@ -1188,6 +1228,10 @@
      "description": "The timestamp when the password was last updated.",
      "format": "double"
     },
+    "phoneNumber": {
+     "type": "string",
+     "description": "User's phone number."
+    },
     "photoUrl": {
      "type": "string",
      "description": "The URL of the user profile photo."
@@ -1209,6 +1253,10 @@
        "federatedId": {
         "type": "string",
         "description": "User's identifier at IDP."
+       },
+       "phoneNumber": {
+        "type": "string",
+        "description": "User's phone number."
        },
        "photoUrl": {
         "type": "string",
@@ -1323,6 +1371,10 @@
     "inputEmail": {
      "type": "string",
      "description": "It's the identifier param in the createAuthUri request if the identifier is an email. It can be used to check whether the user input email is different from the asserted email."
+    },
+    "isNewUser": {
+     "type": "boolean",
+     "description": "True if it's a new user sign-in, false if it's a returning user."
     },
     "kind": {
      "type": "string",

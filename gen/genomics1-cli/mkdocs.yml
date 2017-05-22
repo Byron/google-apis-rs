@@ -1,4 +1,4 @@
-site_name: genomics v1.0.4+20160928
+site_name: genomics v1.0.4+20170520
 site_url: http://byron.github.io/google-apis-rs/google-genomics1-cli
 site_description: A complete library to interact with genomics (protocol v1)
 
@@ -45,7 +45,6 @@ pages:
 - ['readgroupsets_patch.md', 'Readgroupsets', 'Patch']
 - ['readgroupsets_search.md', 'Readgroupsets', 'Search']
 - ['reads_search.md', 'Reads', 'Search']
-- ['reads_stream.md', 'Reads', 'Stream']
 - ['references_bases-list.md', 'References', 'Bases List']
 - ['references_get.md', 'References', 'Get']
 - ['references_search.md', 'References', 'Search']
@@ -58,7 +57,6 @@ pages:
 - ['variants_merge.md', 'Variants', 'Merge']
 - ['variants_patch.md', 'Variants', 'Patch']
 - ['variants_search.md', 'Variants', 'Search']
-- ['variants_stream.md', 'Variants', 'Stream']
 - ['variantsets_create.md', 'Variantsets', 'Create']
 - ['variantsets_delete.md', 'Variantsets', 'Delete']
 - ['variantsets_export.md', 'Variantsets', 'Export']

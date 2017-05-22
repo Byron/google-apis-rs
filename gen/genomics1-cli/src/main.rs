@@ -157,9 +157,7 @@ impl<'n> Engine<'n> {
                     "reference-id" => Some(("referenceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "end" => Some(("end", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "transcript.coding-sequence.start" => Some(("transcript.codingSequence.start", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "transcript.coding-sequence.end" => Some(("transcript.codingSequence.end", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "transcript.gene-id" => Some(("transcript.geneId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "variant.effect" => Some(("variant.effect", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "variant.transcript-ids" => Some(("variant.transcriptIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "variant.alternate-bases" => Some(("variant.alternateBases", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -170,7 +168,9 @@ impl<'n> Engine<'n> {
                     "annotation-set-id" => Some(("annotationSetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "reference-name" => Some(("referenceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "reverse-strand" => Some(("reverseStrand", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transcript.coding-sequence.start" => Some(("transcript.codingSequence.start", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transcript.coding-sequence.end" => Some(("transcript.codingSequence.end", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transcript.gene-id" => Some(("transcript.geneId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["alternate-bases", "annotation-set-id", "clinical-significance", "coding-sequence", "effect", "end", "gene-id", "id", "name", "reference-id", "reference-name", "reverse-strand", "start", "transcript", "transcript-ids", "type", "variant"]);
@@ -454,9 +454,7 @@ impl<'n> Engine<'n> {
                     "reference-id" => Some(("referenceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "end" => Some(("end", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "transcript.coding-sequence.start" => Some(("transcript.codingSequence.start", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "transcript.coding-sequence.end" => Some(("transcript.codingSequence.end", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "transcript.gene-id" => Some(("transcript.geneId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "variant.effect" => Some(("variant.effect", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "variant.transcript-ids" => Some(("variant.transcriptIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "variant.alternate-bases" => Some(("variant.alternateBases", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -467,7 +465,9 @@ impl<'n> Engine<'n> {
                     "annotation-set-id" => Some(("annotationSetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "reference-name" => Some(("referenceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "reverse-strand" => Some(("reverseStrand", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transcript.coding-sequence.start" => Some(("transcript.codingSequence.start", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transcript.coding-sequence.end" => Some(("transcript.codingSequence.end", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transcript.gene-id" => Some(("transcript.geneId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["alternate-bases", "annotation-set-id", "clinical-significance", "coding-sequence", "effect", "end", "gene-id", "id", "name", "reference-id", "reference-name", "reverse-strand", "start", "transcript", "transcript-ids", "type", "variant"]);
@@ -559,8 +559,8 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-uri" => Some(("sourceUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "reference-set-id" => Some(("referenceSetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "reference-set-id" => Some(("referenceSetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dataset-id" => Some(("datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
@@ -753,9 +753,9 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "page-size" => Some(("pageSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "dataset-ids" => Some(("datasetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "reference-set-id" => Some(("referenceSetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dataset-ids" => Some(("datasetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "types" => Some(("types", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["dataset-ids", "name", "page-size", "page-token", "reference-set-id", "types"]);
@@ -843,8 +843,8 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-uri" => Some(("sourceUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "reference-set-id" => Some(("referenceSetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "reference-set-id" => Some(("referenceSetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dataset-id" => Some(("datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
@@ -1739,8 +1739,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "policy.version" => Some(("policy.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "policy.etag" => Some(("policy.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "policy.version" => Some(("policy.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "policy", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -2315,9 +2315,9 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "reference-names" => Some(("referenceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "export-uri" => Some(("exportUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "reference-names" => Some(("referenceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["export-uri", "project-id", "reference-names"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -2726,8 +2726,8 @@ impl<'n> Engine<'n> {
                     "end" => Some(("end", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "read-group-ids" => Some(("readGroupIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "page-size" => Some(("pageSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "start" => Some(("start", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "reference-name" => Some(("referenceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "read-group-set-ids" => Some(("readGroupSetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
@@ -2742,97 +2742,6 @@ impl<'n> Engine<'n> {
         }
         let mut request: api::SearchReadsRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.reads().search(request);
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _reads_stream(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "end" => Some(("end", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "total-shards" => Some(("totalShards", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "read-group-set-id" => Some(("readGroupSetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "shard" => Some(("shard", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "start" => Some(("start", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "reference-name" => Some(("referenceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["end", "project-id", "read-group-set-id", "reference-name", "shard", "start", "total-shards"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::StreamReadsRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.reads().stream(request);
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -3164,10 +3073,10 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "md5checksums" => Some(("md5checksums", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "assembly-id" => Some(("assemblyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "accessions" => Some(("accessions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "page-size" => Some(("pageSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "assembly-id" => Some(("assemblyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["accessions", "assembly-id", "md5checksums", "page-size", "page-token"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -3255,14 +3164,14 @@ impl<'n> Engine<'n> {
                     "variant-set-id" => Some(("variantSetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "end" => Some(("end", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "reference-bases" => Some(("referenceBases", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "filter" => Some(("filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "start" => Some(("start", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "names" => Some(("names", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "alternate-bases" => Some(("alternateBases", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "reference-name" => Some(("referenceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "quality" => Some(("quality", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "reference-bases" => Some(("referenceBases", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["alternate-bases", "created", "end", "filter", "id", "names", "quality", "reference-bases", "reference-name", "start", "variant-set-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -3452,10 +3361,10 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "variant-set-id" => Some(("variantSetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "normalize-reference-names" => Some(("normalizeReferenceNames", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "format" => Some(("format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-uris" => Some(("sourceUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "info-merge-config" => Some(("infoMergeConfig", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "format" => Some(("format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "normalize-reference-names" => Some(("normalizeReferenceNames", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["format", "info-merge-config", "normalize-reference-names", "source-uris", "variant-set-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -3629,14 +3538,14 @@ impl<'n> Engine<'n> {
                     "variant-set-id" => Some(("variantSetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "end" => Some(("end", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "reference-bases" => Some(("referenceBases", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "filter" => Some(("filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "start" => Some(("start", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "names" => Some(("names", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "alternate-bases" => Some(("alternateBases", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "reference-name" => Some(("referenceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "quality" => Some(("quality", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "reference-bases" => Some(("referenceBases", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["alternate-bases", "created", "end", "filter", "id", "names", "quality", "reference-bases", "reference-name", "start", "variant-set-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -3730,10 +3639,10 @@ impl<'n> Engine<'n> {
                     "start" => Some(("start", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "max-calls" => Some(("maxCalls", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "call-set-ids" => Some(("callSetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "variant-set-ids" => Some(("variantSetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "variant-name" => Some(("variantName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "reference-name" => Some(("referenceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "variant-set-ids" => Some(("variantSetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "call-set-ids" => Some(("callSetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["call-set-ids", "end", "max-calls", "page-size", "page-token", "reference-name", "start", "variant-name", "variant-set-ids"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -3746,96 +3655,6 @@ impl<'n> Engine<'n> {
         }
         let mut request: api::SearchVariantsRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.variants().search(request);
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _variants_stream(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "variant-set-id" => Some(("variantSetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "end" => Some(("end", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "start" => Some(("start", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "call-set-ids" => Some(("callSetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "reference-name" => Some(("referenceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["call-set-ids", "end", "project-id", "reference-name", "start", "variant-set-id"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::StreamVariantsRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.variants().stream(request);
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -3908,9 +3727,9 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "reference-set-id" => Some(("referenceSetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "reference-set-id" => Some(("referenceSetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dataset-id" => Some(("datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
@@ -4049,10 +3868,10 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "bigquery-table" => Some(("bigqueryTable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "bigquery-dataset" => Some(("bigqueryDataset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "bigquery-table" => Some(("bigqueryTable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "call-set-ids" => Some(("callSetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "format" => Some(("format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["bigquery-dataset", "bigquery-table", "call-set-ids", "format", "project-id"]);
@@ -4190,9 +4009,9 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "reference-set-id" => Some(("referenceSetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "reference-set-id" => Some(("referenceSetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dataset-id" => Some(("datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
@@ -4510,9 +4329,6 @@ impl<'n> Engine<'n> {
                     ("search", Some(opt)) => {
                         call_result = self._reads_search(opt, dry_run, &mut err);
                     },
-                    ("stream", Some(opt)) => {
-                        call_result = self._reads_stream(opt, dry_run, &mut err);
-                    },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("reads".to_string()));
                         writeln!(io::stderr(), "{}\n", opt.usage()).ok();
@@ -4572,9 +4388,6 @@ impl<'n> Engine<'n> {
                     },
                     ("search", Some(opt)) => {
                         call_result = self._variants_search(opt, dry_run, &mut err);
-                    },
-                    ("stream", Some(opt)) => {
-                        call_result = self._variants_stream(opt, dry_run, &mut err);
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("variants".to_string()));
@@ -4696,7 +4509,20 @@ fn main() {
     let arg_data = [
         ("annotations", "methods: 'batch-create', 'create', 'delete', 'get', 'search' and 'update'", vec![
             ("batch-create",
-                    Some(r##"Creates one or more new annotations atomically. All annotations must belong to the same annotation set. Caller must have WRITE permission for this annotation set. For optimal performance, batch positionally adjacent annotations together. If the request has a systemic issue, such as an attempt to write to an inaccessible annotation set, the entire RPC will fail accordingly. For lesser data issues, when possible an error will be isolated to the corresponding batch entry in the response; the remaining well formed annotations will be created normally. For details on the requirements for each individual annotation resource, see CreateAnnotation."##),
+                    Some(r##"Creates one or more new annotations atomically. All annotations must
+        belong to the same annotation set. Caller must have WRITE
+        permission for this annotation set. For optimal performance, batch
+        positionally adjacent annotations together.
+        
+        If the request has a systemic issue, such as an attempt to write to
+        an inaccessible annotation set, the entire RPC will fail accordingly. For
+        lesser data issues, when possible an error will be isolated to the
+        corresponding batch entry in the response; the remaining well formed
+        annotations will be created normally.
+        
+        For details on the requirements for each individual annotation resource,
+        see
+        CreateAnnotation."##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/annotations_batch-create",
                   vec![
                     (Some(r##"kv"##),
@@ -4718,7 +4544,28 @@ fn main() {
                      Some(false)),
                   ]),
             ("create",
-                    Some(r##"Creates a new annotation. Caller must have WRITE permission for the associated annotation set. The following fields are required: * annotationSetId * referenceName or referenceId ### Transcripts For annotations of type TRANSCRIPT, the following fields of transcript must be provided: * exons.start * exons.end All other fields may be optionally specified, unless documented as being server-generated (for example, the `id` field). The annotated range must be no longer than 100Mbp (mega base pairs). See the Annotation resource for additional restrictions on each field."##),
+                    Some(r##"Creates a new annotation. Caller must have WRITE permission
+        for the associated annotation set.
+        
+        The following fields are required:
+        
+        * annotationSetId
+        * referenceName or
+          referenceId
+        
+        ### Transcripts
+        
+        For annotations of type TRANSCRIPT, the following fields of
+        transcript must be provided:
+        
+        * exons.start
+        * exons.end
+        
+        All other fields may be optionally specified, unless documented as being
+        server-generated (for example, the `id` field). The annotated
+        range must be no longer than 100Mbp (mega base pairs). See the
+        Annotation resource
+        for additional restrictions on each field."##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/annotations_create",
                   vec![
                     (Some(r##"kv"##),
@@ -4740,7 +4587,8 @@ fn main() {
                      Some(false)),
                   ]),
             ("delete",
-                    Some(r##"Deletes an annotation. Caller must have WRITE permission for the associated annotation set."##),
+                    Some(r##"Deletes an annotation. Caller must have WRITE permission for
+        the associated annotation set."##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/annotations_delete",
                   vec![
                     (Some(r##"annotation-id"##),
@@ -4762,7 +4610,8 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Gets an annotation. Caller must have READ permission for the associated annotation set."##),
+                    Some(r##"Gets an annotation. Caller must have READ permission
+        for the associated annotation set."##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/annotations_get",
                   vec![
                     (Some(r##"annotation-id"##),
@@ -4784,7 +4633,13 @@ fn main() {
                      Some(false)),
                   ]),
             ("search",
-                    Some(r##"Searches for annotations that match the given criteria. Results are ordered by genomic coordinate (by reference sequence, then position). Annotations with equivalent genomic coordinates are returned in an unspecified order. This order is consistent, such that two queries for the same content (regardless of page size) yield annotations in the same order across their respective streams of paginated responses. Caller must have READ permission for the queried annotation sets."##),
+                    Some(r##"Searches for annotations that match the given criteria. Results are
+        ordered by genomic coordinate (by reference sequence, then position).
+        Annotations with equivalent genomic coordinates are returned in an
+        unspecified order. This order is consistent, such that two queries for the
+        same content (regardless of page size) yield annotations in the same order
+        across their respective streams of paginated responses. Caller must have
+        READ permission for the queried annotation sets."##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/annotations_search",
                   vec![
                     (Some(r##"kv"##),
@@ -4806,7 +4661,8 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Updates an annotation. Caller must have WRITE permission for the associated dataset."##),
+                    Some(r##"Updates an annotation. Caller must have
+        WRITE permission for the associated dataset."##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/annotations_update",
                   vec![
                     (Some(r##"annotation-id"##),
@@ -4837,7 +4693,16 @@ fn main() {
         
         ("annotationsets", "methods: 'create', 'delete', 'get', 'search' and 'update'", vec![
             ("create",
-                    Some(r##"Creates a new annotation set. Caller must have WRITE permission for the associated dataset. The following fields are required: * datasetId * referenceSetId All other fields may be optionally specified, unless documented as being server-generated (for example, the `id` field)."##),
+                    Some(r##"Creates a new annotation set. Caller must have WRITE permission for the
+        associated dataset.
+        
+        The following fields are required:
+        
+          * datasetId
+          * referenceSetId
+        
+        All other fields may be optionally specified, unless documented as being
+        server-generated (for example, the `id` field)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/annotationsets_create",
                   vec![
                     (Some(r##"kv"##),
@@ -4859,7 +4724,8 @@ fn main() {
                      Some(false)),
                   ]),
             ("delete",
-                    Some(r##"Deletes an annotation set. Caller must have WRITE permission for the associated annotation set."##),
+                    Some(r##"Deletes an annotation set. Caller must have WRITE permission
+        for the associated annotation set."##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/annotationsets_delete",
                   vec![
                     (Some(r##"annotation-set-id"##),
@@ -4881,7 +4747,8 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Gets an annotation set. Caller must have READ permission for the associated dataset."##),
+                    Some(r##"Gets an annotation set. Caller must have READ permission for
+        the associated dataset."##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/annotationsets_get",
                   vec![
                     (Some(r##"annotation-set-id"##),
@@ -4903,7 +4770,11 @@ fn main() {
                      Some(false)),
                   ]),
             ("search",
-                    Some(r##"Searches for annotation sets that match the given criteria. Annotation sets are returned in an unspecified order. This order is consistent, such that two queries for the same content (regardless of page size) yield annotation sets in the same order across their respective streams of paginated responses. Caller must have READ permission for the queried datasets."##),
+                    Some(r##"Searches for annotation sets that match the given criteria. Annotation sets
+        are returned in an unspecified order. This order is consistent, such that
+        two queries for the same content (regardless of page size) yield annotation
+        sets in the same order across their respective streams of paginated
+        responses. Caller must have READ permission for the queried datasets."##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/annotationsets_search",
                   vec![
                     (Some(r##"kv"##),
@@ -4925,7 +4796,9 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Updates an annotation set. The update must respect all mutability restrictions and other invariants described on the annotation set resource. Caller must have WRITE permission for the associated dataset."##),
+                    Some(r##"Updates an annotation set. The update must respect all mutability
+        restrictions and other invariants described on the annotation set resource.
+        Caller must have WRITE permission for the associated dataset."##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/annotationsets_update",
                   vec![
                     (Some(r##"annotation-set-id"##),
@@ -4956,7 +4829,11 @@ fn main() {
         
         ("callsets", "methods: 'create', 'delete', 'get', 'patch' and 'search'", vec![
             ("create",
-                    Some(r##"Creates a new call set. For the definitions of call sets and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)"##),
+                    Some(r##"Creates a new call set.
+        
+        For the definitions of call sets and other genomics resources, see
+        [Fundamentals of Google
+        Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)"##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/callsets_create",
                   vec![
                     (Some(r##"kv"##),
@@ -4978,7 +4855,11 @@ fn main() {
                      Some(false)),
                   ]),
             ("delete",
-                    Some(r##"Deletes a call set. For the definitions of call sets and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)"##),
+                    Some(r##"Deletes a call set.
+        
+        For the definitions of call sets and other genomics resources, see
+        [Fundamentals of Google
+        Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)"##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/callsets_delete",
                   vec![
                     (Some(r##"call-set-id"##),
@@ -5000,7 +4881,11 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Gets a call set by ID. For the definitions of call sets and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)"##),
+                    Some(r##"Gets a call set by ID.
+        
+        For the definitions of call sets and other genomics resources, see
+        [Fundamentals of Google
+        Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)"##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/callsets_get",
                   vec![
                     (Some(r##"call-set-id"##),
@@ -5022,7 +4907,13 @@ fn main() {
                      Some(false)),
                   ]),
             ("patch",
-                    Some(r##"Updates a call set. For the definitions of call sets and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics) This method supports patch semantics."##),
+                    Some(r##"Updates a call set.
+        
+        For the definitions of call sets and other genomics resources, see
+        [Fundamentals of Google
+        Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
+        
+        This method supports patch semantics."##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/callsets_patch",
                   vec![
                     (Some(r##"call-set-id"##),
@@ -5050,7 +4941,14 @@ fn main() {
                      Some(false)),
                   ]),
             ("search",
-                    Some(r##"Gets a list of call sets matching the criteria. For the definitions of call sets and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics) Implements [GlobalAllianceApi.searchCallSets](https://github.com/ga4gh/schemas/blob/v0.5.1/src/main/resources/avro/variantmethods.avdl#L178)."##),
+                    Some(r##"Gets a list of call sets matching the criteria.
+        
+        For the definitions of call sets and other genomics resources, see
+        [Fundamentals of Google
+        Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
+        
+        Implements
+        [GlobalAllianceApi.searchCallSets](https://github.com/ga4gh/schemas/blob/v0.5.1/src/main/resources/avro/variantmethods.avdl#L178)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/callsets_search",
                   vec![
                     (Some(r##"kv"##),
@@ -5075,7 +4973,11 @@ fn main() {
         
         ("datasets", "methods: 'create', 'delete', 'get', 'get-iam-policy', 'list', 'patch', 'set-iam-policy', 'test-iam-permissions' and 'undelete'", vec![
             ("create",
-                    Some(r##"Creates a new dataset. For the definitions of datasets and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)"##),
+                    Some(r##"Creates a new dataset.
+        
+        For the definitions of datasets and other genomics resources, see
+        [Fundamentals of Google
+        Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)"##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/datasets_create",
                   vec![
                     (Some(r##"kv"##),
@@ -5097,7 +4999,16 @@ fn main() {
                      Some(false)),
                   ]),
             ("delete",
-                    Some(r##"Deletes a dataset and all of its contents (all read group sets, reference sets, variant sets, call sets, annotation sets, etc.) This is reversible (up to one week after the deletion) via the datasets.undelete operation. For the definitions of datasets and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)"##),
+                    Some(r##"Deletes a dataset and all of its contents (all read group sets,
+        reference sets, variant sets, call sets, annotation sets, etc.)
+        This is reversible (up to one week after the deletion) via
+        the
+        datasets.undelete
+        operation.
+        
+        For the definitions of datasets and other genomics resources, see
+        [Fundamentals of Google
+        Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)"##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/datasets_delete",
                   vec![
                     (Some(r##"dataset-id"##),
@@ -5119,7 +5030,11 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Gets a dataset by ID. For the definitions of datasets and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)"##),
+                    Some(r##"Gets a dataset by ID.
+        
+        For the definitions of datasets and other genomics resources, see
+        [Fundamentals of Google
+        Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)"##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/datasets_get",
                   vec![
                     (Some(r##"dataset-id"##),
@@ -5141,12 +5056,21 @@ fn main() {
                      Some(false)),
                   ]),
             ("get-iam-policy",
-                    Some(r##"Gets the access control policy for the dataset. This is empty if the policy or resource does not exist. See Getting a Policy for more information. For the definitions of datasets and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)"##),
+                    Some(r##"Gets the access control policy for the dataset. This is empty if the
+        policy or resource does not exist.
+        
+        See <a href="/iam/docs/managing-policies#getting_a_policy">Getting a
+        Policy</a> for more information.
+        
+        For the definitions of datasets and other genomics resources, see
+        [Fundamentals of Google
+        Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)"##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/datasets_get-iam-policy",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which policy is being specified. Format is `datasets/`."##),
+                     Some(r##"REQUIRED: The resource for which policy is being specified. Format is
+        `datasets/<dataset ID>`."##),
                      Some(true),
                      Some(false)),
         
@@ -5169,7 +5093,11 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Lists datasets within a project. For the definitions of datasets and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)"##),
+                    Some(r##"Lists datasets within a project.
+        
+        For the definitions of datasets and other genomics resources, see
+        [Fundamentals of Google
+        Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)"##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/datasets_list",
                   vec![
                     (Some(r##"v"##),
@@ -5185,7 +5113,13 @@ fn main() {
                      Some(false)),
                   ]),
             ("patch",
-                    Some(r##"Updates a dataset. For the definitions of datasets and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics) This method supports patch semantics."##),
+                    Some(r##"Updates a dataset.
+        
+        For the definitions of datasets and other genomics resources, see
+        [Fundamentals of Google
+        Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
+        
+        This method supports patch semantics."##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/datasets_patch",
                   vec![
                     (Some(r##"dataset-id"##),
@@ -5213,12 +5147,21 @@ fn main() {
                      Some(false)),
                   ]),
             ("set-iam-policy",
-                    Some(r##"Sets the access control policy on the specified dataset. Replaces any existing policy. For the definitions of datasets and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics) See Setting a Policy for more information."##),
+                    Some(r##"Sets the access control policy on the specified dataset. Replaces any
+        existing policy.
+        
+        For the definitions of datasets and other genomics resources, see
+        [Fundamentals of Google
+        Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
+        
+        See <a href="/iam/docs/managing-policies#setting_a_policy">Setting a
+        Policy</a> for more information."##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/datasets_set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which policy is being specified. Format is `datasets/`."##),
+                     Some(r##"REQUIRED: The resource for which policy is being specified. Format is
+        `datasets/<dataset ID>`."##),
                      Some(true),
                      Some(false)),
         
@@ -5241,12 +5184,19 @@ fn main() {
                      Some(false)),
                   ]),
             ("test-iam-permissions",
-                    Some(r##"Returns permissions that a caller has on the specified resource. See Testing Permissions for more information. For the definitions of datasets and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)"##),
+                    Some(r##"Returns permissions that a caller has on the specified resource.
+        See <a href="/iam/docs/managing-policies#testing_permissions">Testing
+        Permissions</a> for more information.
+        
+        For the definitions of datasets and other genomics resources, see
+        [Fundamentals of Google
+        Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)"##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/datasets_test-iam-permissions",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which policy is being specified. Format is `datasets/`."##),
+                     Some(r##"REQUIRED: The resource for which policy is being specified. Format is
+        `datasets/<dataset ID>`."##),
                      Some(true),
                      Some(false)),
         
@@ -5269,7 +5219,13 @@ fn main() {
                      Some(false)),
                   ]),
             ("undelete",
-                    Some(r##"Undeletes a dataset by restoring a dataset which was deleted via this API. For the definitions of datasets and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics) This operation is only possible for a week after the deletion occurred."##),
+                    Some(r##"Undeletes a dataset by restoring a dataset which was deleted via this API.
+        
+        For the definitions of datasets and other genomics resources, see
+        [Fundamentals of Google
+        Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
+        
+        This operation is only possible for a week after the deletion occurred."##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/datasets_undelete",
                   vec![
                     (Some(r##"dataset-id"##),
@@ -5328,7 +5284,9 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Gets the latest state of a long-running operation. Clients can use this method to poll the operation result at intervals as recommended by the API service."##),
+                    Some(r##"Gets the latest state of a long-running operation.  Clients can use this
+        method to poll the operation result at intervals as recommended by the API
+        service."##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/operations_get",
                   vec![
                     (Some(r##"name"##),
@@ -5375,7 +5333,19 @@ fn main() {
         
         ("readgroupsets", "methods: 'coveragebuckets-list', 'delete', 'export', 'get', 'import', 'patch' and 'search'", vec![
             ("coveragebuckets-list",
-                    Some(r##"Lists fixed width coverage buckets for a read group set, each of which correspond to a range of a reference sequence. Each bucket summarizes coverage information across its corresponding genomic range. For the definitions of read group sets and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics) Coverage is defined as the number of reads which are aligned to a given base in the reference sequence. Coverage buckets are available at several precomputed bucket widths, enabling retrieval of various coverage 'zoom levels'. The caller must have READ permissions for the target read group set."##),
+                    Some(r##"Lists fixed width coverage buckets for a read group set, each of which
+        correspond to a range of a reference sequence. Each bucket summarizes
+        coverage information across its corresponding genomic range.
+        
+        For the definitions of read group sets and other genomics resources, see
+        [Fundamentals of Google
+        Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
+        
+        Coverage is defined as the number of reads which are aligned to a given
+        base in the reference sequence. Coverage buckets are available at several
+        precomputed bucket widths, enabling retrieval of various coverage 'zoom
+        levels'. The caller must have READ permissions for the target read group
+        set."##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/readgroupsets_coveragebuckets-list",
                   vec![
                     (Some(r##"read-group-set-id"##),
@@ -5397,12 +5367,17 @@ fn main() {
                      Some(false)),
                   ]),
             ("delete",
-                    Some(r##"Deletes a read group set. For the definitions of read group sets and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)"##),
+                    Some(r##"Deletes a read group set.
+        
+        For the definitions of read group sets and other genomics resources, see
+        [Fundamentals of Google
+        Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)"##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/readgroupsets_delete",
                   vec![
                     (Some(r##"read-group-set-id"##),
                      None,
-                     Some(r##"The ID of the read group set to be deleted. The caller must have WRITE permissions to the dataset associated with this read group set."##),
+                     Some(r##"The ID of the read group set to be deleted. The caller must have WRITE
+        permissions to the dataset associated with this read group set."##),
                      Some(true),
                      Some(false)),
         
@@ -5419,12 +5394,22 @@ fn main() {
                      Some(false)),
                   ]),
             ("export",
-                    Some(r##"Exports a read group set to a BAM file in Google Cloud Storage. For the definitions of read group sets and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics) Note that currently there may be some differences between exported BAM files and the original BAM file at the time of import. See ImportReadGroupSets for caveats."##),
+                    Some(r##"Exports a read group set to a BAM file in Google Cloud Storage.
+        
+        For the definitions of read group sets and other genomics resources, see
+        [Fundamentals of Google
+        Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
+        
+        Note that currently there may be some differences between exported BAM
+        files and the original BAM file at the time of import. See
+        ImportReadGroupSets
+        for caveats."##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/readgroupsets_export",
                   vec![
                     (Some(r##"read-group-set-id"##),
                      None,
-                     Some(r##"Required. The ID of the read group set to export. The caller must have READ access to this read group set."##),
+                     Some(r##"Required. The ID of the read group set to export. The caller must have
+        READ access to this read group set."##),
                      Some(true),
                      Some(false)),
         
@@ -5447,7 +5432,11 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Gets a read group set by ID. For the definitions of read group sets and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)"##),
+                    Some(r##"Gets a read group set by ID.
+        
+        For the definitions of read group sets and other genomics resources, see
+        [Fundamentals of Google
+        Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)"##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/readgroupsets_get",
                   vec![
                     (Some(r##"read-group-set-id"##),
@@ -5469,7 +5458,24 @@ fn main() {
                      Some(false)),
                   ]),
             ("import",
-                    Some(r##"Creates read group sets by asynchronously importing the provided information. For the definitions of read group sets and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics) The caller must have WRITE permissions to the dataset. ## Notes on [BAM](https://samtools.github.io/hts-specs/SAMv1.pdf) import - Tags will be converted to strings - tag types are not preserved - Comments (`@CO`) in the input file header will not be preserved - Original header order of references (`@SQ`) will not be preserved - Any reverse stranded unmapped reads will be reverse complemented, and their qualities (also the "BQ" and "OQ" tags, if any) will be reversed - Unmapped reads will be stripped of positional information (reference name and position)"##),
+                    Some(r##"Creates read group sets by asynchronously importing the provided
+        information.
+        
+        For the definitions of read group sets and other genomics resources, see
+        [Fundamentals of Google
+        Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
+        
+        The caller must have WRITE permissions to the dataset.
+        
+        ## Notes on [BAM](https://samtools.github.io/hts-specs/SAMv1.pdf) import
+        
+        - Tags will be converted to strings - tag types are not preserved
+        - Comments (`@CO`) in the input file header will not be preserved
+        - Original header order of references (`@SQ`) will not be preserved
+        - Any reverse stranded unmapped reads will be reverse complemented, and
+        their qualities (also the "BQ" and "OQ" tags, if any) will be reversed
+        - Unmapped reads will be stripped of positional information (reference name
+        and position)"##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/readgroupsets_import",
                   vec![
                     (Some(r##"kv"##),
@@ -5491,12 +5497,19 @@ fn main() {
                      Some(false)),
                   ]),
             ("patch",
-                    Some(r##"Updates a read group set. For the definitions of read group sets and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics) This method supports patch semantics."##),
+                    Some(r##"Updates a read group set.
+        
+        For the definitions of read group sets and other genomics resources, see
+        [Fundamentals of Google
+        Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
+        
+        This method supports patch semantics."##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/readgroupsets_patch",
                   vec![
                     (Some(r##"read-group-set-id"##),
                      None,
-                     Some(r##"The ID of the read group set to be updated. The caller must have WRITE permissions to the dataset associated with this read group set."##),
+                     Some(r##"The ID of the read group set to be updated. The caller must have WRITE
+        permissions to the dataset associated with this read group set."##),
                      Some(true),
                      Some(false)),
         
@@ -5519,7 +5532,14 @@ fn main() {
                      Some(false)),
                   ]),
             ("search",
-                    Some(r##"Searches for read group sets matching the criteria. For the definitions of read group sets and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics) Implements [GlobalAllianceApi.searchReadGroupSets](https://github.com/ga4gh/schemas/blob/v0.5.1/src/main/resources/avro/readmethods.avdl#L135)."##),
+                    Some(r##"Searches for read group sets matching the criteria.
+        
+        For the definitions of read group sets and other genomics resources, see
+        [Fundamentals of Google
+        Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
+        
+        Implements
+        [GlobalAllianceApi.searchReadGroupSets](https://github.com/ga4gh/schemas/blob/v0.5.1/src/main/resources/avro/readmethods.avdl#L135)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/readgroupsets_search",
                   vec![
                     (Some(r##"kv"##),
@@ -5542,32 +5562,33 @@ fn main() {
                   ]),
             ]),
         
-        ("reads", "methods: 'search' and 'stream'", vec![
+        ("reads", "methods: 'search'", vec![
             ("search",
-                    Some(r##"Gets a list of reads for one or more read group sets. For the definitions of read group sets and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics) Reads search operates over a genomic coordinate space of reference sequence & position defined over the reference sequences to which the requested read group sets are aligned. If a target positional range is specified, search returns all reads whose alignment to the reference genome overlap the range. A query which specifies only read group set IDs yields all reads in those read group sets, including unmapped reads. All reads returned (including reads on subsequent pages) are ordered by genomic coordinate (by reference sequence, then position). Reads with equivalent genomic coordinates are returned in an unspecified order. This order is consistent, such that two queries for the same content (regardless of page size) yield reads in the same order across their respective streams of paginated responses. Implements [GlobalAllianceApi.searchReads](https://github.com/ga4gh/schemas/blob/v0.5.1/src/main/resources/avro/readmethods.avdl#L85)."##),
+                    Some(r##"Gets a list of reads for one or more read group sets.
+        
+        For the definitions of read group sets and other genomics resources, see
+        [Fundamentals of Google
+        Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
+        
+        Reads search operates over a genomic coordinate space of reference sequence
+        & position defined over the reference sequences to which the requested
+        read group sets are aligned.
+        
+        If a target positional range is specified, search returns all reads whose
+        alignment to the reference genome overlap the range. A query which
+        specifies only read group set IDs yields all reads in those read group
+        sets, including unmapped reads.
+        
+        All reads returned (including reads on subsequent pages) are ordered by
+        genomic coordinate (by reference sequence, then position). Reads with
+        equivalent genomic coordinates are returned in an unspecified order. This
+        order is consistent, such that two queries for the same content (regardless
+        of page size) yield reads in the same order across their respective streams
+        of paginated responses.
+        
+        Implements
+        [GlobalAllianceApi.searchReads](https://github.com/ga4gh/schemas/blob/v0.5.1/src/main/resources/avro/readmethods.avdl#L85)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/reads_search",
-                  vec![
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("stream",
-                    Some(r##"Returns a stream of all the reads matching the search request, ordered by reference name, position, and ID."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/reads_stream",
                   vec![
                     (Some(r##"kv"##),
                      Some(r##"r"##),
@@ -5591,7 +5612,14 @@ fn main() {
         
         ("references", "methods: 'bases-list', 'get' and 'search'", vec![
             ("bases-list",
-                    Some(r##"Lists the bases in a reference, optionally restricted to a range. For the definitions of references and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics) Implements [GlobalAllianceApi.getReferenceBases](https://github.com/ga4gh/schemas/blob/v0.5.1/src/main/resources/avro/referencemethods.avdl#L221)."##),
+                    Some(r##"Lists the bases in a reference, optionally restricted to a range.
+        
+        For the definitions of references and other genomics resources, see
+        [Fundamentals of Google
+        Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
+        
+        Implements
+        [GlobalAllianceApi.getReferenceBases](https://github.com/ga4gh/schemas/blob/v0.5.1/src/main/resources/avro/referencemethods.avdl#L221)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/references_bases-list",
                   vec![
                     (Some(r##"reference-id"##),
@@ -5613,7 +5641,14 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Gets a reference. For the definitions of references and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics) Implements [GlobalAllianceApi.getReference](https://github.com/ga4gh/schemas/blob/v0.5.1/src/main/resources/avro/referencemethods.avdl#L158)."##),
+                    Some(r##"Gets a reference.
+        
+        For the definitions of references and other genomics resources, see
+        [Fundamentals of Google
+        Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
+        
+        Implements
+        [GlobalAllianceApi.getReference](https://github.com/ga4gh/schemas/blob/v0.5.1/src/main/resources/avro/referencemethods.avdl#L158)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/references_get",
                   vec![
                     (Some(r##"reference-id"##),
@@ -5635,7 +5670,14 @@ fn main() {
                      Some(false)),
                   ]),
             ("search",
-                    Some(r##"Searches for references which match the given criteria. For the definitions of references and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics) Implements [GlobalAllianceApi.searchReferences](https://github.com/ga4gh/schemas/blob/v0.5.1/src/main/resources/avro/referencemethods.avdl#L146)."##),
+                    Some(r##"Searches for references which match the given criteria.
+        
+        For the definitions of references and other genomics resources, see
+        [Fundamentals of Google
+        Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
+        
+        Implements
+        [GlobalAllianceApi.searchReferences](https://github.com/ga4gh/schemas/blob/v0.5.1/src/main/resources/avro/referencemethods.avdl#L146)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/references_search",
                   vec![
                     (Some(r##"kv"##),
@@ -5660,7 +5702,14 @@ fn main() {
         
         ("referencesets", "methods: 'get' and 'search'", vec![
             ("get",
-                    Some(r##"Gets a reference set. For the definitions of references and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics) Implements [GlobalAllianceApi.getReferenceSet](https://github.com/ga4gh/schemas/blob/v0.5.1/src/main/resources/avro/referencemethods.avdl#L83)."##),
+                    Some(r##"Gets a reference set.
+        
+        For the definitions of references and other genomics resources, see
+        [Fundamentals of Google
+        Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
+        
+        Implements
+        [GlobalAllianceApi.getReferenceSet](https://github.com/ga4gh/schemas/blob/v0.5.1/src/main/resources/avro/referencemethods.avdl#L83)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/referencesets_get",
                   vec![
                     (Some(r##"reference-set-id"##),
@@ -5682,7 +5731,14 @@ fn main() {
                      Some(false)),
                   ]),
             ("search",
-                    Some(r##"Searches for reference sets which match the given criteria. For the definitions of references and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics) Implements [GlobalAllianceApi.searchReferenceSets](https://github.com/ga4gh/schemas/blob/v0.5.1/src/main/resources/avro/referencemethods.avdl#L71)"##),
+                    Some(r##"Searches for reference sets which match the given criteria.
+        
+        For the definitions of references and other genomics resources, see
+        [Fundamentals of Google
+        Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
+        
+        Implements
+        [GlobalAllianceApi.searchReferenceSets](https://github.com/ga4gh/schemas/blob/v0.5.1/src/main/resources/avro/referencemethods.avdl#L71)"##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/referencesets_search",
                   vec![
                     (Some(r##"kv"##),
@@ -5705,9 +5761,13 @@ fn main() {
                   ]),
             ]),
         
-        ("variants", "methods: 'create', 'delete', 'get', 'import', 'merge', 'patch', 'search' and 'stream'", vec![
+        ("variants", "methods: 'create', 'delete', 'get', 'import', 'merge', 'patch' and 'search'", vec![
             ("create",
-                    Some(r##"Creates a new variant. For the definitions of variants and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)"##),
+                    Some(r##"Creates a new variant.
+        
+        For the definitions of variants and other genomics resources, see
+        [Fundamentals of Google
+        Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)"##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/variants_create",
                   vec![
                     (Some(r##"kv"##),
@@ -5729,7 +5789,11 @@ fn main() {
                      Some(false)),
                   ]),
             ("delete",
-                    Some(r##"Deletes a variant. For the definitions of variants and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)"##),
+                    Some(r##"Deletes a variant.
+        
+        For the definitions of variants and other genomics resources, see
+        [Fundamentals of Google
+        Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)"##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/variants_delete",
                   vec![
                     (Some(r##"variant-id"##),
@@ -5751,7 +5815,11 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Gets a variant by ID. For the definitions of variants and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)"##),
+                    Some(r##"Gets a variant by ID.
+        
+        For the definitions of variants and other genomics resources, see
+        [Fundamentals of Google
+        Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)"##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/variants_get",
                   vec![
                     (Some(r##"variant-id"##),
@@ -5773,7 +5841,24 @@ fn main() {
                      Some(false)),
                   ]),
             ("import",
-                    Some(r##"Creates variant data by asynchronously importing the provided information. For the definitions of variant sets and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics) The variants for import will be merged with any existing variant that matches its reference sequence, start, end, reference bases, and alternative bases. If no such variant exists, a new one will be created. When variants are merged, the call information from the new variant is added to the existing variant, and Variant info fields are merged as specified in infoMergeConfig. As a special case, for single-sample VCF files, QUAL and FILTER fields will be moved to the call level; these are sometimes interpreted in a call-specific context. Imported VCF headers are appended to the metadata already in a variant set."##),
+                    Some(r##"Creates variant data by asynchronously importing the provided information.
+        
+        For the definitions of variant sets and other genomics resources, see
+        [Fundamentals of Google
+        Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
+        
+        The variants for import will be merged with any existing variant that
+        matches its reference sequence, start, end, reference bases, and
+        alternative bases. If no such variant exists, a new one will be created.
+        
+        When variants are merged, the call information from the new variant
+        is added to the existing variant, and Variant info fields are merged
+        as specified in
+        infoMergeConfig.
+        As a special case, for single-sample VCF files, QUAL and FILTER fields will
+        be moved to the call level; these are sometimes interpreted in a
+        call-specific context.
+        Imported VCF headers are appended to the metadata already in a variant set."##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/variants_import",
                   vec![
                     (Some(r##"kv"##),
@@ -5795,7 +5880,97 @@ fn main() {
                      Some(false)),
                   ]),
             ("merge",
-                    Some(r##"Merges the given variants with existing variants. For the definitions of variants and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics) Each variant will be merged with an existing variant that matches its reference sequence, start, end, reference bases, and alternative bases. If no such variant exists, a new one will be created. When variants are merged, the call information from the new variant is added to the existing variant. Variant info fields are merged as specified in the infoMergeConfig field of the MergeVariantsRequest. Please exercise caution when using this method! It is easy to introduce mistakes in existing variants and difficult to back out of them. For example, suppose you were trying to merge a new variant with an existing one and both variants contain calls that belong to callsets with the same callset ID. // Existing variant - irrelevant fields trimmed for clarity { "variantSetId": "10473108253681171589", "referenceName": "1", "start": "10582", "referenceBases": "G", "alternateBases": [ "A" ], "calls": [ { "callSetId": "10473108253681171589-0", "callSetName": "CALLSET0", "genotype": [ 0, 1 ], } ] } // New variant with conflicting call information { "variantSetId": "10473108253681171589", "referenceName": "1", "start": "10582", "referenceBases": "G", "alternateBases": [ "A" ], "calls": [ { "callSetId": "10473108253681171589-0", "callSetName": "CALLSET0", "genotype": [ 1, 1 ], } ] } The resulting merged variant would overwrite the existing calls with those from the new variant: { "variantSetId": "10473108253681171589", "referenceName": "1", "start": "10582", "referenceBases": "G", "alternateBases": [ "A" ], "calls": [ { "callSetId": "10473108253681171589-0", "callSetName": "CALLSET0", "genotype": [ 1, 1 ], } ] } This may be the desired outcome, but it is up to the user to determine if if that is indeed the case."##),
+                    Some(r##"Merges the given variants with existing variants.
+        
+        For the definitions of variants and other genomics resources, see
+        [Fundamentals of Google
+        Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
+        
+        Each variant will be
+        merged with an existing variant that matches its reference sequence,
+        start, end, reference bases, and alternative bases. If no such variant
+        exists, a new one will be created.
+        
+        When variants are merged, the call information from the new variant
+        is added to the existing variant. Variant info fields are merged as
+        specified in the
+        infoMergeConfig
+        field of the MergeVariantsRequest.
+        
+        Please exercise caution when using this method!  It is easy to introduce
+        mistakes in existing variants and difficult to back out of them.  For
+        example,
+        suppose you were trying to merge a new variant with an existing one and
+        both
+        variants contain calls that belong to callsets with the same callset ID.
+        
+            // Existing variant - irrelevant fields trimmed for clarity
+            {
+                "variantSetId": "10473108253681171589",
+                "referenceName": "1",
+                "start": "10582",
+                "referenceBases": "G",
+                "alternateBases": [
+                    "A"
+                ],
+                "calls": [
+                    {
+                        "callSetId": "10473108253681171589-0",
+                        "callSetName": "CALLSET0",
+                        "genotype": [
+                            0,
+                            1
+                        ],
+                    }
+                ]
+            }
+        
+            // New variant with conflicting call information
+            {
+                "variantSetId": "10473108253681171589",
+                "referenceName": "1",
+                "start": "10582",
+                "referenceBases": "G",
+                "alternateBases": [
+                    "A"
+                ],
+                "calls": [
+                    {
+                        "callSetId": "10473108253681171589-0",
+                        "callSetName": "CALLSET0",
+                        "genotype": [
+                            1,
+                            1
+                        ],
+                    }
+                ]
+            }
+        
+        The resulting merged variant would overwrite the existing calls with those
+        from the new variant:
+        
+            {
+                "variantSetId": "10473108253681171589",
+                "referenceName": "1",
+                "start": "10582",
+                "referenceBases": "G",
+                "alternateBases": [
+                    "A"
+                ],
+                "calls": [
+                    {
+                        "callSetId": "10473108253681171589-0",
+                        "callSetName": "CALLSET0",
+                        "genotype": [
+                            1,
+                            1
+                        ],
+                    }
+                ]
+            }
+        
+        This may be the desired outcome, but it is up to the user to determine if
+        if that is indeed the case."##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/variants_merge",
                   vec![
                     (Some(r##"kv"##),
@@ -5817,7 +5992,14 @@ fn main() {
                      Some(false)),
                   ]),
             ("patch",
-                    Some(r##"Updates a variant. For the definitions of variants and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics) This method supports patch semantics. Returns the modified variant without its calls."##),
+                    Some(r##"Updates a variant.
+        
+        For the definitions of variants and other genomics resources, see
+        [Fundamentals of Google
+        Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
+        
+        This method supports patch semantics. Returns the modified variant without
+        its calls."##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/variants_patch",
                   vec![
                     (Some(r##"variant-id"##),
@@ -5845,30 +6027,15 @@ fn main() {
                      Some(false)),
                   ]),
             ("search",
-                    Some(r##"Gets a list of variants matching the criteria. For the definitions of variants and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics) Implements [GlobalAllianceApi.searchVariants](https://github.com/ga4gh/schemas/blob/v0.5.1/src/main/resources/avro/variantmethods.avdl#L126)."##),
+                    Some(r##"Gets a list of variants matching the criteria.
+        
+        For the definitions of variants and other genomics resources, see
+        [Fundamentals of Google
+        Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
+        
+        Implements
+        [GlobalAllianceApi.searchVariants](https://github.com/ga4gh/schemas/blob/v0.5.1/src/main/resources/avro/variantmethods.avdl#L126)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/variants_search",
-                  vec![
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("stream",
-                    Some(r##"Returns a stream of all the variants matching the search request, ordered by reference name, position, and ID."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/variants_stream",
                   vec![
                     (Some(r##"kv"##),
                      Some(r##"r"##),
@@ -5892,7 +6059,15 @@ fn main() {
         
         ("variantsets", "methods: 'create', 'delete', 'export', 'get', 'patch' and 'search'", vec![
             ("create",
-                    Some(r##"Creates a new variant set. For the definitions of variant sets and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics) The provided variant set must have a valid `datasetId` set - all other fields are optional. Note that the `id` field will be ignored, as this is assigned by the server."##),
+                    Some(r##"Creates a new variant set.
+        
+        For the definitions of variant sets and other genomics resources, see
+        [Fundamentals of Google
+        Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
+        
+        The provided variant set must have a valid `datasetId` set - all other
+        fields are optional. Note that the `id` field will be ignored, as this is
+        assigned by the server."##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/variantsets_create",
                   vec![
                     (Some(r##"kv"##),
@@ -5914,7 +6089,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("delete",
-                    Some(r##"Deletes a variant set including all variants, call sets, and calls within. This is not reversible. For the definitions of variant sets and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)"##),
+                    Some(r##"Deletes a variant set including all variants, call sets, and calls within.
+        This is not reversible.
+        
+        For the definitions of variant sets and other genomics resources, see
+        [Fundamentals of Google
+        Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)"##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/variantsets_delete",
                   vec![
                     (Some(r##"variant-set-id"##),
@@ -5936,12 +6116,17 @@ fn main() {
                      Some(false)),
                   ]),
             ("export",
-                    Some(r##"Exports variant set data to an external destination. For the definitions of variant sets and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)"##),
+                    Some(r##"Exports variant set data to an external destination.
+        
+        For the definitions of variant sets and other genomics resources, see
+        [Fundamentals of Google
+        Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)"##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/variantsets_export",
                   vec![
                     (Some(r##"variant-set-id"##),
                      None,
-                     Some(r##"Required. The ID of the variant set that contains variant data which should be exported. The caller must have READ access to this variant set."##),
+                     Some(r##"Required. The ID of the variant set that contains variant data which
+        should be exported. The caller must have READ access to this variant set."##),
                      Some(true),
                      Some(false)),
         
@@ -5964,7 +6149,11 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Gets a variant set by ID. For the definitions of variant sets and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)"##),
+                    Some(r##"Gets a variant set by ID.
+        
+        For the definitions of variant sets and other genomics resources, see
+        [Fundamentals of Google
+        Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)"##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/variantsets_get",
                   vec![
                     (Some(r##"variant-set-id"##),
@@ -5986,7 +6175,11 @@ fn main() {
                      Some(false)),
                   ]),
             ("patch",
-                    Some(r##"Updates a variant set using patch semantics. For the definitions of variant sets and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)"##),
+                    Some(r##"Updates a variant set using patch semantics.
+        
+        For the definitions of variant sets and other genomics resources, see
+        [Fundamentals of Google
+        Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)"##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/variantsets_patch",
                   vec![
                     (Some(r##"variant-set-id"##),
@@ -6014,7 +6207,14 @@ fn main() {
                      Some(false)),
                   ]),
             ("search",
-                    Some(r##"Returns a list of all variant sets matching search criteria. For the definitions of variant sets and other genomics resources, see [Fundamentals of Google Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics) Implements [GlobalAllianceApi.searchVariantSets](https://github.com/ga4gh/schemas/blob/v0.5.1/src/main/resources/avro/variantmethods.avdl#L49)."##),
+                    Some(r##"Returns a list of all variant sets matching search criteria.
+        
+        For the definitions of variant sets and other genomics resources, see
+        [Fundamentals of Google
+        Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
+        
+        Implements
+        [GlobalAllianceApi.searchVariantSets](https://github.com/ga4gh/schemas/blob/v0.5.1/src/main/resources/avro/variantmethods.avdl#L49)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/variantsets_search",
                   vec![
                     (Some(r##"kv"##),
@@ -6041,8 +6241,8 @@ fn main() {
     
     let mut app = App::new("genomics1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.4+20160928")
-           .about("Stores, processes, explores and shares genomic data.")
+           .version("1.0.4+20170520")
+           .about("Upload, process, query, and search Genomics data in the cloud.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_genomics1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

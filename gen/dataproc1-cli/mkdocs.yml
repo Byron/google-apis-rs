@@ -1,4 +1,4 @@
-site_name: dataproc v1.0.4+20161102
+site_name: dataproc v1.0.4+20170515
 site_url: http://byron.github.io/google-apis-rs/google-dataproc1-cli
 site_description: A complete library to interact with dataproc (protocol v1)
 
@@ -19,6 +19,7 @@ pages:
 - ['projects_regions-jobs-delete.md', 'Projects', 'Regions Jobs Delete']
 - ['projects_regions-jobs-get.md', 'Projects', 'Regions Jobs Get']
 - ['projects_regions-jobs-list.md', 'Projects', 'Regions Jobs List']
+- ['projects_regions-jobs-patch.md', 'Projects', 'Regions Jobs Patch']
 - ['projects_regions-jobs-submit.md', 'Projects', 'Regions Jobs Submit']
 - ['projects_regions-operations-cancel.md', 'Projects', 'Regions Operations Cancel']
 - ['projects_regions-operations-delete.md', 'Projects', 'Regions Operations Delete']

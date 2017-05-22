@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *analytics* API at revision *20161004*. The CLI is at version *1.0.4*.
+This documentation was generated from the *analytics* API at revision *20170321*. The CLI is at version *1.0.4*.
 
 ```bash
 analytics3 [options]
@@ -84,6 +84,7 @@ analytics3 [options]
                 profiles-list <account-id> <web-property-id> [-p <v>]... [-o <out>]
                 profiles-patch <account-id> <web-property-id> <profile-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 profiles-update <account-id> <web-property-id> <profile-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                remarketing-audience-delete <account-id> <web-property-id> <remarketing-audience-id> [-p <v>]...
                 remarketing-audience-get <account-id> <web-property-id> <remarketing-audience-id> [-p <v>]... [-o <out>]
                 remarketing-audience-insert <account-id> <web-property-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 remarketing-audience-list <account-id> <web-property-id> [-p <v>]... [-o <out>]

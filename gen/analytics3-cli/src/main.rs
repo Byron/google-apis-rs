@@ -4329,6 +4329,50 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _management_remarketing_audience_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.management().remarketing_audience_delete(opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("remarketing-audience-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok(mut response) => {
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _management_remarketing_audience_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.management().remarketing_audience_get(opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("remarketing-audience-id").unwrap_or(""));
@@ -6877,6 +6921,9 @@ impl<'n> Engine<'n> {
                     ("profiles-update", Some(opt)) => {
                         call_result = self._management_profiles_update(opt, dry_run, &mut err);
                     },
+                    ("remarketing-audience-delete", Some(opt)) => {
+                        call_result = self._management_remarketing_audience_delete(opt, dry_run, &mut err);
+                    },
                     ("remarketing-audience-get", Some(opt)) => {
                         call_result = self._management_remarketing_audience_get(opt, dry_run, &mut err);
                     },
@@ -7186,7 +7233,7 @@ fn main() {
                   ]),
             ]),
         
-        ("management", "methods: 'account-summaries-list', 'account-user-links-delete', 'account-user-links-insert', 'account-user-links-list', 'account-user-links-update', 'accounts-list', 'custom-data-sources-list', 'custom-dimensions-get', 'custom-dimensions-insert', 'custom-dimensions-list', 'custom-dimensions-patch', 'custom-dimensions-update', 'custom-metrics-get', 'custom-metrics-insert', 'custom-metrics-list', 'custom-metrics-patch', 'custom-metrics-update', 'experiments-delete', 'experiments-get', 'experiments-insert', 'experiments-list', 'experiments-patch', 'experiments-update', 'filters-delete', 'filters-get', 'filters-insert', 'filters-list', 'filters-patch', 'filters-update', 'goals-get', 'goals-insert', 'goals-list', 'goals-patch', 'goals-update', 'profile-filter-links-delete', 'profile-filter-links-get', 'profile-filter-links-insert', 'profile-filter-links-list', 'profile-filter-links-patch', 'profile-filter-links-update', 'profile-user-links-delete', 'profile-user-links-insert', 'profile-user-links-list', 'profile-user-links-update', 'profiles-delete', 'profiles-get', 'profiles-insert', 'profiles-list', 'profiles-patch', 'profiles-update', 'remarketing-audience-get', 'remarketing-audience-insert', 'remarketing-audience-list', 'remarketing-audience-patch', 'remarketing-audience-update', 'segments-list', 'unsampled-reports-delete', 'unsampled-reports-get', 'unsampled-reports-insert', 'unsampled-reports-list', 'uploads-delete-upload-data', 'uploads-get', 'uploads-list', 'uploads-upload-data', 'web-property-ad-words-links-delete', 'web-property-ad-words-links-get', 'web-property-ad-words-links-insert', 'web-property-ad-words-links-list', 'web-property-ad-words-links-patch', 'web-property-ad-words-links-update', 'webproperties-get', 'webproperties-insert', 'webproperties-list', 'webproperties-patch', 'webproperties-update', 'webproperty-user-links-delete', 'webproperty-user-links-insert', 'webproperty-user-links-list' and 'webproperty-user-links-update'", vec![
+        ("management", "methods: 'account-summaries-list', 'account-user-links-delete', 'account-user-links-insert', 'account-user-links-list', 'account-user-links-update', 'accounts-list', 'custom-data-sources-list', 'custom-dimensions-get', 'custom-dimensions-insert', 'custom-dimensions-list', 'custom-dimensions-patch', 'custom-dimensions-update', 'custom-metrics-get', 'custom-metrics-insert', 'custom-metrics-list', 'custom-metrics-patch', 'custom-metrics-update', 'experiments-delete', 'experiments-get', 'experiments-insert', 'experiments-list', 'experiments-patch', 'experiments-update', 'filters-delete', 'filters-get', 'filters-insert', 'filters-list', 'filters-patch', 'filters-update', 'goals-get', 'goals-insert', 'goals-list', 'goals-patch', 'goals-update', 'profile-filter-links-delete', 'profile-filter-links-get', 'profile-filter-links-insert', 'profile-filter-links-list', 'profile-filter-links-patch', 'profile-filter-links-update', 'profile-user-links-delete', 'profile-user-links-insert', 'profile-user-links-list', 'profile-user-links-update', 'profiles-delete', 'profiles-get', 'profiles-insert', 'profiles-list', 'profiles-patch', 'profiles-update', 'remarketing-audience-delete', 'remarketing-audience-get', 'remarketing-audience-insert', 'remarketing-audience-list', 'remarketing-audience-patch', 'remarketing-audience-update', 'segments-list', 'unsampled-reports-delete', 'unsampled-reports-get', 'unsampled-reports-insert', 'unsampled-reports-list', 'uploads-delete-upload-data', 'uploads-get', 'uploads-list', 'uploads-upload-data', 'web-property-ad-words-links-delete', 'web-property-ad-words-links-get', 'web-property-ad-words-links-insert', 'web-property-ad-words-links-list', 'web-property-ad-words-links-patch', 'web-property-ad-words-links-update', 'webproperties-get', 'webproperties-insert', 'webproperties-list', 'webproperties-patch', 'webproperties-update', 'webproperty-user-links-delete', 'webproperty-user-links-insert', 'webproperty-user-links-list' and 'webproperty-user-links-update'", vec![
             ("account-summaries-list",
                     Some(r##"Lists account summaries (lightweight tree comprised of accounts/properties/profiles) to which the user has access."##),
                     "Details at http://byron.github.io/google-apis-rs/google_analytics3_cli/management_account-summaries-list",
@@ -8923,6 +8970,34 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("remarketing-audience-delete",
+                    Some(r##"Delete a remarketing audience."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_analytics3_cli/management_remarketing-audience-delete",
+                  vec![
+                    (Some(r##"account-id"##),
+                     None,
+                     Some(r##"Account ID to which the remarketing audience belongs."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"web-property-id"##),
+                     None,
+                     Some(r##"Web property ID to which the remarketing audience belongs."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"remarketing-audience-id"##),
+                     None,
+                     Some(r##"The ID of the remarketing audience to delete."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                  ]),
             ("remarketing-audience-get",
                     Some(r##"Gets a remarketing audience to which the user has access."##),
                     "Details at http://byron.github.io/google-apis-rs/google_analytics3_cli/management_remarketing-audience-get",
@@ -9947,7 +10022,7 @@ fn main() {
     
     let mut app = App::new("analytics3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.4+20161004")
+           .version("1.0.4+20170321")
            .about("Views and manages your Google Analytics data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_analytics3_cli")
            .arg(Arg::with_name("url")

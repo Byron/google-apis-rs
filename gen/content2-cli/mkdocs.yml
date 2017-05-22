@@ -1,4 +1,4 @@
-site_name: Shopping Content v1.0.4+20161205
+site_name: Shopping Content v1.0.4+20170519
 site_url: http://byron.github.io/google-apis-rs/google-content2-cli
 site_description: A complete library to interact with Shopping Content (protocol v2)
 
@@ -10,6 +10,7 @@ site_dir: build_html
 pages:
 - ['index.md', 'Home']
 - ['accounts_authinfo.md', 'Accounts', 'Authinfo']
+- ['accounts_claimwebsite.md', 'Accounts', 'Claimwebsite']
 - ['accounts_custombatch.md', 'Accounts', 'Custombatch']
 - ['accounts_delete.md', 'Accounts', 'Delete']
 - ['accounts_get.md', 'Accounts', 'Get']
@@ -17,11 +18,6 @@ pages:
 - ['accounts_list.md', 'Accounts', 'List']
 - ['accounts_patch.md', 'Accounts', 'Patch']
 - ['accounts_update.md', 'Accounts', 'Update']
-- ['accountshipping_custombatch.md', 'Accountshipping', 'Custombatch']
-- ['accountshipping_get.md', 'Accountshipping', 'Get']
-- ['accountshipping_list.md', 'Accountshipping', 'List']
-- ['accountshipping_patch.md', 'Accountshipping', 'Patch']
-- ['accountshipping_update.md', 'Accountshipping', 'Update']
 - ['accountstatuses_custombatch.md', 'Accountstatuses', 'Custombatch']
 - ['accountstatuses_get.md', 'Accountstatuses', 'Get']
 - ['accountstatuses_list.md', 'Accountstatuses', 'List']

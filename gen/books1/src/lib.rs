@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *books* crate version *1.0.4+20161206*, where *20161206* is the exact revision of the *books:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
+//! This documentation was generated from *books* crate version *1.0.4+20170313*, where *20170313* is the exact revision of the *books:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
 //! 
 //! Everything else about the *books* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/books/docs/v1/getting_started).
@@ -2107,6 +2107,9 @@ pub struct UsersettingsNotification {
     #[serde(rename="moreFromSeries")]
     pub more_from_series: Option<UsersettingsNotificationMoreFromSeries>,
     /// no description provided
+    #[serde(rename="rewardExpirations")]
+    pub reward_expirations: Option<UsersettingsNotificationRewardExpirations>,
+    /// no description provided
     #[serde(rename="moreFromAuthors")]
     pub more_from_authors: Option<UsersettingsNotificationMoreFromAuthors>,
 }
@@ -2250,6 +2253,20 @@ pub struct VolumeUserInfo {
 
 impl NestedType for VolumeUserInfo {}
 impl Part for VolumeUserInfo {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UsersettingsNotificationRewardExpirations {
+    /// no description provided
+    pub opted_state: Option<String>,
+}
+
+impl NestedType for UsersettingsNotificationRewardExpirations {}
+impl Part for UsersettingsNotificationRewardExpirations {}
 
 
 /// There is no detailed description.
@@ -3613,6 +3630,7 @@ impl<'a, C, A> MylibraryMethods<'a, C, A> {
             _source: Default::default(),
             _show_only_summary_in_response: Default::default(),
             _country: Default::default(),
+            _annotation_id: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -13771,6 +13789,7 @@ impl<'a, C, A> MylibraryBookshelveAddVolumeCall<'a, C, A> where C: BorrowMut<hyp
 ///              .source("Lorem")
 ///              .show_only_summary_in_response(true)
 ///              .country("et")
+///              .annotation_id("clita")
 ///              .doit();
 /// # }
 /// ```
@@ -13782,6 +13801,7 @@ pub struct MylibraryAnnotationInsertCall<'a, C, A>
     _source: Option<String>,
     _show_only_summary_in_response: Option<bool>,
     _country: Option<String>,
+    _annotation_id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -13803,7 +13823,7 @@ impl<'a, C, A> MylibraryAnnotationInsertCall<'a, C, A> where C: BorrowMut<hyper:
         };
         dlg.begin(MethodInfo { id: "books.mylibrary.annotations.insert",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
         if let Some(value) = self._source {
             params.push(("source", value.to_string()));
         }
@@ -13813,7 +13833,10 @@ impl<'a, C, A> MylibraryAnnotationInsertCall<'a, C, A> where C: BorrowMut<hyper:
         if let Some(value) = self._country {
             params.push(("country", value.to_string()));
         }
-        for &field in ["alt", "source", "showOnlySummaryInResponse", "country"].iter() {
+        if let Some(value) = self._annotation_id {
+            params.push(("annotationId", value.to_string()));
+        }
+        for &field in ["alt", "source", "showOnlySummaryInResponse", "country", "annotationId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -13952,6 +13975,13 @@ impl<'a, C, A> MylibraryAnnotationInsertCall<'a, C, A> where C: BorrowMut<hyper:
         self._country = Some(new_value.to_string());
         self
     }
+    /// The ID for the annotation to insert.
+    ///
+    /// Sets the *annotation id* query property to the given value.
+    pub fn annotation_id(mut self, new_value: &str) -> MylibraryAnnotationInsertCall<'a, C, A> {
+        self._annotation_id = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -14031,8 +14061,8 @@ impl<'a, C, A> MylibraryAnnotationInsertCall<'a, C, A> where C: BorrowMut<hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().bookshelves_remove_volume("shelf", "volumeId")
-///              .source("dolores")
-///              .reason("vero")
+///              .source("vero")
+///              .reason("consetetur")
 ///              .doit();
 /// # }
 /// ```
@@ -14291,16 +14321,16 @@ impl<'a, C, A> MylibraryBookshelveRemoveVolumeCall<'a, C, A> where C: BorrowMut<
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().annotations_list()
-///              .volume_id("consetetur")
-///              .updated_min("vero")
-///              .updated_max("consetetur")
-///              .source("eos")
+///              .volume_id("vero")
+///              .updated_min("consetetur")
+///              .updated_max("eos")
+///              .source("justo")
 ///              .show_deleted(true)
-///              .page_token("tempor")
-///              .max_results(40)
-///              .add_layer_ids("dolore")
-///              .layer_id("amet.")
-///              .content_version("dolore")
+///              .page_token("gubergren")
+///              .max_results(17)
+///              .add_layer_ids("amet.")
+///              .layer_id("dolore")
+///              .content_version("magna")
 ///              .doit();
 /// # }
 /// ```
@@ -14622,7 +14652,7 @@ impl<'a, C, A> MylibraryAnnotationListCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().annotations_update(req, "annotationId")
-///              .source("elitr")
+///              .source("magna")
 ///              .doit();
 /// # }
 /// ```
@@ -14894,10 +14924,10 @@ impl<'a, C, A> MylibraryAnnotationUpdateCall<'a, C, A> where C: BorrowMut<hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().readingpositions_set_position("volumeId", "timestamp", "position")
-///              .source("accusam")
-///              .device_cookie("labore")
-///              .content_version("diam")
-///              .action("nonumy")
+///              .source("labore")
+///              .device_cookie("diam")
+///              .content_version("nonumy")
+///              .action("sed")
 ///              .doit();
 /// # }
 /// ```
@@ -15190,7 +15220,7 @@ impl<'a, C, A> MylibraryReadingpositionSetPositionCall<'a, C, A> where C: Borrow
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().bookshelves_get("shelf")
-///              .source("diam")
+///              .source("magna")
 ///              .doit();
 /// # }
 /// ```
@@ -15437,7 +15467,7 @@ impl<'a, C, A> MylibraryBookshelveGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().bookshelves_list()
-///              .source("magna")
+///              .source("dolor")
 ///              .doit();
 /// # }
 /// ```
@@ -15651,8 +15681,8 @@ impl<'a, C, A> MylibraryBookshelveListCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().readingpositions_get("volumeId")
-///              .source("Lorem")
-///              .content_version("dolor")
+///              .source("dolor")
+///              .content_version("vero")
 ///              .doit();
 /// # }
 /// ```
@@ -15910,8 +15940,8 @@ impl<'a, C, A> MylibraryReadingpositionGetCall<'a, C, A> where C: BorrowMut<hype
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.notification().get("notification_id")
-///              .source("nonumy")
-///              .locale("takimata")
+///              .source("takimata")
+///              .locale("dolores")
 ///              .doit();
 /// # }
 /// ```
@@ -16148,10 +16178,10 @@ impl<'a, C, A> NotificationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.cloudloading().add_book()
-///              .upload_client_token("dolores")
-///              .name("consetetur")
-///              .mime_type("erat")
-///              .drive_document_id("amet.")
+///              .upload_client_token("consetetur")
+///              .name("erat")
+///              .mime_type("amet.")
+///              .drive_document_id("dolores")
 ///              .doit();
 /// # }
 /// ```

@@ -4,7 +4,7 @@
 [package]
 
 name = "google-surveys2-cli"
-version = "1.0.4+20161103"
+version = "1.0.4+20170407"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Surveys (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/surveys2-cli"
@@ -23,7 +23,7 @@ serde_json = "^ 0.9"
 serde_derive = "^ 0.9"
 yup-oauth2 = "^ 1.0"
 strsim = "^0.5"
-hyper-rustls = "^0.3"
+hyper-rustls = "^0.6"
 yup-hyper-mock = "^2.0"
 clap = "^2.0"
 
@@ -33,4 +33,4 @@ clap = "^2.0"
 
 [dependencies.google-surveys2]
 path = "../surveys2"
-version = "1.0.4+20161103"
+version = "1.0.4+20170407"

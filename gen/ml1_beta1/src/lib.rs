@@ -2,14 +2,14 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Machine Learning* crate version *1.0.4+20161212*, where *20161212* is the exact revision of the *ml:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
+//! This documentation was generated from *Cloud Machine Learning Engine* crate version *1.0.4+20170515*, where *20170515* is the exact revision of the *ml:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
 //! 
-//! Everything else about the *Cloud Machine Learning* *v1_beta1* API can be found at the
+//! Everything else about the *Cloud Machine Learning Engine* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/ml/).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/ml1_beta1).
 //! # Features
 //! 
-//! Handle the following *Resources* with ease from the central [hub](struct.CloudMachineLearning.html) ... 
+//! Handle the following *Resources* with ease from the central [hub](struct.CloudMachineLearningEngine.html) ... 
 //! 
 //! * projects
 //!  * [*get config*](struct.ProjectGetConfigCall.html), [*jobs cancel*](struct.ProjectJobCancelCall.html), [*jobs create*](struct.ProjectJobCreateCall.html), [*jobs get*](struct.ProjectJobGetCall.html), [*jobs list*](struct.ProjectJobListCall.html), [*models create*](struct.ProjectModelCreateCall.html), [*models delete*](struct.ProjectModelDeleteCall.html), [*models get*](struct.ProjectModelGetCall.html), [*models list*](struct.ProjectModelListCall.html), [*models versions create*](struct.ProjectModelVersionCreateCall.html), [*models versions delete*](struct.ProjectModelVersionDeleteCall.html), [*models versions get*](struct.ProjectModelVersionGetCall.html), [*models versions list*](struct.ProjectModelVersionListCall.html), [*models versions set default*](struct.ProjectModelVersionSetDefaultCall.html), [*operations cancel*](struct.ProjectOperationCancelCall.html), [*operations delete*](struct.ProjectOperationDeleteCall.html), [*operations get*](struct.ProjectOperationGetCall.html), [*operations list*](struct.ProjectOperationListCall.html) and [*predict*](struct.ProjectPredictCall.html)
@@ -23,7 +23,7 @@
 //! 
 //! The API is structured into the following primary items:
 //! 
-//! * **[Hub](struct.CloudMachineLearning.html)**
+//! * **[Hub](struct.CloudMachineLearningEngine.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
 //!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
 //!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
@@ -48,9 +48,9 @@
 //! 
 //! ```ignore
 //! let r = hub.projects().models_versions_delete(...).doit()
-//! let r = hub.projects().operations_get(...).doit()
-//! let r = hub.projects().models_versions_create(...).doit()
 //! let r = hub.projects().models_delete(...).doit()
+//! let r = hub.projects().models_versions_create(...).doit()
+//! let r = hub.projects().operations_get(...).doit()
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -80,7 +80,7 @@
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-//! use ml1_beta1::CloudMachineLearning;
+//! use ml1_beta1::CloudMachineLearningEngine;
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -93,7 +93,7 @@
 //! let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 //!                               hyper::Client::new(),
 //!                               <MemoryStorage as Default>::default(), None);
-//! let mut hub = CloudMachineLearning::new(hyper::Client::new(), auth);
+//! let mut hub = CloudMachineLearningEngine::new(hyper::Client::new(), auth);
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
@@ -248,7 +248,7 @@ impl Default for Scope {
 // HUB ###
 // ######
 
-/// Central instance to access all CloudMachineLearning related resource activities
+/// Central instance to access all CloudMachineLearningEngine related resource activities
 ///
 /// # Examples
 ///
@@ -263,7 +263,7 @@ impl Default for Scope {
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// use ml1_beta1::CloudMachineLearning;
+/// use ml1_beta1::CloudMachineLearningEngine;
 /// 
 /// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 /// // `client_secret`, among other things.
@@ -276,7 +276,7 @@ impl Default for Scope {
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::new(),
 ///                               <MemoryStorage as Default>::default(), None);
-/// let mut hub = CloudMachineLearning::new(hyper::Client::new(), auth);
+/// let mut hub = CloudMachineLearningEngine::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -306,19 +306,19 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct CloudMachineLearning<C, A> {
+pub struct CloudMachineLearningEngine<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
 }
 
-impl<'a, C, A> Hub for CloudMachineLearning<C, A> {}
+impl<'a, C, A> Hub for CloudMachineLearningEngine<C, A> {}
 
-impl<'a, C, A> CloudMachineLearning<C, A>
+impl<'a, C, A> CloudMachineLearningEngine<C, A>
     where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> CloudMachineLearning<C, A> {
-        CloudMachineLearning {
+    pub fn new(client: C, authenticator: A) -> CloudMachineLearningEngine<C, A> {
+        CloudMachineLearningEngine {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
@@ -396,6 +396,9 @@ pub struct GoogleCloudMlV1beta1__PredictionOutput {
     /// The output Google Cloud Storage location provided at the job creation time.
     #[serde(rename="outputPath")]
     pub output_path: Option<String>,
+    /// Node hours used by the batch prediction job.
+    #[serde(rename="nodeHours")]
+    pub node_hours: Option<f64>,
     /// The number of generated predictions.
     #[serde(rename="predictionCount")]
     pub prediction_count: Option<i64>,
@@ -430,41 +433,6 @@ pub struct GoogleCloudMlV1beta1__HyperparameterOutput {
 }
 
 impl Part for GoogleCloudMlV1beta1__HyperparameterOutput {}
-
-
-/// Represents a machine learning solution.
-/// 
-/// A model can have multiple versions, each of which is a deployed, trained
-/// model ready to receive prediction requests. The model itself is just a
-/// container.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [models get projects](struct.ProjectModelGetCall.html) (response)
-/// * [models create projects](struct.ProjectModelCreateCall.html) (request|response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudMlV1beta1__Model {
-    /// Output only. The default version of the model. This version will be used to
-    /// handle prediction requests that do not specify a version.
-    /// 
-    /// You can change the default version by calling
-    /// [projects.methods.versions.setDefault](/ml/reference/rest/v1beta1/projects.models.versions/setDefault).
-    #[serde(rename="defaultVersion")]
-    pub default_version: Option<GoogleCloudMlV1beta1__Version>,
-    /// Optional. The description specified for the model when it was created.
-    pub description: Option<String>,
-    /// Required. The name specified for the model when it was created.
-    /// 
-    /// The model name must be unique within the project it is created in.
-    pub name: Option<String>,
-}
-
-impl RequestValue for GoogleCloudMlV1beta1__Model {}
-impl ResponseResult for GoogleCloudMlV1beta1__Model {}
 
 
 /// An observed value of a metric.
@@ -533,6 +501,13 @@ pub struct GoogleCloudMlV1beta1__HyperparameterSpec {
     /// Defaults to one.
     #[serde(rename="maxTrials")]
     pub max_trials: Option<i32>,
+    /// Optional. The Tensorflow summary tag name to use for optimizing trials. For
+    /// current versions of Tensorflow, this tag name should exactly match what is
+    /// shown in Tensorboard, including all scopes.  For versions of Tensorflow
+    /// prior to 0.12, this should be only the tag passed to tf.Summary.
+    /// By default, "training/hptuning/metric" will be used.
+    #[serde(rename="hyperparameterMetricTag")]
+    pub hyperparameter_metric_tag: Option<String>,
     /// Required. The set of parameters to tune.
     pub params: Option<Vec<GoogleCloudMlV1beta1__ParameterSpec>>,
     /// Optional. The number of training trials to run concurrently.
@@ -555,6 +530,78 @@ pub struct GoogleCloudMlV1beta1__HyperparameterSpec {
 }
 
 impl Part for GoogleCloudMlV1beta1__HyperparameterSpec {}
+
+
+/// Response message for the ListModels method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [models list projects](struct.ProjectModelListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudMlV1beta1__ListModelsResponse {
+    /// The list of models.
+    pub models: Option<Vec<GoogleCloudMlV1beta1__Model>>,
+    /// Optional. Pass this token as the `page_token` field of the request for a
+    /// subsequent call.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+}
+
+impl ResponseResult for GoogleCloudMlV1beta1__ListModelsResponse {}
+
+
+/// Represents input parameters for a prediction job.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudMlV1beta1__PredictionInput {
+    /// Use this field if you want to use the default version for the specified
+    /// model. The string must use the following format:
+    /// 
+    /// `"projects/<var>[YOUR_PROJECT]</var>/models/<var>[YOUR_MODEL]</var>"`
+    #[serde(rename="modelName")]
+    pub model_name: Option<String>,
+    /// Optional. The Google Cloud ML runtime version to use for this batch
+    /// prediction. If not set, Google Cloud ML will pick the runtime version used
+    /// during the CreateVersion request for this model version, or choose the
+    /// latest stable version when model version information is not available
+    /// such as when the model is specified by uri.
+    #[serde(rename="runtimeVersion")]
+    pub runtime_version: Option<String>,
+    /// Required. The Google Compute Engine region to run the prediction job in.
+    pub region: Option<String>,
+    /// Optional. The maximum number of workers to be used for parallel processing.
+    /// Defaults to 10 if not specified.
+    #[serde(rename="maxWorkerCount")]
+    pub max_worker_count: Option<i64>,
+    /// Use this field if you want to specify a Google Cloud Storage path for
+    /// the model to use.
+    pub uri: Option<String>,
+    /// Required. The output Google Cloud Storage location.
+    #[serde(rename="outputPath")]
+    pub output_path: Option<String>,
+    /// Required. The format of the input data files.
+    #[serde(rename="dataFormat")]
+    pub data_format: Option<String>,
+    /// Use this field if you want to specify a version of the model to use. The
+    /// string is formatted the same way as `model_version`, with the addition
+    /// of the version information:
+    /// 
+    /// `"projects/<var>[YOUR_PROJECT]</var>/models/<var>YOUR_MODEL/versions/<var>[YOUR_VERSION]</var>"`
+    #[serde(rename="versionName")]
+    pub version_name: Option<String>,
+    /// Required. The Google Cloud Storage location of the input data files.
+    /// May contain wildcards.
+    #[serde(rename="inputPaths")]
+    pub input_paths: Option<Vec<String>>,
+}
+
+impl Part for GoogleCloudMlV1beta1__PredictionInput {}
 
 
 /// Message that represents an arbitrary HTTP body. It should only be used for
@@ -615,68 +662,6 @@ pub struct GoogleApi__HttpBody {
 impl ResponseResult for GoogleApi__HttpBody {}
 
 
-/// Represents input parameters for a prediction job.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudMlV1beta1__PredictionInput {
-    /// Required. The output Google Cloud Storage location.
-    #[serde(rename="outputPath")]
-    pub output_path: Option<String>,
-    /// Use this field if you want to use the default version for the specified
-    /// model. The string must use the following format:
-    /// 
-    /// `"projects/<var>[YOUR_PROJECT]</var>/models/<var>[YOUR_MODEL]</var>"`
-    #[serde(rename="modelName")]
-    pub model_name: Option<String>,
-    /// Required. The format of the input data files.
-    #[serde(rename="dataFormat")]
-    pub data_format: Option<String>,
-    /// Use this field if you want to specify a version of the model to use. The
-    /// string is formatted the same way as `model_version`, with the addition
-    /// of the version information:
-    /// 
-    /// `"projects/<var>[YOUR_PROJECT]</var>/models/<var>YOUR_MODEL/versions/<var>[YOUR_VERSION]</var>"`
-    #[serde(rename="versionName")]
-    pub version_name: Option<String>,
-    /// Required. The Google Cloud Storage location of the input data files.
-    /// May contain wildcards.
-    #[serde(rename="inputPaths")]
-    pub input_paths: Option<Vec<String>>,
-    /// Optional. The maximum number of workers to be used for parallel processing.
-    /// Defaults to 10 if not specified.
-    #[serde(rename="maxWorkerCount")]
-    pub max_worker_count: Option<i64>,
-    /// Required. The Google Compute Engine region to run the prediction job in.
-    pub region: Option<String>,
-}
-
-impl Part for GoogleCloudMlV1beta1__PredictionInput {}
-
-
-/// Response message for the ListModels method.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [models list projects](struct.ProjectModelListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudMlV1beta1__ListModelsResponse {
-    /// The list of models.
-    pub models: Option<Vec<GoogleCloudMlV1beta1__Model>>,
-    /// Optional. Pass this token as the `page_token` field of the request for a
-    /// subsequent call.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-}
-
-impl ResponseResult for GoogleCloudMlV1beta1__ListModelsResponse {}
-
-
 /// A generic empty message that you can re-use to avoid defining duplicated
 /// empty messages in your APIs. A typical example is to use it as the request
 /// or the response type of an API method. For instance:
@@ -702,19 +687,24 @@ pub struct GoogleProtobuf__Empty { _never_set: Option<bool> }
 impl ResponseResult for GoogleProtobuf__Empty {}
 
 
-/// Represents results of a training job.
+/// Represents results of a training job. Output only.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudMlV1beta1__TrainingOutput {
-    /// The amount of ML units consumed by the job.
-    #[serde(rename="consumedMlUnits")]
-    pub consumed_ml_units: Option<f64>,
     /// The number of hyperparameter tuning trials that completed successfully.
+    /// Only set for hyperparameter tuning jobs.
     #[serde(rename="completedTrialCount")]
     pub completed_trial_count: Option<i64>,
+    /// Whether this job is a hyperparameter tuning job.
+    #[serde(rename="isHyperparameterTuningJob")]
+    pub is_hyperparameter_tuning_job: Option<bool>,
+    /// The amount of ML units consumed by the job.
+    #[serde(rename="consumedMLUnits")]
+    pub consumed_ml_units: Option<f64>,
     /// Results for individual Hyperparameter trials.
+    /// Only set for hyperparameter tuning jobs.
     pub trials: Option<Vec<GoogleCloudMlV1beta1__HyperparameterOutput>>,
 }
 
@@ -730,14 +720,17 @@ impl Part for GoogleCloudMlV1beta1__TrainingOutput {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [models versions delete projects](struct.ProjectModelVersionDeleteCall.html) (response)
-/// * [operations get projects](struct.ProjectOperationGetCall.html) (response)
-/// * [models versions create projects](struct.ProjectModelVersionCreateCall.html) (response)
 /// * [models delete projects](struct.ProjectModelDeleteCall.html) (response)
+/// * [models versions create projects](struct.ProjectModelVersionCreateCall.html) (response)
+/// * [operations get projects](struct.ProjectOperationGetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleLongrunning__Operation {
-    /// The error result of the operation in case of failure or cancellation.
-    pub error: Option<GoogleRpc__Status>,
+    /// Service-specific metadata associated with the operation.  It typically
+    /// contains progress information and common metadata such as create time.
+    /// Some services might not provide such metadata.  Any method that returns a
+    /// long-running operation should document the metadata type, if any.
+    pub metadata: Option<HashMap<String, String>>,
     /// If the value is `false`, it means the operation is still in progress.
     /// If true, the operation is completed, and either `error` or `response` is
     /// available.
@@ -755,14 +748,27 @@ pub struct GoogleLongrunning__Operation {
     /// originally returns it. If you use the default HTTP mapping, the
     /// `name` should have the format of `operations/some/unique/name`.
     pub name: Option<String>,
-    /// Service-specific metadata associated with the operation.  It typically
-    /// contains progress information and common metadata such as create time.
-    /// Some services might not provide such metadata.  Any method that returns a
-    /// long-running operation should document the metadata type, if any.
-    pub metadata: Option<HashMap<String, String>>,
+    /// The error result of the operation in case of failure or cancellation.
+    pub error: Option<GoogleRpc__Status>,
 }
 
 impl ResponseResult for GoogleLongrunning__Operation {}
+
+
+/// Options for manually scaling a model.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudMlV1beta1__ManualScaling {
+    /// The number of nodes to allocate for this model. These nodes are always up,
+    /// starting from the time the model is deployed, so the cost of operating
+    /// this model will be proportional to nodes * number of hours since
+    /// deployment.
+    pub nodes: Option<i32>,
+}
+
+impl Part for GoogleCloudMlV1beta1__ManualScaling {}
 
 
 /// Response message for the ListVersions method.
@@ -787,12 +793,61 @@ pub struct GoogleCloudMlV1beta1__ListVersionsResponse {
 impl ResponseResult for GoogleCloudMlV1beta1__ListVersionsResponse {}
 
 
+/// Represents a machine learning solution.
+/// 
+/// A model can have multiple versions, each of which is a deployed, trained
+/// model ready to receive prediction requests. The model itself is just a
+/// container.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [models get projects](struct.ProjectModelGetCall.html) (response)
+/// * [models create projects](struct.ProjectModelCreateCall.html) (request|response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudMlV1beta1__Model {
+    /// Optional. The list of regions where the model is going to be deployed.
+    /// Currently only one region per model is supported.
+    /// Defaults to 'us-central1' if nothing is set.
+    /// Note:
+    /// *   No matter where a model is deployed, it can always be accessed by
+    ///     users from anywhere, both for online and batch prediction.
+    /// *   The region for a batch prediction job is set by the region field when
+    ///     submitting the batch prediction job and does not take its value from
+    ///     this field.
+    pub regions: Option<Vec<String>>,
+    /// Output only. The default version of the model. This version will be used to
+    /// handle prediction requests that do not specify a version.
+    /// 
+    /// You can change the default version by calling
+    /// [projects.methods.versions.setDefault](/ml-engine/reference/rest/v1beta1/projects.models.versions/setDefault).
+    #[serde(rename="defaultVersion")]
+    pub default_version: Option<GoogleCloudMlV1beta1__Version>,
+    /// Required. The name specified for the model when it was created.
+    /// 
+    /// The model name must be unique within the project it is created in.
+    pub name: Option<String>,
+    /// Optional. If true, enables StackDriver Logging for online prediction.
+    /// Default is false.
+    #[serde(rename="onlinePredictionLogging")]
+    pub online_prediction_logging: Option<bool>,
+    /// Optional. The description specified for the model when it was created.
+    pub description: Option<String>,
+}
+
+impl RequestValue for GoogleCloudMlV1beta1__Model {}
+impl ResponseResult for GoogleCloudMlV1beta1__Model {}
+
+
 /// Represents a version of the model.
 /// 
 /// Each version is a trained model deployed in the cloud, ready to handle
 /// prediction requests. A model can have multiple versions. You can get
 /// information about all of the versions of a given model by calling
-/// [projects.models.versions.list](/ml/reference/rest/v1beta1/projects.models.versions/list).
+/// [projects.models.versions.list](/ml-engine/reference/rest/v1beta1/projects.models.versions/list).
 /// 
 /// # Activities
 /// 
@@ -807,20 +862,33 @@ impl ResponseResult for GoogleCloudMlV1beta1__ListVersionsResponse {}
 pub struct GoogleCloudMlV1beta1__Version {
     /// Optional. The description specified for the version when it was created.
     pub description: Option<String>,
-    /// Required.The name specified for the version when it was created.
-    /// 
-    /// The version name must be unique within the model it is created in.
-    pub name: Option<String>,
+    /// Optional. The Google Cloud ML runtime version to use for this deployment.
+    /// If not set, Google Cloud ML will choose a version.
+    #[serde(rename="runtimeVersion")]
+    pub runtime_version: Option<String>,
+    /// Optional. Manually select the number of nodes to use for serving the
+    /// model. If unset (i.e., by default), the number of nodes used to serve
+    /// the model automatically scales with traffic. However, care should be
+    /// taken to ramp up traffic according to the model's ability to scale. If
+    /// your model needs to handle bursts of traffic beyond it's ability to
+    /// scale, it is recommended you set this field appropriately.
+    #[serde(rename="manualScaling")]
+    pub manual_scaling: Option<GoogleCloudMlV1beta1__ManualScaling>,
+    /// Output only. The time the version was last used for prediction.
+    #[serde(rename="lastUseTime")]
+    pub last_use_time: Option<String>,
     /// Required. The Google Cloud Storage location of the trained model used to
     /// create the version. See the
-    /// [overview of model deployment](/ml/docs/concepts/deployment-overview) for
-    /// more informaiton.
+    /// [overview of model
+    /// deployment](/ml-engine/docs/concepts/deployment-overview) for more
+    /// informaiton.
     /// 
     /// When passing Version to
-    /// [projects.models.versions.create](/ml/reference/rest/v1beta1/projects.models.versions/create)
+    /// [projects.models.versions.create](/ml-engine/reference/rest/v1beta1/projects.models.versions/create)
     /// the model service uses the specified location as the source of the model.
     /// Once deployed, the model version is hosted by the prediction service, so
     /// this location is useful only as a historical record.
+    /// The total number of model files can't exceed 1000.
     #[serde(rename="deploymentUri")]
     pub deployment_uri: Option<String>,
     /// Output only. The time the version was created.
@@ -830,12 +898,13 @@ pub struct GoogleCloudMlV1beta1__Version {
     /// requests that do not specify a version.
     /// 
     /// You can change the default version by calling
-    /// [projects.methods.versions.setDefault](/ml/reference/rest/v1beta1/projects.models.versions/setDefault).
+    /// [projects.methods.versions.setDefault](/ml-engine/reference/rest/v1beta1/projects.models.versions/setDefault).
     #[serde(rename="isDefault")]
     pub is_default: Option<bool>,
-    /// Output only. The time the version was last used for prediction.
-    #[serde(rename="lastUseTime")]
-    pub last_use_time: Option<String>,
+    /// Required.The name specified for the version when it was created.
+    /// 
+    /// The version name must be unique within the model it is created in.
+    pub name: Option<String>,
 }
 
 impl RequestValue for GoogleCloudMlV1beta1__Version {}
@@ -857,7 +926,7 @@ impl ResponseResult for GoogleCloudMlV1beta1__Version {}
 /// model's input definition. Instances can include named inputs or can contain
 /// only unlabeled values.
 /// 
-/// Most data does not include named inputs. Some instances will be simple
+/// Not all data includes named inputs. Some instances will be simple
 /// JSON values (boolean, number, or string). However, instances are often lists
 /// of simple values, or complex nested lists. Here are some examples of request
 /// bodies:
@@ -872,7 +941,13 @@ impl ResponseResult for GoogleCloudMlV1beta1__Version {}
 /// </pre>
 /// Sentences encoded as lists of words (vectors of strings):
 /// <pre>
-/// {"instances": [["the","quick","brown"], ["la","bruja","le"]]}
+/// {
+///   "instances": [
+///     ["the","quick","brown"],
+///     ["la","bruja","le"],
+///     ...
+///   ]
+/// }
 /// </pre>
 /// Floating point scalar values:
 /// <pre>
@@ -880,22 +955,53 @@ impl ResponseResult for GoogleCloudMlV1beta1__Version {}
 /// </pre>
 /// Vectors of integers:
 /// <pre>
-/// {"instances": [[0, 1, 2], [3, 4, 5],...]}
+/// {
+///   "instances": [
+///     [0, 1, 2],
+///     [3, 4, 5],
+///     ...
+///   ]
+/// }
 /// </pre>
 /// Tensors (in this case, two-dimensional tensors):
 /// <pre>
-/// {"instances": [[[0, 1, 2], [3, 4, 5]], ...]}
+/// {
+///   "instances": [
+///     [
+///       [0, 1, 2],
+///       [3, 4, 5]
+///     ],
+///     ...
+///   ]
+/// }
 /// </pre>
-/// Images represented as a three-dimensional list. In this encoding scheme the
-/// first two dimensions represent the rows and columns of the image, and the
-/// third contains the R, G, and B values for each pixel.
+/// Images can be represented different ways. In this encoding scheme the first
+/// two dimensions represent the rows and columns of the image, and the third
+/// contains lists (vectors) of the R, G, and B values for each pixel.
 /// <pre>
-/// {"instances": [[[[138, 30, 66], [130, 20, 56], ...]]]]}
+/// {
+///   "instances": [
+///     [
+///       [
+///         [138, 30, 66],
+///         [130, 20, 56],
+///         ...
+///       ],
+///       [
+///         [126, 38, 61],
+///         [122, 24, 57],
+///         ...
+///       ],
+///       ...
+///     ],
+///     ...
+///   ]
+/// }
 /// </pre>
-/// Data must be encoded as UTF-8. If your data uses another character encoding,
-/// you must base64 encode the data and mark it as binary. To mark a JSON string
-/// as binary, replace it with an object with a single attribute named `b`:
-/// <pre>{"b": "..."} </pre>
+/// JSON strings must be encoded as UTF-8. To send binary data, you must
+/// base64-encode the data and mark it as binary. To mark a JSON string
+/// as binary, replace it with a JSON object with a single attribute named `b64`:
+/// <pre>{"b64": "..."} </pre>
 /// For example:
 /// 
 /// Two Serialized tf.Examples (fake data, for illustrative purposes only):
@@ -911,8 +1017,20 @@ impl ResponseResult for GoogleCloudMlV1beta1__Version {}
 /// 
 /// JSON input data to be preprocessed:
 /// <pre>
-/// {"instances": [{"a": 1.0,  "b": true,  "c": "x"},
-///                {"a": -2.0, "b": false, "c": "y"}]}
+/// {
+///   "instances": [
+///     {
+///       "a": 1.0,
+///       "b": true,
+///       "c": "x"
+///     },
+///     {
+///       "a": -2.0,
+///       "b": false,
+///       "c": "y"
+///     }
+///   ]
+/// }
 /// </pre>
 /// Some models have an underlying TensorFlow graph that accepts multiple input
 /// tensors. In this case, you should use the names of JSON name/value pairs to
@@ -921,14 +1039,59 @@ impl ResponseResult for GoogleCloudMlV1beta1__Version {}
 /// For a graph with input tensor aliases "tag" (string) and "image"
 /// (base64-encoded string):
 /// <pre>
-/// {"instances": [{"tag": "beach", "image": {"b64": "ASa8asdf"}},
-///                {"tag": "car", "image": {"b64": "JLK7ljk3"}}]}
+/// {
+///   "instances": [
+///     {
+///       "tag": "beach",
+///       "image": {"b64": "ASa8asdf"}
+///     },
+///     {
+///       "tag": "car",
+///       "image": {"b64": "JLK7ljk3"}
+///     }
+///   ]
+/// }
 /// </pre>
 /// For a graph with input tensor aliases "tag" (string) and "image"
 /// (3-dimensional array of 8-bit ints):
 /// <pre>
-/// {"instances": [{"tag": "beach", "image": [[[263, 1, 10], [262, 2, 11], ...]]},
-///                {"tag": "car", "image": [[[10, 11, 24], [23, 10, 15], ...]]}]}
+/// {
+///   "instances": [
+///     {
+///       "tag": "beach",
+///       "image": [
+///         [
+///           [138, 30, 66],
+///           [130, 20, 56],
+///           ...
+///         ],
+///         [
+///           [126, 38, 61],
+///           [122, 24, 57],
+///           ...
+///         ],
+///         ...
+///       ]
+///     },
+///     {
+///       "tag": "car",
+///       "image": [
+///         [
+///           [255, 0, 102],
+///           [255, 0, 97],
+///           ...
+///         ],
+///         [
+///           [254, 1, 101],
+///           [254, 2, 93],
+///           ...
+///         ],
+///         ...
+///       ]
+///     },
+///     ...
+///   ]
+/// }
 /// </pre>
 /// If the call is successful, the response body will contain one prediction
 /// entry per instance in the request body. If prediction fails for any
@@ -976,11 +1139,9 @@ pub struct GoogleCloudMlV1beta1__ParameterSpec {
     /// a HyperparameterSpec message. E.g., "learning_rate".
     #[serde(rename="parameterName")]
     pub parameter_name: Option<String>,
-    /// Required if type is `DOUBLE` or `INTEGER`. This field
-    /// should be unset if type is `CATEGORICAL`. This value should be integers if
-    /// type is INTEGER.
-    #[serde(rename="minValue")]
-    pub min_value: Option<f64>,
+    /// Required if type is `CATEGORICAL`. The list of possible categories.
+    #[serde(rename="categoricalValues")]
+    pub categorical_values: Option<Vec<String>>,
     /// Required. The type of the parameter.
     #[serde(rename="type")]
     pub type_: Option<String>,
@@ -989,9 +1150,11 @@ pub struct GoogleCloudMlV1beta1__ParameterSpec {
     /// type is `INTEGER`.
     #[serde(rename="maxValue")]
     pub max_value: Option<f64>,
-    /// Required if type is `CATEGORICAL`. The list of possible categories.
-    #[serde(rename="categoricalValues")]
-    pub categorical_values: Option<Vec<String>>,
+    /// Required if type is `DOUBLE` or `INTEGER`. This field
+    /// should be unset if type is `CATEGORICAL`. This value should be integers if
+    /// type is INTEGER.
+    #[serde(rename="minValue")]
+    pub min_value: Option<f64>,
 }
 
 impl Part for GoogleCloudMlV1beta1__ParameterSpec {}
@@ -1009,15 +1172,18 @@ impl Part for GoogleCloudMlV1beta1__ParameterSpec {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudMlV1beta1__Job {
+    /// Output only. The details of a failure or a cancellation.
+    #[serde(rename="errorMessage")]
+    pub error_message: Option<String>,
     /// The current training job result.
     #[serde(rename="trainingOutput")]
     pub training_output: Option<GoogleCloudMlV1beta1__TrainingOutput>,
     /// Output only. When the job processing was started.
     #[serde(rename="startTime")]
     pub start_time: Option<String>,
-    /// Output only. The details of a failure or a cancellation.
-    #[serde(rename="errorMessage")]
-    pub error_message: Option<String>,
+    /// Input parameters to create a training job.
+    #[serde(rename="trainingInput")]
+    pub training_input: Option<GoogleCloudMlV1beta1__TrainingInput>,
     /// Required. The user-specified id of the job.
     #[serde(rename="jobId")]
     pub job_id: Option<String>,
@@ -1026,9 +1192,6 @@ pub struct GoogleCloudMlV1beta1__Job {
     /// Input parameters to create a prediction job.
     #[serde(rename="predictionInput")]
     pub prediction_input: Option<GoogleCloudMlV1beta1__PredictionInput>,
-    /// Input parameters to create a training job.
-    #[serde(rename="trainingInput")]
-    pub training_input: Option<GoogleCloudMlV1beta1__TrainingInput>,
     /// Output only. When the job processing was completed.
     #[serde(rename="endTime")]
     pub end_time: Option<String>,
@@ -1075,6 +1238,10 @@ pub struct GoogleCloudMlV1beta1__TrainingInput {
     /// `workerCount` is greater than zero.
     #[serde(rename="workerType")]
     pub worker_type: Option<String>,
+    /// Optional. The Google Cloud ML runtime version to use for training.  If not
+    /// set, Google Cloud ML will choose the latest stable version.
+    #[serde(rename="runtimeVersion")]
+    pub runtime_version: Option<String>,
     /// Required. Specifies the machine types, the number of replicas for workers
     /// and parameter servers.
     #[serde(rename="scaleTier")]
@@ -1112,6 +1279,19 @@ pub struct GoogleCloudMlV1beta1__TrainingInput {
     ///   A machine with roughly twice the number of cores and roughly double the
     ///   memory of <code suppresswarning="true">complex_model_m</code>.
     ///   </dd>
+    ///   <dt>standard_gpu</dt>
+    ///   <dd>
+    ///   A machine equivalent to <code suppresswarning="true">standard</code> that
+    ///   also includes a
+    ///   <a href="/ml-engine/docs/how-tos/using-gpus">
+    ///   GPU that you can use in your trainer</a>.
+    ///   </dd>
+    ///   <dt>complex_model_m_gpu</dt>
+    ///   <dd>
+    ///   A machine equivalent to
+    ///   <code suppresswarning="true">complex_model_m</code> that also includes
+    ///   four GPUs.
+    ///   </dd>
     /// </dl>
     /// 
     /// You must set this value when `scaleTier` is set to `CUSTOM`.
@@ -1126,8 +1306,15 @@ pub struct GoogleCloudMlV1beta1__TrainingInput {
     /// Required. The Python module name to run after installing the packages.
     #[serde(rename="pythonModule")]
     pub python_module: Option<String>,
+    /// Optional. A Google Cloud Storage path in which to store training outputs
+    /// and other data needed for training. This path is passed to your TensorFlow
+    /// program as the 'job_dir' command-line argument. The benefit of specifying
+    /// this field is that Cloud ML validates the path for use in training.
+    #[serde(rename="jobDir")]
+    pub job_dir: Option<String>,
     /// Required. The Google Cloud Storage location of the packages with
     /// the training program and any additional dependencies.
+    /// The maximum number of package URIs is 100.
     #[serde(rename="packageUris")]
     pub package_uris: Option<Vec<String>>,
     /// Optional. The number of worker replicas to use for the training job. Each
@@ -1177,7 +1364,7 @@ impl Part for GoogleCloudMlV1beta1__TrainingInput {}
 /// error message is needed, put the localized message in the error details or
 /// localize it in the client. The optional error details may contain arbitrary
 /// information about the error. There is a predefined set of error detail types
-/// in the package `google.rpc` which can be used for common error conditions.
+/// in the package `google.rpc` that can be used for common error conditions.
 /// 
 /// # Language mapping
 /// 
@@ -1200,7 +1387,7 @@ impl Part for GoogleCloudMlV1beta1__TrainingInput {}
 ///     errors.
 /// 
 /// - Workflow errors. A typical workflow has multiple steps. Each step may
-///     have a `Status` message for error reporting purpose.
+///     have a `Status` message for error reporting.
 /// 
 /// - Batch operations. If a client uses batch request and batch response, the
 ///     `Status` message should be used directly inside batch response, one for
@@ -1237,7 +1424,7 @@ impl Part for GoogleRpc__Status {}
 // #################
 
 /// A builder providing access to all methods supported on *project* resources.
-/// It is not used directly, but through the `CloudMachineLearning` hub.
+/// It is not used directly, but through the `CloudMachineLearningEngine` hub.
 ///
 /// # Example
 ///
@@ -1251,13 +1438,13 @@ impl Part for GoogleRpc__Status {}
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// use ml1_beta1::CloudMachineLearning;
+/// use ml1_beta1::CloudMachineLearningEngine;
 /// 
 /// let secret: ApplicationSecret = Default::default();
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::new(),
 ///                               <MemoryStorage as Default>::default(), None);
-/// let mut hub = CloudMachineLearning::new(hyper::Client::new(), auth);
+/// let mut hub = CloudMachineLearningEngine::new(hyper::Client::new(), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get_config(...)`, `jobs_cancel(...)`, `jobs_create(...)`, `jobs_get(...)`, `jobs_list(...)`, `models_create(...)`, `models_delete(...)`, `models_get(...)`, `models_list(...)`, `models_versions_create(...)`, `models_versions_delete(...)`, `models_versions_get(...)`, `models_versions_list(...)`, `models_versions_set_default(...)`, `operations_cancel(...)`, `operations_delete(...)`, `operations_get(...)`, `operations_list(...)` and `predict(...)`
 /// // to build up your call.
@@ -1267,7 +1454,7 @@ impl Part for GoogleRpc__Status {}
 pub struct ProjectMethods<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a CloudMachineLearning<C, A>,
+    hub: &'a CloudMachineLearningEngine<C, A>,
 }
 
 impl<'a, C, A> MethodsBuilder for ProjectMethods<'a, C, A> {}
@@ -1327,7 +1514,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// model. When you add a version to a model that already has one or more
     /// versions, the default version does not automatically change. If you want a
     /// new version to be the default, you must call
-    /// [projects.models.versions.setDefault](/ml/reference/rest/v1beta1/projects.models.versions/setDefault).
+    /// [projects.models.versions.setDefault](/ml-engine/reference/rest/v1beta1/projects.models.versions/setDefault).
     /// 
     /// # Arguments
     ///
@@ -1402,7 +1589,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `name` - Required. The name of the version. You can get the names of all the
     ///            versions of a model by calling
-    ///            [projects.models.versions.list](/ml/reference/rest/v1beta1/projects.models.versions/list).
+    ///            [projects.models.versions.list](/ml-engine/reference/rest/v1beta1/projects.models.versions/list).
     ///            Authorization: requires `Editor` role on the parent project.
     pub fn models_versions_delete(&self, name: &str) -> ProjectModelVersionDeleteCall<'a, C, A> {
         ProjectModelVersionDeleteCall {
@@ -1436,26 +1623,19 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Designates a version to be the default for the model.
+    /// Deletes a model.
     /// 
-    /// The default version is used for prediction requests made against the model
-    /// that don't specify a version.
-    /// 
-    /// The first version to be created for a model is automatically set as the
-    /// default. You must make any subsequent changes to the default version
-    /// setting manually using this method.
+    /// You can only delete a model if there are no versions in it. You can delete
+    /// versions by calling
+    /// [projects.models.versions.delete](/ml-engine/reference/rest/v1beta1/projects.models.versions/delete).
     /// 
     /// # Arguments
     ///
-    /// * `request` - No description provided.
-    /// * `name` - Required. The name of the version to make the default for the model. You
-    ///            can get the names of all the versions of a model by calling
-    ///            [projects.models.versions.list](/ml/reference/rest/v1beta1/projects.models.versions/list).
+    /// * `name` - Required. The name of the model.
     ///            Authorization: requires `Editor` role on the parent project.
-    pub fn models_versions_set_default(&self, request: GoogleCloudMlV1beta1__SetDefaultVersionRequest, name: &str) -> ProjectModelVersionSetDefaultCall<'a, C, A> {
-        ProjectModelVersionSetDefaultCall {
+    pub fn models_delete(&self, name: &str) -> ProjectModelDeleteCall<'a, C, A> {
+        ProjectModelDeleteCall {
             hub: self.hub,
-            _request: request,
             _name: name.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -1467,51 +1647,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Performs prediction on the data in the request.
     /// 
-    /// Responses are very similar to requests. There are two top-level fields,
-    /// each of which are JSON lists:
-    /// 
-    /// <dl>
-    ///   <dt>predictions</dt>
-    ///   <dd>The list of predictions, one per instance in the request.</dd>
-    ///   <dt>error</dt>
-    ///   <dd>An error message returned instead of a prediction list if any
-    ///       instance produced an error.</dd>
-    /// </dl>
-    /// 
-    /// If the call is successful, the response body will contain one prediction
-    /// entry per instance in the request body. If prediction fails for any
-    /// instance, the response body will contain no predictions and will contian
-    /// a single error entry instead.
-    /// 
-    /// Even though there is one prediction per instance, the format of a
-    /// prediction is not directly related to the format of an instance.
-    /// Predictions take whatever format is specified in the outputs collection
-    /// defined in the model. The collection of predictions is returned in a JSON
-    /// list. Each member of the list can be a simple value, a list, or a JSON
-    /// object of any complexity. If your model has more than one output tensor,
-    /// each prediction will be a JSON object containing a name/value pair for each
-    /// output. The names identify the output aliases in the graph.
-    /// 
-    /// The following examples show some possible responses:
-    /// 
-    /// A simple set of predictions for three input instances, where each
-    /// prediction is an integer value:
-    /// <pre>
-    /// {"predictions": [5, 4, 3]}
-    /// </pre>
-    /// A more complex set of predictions, each containing two named values that
-    /// correspond to output tensors, named **label** and **scores** respectively.
-    /// The value of **label** is the predicted category ("car" or "beach") and
-    /// **scores** contains a list of probabilities for that instance across the
-    /// possible categories.
-    /// <pre>
-    /// {"predictions": [{"label": "beach", "scores": [0.1, 0.9]},
-    ///                  {"label": "car", "scores": [0.75, 0.25]}]}
-    /// </pre>
-    /// A response when there is an error processing an input instance:
-    /// <pre>
-    /// {"error": "Divide by zero"}
-    /// </pre>
+    /// **** REMOVE FROM GENERATED DOCUMENTATION
     /// 
     /// # Arguments
     ///
@@ -1531,18 +1667,19 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a model.
+    /// Gets information about a model version.
     /// 
-    /// You can only delete a model if there are no versions in it. You can delete
-    /// versions by calling
-    /// [projects.models.versions.delete](/ml/reference/rest/v1beta1/projects.models.versions/delete).
+    /// Models can have multiple versions. You can call
+    /// [projects.models.versions.list](/ml-engine/reference/rest/v1beta1/projects.models.versions/list)
+    /// to get the same information that this method returns for all of the
+    /// versions of a model.
     /// 
     /// # Arguments
     ///
-    /// * `name` - Required. The name of the model.
-    ///            Authorization: requires `Editor` role on the parent project.
-    pub fn models_delete(&self, name: &str) -> ProjectModelDeleteCall<'a, C, A> {
-        ProjectModelDeleteCall {
+    /// * `name` - Required. The name of the version.
+    ///            Authorization: requires `Viewer` role on the parent project.
+    pub fn models_versions_get(&self, name: &str) -> ProjectModelVersionGetCall<'a, C, A> {
+        ProjectModelVersionGetCall {
             hub: self.hub,
             _name: name.to_string(),
             _delegate: Default::default(),
@@ -1622,7 +1759,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// You must add at least one version before you can request predictions from
     /// the model. Add versions by calling
-    /// [projects.models.versions.create](/ml/reference/rest/v1beta1/projects.models.versions/create).
+    /// [projects.models.versions.create](/ml-engine/reference/rest/v1beta1/projects.models.versions/create).
     /// 
     /// # Arguments
     ///
@@ -1642,20 +1779,26 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets information about a model version.
+    /// Designates a version to be the default for the model.
     /// 
-    /// Models can have multiple versions. You can call
-    /// [projects.models.versions.list](/ml/reference/rest/v1beta1/projects.models.versions/list)
-    /// to get the same information that this method returns for all of the
-    /// versions of a model.
+    /// The default version is used for prediction requests made against the model
+    /// that don't specify a version.
+    /// 
+    /// The first version to be created for a model is automatically set as the
+    /// default. You must make any subsequent changes to the default version
+    /// setting manually using this method.
     /// 
     /// # Arguments
     ///
-    /// * `name` - Required. The name of the version.
-    ///            Authorization: requires `Viewer` role on the parent project.
-    pub fn models_versions_get(&self, name: &str) -> ProjectModelVersionGetCall<'a, C, A> {
-        ProjectModelVersionGetCall {
+    /// * `request` - No description provided.
+    /// * `name` - Required. The name of the version to make the default for the model. You
+    ///            can get the names of all the versions of a model by calling
+    ///            [projects.models.versions.list](/ml-engine/reference/rest/v1beta1/projects.models.versions/list).
+    ///            Authorization: requires `Editor` role on the parent project.
+    pub fn models_versions_set_default(&self, request: GoogleCloudMlV1beta1__SetDefaultVersionRequest, name: &str) -> ProjectModelVersionSetDefaultCall<'a, C, A> {
+        ProjectModelVersionSetDefaultCall {
             hub: self.hub,
+            _request: request,
             _name: name.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -1776,13 +1919,13 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use ml1_beta1::CloudMachineLearning;
+/// # use ml1_beta1::CloudMachineLearningEngine;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = CloudMachineLearning::new(hyper::Client::new(), auth);
+/// # let mut hub = CloudMachineLearningEngine::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1796,7 +1939,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 pub struct ProjectOperationListCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a CloudMachineLearning<C, A>,
+    hub: &'a CloudMachineLearningEngine<C, A>,
     _name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -2060,13 +2203,13 @@ impl<'a, C, A> ProjectOperationListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use ml1_beta1::CloudMachineLearning;
+/// # use ml1_beta1::CloudMachineLearningEngine;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = CloudMachineLearning::new(hyper::Client::new(), auth);
+/// # let mut hub = CloudMachineLearningEngine::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2077,7 +2220,7 @@ impl<'a, C, A> ProjectOperationListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 pub struct ProjectOperationDeleteCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a CloudMachineLearning<C, A>,
+    hub: &'a CloudMachineLearningEngine<C, A>,
     _name: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
@@ -2296,7 +2439,7 @@ impl<'a, C, A> ProjectOperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// model. When you add a version to a model that already has one or more
 /// versions, the default version does not automatically change. If you want a
 /// new version to be the default, you must call
-/// [projects.models.versions.setDefault](/ml/reference/rest/v1beta1/projects.models.versions/setDefault).
+/// [projects.models.versions.setDefault](/ml-engine/reference/rest/v1beta1/projects.models.versions/setDefault).
 ///
 /// A builder for the *models.versions.create* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -2313,13 +2456,13 @@ impl<'a, C, A> ProjectOperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use ml1_beta1::CloudMachineLearning;
+/// # use ml1_beta1::CloudMachineLearningEngine;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = CloudMachineLearning::new(hyper::Client::new(), auth);
+/// # let mut hub = CloudMachineLearningEngine::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2335,7 +2478,7 @@ impl<'a, C, A> ProjectOperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
 pub struct ProjectModelVersionCreateCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a CloudMachineLearning<C, A>,
+    hub: &'a CloudMachineLearningEngine<C, A>,
     _request: GoogleCloudMlV1beta1__Version,
     _parent: String,
     _delegate: Option<&'a mut Delegate>,
@@ -2594,13 +2737,13 @@ impl<'a, C, A> ProjectModelVersionCreateCall<'a, C, A> where C: BorrowMut<hyper:
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use ml1_beta1::CloudMachineLearning;
+/// # use ml1_beta1::CloudMachineLearningEngine;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = CloudMachineLearning::new(hyper::Client::new(), auth);
+/// # let mut hub = CloudMachineLearningEngine::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2613,7 +2756,7 @@ impl<'a, C, A> ProjectModelVersionCreateCall<'a, C, A> where C: BorrowMut<hyper:
 pub struct ProjectModelVersionListCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a CloudMachineLearning<C, A>,
+    hub: &'a CloudMachineLearningEngine<C, A>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -2874,13 +3017,13 @@ impl<'a, C, A> ProjectModelVersionListCall<'a, C, A> where C: BorrowMut<hyper::C
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use ml1_beta1::CloudMachineLearning;
+/// # use ml1_beta1::CloudMachineLearningEngine;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = CloudMachineLearning::new(hyper::Client::new(), auth);
+/// # let mut hub = CloudMachineLearningEngine::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2891,7 +3034,7 @@ impl<'a, C, A> ProjectModelVersionListCall<'a, C, A> where C: BorrowMut<hyper::C
 pub struct ProjectOperationGetCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a CloudMachineLearning<C, A>,
+    hub: &'a CloudMachineLearningEngine<C, A>,
     _name: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
@@ -3125,13 +3268,13 @@ impl<'a, C, A> ProjectOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use ml1_beta1::CloudMachineLearning;
+/// # use ml1_beta1::CloudMachineLearningEngine;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = CloudMachineLearning::new(hyper::Client::new(), auth);
+/// # let mut hub = CloudMachineLearningEngine::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3142,7 +3285,7 @@ impl<'a, C, A> ProjectOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
 pub struct ProjectModelVersionDeleteCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a CloudMachineLearning<C, A>,
+    hub: &'a CloudMachineLearningEngine<C, A>,
     _name: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
@@ -3288,7 +3431,7 @@ impl<'a, C, A> ProjectModelVersionDeleteCall<'a, C, A> where C: BorrowMut<hyper:
 
     /// Required. The name of the version. You can get the names of all the
     /// versions of a model by calling
-    /// [projects.models.versions.list](/ml/reference/rest/v1beta1/projects.models.versions/list).
+    /// [projects.models.versions.list](/ml-engine/reference/rest/v1beta1/projects.models.versions/list).
     /// 
     /// Authorization: requires `Editor` role on the parent project.
     ///
@@ -3375,13 +3518,13 @@ impl<'a, C, A> ProjectModelVersionDeleteCall<'a, C, A> where C: BorrowMut<hyper:
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use ml1_beta1::CloudMachineLearning;
+/// # use ml1_beta1::CloudMachineLearningEngine;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = CloudMachineLearning::new(hyper::Client::new(), auth);
+/// # let mut hub = CloudMachineLearningEngine::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3397,7 +3540,7 @@ impl<'a, C, A> ProjectModelVersionDeleteCall<'a, C, A> where C: BorrowMut<hyper:
 pub struct ProjectJobCreateCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a CloudMachineLearning<C, A>,
+    hub: &'a CloudMachineLearningEngine<C, A>,
     _request: GoogleCloudMlV1beta1__Job,
     _parent: String,
     _delegate: Option<&'a mut Delegate>,
@@ -3636,16 +3779,13 @@ impl<'a, C, A> ProjectJobCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 }
 
 
-/// Designates a version to be the default for the model.
+/// Deletes a model.
 /// 
-/// The default version is used for prediction requests made against the model
-/// that don't specify a version.
-/// 
-/// The first version to be created for a model is automatically set as the
-/// default. You must make any subsequent changes to the default version
-/// setting manually using this method.
+/// You can only delete a model if there are no versions in it. You can delete
+/// versions by calling
+/// [projects.models.versions.delete](/ml-engine/reference/rest/v1beta1/projects.models.versions/delete).
 ///
-/// A builder for the *models.versions.setDefault* method supported by a *project* resource.
+/// A builder for the *models.delete* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -3656,47 +3796,40 @@ impl<'a, C, A> ProjectJobCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// # extern crate hyper;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_ml1_beta1 as ml1_beta1;
-/// use ml1_beta1::GoogleCloudMlV1beta1__SetDefaultVersionRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use ml1_beta1::CloudMachineLearning;
+/// # use ml1_beta1::CloudMachineLearningEngine;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = CloudMachineLearning::new(hyper::Client::new(), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = GoogleCloudMlV1beta1__SetDefaultVersionRequest::default();
-/// 
+/// # let mut hub = CloudMachineLearningEngine::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().models_versions_set_default(req, "name")
+/// let result = hub.projects().models_delete("name")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectModelVersionSetDefaultCall<'a, C, A>
+pub struct ProjectModelDeleteCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a CloudMachineLearning<C, A>,
-    _request: GoogleCloudMlV1beta1__SetDefaultVersionRequest,
+    hub: &'a CloudMachineLearningEngine<C, A>,
     _name: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectModelVersionSetDefaultCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectModelDeleteCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectModelVersionSetDefaultCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectModelDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleCloudMlV1beta1__Version)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleLongrunning__Operation)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -3705,9 +3838,9 @@ impl<'a, C, A> ProjectModelVersionSetDefaultCall<'a, C, A> where C: BorrowMut<hy
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "ml.projects.models.versions.setDefault",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        dlg.begin(MethodInfo { id: "ml.projects.models.delete",
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -3721,7 +3854,7 @@ impl<'a, C, A> ProjectModelVersionSetDefaultCall<'a, C, A> where C: BorrowMut<hy
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://ml.googleapis.com/v1beta1/{+name}:setDefault".to_string();
+        let mut url = "https://ml.googleapis.com/v1beta1/{+name}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -3756,17 +3889,6 @@ impl<'a, C, A> ProjectModelVersionSetDefaultCall<'a, C, A> where C: BorrowMut<hy
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
@@ -3783,15 +3905,11 @@ impl<'a, C, A> ProjectModelVersionSetDefaultCall<'a, C, A> where C: BorrowMut<hy
                 }
             };
             let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -3842,18 +3960,7 @@ impl<'a, C, A> ProjectModelVersionSetDefaultCall<'a, C, A> where C: BorrowMut<hy
     }
 
 
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudMlV1beta1__SetDefaultVersionRequest) -> ProjectModelVersionSetDefaultCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// Required. The name of the version to make the default for the model. You
-    /// can get the names of all the versions of a model by calling
-    /// [projects.models.versions.list](/ml/reference/rest/v1beta1/projects.models.versions/list).
+    /// Required. The name of the model.
     /// 
     /// Authorization: requires `Editor` role on the parent project.
     ///
@@ -3861,7 +3968,7 @@ impl<'a, C, A> ProjectModelVersionSetDefaultCall<'a, C, A> where C: BorrowMut<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectModelVersionSetDefaultCall<'a, C, A> {
+    pub fn name(mut self, new_value: &str) -> ProjectModelDeleteCall<'a, C, A> {
         self._name = new_value.to_string();
         self
     }
@@ -3871,7 +3978,7 @@ impl<'a, C, A> ProjectModelVersionSetDefaultCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectModelVersionSetDefaultCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectModelDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3898,7 +4005,7 @@ impl<'a, C, A> ProjectModelVersionSetDefaultCall<'a, C, A> where C: BorrowMut<hy
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectModelVersionSetDefaultCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectModelDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3915,7 +4022,7 @@ impl<'a, C, A> ProjectModelVersionSetDefaultCall<'a, C, A> where C: BorrowMut<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectModelVersionSetDefaultCall<'a, C, A>
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectModelDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3925,51 +4032,7 @@ impl<'a, C, A> ProjectModelVersionSetDefaultCall<'a, C, A> where C: BorrowMut<hy
 
 /// Performs prediction on the data in the request.
 /// 
-/// Responses are very similar to requests. There are two top-level fields,
-/// each of which are JSON lists:
-/// 
-/// <dl>
-///   <dt>predictions</dt>
-///   <dd>The list of predictions, one per instance in the request.</dd>
-///   <dt>error</dt>
-///   <dd>An error message returned instead of a prediction list if any
-///       instance produced an error.</dd>
-/// </dl>
-/// 
-/// If the call is successful, the response body will contain one prediction
-/// entry per instance in the request body. If prediction fails for any
-/// instance, the response body will contain no predictions and will contian
-/// a single error entry instead.
-/// 
-/// Even though there is one prediction per instance, the format of a
-/// prediction is not directly related to the format of an instance.
-/// Predictions take whatever format is specified in the outputs collection
-/// defined in the model. The collection of predictions is returned in a JSON
-/// list. Each member of the list can be a simple value, a list, or a JSON
-/// object of any complexity. If your model has more than one output tensor,
-/// each prediction will be a JSON object containing a name/value pair for each
-/// output. The names identify the output aliases in the graph.
-/// 
-/// The following examples show some possible responses:
-/// 
-/// A simple set of predictions for three input instances, where each
-/// prediction is an integer value:
-/// <pre>
-/// {"predictions": [5, 4, 3]}
-/// </pre>
-/// A more complex set of predictions, each containing two named values that
-/// correspond to output tensors, named **label** and **scores** respectively.
-/// The value of **label** is the predicted category ("car" or "beach") and
-/// **scores** contains a list of probabilities for that instance across the
-/// possible categories.
-/// <pre>
-/// {"predictions": [{"label": "beach", "scores": [0.1, 0.9]},
-///                  {"label": "car", "scores": [0.75, 0.25]}]}
-/// </pre>
-/// A response when there is an error processing an input instance:
-/// <pre>
-/// {"error": "Divide by zero"}
-/// </pre>
+/// **** REMOVE FROM GENERATED DOCUMENTATION
 ///
 /// A builder for the *predict* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -3986,13 +4049,13 @@ impl<'a, C, A> ProjectModelVersionSetDefaultCall<'a, C, A> where C: BorrowMut<hy
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use ml1_beta1::CloudMachineLearning;
+/// # use ml1_beta1::CloudMachineLearningEngine;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = CloudMachineLearning::new(hyper::Client::new(), auth);
+/// # let mut hub = CloudMachineLearningEngine::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4008,7 +4071,7 @@ impl<'a, C, A> ProjectModelVersionSetDefaultCall<'a, C, A> where C: BorrowMut<hy
 pub struct ProjectPredictCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a CloudMachineLearning<C, A>,
+    hub: &'a CloudMachineLearningEngine<C, A>,
     _request: GoogleCloudMlV1beta1__PredictRequest,
     _name: String,
     _delegate: Option<&'a mut Delegate>,
@@ -4247,13 +4310,14 @@ impl<'a, C, A> ProjectPredictCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 }
 
 
-/// Deletes a model.
+/// Gets information about a model version.
 /// 
-/// You can only delete a model if there are no versions in it. You can delete
-/// versions by calling
-/// [projects.models.versions.delete](/ml/reference/rest/v1beta1/projects.models.versions/delete).
+/// Models can have multiple versions. You can call
+/// [projects.models.versions.list](/ml-engine/reference/rest/v1beta1/projects.models.versions/list)
+/// to get the same information that this method returns for all of the
+/// versions of a model.
 ///
-/// A builder for the *models.delete* method supported by a *project* resource.
+/// A builder for the *models.versions.get* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -4267,37 +4331,37 @@ impl<'a, C, A> ProjectPredictCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use ml1_beta1::CloudMachineLearning;
+/// # use ml1_beta1::CloudMachineLearningEngine;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = CloudMachineLearning::new(hyper::Client::new(), auth);
+/// # let mut hub = CloudMachineLearningEngine::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().models_delete("name")
+/// let result = hub.projects().models_versions_get("name")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectModelDeleteCall<'a, C, A>
+pub struct ProjectModelVersionGetCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a CloudMachineLearning<C, A>,
+    hub: &'a CloudMachineLearningEngine<C, A>,
     _name: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectModelDeleteCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectModelVersionGetCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectModelDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectModelVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleLongrunning__Operation)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleCloudMlV1beta1__Version)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -4306,8 +4370,8 @@ impl<'a, C, A> ProjectModelDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "ml.projects.models.delete",
-                               http_method: hyper::method::Method::Delete });
+        dlg.begin(MethodInfo { id: "ml.projects.models.versions.get",
+                               http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
@@ -4375,7 +4439,7 @@ impl<'a, C, A> ProjectModelDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4428,15 +4492,15 @@ impl<'a, C, A> ProjectModelDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
-    /// Required. The name of the model.
+    /// Required. The name of the version.
     /// 
-    /// Authorization: requires `Editor` role on the parent project.
+    /// Authorization: requires `Viewer` role on the parent project.
     ///
     /// Sets the *name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectModelDeleteCall<'a, C, A> {
+    pub fn name(mut self, new_value: &str) -> ProjectModelVersionGetCall<'a, C, A> {
         self._name = new_value.to_string();
         self
     }
@@ -4446,7 +4510,7 @@ impl<'a, C, A> ProjectModelDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectModelDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectModelVersionGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4473,7 +4537,7 @@ impl<'a, C, A> ProjectModelDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectModelDeleteCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectModelVersionGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4490,7 +4554,7 @@ impl<'a, C, A> ProjectModelDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectModelDeleteCall<'a, C, A>
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectModelVersionGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4517,13 +4581,13 @@ impl<'a, C, A> ProjectModelDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use ml1_beta1::CloudMachineLearning;
+/// # use ml1_beta1::CloudMachineLearningEngine;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = CloudMachineLearning::new(hyper::Client::new(), auth);
+/// # let mut hub = CloudMachineLearningEngine::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4534,7 +4598,7 @@ impl<'a, C, A> ProjectModelDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 pub struct ProjectGetConfigCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a CloudMachineLearning<C, A>,
+    hub: &'a CloudMachineLearningEngine<C, A>,
     _name: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
@@ -4764,13 +4828,13 @@ impl<'a, C, A> ProjectGetConfigCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use ml1_beta1::CloudMachineLearning;
+/// # use ml1_beta1::CloudMachineLearningEngine;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = CloudMachineLearning::new(hyper::Client::new(), auth);
+/// # let mut hub = CloudMachineLearningEngine::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4781,7 +4845,7 @@ impl<'a, C, A> ProjectGetConfigCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 pub struct ProjectJobGetCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a CloudMachineLearning<C, A>,
+    hub: &'a CloudMachineLearningEngine<C, A>,
     _name: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
@@ -5020,13 +5084,13 @@ impl<'a, C, A> ProjectJobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use ml1_beta1::CloudMachineLearning;
+/// # use ml1_beta1::CloudMachineLearningEngine;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = CloudMachineLearning::new(hyper::Client::new(), auth);
+/// # let mut hub = CloudMachineLearningEngine::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5037,7 +5101,7 @@ impl<'a, C, A> ProjectJobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 pub struct ProjectOperationCancelCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a CloudMachineLearning<C, A>,
+    hub: &'a CloudMachineLearningEngine<C, A>,
     _name: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
@@ -5253,7 +5317,7 @@ impl<'a, C, A> ProjectOperationCancelCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// 
 /// You must add at least one version before you can request predictions from
 /// the model. Add versions by calling
-/// [projects.models.versions.create](/ml/reference/rest/v1beta1/projects.models.versions/create).
+/// [projects.models.versions.create](/ml-engine/reference/rest/v1beta1/projects.models.versions/create).
 ///
 /// A builder for the *models.create* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -5270,13 +5334,13 @@ impl<'a, C, A> ProjectOperationCancelCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use ml1_beta1::CloudMachineLearning;
+/// # use ml1_beta1::CloudMachineLearningEngine;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = CloudMachineLearning::new(hyper::Client::new(), auth);
+/// # let mut hub = CloudMachineLearningEngine::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5292,7 +5356,7 @@ impl<'a, C, A> ProjectOperationCancelCall<'a, C, A> where C: BorrowMut<hyper::Cl
 pub struct ProjectModelCreateCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a CloudMachineLearning<C, A>,
+    hub: &'a CloudMachineLearningEngine<C, A>,
     _request: GoogleCloudMlV1beta1__Model,
     _parent: String,
     _delegate: Option<&'a mut Delegate>,
@@ -5531,14 +5595,16 @@ impl<'a, C, A> ProjectModelCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
 }
 
 
-/// Gets information about a model version.
+/// Designates a version to be the default for the model.
 /// 
-/// Models can have multiple versions. You can call
-/// [projects.models.versions.list](/ml/reference/rest/v1beta1/projects.models.versions/list)
-/// to get the same information that this method returns for all of the
-/// versions of a model.
+/// The default version is used for prediction requests made against the model
+/// that don't specify a version.
+/// 
+/// The first version to be created for a model is automatically set as the
+/// default. You must make any subsequent changes to the default version
+/// setting manually using this method.
 ///
-/// A builder for the *models.versions.get* method supported by a *project* resource.
+/// A builder for the *models.versions.setDefault* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -5549,36 +5615,43 @@ impl<'a, C, A> ProjectModelCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// # extern crate hyper;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_ml1_beta1 as ml1_beta1;
+/// use ml1_beta1::GoogleCloudMlV1beta1__SetDefaultVersionRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use ml1_beta1::CloudMachineLearning;
+/// # use ml1_beta1::CloudMachineLearningEngine;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = CloudMachineLearning::new(hyper::Client::new(), auth);
+/// # let mut hub = CloudMachineLearningEngine::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleCloudMlV1beta1__SetDefaultVersionRequest::default();
+/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().models_versions_get("name")
+/// let result = hub.projects().models_versions_set_default(req, "name")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectModelVersionGetCall<'a, C, A>
+pub struct ProjectModelVersionSetDefaultCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a CloudMachineLearning<C, A>,
+    hub: &'a CloudMachineLearningEngine<C, A>,
+    _request: GoogleCloudMlV1beta1__SetDefaultVersionRequest,
     _name: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectModelVersionGetCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectModelVersionSetDefaultCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectModelVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectModelVersionSetDefaultCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5591,9 +5664,9 @@ impl<'a, C, A> ProjectModelVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "ml.projects.models.versions.get",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        dlg.begin(MethodInfo { id: "ml.projects.models.versions.setDefault",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -5607,7 +5680,7 @@ impl<'a, C, A> ProjectModelVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://ml.googleapis.com/v1beta1/{+name}".to_string();
+        let mut url = "https://ml.googleapis.com/v1beta1/{+name}:setDefault".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5642,6 +5715,17 @@ impl<'a, C, A> ProjectModelVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
@@ -5658,11 +5742,15 @@ impl<'a, C, A> ProjectModelVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
                 }
             };
             let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
 
                 dlg.pre_request();
                 req.send()
@@ -5713,15 +5801,26 @@ impl<'a, C, A> ProjectModelVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
-    /// Required. The name of the version.
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GoogleCloudMlV1beta1__SetDefaultVersionRequest) -> ProjectModelVersionSetDefaultCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The name of the version to make the default for the model. You
+    /// can get the names of all the versions of a model by calling
+    /// [projects.models.versions.list](/ml-engine/reference/rest/v1beta1/projects.models.versions/list).
     /// 
-    /// Authorization: requires `Viewer` role on the parent project.
+    /// Authorization: requires `Editor` role on the parent project.
     ///
     /// Sets the *name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectModelVersionGetCall<'a, C, A> {
+    pub fn name(mut self, new_value: &str) -> ProjectModelVersionSetDefaultCall<'a, C, A> {
         self._name = new_value.to_string();
         self
     }
@@ -5731,7 +5830,7 @@ impl<'a, C, A> ProjectModelVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectModelVersionGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectModelVersionSetDefaultCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5758,7 +5857,7 @@ impl<'a, C, A> ProjectModelVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectModelVersionGetCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectModelVersionSetDefaultCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5775,7 +5874,7 @@ impl<'a, C, A> ProjectModelVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectModelVersionGetCall<'a, C, A>
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectModelVersionSetDefaultCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5799,13 +5898,13 @@ impl<'a, C, A> ProjectModelVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use ml1_beta1::CloudMachineLearning;
+/// # use ml1_beta1::CloudMachineLearningEngine;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = CloudMachineLearning::new(hyper::Client::new(), auth);
+/// # let mut hub = CloudMachineLearningEngine::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5819,7 +5918,7 @@ impl<'a, C, A> ProjectModelVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 pub struct ProjectJobListCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a CloudMachineLearning<C, A>,
+    hub: &'a CloudMachineLearningEngine<C, A>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -6090,13 +6189,13 @@ impl<'a, C, A> ProjectJobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use ml1_beta1::CloudMachineLearning;
+/// # use ml1_beta1::CloudMachineLearningEngine;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = CloudMachineLearning::new(hyper::Client::new(), auth);
+/// # let mut hub = CloudMachineLearningEngine::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6112,7 +6211,7 @@ impl<'a, C, A> ProjectJobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 pub struct ProjectJobCancelCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a CloudMachineLearning<C, A>,
+    hub: &'a CloudMachineLearningEngine<C, A>,
     _request: GoogleCloudMlV1beta1__CancelJobRequest,
     _name: String,
     _delegate: Option<&'a mut Delegate>,
@@ -6369,13 +6468,13 @@ impl<'a, C, A> ProjectJobCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use ml1_beta1::CloudMachineLearning;
+/// # use ml1_beta1::CloudMachineLearningEngine;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = CloudMachineLearning::new(hyper::Client::new(), auth);
+/// # let mut hub = CloudMachineLearningEngine::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6386,7 +6485,7 @@ impl<'a, C, A> ProjectJobCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 pub struct ProjectModelGetCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a CloudMachineLearning<C, A>,
+    hub: &'a CloudMachineLearningEngine<C, A>,
     _name: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
@@ -6619,13 +6718,13 @@ impl<'a, C, A> ProjectModelGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use ml1_beta1::CloudMachineLearning;
+/// # use ml1_beta1::CloudMachineLearningEngine;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = CloudMachineLearning::new(hyper::Client::new(), auth);
+/// # let mut hub = CloudMachineLearningEngine::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6638,7 +6737,7 @@ impl<'a, C, A> ProjectModelGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 pub struct ProjectModelListCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a CloudMachineLearning<C, A>,
+    hub: &'a CloudMachineLearningEngine<C, A>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,

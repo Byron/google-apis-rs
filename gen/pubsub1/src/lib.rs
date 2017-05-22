@@ -2,9 +2,9 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *pubsub* crate version *1.0.4+20161122*, where *20161122* is the exact revision of the *pubsub:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
+//! This documentation was generated from *Pubsub* crate version *1.0.4+20170502*, where *20170502* is the exact revision of the *pubsub:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
 //! 
-//! Everything else about the *pubsub* *v1* API can be found at the
+//! Everything else about the *Pubsub* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/pubsub/docs).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/pubsub1).
 //! # Features
@@ -467,10 +467,12 @@ impl RequestValue for AcknowledgeRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ModifyAckDeadlineRequest {
     /// The new ack deadline with respect to the time this request was sent to
-    /// the Pub/Sub system. Must be >= 0. For example, if the value is 10, the new
+    /// the Pub/Sub system. For example, if the value is 10, the new
     /// ack deadline will expire 10 seconds after the `ModifyAckDeadline` call
     /// was made. Specifying zero may immediately make the message available for
     /// another pull request.
+    /// The minimum deadline you can specify is 0 seconds.
+    /// The maximum deadline you can specify is 600 seconds (10 minutes).
     #[serde(rename="ackDeadlineSeconds")]
     pub ack_deadline_seconds: Option<i32>,
     /// List of acknowledgment IDs.
@@ -695,11 +697,12 @@ impl ResponseResult for TestIamPermissionsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PullRequest {
-    /// If this is specified as true the system will respond immediately even if
-    /// it is not able to return a message in the `Pull` response. Otherwise the
-    /// system is allowed to wait until at least one message is available rather
-    /// than returning no messages. The client may cancel the request if it does
-    /// not wish to wait any longer for the response.
+    /// If this field set to true, the system will respond immediately even if
+    /// it there are no messages available to return in the `Pull` response.
+    /// Otherwise, the system may wait (for a bounded amount of time) until at
+    /// least one message is available, rather than returning no messages. The
+    /// client may cancel the request if it does not wish to wait any longer for
+    /// the response.
     #[serde(rename="returnImmediately")]
     pub return_immediately: Option<bool>,
     /// The maximum number of messages returned for this request. The Pub/Sub
@@ -723,11 +726,10 @@ pub struct PushConfig {
     /// control different aspects of the message delivery.
     /// 
     /// The currently supported attribute is `x-goog-version`, which you can
-    /// use to change the format of the push message. This attribute
+    /// use to change the format of the pushed message. This attribute
     /// indicates the version of the data expected by the endpoint. This
-    /// controls the shape of the envelope (i.e. its fields and metadata).
-    /// The endpoint version is based on the version of the Pub/Sub
-    /// API.
+    /// controls the shape of the pushed message (i.e., its fields and metadata).
+    /// The endpoint version is based on the version of the Pub/Sub API.
     /// 
     /// If not present during the `CreateSubscription` call, it will default to
     /// the version of the API used to make such call. If not present during a
@@ -1029,13 +1031,18 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns permissions that a caller has on the specified resource.
+    /// If the resource does not exist, this will return an empty set of
+    /// permissions, not a NOT_FOUND error.
+    /// 
+    /// Note: This operation is designed to be used for building permission-aware
+    /// UIs and command-line tools, not for authorization checking. This operation
+    /// may "fail open" without warning.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy detail is being requested.
-    ///                `resource` is usually specified as a path. For example, a Project
-    ///                resource is specified as `projects/{project}`.
+    ///                See the operation documentation for the appropriate value for this field.
     pub fn topics_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectTopicTestIamPermissionCall<'a, C, A> {
         ProjectTopicTestIamPermissionCall {
             hub: self.hub,
@@ -1050,13 +1057,18 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns permissions that a caller has on the specified resource.
+    /// If the resource does not exist, this will return an empty set of
+    /// permissions, not a NOT_FOUND error.
+    /// 
+    /// Note: This operation is designed to be used for building permission-aware
+    /// UIs and command-line tools, not for authorization checking. This operation
+    /// may "fail open" without warning.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy detail is being requested.
-    ///                `resource` is usually specified as a path. For example, a Project
-    ///                resource is specified as `projects/{project}`.
+    ///                See the operation documentation for the appropriate value for this field.
     pub fn subscriptions_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectSubscriptionTestIamPermissionCall<'a, C, A> {
         ProjectSubscriptionTestIamPermissionCall {
             hub: self.hub,
@@ -1071,13 +1083,18 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns permissions that a caller has on the specified resource.
+    /// If the resource does not exist, this will return an empty set of
+    /// permissions, not a NOT_FOUND error.
+    /// 
+    /// Note: This operation is designed to be used for building permission-aware
+    /// UIs and command-line tools, not for authorization checking. This operation
+    /// may "fail open" without warning.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy detail is being requested.
-    ///                `resource` is usually specified as a path. For example, a Project
-    ///                resource is specified as `projects/{project}`.
+    ///                See the operation documentation for the appropriate value for this field.
     pub fn snapshots_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectSnapshotTestIamPermissionCall<'a, C, A> {
         ProjectSnapshotTestIamPermissionCall {
             hub: self.hub,
@@ -1146,8 +1163,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `resource` - REQUIRED: The resource for which the policy is being requested.
-    ///                `resource` is usually specified as a path. For example, a Project
-    ///                resource is specified as `projects/{project}`.
+    ///                See the operation documentation for the appropriate value for this field.
     pub fn snapshots_get_iam_policy(&self, resource: &str) -> ProjectSnapshotGetIamPolicyCall<'a, C, A> {
         ProjectSnapshotGetIamPolicyCall {
             hub: self.hub,
@@ -1191,8 +1207,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `resource` - REQUIRED: The resource for which the policy is being requested.
-    ///                `resource` is usually specified as a path. For example, a Project
-    ///                resource is specified as `projects/{project}`.
+    ///                See the operation documentation for the appropriate value for this field.
     pub fn topics_get_iam_policy(&self, resource: &str) -> ProjectTopicGetIamPolicyCall<'a, C, A> {
         ProjectTopicGetIamPolicyCall {
             hub: self.hub,
@@ -1260,8 +1275,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `resource` - REQUIRED: The resource for which the policy is being requested.
-    ///                `resource` is usually specified as a path. For example, a Project
-    ///                resource is specified as `projects/{project}`.
+    ///                See the operation documentation for the appropriate value for this field.
     pub fn subscriptions_get_iam_policy(&self, resource: &str) -> ProjectSubscriptionGetIamPolicyCall<'a, C, A> {
         ProjectSubscriptionGetIamPolicyCall {
             hub: self.hub,
@@ -1341,8 +1355,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being specified.
-    ///                `resource` is usually specified as a path. For example, a Project
-    ///                resource is specified as `projects/{project}`.
+    ///                See the operation documentation for the appropriate value for this field.
     pub fn topics_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectTopicSetIamPolicyCall<'a, C, A> {
         ProjectTopicSetIamPolicyCall {
             hub: self.hub,
@@ -1418,8 +1431,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being specified.
-    ///                `resource` is usually specified as a path. For example, a Project
-    ///                resource is specified as `projects/{project}`.
+    ///                See the operation documentation for the appropriate value for this field.
     pub fn snapshots_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectSnapshotSetIamPolicyCall<'a, C, A> {
         ProjectSnapshotSetIamPolicyCall {
             hub: self.hub,
@@ -1478,8 +1490,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being specified.
-    ///                `resource` is usually specified as a path. For example, a Project
-    ///                resource is specified as `projects/{project}`.
+    ///                See the operation documentation for the appropriate value for this field.
     pub fn subscriptions_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectSubscriptionSetIamPolicyCall<'a, C, A> {
         ProjectSubscriptionSetIamPolicyCall {
             hub: self.hub,
@@ -2054,6 +2065,12 @@ impl<'a, C, A> ProjectTopicCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 
 /// Returns permissions that a caller has on the specified resource.
+/// If the resource does not exist, this will return an empty set of
+/// permissions, not a NOT_FOUND error.
+/// 
+/// Note: This operation is designed to be used for building permission-aware
+/// UIs and command-line tools, not for authorization checking. This operation
+/// may "fail open" without warning.
 ///
 /// A builder for the *topics.testIamPermissions* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -2262,8 +2279,7 @@ impl<'a, C, A> ProjectTopicTestIamPermissionCall<'a, C, A> where C: BorrowMut<hy
         self
     }
     /// REQUIRED: The resource for which the policy detail is being requested.
-    /// `resource` is usually specified as a path. For example, a Project
-    /// resource is specified as `projects/{project}`.
+    /// See the operation documentation for the appropriate value for this field.
     ///
     /// Sets the *resource* path property to the given value.
     ///
@@ -2332,6 +2348,12 @@ impl<'a, C, A> ProjectTopicTestIamPermissionCall<'a, C, A> where C: BorrowMut<hy
 
 
 /// Returns permissions that a caller has on the specified resource.
+/// If the resource does not exist, this will return an empty set of
+/// permissions, not a NOT_FOUND error.
+/// 
+/// Note: This operation is designed to be used for building permission-aware
+/// UIs and command-line tools, not for authorization checking. This operation
+/// may "fail open" without warning.
 ///
 /// A builder for the *subscriptions.testIamPermissions* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -2540,8 +2562,7 @@ impl<'a, C, A> ProjectSubscriptionTestIamPermissionCall<'a, C, A> where C: Borro
         self
     }
     /// REQUIRED: The resource for which the policy detail is being requested.
-    /// `resource` is usually specified as a path. For example, a Project
-    /// resource is specified as `projects/{project}`.
+    /// See the operation documentation for the appropriate value for this field.
     ///
     /// Sets the *resource* path property to the given value.
     ///
@@ -2610,6 +2631,12 @@ impl<'a, C, A> ProjectSubscriptionTestIamPermissionCall<'a, C, A> where C: Borro
 
 
 /// Returns permissions that a caller has on the specified resource.
+/// If the resource does not exist, this will return an empty set of
+/// permissions, not a NOT_FOUND error.
+/// 
+/// Note: This operation is designed to be used for building permission-aware
+/// UIs and command-line tools, not for authorization checking. This operation
+/// may "fail open" without warning.
 ///
 /// A builder for the *snapshots.testIamPermissions* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -2818,8 +2845,7 @@ impl<'a, C, A> ProjectSnapshotTestIamPermissionCall<'a, C, A> where C: BorrowMut
         self
     }
     /// REQUIRED: The resource for which the policy detail is being requested.
-    /// `resource` is usually specified as a path. For example, a Project
-    /// resource is specified as `projects/{project}`.
+    /// See the operation documentation for the appropriate value for this field.
     ///
     /// Sets the *resource* path property to the given value.
     ///
@@ -3629,8 +3655,7 @@ impl<'a, C, A> ProjectSnapshotGetIamPolicyCall<'a, C, A> where C: BorrowMut<hype
 
 
     /// REQUIRED: The resource for which the policy is being requested.
-    /// `resource` is usually specified as a path. For example, a Project
-    /// resource is specified as `projects/{project}`.
+    /// See the operation documentation for the appropriate value for this field.
     ///
     /// Sets the *resource* path property to the given value.
     ///
@@ -4159,8 +4184,7 @@ impl<'a, C, A> ProjectTopicGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
 
 
     /// REQUIRED: The resource for which the policy is being requested.
-    /// `resource` is usually specified as a path. For example, a Project
-    /// resource is specified as `projects/{project}`.
+    /// See the operation documentation for the appropriate value for this field.
     ///
     /// Sets the *resource* path property to the given value.
     ///
@@ -4941,8 +4965,7 @@ impl<'a, C, A> ProjectSubscriptionGetIamPolicyCall<'a, C, A> where C: BorrowMut<
 
 
     /// REQUIRED: The resource for which the policy is being requested.
-    /// `resource` is usually specified as a path. For example, a Project
-    /// resource is specified as `projects/{project}`.
+    /// See the operation documentation for the appropriate value for this field.
     ///
     /// Sets the *resource* path property to the given value.
     ///
@@ -6017,8 +6040,7 @@ impl<'a, C, A> ProjectTopicSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
         self
     }
     /// REQUIRED: The resource for which the policy is being specified.
-    /// `resource` is usually specified as a path. For example, a Project
-    /// resource is specified as `projects/{project}`.
+    /// See the operation documentation for the appropriate value for this field.
     ///
     /// Sets the *resource* path property to the given value.
     ///
@@ -6836,8 +6858,7 @@ impl<'a, C, A> ProjectSnapshotSetIamPolicyCall<'a, C, A> where C: BorrowMut<hype
         self
     }
     /// REQUIRED: The resource for which the policy is being specified.
-    /// `resource` is usually specified as a path. For example, a Project
-    /// resource is specified as `projects/{project}`.
+    /// See the operation documentation for the appropriate value for this field.
     ///
     /// Sets the *resource* path property to the given value.
     ///
@@ -7633,8 +7654,7 @@ impl<'a, C, A> ProjectSubscriptionSetIamPolicyCall<'a, C, A> where C: BorrowMut<
         self
     }
     /// REQUIRED: The resource for which the policy is being specified.
-    /// `resource` is usually specified as a path. For example, a Project
-    /// resource is specified as `projects/{project}`.
+    /// See the operation documentation for the appropriate value for this field.
     ///
     /// Sets the *resource* path property to the given value.
     ///

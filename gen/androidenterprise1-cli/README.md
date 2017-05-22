@@ -25,23 +25,10 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Android Enterprise* API at revision *20161207*. The CLI is at version *1.0.4*.
+This documentation was generated from the *Android Enterprise* API at revision *20170516*. The CLI is at version *1.0.4*.
 
 ```bash
 androidenterprise1 [options]
-        collections
-                delete <enterprise-id> <collection-id> [-p <v>]...
-                get <enterprise-id> <collection-id> [-p <v>]... [-o <out>]
-                insert <enterprise-id> (-r <kv>)... [-p <v>]... [-o <out>]
-                list <enterprise-id> [-p <v>]... [-o <out>]
-                patch <enterprise-id> <collection-id> (-r <kv>)... [-p <v>]... [-o <out>]
-                update <enterprise-id> <collection-id> (-r <kv>)... [-p <v>]... [-o <out>]
-        collectionviewers
-                delete <enterprise-id> <collection-id> <user-id> [-p <v>]...
-                get <enterprise-id> <collection-id> <user-id> [-p <v>]... [-o <out>]
-                list <enterprise-id> <collection-id> [-p <v>]... [-o <out>]
-                patch <enterprise-id> <collection-id> <user-id> (-r <kv>)... [-p <v>]... [-o <out>]
-                update <enterprise-id> <collection-id> <user-id> (-r <kv>)... [-p <v>]... [-o <out>]
         devices
                 get <enterprise-id> <user-id> <device-id> [-p <v>]... [-o <out>]
                 get-state <enterprise-id> <user-id> <device-id> [-p <v>]... [-o <out>]
@@ -103,7 +90,6 @@ androidenterprise1 [options]
                 get-permissions <enterprise-id> <product-id> [-p <v>]... [-o <out>]
                 list <enterprise-id> [-p <v>]... [-o <out>]
                 unapprove <enterprise-id> <product-id> [-p <v>]...
-                update-permissions <enterprise-id> <product-id> (-r <kv>)... [-p <v>]... [-o <out>]
         serviceaccountkeys
                 delete <enterprise-id> <key-id> [-p <v>]...
                 insert <enterprise-id> (-r <kv>)... [-p <v>]... [-o <out>]

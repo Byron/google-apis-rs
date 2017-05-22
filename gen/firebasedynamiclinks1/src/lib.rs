@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Firebase Dynamic Links* crate version *1.0.4+20161118*, where *20161118* is the exact revision of the *firebasedynamiclinks:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
+//! This documentation was generated from *Firebase Dynamic Links* crate version *1.0.4+20170517*, where *20170517* is the exact revision of the *firebasedynamiclinks:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
 //! 
 //! Everything else about the *Firebase Dynamic Links* *v1* API can be found at the
 //! [official documentation site](https://firebase.google.com/docs/dynamic-links/).
@@ -341,6 +341,21 @@ impl<'a, C, A> FirebaseDynamicLinks<C, A>
 // ############
 // SCHEMAS ###
 // ##########
+/// Information of navigation behavior.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct NavigationInfo {
+    /// If this option is on, FDL click will be forced to redirect rather than
+    /// show an interstitial page.
+    #[serde(rename="enableForcedRedirect")]
+    pub enable_forced_redirect: Option<bool>,
+}
+
+impl Part for NavigationInfo {}
+
+
 /// Tracking parameters supported by Dynamic Link.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -553,23 +568,26 @@ impl Part for GooglePlayAnalytics {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DynamicLinkInfo {
+    /// Information of navigation behavior of a Firebase Dynamic Links.
+    #[serde(rename="navigationInfo")]
+    pub navigation_info: Option<NavigationInfo>,
     /// Parameters used for tracking. See all tracking parameters in the
-    /// [documentation](https://firebase.google.com/docs/dynamic-links/android#create-a-dynamic-link-programmatically).
+    /// [documentation](https://firebase.google.com/docs/dynamic-links/create-manually).
     #[serde(rename="analyticsInfo")]
     pub analytics_info: Option<AnalyticsInfo>,
     /// The link your app will open, You can specify any URL your app can handle.
     /// This link must be a well-formatted URL, be properly URL-encoded, and use
     /// the HTTP or HTTPS scheme. See 'link' parameters in the
-    /// [documentation](https://firebase.google.com/docs/dynamic-links/android#create-a-dynamic-link-programmatically).
+    /// [documentation](https://firebase.google.com/docs/dynamic-links/create-manually).
     /// 
     /// Required.
     pub link: Option<String>,
     /// iOS related information. See iOS related parameters in the
-    /// [documentation](https://firebase.google.com/docs/dynamic-links/ios#create-a-dynamic-link-programmatically).
+    /// [documentation](https://firebase.google.com/docs/dynamic-links/create-manually).
     #[serde(rename="iosInfo")]
     pub ios_info: Option<IosInfo>,
     /// Android related information. See Android related parameters in the
-    /// [documentation](https://firebase.google.com/docs/dynamic-links/android#create-a-dynamic-link-programmatically).
+    /// [documentation](https://firebase.google.com/docs/dynamic-links/create-manually).
     #[serde(rename="androidInfo")]
     pub android_info: Option<AndroidInfo>,
     /// Parameters for social meta tag params.
@@ -577,7 +595,7 @@ pub struct DynamicLinkInfo {
     #[serde(rename="socialMetaTagInfo")]
     pub social_meta_tag_info: Option<SocialMetaTagInfo>,
     /// Dynamic Links domain that the project owns, e.g. abcd.app.goo.gl
-    /// [Learn more](https://firebase.google.com/docs/dynamic-links/android#set-up-firebase-and-the-dynamic-links-sdk)
+    /// [Learn more](https://firebase.google.com/docs/dynamic-links/android/receive)
     /// on how to set up Dynamic Link domain associated with your Firebase project.
     /// 
     /// Required.
@@ -599,14 +617,14 @@ impl Part for DynamicLinkInfo {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreateShortDynamicLinkResponse {
-    /// Preivew link to show the link flow chart.
-    #[serde(rename="previewLink")]
-    pub preview_link: Option<String>,
-    /// Information about potential warnings on link creation.
-    pub warning: Option<Vec<DynamicLinkWarning>>,
     /// Short Dynamic Link value. e.g. https://abcd.app.goo.gl/wxyz
     #[serde(rename="shortLink")]
     pub short_link: Option<String>,
+    /// Information about potential warnings on link creation.
+    pub warning: Option<Vec<DynamicLinkWarning>>,
+    /// Preivew link to show the link flow chart.
+    #[serde(rename="previewLink")]
+    pub preview_link: Option<String>,
 }
 
 impl ResponseResult for CreateShortDynamicLinkResponse {}

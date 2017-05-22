@@ -1,4 +1,4 @@
-site_name: Android Enterprise v1.0.4+20161207
+site_name: Android Enterprise v1.0.4+20170516
 site_url: http://byron.github.io/google-apis-rs/google-androidenterprise1-cli
 site_description: A complete library to interact with Android Enterprise (protocol v1)
 
@@ -9,17 +9,6 @@ site_dir: build_html
 
 pages:
 - ['index.md', 'Home']
-- ['collections_delete.md', 'Collections', 'Delete']
-- ['collections_get.md', 'Collections', 'Get']
-- ['collections_insert.md', 'Collections', 'Insert']
-- ['collections_list.md', 'Collections', 'List']
-- ['collections_patch.md', 'Collections', 'Patch']
-- ['collections_update.md', 'Collections', 'Update']
-- ['collectionviewers_delete.md', 'Collectionviewers', 'Delete']
-- ['collectionviewers_get.md', 'Collectionviewers', 'Get']
-- ['collectionviewers_list.md', 'Collectionviewers', 'List']
-- ['collectionviewers_patch.md', 'Collectionviewers', 'Patch']
-- ['collectionviewers_update.md', 'Collectionviewers', 'Update']
 - ['devices_get.md', 'Devices', 'Get']
 - ['devices_get-state.md', 'Devices', 'Get State']
 - ['devices_list.md', 'Devices', 'List']
@@ -71,7 +60,6 @@ pages:
 - ['products_get-permissions.md', 'Products', 'Get Permissions']
 - ['products_list.md', 'Products', 'List']
 - ['products_unapprove.md', 'Products', 'Unapprove']
-- ['products_update-permissions.md', 'Products', 'Update Permissions']
 - ['serviceaccountkeys_delete.md', 'Serviceaccountkeys', 'Delete']
 - ['serviceaccountkeys_insert.md', 'Serviceaccountkeys', 'Insert']
 - ['serviceaccountkeys_list.md', 'Serviceaccountkeys', 'List']

@@ -25,26 +25,49 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Resource Manager* API at revision *20161212*. The CLI is at version *1.0.4*.
+This documentation was generated from the *Cloud Resource Manager* API at revision *20170517*. The CLI is at version *1.0.4*.
 
 ```bash
 cloudresourcemanager1 [options]
+        folders
+                clear-org-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                get-effective-org-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                get-org-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                list-available-org-policy-constraints <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                list-org-policies <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                set-org-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+        liens
+                create (-r <kv>)... [-p <v>]... [-o <out>]
+                delete <name> [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
         operations
                 get <name> [-p <v>]... [-o <out>]
         organizations
+                clear-org-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 get <name> [-p <v>]... [-o <out>]
+                get-effective-org-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 get-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                get-org-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                list-available-org-policy-constraints <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                list-org-policies <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 search (-r <kv>)... [-p <v>]... [-o <out>]
                 set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                set-org-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
         projects
+                clear-org-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 create (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <project-id> [-p <v>]... [-o <out>]
                 get <project-id> [-p <v>]... [-o <out>]
                 get-ancestry <project-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                get-effective-org-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 get-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                get-org-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]
+                list-available-org-policy-constraints <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                list-org-policies <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                set-org-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 undelete <project-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 update <project-id> (-r <kv>)... [-p <v>]... [-o <out>]

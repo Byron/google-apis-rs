@@ -69,6 +69,7 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "dynamic-link-info.navigation-info.enable-forced-redirect" => Some(("dynamicLinkInfo.navigationInfo.enableForcedRedirect", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "dynamic-link-info.analytics-info.google-play-analytics.utm-medium" => Some(("dynamicLinkInfo.analyticsInfo.googlePlayAnalytics.utmMedium", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dynamic-link-info.analytics-info.google-play-analytics.utm-source" => Some(("dynamicLinkInfo.analyticsInfo.googlePlayAnalytics.utmSource", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dynamic-link-info.analytics-info.google-play-analytics.gclid" => Some(("dynamicLinkInfo.analyticsInfo.googlePlayAnalytics.gclid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -97,7 +98,7 @@ impl<'n> Engine<'n> {
                     "long-dynamic-link" => Some(("longDynamicLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "suffix.option" => Some(("suffix.option", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analytics-info", "android-fallback-link", "android-info", "android-link", "android-min-package-version-code", "android-package-name", "at", "ct", "dynamic-link-domain", "dynamic-link-info", "gclid", "google-play-analytics", "ios-app-store-id", "ios-bundle-id", "ios-custom-scheme", "ios-fallback-link", "ios-info", "ios-ipad-bundle-id", "ios-ipad-fallback-link", "itunes-connect-analytics", "link", "long-dynamic-link", "mt", "option", "pt", "social-description", "social-image-link", "social-meta-tag-info", "social-title", "suffix", "utm-campaign", "utm-content", "utm-medium", "utm-source", "utm-term"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analytics-info", "android-fallback-link", "android-info", "android-link", "android-min-package-version-code", "android-package-name", "at", "ct", "dynamic-link-domain", "dynamic-link-info", "enable-forced-redirect", "gclid", "google-play-analytics", "ios-app-store-id", "ios-bundle-id", "ios-custom-scheme", "ios-fallback-link", "ios-info", "ios-ipad-bundle-id", "ios-ipad-fallback-link", "itunes-connect-analytics", "link", "long-dynamic-link", "mt", "navigation-info", "option", "pt", "social-description", "social-image-link", "social-meta-tag-info", "social-title", "suffix", "utm-campaign", "utm-content", "utm-medium", "utm-source", "utm-term"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -296,8 +297,8 @@ fn main() {
     
     let mut app = App::new("firebasedynamiclinks1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.4+20161118")
-           .about("Firebase Dynamic Links API enables third party developers to programmatically create and manage Dynamic Links.")
+           .version("1.0.4+20170517")
+           .about("Programmatically creates and manages Firebase Dynamic Links.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_firebasedynamiclinks1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

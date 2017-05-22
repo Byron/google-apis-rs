@@ -5915,7 +5915,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Returns a list of reviews."##),
+                    Some(r##"Returns a list of reviews. Only reviews from last week will be returned."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher2_cli/reviews_list",
                   vec![
                     (Some(r##"package-name"##),
@@ -5976,7 +5976,7 @@ fn main() {
     
     let mut app = App::new("androidpublisher2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.4+20161212")
+           .version("1.0.4+20170425")
            .about("Lets Android application developers access their Google Play accounts.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_androidpublisher2_cli")
            .arg(Arg::with_name("url")

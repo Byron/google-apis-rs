@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *calendar* crate version *1.0.4+20161211*, where *20161211* is the exact revision of the *calendar:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
+//! This documentation was generated from *calendar* crate version *1.0.4+20170514*, where *20170514* is the exact revision of the *calendar:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
 //! 
 //! Everything else about the *calendar* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/google-apps/calendar/firstapp).
@@ -468,21 +468,6 @@ impl NestedType for EventGadget {}
 impl Part for EventGadget {}
 
 
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct FreeBusyCalendar {
-    /// List of time ranges during which this calendar should be regarded as busy.
-    pub busy: Option<Vec<TimePeriod>>,
-    /// Optional error(s) (if computation for the calendar failed).
-    pub errors: Option<Vec<ErrorType>>,
-}
-
-impl Part for FreeBusyCalendar {}
-
-
 /// The scope of the rule.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -502,34 +487,6 @@ pub struct AclRuleScope {
 
 impl NestedType for AclRuleScope {}
 impl Part for AclRuleScope {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list settings](struct.SettingListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Settings {
-    /// Token used to access the next page of this result. Omitted if no further results are available, in which case nextSyncToken is provided.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// List of user settings.
-    pub items: Option<Vec<Setting>>,
-    /// Type of the collection ("calendar#settings").
-    pub kind: Option<String>,
-    /// Etag of the collection.
-    pub etag: Option<String>,
-    /// Token used at a later point in time to retrieve only the entries that have changed since this result was returned. Omitted if further results are available, in which case nextPageToken is provided.
-    #[serde(rename="nextSyncToken")]
-    pub next_sync_token: Option<String>,
-}
-
-impl ResponseResult for Settings {}
 
 
 /// There is no detailed description.
@@ -595,6 +552,28 @@ pub struct Calendar {
 impl RequestValue for Calendar {}
 impl Resource for Calendar {}
 impl ResponseResult for Calendar {}
+
+
+/// The organizer of the event. If the organizer is also an attendee, this is indicated with a separate entry in attendees with the organizer field set to True. To change the organizer, use the move operation. Read-only, except when importing an event.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct EventOrganizer {
+    /// Whether the organizer corresponds to the calendar on which this copy of the event appears. Read-only. The default is False.
+    #[serde(rename="self")]
+    pub self_: Option<bool>,
+    /// The organizer's name, if available.
+    #[serde(rename="displayName")]
+    pub display_name: Option<String>,
+    /// The organizer's email address, if available. It must be a valid email address as per RFC5322.
+    pub email: Option<String>,
+    /// The organizer's Profile ID, if available. It corresponds to theid field in the People collection of the Google+ API
+    pub id: Option<String>,
+}
+
+impl NestedType for EventOrganizer {}
+impl Part for EventOrganizer {}
 
 
 /// There is no detailed description.
@@ -895,51 +874,6 @@ impl ResponseResult for Events {}
 
 /// There is no detailed description.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [stop channels](struct.ChannelStopCall.html) (request)
-/// * [watch settings](struct.SettingWatchCall.html) (request|response)
-/// * [watch acl](struct.AclWatchCall.html) (request|response)
-/// * [watch calendar list](struct.CalendarListWatchCall.html) (request|response)
-/// * [watch events](struct.EventWatchCall.html) (request|response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Channel {
-    /// A version-specific identifier for the watched resource.
-    #[serde(rename="resourceUri")]
-    pub resource_uri: Option<String>,
-    /// Identifies this as a notification channel used to watch for changes to a resource. Value: the fixed string "api#channel".
-    pub kind: Option<String>,
-    /// An opaque ID that identifies the resource being watched on this channel. Stable across different API versions.
-    #[serde(rename="resourceId")]
-    pub resource_id: Option<String>,
-    /// A UUID or similar unique string that identifies this channel.
-    pub id: Option<String>,
-    /// An arbitrary string delivered to the target address with each notification delivered over this channel. Optional.
-    pub token: Option<String>,
-    /// Additional parameters controlling delivery channel behavior. Optional.
-    pub params: Option<HashMap<String, String>>,
-    /// Date and time of notification channel expiration, expressed as a Unix timestamp, in milliseconds. Optional.
-    pub expiration: Option<String>,
-    /// The address where notifications are delivered for this channel.
-    pub address: Option<String>,
-    /// The type of delivery mechanism used for this channel.
-    #[serde(rename="type")]
-    pub type_: Option<String>,
-    /// A Boolean value to indicate whether payload is wanted. Optional.
-    pub payload: Option<bool>,
-}
-
-impl RequestValue for Channel {}
-impl Resource for Channel {}
-impl ResponseResult for Channel {}
-
-
-/// There is no detailed description.
-/// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -977,6 +911,22 @@ pub struct EventAttendee {
 impl Part for EventAttendee {}
 
 
+/// Extended properties of the event.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct EventExtendedProperties {
+    /// Properties that are shared between copies of the event on other attendees' calendars.
+    pub shared: Option<HashMap<String, String>>,
+    /// Properties that are private to the copy of the event that appears on this calendar.
+    pub private: Option<HashMap<String, String>>,
+}
+
+impl NestedType for EventExtendedProperties {}
+impl Part for EventExtendedProperties {}
+
+
 /// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1011,6 +961,21 @@ impl Part for EventReminders {}
 
 /// There is no detailed description.
 /// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct FreeBusyCalendar {
+    /// List of time ranges during which this calendar should be regarded as busy.
+    pub busy: Option<Vec<TimePeriod>>,
+    /// Optional error(s) (if computation for the calendar failed).
+    pub errors: Option<Vec<ErrorType>>,
+}
+
+impl Part for FreeBusyCalendar {}
+
+
+/// There is no detailed description.
+/// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
@@ -1037,20 +1002,32 @@ pub struct CalendarList {
 impl ResponseResult for CalendarList {}
 
 
-/// Extended properties of the event.
+/// There is no detailed description.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list settings](struct.SettingListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct EventExtendedProperties {
-    /// Properties that are shared between copies of the event on other attendees' calendars.
-    pub shared: Option<HashMap<String, String>>,
-    /// Properties that are private to the copy of the event that appears on this calendar.
-    pub private: Option<HashMap<String, String>>,
+pub struct Settings {
+    /// Token used to access the next page of this result. Omitted if no further results are available, in which case nextSyncToken is provided.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// List of user settings.
+    pub items: Option<Vec<Setting>>,
+    /// Type of the collection ("calendar#settings").
+    pub kind: Option<String>,
+    /// Etag of the collection.
+    pub etag: Option<String>,
+    /// Token used at a later point in time to retrieve only the entries that have changed since this result was returned. Omitted if further results are available, in which case nextPageToken is provided.
+    #[serde(rename="nextSyncToken")]
+    pub next_sync_token: Option<String>,
 }
 
-impl NestedType for EventExtendedProperties {}
-impl Part for EventExtendedProperties {}
+impl ResponseResult for Settings {}
 
 
 /// There is no detailed description.
@@ -1151,6 +1128,69 @@ pub struct FreeBusyRequest {
 impl RequestValue for FreeBusyRequest {}
 
 
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [stop channels](struct.ChannelStopCall.html) (request)
+/// * [watch settings](struct.SettingWatchCall.html) (request|response)
+/// * [watch acl](struct.AclWatchCall.html) (request|response)
+/// * [watch calendar list](struct.CalendarListWatchCall.html) (request|response)
+/// * [watch events](struct.EventWatchCall.html) (request|response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Channel {
+    /// A version-specific identifier for the watched resource.
+    #[serde(rename="resourceUri")]
+    pub resource_uri: Option<String>,
+    /// Identifies this as a notification channel used to watch for changes to a resource. Value: the fixed string "api#channel".
+    pub kind: Option<String>,
+    /// An opaque ID that identifies the resource being watched on this channel. Stable across different API versions.
+    #[serde(rename="resourceId")]
+    pub resource_id: Option<String>,
+    /// A UUID or similar unique string that identifies this channel.
+    pub id: Option<String>,
+    /// An arbitrary string delivered to the target address with each notification delivered over this channel. Optional.
+    pub token: Option<String>,
+    /// Additional parameters controlling delivery channel behavior. Optional.
+    pub params: Option<HashMap<String, String>>,
+    /// Date and time of notification channel expiration, expressed as a Unix timestamp, in milliseconds. Optional.
+    pub expiration: Option<String>,
+    /// The address where notifications are delivered for this channel.
+    pub address: Option<String>,
+    /// The type of delivery mechanism used for this channel.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// A Boolean value to indicate whether payload is wanted. Optional.
+    pub payload: Option<bool>,
+}
+
+impl RequestValue for Channel {}
+impl Resource for Channel {}
+impl ResponseResult for Channel {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct EventReminder {
+    /// Number of minutes before the start of the event when the reminder should trigger. Valid values are between 0 and 40320 (4 weeks in minutes).
+    pub minutes: Option<i32>,
+    /// The method used by this reminder. Possible values are:  
+    /// - "email" - Reminders are sent via email. 
+    /// - "sms" - Reminders are sent via SMS. These are only available for G Suite customers. Requests to set SMS reminders for other account types are ignored. 
+    /// - "popup" - Reminders are sent via a UI popup.
+    pub method: Option<String>,
+}
+
+impl Part for EventReminder {}
+
+
 /// Source from which the event was created. For example, a web page, an email message or any document identifiable by an URL with HTTP or HTTPS scheme. Can only be seen or modified by the creator of the event.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1165,46 +1205,6 @@ pub struct EventSource {
 
 impl NestedType for EventSource {}
 impl Part for EventSource {}
-
-
-/// The organizer of the event. If the organizer is also an attendee, this is indicated with a separate entry in attendees with the organizer field set to True. To change the organizer, use the move operation. Read-only, except when importing an event.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct EventOrganizer {
-    /// Whether the organizer corresponds to the calendar on which this copy of the event appears. Read-only. The default is False.
-    #[serde(rename="self")]
-    pub self_: Option<bool>,
-    /// The organizer's name, if available.
-    #[serde(rename="displayName")]
-    pub display_name: Option<String>,
-    /// The organizer's email address, if available. It must be a valid email address as per RFC5322.
-    pub email: Option<String>,
-    /// The organizer's Profile ID, if available. It corresponds to theid field in the People collection of the Google+ API
-    pub id: Option<String>,
-}
-
-impl NestedType for EventOrganizer {}
-impl Part for EventOrganizer {}
-
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct EventReminder {
-    /// Number of minutes before the start of the event when the reminder should trigger. Valid values are between 0 and 40320 (4 weeks in minutes).
-    pub minutes: Option<i32>,
-    /// The method used by this reminder. Possible values are:  
-    /// - "email" - Reminders are sent via email. 
-    /// - "sms" - Reminders are sent via SMS. These are only available for Google Apps for Work, Education, and Government customers. Requests to set SMS reminders for other account types are ignored. 
-    /// - "popup" - Reminders are sent via a UI popup.
-    pub method: Option<String>,
-}
-
-impl Part for EventReminder {}
 
 
 /// There is no detailed description.
@@ -1238,7 +1238,7 @@ pub struct CalendarNotification {
     pub type_: Option<String>,
     /// The method used to deliver the notification. Possible values are:  
     /// - "email" - Reminders are sent via email. 
-    /// - "sms" - Reminders are sent via SMS. This value is read-only and is ignored on inserts and updates. SMS reminders are only available for Google Apps for Work, Education, and Government customers.
+    /// - "sms" - Reminders are sent via SMS. This value is read-only and is ignored on inserts and updates. SMS reminders are only available for G Suite customers.
     pub method: Option<String>,
 }
 

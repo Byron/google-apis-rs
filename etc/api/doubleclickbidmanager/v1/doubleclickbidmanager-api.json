@@ -1,12 +1,12 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"tbys6C40o18GZwyMen5GMkdK-3s/xZhMuyiLnKVSMmQ3sSqyBn6nxs0\"",
+ "etag": "\"YWOzh2SDasdU84ArJnpYek-OMdg/TpAruLLB982pPy6sW_n60NUC_v0\"",
  "discoveryVersion": "v1",
  "id": "doubleclickbidmanager:v1",
  "name": "doubleclickbidmanager",
  "canonicalName": "DoubleClick Bid Manager",
  "version": "v1",
- "revision": "20161010",
+ "revision": "20170224",
  "title": "DoubleClick Bid Manager API",
  "description": "API for viewing and managing your reports in DoubleClick Bid Manager.",
  "ownerDomain": "google.com",
@@ -68,6 +68,15 @@
    "type": "string",
    "description": "IP address of the site where the request originates. Use this if you want to enforce per-user limits.",
    "location": "query"
+  }
+ },
+ "auth": {
+  "oauth2": {
+   "scopes": {
+    "https://www.googleapis.com/auth/doubleclickbidmanager": {
+     "description": "View and manage your reports in DoubleClick Bid Manager"
+    }
+   }
   }
  },
  "schemas": {
@@ -159,7 +168,7 @@
     },
     "filterIds": {
      "type": "array",
-     "description": "The IDs of the specified filter type. This is used to filter entities to fetch. At least one ID must be specified. Only one ID is allowed for the ADVERTISER_ID filter type. For INSERTION_ORDER_ID or LINE_ITEM_ID filter types all IDs must be from the same Advertiser.",
+     "description": "The IDs of the specified filter type. This is used to filter entities to fetch. At least one ID must be specified. Only one ID is allowed for the ADVERTISER_ID filter type. For INSERTION_ORDER_ID or LINE_ITEM_ID filter types, all IDs must be from the same Advertiser.",
      "items": {
       "type": "string",
       "format": "int64"
@@ -230,6 +239,7 @@
       "FILTER_CARRIER",
       "FILTER_CHANNEL_ID",
       "FILTER_CITY",
+      "FILTER_COMPANION_CREATIVE_ID",
       "FILTER_CONVERSION_DELAY",
       "FILTER_COUNTRY",
       "FILTER_CREATIVE_HEIGHT",
@@ -278,6 +288,7 @@
       "FILTER_REGULAR_CHANNEL_ID",
       "FILTER_SITE_ID",
       "FILTER_SITE_LANGUAGE",
+      "FILTER_SKIPPABLE_SUPPORT",
       "FILTER_TARGETED_USER_LIST",
       "FILTER_TIME_OF_DAY",
       "FILTER_TRUEVIEW_AD_GROUP_AD_ID",
@@ -334,6 +345,8 @@
       "FILTER_ZIP_CODE"
      ],
      "enumDescriptions": [
+      "",
+      "",
       "",
       "",
       "",
@@ -526,6 +539,7 @@
        "FILTER_CARRIER",
        "FILTER_CHANNEL_ID",
        "FILTER_CITY",
+       "FILTER_COMPANION_CREATIVE_ID",
        "FILTER_CONVERSION_DELAY",
        "FILTER_COUNTRY",
        "FILTER_CREATIVE_HEIGHT",
@@ -574,6 +588,7 @@
        "FILTER_REGULAR_CHANNEL_ID",
        "FILTER_SITE_ID",
        "FILTER_SITE_LANGUAGE",
+       "FILTER_SKIPPABLE_SUPPORT",
        "FILTER_TARGETED_USER_LIST",
        "FILTER_TIME_OF_DAY",
        "FILTER_TRUEVIEW_AD_GROUP_AD_ID",
@@ -744,6 +759,8 @@
        "",
        "",
        "",
+       "",
+       "",
        ""
       ]
      }
@@ -758,6 +775,7 @@
      "items": {
       "type": "string",
       "enum": [
+       "METRIC_ACTIVE_VIEW_AUDIBLE_VISIBLE_ON_COMPLETE_IMPRESSIONS",
        "METRIC_ACTIVE_VIEW_AVERAGE_VIEWABLE_TIME",
        "METRIC_ACTIVE_VIEW_DISTRIBUTION_UNMEASURABLE",
        "METRIC_ACTIVE_VIEW_DISTRIBUTION_UNVIEWABLE",
@@ -766,8 +784,20 @@
        "METRIC_ACTIVE_VIEW_MEASURABLE_IMPRESSIONS",
        "METRIC_ACTIVE_VIEW_PCT_MEASURABLE_IMPRESSIONS",
        "METRIC_ACTIVE_VIEW_PCT_VIEWABLE_IMPRESSIONS",
+       "METRIC_ACTIVE_VIEW_PERCENT_AUDIBLE_VISIBLE_AT_START",
+       "METRIC_ACTIVE_VIEW_PERCENT_AUDIBLE_VISIBLE_FIRST_QUAR",
+       "METRIC_ACTIVE_VIEW_PERCENT_AUDIBLE_VISIBLE_ON_COMPLETE",
+       "METRIC_ACTIVE_VIEW_PERCENT_AUDIBLE_VISIBLE_SECOND_QUAR",
+       "METRIC_ACTIVE_VIEW_PERCENT_AUDIBLE_VISIBLE_THIRD_QUAR",
+       "METRIC_ACTIVE_VIEW_PERCENT_VIEWABLE_FOR_TIME_THRESHOLD",
+       "METRIC_ACTIVE_VIEW_PERCENT_VISIBLE_AT_START",
+       "METRIC_ACTIVE_VIEW_PERCENT_VISIBLE_FIRST_QUAR",
+       "METRIC_ACTIVE_VIEW_PERCENT_VISIBLE_ON_COMPLETE",
+       "METRIC_ACTIVE_VIEW_PERCENT_VISIBLE_SECOND_QUAR",
+       "METRIC_ACTIVE_VIEW_PERCENT_VISIBLE_THIRD_QUAR",
        "METRIC_ACTIVE_VIEW_UNMEASURABLE_IMPRESSIONS",
        "METRIC_ACTIVE_VIEW_UNVIEWABLE_IMPRESSIONS",
+       "METRIC_ACTIVE_VIEW_VIEWABLE_FOR_TIME_THRESHOLD",
        "METRIC_ACTIVE_VIEW_VIEWABLE_IMPRESSIONS",
        "METRIC_BID_REQUESTS",
        "METRIC_BILLABLE_COST_ADVERTISER",
@@ -954,6 +984,7 @@
        "METRIC_REVENUE_ECPC_ADVERTISER",
        "METRIC_REVENUE_ECPC_PARTNER",
        "METRIC_REVENUE_ECPC_USD",
+       "METRIC_REVENUE_ECPIAVC_ADVERTISER",
        "METRIC_REVENUE_ECPM_ADVERTISER",
        "METRIC_REVENUE_ECPM_PARTNER",
        "METRIC_REVENUE_ECPM_USD",
@@ -1337,6 +1368,20 @@
        "",
        "",
        "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
        ""
       ]
      }
@@ -1370,6 +1415,7 @@
       "TYPE_PETRA_NIELSEN_ONLINE_GLOBAL_MARKET",
       "TYPE_PIXEL_LOAD",
       "TYPE_REACH_AND_FREQUENCY",
+      "TYPE_REACH_AUDIENCE",
       "TYPE_THIRD_PARTY_DATA_PROVIDER",
       "TYPE_TRUEVIEW",
       "TYPE_TRUEVIEW_IAR",
@@ -1377,6 +1423,7 @@
       "TYPE_YOUTUBE_VERTICAL"
      ],
      "enumDescriptions": [
+      "",
       "",
       "",
       "",
@@ -1933,7 +1980,10 @@
      },
      "response": {
       "$ref": "DownloadLineItemsResponse"
-     }
+     },
+     "scopes": [
+      "https://www.googleapis.com/auth/doubleclickbidmanager"
+     ]
     },
     "uploadlineitems": {
      "id": "doubleclickbidmanager.lineitems.uploadlineitems",
@@ -1945,7 +1995,10 @@
      },
      "response": {
       "$ref": "UploadLineItemsResponse"
-     }
+     },
+     "scopes": [
+      "https://www.googleapis.com/auth/doubleclickbidmanager"
+     ]
     }
    }
   },
@@ -1961,7 +2014,10 @@
      },
      "response": {
       "$ref": "Query"
-     }
+     },
+     "scopes": [
+      "https://www.googleapis.com/auth/doubleclickbidmanager"
+     ]
     },
     "deletequery": {
      "id": "doubleclickbidmanager.queries.deletequery",
@@ -1979,6 +2035,9 @@
      },
      "parameterOrder": [
       "queryId"
+     ],
+     "scopes": [
+      "https://www.googleapis.com/auth/doubleclickbidmanager"
      ]
     },
     "getquery": {
@@ -2000,7 +2059,10 @@
      ],
      "response": {
       "$ref": "Query"
-     }
+     },
+     "scopes": [
+      "https://www.googleapis.com/auth/doubleclickbidmanager"
+     ]
     },
     "listqueries": {
      "id": "doubleclickbidmanager.queries.listqueries",
@@ -2009,7 +2071,10 @@
      "description": "Retrieves stored queries.",
      "response": {
       "$ref": "ListQueriesResponse"
-     }
+     },
+     "scopes": [
+      "https://www.googleapis.com/auth/doubleclickbidmanager"
+     ]
     },
     "runquery": {
      "id": "doubleclickbidmanager.queries.runquery",
@@ -2030,7 +2095,10 @@
      ],
      "request": {
       "$ref": "RunQueryRequest"
-     }
+     },
+     "scopes": [
+      "https://www.googleapis.com/auth/doubleclickbidmanager"
+     ]
     }
    }
   },
@@ -2055,7 +2123,10 @@
      ],
      "response": {
       "$ref": "ListReportsResponse"
-     }
+     },
+     "scopes": [
+      "https://www.googleapis.com/auth/doubleclickbidmanager"
+     ]
     }
    }
   },
@@ -2071,7 +2142,10 @@
      },
      "response": {
       "$ref": "DownloadResponse"
-     }
+     },
+     "scopes": [
+      "https://www.googleapis.com/auth/doubleclickbidmanager"
+     ]
     }
    }
   }

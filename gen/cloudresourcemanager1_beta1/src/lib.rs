@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Resource Manager* crate version *1.0.4+20161212*, where *20161212* is the exact revision of the *cloudresourcemanager:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
+//! This documentation was generated from *Cloud Resource Manager* crate version *1.0.4+20170517*, where *20170517* is the exact revision of the *cloudresourcemanager:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
 //! 
 //! Everything else about the *Cloud Resource Manager* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/resource-manager).
@@ -353,6 +353,43 @@ impl<'a, C, A> CloudResourceManager<C, A>
 // ############
 // SCHEMAS ###
 // ##########
+/// Provides the configuration for logging a type of permissions.
+/// Example:
+/// 
+///     {
+///       "audit_log_configs": [
+///         {
+///           "log_type": "DATA_READ",
+///           "exempted_members": [
+///             "user:foo@gmail.com"
+///           ]
+///         },
+///         {
+///           "log_type": "DATA_WRITE",
+///         }
+///       ]
+///     }
+/// 
+/// This enables 'DATA_READ' and 'DATA_WRITE' logging, while exempting
+/// foo@gmail.com from DATA_READ logging.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AuditLogConfig {
+    /// Specifies the identities that do not cause logging for this type of
+    /// permission.
+    /// Follows the same format of Binding.members.
+    #[serde(rename="exemptedMembers")]
+    pub exempted_members: Option<Vec<String>>,
+    /// The log type that this config enables.
+    #[serde(rename="logType")]
+    pub log_type: Option<String>,
+}
+
+impl Part for AuditLogConfig {}
+
+
 /// Request message for `GetIamPolicy` method.
 /// 
 /// # Activities
@@ -408,6 +445,13 @@ pub struct SetIamPolicyRequest {
     /// valid policy but certain Cloud Platform services (such as Projects)
     /// might reject them.
     pub policy: Option<Policy>,
+    /// OPTIONAL: A FieldMask specifying which fields of the policy to modify. Only
+    /// the fields in the mask will be modified. If no mask is provided, the
+    /// following default mask is used:
+    /// paths: "bindings, etag"
+    /// This field is only used by Cloud IAM.
+    #[serde(rename="updateMask")]
+    pub update_mask: Option<String>,
 }
 
 impl RequestValue for SetIamPolicyRequest {}
@@ -434,7 +478,7 @@ impl ResponseResult for GetAncestryResponse {}
 
 
 /// A Project is a high-level Google Cloud Platform entity.  It is a
-/// container for ACLs, APIs, AppEngine Apps, VMs, and other
+/// container for ACLs, APIs, App Engine Apps, VMs, and other
 /// Google Cloud Platform resources.
 /// 
 /// # Activities
@@ -461,7 +505,6 @@ pub struct Project {
     /// hyphen, single-quote, double-quote, space, and exclamation point.
     /// 
     /// Example: <code>My Project</code>
-    /// 
     /// Read-write.
     pub name: Option<String>,
     /// An optional reference to a parent Resource.
@@ -479,7 +522,6 @@ pub struct Project {
     /// Trailing hyphens are prohibited.
     /// 
     /// Example: <code>tokyo-rain-123</code>
-    /// 
     /// Read-only after creation.
     #[serde(rename="projectId")]
     pub project_id: Option<String>,
@@ -497,21 +539,19 @@ pub struct Project {
     /// depend on specific characters being disallowed.
     /// 
     /// Example: <code>"environment" : "dev"</code>
-    /// 
     /// Read-write.
     pub labels: Option<HashMap<String, String>>,
+    /// The number uniquely identifying the project.
+    /// 
+    /// Example: <code>415104041262</code>
+    /// Read-only.
+    #[serde(rename="projectNumber")]
+    pub project_number: Option<String>,
     /// Creation time.
     /// 
     /// Read-only.
     #[serde(rename="createTime")]
     pub create_time: Option<String>,
-    /// The number uniquely identifying the project.
-    /// 
-    /// Example: <code>415104041262</code>
-    /// 
-    /// Read-only.
-    #[serde(rename="projectNumber")]
-    pub project_number: Option<String>,
     /// The Project lifecycle state.
     /// 
     /// Read-only.
@@ -600,6 +640,9 @@ pub struct Policy {
     /// If no `etag` is provided in the call to `setIamPolicy`, then the existing
     /// policy is overwritten blindly.
     pub etag: Option<String>,
+    /// Specifies cloud audit logging configuration for this policy.
+    #[serde(rename="auditConfigs")]
+    pub audit_configs: Option<Vec<AuditConfig>>,
     /// Version of the `Policy`. The default version is 0.
     pub version: Option<i32>,
 }
@@ -629,8 +672,8 @@ pub struct Organization {
     /// This field is required.
     pub owner: Option<OrganizationOwner>,
     /// A friendly string to be used to refer to the Organization in the UI.
-    /// Assigned by the server, set to the firm name of the Google For Work
-    /// customer that owns this organization.
+    /// Assigned by the server, set to the primary domain of the G Suite
+    /// customer that owns the organization.
     /// @OutputOnly
     #[serde(rename="displayName")]
     pub display_name: Option<String>,
@@ -659,42 +702,18 @@ impl Resource for Organization {}
 impl ResponseResult for Organization {}
 
 
-/// A page of the response received from the
-/// ListProjects
-/// method.
+/// Identifying information for a single ancestor of a project.
 /// 
-/// A paginated response where more pages are available has
-/// `next_page_token` set. This token can be used in a subsequent request to
-/// retrieve the next request page.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list projects](struct.ProjectListCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListProjectsResponse {
-    /// Pagination token.
-    /// 
-    /// If the result set is too large to fit in a single response, this token
-    /// is returned. It encodes the position of the current result cursor.
-    /// Feeding this value into a new list request with the `page_token` parameter
-    /// gives the next page of the results.
-    /// 
-    /// When `next_page_token` is not filled in, there is no next page and
-    /// the list returned is the last page in the result set.
-    /// 
-    /// Pagination tokens have a limited lifetime.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The list of Projects that matched the list filter. This list can
-    /// be paginated.
-    pub projects: Option<Vec<Project>>,
+pub struct Ancestor {
+    /// Resource id of the ancestor.
+    #[serde(rename="resourceId")]
+    pub resource_id: Option<ResourceId>,
 }
 
-impl ResponseResult for ListProjectsResponse {}
+impl Part for Ancestor {}
 
 
 /// A generic empty message that you can re-use to avoid defining duplicated
@@ -782,23 +801,47 @@ pub struct TestIamPermissionsResponse {
 impl ResponseResult for TestIamPermissionsResponse {}
 
 
-/// Identifying information for a single ancestor of a project.
+/// A page of the response received from the
+/// ListProjects
+/// method.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// A paginated response where more pages are available has
+/// `next_page_token` set. This token can be used in a subsequent request to
+/// retrieve the next request page.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list projects](struct.ProjectListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Ancestor {
-    /// Resource id of the ancestor.
-    #[serde(rename="resourceId")]
-    pub resource_id: Option<ResourceId>,
+pub struct ListProjectsResponse {
+    /// Pagination token.
+    /// 
+    /// If the result set is too large to fit in a single response, this token
+    /// is returned. It encodes the position of the current result cursor.
+    /// Feeding this value into a new list request with the `page_token` parameter
+    /// gives the next page of the results.
+    /// 
+    /// When `next_page_token` is not filled in, there is no next page and
+    /// the list returned is the last page in the result set.
+    /// 
+    /// Pagination tokens have a limited lifetime.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The list of Projects that matched the list filter. This list can
+    /// be paginated.
+    pub projects: Option<Vec<Project>>,
 }
 
-impl Part for Ancestor {}
+impl ResponseResult for ListProjectsResponse {}
 
 
 /// A container to reference an id for any resource type. A `resource` in Google
 /// Cloud Platform is a generic term for something you (a developer) may want to
-/// interact with through one of our API's. Some examples are an AppEngine app,
+/// interact with through one of our API's. Some examples are an App Engine app,
 /// a Compute Engine instance, a Cloud SQL database, and so on.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -846,6 +889,7 @@ pub struct Binding {
     /// * `group:{emailid}`: An email address that represents a Google group.
     ///    For example, `admins@example.com`.
     /// 
+    /// 
     /// * `domain:{domain}`: A Google Apps domain name that represents all the
     ///    users of that domain. For example, `google.com` or `example.com`.
     /// 
@@ -854,6 +898,75 @@ pub struct Binding {
 }
 
 impl Part for Binding {}
+
+
+/// Specifies the audit configuration for a service.
+/// The configuration determines which permission types are logged, and what
+/// identities, if any, are exempted from logging.
+/// An AuditConfig must have one or more AuditLogConfigs.
+/// 
+/// If there are AuditConfigs for both `allServices` and a specific service,
+/// the union of the two AuditConfigs is used for that service: the log_types
+/// specified in each AuditConfig are enabled, and the exempted_members in each
+/// AuditConfig are exempted.
+/// 
+/// Example Policy with multiple AuditConfigs:
+/// 
+///     {
+///       "audit_configs": [
+///         {
+///           "service": "allServices"
+///           "audit_log_configs": [
+///             {
+///               "log_type": "DATA_READ",
+///               "exempted_members": [
+///                 "user:foo@gmail.com"
+///               ]
+///             },
+///             {
+///               "log_type": "DATA_WRITE",
+///             },
+///             {
+///               "log_type": "ADMIN_READ",
+///             }
+///           ]
+///         },
+///         {
+///           "service": "fooservice.googleapis.com"
+///           "audit_log_configs": [
+///             {
+///               "log_type": "DATA_READ",
+///             },
+///             {
+///               "log_type": "DATA_WRITE",
+///               "exempted_members": [
+///                 "user:bar@gmail.com"
+///               ]
+///             }
+///           ]
+///         }
+///       ]
+///     }
+/// 
+/// For fooservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ
+/// logging. It also exempts foo@gmail.com from DATA_READ logging, and
+/// bar@gmail.com from DATA_WRITE logging.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AuditConfig {
+    /// The configuration for logging of each type of permission.
+    /// Next ID: 4
+    #[serde(rename="auditLogConfigs")]
+    pub audit_log_configs: Option<Vec<AuditLogConfig>>,
+    /// Specifies a service that will be enabled for audit logging.
+    /// For example, `storage.googleapis.com`, `cloudsql.googleapis.com`.
+    /// `allServices` is a special value that covers all services.
+    pub service: Option<String>,
+}
+
+impl Part for AuditConfig {}
 
 
 /// The entity that owns an Organization. The lifetime of the Organization and
@@ -926,8 +1039,7 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being specified.
-    ///                `resource` is usually specified as a path. For example, a Project
-    ///                resource is specified as `projects/{project}`.
+    ///                See the operation documentation for the appropriate value for this field.
     pub fn set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> OrganizationSetIamPolicyCall<'a, C, A> {
         OrganizationSetIamPolicyCall {
             hub: self.hub,
@@ -949,8 +1061,7 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being requested.
-    ///                `resource` is usually specified as a path. For example, a Project
-    ///                resource is specified as `projects/{project}`.
+    ///                See the operation documentation for the appropriate value for this field.
     pub fn get_iam_policy(&self, request: GetIamPolicyRequest, resource: &str) -> OrganizationGetIamPolicyCall<'a, C, A> {
         OrganizationGetIamPolicyCall {
             hub: self.hub,
@@ -972,8 +1083,7 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy detail is being requested.
-    ///                `resource` is usually specified as a path. For example, a Project
-    ///                resource is specified as `projects/{project}`.
+    ///                See the operation documentation for the appropriate value for this field.
     pub fn test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> OrganizationTestIamPermissionCall<'a, C, A> {
         OrganizationTestIamPermissionCall {
             hub: self.hub,
@@ -1090,8 +1200,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy detail is being requested.
-    ///                `resource` is usually specified as a path. For example, a Project
-    ///                resource is specified as `projects/{project}`.
+    ///                See the operation documentation for the appropriate value for this field.
     pub fn test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectTestIamPermissionCall<'a, C, A> {
         ProjectTestIamPermissionCall {
             hub: self.hub,
@@ -1174,15 +1283,15 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// must be granted the owner role using the Cloud Platform Console and must
     /// explicitly accept the invitation.
     /// 
-    /// + Invitations to grant the owner role cannot be sent using `setIamPolicy()`;
-    /// they must be sent only using the Cloud Platform Console.
+    /// + Invitations to grant the owner role cannot be sent using
+    /// `setIamPolicy()`; they must be sent only using the Cloud Platform Console.
     /// 
     /// + Membership changes that leave the project without any owners that have
     /// accepted the Terms of Service (ToS) will be rejected.
     /// 
     /// + There must be at least one owner who has accepted the Terms of
     /// Service (ToS) agreement in the policy. Calling `setIamPolicy()` to
-    /// to remove the last ToS-accepted owner from the policy will fail. This
+    /// remove the last ToS-accepted owner from the policy will fail. This
     /// restriction also applies to legacy projects that no longer have owners
     /// who have accepted the ToS. Edits to IAM policies will be rejected until
     /// the lack of a ToS-accepting owner is rectified.
@@ -1191,14 +1300,14 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// Note: Removing service accounts from policies or changing their roles
     /// can render services completely inoperable. It is important to understand
-    /// how the service account is being used before removing or updating its roles.
+    /// how the service account is being used before removing or updating its
+    /// roles.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being specified.
-    ///                `resource` is usually specified as a path. For example, a Project
-    ///                resource is specified as `projects/{project}`.
+    ///                See the operation documentation for the appropriate value for this field.
     pub fn set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectSetIamPolicyCall<'a, C, A> {
         ProjectSetIamPolicyCall {
             hub: self.hub,
@@ -1286,8 +1395,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being requested.
-    ///                `resource` is usually specified as a path. For example, a Project
-    ///                resource is specified as `projects/{project}`.
+    ///                See the operation documentation for the appropriate value for this field.
     pub fn get_iam_policy(&self, request: GetIamPolicyRequest, resource: &str) -> ProjectGetIamPolicyCall<'a, C, A> {
         ProjectGetIamPolicyCall {
             hub: self.hub,
@@ -1577,8 +1685,7 @@ impl<'a, C, A> OrganizationSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
         self
     }
     /// REQUIRED: The resource for which the policy is being specified.
-    /// `resource` is usually specified as a path. For example, a Project
-    /// resource is specified as `projects/{project}`.
+    /// See the operation documentation for the appropriate value for this field.
     ///
     /// Sets the *resource* path property to the given value.
     ///
@@ -1857,8 +1964,7 @@ impl<'a, C, A> OrganizationGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
         self
     }
     /// REQUIRED: The resource for which the policy is being requested.
-    /// `resource` is usually specified as a path. For example, a Project
-    /// resource is specified as `projects/{project}`.
+    /// See the operation documentation for the appropriate value for this field.
     ///
     /// Sets the *resource* path property to the given value.
     ///
@@ -2137,8 +2243,7 @@ impl<'a, C, A> OrganizationTestIamPermissionCall<'a, C, A> where C: BorrowMut<hy
         self
     }
     /// REQUIRED: The resource for which the policy detail is being requested.
-    /// `resource` is usually specified as a path. For example, a Project
-    /// resource is specified as `projects/{project}`.
+    /// See the operation documentation for the appropriate value for this field.
     ///
     /// Sets the *resource* path property to the given value.
     ///
@@ -3208,8 +3313,7 @@ impl<'a, C, A> ProjectTestIamPermissionCall<'a, C, A> where C: BorrowMut<hyper::
         self
     }
     /// REQUIRED: The resource for which the policy detail is being requested.
-    /// `resource` is usually specified as a path. For example, a Project
-    /// resource is specified as `projects/{project}`.
+    /// See the operation documentation for the appropriate value for this field.
     ///
     /// Sets the *resource* path property to the given value.
     ///
@@ -3833,15 +3937,15 @@ impl<'a, C, A> ProjectCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// must be granted the owner role using the Cloud Platform Console and must
 /// explicitly accept the invitation.
 /// 
-/// + Invitations to grant the owner role cannot be sent using `setIamPolicy()`;
-/// they must be sent only using the Cloud Platform Console.
+/// + Invitations to grant the owner role cannot be sent using
+/// `setIamPolicy()`; they must be sent only using the Cloud Platform Console.
 /// 
 /// + Membership changes that leave the project without any owners that have
 /// accepted the Terms of Service (ToS) will be rejected.
 /// 
 /// + There must be at least one owner who has accepted the Terms of
 /// Service (ToS) agreement in the policy. Calling `setIamPolicy()` to
-/// to remove the last ToS-accepted owner from the policy will fail. This
+/// remove the last ToS-accepted owner from the policy will fail. This
 /// restriction also applies to legacy projects that no longer have owners
 /// who have accepted the ToS. Edits to IAM policies will be rejected until
 /// the lack of a ToS-accepting owner is rectified.
@@ -3850,7 +3954,8 @@ impl<'a, C, A> ProjectCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// 
 /// Note: Removing service accounts from policies or changing their roles
 /// can render services completely inoperable. It is important to understand
-/// how the service account is being used before removing or updating its roles.
+/// how the service account is being used before removing or updating its
+/// roles.
 ///
 /// A builder for the *setIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -4055,8 +4160,7 @@ impl<'a, C, A> ProjectSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self
     }
     /// REQUIRED: The resource for which the policy is being specified.
-    /// `resource` is usually specified as a path. For example, a Project
-    /// resource is specified as `projects/{project}`.
+    /// See the operation documentation for the appropriate value for this field.
     ///
     /// Sets the *resource* path property to the given value.
     ///
@@ -5130,8 +5234,7 @@ impl<'a, C, A> ProjectGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self
     }
     /// REQUIRED: The resource for which the policy is being requested.
-    /// `resource` is usually specified as a path. For example, a Project
-    /// resource is specified as `projects/{project}`.
+    /// See the operation documentation for the appropriate value for this field.
     ///
     /// Sets the *resource* path property to the given value.
     ///
@@ -5664,13 +5767,14 @@ impl<'a, C, A> ProjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// 
     /// |Filter|Description|
     /// |------|-----------|
-    /// |name:*|The project has a name.|
+    /// |name:how*|The project's name starts with "how".|
     /// |name:Howl|The project's name is `Howl` or `howl`.|
     /// |name:HOWL|Equivalent to above.|
     /// |NAME:howl|Equivalent to above.|
     /// |labels.color:*|The project has the label `color`.|
     /// |labels.color:red|The project's label `color` has the value `red`.|
-    /// |labels.color:red&nbsp;label.size:big|The project's label `color` has the value `red` and its label `size` has the value `big`.
+    /// |labels.color:red&nbsp;labels.size:big|The project's label `color` has the
+    /// value `red` and its label `size` has the value `big`.
     /// 
     /// Optional.
     ///

@@ -562,6 +562,9 @@ impl<'n> Engine<'n> {
                 "max-results" => {
                     call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
                 },
+                "include-historical-channel-data" => {
+                    call = call.include_historical_channel_data(arg_from_str(value.unwrap_or("false"), err, "include-historical-channel-data", "boolean"));
+                },
                 "filters" => {
                     call = call.filters(value.unwrap_or(""));
                 },
@@ -584,7 +587,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["sort", "max-results", "dimensions", "start-index", "currency", "filters"].iter().map(|v|*v));
+                                                                           v.extend(["sort", "max-results", "dimensions", "start-index", "include-historical-channel-data", "currency", "filters"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -944,7 +947,7 @@ fn main() {
     
     let mut app = App::new("youtubeanalytics1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.4+20161213")
+           .version("1.0.4+20170517")
            .about("Retrieves your YouTube Analytics data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_youtubeanalytics1_cli")
            .arg(Arg::with_name("url")

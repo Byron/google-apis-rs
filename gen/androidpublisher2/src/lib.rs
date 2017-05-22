@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Android Publisher* crate version *1.0.4+20161212*, where *20161212* is the exact revision of the *androidpublisher:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
+//! This documentation was generated from *Android Publisher* crate version *1.0.4+20170425*, where *20170425* is the exact revision of the *androidpublisher:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
 //! 
 //! Everything else about the *Android Publisher* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/android-publisher).
@@ -1277,7 +1277,7 @@ impl RequestValue for Testers {}
 impl ResponseResult for Testers {}
 
 
-/// A VoidedPurchase resource indicates the purchase was either cancelled/refunded/charged-back.
+/// A VoidedPurchase resource indicates a purchase that was either cancelled/refunded/charged-back.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1285,13 +1285,13 @@ impl ResponseResult for Testers {}
 pub struct VoidedPurchase {
     /// This kind represents a voided purchase object in the androidpublisher service.
     pub kind: Option<String>,
-    /// The time when the purchase was cancelled/refunded/chargeback, in milliseconds since the epoch (Jan 1, 1970).
+    /// The time at which the purchase was cancelled/refunded/charged-back, in milliseconds since the epoch (Jan 1, 1970).
     #[serde(rename="voidedTimeMillis")]
     pub voided_time_millis: Option<String>,
-    /// The token that was generated when a purchase was made and uniquely identifies a purchase.
+    /// The token that was generated when a purchase was made. This uniquely identifies a purchase.
     #[serde(rename="purchaseToken")]
     pub purchase_token: Option<String>,
-    /// The time the purchase was made, in milliseconds since the epoch (Jan 1, 1970).
+    /// The time at which the purchase was made, in milliseconds since the epoch (Jan 1, 1970).
     #[serde(rename="purchaseTimeMillis")]
     pub purchase_time_millis: Option<String>,
 }
@@ -1425,6 +1425,9 @@ pub struct SubscriptionPurchase {
     /// Time at which the subscription was granted, in milliseconds since the Epoch.
     #[serde(rename="startTimeMillis")]
     pub start_time_millis: Option<String>,
+    /// The time at which the subscription was canceled by the user, in milliseconds since the epoch. Only present if cancelReason is 0.
+    #[serde(rename="userCancellationTimeMillis")]
+    pub user_cancellation_time_millis: Option<String>,
     /// Price of the subscription, not including tax. Price is expressed in micro-units, where 1,000,000 micro-units represents one unit of the currency. For example, if the subscription price is €1.99, price_amount_micros is 1990000.
     #[serde(rename="priceAmountMicros")]
     pub price_amount_micros: Option<String>,
@@ -2915,7 +2918,7 @@ impl<'a, C, A> ReviewMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns a list of reviews.
+    /// Returns a list of reviews. Only reviews from last week will be returned.
     /// 
     /// # Arguments
     ///
@@ -4358,7 +4361,7 @@ impl<'a, C, A> PurchaseVoidedpurchaseListCall<'a, C, A> where C: BorrowMut<hyper
         self._token = Some(new_value.to_string());
         self
     }
-    /// The start time of list window, in milliseconds since the epoch (Jan 1, 1970). If not specified, default to current time - 30 days, which is also the earlies accepted start time. This parameter will be ignored if pagination token is set.
+    /// The time, in milliseconds since the Epoch, of the oldest voided in-app product purchase that you want to see in the response. The value of this parameter cannot be older than 30 days and is ignored if a pagination token is set. Default value is current time minus 30 days.
     ///
     /// Sets the *start time* query property to the given value.
     pub fn start_time(mut self, new_value: &str) -> PurchaseVoidedpurchaseListCall<'a, C, A> {
@@ -4377,7 +4380,7 @@ impl<'a, C, A> PurchaseVoidedpurchaseListCall<'a, C, A> where C: BorrowMut<hyper
         self._max_results = Some(new_value);
         self
     }
-    /// The end time of list window, in milliseconds since the epoch (Jan 1, 1970). If not specified, default to current time, which is also the latest accepted end time. This parameter will be ignored if pagination token is set.
+    /// The time, in milliseconds since the Epoch, of the newest voided in-app product purchase that you want to see in the response. The value of this parameter cannot be greater than the current time and is ignored if a pagination token is set. Default value is current time.
     ///
     /// Sets the *end time* query property to the given value.
     pub fn end_time(mut self, new_value: &str) -> PurchaseVoidedpurchaseListCall<'a, C, A> {
@@ -16627,7 +16630,7 @@ impl<'a, C, A> ReviewGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 }
 
 
-/// Returns a list of reviews.
+/// Returns a list of reviews. Only reviews from last week will be returned.
 ///
 /// A builder for the *list* method supported by a *review* resource.
 /// It is not used directly, but through a `ReviewMethods` instance.

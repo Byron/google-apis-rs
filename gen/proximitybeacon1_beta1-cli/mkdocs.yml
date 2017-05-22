@@ -1,4 +1,4 @@
-site_name: proximitybeacon v1.0.4+20160429
+site_name: proximitybeacon v1.0.4+20170517
 site_url: http://byron.github.io/google-apis-rs/google-proximitybeacon1_beta1-cli
 site_description: A complete library to interact with proximitybeacon (protocol v1beta1)
 
@@ -17,6 +17,7 @@ pages:
 - ['beacons_attachments-list.md', 'Beacons', 'Attachments List']
 - ['beacons_deactivate.md', 'Beacons', 'Deactivate']
 - ['beacons_decommission.md', 'Beacons', 'Decommission']
+- ['beacons_delete.md', 'Beacons', 'Delete']
 - ['beacons_diagnostics-list.md', 'Beacons', 'Diagnostics List']
 - ['beacons_get.md', 'Beacons', 'Get']
 - ['beacons_list.md', 'Beacons', 'List']

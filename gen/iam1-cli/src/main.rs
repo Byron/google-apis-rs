@@ -318,9 +318,10 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "private-key-type" => Some(("privateKeyType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "include-public-key-data" => Some(("includePublicKeyData", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "key-algorithm" => Some(("keyAlgorithm", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["key-algorithm", "private-key-type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["include-public-key-data", "key-algorithm", "private-key-type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -626,8 +627,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "policy.version" => Some(("policy.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "policy.etag" => Some(("policy.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "policy.version" => Some(("policy.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "policy", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -725,6 +726,91 @@ impl<'n> Engine<'n> {
         }
         let mut request: api::SignBlobRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.projects().service_accounts_sign_blob(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_service_accounts_sign_jwt(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "payload" => Some(("payload", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["payload"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::SignJwtRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().service_accounts_sign_jwt(request, opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -973,9 +1059,11 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "full-resource-name" => Some(("fullResourceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "page-size" => Some(("pageSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["full-resource-name"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["full-resource-name", "page-size", "page-token"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1074,6 +1162,9 @@ impl<'n> Engine<'n> {
                     },
                     ("service-accounts-sign-blob", Some(opt)) => {
                         call_result = self._projects_service_accounts_sign_blob(opt, dry_run, &mut err);
+                    },
+                    ("service-accounts-sign-jwt", Some(opt)) => {
+                        call_result = self._projects_service_accounts_sign_jwt(opt, dry_run, &mut err);
                     },
                     ("service-accounts-test-iam-permissions", Some(opt)) => {
                         call_result = self._projects_service_accounts_test_iam_permissions(opt, dry_run, &mut err);
@@ -1184,14 +1275,16 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'service-accounts-create', 'service-accounts-delete', 'service-accounts-get', 'service-accounts-get-iam-policy', 'service-accounts-keys-create', 'service-accounts-keys-delete', 'service-accounts-keys-get', 'service-accounts-keys-list', 'service-accounts-list', 'service-accounts-set-iam-policy', 'service-accounts-sign-blob', 'service-accounts-test-iam-permissions' and 'service-accounts-update'", vec![
+        ("projects", "methods: 'service-accounts-create', 'service-accounts-delete', 'service-accounts-get', 'service-accounts-get-iam-policy', 'service-accounts-keys-create', 'service-accounts-keys-delete', 'service-accounts-keys-get', 'service-accounts-keys-list', 'service-accounts-list', 'service-accounts-set-iam-policy', 'service-accounts-sign-blob', 'service-accounts-sign-jwt', 'service-accounts-test-iam-permissions' and 'service-accounts-update'", vec![
             ("service-accounts-create",
-                    Some(r##"Creates a ServiceAccount and returns it."##),
+                    Some(r##"Creates a ServiceAccount
+        and returns it."##),
                     "Details at http://byron.github.io/google-apis-rs/google_iam1_cli/projects_service-accounts-create",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The resource name of the project associated with the service accounts, such as `projects/my-project-123`."##),
+                     Some(r##"Required. The resource name of the project associated with the service
+        accounts, such as `projects/my-project-123`."##),
                      Some(true),
                      Some(false)),
         
@@ -1219,7 +1312,11 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the service account in the following format: `projects/{project}/serviceAccounts/{account}`. Using `-` as a wildcard for the project will infer the project from the account. The `account` value can be the `email` address or the `unique_id` of the service account."##),
+                     Some(r##"The resource name of the service account in the following format:
+        `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
+        Using `-` as a wildcard for the project will infer the project from
+        the account. The `account` value can be the `email` address or the
+        `unique_id` of the service account."##),
                      Some(true),
                      Some(false)),
         
@@ -1241,7 +1338,11 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the service account in the following format: `projects/{project}/serviceAccounts/{account}`. Using `-` as a wildcard for the project will infer the project from the account. The `account` value can be the `email` address or the `unique_id` of the service account."##),
+                     Some(r##"The resource name of the service account in the following format:
+        `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
+        Using `-` as a wildcard for the project will infer the project from
+        the account. The `account` value can be the `email` address or the
+        `unique_id` of the service account."##),
                      Some(true),
                      Some(false)),
         
@@ -1258,12 +1359,14 @@ fn main() {
                      Some(false)),
                   ]),
             ("service-accounts-get-iam-policy",
-                    Some(r##"Returns the IAM access control policy for a ServiceAccount."##),
+                    Some(r##"Returns the IAM access control policy for a
+        ServiceAccount."##),
                     "Details at http://byron.github.io/google-apis-rs/google_iam1_cli/projects_service-accounts-get-iam-policy",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being requested. `resource` is usually specified as a path. For example, a Project resource is specified as `projects/{project}`."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being requested.
+        See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -1280,12 +1383,17 @@ fn main() {
                      Some(false)),
                   ]),
             ("service-accounts-keys-create",
-                    Some(r##"Creates a ServiceAccountKey and returns it."##),
+                    Some(r##"Creates a ServiceAccountKey
+        and returns it."##),
                     "Details at http://byron.github.io/google-apis-rs/google_iam1_cli/projects_service-accounts-keys-create",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the service account in the following format: `projects/{project}/serviceAccounts/{account}`. Using `-` as a wildcard for the project will infer the project from the account. The `account` value can be the `email` address or the `unique_id` of the service account."##),
+                     Some(r##"The resource name of the service account in the following format:
+        `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
+        Using `-` as a wildcard for the project will infer the project from
+        the account. The `account` value can be the `email` address or the
+        `unique_id` of the service account."##),
                      Some(true),
                      Some(false)),
         
@@ -1313,7 +1421,11 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the service account key in the following format: `projects/{project}/serviceAccounts/{account}/keys/{key}`. Using `-` as a wildcard for the project will infer the project from the account. The `account` value can be the `email` address or the `unique_id` of the service account."##),
+                     Some(r##"The resource name of the service account key in the following format:
+        `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}/keys/{key}`.
+        Using `-` as a wildcard for the project will infer the project from
+        the account. The `account` value can be the `email` address or the
+        `unique_id` of the service account."##),
                      Some(true),
                      Some(false)),
         
@@ -1330,12 +1442,18 @@ fn main() {
                      Some(false)),
                   ]),
             ("service-accounts-keys-get",
-                    Some(r##"Gets the ServiceAccountKey by key id."##),
+                    Some(r##"Gets the ServiceAccountKey
+        by key id."##),
                     "Details at http://byron.github.io/google-apis-rs/google_iam1_cli/projects_service-accounts-keys-get",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the service account key in the following format: `projects/{project}/serviceAccounts/{account}/keys/{key}`. Using `-` as a wildcard for the project will infer the project from the account. The `account` value can be the `email` address or the `unique_id` of the service account."##),
+                     Some(r##"The resource name of the service account key in the following format:
+        `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}/keys/{key}`.
+        
+        Using `-` as a wildcard for the project will infer the project from
+        the account. The `account` value can be the `email` address or the
+        `unique_id` of the service account."##),
                      Some(true),
                      Some(false)),
         
@@ -1357,7 +1475,12 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the service account in the following format: `projects/{project}/serviceAccounts/{account}`. Using `-` as a wildcard for the project, will infer the project from the account. The `account` value can be the `email` address or the `unique_id` of the service account."##),
+                     Some(r##"The resource name of the service account in the following format:
+        `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
+        
+        Using `-` as a wildcard for the project, will infer the project from
+        the account. The `account` value can be the `email` address or the
+        `unique_id` of the service account."##),
                      Some(true),
                      Some(false)),
         
@@ -1379,7 +1502,8 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The resource name of the project associated with the service accounts, such as `projects/my-project-123`."##),
+                     Some(r##"Required. The resource name of the project associated with the service
+        accounts, such as `projects/my-project-123`."##),
                      Some(true),
                      Some(false)),
         
@@ -1396,12 +1520,14 @@ fn main() {
                      Some(false)),
                   ]),
             ("service-accounts-set-iam-policy",
-                    Some(r##"Sets the IAM access control policy for a ServiceAccount."##),
+                    Some(r##"Sets the IAM access control policy for a
+        ServiceAccount."##),
                     "Details at http://byron.github.io/google-apis-rs/google_iam1_cli/projects_service-accounts-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being specified. `resource` is usually specified as a path. For example, a Project resource is specified as `projects/{project}`."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being specified.
+        See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -1429,7 +1555,47 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the service account in the following format: `projects/{project}/serviceAccounts/{account}`. Using `-` as a wildcard for the project will infer the project from the account. The `account` value can be the `email` address or the `unique_id` of the service account."##),
+                     Some(r##"The resource name of the service account in the following format:
+        `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
+        Using `-` as a wildcard for the project will infer the project from
+        the account. The `account` value can be the `email` address or the
+        `unique_id` of the service account."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("service-accounts-sign-jwt",
+                    Some(r##"Signs a JWT using a service account's system-managed private key.
+        
+        If no expiry time (`exp`) is provided in the `SignJwtRequest`, IAM sets an
+        an expiry time of one hour by default. If you request an expiry time of
+        more than one hour, the request will fail."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_iam1_cli/projects_service-accounts-sign-jwt",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The resource name of the service account in the following format:
+        `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
+        Using `-` as a wildcard for the project will infer the project from
+        the account. The `account` value can be the `email` address or the
+        `unique_id` of the service account."##),
                      Some(true),
                      Some(false)),
         
@@ -1452,12 +1618,14 @@ fn main() {
                      Some(false)),
                   ]),
             ("service-accounts-test-iam-permissions",
-                    Some(r##"Tests the specified permissions against the IAM access control policy for a ServiceAccount."##),
+                    Some(r##"Tests the specified permissions against the IAM access control policy
+        for a ServiceAccount."##),
                     "Details at http://byron.github.io/google-apis-rs/google_iam1_cli/projects_service-accounts-test-iam-permissions",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. `resource` is usually specified as a path. For example, a Project resource is specified as `projects/{project}`."##),
+                     Some(r##"REQUIRED: The resource for which the policy detail is being requested.
+        See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -1480,12 +1648,24 @@ fn main() {
                      Some(false)),
                   ]),
             ("service-accounts-update",
-                    Some(r##"Updates a ServiceAccount. Currently, only the following fields are updatable: `display_name` . The `etag` is mandatory."##),
+                    Some(r##"Updates a ServiceAccount.
+        
+        Currently, only the following fields are updatable:
+        `display_name` .
+        The `etag` is mandatory."##),
                     "Details at http://byron.github.io/google-apis-rs/google_iam1_cli/projects_service-accounts-update",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the service account in the following format: `projects/{project}/serviceAccounts/{account}`. Requests using `-` as a wildcard for the project will infer the project from the `account` and the `account` value can be the `email` address or the `unique_id` of the service account. In responses the resource name will always be in the format `projects/{project}/serviceAccounts/{email}`."##),
+                     Some(r##"The resource name of the service account in the following format:
+        `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
+        
+        Requests using `-` as a wildcard for the project will infer the project
+        from the `account` and the `account` value can be the `email` address or
+        the `unique_id` of the service account.
+        
+        In responses the resource name will always be in the format
+        `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`."##),
                      Some(true),
                      Some(false)),
         
@@ -1511,7 +1691,9 @@ fn main() {
         
         ("roles", "methods: 'query-grantable-roles'", vec![
             ("query-grantable-roles",
-                    Some(r##"Queries roles that can be granted on a particular resource. A role is grantable if it can be used as the role in a binding for a policy for that resource."##),
+                    Some(r##"Queries roles that can be granted on a particular resource.
+        A role is grantable if it can be used as the role in a binding for a policy
+        for that resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_iam1_cli/roles_query-grantable-roles",
                   vec![
                     (Some(r##"kv"##),
@@ -1538,7 +1720,7 @@ fn main() {
     
     let mut app = App::new("iam1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.4+20160915")
+           .version("1.0.4+20170515")
            .about("Manages identity and access control for Google Cloud Platform resources, including the creation of service accounts, which you can use to authenticate to Google and make API calls.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_iam1_cli")
            .arg(Arg::with_name("url")

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Monitoring* crate version *1.0.4+20161212*, where *20161212* is the exact revision of the *monitoring:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
+//! This documentation was generated from *Monitoring* crate version *1.0.4+20170519*, where *20170519* is the exact revision of the *monitoring:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
 //! 
 //! Everything else about the *Monitoring* *v3* API can be found at the
 //! [official documentation site](https://cloud.google.com/monitoring/api/).
@@ -224,14 +224,14 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
 #[derive(PartialEq, Eq, Hash)]
 pub enum Scope {
-    /// View monitoring data for all of your Google Cloud and third-party projects
-    Read,
+    /// Publish metric data to your Google Cloud projects
+    Write,
 
     /// View and manage your data across Google Cloud Platform services
     CloudPlatform,
 
-    /// Publish metric data to your Google Cloud projects
-    Write,
+    /// View monitoring data for all of your Google Cloud and third-party projects
+    Read,
 
     /// View and write monitoring data for all of your Google and third-party Cloud and API projects
     Full,
@@ -240,9 +240,9 @@ pub enum Scope {
 impl AsRef<str> for Scope {
     fn as_ref(&self) -> &str {
         match *self {
-            Scope::Read => "https://www.googleapis.com/auth/monitoring.read",
-            Scope::CloudPlatform => "https://www.googleapis.com/auth/cloud-platform",
             Scope::Write => "https://www.googleapis.com/auth/monitoring.write",
+            Scope::CloudPlatform => "https://www.googleapis.com/auth/cloud-platform",
+            Scope::Read => "https://www.googleapis.com/auth/monitoring.read",
             Scope::Full => "https://www.googleapis.com/auth/monitoring",
         }
     }
@@ -466,18 +466,18 @@ pub struct TypedValue {
     /// A Boolean value: true or false.
     #[serde(rename="boolValue")]
     pub bool_value: Option<bool>,
-    /// A 64-bit integer. Its range is approximately &plusmn;9.2x10<sup>18</sup>.
-    #[serde(rename="int64Value")]
-    pub int64_value: Option<String>,
     /// A 64-bit double-precision floating-point number. Its magnitude is approximately &plusmn;10<sup>&plusmn;300</sup> and it has 16 significant digits of precision.
     #[serde(rename="doubleValue")]
     pub double_value: Option<f64>,
+    /// A 64-bit integer. Its range is approximately &plusmn;9.2x10<sup>18</sup>.
+    #[serde(rename="int64Value")]
+    pub int64_value: Option<String>,
 }
 
 impl Part for TypedValue {}
 
 
-/// Specify a sequence of buckets that have a width that is proportional to the value of the lower bound. Each bucket represents a constant relative uncertainty on a specific value in the bucket.Defines num_finite_buckets + 2 (= N) buckets with these boundaries for bucket i:Upper bound (0 <= i < N-1): scale * (growth_factor ^ i).  Lower bound (1 <= i < N): scale * (growth_factor ^ (i - 1)).
+/// Specifies an exponential sequence of buckets that have a width that is proportional to the value of the lower bound. Each bucket represents a constant relative uncertainty on a specific value in the bucket.There are num_finite_buckets + 2 (= N) buckets. Bucket i has the following boundaries:Upper bound (0 <= i < N-1): scale * (growth_factor ^ i).  Lower bound (1 <= i < N): scale * (growth_factor ^ (i - 1)).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -528,7 +528,7 @@ pub struct CollectdPayload {
 impl Part for CollectdPayload {}
 
 
-/// A set of buckets with arbitrary widths.Defines size(bounds) + 1 (= N) buckets with these boundaries for bucket i:Upper bound (0 <= i < N-1): boundsi  Lower bound (1 <= i < N); boundsi - 1There must be at least one element in bounds. If bounds has only one element, there are no finite buckets, and that single element is the common boundary of the overflow and underflow buckets.
+/// Specifies a set of buckets with arbitrary widths.There are size(bounds) + 1 (= N) buckets. Bucket i has the following boundaries:Upper bound (0 <= i < N-1): boundsi  Lower bound (1 <= i < N); boundsi - 1The bounds field must contain at least one element. If bounds has only one element, then there are no finite buckets, and that single element is the common boundary of the overflow and underflow buckets.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -551,9 +551,9 @@ impl Part for Explicit {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MonitoredResource {
-    /// Required. Values for all of the labels listed in the associated monitored resource descriptor. For example, Cloud SQL databases use the labels "database_id" and "zone".
+    /// Required. Values for all of the labels listed in the associated monitored resource descriptor. For example, Compute Engine VM instances use the labels "project_id", "instance_id", and "zone".
     pub labels: Option<HashMap<String, String>>,
-    /// Required. The monitored resource type. This field must match the type field of a MonitoredResourceDescriptor object. For example, the type of a Cloud SQL database is "cloudsql_database".
+    /// Required. The monitored resource type. This field must match the type field of a MonitoredResourceDescriptor object. For example, the type of a Compute Engine VM instance is gce_instance.
     #[serde(rename="type")]
     pub type_: Option<String>,
 }
@@ -608,7 +608,7 @@ pub struct TimeSeries {
     pub metric: Option<Metric>,
     /// The data points of this time series. When listing time series, the order of the points is specified by the list method.When creating a time series, this field must contain exactly one point and the point's type must be the same as the value type of the associated metric. If the associated metric's descriptor must be auto-created, then the value type of the descriptor is determined by the point's type, which must be BOOL, INT64, DOUBLE, or DISTRIBUTION.
     pub points: Option<Vec<Point>>,
-    /// The associated resource. A fully-specified monitored resource used to identify the time series.
+    /// The associated monitored resource. Custom metrics can use only certain monitored resource types in their time series data.
     pub resource: Option<MonitoredResource>,
     /// The value type of the time series. When listing time series, this value type might be different from the value type of the associated metric if this time series is an alignment or reduction of other time series.When creating a time series, this field is optional. If present, it must be the same as the type of the data in the points field.
     #[serde(rename="valueType")]
@@ -618,15 +618,15 @@ pub struct TimeSeries {
 impl Part for TimeSeries {}
 
 
-/// Distribution contains summary statistics for a population of values and, optionally, a histogram representing the distribution of those values across a specified set of histogram buckets.The summary statistics are the count, mean, sum of the squared deviation from the mean, the minimum, and the maximum of the set of population of values.The histogram is based on a sequence of buckets and gives a count of values that fall into each bucket. The boundaries of the buckets are given either explicitly or by specifying parameters for a method of computing them (buckets of fixed width or buckets of exponentially increasing width).Although it is not forbidden, it is generally a bad idea to include non-finite values (infinities or NaNs) in the population of values, as this will render the mean and sum_of_squared_deviation fields meaningless.
+/// Distribution contains summary statistics for a population of values. It optionally contains a histogram representing the distribution of those values across a set of buckets.The summary statistics are the count, mean, sum of the squared deviation from the mean, the minimum, and the maximum of the set of population of values. The histogram is based on a sequence of buckets and gives a count of values that fall into each bucket. The boundaries of the buckets are given either explicitly or by formulas for buckets of fixed or exponentially increasing widths.Although it is not forbidden, it is generally a bad idea to include non-finite values (infinities or NaNs) in the population of values, as this will render the mean and sum_of_squared_deviation fields meaningless.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Distribution {
-    /// The number of values in the population. Must be non-negative.
+    /// The number of values in the population. Must be non-negative. This value must equal the sum of the values in bucket_counts if a histogram is provided.
     pub count: Option<String>,
-    /// If bucket_options is given, then the sum of the values in bucket_counts must equal the value in count. If bucket_options is not given, no bucket_counts fields may be given.Bucket counts are given in order under the numbering scheme described above (the underflow bucket has number 0; the finite buckets, if any, have numbers 1 through N-2; the overflow bucket has number N-1).The size of bucket_counts must be no greater than N as defined in bucket_options.Any suffix of trailing zero bucket_count fields may be omitted.
+    /// Required in the Stackdriver Monitoring API v3. The values for each bucket specified in bucket_options. The sum of the values in bucketCounts must equal the value in the count field of the Distribution object. The order of the bucket counts follows the numbering schemes described for the three bucket types. The underflow bucket has number 0; the finite buckets, if any, have numbers 1 through N-2; and the overflow bucket has number N-1. The size of bucket_counts must not be greater than N. If the size is less than N, then the remaining buckets are assigned values of zero.
     #[serde(rename="bucketCounts")]
     pub bucket_counts: Option<Vec<i64>>,
     /// The sum of squared deviations from the mean of the values in the population. For values x_i this is:
@@ -636,7 +636,7 @@ pub struct Distribution {
     pub sum_of_squared_deviation: Option<f64>,
     /// If specified, contains the range of the population values. The field must not be present if the count is zero. This field is presently ignored by the Stackdriver Monitoring API v3.
     pub range: Option<Range>,
-    /// Defines the histogram bucket boundaries.
+    /// Required in the Stackdriver Monitoring API v3. Defines the histogram bucket boundaries.
     #[serde(rename="bucketOptions")]
     pub bucket_options: Option<BucketOptions>,
     /// The arithmetic mean of the values in the population. If count is zero then this field must be zero.
@@ -690,7 +690,7 @@ pub struct ListTimeSeriesResponse {
 impl ResponseResult for ListTimeSeriesResponse {}
 
 
-/// Specify a sequence of buckets that all have the same width (except overflow and underflow). Each bucket represents a constant absolute uncertainty on the specific value in the bucket.Defines num_finite_buckets + 2 (= N) buckets with these boundaries for bucket i:Upper bound (0 <= i < N-1): offset + (width * i).  Lower bound (1 <= i < N): offset + (width * (i - 1)).
+/// Specifies a linear sequence of buckets that all have the same width (except overflow and underflow). Each bucket represents a constant absolute uncertainty on the specific value in the bucket.There are num_finite_buckets + 2 (= N) buckets. Bucket i has the following boundaries:Upper bound (0 <= i < N-1): offset + (width * i).  Lower bound (1 <= i < N): offset + (width * (i - 1)).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -733,7 +733,7 @@ pub struct MetricDescriptor {
     pub value_type: Option<String>,
     /// The set of labels that can be used to describe a specific instance of this metric type. For example, the appengine.googleapis.com/http/server/response_latencies metric type has a label for the HTTP response code, response_code, so you can look at latencies for successful responses or just for responses that failed.
     pub labels: Option<Vec<LabelDescriptor>>,
-    /// The metric type, including its DNS name prefix. The type is not URL-encoded. All user-defined metric types have the DNS name custom.googleapis.com. Metric types should use a natural hierarchical grouping. For example:
+    /// The metric type, including its DNS name prefix. The type is not URL-encoded. All user-defined custom metric types have the DNS name custom.googleapis.com. Metric types should use a natural hierarchical grouping. For example:
     /// "custom.googleapis.com/invoice/paid/amount"
     /// "appengine.googleapis.com/http/server/response_latencies"
     /// 
@@ -780,8 +780,8 @@ pub struct MetricDescriptor {
     /// Annotation is just a comment if it follows a UNIT and is  equivalent to 1 if it is used alone. For examples,  {requests}/s == 1/s, By{transmitted}/s == By/s.
     /// NAME is a sequence of non-blank printable ASCII characters not  containing '{' or '}'.
     pub unit: Option<String>,
-    /// The resource name of the metric descriptor. Depending on the implementation, the name typically includes: (1) the parent resource name that defines the scope of the metric type or of its data; and (2) the metric's URL-encoded type, which also appears in the type field of this descriptor. For example, following is the resource name of a custom metric within the GCP project 123456789:
-    /// "projects/123456789/metricDescriptors/custom.googleapis.com%2Finvoice%2Fpaid%2Famount"
+    /// The resource name of the metric descriptor. Depending on the implementation, the name typically includes: (1) the parent resource name that defines the scope of the metric type or of its data; and (2) the metric's URL-encoded type, which also appears in the type field of this descriptor. For example, following is the resource name of a custom metric within the GCP project my-project-id:
+    /// "projects/my-project-id/metricDescriptors/custom.googleapis.com%2Finvoice%2Fpaid%2Famount"
     /// 
     pub name: Option<String>,
 }
@@ -821,7 +821,7 @@ pub struct Point {
 impl Part for Point {}
 
 
-/// A Distribution may optionally contain a histogram of the values in the population. The histogram is given in bucket_counts as counts of values that fall into one of a sequence of non-overlapping buckets. The sequence of buckets is described by bucket_options.A bucket specifies an inclusive lower bound and exclusive upper bound for the values that are counted for that bucket. The upper bound of a bucket is strictly greater than the lower bound.The sequence of N buckets for a Distribution consists of an underflow bucket (number 0), zero or more finite buckets (number 1 through N - 2) and an overflow bucket (number N - 1). The buckets are contiguous: the lower bound of bucket i (i > 0) is the same as the upper bound of bucket i - 1. The buckets span the whole range of finite values: lower bound of the underflow bucket is -infinity and the upper bound of the overflow bucket is +infinity. The finite buckets are so-called because both bounds are finite.BucketOptions describes bucket boundaries in one of three ways. Two describe the boundaries by giving parameters for a formula to generate boundaries and one gives the bucket boundaries explicitly.If bucket_options is not given, then no bucket_counts may be given.
+/// BucketOptions describes the bucket boundaries used to create a histogram for the distribution. The buckets can be in a linear sequence, an exponential sequence, or each bucket can be specified explicitly. BucketOptions does not include the number of values in each bucket.A bucket has an inclusive lower bound and exclusive upper bound for the values that are counted for that bucket. The upper bound of a bucket must be strictly greater than the lower bound. The sequence of N buckets for a distribution consists of an underflow bucket (number 0), zero or more finite buckets (number 1 through N - 2) and an overflow bucket (number N - 1). The buckets are contiguous: the lower bound of bucket i (i > 0) is the same as the upper bound of bucket i - 1. The buckets span the whole range of finite values: lower bound of the underflow bucket is -infinity and the upper bound of the overflow bucket is +infinity. The finite buckets are so-called because both bounds are finite.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -862,7 +862,7 @@ pub struct ListGroupsResponse {
 impl ResponseResult for ListGroupsResponse {}
 
 
-/// The ListMonitoredResourcDescriptors response.
+/// The ListMonitoredResourceDescriptors response.
 /// 
 /// # Activities
 /// 
@@ -964,10 +964,10 @@ pub struct MonitoredResourceDescriptor {
     /// Required. The monitored resource type. For example, the type "cloudsql_database" represents databases in Google Cloud SQL. The maximum length of this value is 256 characters.
     #[serde(rename="type")]
     pub type_: Option<String>,
-    /// Optional. A detailed description of the monitored resource type that might be used in documentation.
-    pub description: Option<String>,
     /// Optional. The resource name of the monitored resource descriptor: "projects/{project_id}/monitoredResourceDescriptors/{type}" where {type} is the value of the type field in this object and {project_id} is a project ID that provides API-specific context for accessing the type. APIs that do not use project information can use the resource name format "monitoredResourceDescriptors/{type}".
     pub name: Option<String>,
+    /// Optional. A detailed description of the monitored resource type that might be used in documentation.
+    pub description: Option<String>,
 }
 
 impl ResponseResult for MonitoredResourceDescriptor {}
@@ -1018,13 +1018,13 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a single metric descriptor. This method does not require a Stackdriver account.
+    /// Deletes a metric descriptor. Only user-created custom metrics can be deleted.
     /// 
     /// # Arguments
     ///
-    /// * `name` - The metric descriptor on which to execute the request. The format is "projects/{project_id_or_number}/metricDescriptors/{metric_id}". An example value of {metric_id} is "compute.googleapis.com/instance/disk/read_bytes_count".
-    pub fn metric_descriptors_get(&self, name: &str) -> ProjectMetricDescriptorGetCall<'a, C, A> {
-        ProjectMetricDescriptorGetCall {
+    /// * `name` - The metric descriptor on which to execute the request. The format is "projects/{project_id_or_number}/metricDescriptors/{metric_id}". An example of {metric_id} is: "custom.googleapis.com/my_test_metric".
+    pub fn metric_descriptors_delete(&self, name: &str) -> ProjectMetricDescriptorDeleteCall<'a, C, A> {
+        ProjectMetricDescriptorDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
             _delegate: Default::default(),
@@ -1072,13 +1072,13 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a metric descriptor. Only user-created custom metrics can be deleted.
+    /// Gets a single metric descriptor. This method does not require a Stackdriver account.
     /// 
     /// # Arguments
     ///
-    /// * `name` - The metric descriptor on which to execute the request. The format is "projects/{project_id_or_number}/metricDescriptors/{metric_id}". An example of {metric_id} is: "custom.googleapis.com/my_test_metric".
-    pub fn metric_descriptors_delete(&self, name: &str) -> ProjectMetricDescriptorDeleteCall<'a, C, A> {
-        ProjectMetricDescriptorDeleteCall {
+    /// * `name` - The metric descriptor on which to execute the request. The format is "projects/{project_id_or_number}/metricDescriptors/{metric_id}". An example value of {metric_id} is "compute.googleapis.com/instance/disk/read_bytes_count".
+    pub fn metric_descriptors_get(&self, name: &str) -> ProjectMetricDescriptorGetCall<'a, C, A> {
+        ProjectMetricDescriptorGetCall {
             hub: self.hub,
             _name: name.to_string(),
             _delegate: Default::default(),
@@ -1319,9 +1319,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 // CallBuilders   ###
 // #################
 
-/// Gets a single metric descriptor. This method does not require a Stackdriver account.
+/// Deletes a metric descriptor. Only user-created custom metrics can be deleted.
 ///
-/// A builder for the *metricDescriptors.get* method supported by a *project* resource.
+/// A builder for the *metricDescriptors.delete* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -1345,11 +1345,11 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().metric_descriptors_get("name")
+/// let result = hub.projects().metric_descriptors_delete("name")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectMetricDescriptorGetCall<'a, C, A>
+pub struct ProjectMetricDescriptorDeleteCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Monitoring<C, A>,
@@ -1359,13 +1359,13 @@ pub struct ProjectMetricDescriptorGetCall<'a, C, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectMetricDescriptorGetCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectMetricDescriptorDeleteCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectMetricDescriptorGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectMetricDescriptorDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, MetricDescriptor)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -1374,8 +1374,8 @@ impl<'a, C, A> ProjectMetricDescriptorGetCall<'a, C, A> where C: BorrowMut<hyper
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "monitoring.projects.metricDescriptors.get",
-                               http_method: hyper::method::Method::Get });
+        dlg.begin(MethodInfo { id: "monitoring.projects.metricDescriptors.delete",
+                               http_method: hyper::method::Method::Delete });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
@@ -1443,7 +1443,7 @@ impl<'a, C, A> ProjectMetricDescriptorGetCall<'a, C, A> where C: BorrowMut<hyper
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1496,13 +1496,13 @@ impl<'a, C, A> ProjectMetricDescriptorGetCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
-    /// The metric descriptor on which to execute the request. The format is "projects/{project_id_or_number}/metricDescriptors/{metric_id}". An example value of {metric_id} is "compute.googleapis.com/instance/disk/read_bytes_count".
+    /// The metric descriptor on which to execute the request. The format is "projects/{project_id_or_number}/metricDescriptors/{metric_id}". An example of {metric_id} is: "custom.googleapis.com/my_test_metric".
     ///
     /// Sets the *name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectMetricDescriptorGetCall<'a, C, A> {
+    pub fn name(mut self, new_value: &str) -> ProjectMetricDescriptorDeleteCall<'a, C, A> {
         self._name = new_value.to_string();
         self
     }
@@ -1512,7 +1512,7 @@ impl<'a, C, A> ProjectMetricDescriptorGetCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectMetricDescriptorGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectMetricDescriptorDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1539,7 +1539,7 @@ impl<'a, C, A> ProjectMetricDescriptorGetCall<'a, C, A> where C: BorrowMut<hyper
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectMetricDescriptorGetCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectMetricDescriptorDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1556,7 +1556,7 @@ impl<'a, C, A> ProjectMetricDescriptorGetCall<'a, C, A> where C: BorrowMut<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectMetricDescriptorGetCall<'a, C, A>
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectMetricDescriptorDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2097,9 +2097,9 @@ impl<'a, C, A> ProjectGroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 }
 
 
-/// Deletes a metric descriptor. Only user-created custom metrics can be deleted.
+/// Gets a single metric descriptor. This method does not require a Stackdriver account.
 ///
-/// A builder for the *metricDescriptors.delete* method supported by a *project* resource.
+/// A builder for the *metricDescriptors.get* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -2123,11 +2123,11 @@ impl<'a, C, A> ProjectGroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().metric_descriptors_delete("name")
+/// let result = hub.projects().metric_descriptors_get("name")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectMetricDescriptorDeleteCall<'a, C, A>
+pub struct ProjectMetricDescriptorGetCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Monitoring<C, A>,
@@ -2137,13 +2137,13 @@ pub struct ProjectMetricDescriptorDeleteCall<'a, C, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectMetricDescriptorDeleteCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectMetricDescriptorGetCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectMetricDescriptorDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectMetricDescriptorGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, MetricDescriptor)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -2152,8 +2152,8 @@ impl<'a, C, A> ProjectMetricDescriptorDeleteCall<'a, C, A> where C: BorrowMut<hy
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "monitoring.projects.metricDescriptors.delete",
-                               http_method: hyper::method::Method::Delete });
+        dlg.begin(MethodInfo { id: "monitoring.projects.metricDescriptors.get",
+                               http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
@@ -2221,7 +2221,7 @@ impl<'a, C, A> ProjectMetricDescriptorDeleteCall<'a, C, A> where C: BorrowMut<hy
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2274,13 +2274,13 @@ impl<'a, C, A> ProjectMetricDescriptorDeleteCall<'a, C, A> where C: BorrowMut<hy
     }
 
 
-    /// The metric descriptor on which to execute the request. The format is "projects/{project_id_or_number}/metricDescriptors/{metric_id}". An example of {metric_id} is: "custom.googleapis.com/my_test_metric".
+    /// The metric descriptor on which to execute the request. The format is "projects/{project_id_or_number}/metricDescriptors/{metric_id}". An example value of {metric_id} is "compute.googleapis.com/instance/disk/read_bytes_count".
     ///
     /// Sets the *name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectMetricDescriptorDeleteCall<'a, C, A> {
+    pub fn name(mut self, new_value: &str) -> ProjectMetricDescriptorGetCall<'a, C, A> {
         self._name = new_value.to_string();
         self
     }
@@ -2290,7 +2290,7 @@ impl<'a, C, A> ProjectMetricDescriptorDeleteCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectMetricDescriptorDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectMetricDescriptorGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2317,7 +2317,7 @@ impl<'a, C, A> ProjectMetricDescriptorDeleteCall<'a, C, A> where C: BorrowMut<hy
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectMetricDescriptorDeleteCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectMetricDescriptorGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2334,7 +2334,7 @@ impl<'a, C, A> ProjectMetricDescriptorDeleteCall<'a, C, A> where C: BorrowMut<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectMetricDescriptorDeleteCall<'a, C, A>
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectMetricDescriptorGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

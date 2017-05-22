@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *iam* API at revision *20160915*. The CLI is at version *1.0.4*.
+This documentation was generated from the *iam* API at revision *20170515*. The CLI is at version *1.0.4*.
 
 ```bash
 iam1 [options]
@@ -41,6 +41,7 @@ iam1 [options]
                 service-accounts-list <name> [-p <v>]... [-o <out>]
                 service-accounts-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 service-accounts-sign-blob <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                service-accounts-sign-jwt <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 service-accounts-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 service-accounts-update <name> (-r <kv>)... [-p <v>]... [-o <out>]
         roles

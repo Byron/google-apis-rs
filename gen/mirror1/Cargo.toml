@@ -4,12 +4,12 @@
 [package]
 
 name = "google-mirror1"
-version = "1.0.4+20160616"
+version = "1.0.4+20170419"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with mirror (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/mirror1"
 homepage = "https://developers.google.com/glass"
-documentation = "https://docs.rs/google-mirror1/1.0.4+20160616"
+documentation = "https://docs.rs/google-mirror1/1.0.4+20170419"
 license = "MIT"
 keywords = ["mirror", "google", "protocol", "web", "api"]
 

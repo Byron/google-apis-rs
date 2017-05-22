@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Surveys* crate version *1.0.4+20161103*, where *20161103* is the exact revision of the *surveys:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
+//! This documentation was generated from *Surveys* crate version *1.0.4+20170407*, where *20170407* is the exact revision of the *surveys:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/surveys2).
 //! # Features
 //! 
@@ -440,8 +440,6 @@ impl Part for FieldMask {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SurveysStartResponse {
-    /// Survey object containing the specification of the started Survey.
-    pub resource: Option<Survey>,
     /// Unique request ID used for logging and debugging. Please include in any error reporting or troubleshooting requests.
     #[serde(rename="requestId")]
     pub request_id: Option<String>,
@@ -820,8 +818,6 @@ impl ResponseResult for MobileAppPanel {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SurveysStopResponse {
-    /// Survey object containing the specification of the stopped Survey.
-    pub resource: Option<Survey>,
     /// Unique request ID used for logging and debugging. Please include in any error reporting or troubleshooting requests.
     #[serde(rename="requestId")]
     pub request_id: Option<String>,

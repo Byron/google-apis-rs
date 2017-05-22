@@ -4,12 +4,12 @@
 [package]
 
 name = "google-dns1"
-version = "1.0.4+20161130"
+version = "1.0.4+20170512"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with dns (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/dns1"
 homepage = "https://developers.google.com/cloud-dns"
-documentation = "https://docs.rs/google-dns1/1.0.4+20161130"
+documentation = "https://docs.rs/google-dns1/1.0.4+20170512"
 license = "MIT"
 keywords = ["dns", "google", "protocol", "web", "api"]
 

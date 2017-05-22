@@ -1,4 +1,4 @@
-site_name: drive v1.0.4+20161212
+site_name: drive v1.0.4+20170512
 site_url: http://byron.github.io/google-apis-rs/google-drive2-cli
 site_description: A complete library to interact with drive (protocol v2)
 
@@ -13,6 +13,7 @@ pages:
 - ['apps_get.md', 'Apps', 'Get']
 - ['apps_list.md', 'Apps', 'List']
 - ['changes_get.md', 'Changes', 'Get']
+- ['changes_get-start-page-token.md', 'Changes', 'Get Start Page Token']
 - ['changes_list.md', 'Changes', 'List']
 - ['changes_watch.md', 'Changes', 'Watch']
 - ['channels_stop.md', 'Channels', 'Stop']
@@ -70,6 +71,11 @@ pages:
 - ['revisions_list.md', 'Revisions', 'List']
 - ['revisions_patch.md', 'Revisions', 'Patch']
 - ['revisions_update.md', 'Revisions', 'Update']
+- ['teamdrives_delete.md', 'Teamdrives', 'Delete']
+- ['teamdrives_get.md', 'Teamdrives', 'Get']
+- ['teamdrives_insert.md', 'Teamdrives', 'Insert']
+- ['teamdrives_list.md', 'Teamdrives', 'List']
+- ['teamdrives_update.md', 'Teamdrives', 'Update']
 
 theme: readthedocs
 
