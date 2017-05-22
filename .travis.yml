@@ -5,6 +5,9 @@ os:
 rust:
   - stable
   - nightly
+matrix:
+  allow_failures:
+    - rust: nightly
 script:
   - make gen-all-cli cargo-api ARGS=test
   - make cargo-api ARGS=doc
