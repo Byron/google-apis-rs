@@ -179,7 +179,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -207,6 +207,7 @@ use std::collections::BTreeMap;
 use serde_json as json;
 use std::io;
 use std::fs;
+use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
@@ -322,6 +323,8 @@ pub struct Monitoring<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
+    _base_url: String,
+    _root_url: String,
 }
 
 impl<'a, C, A> Hub for Monitoring<C, A> {}
@@ -334,6 +337,8 @@ impl<'a, C, A> Monitoring<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
+            _base_url: "https://monitoring.googleapis.com/".to_string(),
+            _root_url: "https://monitoring.googleapis.com/".to_string(),
         }
     }
 
@@ -346,9 +351,23 @@ impl<'a, C, A> Monitoring<C, A>
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
-        let prev = self._user_agent.clone();
-        self._user_agent = agent_name;
-        prev
+        mem::replace(&mut self._user_agent, agent_name)
+    }
+
+    /// Set the base url to use in all requests to the server.
+    /// It defaults to `https://monitoring.googleapis.com/`.
+    ///
+    /// Returns the previously set base url.
+    pub fn base_url(&mut self, new_base_url: String) -> String {
+        mem::replace(&mut self._base_url, new_base_url)
+    }
+
+    /// Set the root url to use in all requests to the server.
+    /// It defaults to `https://monitoring.googleapis.com/`.
+    ///
+    /// Returns the previously set root url.
+    pub fn root_url(&mut self, new_root_url: String) -> String {
+        mem::replace(&mut self._root_url, new_root_url)
     }
 }
 
@@ -1390,7 +1409,7 @@ impl<'a, C, A> ProjectMetricDescriptorDeleteCall<'a, C, A> where C: BorrowMut<hy
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://monitoring.googleapis.com/v3/{+name}".to_string();
+        let mut url = self.hub._base_url.clone() + "v3/{+name}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -1647,7 +1666,7 @@ impl<'a, C, A> ProjectGroupCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://monitoring.googleapis.com/v3/{+name}/groups".to_string();
+        let mut url = self.hub._base_url.clone() + "v3/{+name}/groups";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -1923,7 +1942,7 @@ impl<'a, C, A> ProjectGroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://monitoring.googleapis.com/v3/{+name}".to_string();
+        let mut url = self.hub._base_url.clone() + "v3/{+name}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -2168,7 +2187,7 @@ impl<'a, C, A> ProjectMetricDescriptorGetCall<'a, C, A> where C: BorrowMut<hyper
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://monitoring.googleapis.com/v3/{+name}".to_string();
+        let mut url = self.hub._base_url.clone() + "v3/{+name}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -2420,7 +2439,7 @@ impl<'a, C, A> ProjectCollectdTimeSeryCreateCall<'a, C, A> where C: BorrowMut<hy
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://monitoring.googleapis.com/v3/{+name}/collectdTimeSeries".to_string();
+        let mut url = self.hub._base_url.clone() + "v3/{+name}/collectdTimeSeries";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -2714,7 +2733,7 @@ impl<'a, C, A> ProjectGroupMemberListCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://monitoring.googleapis.com/v3/{+name}/members".to_string();
+        let mut url = self.hub._base_url.clone() + "v3/{+name}/members";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -3011,7 +3030,7 @@ impl<'a, C, A> ProjectMonitoredResourceDescriptorListCall<'a, C, A> where C: Bor
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://monitoring.googleapis.com/v3/{+name}/monitoredResourceDescriptors".to_string();
+        let mut url = self.hub._base_url.clone() + "v3/{+name}/monitoredResourceDescriptors";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -3286,7 +3305,7 @@ impl<'a, C, A> ProjectTimeSeryCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://monitoring.googleapis.com/v3/{+name}/timeSeries".to_string();
+        let mut url = self.hub._base_url.clone() + "v3/{+name}/timeSeries";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -3562,7 +3581,7 @@ impl<'a, C, A> ProjectMetricDescriptorCreateCall<'a, C, A> where C: BorrowMut<hy
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://monitoring.googleapis.com/v3/{+name}/metricDescriptors".to_string();
+        let mut url = self.hub._base_url.clone() + "v3/{+name}/metricDescriptors";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -3856,7 +3875,7 @@ impl<'a, C, A> ProjectGroupListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://monitoring.googleapis.com/v3/{+name}/groups".to_string();
+        let mut url = self.hub._base_url.clone() + "v3/{+name}/groups";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -4151,7 +4170,7 @@ impl<'a, C, A> ProjectMetricDescriptorListCall<'a, C, A> where C: BorrowMut<hype
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://monitoring.googleapis.com/v3/{+name}/metricDescriptors".to_string();
+        let mut url = self.hub._base_url.clone() + "v3/{+name}/metricDescriptors";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -4419,7 +4438,7 @@ impl<'a, C, A> ProjectMonitoredResourceDescriptorGetCall<'a, C, A> where C: Borr
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://monitoring.googleapis.com/v3/{+name}".to_string();
+        let mut url = self.hub._base_url.clone() + "v3/{+name}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -4676,7 +4695,7 @@ impl<'a, C, A> ProjectGroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://monitoring.googleapis.com/v3/{+name}".to_string();
+        let mut url = self.hub._base_url.clone() + "v3/{+name}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -4952,7 +4971,7 @@ impl<'a, C, A> ProjectGroupDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://monitoring.googleapis.com/v3/{+name}".to_string();
+        let mut url = self.hub._base_url.clone() + "v3/{+name}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5254,7 +5273,7 @@ impl<'a, C, A> ProjectTimeSeryListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://monitoring.googleapis.com/v3/{+name}/timeSeries".to_string();
+        let mut url = self.hub._base_url.clone() + "v3/{+name}/timeSeries";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5507,6 +5526,5 @@ impl<'a, C, A> ProjectTimeSeryListCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self
     }
 }
-
 
 

@@ -183,7 +183,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -211,6 +211,7 @@ use std::collections::BTreeMap;
 use serde_json as json;
 use std::io;
 use std::fs;
+use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
@@ -334,6 +335,8 @@ pub struct Resourceviews<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
+    _base_url: String,
+    _root_url: String,
 }
 
 impl<'a, C, A> Hub for Resourceviews<C, A> {}
@@ -346,6 +349,8 @@ impl<'a, C, A> Resourceviews<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
+            _base_url: "https://www.googleapis.com/resourceviews/v1beta2/projects/".to_string(),
+            _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
@@ -361,9 +366,23 @@ impl<'a, C, A> Resourceviews<C, A>
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
-        let prev = self._user_agent.clone();
-        self._user_agent = agent_name;
-        prev
+        mem::replace(&mut self._user_agent, agent_name)
+    }
+
+    /// Set the base url to use in all requests to the server.
+    /// It defaults to `https://www.googleapis.com/resourceviews/v1beta2/projects/`.
+    ///
+    /// Returns the previously set base url.
+    pub fn base_url(&mut self, new_base_url: String) -> String {
+        mem::replace(&mut self._base_url, new_base_url)
+    }
+
+    /// Set the root url to use in all requests to the server.
+    /// It defaults to `https://www.googleapis.com/`.
+    ///
+    /// Returns the previously set root url.
+    pub fn root_url(&mut self, new_root_url: String) -> String {
+        mem::replace(&mut self._root_url, new_root_url)
     }
 }
 
@@ -1177,7 +1196,7 @@ impl<'a, C, A> ZoneViewRemoveResourceCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/resourceviews/v1beta2/projects/{project}/zones/{zone}/resourceViews/{resourceView}/removeResources".to_string();
+        let mut url = self.hub._base_url.clone() + "{project}/zones/{zone}/resourceViews/{resourceView}/removeResources";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -1467,7 +1486,7 @@ impl<'a, C, A> ZoneViewAddResourceCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/resourceviews/v1beta2/projects/{project}/zones/{zone}/resourceViews/{resourceView}/addResources".to_string();
+        let mut url = self.hub._base_url.clone() + "{project}/zones/{zone}/resourceViews/{resourceView}/addResources";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -1775,7 +1794,7 @@ impl<'a, C, A> ZoneViewListResourceCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/resourceviews/v1beta2/projects/{project}/zones/{zone}/resourceViews/{resourceView}/resources".to_string();
+        let mut url = self.hub._base_url.clone() + "{project}/zones/{zone}/resourceViews/{resourceView}/resources";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ComputeReadonly.as_ref().to_string(), ());
         }
@@ -2069,7 +2088,7 @@ impl<'a, C, A> ZoneViewGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/resourceviews/v1beta2/projects/{project}/zones/{zone}/resourceViews/{resourceView}".to_string();
+        let mut url = self.hub._base_url.clone() + "{project}/zones/{zone}/resourceViews/{resourceView}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ComputeReadonly.as_ref().to_string(), ());
         }
@@ -2336,7 +2355,7 @@ impl<'a, C, A> ZoneViewListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/resourceviews/v1beta2/projects/{project}/zones/{zone}/resourceViews".to_string();
+        let mut url = self.hub._base_url.clone() + "{project}/zones/{zone}/resourceViews";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ComputeReadonly.as_ref().to_string(), ());
         }
@@ -2604,7 +2623,7 @@ impl<'a, C, A> ZoneViewInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/resourceviews/v1beta2/projects/{project}/zones/{zone}/resourceViews".to_string();
+        let mut url = self.hub._base_url.clone() + "{project}/zones/{zone}/resourceViews";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -2877,7 +2896,7 @@ impl<'a, C, A> ZoneViewDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/resourceviews/v1beta2/projects/{project}/zones/{zone}/resourceViews/{resourceView}".to_string();
+        let mut url = self.hub._base_url.clone() + "{project}/zones/{zone}/resourceViews/{resourceView}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -3143,7 +3162,7 @@ impl<'a, C, A> ZoneViewSetServiceCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/resourceviews/v1beta2/projects/{project}/zones/{zone}/resourceViews/{resourceView}/setService".to_string();
+        let mut url = self.hub._base_url.clone() + "{project}/zones/{zone}/resourceViews/{resourceView}/setService";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -3431,7 +3450,7 @@ impl<'a, C, A> ZoneViewGetServiceCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/resourceviews/v1beta2/projects/{project}/zones/{zone}/resourceViews/{resourceView}/getService".to_string();
+        let mut url = self.hub._base_url.clone() + "{project}/zones/{zone}/resourceViews/{resourceView}/getService";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -3697,7 +3716,7 @@ impl<'a, C, A> ZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/resourceviews/v1beta2/projects/{project}/zones/{zone}/operations/{operation}".to_string();
+        let mut url = self.hub._base_url.clone() + "{project}/zones/{zone}/operations/{operation}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ComputeReadonly.as_ref().to_string(), ());
         }
@@ -3969,7 +3988,7 @@ impl<'a, C, A> ZoneOperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/resourceviews/v1beta2/projects/{project}/zones/{zone}/operations".to_string();
+        let mut url = self.hub._base_url.clone() + "{project}/zones/{zone}/operations";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ComputeReadonly.as_ref().to_string(), ());
         }
@@ -4163,6 +4182,5 @@ impl<'a, C, A> ZoneOperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self
     }
 }
-
 
 

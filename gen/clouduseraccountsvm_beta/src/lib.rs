@@ -190,7 +190,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -218,6 +218,7 @@ use std::collections::BTreeMap;
 use serde_json as json;
 use std::io;
 use std::fs;
+use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
@@ -333,6 +334,8 @@ pub struct CloudUserAccounts<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
+    _base_url: String,
+    _root_url: String,
 }
 
 impl<'a, C, A> Hub for CloudUserAccounts<C, A> {}
@@ -345,6 +348,8 @@ impl<'a, C, A> CloudUserAccounts<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
+            _base_url: "https://www.googleapis.com/clouduseraccounts/vm_beta/projects/".to_string(),
+            _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
@@ -366,9 +371,23 @@ impl<'a, C, A> CloudUserAccounts<C, A>
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
-        let prev = self._user_agent.clone();
-        self._user_agent = agent_name;
-        prev
+        mem::replace(&mut self._user_agent, agent_name)
+    }
+
+    /// Set the base url to use in all requests to the server.
+    /// It defaults to `https://www.googleapis.com/clouduseraccounts/vm_beta/projects/`.
+    ///
+    /// Returns the previously set base url.
+    pub fn base_url(&mut self, new_base_url: String) -> String {
+        mem::replace(&mut self._base_url, new_base_url)
+    }
+
+    /// Set the root url to use in all requests to the server.
+    /// It defaults to `https://www.googleapis.com/`.
+    ///
+    /// Returns the previously set root url.
+    pub fn root_url(&mut self, new_root_url: String) -> String {
+        mem::replace(&mut self._root_url, new_root_url)
     }
 }
 
@@ -1463,7 +1482,7 @@ impl<'a, C, A> GlobalAccountsOperationDeleteCall<'a, C, A> where C: BorrowMut<hy
         }
 
 
-        let mut url = "https://www.googleapis.com/clouduseraccounts/vm_beta/projects/{project}/global/operations/{operation}".to_string();
+        let mut url = self.hub._base_url.clone() + "{project}/global/operations/{operation}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -1718,7 +1737,7 @@ impl<'a, C, A> GlobalAccountsOperationListCall<'a, C, A> where C: BorrowMut<hype
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/clouduseraccounts/vm_beta/projects/{project}/global/operations".to_string();
+        let mut url = self.hub._base_url.clone() + "{project}/global/operations";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudUseraccountReadonly.as_ref().to_string(), ());
         }
@@ -1995,7 +2014,7 @@ impl<'a, C, A> GlobalAccountsOperationGetCall<'a, C, A> where C: BorrowMut<hyper
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/clouduseraccounts/vm_beta/projects/{project}/global/operations/{operation}".to_string();
+        let mut url = self.hub._base_url.clone() + "{project}/global/operations/{operation}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudUseraccountReadonly.as_ref().to_string(), ());
         }
@@ -2249,7 +2268,7 @@ impl<'a, C, A> UserAddPublicKeyCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/clouduseraccounts/vm_beta/projects/{project}/global/users/{user}/addPublicKey".to_string();
+        let mut url = self.hub._base_url.clone() + "{project}/global/users/{user}/addPublicKey";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -2538,7 +2557,7 @@ impl<'a, C, A> UserListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/clouduseraccounts/vm_beta/projects/{project}/global/users".to_string();
+        let mut url = self.hub._base_url.clone() + "{project}/global/users";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudUseraccountReadonly.as_ref().to_string(), ());
         }
@@ -2820,7 +2839,7 @@ impl<'a, C, A> UserInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/clouduseraccounts/vm_beta/projects/{project}/global/users".to_string();
+        let mut url = self.hub._base_url.clone() + "{project}/global/users";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -3081,7 +3100,7 @@ impl<'a, C, A> UserGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/clouduseraccounts/vm_beta/projects/{project}/global/users/{user}".to_string();
+        let mut url = self.hub._base_url.clone() + "{project}/global/users/{user}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudUseraccountReadonly.as_ref().to_string(), ());
         }
@@ -3330,7 +3349,7 @@ impl<'a, C, A> UserRemovePublicKeyCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/clouduseraccounts/vm_beta/projects/{project}/global/users/{user}/removePublicKey".to_string();
+        let mut url = self.hub._base_url.clone() + "{project}/global/users/{user}/removePublicKey";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -3587,7 +3606,7 @@ impl<'a, C, A> UserDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/clouduseraccounts/vm_beta/projects/{project}/global/users/{user}".to_string();
+        let mut url = self.hub._base_url.clone() + "{project}/global/users/{user}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -3834,7 +3853,7 @@ impl<'a, C, A> GroupDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/clouduseraccounts/vm_beta/projects/{project}/global/groups/{groupName}".to_string();
+        let mut url = self.hub._base_url.clone() + "{project}/global/groups/{groupName}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -4081,7 +4100,7 @@ impl<'a, C, A> GroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/clouduseraccounts/vm_beta/projects/{project}/global/groups/{groupName}".to_string();
+        let mut url = self.hub._base_url.clone() + "{project}/global/groups/{groupName}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudUseraccountReadonly.as_ref().to_string(), ());
         }
@@ -4335,7 +4354,7 @@ impl<'a, C, A> GroupAddMemberCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/clouduseraccounts/vm_beta/projects/{project}/global/groups/{groupName}/addMember".to_string();
+        let mut url = self.hub._base_url.clone() + "{project}/global/groups/{groupName}/addMember";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -4611,7 +4630,7 @@ impl<'a, C, A> GroupInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/clouduseraccounts/vm_beta/projects/{project}/global/groups".to_string();
+        let mut url = self.hub._base_url.clone() + "{project}/global/groups";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -4890,7 +4909,7 @@ impl<'a, C, A> GroupListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/clouduseraccounts/vm_beta/projects/{project}/global/groups".to_string();
+        let mut url = self.hub._base_url.clone() + "{project}/global/groups";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudUseraccountReadonly.as_ref().to_string(), ());
         }
@@ -5174,7 +5193,7 @@ impl<'a, C, A> GroupRemoveMemberCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/clouduseraccounts/vm_beta/projects/{project}/global/groups/{groupName}/removeMember".to_string();
+        let mut url = self.hub._base_url.clone() + "{project}/global/groups/{groupName}/removeMember";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5467,7 +5486,7 @@ impl<'a, C, A> LinuxGetLinuxAccountViewCall<'a, C, A> where C: BorrowMut<hyper::
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/clouduseraccounts/vm_beta/projects/{project}/zones/{zone}/linuxAccountViews".to_string();
+        let mut url = self.hub._base_url.clone() + "{project}/zones/{zone}/linuxAccountViews";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5773,7 +5792,7 @@ impl<'a, C, A> LinuxGetAuthorizedKeysViewCall<'a, C, A> where C: BorrowMut<hyper
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/clouduseraccounts/vm_beta/projects/{project}/zones/{zone}/authorizedKeysView/{user}".to_string();
+        let mut url = self.hub._base_url.clone() + "{project}/zones/{zone}/authorizedKeysView/{user}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5973,6 +5992,5 @@ impl<'a, C, A> LinuxGetAuthorizedKeysViewCall<'a, C, A> where C: BorrowMut<hyper
         self
     }
 }
-
 
 

@@ -186,7 +186,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -214,6 +214,7 @@ use std::collections::BTreeMap;
 use serde_json as json;
 use std::io;
 use std::fs;
+use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
@@ -320,6 +321,8 @@ pub struct Reseller<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
+    _base_url: String,
+    _root_url: String,
 }
 
 impl<'a, C, A> Hub for Reseller<C, A> {}
@@ -332,6 +335,8 @@ impl<'a, C, A> Reseller<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
+            _base_url: "https://www.googleapis.com/apps/reseller/v1sandbox/".to_string(),
+            _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
@@ -347,9 +352,23 @@ impl<'a, C, A> Reseller<C, A>
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
-        let prev = self._user_agent.clone();
-        self._user_agent = agent_name;
-        prev
+        mem::replace(&mut self._user_agent, agent_name)
+    }
+
+    /// Set the base url to use in all requests to the server.
+    /// It defaults to `https://www.googleapis.com/apps/reseller/v1sandbox/`.
+    ///
+    /// Returns the previously set base url.
+    pub fn base_url(&mut self, new_base_url: String) -> String {
+        mem::replace(&mut self._base_url, new_base_url)
+    }
+
+    /// Set the root url to use in all requests to the server.
+    /// It defaults to `https://www.googleapis.com/`.
+    ///
+    /// Returns the previously set root url.
+    pub fn root_url(&mut self, new_root_url: String) -> String {
+        mem::replace(&mut self._root_url, new_root_url)
     }
 }
 
@@ -1133,7 +1152,7 @@ impl<'a, C, A> CustomerUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/apps/reseller/v1sandbox/customers/{customerId}".to_string();
+        let mut url = self.hub._base_url.clone() + "customers/{customerId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AppOrder.as_ref().to_string(), ());
         }
@@ -1402,7 +1421,7 @@ impl<'a, C, A> CustomerInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/apps/reseller/v1sandbox/customers".to_string();
+        let mut url = self.hub._base_url.clone() + "customers";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AppOrder.as_ref().to_string(), ());
         }
@@ -1644,7 +1663,7 @@ impl<'a, C, A> CustomerPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/apps/reseller/v1sandbox/customers/{customerId}".to_string();
+        let mut url = self.hub._base_url.clone() + "customers/{customerId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AppOrder.as_ref().to_string(), ());
         }
@@ -1903,7 +1922,7 @@ impl<'a, C, A> CustomerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/apps/reseller/v1sandbox/customers/{customerId}".to_string();
+        let mut url = self.hub._base_url.clone() + "customers/{customerId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AppOrderReadonly.as_ref().to_string(), ());
         }
@@ -2150,7 +2169,7 @@ impl<'a, C, A> SubscriptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/apps/reseller/v1sandbox/customers/{customerId}/subscriptions".to_string();
+        let mut url = self.hub._base_url.clone() + "customers/{customerId}/subscriptions";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AppOrder.as_ref().to_string(), ());
         }
@@ -2419,7 +2438,7 @@ impl<'a, C, A> SubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
         }
 
 
-        let mut url = "https://www.googleapis.com/apps/reseller/v1sandbox/customers/{customerId}/subscriptions/{subscriptionId}".to_string();
+        let mut url = self.hub._base_url.clone() + "customers/{customerId}/subscriptions/{subscriptionId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AppOrder.as_ref().to_string(), ());
         }
@@ -2666,7 +2685,7 @@ impl<'a, C, A> SubscriptionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/apps/reseller/v1sandbox/customers/{customerId}/subscriptions/{subscriptionId}".to_string();
+        let mut url = self.hub._base_url.clone() + "customers/{customerId}/subscriptions/{subscriptionId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AppOrderReadonly.as_ref().to_string(), ());
         }
@@ -2934,7 +2953,7 @@ impl<'a, C, A> SubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/apps/reseller/v1sandbox/subscriptions".to_string();
+        let mut url = self.hub._base_url.clone() + "subscriptions";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AppOrderReadonly.as_ref().to_string(), ());
         }
@@ -3182,7 +3201,7 @@ impl<'a, C, A> SubscriptionChangeRenewalSettingCall<'a, C, A> where C: BorrowMut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/apps/reseller/v1sandbox/customers/{customerId}/subscriptions/{subscriptionId}/changeRenewalSettings".to_string();
+        let mut url = self.hub._base_url.clone() + "customers/{customerId}/subscriptions/{subscriptionId}/changeRenewalSettings";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AppOrder.as_ref().to_string(), ());
         }
@@ -3453,7 +3472,7 @@ impl<'a, C, A> SubscriptionStartPaidServiceCall<'a, C, A> where C: BorrowMut<hyp
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/apps/reseller/v1sandbox/customers/{customerId}/subscriptions/{subscriptionId}/startPaidService".to_string();
+        let mut url = self.hub._base_url.clone() + "customers/{customerId}/subscriptions/{subscriptionId}/startPaidService";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AppOrder.as_ref().to_string(), ());
         }
@@ -3707,7 +3726,7 @@ impl<'a, C, A> SubscriptionChangeSeatCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/apps/reseller/v1sandbox/customers/{customerId}/subscriptions/{subscriptionId}/changeSeats".to_string();
+        let mut url = self.hub._base_url.clone() + "customers/{customerId}/subscriptions/{subscriptionId}/changeSeats";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AppOrder.as_ref().to_string(), ());
         }
@@ -3978,7 +3997,7 @@ impl<'a, C, A> SubscriptionSuspendCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/apps/reseller/v1sandbox/customers/{customerId}/subscriptions/{subscriptionId}/suspend".to_string();
+        let mut url = self.hub._base_url.clone() + "customers/{customerId}/subscriptions/{subscriptionId}/suspend";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AppOrder.as_ref().to_string(), ());
         }
@@ -4225,7 +4244,7 @@ impl<'a, C, A> SubscriptionActivateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/apps/reseller/v1sandbox/customers/{customerId}/subscriptions/{subscriptionId}/activate".to_string();
+        let mut url = self.hub._base_url.clone() + "customers/{customerId}/subscriptions/{subscriptionId}/activate";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AppOrder.as_ref().to_string(), ());
         }
@@ -4479,7 +4498,7 @@ impl<'a, C, A> SubscriptionChangePlanCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/apps/reseller/v1sandbox/customers/{customerId}/subscriptions/{subscriptionId}/changePlan".to_string();
+        let mut url = self.hub._base_url.clone() + "customers/{customerId}/subscriptions/{subscriptionId}/changePlan";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AppOrder.as_ref().to_string(), ());
         }
@@ -4676,6 +4695,5 @@ impl<'a, C, A> SubscriptionChangePlanCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self
     }
 }
-
 
 

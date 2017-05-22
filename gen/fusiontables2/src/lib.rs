@@ -199,7 +199,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -227,6 +227,7 @@ use std::collections::BTreeMap;
 use serde_json as json;
 use std::io;
 use std::fs;
+use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
@@ -331,6 +332,8 @@ pub struct Fusiontables<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
+    _base_url: String,
+    _root_url: String,
 }
 
 impl<'a, C, A> Hub for Fusiontables<C, A> {}
@@ -343,6 +346,8 @@ impl<'a, C, A> Fusiontables<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
+            _base_url: "https://www.googleapis.com/fusiontables/v2/".to_string(),
+            _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
@@ -370,9 +375,23 @@ impl<'a, C, A> Fusiontables<C, A>
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
-        let prev = self._user_agent.clone();
-        self._user_agent = agent_name;
-        prev
+        mem::replace(&mut self._user_agent, agent_name)
+    }
+
+    /// Set the base url to use in all requests to the server.
+    /// It defaults to `https://www.googleapis.com/fusiontables/v2/`.
+    ///
+    /// Returns the previously set base url.
+    pub fn base_url(&mut self, new_base_url: String) -> String {
+        mem::replace(&mut self._base_url, new_base_url)
+    }
+
+    /// Set the root url to use in all requests to the server.
+    /// It defaults to `https://www.googleapis.com/`.
+    ///
+    /// Returns the previously set root url.
+    pub fn root_url(&mut self, new_root_url: String) -> String {
+        mem::replace(&mut self._root_url, new_root_url)
     }
 }
 
@@ -1931,7 +1950,7 @@ impl<'a, C, A> StyleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/fusiontables/v2/tables/{tableId}/styles".to_string();
+        let mut url = self.hub._base_url.clone() + "tables/{tableId}/styles";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -2189,7 +2208,7 @@ impl<'a, C, A> StyleUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/fusiontables/v2/tables/{tableId}/styles/{styleId}".to_string();
+        let mut url = self.hub._base_url.clone() + "tables/{tableId}/styles/{styleId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -2465,7 +2484,7 @@ impl<'a, C, A> StyleInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/fusiontables/v2/tables/{tableId}/styles".to_string();
+        let mut url = self.hub._base_url.clone() + "tables/{tableId}/styles";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -2726,7 +2745,7 @@ impl<'a, C, A> StyleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/fusiontables/v2/tables/{tableId}/styles/{styleId}".to_string();
+        let mut url = self.hub._base_url.clone() + "tables/{tableId}/styles/{styleId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -2972,7 +2991,7 @@ impl<'a, C, A> StyleDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         }
 
 
-        let mut url = "https://www.googleapis.com/fusiontables/v2/tables/{tableId}/styles/{styleId}".to_string();
+        let mut url = self.hub._base_url.clone() + "tables/{tableId}/styles/{styleId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -3216,7 +3235,7 @@ impl<'a, C, A> StylePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/fusiontables/v2/tables/{tableId}/styles/{styleId}".to_string();
+        let mut url = self.hub._base_url.clone() + "tables/{tableId}/styles/{styleId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -3500,7 +3519,7 @@ impl<'a, C, A> TaskListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/fusiontables/v2/tables/{tableId}/tasks".to_string();
+        let mut url = self.hub._base_url.clone() + "tables/{tableId}/tasks";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -3757,7 +3776,7 @@ impl<'a, C, A> TaskDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         }
 
 
-        let mut url = "https://www.googleapis.com/fusiontables/v2/tables/{tableId}/tasks/{taskId}".to_string();
+        let mut url = self.hub._base_url.clone() + "tables/{tableId}/tasks/{taskId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -3994,7 +4013,7 @@ impl<'a, C, A> TaskGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/fusiontables/v2/tables/{tableId}/tasks/{taskId}".to_string();
+        let mut url = self.hub._base_url.clone() + "tables/{tableId}/tasks/{taskId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -4246,7 +4265,7 @@ impl<'a, C, A> ColumnInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/fusiontables/v2/tables/{tableId}/columns".to_string();
+        let mut url = self.hub._base_url.clone() + "tables/{tableId}/columns";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -4514,7 +4533,7 @@ impl<'a, C, A> ColumnUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/fusiontables/v2/tables/{tableId}/columns/{columnId}".to_string();
+        let mut url = self.hub._base_url.clone() + "tables/{tableId}/columns/{columnId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -4793,7 +4812,7 @@ impl<'a, C, A> ColumnListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/fusiontables/v2/tables/{tableId}/columns".to_string();
+        let mut url = self.hub._base_url.clone() + "tables/{tableId}/columns";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -5051,7 +5070,7 @@ impl<'a, C, A> ColumnPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/fusiontables/v2/tables/{tableId}/columns/{columnId}".to_string();
+        let mut url = self.hub._base_url.clone() + "tables/{tableId}/columns/{columnId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -5321,7 +5340,7 @@ impl<'a, C, A> ColumnDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         }
 
 
-        let mut url = "https://www.googleapis.com/fusiontables/v2/tables/{tableId}/columns/{columnId}".to_string();
+        let mut url = self.hub._base_url.clone() + "tables/{tableId}/columns/{columnId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -5558,7 +5577,7 @@ impl<'a, C, A> ColumnGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/fusiontables/v2/tables/{tableId}/columns/{columnId}".to_string();
+        let mut url = self.hub._base_url.clone() + "tables/{tableId}/columns/{columnId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -5812,7 +5831,7 @@ impl<'a, C, A> TemplateUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/fusiontables/v2/tables/{tableId}/templates/{templateId}".to_string();
+        let mut url = self.hub._base_url.clone() + "tables/{tableId}/templates/{templateId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -6091,7 +6110,7 @@ impl<'a, C, A> TemplateListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/fusiontables/v2/tables/{tableId}/templates".to_string();
+        let mut url = self.hub._base_url.clone() + "tables/{tableId}/templates";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -6341,7 +6360,7 @@ impl<'a, C, A> TemplateDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         }
 
 
-        let mut url = "https://www.googleapis.com/fusiontables/v2/tables/{tableId}/templates/{templateId}".to_string();
+        let mut url = self.hub._base_url.clone() + "tables/{tableId}/templates/{templateId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -6583,7 +6602,7 @@ impl<'a, C, A> TemplateInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/fusiontables/v2/tables/{tableId}/templates".to_string();
+        let mut url = self.hub._base_url.clone() + "tables/{tableId}/templates";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -6851,7 +6870,7 @@ impl<'a, C, A> TemplatePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/fusiontables/v2/tables/{tableId}/templates/{templateId}".to_string();
+        let mut url = self.hub._base_url.clone() + "tables/{tableId}/templates/{templateId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -7122,7 +7141,7 @@ impl<'a, C, A> TemplateGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/fusiontables/v2/tables/{tableId}/templates/{templateId}".to_string();
+        let mut url = self.hub._base_url.clone() + "tables/{tableId}/templates/{templateId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -7401,7 +7420,7 @@ impl<'a, C, A> QuerySqlGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             params.push(("alt", "json".to_string()));
         }
 
-        let mut url = "https://www.googleapis.com/fusiontables/v2/query".to_string();
+        let mut url = self.hub._base_url.clone() + "query";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -7670,7 +7689,7 @@ impl<'a, C, A> QuerySqlCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
             params.push(("alt", "json".to_string()));
         }
 
-        let mut url = "https://www.googleapis.com/fusiontables/v2/query".to_string();
+        let mut url = self.hub._base_url.clone() + "query";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -7917,7 +7936,7 @@ impl<'a, C, A> TablePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/fusiontables/v2/tables/{tableId}".to_string();
+        let mut url = self.hub._base_url.clone() + "tables/{tableId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -8212,9 +8231,9 @@ impl<'a, C, A> TableReplaceRowCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         let (mut url, upload_type) =
             if protocol == "simple" {
-                ("https://www.googleapis.com/upload/fusiontables/v2/tables/{tableId}/replace".to_string(), "multipart")
+                (self.hub._root_url.clone() + "/upload/fusiontables/v2/tables/{tableId}/replace", "multipart")
             } else if protocol == "resumable" {
-                ("https://www.googleapis.com/resumable/upload/fusiontables/v2/tables/{tableId}/replace".to_string(), "resumable")
+                (self.hub._root_url.clone() + "/resumable/upload/fusiontables/v2/tables/{tableId}/replace", "resumable")
             } else {
                 unreachable!()
             };
@@ -8599,7 +8618,7 @@ impl<'a, C, A> TableUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/fusiontables/v2/tables/{tableId}".to_string();
+        let mut url = self.hub._base_url.clone() + "tables/{tableId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -8864,7 +8883,7 @@ impl<'a, C, A> TableDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         }
 
 
-        let mut url = "https://www.googleapis.com/fusiontables/v2/tables/{tableId}".to_string();
+        let mut url = self.hub._base_url.clone() + "tables/{tableId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -9094,7 +9113,7 @@ impl<'a, C, A> TableInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/fusiontables/v2/tables".to_string();
+        let mut url = self.hub._base_url.clone() + "tables";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -9322,7 +9341,7 @@ impl<'a, C, A> TableGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/fusiontables/v2/tables/{tableId}".to_string();
+        let mut url = self.hub._base_url.clone() + "tables/{tableId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -9565,7 +9584,7 @@ impl<'a, C, A> TableListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/fusiontables/v2/tables".to_string();
+        let mut url = self.hub._base_url.clone() + "tables";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -9812,9 +9831,9 @@ impl<'a, C, A> TableImportRowCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         let (mut url, upload_type) =
             if protocol == "simple" {
-                ("https://www.googleapis.com/upload/fusiontables/v2/tables/{tableId}/import".to_string(), "multipart")
+                (self.hub._root_url.clone() + "/upload/fusiontables/v2/tables/{tableId}/import", "multipart")
             } else if protocol == "resumable" {
-                ("https://www.googleapis.com/resumable/upload/fusiontables/v2/tables/{tableId}/import".to_string(), "resumable")
+                (self.hub._root_url.clone() + "/resumable/upload/fusiontables/v2/tables/{tableId}/import", "resumable")
             } else {
                 unreachable!()
             };
@@ -10201,9 +10220,9 @@ impl<'a, C, A> TableImportTableCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         let (mut url, upload_type) =
             if protocol == "simple" {
-                ("https://www.googleapis.com/upload/fusiontables/v2/tables/import".to_string(), "multipart")
+                (self.hub._root_url.clone() + "/upload/fusiontables/v2/tables/import", "multipart")
             } else if protocol == "resumable" {
-                ("https://www.googleapis.com/resumable/upload/fusiontables/v2/tables/import".to_string(), "resumable")
+                (self.hub._root_url.clone() + "/resumable/upload/fusiontables/v2/tables/import", "resumable")
             } else {
                 unreachable!()
             };
@@ -10539,7 +10558,7 @@ impl<'a, C, A> TableCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/fusiontables/v2/tables/{tableId}/copy".to_string();
+        let mut url = self.hub._base_url.clone() + "tables/{tableId}/copy";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -10709,6 +10728,5 @@ impl<'a, C, A> TableCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self
     }
 }
-
 
 

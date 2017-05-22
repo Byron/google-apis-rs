@@ -181,7 +181,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -209,6 +209,7 @@ use std::collections::BTreeMap;
 use serde_json as json;
 use std::io;
 use std::fs;
+use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
@@ -313,6 +314,8 @@ pub struct CloudKMS<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
+    _base_url: String,
+    _root_url: String,
 }
 
 impl<'a, C, A> Hub for CloudKMS<C, A> {}
@@ -325,6 +328,8 @@ impl<'a, C, A> CloudKMS<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
+            _base_url: "https://cloudkms.googleapis.com/".to_string(),
+            _root_url: "https://cloudkms.googleapis.com/".to_string(),
         }
     }
 
@@ -337,9 +342,23 @@ impl<'a, C, A> CloudKMS<C, A>
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
-        let prev = self._user_agent.clone();
-        self._user_agent = agent_name;
-        prev
+        mem::replace(&mut self._user_agent, agent_name)
+    }
+
+    /// Set the base url to use in all requests to the server.
+    /// It defaults to `https://cloudkms.googleapis.com/`.
+    ///
+    /// Returns the previously set base url.
+    pub fn base_url(&mut self, new_base_url: String) -> String {
+        mem::replace(&mut self._base_url, new_base_url)
+    }
+
+    /// Set the root url to use in all requests to the server.
+    /// It defaults to `https://cloudkms.googleapis.com/`.
+    ///
+    /// Returns the previously set root url.
+    pub fn root_url(&mut self, new_root_url: String) -> String {
+        mem::replace(&mut self._root_url, new_root_url)
     }
 }
 
@@ -1810,7 +1829,7 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a, C, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://cloudkms.googleapis.com/v1beta1/{+name}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -2099,7 +2118,7 @@ impl<'a, C, A> ProjectLocationKeyRingCreateCall<'a, C, A> where C: BorrowMut<hyp
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://cloudkms.googleapis.com/v1beta1/{+parent}/keyRings".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+parent}/keyRings";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -2387,7 +2406,7 @@ impl<'a, C, A> ProjectLocationKeyRingListCall<'a, C, A> where C: BorrowMut<hyper
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://cloudkms.googleapis.com/v1beta1/{+parent}/keyRings".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+parent}/keyRings";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -2669,7 +2688,7 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a, C,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://cloudkms.googleapis.com/v1beta1/{+name}:destroy".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}:destroy";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -2945,7 +2964,7 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyEncryptCall<'a, C, A> where C: Bor
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://cloudkms.googleapis.com/v1beta1/{+name}:encrypt".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}:encrypt";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -3218,7 +3237,7 @@ impl<'a, C, A> ProjectLocationKeyRingGetCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://cloudkms.googleapis.com/v1beta1/{+name}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -3464,7 +3483,7 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyGetCall<'a, C, A> where C: BorrowM
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://cloudkms.googleapis.com/v1beta1/{+name}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -3724,7 +3743,7 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://cloudkms.googleapis.com/v1beta1/{+name}/locations".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}/locations";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -4003,7 +4022,7 @@ impl<'a, C, A> ProjectLocationKeyRingTestIamPermissionCall<'a, C, A> where C: Bo
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://cloudkms.googleapis.com/v1beta1/{+resource}:testIamPermissions".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+resource}:testIamPermissions";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -4275,7 +4294,7 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a, C, A> where C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://cloudkms.googleapis.com/v1beta1/{+resource}:getIamPolicy".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+resource}:getIamPolicy";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -4528,7 +4547,7 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a, C, A>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://cloudkms.googleapis.com/v1beta1/{+name}:updatePrimaryVersion".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}:updatePrimaryVersion";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -4809,7 +4828,7 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyPatchCall<'a, C, A> where C: Borro
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://cloudkms.googleapis.com/v1beta1/{+name}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5093,7 +5112,7 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyDecryptCall<'a, C, A> where C: Bor
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://cloudkms.googleapis.com/v1beta1/{+name}:decrypt".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}:decrypt";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5365,7 +5384,7 @@ impl<'a, C, A> ProjectLocationKeyRingGetIamPolicyCall<'a, C, A> where C: BorrowM
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://cloudkms.googleapis.com/v1beta1/{+resource}:getIamPolicy".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+resource}:getIamPolicy";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5619,7 +5638,7 @@ impl<'a, C, A> ProjectLocationKeyRingSetIamPolicyCall<'a, C, A> where C: BorrowM
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://cloudkms.googleapis.com/v1beta1/{+resource}:setIamPolicy".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+resource}:setIamPolicy";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5889,7 +5908,7 @@ impl<'a, C, A> ProjectLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://cloudkms.googleapis.com/v1beta1/{+name}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -6147,7 +6166,7 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a, C, A> wh
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://cloudkms.googleapis.com/v1beta1/{+resource}:testIamPermissions".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+resource}:testIamPermissions";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -6427,7 +6446,7 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a, C, A>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://cloudkms.googleapis.com/v1beta1/{+parent}/cryptoKeyVersions".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+parent}/cryptoKeyVersions";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -6702,7 +6721,7 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyListCall<'a, C, A> where C: Borrow
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://cloudkms.googleapis.com/v1beta1/{+parent}/cryptoKeys".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+parent}/cryptoKeys";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -6977,7 +6996,7 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a, C, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://cloudkms.googleapis.com/v1beta1/{+parent}/cryptoKeyVersions".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+parent}/cryptoKeyVersions";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -7247,7 +7266,7 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a, C, A> 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://cloudkms.googleapis.com/v1beta1/{+name}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -7500,7 +7519,7 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a, C, A> where C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://cloudkms.googleapis.com/v1beta1/{+resource}:setIamPolicy".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+resource}:setIamPolicy";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -7783,7 +7802,7 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a, C,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://cloudkms.googleapis.com/v1beta1/{+name}:restore".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}:restore";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -8066,7 +8085,7 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyCreateCall<'a, C, A> where C: Borr
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://cloudkms.googleapis.com/v1beta1/{+parent}/cryptoKeys".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+parent}/cryptoKeys";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -8271,6 +8290,5 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyCreateCall<'a, C, A> where C: Borr
         self
     }
 }
-
 
 

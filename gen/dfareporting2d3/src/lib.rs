@@ -301,7 +301,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -329,6 +329,7 @@ use std::collections::BTreeMap;
 use serde_json as json;
 use std::io;
 use std::fs;
+use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
@@ -435,6 +436,8 @@ pub struct Dfareporting<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
+    _base_url: String,
+    _root_url: String,
 }
 
 impl<'a, C, A> Hub for Dfareporting<C, A> {}
@@ -447,6 +450,8 @@ impl<'a, C, A> Dfareporting<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
+            _base_url: "https://www.googleapis.com/dfareporting/v2.3/".to_string(),
+            _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
@@ -621,9 +626,23 @@ impl<'a, C, A> Dfareporting<C, A>
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
-        let prev = self._user_agent.clone();
-        self._user_agent = agent_name;
-        prev
+        mem::replace(&mut self._user_agent, agent_name)
+    }
+
+    /// Set the base url to use in all requests to the server.
+    /// It defaults to `https://www.googleapis.com/dfareporting/v2.3/`.
+    ///
+    /// Returns the previously set base url.
+    pub fn base_url(&mut self, new_base_url: String) -> String {
+        mem::replace(&mut self._base_url, new_base_url)
+    }
+
+    /// Set the root url to use in all requests to the server.
+    /// It defaults to `https://www.googleapis.com/`.
+    ///
+    /// Returns the previously set root url.
+    pub fn root_url(&mut self, new_root_url: String) -> String {
+        mem::replace(&mut self._root_url, new_root_url)
     }
 }
 
@@ -13239,7 +13258,7 @@ impl<'a, C, A> UserRolePermissionGroupGetCall<'a, C, A> where C: BorrowMut<hyper
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/userRolePermissionGroups/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/userRolePermissionGroups/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -13484,7 +13503,7 @@ impl<'a, C, A> UserRolePermissionGroupListCall<'a, C, A> where C: BorrowMut<hype
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/userRolePermissionGroups".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/userRolePermissionGroups";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -13721,7 +13740,7 @@ impl<'a, C, A> PlatformTypeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/platformTypes/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/platformTypes/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -13966,7 +13985,7 @@ impl<'a, C, A> PlatformTypeListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/platformTypes".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/platformTypes";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -14212,7 +14231,7 @@ impl<'a, C, A> CreativeFieldValuePatchCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/creativeFields/{creativeFieldId}/creativeFieldValues".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/creativeFields/{creativeFieldId}/creativeFieldValues";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -14495,7 +14514,7 @@ impl<'a, C, A> CreativeFieldValueGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/creativeFields/{creativeFieldId}/creativeFieldValues/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/creativeFields/{creativeFieldId}/creativeFieldValues/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -14753,7 +14772,7 @@ impl<'a, C, A> CreativeFieldValueDeleteCall<'a, C, A> where C: BorrowMut<hyper::
         }
 
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/creativeFields/{creativeFieldId}/creativeFieldValues/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/creativeFields/{creativeFieldId}/creativeFieldValues/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -15007,7 +15026,7 @@ impl<'a, C, A> CreativeFieldValueInsertCall<'a, C, A> where C: BorrowMut<hyper::
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/creativeFields/{creativeFieldId}/creativeFieldValues".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/creativeFields/{creativeFieldId}/creativeFieldValues";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -15285,7 +15304,7 @@ impl<'a, C, A> CreativeFieldValueUpdateCall<'a, C, A> where C: BorrowMut<hyper::
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/creativeFields/{creativeFieldId}/creativeFieldValues".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/creativeFields/{creativeFieldId}/creativeFieldValues";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -15588,7 +15607,7 @@ impl<'a, C, A> CreativeFieldValueListCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/creativeFields/{creativeFieldId}/creativeFieldValues".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/creativeFields/{creativeFieldId}/creativeFieldValues";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -15883,7 +15902,7 @@ impl<'a, C, A> CreativeFieldUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/creativeFields".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/creativeFields";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -16181,7 +16200,7 @@ impl<'a, C, A> CreativeFieldListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/creativeFields".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/creativeFields";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -16468,7 +16487,7 @@ impl<'a, C, A> CreativeFieldDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
         }
 
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/creativeFields/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/creativeFields/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -16705,7 +16724,7 @@ impl<'a, C, A> CreativeFieldGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/creativeFields/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/creativeFields/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -16957,7 +16976,7 @@ impl<'a, C, A> CreativeFieldInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/creativeFields".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/creativeFields";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -17225,7 +17244,7 @@ impl<'a, C, A> CreativeFieldPatchCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/creativeFields".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/creativeFields";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -17501,7 +17520,7 @@ impl<'a, C, A> UserRoleInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/userRoles".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/userRoles";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -17762,7 +17781,7 @@ impl<'a, C, A> UserRoleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/userRoles/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/userRoles/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -18014,7 +18033,7 @@ impl<'a, C, A> UserRoleUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/userRoles".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/userRoles";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -18274,7 +18293,7 @@ impl<'a, C, A> UserRoleDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         }
 
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/userRoles/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/userRoles/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -18518,7 +18537,7 @@ impl<'a, C, A> UserRolePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/userRoles".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/userRoles";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -18829,7 +18848,7 @@ impl<'a, C, A> UserRoleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/userRoles".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/userRoles";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -19123,7 +19142,7 @@ impl<'a, C, A> OperatingSystemVersionGetCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/operatingSystemVersions/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/operatingSystemVersions/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -19368,7 +19387,7 @@ impl<'a, C, A> OperatingSystemVersionListCall<'a, C, A> where C: BorrowMut<hyper
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/operatingSystemVersions".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/operatingSystemVersions";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -19607,7 +19626,7 @@ impl<'a, C, A> LandingPageGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/campaigns/{campaignId}/landingPages/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/campaigns/{campaignId}/landingPages/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -19871,7 +19890,7 @@ impl<'a, C, A> LandingPageUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/campaigns/{campaignId}/landingPages".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/campaigns/{campaignId}/landingPages";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -20142,7 +20161,7 @@ impl<'a, C, A> LandingPageListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/campaigns/{campaignId}/landingPages".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/campaigns/{campaignId}/landingPages";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -20396,7 +20415,7 @@ impl<'a, C, A> LandingPageInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/campaigns/{campaignId}/landingPages".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/campaigns/{campaignId}/landingPages";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -20676,7 +20695,7 @@ impl<'a, C, A> LandingPagePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/campaigns/{campaignId}/landingPages".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/campaigns/{campaignId}/landingPages";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -20958,7 +20977,7 @@ impl<'a, C, A> LandingPageDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
         }
 
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/campaigns/{campaignId}/landingPages/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/campaigns/{campaignId}/landingPages/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -21216,9 +21235,9 @@ impl<'a, C, A> CreativeAssetInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         let (mut url, upload_type) =
             if protocol == "simple" {
-                ("https://www.googleapis.com/upload/dfareporting/v2.3/userprofiles/{profileId}/creativeAssets/{advertiserId}/creativeAssets".to_string(), "multipart")
+                (self.hub._root_url.clone() + "/upload/dfareporting/v2.3/userprofiles/{profileId}/creativeAssets/{advertiserId}/creativeAssets", "multipart")
             } else if protocol == "resumable" {
-                ("https://www.googleapis.com/resumable/upload/dfareporting/v2.3/userprofiles/{profileId}/creativeAssets/{advertiserId}/creativeAssets".to_string(), "resumable")
+                (self.hub._root_url.clone() + "/resumable/upload/dfareporting/v2.3/userprofiles/{profileId}/creativeAssets/{advertiserId}/creativeAssets", "resumable")
             } else {
                 unreachable!()
             };
@@ -21604,7 +21623,7 @@ impl<'a, C, A> CampaignCreativeAssociationInsertCall<'a, C, A> where C: BorrowMu
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/campaigns/{campaignId}/campaignCreativeAssociations".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/campaigns/{campaignId}/campaignCreativeAssociations";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -21890,7 +21909,7 @@ impl<'a, C, A> CampaignCreativeAssociationListCall<'a, C, A> where C: BorrowMut<
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/campaigns/{campaignId}/campaignCreativeAssociations".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/campaigns/{campaignId}/campaignCreativeAssociations";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -22212,7 +22231,7 @@ impl<'a, C, A> ChangeLogListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/changeLogs".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/changeLogs";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -22522,7 +22541,7 @@ impl<'a, C, A> ChangeLogGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/changeLogs/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/changeLogs/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -22769,7 +22788,7 @@ impl<'a, C, A> RemarketingListShareGetCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/remarketingListShares/{remarketingListId}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/remarketingListShares/{remarketingListId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -23023,7 +23042,7 @@ impl<'a, C, A> RemarketingListSharePatchCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/remarketingListShares".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/remarketingListShares";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -23299,7 +23318,7 @@ impl<'a, C, A> RemarketingListShareUpdateCall<'a, C, A> where C: BorrowMut<hyper
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/remarketingListShares".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/remarketingListShares";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -23565,7 +23584,7 @@ impl<'a, C, A> ReportRunCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/reports/{reportId}/run".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/reports/{reportId}/run";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -23826,7 +23845,7 @@ impl<'a, C, A> ReportPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/reports/{reportId}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/reports/{reportId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -24117,7 +24136,7 @@ impl<'a, C, A> ReportFileListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/reports/{reportId}/files".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/reports/{reportId}/files";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -24397,7 +24416,7 @@ impl<'a, C, A> ReportInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/reports".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/reports";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -24665,7 +24684,7 @@ impl<'a, C, A> ReportUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/reports/{reportId}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/reports/{reportId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -24941,7 +24960,7 @@ impl<'a, C, A> ReportCompatibleFieldQueryCall<'a, C, A> where C: BorrowMut<hyper
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/reports/compatiblefields/query".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/reports/compatiblefields/query";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -25202,7 +25221,7 @@ impl<'a, C, A> ReportGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/reports/{reportId}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/reports/{reportId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -25472,7 +25491,7 @@ impl<'a, C, A> ReportFileGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             params.push(("alt", "json".to_string()));
         }
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/reports/{reportId}/files/{fileId}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/reports/{reportId}/files/{fileId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -25728,7 +25747,7 @@ impl<'a, C, A> ReportDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         }
 
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/reports/{reportId}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/reports/{reportId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -25988,7 +26007,7 @@ impl<'a, C, A> ReportListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/reports".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/reports";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -26265,7 +26284,7 @@ impl<'a, C, A> AdvertiserInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/advertisers".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/advertisers";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -26533,7 +26552,7 @@ impl<'a, C, A> AdvertiserPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/advertisers".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/advertisers";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -26868,7 +26887,7 @@ impl<'a, C, A> AdvertiserListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/advertisers".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/advertisers";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -27197,7 +27216,7 @@ impl<'a, C, A> AdvertiserUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/advertisers".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/advertisers";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -27458,7 +27477,7 @@ impl<'a, C, A> AdvertiserGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/advertisers/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/advertisers/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -27720,7 +27739,7 @@ impl<'a, C, A> DimensionValueQueryCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/dimensionvalues/query".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/dimensionvalues/query";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -27995,7 +28014,7 @@ impl<'a, C, A> FloodlightActivityGroupGetCall<'a, C, A> where C: BorrowMut<hyper
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/floodlightActivityGroups/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/floodlightActivityGroups/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -28249,7 +28268,7 @@ impl<'a, C, A> FloodlightActivityGroupPatchCall<'a, C, A> where C: BorrowMut<hyp
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/floodlightActivityGroups".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/floodlightActivityGroups";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -28565,7 +28584,7 @@ impl<'a, C, A> FloodlightActivityGroupListCall<'a, C, A> where C: BorrowMut<hype
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/floodlightActivityGroups".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/floodlightActivityGroups";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -28871,7 +28890,7 @@ impl<'a, C, A> FloodlightActivityGroupInsertCall<'a, C, A> where C: BorrowMut<hy
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/floodlightActivityGroups".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/floodlightActivityGroups";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -29137,7 +29156,7 @@ impl<'a, C, A> FloodlightActivityGroupUpdateCall<'a, C, A> where C: BorrowMut<hy
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/floodlightActivityGroups".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/floodlightActivityGroups";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -29396,7 +29415,7 @@ impl<'a, C, A> MetroListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/metros".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/metros";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -29672,7 +29691,7 @@ impl<'a, C, A> OrderListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/projects/{projectId}/orders".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/projects/{projectId}/orders";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -29972,7 +29991,7 @@ impl<'a, C, A> OrderGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/projects/{projectId}/orders/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/projects/{projectId}/orders/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -30229,7 +30248,7 @@ impl<'a, C, A> DirectorySiteContactGetCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/directorySiteContacts/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/directorySiteContacts/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -30513,7 +30532,7 @@ impl<'a, C, A> DirectorySiteContactListCall<'a, C, A> where C: BorrowMut<hyper::
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/directorySiteContacts".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/directorySiteContacts";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -30797,7 +30816,7 @@ impl<'a, C, A> UserProfileListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -31001,7 +31020,7 @@ impl<'a, C, A> UserProfileGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -31245,7 +31264,7 @@ impl<'a, C, A> AdPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/ads".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/ads";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -31521,7 +31540,7 @@ impl<'a, C, A> AdInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/ads".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/ads";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -31920,7 +31939,7 @@ impl<'a, C, A> AdListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/ads".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/ads";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -32335,7 +32354,7 @@ impl<'a, C, A> AdGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/ads/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/ads/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -32587,7 +32606,7 @@ impl<'a, C, A> AdUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/ads".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/ads";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -32848,7 +32867,7 @@ impl<'a, C, A> AccountPermissionGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/accountPermissions/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/accountPermissions/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -33093,7 +33112,7 @@ impl<'a, C, A> AccountPermissionListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/accountPermissions".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/accountPermissions";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -33328,7 +33347,7 @@ impl<'a, C, A> ConnectionTypeListCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/connectionTypes".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/connectionTypes";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -33565,7 +33584,7 @@ impl<'a, C, A> ConnectionTypeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/connectionTypes/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/connectionTypes/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -33812,7 +33831,7 @@ impl<'a, C, A> AdvertiserGroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/advertiserGroups/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/advertiserGroups/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -34089,7 +34108,7 @@ impl<'a, C, A> AdvertiserGroupListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/advertiserGroups".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/advertiserGroups";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -34374,7 +34393,7 @@ impl<'a, C, A> AdvertiserGroupInsertCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/advertiserGroups".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/advertiserGroups";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -34640,7 +34659,7 @@ impl<'a, C, A> AdvertiserGroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/advertiserGroups".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/advertiserGroups";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -34908,7 +34927,7 @@ impl<'a, C, A> AdvertiserGroupPatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/advertiserGroups".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/advertiserGroups";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -35178,7 +35197,7 @@ impl<'a, C, A> AdvertiserGroupDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
         }
 
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/advertiserGroups/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/advertiserGroups/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -35420,7 +35439,7 @@ impl<'a, C, A> SiteInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/sites".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/sites";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -35681,7 +35700,7 @@ impl<'a, C, A> SiteGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/sites/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/sites/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -36007,7 +36026,7 @@ impl<'a, C, A> SiteListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/sites".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/sites";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -36357,7 +36376,7 @@ impl<'a, C, A> SiteUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/sites".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/sites";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -36625,7 +36644,7 @@ impl<'a, C, A> SitePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/sites".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/sites";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -36896,7 +36915,7 @@ impl<'a, C, A> FloodlightActivityGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/floodlightActivities/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/floodlightActivities/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -37210,7 +37229,7 @@ impl<'a, C, A> FloodlightActivityListCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/floodlightActivities".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/floodlightActivities";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -37545,7 +37564,7 @@ impl<'a, C, A> FloodlightActivityInsertCall<'a, C, A> where C: BorrowMut<hyper::
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/floodlightActivities".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/floodlightActivities";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -37805,7 +37824,7 @@ impl<'a, C, A> FloodlightActivityDeleteCall<'a, C, A> where C: BorrowMut<hyper::
         }
 
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/floodlightActivities/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/floodlightActivities/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -38049,7 +38068,7 @@ impl<'a, C, A> FloodlightActivityPatchCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/floodlightActivities".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/floodlightActivities";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -38323,7 +38342,7 @@ impl<'a, C, A> FloodlightActivityGeneratetagCall<'a, C, A> where C: BorrowMut<hy
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/floodlightActivities/generatetag".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/floodlightActivities/generatetag";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -38572,7 +38591,7 @@ impl<'a, C, A> FloodlightActivityUpdateCall<'a, C, A> where C: BorrowMut<hyper::
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/floodlightActivities".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/floodlightActivities";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -38831,7 +38850,7 @@ impl<'a, C, A> RegionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/regions".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/regions";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -39073,7 +39092,7 @@ impl<'a, C, A> CreativeGroupInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/creativeGroups".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/creativeGroups";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -39334,7 +39353,7 @@ impl<'a, C, A> CreativeGroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/creativeGroups/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/creativeGroups/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -39586,7 +39605,7 @@ impl<'a, C, A> CreativeGroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/creativeGroups".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/creativeGroups";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -39889,7 +39908,7 @@ impl<'a, C, A> CreativeGroupListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/creativeGroups".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/creativeGroups";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -40191,7 +40210,7 @@ impl<'a, C, A> CreativeGroupPatchCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/creativeGroups".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/creativeGroups";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -40492,7 +40511,7 @@ impl<'a, C, A> TargetableRemarketingListListCall<'a, C, A> where C: BorrowMut<hy
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/targetableRemarketingLists".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/targetableRemarketingLists";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -40781,7 +40800,7 @@ impl<'a, C, A> TargetableRemarketingListGetCall<'a, C, A> where C: BorrowMut<hyp
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/targetableRemarketingLists/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/targetableRemarketingLists/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -41035,7 +41054,7 @@ impl<'a, C, A> SubaccountPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/subaccounts".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/subaccounts";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -41311,7 +41330,7 @@ impl<'a, C, A> SubaccountInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/subaccounts".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/subaccounts";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -41602,7 +41621,7 @@ impl<'a, C, A> SubaccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/subaccounts".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/subaccounts";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -41887,7 +41906,7 @@ impl<'a, C, A> SubaccountUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/subaccounts".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/subaccounts";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -42148,7 +42167,7 @@ impl<'a, C, A> SubaccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/subaccounts/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/subaccounts/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -42395,7 +42414,7 @@ impl<'a, C, A> MobileCarrierGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/mobileCarriers/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/mobileCarriers/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -42640,7 +42659,7 @@ impl<'a, C, A> MobileCarrierListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/mobileCarriers".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/mobileCarriers";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -42877,7 +42896,7 @@ impl<'a, C, A> FloodlightConfigurationGetCall<'a, C, A> where C: BorrowMut<hyper
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/floodlightConfigurations/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/floodlightConfigurations/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -43129,7 +43148,7 @@ impl<'a, C, A> FloodlightConfigurationUpdateCall<'a, C, A> where C: BorrowMut<hy
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/floodlightConfigurations".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/floodlightConfigurations";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -43397,7 +43416,7 @@ impl<'a, C, A> FloodlightConfigurationPatchCall<'a, C, A> where C: BorrowMut<hyp
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/floodlightConfigurations".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/floodlightConfigurations";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -43673,7 +43692,7 @@ impl<'a, C, A> FloodlightConfigurationListCall<'a, C, A> where C: BorrowMut<hype
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/floodlightConfigurations".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/floodlightConfigurations";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -43916,7 +43935,7 @@ impl<'a, C, A> OperatingSystemListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/operatingSystems".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/operatingSystems";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -44153,7 +44172,7 @@ impl<'a, C, A> OperatingSystemGetCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/operatingSystems/{dartId}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/operatingSystems/{dartId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -44423,7 +44442,7 @@ impl<'a, C, A> FileListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/files".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/files";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -44716,7 +44735,7 @@ impl<'a, C, A> FileGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
             params.push(("alt", "json".to_string()));
         }
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/reports/{reportId}/files/{fileId}".to_string();
+        let mut url = self.hub._base_url.clone() + "reports/{reportId}/files/{fileId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -45072,7 +45091,7 @@ impl<'a, C, A> PlacementGroupListCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/placementGroups".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/placementGroups";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -45455,7 +45474,7 @@ impl<'a, C, A> PlacementGroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/placementGroups".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/placementGroups";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -45721,7 +45740,7 @@ impl<'a, C, A> PlacementGroupInsertCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/placementGroups".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/placementGroups";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -45982,7 +46001,7 @@ impl<'a, C, A> PlacementGroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/placementGroups/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/placementGroups/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -46236,7 +46255,7 @@ impl<'a, C, A> PlacementGroupPatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/placementGroups".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/placementGroups";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -46553,7 +46572,7 @@ impl<'a, C, A> InventoryItemListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/projects/{projectId}/inventoryItems".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/projects/{projectId}/inventoryItems";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -46861,7 +46880,7 @@ impl<'a, C, A> InventoryItemGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/projects/{projectId}/inventoryItems/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/projects/{projectId}/inventoryItems/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -47118,7 +47137,7 @@ impl<'a, C, A> UserRolePermissionGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/userRolePermissions/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/userRolePermissions/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -47370,7 +47389,7 @@ impl<'a, C, A> UserRolePermissionListCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/userRolePermissions".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/userRolePermissions";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -47613,7 +47632,7 @@ impl<'a, C, A> AccountPermissionGroupListCall<'a, C, A> where C: BorrowMut<hyper
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/accountPermissionGroups".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/accountPermissionGroups";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -47850,7 +47869,7 @@ impl<'a, C, A> AccountPermissionGroupGetCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/accountPermissionGroups/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/accountPermissionGroups/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -48127,7 +48146,7 @@ impl<'a, C, A> ContentCategoryListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/contentCategories".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/contentCategories";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -48412,7 +48431,7 @@ impl<'a, C, A> ContentCategoryUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/contentCategories".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/contentCategories";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -48678,7 +48697,7 @@ impl<'a, C, A> ContentCategoryInsertCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/contentCategories".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/contentCategories";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -48938,7 +48957,7 @@ impl<'a, C, A> ContentCategoryDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
         }
 
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/contentCategories/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/contentCategories/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -49175,7 +49194,7 @@ impl<'a, C, A> ContentCategoryGetCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/contentCategories/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/contentCategories/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -49429,7 +49448,7 @@ impl<'a, C, A> ContentCategoryPatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/contentCategories".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/contentCategories";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -49705,7 +49724,7 @@ impl<'a, C, A> CreativeUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/creatives".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/creatives";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -49971,7 +49990,7 @@ impl<'a, C, A> CreativeInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/creatives".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/creatives";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -50232,7 +50251,7 @@ impl<'a, C, A> CreativeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/creatives/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/creatives/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -50569,7 +50588,7 @@ impl<'a, C, A> CreativeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/creatives".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/creatives";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -50931,7 +50950,7 @@ impl<'a, C, A> CreativePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/creatives".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/creatives";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -51202,7 +51221,7 @@ impl<'a, C, A> CampaignGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/campaigns/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/campaigns/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -51458,7 +51477,7 @@ impl<'a, C, A> CampaignInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/campaigns".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/campaigns";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -51746,7 +51765,7 @@ impl<'a, C, A> CampaignPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/campaigns".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/campaigns";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -52022,7 +52041,7 @@ impl<'a, C, A> CampaignUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/campaigns".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/campaigns";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -52354,7 +52373,7 @@ impl<'a, C, A> CampaignListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/campaigns".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/campaigns";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -52685,7 +52704,7 @@ impl<'a, C, A> EventTagDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         }
 
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/eventTags/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/eventTags/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -52974,7 +52993,7 @@ impl<'a, C, A> EventTagListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/eventTags".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/eventTags";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -53288,7 +53307,7 @@ impl<'a, C, A> EventTagInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/eventTags".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/eventTags";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -53556,7 +53575,7 @@ impl<'a, C, A> EventTagPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/eventTags".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/eventTags";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -53832,7 +53851,7 @@ impl<'a, C, A> EventTagUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/eventTags".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/eventTags";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -54093,7 +54112,7 @@ impl<'a, C, A> EventTagGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/eventTags/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/eventTags/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -54340,7 +54359,7 @@ impl<'a, C, A> RemarketingListGetCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/remarketingLists/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/remarketingLists/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -54592,7 +54611,7 @@ impl<'a, C, A> RemarketingListUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/remarketingLists".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/remarketingLists";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -54888,7 +54907,7 @@ impl<'a, C, A> RemarketingListListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/remarketingLists".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/remarketingLists";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -55191,7 +55210,7 @@ impl<'a, C, A> RemarketingListPatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/remarketingLists".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/remarketingLists";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -55467,7 +55486,7 @@ impl<'a, C, A> RemarketingListInsertCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/remarketingLists".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/remarketingLists";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -55752,7 +55771,7 @@ impl<'a, C, A> CityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/cities".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/cities";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -56025,7 +56044,7 @@ impl<'a, C, A> PlacementStrategyUpdateCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/placementStrategies".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/placementStrategies";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -56286,7 +56305,7 @@ impl<'a, C, A> PlacementStrategyGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/placementStrategies/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/placementStrategies/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -56563,7 +56582,7 @@ impl<'a, C, A> PlacementStrategyListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/placementStrategies".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/placementStrategies";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -56842,7 +56861,7 @@ impl<'a, C, A> PlacementStrategyDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
         }
 
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/placementStrategies/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/placementStrategies/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -57084,7 +57103,7 @@ impl<'a, C, A> PlacementStrategyInsertCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/placementStrategies".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/placementStrategies";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -57352,7 +57371,7 @@ impl<'a, C, A> PlacementStrategyPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/placementStrategies".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/placementStrategies";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -57660,7 +57679,7 @@ impl<'a, C, A> ProjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/projects".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/projects";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -57948,7 +57967,7 @@ impl<'a, C, A> ProjectGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/projects/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/projects/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -58200,7 +58219,7 @@ impl<'a, C, A> DirectorySiteInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/directorySites".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/directorySites";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -58526,7 +58545,7 @@ impl<'a, C, A> DirectorySiteListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/directorySites".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/directorySites";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -58855,7 +58874,7 @@ impl<'a, C, A> DirectorySiteGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/directorySites/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/directorySites/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -59107,7 +59126,7 @@ impl<'a, C, A> SizeInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/sizes".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/sizes";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -59388,7 +59407,7 @@ impl<'a, C, A> SizeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/sizes".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/sizes";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -59654,7 +59673,7 @@ impl<'a, C, A> SizeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/sizes/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/sizes/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -59901,7 +59920,7 @@ impl<'a, C, A> AccountActiveAdSummaryGetCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/accountActiveAdSummaries/{summaryAccountId}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/accountActiveAdSummaries/{summaryAccountId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -60153,7 +60172,7 @@ impl<'a, C, A> AccountUserProfileUpdateCall<'a, C, A> where C: BorrowMut<hyper::
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/accountUserProfiles".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/accountUserProfiles";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -60459,7 +60478,7 @@ impl<'a, C, A> AccountUserProfileListCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/accountUserProfiles".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/accountUserProfiles";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -60765,7 +60784,7 @@ impl<'a, C, A> AccountUserProfileInsertCall<'a, C, A> where C: BorrowMut<hyper::
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/accountUserProfiles".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/accountUserProfiles";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -61033,7 +61052,7 @@ impl<'a, C, A> AccountUserProfilePatchCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/accountUserProfiles".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/accountUserProfiles";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -61304,7 +61323,7 @@ impl<'a, C, A> AccountUserProfileGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/accountUserProfiles/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/accountUserProfiles/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -61549,7 +61568,7 @@ impl<'a, C, A> CountryListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/countries".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/countries";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -61786,7 +61805,7 @@ impl<'a, C, A> CountryGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/countries/{dartId}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/countries/{dartId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -62035,7 +62054,7 @@ impl<'a, C, A> OrderDocumentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/projects/{projectId}/orderDocuments/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/projects/{projectId}/orderDocuments/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -62343,7 +62362,7 @@ impl<'a, C, A> OrderDocumentListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/projects/{projectId}/orderDocuments".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/projects/{projectId}/orderDocuments";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -62656,7 +62675,7 @@ impl<'a, C, A> PostalCodeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/postalCodes/{code}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/postalCodes/{code}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -62901,7 +62920,7 @@ impl<'a, C, A> PostalCodeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/postalCodes".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/postalCodes";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -63136,7 +63155,7 @@ impl<'a, C, A> BrowserListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/browsers".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/browsers";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -63373,7 +63392,7 @@ impl<'a, C, A> AccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/accounts/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/accounts/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -63655,7 +63674,7 @@ impl<'a, C, A> AccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/accounts".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/accounts";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -63947,7 +63966,7 @@ impl<'a, C, A> AccountUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/accounts".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/accounts";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -64215,7 +64234,7 @@ impl<'a, C, A> AccountPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/accounts".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/accounts";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -64493,7 +64512,7 @@ impl<'a, C, A> PlacementPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/placements".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/placements";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -64894,7 +64913,7 @@ impl<'a, C, A> PlacementListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/placements".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/placements";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -65301,7 +65320,7 @@ impl<'a, C, A> PlacementInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/placements".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/placements";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -65567,7 +65586,7 @@ impl<'a, C, A> PlacementUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/placements".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/placements";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -65845,7 +65864,7 @@ impl<'a, C, A> PlacementGeneratetagCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/placements/generatetags".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/placements/generatetags";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -66105,7 +66124,7 @@ impl<'a, C, A> PlacementGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/dfareporting/v2.3/userprofiles/{profileId}/placements/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "userprofiles/{profileId}/placements/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
@@ -66278,6 +66297,5 @@ impl<'a, C, A> PlacementGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self
     }
 }
-
 
 

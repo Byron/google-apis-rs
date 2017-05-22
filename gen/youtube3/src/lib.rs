@@ -257,7 +257,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -285,6 +285,7 @@ use std::collections::BTreeMap;
 use serde_json as json;
 use std::io;
 use std::fs;
+use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
@@ -414,6 +415,8 @@ pub struct YouTube<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
+    _base_url: String,
+    _root_url: String,
 }
 
 impl<'a, C, A> Hub for YouTube<C, A> {}
@@ -426,6 +429,8 @@ impl<'a, C, A> YouTube<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
+            _base_url: "https://www.googleapis.com/youtube/v3/".to_string(),
+            _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
@@ -516,9 +521,23 @@ impl<'a, C, A> YouTube<C, A>
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
-        let prev = self._user_agent.clone();
-        self._user_agent = agent_name;
-        prev
+        mem::replace(&mut self._user_agent, agent_name)
+    }
+
+    /// Set the base url to use in all requests to the server.
+    /// It defaults to `https://www.googleapis.com/youtube/v3/`.
+    ///
+    /// Returns the previously set base url.
+    pub fn base_url(&mut self, new_base_url: String) -> String {
+        mem::replace(&mut self._base_url, new_base_url)
+    }
+
+    /// Set the root url to use in all requests to the server.
+    /// It defaults to `https://www.googleapis.com/`.
+    ///
+    /// Returns the previously set root url.
+    pub fn root_url(&mut self, new_root_url: String) -> String {
+        mem::replace(&mut self._root_url, new_root_url)
     }
 }
 
@@ -8800,7 +8819,7 @@ impl<'a, C, A> ChannelSectionListCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/youtube/v3/channelSections".to_string();
+        let mut url = self.hub._base_url.clone() + "channelSections";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -9096,7 +9115,7 @@ impl<'a, C, A> ChannelSectionInsertCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/youtube/v3/channelSections".to_string();
+        let mut url = self.hub._base_url.clone() + "channelSections";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -9373,7 +9392,7 @@ impl<'a, C, A> ChannelSectionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clie
         }
 
 
-        let mut url = "https://www.googleapis.com/youtube/v3/channelSections".to_string();
+        let mut url = self.hub._base_url.clone() + "channelSections";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -9618,7 +9637,7 @@ impl<'a, C, A> ChannelSectionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/youtube/v3/channelSections".to_string();
+        let mut url = self.hub._base_url.clone() + "channelSections";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -9900,7 +9919,7 @@ impl<'a, C, A> PlaylistInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/youtube/v3/playlists".to_string();
+        let mut url = self.hub._base_url.clone() + "playlists";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -10201,7 +10220,7 @@ impl<'a, C, A> PlaylistListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/youtube/v3/playlists".to_string();
+        let mut url = self.hub._base_url.clone() + "playlists";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -10483,7 +10502,7 @@ impl<'a, C, A> PlaylistDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         }
 
 
-        let mut url = "https://www.googleapis.com/youtube/v3/playlists".to_string();
+        let mut url = self.hub._base_url.clone() + "playlists";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -10711,7 +10730,7 @@ impl<'a, C, A> PlaylistUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/youtube/v3/playlists".to_string();
+        let mut url = self.hub._base_url.clone() + "playlists";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -10972,7 +10991,7 @@ impl<'a, C, A> VideoReportAbuseCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         }
 
 
-        let mut url = "https://www.googleapis.com/youtube/v3/videos/reportAbuse".to_string();
+        let mut url = self.hub._base_url.clone() + "videos/reportAbuse";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -11259,7 +11278,7 @@ impl<'a, C, A> VideoListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/youtube/v3/videos".to_string();
+        let mut url = self.hub._base_url.clone() + "videos";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -11568,7 +11587,7 @@ impl<'a, C, A> VideoRateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         }
 
 
-        let mut url = "https://www.googleapis.com/youtube/v3/videos/rate".to_string();
+        let mut url = self.hub._base_url.clone() + "videos/rate";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -11787,7 +11806,7 @@ impl<'a, C, A> VideoGetRatingCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/youtube/v3/videos/getRating".to_string();
+        let mut url = self.hub._base_url.clone() + "videos/getRating";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -12014,7 +12033,7 @@ impl<'a, C, A> VideoDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         }
 
 
-        let mut url = "https://www.googleapis.com/youtube/v3/videos".to_string();
+        let mut url = self.hub._base_url.clone() + "videos";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -12242,7 +12261,7 @@ impl<'a, C, A> VideoUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/youtube/v3/videos".to_string();
+        let mut url = self.hub._base_url.clone() + "videos";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -12535,9 +12554,9 @@ impl<'a, C, A> VideoInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         let (mut url, upload_type) =
             if protocol == "simple" {
-                ("https://www.googleapis.com/upload/youtube/v3/videos".to_string(), "multipart")
+                (self.hub._root_url.clone() + "/upload/youtube/v3/videos", "multipart")
             } else if protocol == "resumable" {
-                ("https://www.googleapis.com/resumable/upload/youtube/v3/videos".to_string(), "resumable")
+                (self.hub._root_url.clone() + "/resumable/upload/youtube/v3/videos", "resumable")
             } else {
                 unreachable!()
             };
@@ -12969,7 +12988,7 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/youtube/v3/activities".to_string();
+        let mut url = self.hub._base_url.clone() + "activities";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -13253,7 +13272,7 @@ impl<'a, C, A> ActivityInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/youtube/v3/activities".to_string();
+        let mut url = self.hub._base_url.clone() + "activities";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -13534,7 +13553,7 @@ impl<'a, C, A> LiveStreamUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/youtube/v3/liveStreams".to_string();
+        let mut url = self.hub._base_url.clone() + "liveStreams";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -13822,7 +13841,7 @@ impl<'a, C, A> LiveStreamDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         }
 
 
-        let mut url = "https://www.googleapis.com/youtube/v3/liveStreams".to_string();
+        let mut url = self.hub._base_url.clone() + "liveStreams";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -14093,7 +14112,7 @@ impl<'a, C, A> LiveStreamListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/youtube/v3/liveStreams".to_string();
+        let mut url = self.hub._base_url.clone() + "liveStreams";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -14402,7 +14421,7 @@ impl<'a, C, A> LiveStreamInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/youtube/v3/liveStreams".to_string();
+        let mut url = self.hub._base_url.clone() + "liveStreams";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -14694,7 +14713,7 @@ impl<'a, C, A> ChannelUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/youtube/v3/channels".to_string();
+        let mut url = self.hub._base_url.clone() + "channels";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -14996,7 +15015,7 @@ impl<'a, C, A> ChannelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/youtube/v3/channels".to_string();
+        let mut url = self.hub._base_url.clone() + "channels";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -15301,9 +15320,9 @@ impl<'a, C, A> WatermarkSetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         let (mut url, upload_type) =
             if protocol == "simple" {
-                ("https://www.googleapis.com/upload/youtube/v3/watermarks/set".to_string(), "multipart")
+                (self.hub._root_url.clone() + "/upload/youtube/v3/watermarks/set", "multipart")
             } else if protocol == "resumable" {
-                ("https://www.googleapis.com/resumable/upload/youtube/v3/watermarks/set".to_string(), "resumable")
+                (self.hub._root_url.clone() + "/resumable/upload/youtube/v3/watermarks/set", "resumable")
             } else {
                 unreachable!()
             };
@@ -15652,7 +15671,7 @@ impl<'a, C, A> WatermarkUnsetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         }
 
 
-        let mut url = "https://www.googleapis.com/youtube/v3/watermarks/unset".to_string();
+        let mut url = self.hub._base_url.clone() + "watermarks/unset";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -15875,7 +15894,7 @@ impl<'a, C, A> LiveChatModeratorInsertCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/youtube/v3/liveChat/moderators".to_string();
+        let mut url = self.hub._base_url.clone() + "liveChat/moderators";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -16143,7 +16162,7 @@ impl<'a, C, A> LiveChatModeratorListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/youtube/v3/liveChat/moderators".to_string();
+        let mut url = self.hub._base_url.clone() + "liveChat/moderators";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -16385,7 +16404,7 @@ impl<'a, C, A> LiveChatModeratorDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
         }
 
 
-        let mut url = "https://www.googleapis.com/youtube/v3/liveChat/moderators".to_string();
+        let mut url = self.hub._base_url.clone() + "liveChat/moderators";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -16598,7 +16617,7 @@ impl<'a, C, A> CaptionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         }
 
 
-        let mut url = "https://www.googleapis.com/youtube/v3/captions".to_string();
+        let mut url = self.hub._base_url.clone() + "captions";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ForceSsl.as_ref().to_string(), ());
         }
@@ -16847,9 +16866,9 @@ impl<'a, C, A> CaptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         let (mut url, upload_type) =
             if protocol == "simple" {
-                ("https://www.googleapis.com/upload/youtube/v3/captions".to_string(), "multipart")
+                (self.hub._root_url.clone() + "/upload/youtube/v3/captions", "multipart")
             } else if protocol == "resumable" {
-                ("https://www.googleapis.com/resumable/upload/youtube/v3/captions".to_string(), "resumable")
+                (self.hub._root_url.clone() + "/resumable/upload/youtube/v3/captions", "resumable")
             } else {
                 unreachable!()
             };
@@ -17254,7 +17273,7 @@ impl<'a, C, A> CaptionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/youtube/v3/captions".to_string();
+        let mut url = self.hub._base_url.clone() + "captions";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ForceSsl.as_ref().to_string(), ());
         }
@@ -17528,7 +17547,7 @@ impl<'a, C, A> CaptionDownloadCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         }
 
 
-        let mut url = "https://www.googleapis.com/youtube/v3/captions/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "captions/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ForceSsl.as_ref().to_string(), ());
         }
@@ -17812,9 +17831,9 @@ impl<'a, C, A> CaptionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         let (mut url, upload_type) =
             if protocol == "simple" {
-                ("https://www.googleapis.com/upload/youtube/v3/captions".to_string(), "multipart")
+                (self.hub._root_url.clone() + "/upload/youtube/v3/captions", "multipart")
             } else if protocol == "resumable" {
-                ("https://www.googleapis.com/resumable/upload/youtube/v3/captions".to_string(), "resumable")
+                (self.hub._root_url.clone() + "/resumable/upload/youtube/v3/captions", "resumable")
             } else {
                 unreachable!()
             };
@@ -18193,7 +18212,7 @@ impl<'a, C, A> I18nLanguageListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/youtube/v3/i18nLanguages".to_string();
+        let mut url = self.hub._base_url.clone() + "i18nLanguages";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -18429,7 +18448,7 @@ impl<'a, C, A> GuideCategoryListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/youtube/v3/guideCategories".to_string();
+        let mut url = self.hub._base_url.clone() + "guideCategories";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -18714,7 +18733,7 @@ impl<'a, C, A> CommentThreadListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/youtube/v3/commentThreads".to_string();
+        let mut url = self.hub._base_url.clone() + "commentThreads";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ForceSsl.as_ref().to_string(), ());
         }
@@ -19018,7 +19037,7 @@ impl<'a, C, A> CommentThreadUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/youtube/v3/commentThreads".to_string();
+        let mut url = self.hub._base_url.clone() + "commentThreads";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ForceSsl.as_ref().to_string(), ());
         }
@@ -19269,7 +19288,7 @@ impl<'a, C, A> CommentThreadInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/youtube/v3/commentThreads".to_string();
+        let mut url = self.hub._base_url.clone() + "commentThreads";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ForceSsl.as_ref().to_string(), ());
         }
@@ -19520,7 +19539,7 @@ impl<'a, C, A> CommentInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/youtube/v3/comments".to_string();
+        let mut url = self.hub._base_url.clone() + "comments";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ForceSsl.as_ref().to_string(), ());
         }
@@ -19767,7 +19786,7 @@ impl<'a, C, A> CommentSetModerationStatuCall<'a, C, A> where C: BorrowMut<hyper:
         }
 
 
-        let mut url = "https://www.googleapis.com/youtube/v3/comments/setModerationStatus".to_string();
+        let mut url = self.hub._base_url.clone() + "comments/setModerationStatus";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ForceSsl.as_ref().to_string(), ());
         }
@@ -19989,7 +20008,7 @@ impl<'a, C, A> CommentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         }
 
 
-        let mut url = "https://www.googleapis.com/youtube/v3/comments".to_string();
+        let mut url = self.hub._base_url.clone() + "comments";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ForceSsl.as_ref().to_string(), ());
         }
@@ -20218,7 +20237,7 @@ impl<'a, C, A> CommentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/youtube/v3/comments".to_string();
+        let mut url = self.hub._base_url.clone() + "comments";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ForceSsl.as_ref().to_string(), ());
         }
@@ -20483,7 +20502,7 @@ impl<'a, C, A> CommentUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/youtube/v3/comments".to_string();
+        let mut url = self.hub._base_url.clone() + "comments";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ForceSsl.as_ref().to_string(), ());
         }
@@ -20723,7 +20742,7 @@ impl<'a, C, A> CommentMarkAsSpamCall<'a, C, A> where C: BorrowMut<hyper::Client>
         }
 
 
-        let mut url = "https://www.googleapis.com/youtube/v3/comments/markAsSpam".to_string();
+        let mut url = self.hub._base_url.clone() + "comments/markAsSpam";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ForceSsl.as_ref().to_string(), ());
         }
@@ -20942,7 +20961,7 @@ impl<'a, C, A> PlaylistItemInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/youtube/v3/playlistItems".to_string();
+        let mut url = self.hub._base_url.clone() + "playlistItems";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -21196,7 +21215,7 @@ impl<'a, C, A> PlaylistItemDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
         }
 
 
-        let mut url = "https://www.googleapis.com/youtube/v3/playlistItems".to_string();
+        let mut url = self.hub._base_url.clone() + "playlistItems";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -21439,7 +21458,7 @@ impl<'a, C, A> PlaylistItemListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/youtube/v3/playlistItems".to_string();
+        let mut url = self.hub._base_url.clone() + "playlistItems";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -21714,7 +21733,7 @@ impl<'a, C, A> PlaylistItemUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/youtube/v3/playlistItems".to_string();
+        let mut url = self.hub._base_url.clone() + "playlistItems";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -22003,7 +22022,7 @@ impl<'a, C, A> LiveChatMessageListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/youtube/v3/liveChat/messages".to_string();
+        let mut url = self.hub._base_url.clone() + "liveChat/messages";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -22261,7 +22280,7 @@ impl<'a, C, A> LiveChatMessageDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
         }
 
 
-        let mut url = "https://www.googleapis.com/youtube/v3/liveChat/messages".to_string();
+        let mut url = self.hub._base_url.clone() + "liveChat/messages";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -22475,7 +22494,7 @@ impl<'a, C, A> LiveChatMessageInsertCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/youtube/v3/liveChat/messages".to_string();
+        let mut url = self.hub._base_url.clone() + "liveChat/messages";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -22731,7 +22750,7 @@ impl<'a, C, A> VideoCategoryListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/youtube/v3/videoCategories".to_string();
+        let mut url = self.hub._base_url.clone() + "videoCategories";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -22971,7 +22990,7 @@ impl<'a, C, A> I18nRegionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/youtube/v3/i18nRegions".to_string();
+        let mut url = self.hub._base_url.clone() + "i18nRegions";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -23202,7 +23221,7 @@ impl<'a, C, A> SubscriptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/youtube/v3/subscriptions".to_string();
+        let mut url = self.hub._base_url.clone() + "subscriptions";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -23442,7 +23461,7 @@ impl<'a, C, A> SubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
         }
 
 
-        let mut url = "https://www.googleapis.com/youtube/v3/subscriptions".to_string();
+        let mut url = self.hub._base_url.clone() + "subscriptions";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -23701,7 +23720,7 @@ impl<'a, C, A> SubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/youtube/v3/subscriptions".to_string();
+        let mut url = self.hub._base_url.clone() + "subscriptions";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -24010,7 +24029,7 @@ impl<'a, C, A> LiveChatBanInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/youtube/v3/liveChat/bans".to_string();
+        let mut url = self.hub._base_url.clone() + "liveChat/bans";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -24250,7 +24269,7 @@ impl<'a, C, A> LiveChatBanDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
         }
 
 
-        let mut url = "https://www.googleapis.com/youtube/v3/liveChat/bans".to_string();
+        let mut url = self.hub._base_url.clone() + "liveChat/bans";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -24484,7 +24503,7 @@ impl<'a, C, A> SponsorListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/youtube/v3/sponsors".to_string();
+        let mut url = self.hub._base_url.clone() + "sponsors";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -24744,7 +24763,7 @@ impl<'a, C, A> VideoAbuseReportReasonListCall<'a, C, A> where C: BorrowMut<hyper
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/youtube/v3/videoAbuseReportReasons".to_string();
+        let mut url = self.hub._base_url.clone() + "videoAbuseReportReasons";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -25013,7 +25032,7 @@ impl<'a, C, A> LiveBroadcastControlCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/youtube/v3/liveBroadcasts/control".to_string();
+        let mut url = self.hub._base_url.clone() + "liveBroadcasts/control";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -25329,7 +25348,7 @@ impl<'a, C, A> LiveBroadcastUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/youtube/v3/liveBroadcasts".to_string();
+        let mut url = self.hub._base_url.clone() + "liveBroadcasts";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -25641,7 +25660,7 @@ impl<'a, C, A> LiveBroadcastBindCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/youtube/v3/liveBroadcasts/bind".to_string();
+        let mut url = self.hub._base_url.clone() + "liveBroadcasts/bind";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -25929,7 +25948,7 @@ impl<'a, C, A> LiveBroadcastTransitionCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/youtube/v3/liveBroadcasts/transition".to_string();
+        let mut url = self.hub._base_url.clone() + "liveBroadcasts/transition";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -26230,7 +26249,7 @@ impl<'a, C, A> LiveBroadcastInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/youtube/v3/liveBroadcasts".to_string();
+        let mut url = self.hub._base_url.clone() + "liveBroadcasts";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -26516,7 +26535,7 @@ impl<'a, C, A> LiveBroadcastDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
         }
 
 
-        let mut url = "https://www.googleapis.com/youtube/v3/liveBroadcasts".to_string();
+        let mut url = self.hub._base_url.clone() + "liveBroadcasts";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -26797,7 +26816,7 @@ impl<'a, C, A> LiveBroadcastListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/youtube/v3/liveBroadcasts".to_string();
+        let mut url = self.hub._base_url.clone() + "liveBroadcasts";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -27098,9 +27117,9 @@ impl<'a, C, A> ChannelBannerInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         let (mut url, upload_type) =
             if protocol == "simple" {
-                ("https://www.googleapis.com/upload/youtube/v3/channelBanners/insert".to_string(), "multipart")
+                (self.hub._root_url.clone() + "/upload/youtube/v3/channelBanners/insert", "multipart")
             } else if protocol == "resumable" {
-                ("https://www.googleapis.com/resumable/upload/youtube/v3/channelBanners/insert".to_string(), "resumable")
+                (self.hub._root_url.clone() + "/resumable/upload/youtube/v3/channelBanners/insert", "resumable")
             } else {
                 unreachable!()
             };
@@ -27595,7 +27614,7 @@ impl<'a, C, A> SearchListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/youtube/v3/search".to_string();
+        let mut url = self.hub._base_url.clone() + "search";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -28063,7 +28082,7 @@ impl<'a, C, A> SuperChatEventListCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/youtube/v3/superChatEvents".to_string();
+        let mut url = self.hub._base_url.clone() + "superChatEvents";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -28314,9 +28333,9 @@ impl<'a, C, A> ThumbnailSetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         let (mut url, upload_type) =
             if protocol == "simple" {
-                ("https://www.googleapis.com/upload/youtube/v3/thumbnails/set".to_string(), "multipart")
+                (self.hub._root_url.clone() + "/upload/youtube/v3/thumbnails/set", "multipart")
             } else if protocol == "resumable" {
-                ("https://www.googleapis.com/resumable/upload/youtube/v3/thumbnails/set".to_string(), "resumable")
+                (self.hub._root_url.clone() + "/resumable/upload/youtube/v3/thumbnails/set", "resumable")
             } else {
                 unreachable!()
             };
@@ -28672,7 +28691,7 @@ impl<'a, C, A> FanFundingEventListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/youtube/v3/fanFundingEvents".to_string();
+        let mut url = self.hub._base_url.clone() + "fanFundingEvents";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -28842,6 +28861,5 @@ impl<'a, C, A> FanFundingEventListCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self
     }
 }
-
 
 

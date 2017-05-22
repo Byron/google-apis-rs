@@ -205,7 +205,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -233,6 +233,7 @@ use std::collections::BTreeMap;
 use serde_json as json;
 use std::io;
 use std::fs;
+use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
@@ -353,6 +354,8 @@ pub struct Genomics<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
+    _base_url: String,
+    _root_url: String,
 }
 
 impl<'a, C, A> Hub for Genomics<C, A> {}
@@ -365,6 +368,8 @@ impl<'a, C, A> Genomics<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
+            _base_url: "https://genomics.googleapis.com/".to_string(),
+            _root_url: "https://genomics.googleapis.com/".to_string(),
         }
     }
 
@@ -407,9 +412,23 @@ impl<'a, C, A> Genomics<C, A>
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
-        let prev = self._user_agent.clone();
-        self._user_agent = agent_name;
-        prev
+        mem::replace(&mut self._user_agent, agent_name)
+    }
+
+    /// Set the base url to use in all requests to the server.
+    /// It defaults to `https://genomics.googleapis.com/`.
+    ///
+    /// Returns the previously set base url.
+    pub fn base_url(&mut self, new_base_url: String) -> String {
+        mem::replace(&mut self._base_url, new_base_url)
+    }
+
+    /// Set the root url to use in all requests to the server.
+    /// It defaults to `https://genomics.googleapis.com/`.
+    ///
+    /// Returns the previously set root url.
+    pub fn root_url(&mut self, new_root_url: String) -> String {
+        mem::replace(&mut self._root_url, new_root_url)
     }
 }
 
@@ -4749,7 +4768,7 @@ impl<'a, C, A> OperationCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/{+name}:cancel".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:cancel";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5020,7 +5039,7 @@ impl<'a, C, A> OperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/{+name}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5280,7 +5299,7 @@ impl<'a, C, A> OperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/{+name}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5572,7 +5591,7 @@ impl<'a, C, A> DatasetCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/datasets".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/datasets";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5815,7 +5834,7 @@ impl<'a, C, A> DatasetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/datasets/{datasetId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/datasets/{datasetId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -6069,7 +6088,7 @@ impl<'a, C, A> DatasetUndeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/datasets/{datasetId}:undelete".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/datasets/{datasetId}:undelete";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -6350,7 +6369,7 @@ impl<'a, C, A> DatasetSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/{+resource}:setIamPolicy".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/{+resource}:setIamPolicy";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -6633,7 +6652,7 @@ impl<'a, C, A> DatasetTestIamPermissionCall<'a, C, A> where C: BorrowMut<hyper::
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/{+resource}:testIamPermissions".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/{+resource}:testIamPermissions";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -6906,7 +6925,7 @@ impl<'a, C, A> DatasetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/datasets/{datasetId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/datasets/{datasetId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -7164,7 +7183,7 @@ impl<'a, C, A> DatasetListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/datasets".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/datasets";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -7414,7 +7433,7 @@ impl<'a, C, A> DatasetGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/{+resource}:getIamPolicy".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/{+resource}:getIamPolicy";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -7701,7 +7720,7 @@ impl<'a, C, A> DatasetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/datasets/{datasetId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/datasets/{datasetId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -7988,7 +8007,7 @@ impl<'a, C, A> ReferencesetSearchCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/referencesets/search".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/referencesets/search";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -8229,7 +8248,7 @@ impl<'a, C, A> ReferencesetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/referencesets/{referenceSetId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/referencesets/{referenceSetId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -8482,7 +8501,7 @@ impl<'a, C, A> CallsetSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/callsets/search".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/callsets/search";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -8734,7 +8753,7 @@ impl<'a, C, A> CallsetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/callsets/{callSetId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/callsets/{callSetId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -9018,7 +9037,7 @@ impl<'a, C, A> CallsetCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/callsets".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/callsets";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -9256,7 +9275,7 @@ impl<'a, C, A> CallsetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/callsets/{callSetId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/callsets/{callSetId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -9501,7 +9520,7 @@ impl<'a, C, A> CallsetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/callsets/{callSetId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/callsets/{callSetId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -9770,7 +9789,7 @@ impl<'a, C, A> ReadSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/reads/search".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/reads/search";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -10020,7 +10039,7 @@ impl<'a, C, A> ReadgroupsetExportCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/readgroupsets/{readGroupSetId}:export".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/readgroupsets/{readGroupSetId}:export";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -10308,7 +10327,7 @@ impl<'a, C, A> ReadgroupsetImportCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/readgroupsets:import".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/readgroupsets:import";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -10560,7 +10579,7 @@ impl<'a, C, A> ReadgroupsetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/readgroupsets/{readGroupSetId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/readgroupsets/{readGroupSetId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -10843,7 +10862,7 @@ impl<'a, C, A> ReadgroupsetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/readgroupsets/{readGroupSetId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/readgroupsets/{readGroupSetId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -11126,7 +11145,7 @@ impl<'a, C, A> ReadgroupsetCoveragebucketListCall<'a, C, A> where C: BorrowMut<h
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/readgroupsets/{readGroupSetId}/coveragebuckets".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/readgroupsets/{readGroupSetId}/coveragebuckets";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -11426,7 +11445,7 @@ impl<'a, C, A> ReadgroupsetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/readgroupsets/{readGroupSetId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/readgroupsets/{readGroupSetId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -11680,7 +11699,7 @@ impl<'a, C, A> ReadgroupsetSearchCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/readgroupsets/search".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/readgroupsets/search";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -11941,7 +11960,7 @@ impl<'a, C, A> ReferenceBaseListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/references/{referenceId}/bases".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/references/{referenceId}/bases";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -12227,7 +12246,7 @@ impl<'a, C, A> ReferenceSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/references/search".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/references/search";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -12468,7 +12487,7 @@ impl<'a, C, A> ReferenceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/references/{referenceId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/references/{referenceId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -12721,7 +12740,7 @@ impl<'a, C, A> VariantSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/variants/search".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/variants/search";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -12959,7 +12978,7 @@ impl<'a, C, A> VariantDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/variants/{variantId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/variants/{variantId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -13204,7 +13223,7 @@ impl<'a, C, A> VariantGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/variants/{variantId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/variants/{variantId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -13540,7 +13559,7 @@ impl<'a, C, A> VariantMergeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/variants:merge".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/variants:merge";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -13783,7 +13802,7 @@ impl<'a, C, A> VariantCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/variants".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/variants";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -14039,7 +14058,7 @@ impl<'a, C, A> VariantImportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/variants:import".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/variants:import";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -14292,7 +14311,7 @@ impl<'a, C, A> VariantPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/variants/{variantId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/variants/{variantId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -14580,7 +14599,7 @@ impl<'a, C, A> AnnotationUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/annotations/{annotationId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/annotations/{annotationId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -14858,7 +14877,7 @@ impl<'a, C, A> AnnotationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/annotations/{annotationId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/annotations/{annotationId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -15110,7 +15129,7 @@ impl<'a, C, A> AnnotationSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/annotations/search".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/annotations/search";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -15345,7 +15364,7 @@ impl<'a, C, A> AnnotationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/annotations/{annotationId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/annotations/{annotationId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -15612,7 +15631,7 @@ impl<'a, C, A> AnnotationCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/annotations".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/annotations";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -15864,7 +15883,7 @@ impl<'a, C, A> AnnotationBatchCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/annotations:batchCreate".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/annotations:batchCreate";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -16112,7 +16131,7 @@ impl<'a, C, A> AnnotationsetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/annotationsets/{annotationSetId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/annotationsets/{annotationSetId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -16397,7 +16416,7 @@ impl<'a, C, A> AnnotationsetSearchCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/annotationsets/search".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/annotationsets/search";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -16645,7 +16664,7 @@ impl<'a, C, A> AnnotationsetCreateCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/annotationsets".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/annotationsets";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -16880,7 +16899,7 @@ impl<'a, C, A> AnnotationsetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/annotationsets/{annotationSetId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/annotationsets/{annotationSetId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -17122,7 +17141,7 @@ impl<'a, C, A> AnnotationsetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/annotationsets/{annotationSetId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/annotationsets/{annotationSetId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -17376,7 +17395,7 @@ impl<'a, C, A> VariantsetCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/variantsets".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/variantsets";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -17615,7 +17634,7 @@ impl<'a, C, A> VariantsetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/variantsets/{variantSetId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/variantsets/{variantSetId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -17867,7 +17886,7 @@ impl<'a, C, A> VariantsetExportCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/variantsets/{variantSetId}:export".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/variantsets/{variantSetId}:export";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
         }
@@ -18149,7 +18168,7 @@ impl<'a, C, A> VariantsetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/variantsets/{variantSetId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/variantsets/{variantSetId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -18440,7 +18459,7 @@ impl<'a, C, A> VariantsetSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/variantsets/search".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/variantsets/search";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -18678,7 +18697,7 @@ impl<'a, C, A> VariantsetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://genomics.googleapis.com/v1/variantsets/{variantSetId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1/variantsets/{variantSetId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -18847,6 +18866,5 @@ impl<'a, C, A> VariantsetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self
     }
 }
-
 
 

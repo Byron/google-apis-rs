@@ -207,7 +207,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -235,6 +235,7 @@ use std::collections::BTreeMap;
 use serde_json as json;
 use std::io;
 use std::fs;
+use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
@@ -323,6 +324,8 @@ pub struct Partners<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
+    _base_url: String,
+    _root_url: String,
 }
 
 impl<'a, C, A> Hub for Partners<C, A> {}
@@ -335,6 +338,8 @@ impl<'a, C, A> Partners<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
+            _base_url: "https://partners.googleapis.com/".to_string(),
+            _root_url: "https://partners.googleapis.com/".to_string(),
         }
     }
 
@@ -374,9 +379,23 @@ impl<'a, C, A> Partners<C, A>
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
-        let prev = self._user_agent.clone();
-        self._user_agent = agent_name;
-        prev
+        mem::replace(&mut self._user_agent, agent_name)
+    }
+
+    /// Set the base url to use in all requests to the server.
+    /// It defaults to `https://partners.googleapis.com/`.
+    ///
+    /// Returns the previously set base url.
+    pub fn base_url(&mut self, new_base_url: String) -> String {
+        mem::replace(&mut self._base_url, new_base_url)
+    }
+
+    /// Set the root url to use in all requests to the server.
+    /// It defaults to `https://partners.googleapis.com/`.
+    ///
+    /// Returns the previously set root url.
+    pub fn root_url(&mut self, new_root_url: String) -> String {
+        mem::replace(&mut self._root_url, new_root_url)
     }
 }
 
@@ -2775,7 +2794,7 @@ impl<'a, C, A> MethodUpdateCompanyCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://partners.googleapis.com/v2/companies".to_string();
+        let mut url = self.hub._base_url.clone() + "v2/companies";
         
         let mut key = self.hub.auth.borrow_mut().api_key();
         if key.is_none() {
@@ -3085,7 +3104,7 @@ impl<'a, C, A> MethodGetPartnersstatuCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://partners.googleapis.com/v2/partnersstatus".to_string();
+        let mut url = self.hub._base_url.clone() + "v2/partnersstatus";
         
         let mut key = self.hub.auth.borrow_mut().api_key();
         if key.is_none() {
@@ -3374,7 +3393,7 @@ impl<'a, C, A> MethodUpdateLeadCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://partners.googleapis.com/v2/leads".to_string();
+        let mut url = self.hub._base_url.clone() + "v2/leads";
         
         let mut key = self.hub.auth.borrow_mut().api_key();
         if key.is_none() {
@@ -3654,7 +3673,7 @@ impl<'a, C, A> UserEventLogCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://partners.googleapis.com/v2/userEvents:log".to_string();
+        let mut url = self.hub._base_url.clone() + "v2/userEvents:log";
         
         let mut key = self.hub.auth.borrow_mut().api_key();
         if key.is_none() {
@@ -3873,7 +3892,7 @@ impl<'a, C, A> ClientMessageLogCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://partners.googleapis.com/v2/clientMessages:log".to_string();
+        let mut url = self.hub._base_url.clone() + "v2/clientMessages:log";
         
         let mut key = self.hub.auth.borrow_mut().api_key();
         if key.is_none() {
@@ -4142,7 +4161,7 @@ impl<'a, C, A> CompanyGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://partners.googleapis.com/v2/companies/{companyId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v2/companies/{companyId}";
         
         let mut key = self.hub.auth.borrow_mut().api_key();
         if key.is_none() {
@@ -4457,7 +4476,7 @@ impl<'a, C, A> CompanyLeadCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://partners.googleapis.com/v2/companies/{companyId}/leads".to_string();
+        let mut url = self.hub._base_url.clone() + "v2/companies/{companyId}/leads";
         
         let mut key = self.hub.auth.borrow_mut().api_key();
         if key.is_none() {
@@ -4835,7 +4854,7 @@ impl<'a, C, A> CompanyListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://partners.googleapis.com/v2/companies".to_string();
+        let mut url = self.hub._base_url.clone() + "v2/companies";
         
         let mut key = self.hub.auth.borrow_mut().api_key();
         if key.is_none() {
@@ -5288,7 +5307,7 @@ impl<'a, C, A> LeadListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://partners.googleapis.com/v2/leads".to_string();
+        let mut url = self.hub._base_url.clone() + "v2/leads";
         
         let mut key = self.hub.auth.borrow_mut().api_key();
         if key.is_none() {
@@ -5602,7 +5621,7 @@ impl<'a, C, A> AnalyticListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://partners.googleapis.com/v2/analytics".to_string();
+        let mut url = self.hub._base_url.clone() + "v2/analytics";
         
         let mut key = self.hub.auth.borrow_mut().api_key();
         if key.is_none() {
@@ -5925,7 +5944,7 @@ impl<'a, C, A> OfferHistoryListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://partners.googleapis.com/v2/offers/history".to_string();
+        let mut url = self.hub._base_url.clone() + "v2/offers/history";
         
         let mut key = self.hub.auth.borrow_mut().api_key();
         if key.is_none() {
@@ -6234,7 +6253,7 @@ impl<'a, C, A> OfferListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://partners.googleapis.com/v2/offers".to_string();
+        let mut url = self.hub._base_url.clone() + "v2/offers";
         
         let mut key = self.hub.auth.borrow_mut().api_key();
         if key.is_none() {
@@ -6513,7 +6532,7 @@ impl<'a, C, A> ExamGetTokenCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://partners.googleapis.com/v2/exams/{examType}/token".to_string();
+        let mut url = self.hub._base_url.clone() + "v2/exams/{examType}/token";
         
         let mut key = self.hub.auth.borrow_mut().api_key();
         if key.is_none() {
@@ -6821,7 +6840,7 @@ impl<'a, C, A> UserStateListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://partners.googleapis.com/v2/userStates".to_string();
+        let mut url = self.hub._base_url.clone() + "v2/userStates";
         
         let mut key = self.hub.auth.borrow_mut().api_key();
         if key.is_none() {
@@ -7106,7 +7125,7 @@ impl<'a, C, A> UserUpdateProfileCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://partners.googleapis.com/v2/users/profile".to_string();
+        let mut url = self.hub._base_url.clone() + "v2/users/profile";
         
         let mut key = self.hub.auth.borrow_mut().api_key();
         if key.is_none() {
@@ -7416,7 +7435,7 @@ impl<'a, C, A> UserCreateCompanyRelationCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://partners.googleapis.com/v2/users/{userId}/companyRelation".to_string();
+        let mut url = self.hub._base_url.clone() + "v2/users/{userId}/companyRelation";
         
         let mut key = self.hub.auth.borrow_mut().api_key();
         if key.is_none() {
@@ -7756,7 +7775,7 @@ impl<'a, C, A> UserGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://partners.googleapis.com/v2/users/{userId}".to_string();
+        let mut url = self.hub._base_url.clone() + "v2/users/{userId}";
         
         let mut key = self.hub.auth.borrow_mut().api_key();
         if key.is_none() {
@@ -8074,7 +8093,7 @@ impl<'a, C, A> UserDeleteCompanyRelationCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://partners.googleapis.com/v2/users/{userId}/companyRelation".to_string();
+        let mut url = self.hub._base_url.clone() + "v2/users/{userId}/companyRelation";
         
         let mut key = self.hub.auth.borrow_mut().api_key();
         if key.is_none() {
@@ -8277,6 +8296,5 @@ impl<'a, C, A> UserDeleteCompanyRelationCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 }
-
 
 

@@ -180,7 +180,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -208,6 +208,7 @@ use std::collections::BTreeMap;
 use serde_json as json;
 use std::io;
 use std::fs;
+use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
@@ -315,6 +316,8 @@ pub struct Pubsub<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
+    _base_url: String,
+    _root_url: String,
 }
 
 impl<'a, C, A> Hub for Pubsub<C, A> {}
@@ -327,6 +330,8 @@ impl<'a, C, A> Pubsub<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
+            _base_url: "https://pubsub.googleapis.com/".to_string(),
+            _root_url: "https://pubsub.googleapis.com/".to_string(),
         }
     }
 
@@ -339,9 +344,23 @@ impl<'a, C, A> Pubsub<C, A>
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
-        let prev = self._user_agent.clone();
-        self._user_agent = agent_name;
-        prev
+        mem::replace(&mut self._user_agent, agent_name)
+    }
+
+    /// Set the base url to use in all requests to the server.
+    /// It defaults to `https://pubsub.googleapis.com/`.
+    ///
+    /// Returns the previously set base url.
+    pub fn base_url(&mut self, new_base_url: String) -> String {
+        mem::replace(&mut self._base_url, new_base_url)
+    }
+
+    /// Set the root url to use in all requests to the server.
+    /// It defaults to `https://pubsub.googleapis.com/`.
+    ///
+    /// Returns the previously set root url.
+    pub fn root_url(&mut self, new_root_url: String) -> String {
+        mem::replace(&mut self._root_url, new_root_url)
     }
 }
 
@@ -1505,7 +1524,7 @@ impl<'a, C, A> ProjectTopicListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://pubsub.googleapis.com/v1beta2/{+project}/topics".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta2/{+project}/topics";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -1776,7 +1795,7 @@ impl<'a, C, A> ProjectSubscriptionPullCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://pubsub.googleapis.com/v1beta2/{+subscription}:pull".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta2/{+subscription}:pull";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -2052,7 +2071,7 @@ impl<'a, C, A> ProjectTopicCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://pubsub.googleapis.com/v1beta2/{+name}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta2/{+name}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -2339,7 +2358,7 @@ impl<'a, C, A> ProjectTopicTestIamPermissionCall<'a, C, A> where C: BorrowMut<hy
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://pubsub.googleapis.com/v1beta2/{+resource}:testIamPermissions".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta2/{+resource}:testIamPermissions";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -2621,7 +2640,7 @@ impl<'a, C, A> ProjectSubscriptionModifyPushConfigCall<'a, C, A> where C: Borrow
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://pubsub.googleapis.com/v1beta2/{+subscription}:modifyPushConfig".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta2/{+subscription}:modifyPushConfig";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -2899,7 +2918,7 @@ impl<'a, C, A> ProjectTopicPublishCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://pubsub.googleapis.com/v1beta2/{+topic}:publish".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta2/{+topic}:publish";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -3168,7 +3187,7 @@ impl<'a, C, A> ProjectTopicGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://pubsub.googleapis.com/v1beta2/{+topic}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta2/{+topic}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -3415,7 +3434,7 @@ impl<'a, C, A> ProjectTopicGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://pubsub.googleapis.com/v1beta2/{+resource}:getIamPolicy".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta2/{+resource}:getIamPolicy";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -3672,7 +3691,7 @@ impl<'a, C, A> ProjectSubscriptionModifyAckDeadlineCall<'a, C, A> where C: Borro
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://pubsub.googleapis.com/v1beta2/{+subscription}:modifyAckDeadline".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta2/{+subscription}:modifyAckDeadline";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -3945,7 +3964,7 @@ impl<'a, C, A> ProjectSubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://pubsub.googleapis.com/v1beta2/{+subscription}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta2/{+subscription}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -4198,7 +4217,7 @@ impl<'a, C, A> ProjectTopicSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://pubsub.googleapis.com/v1beta2/{+resource}:setIamPolicy".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta2/{+resource}:setIamPolicy";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -4481,7 +4500,7 @@ impl<'a, C, A> ProjectSubscriptionCreateCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://pubsub.googleapis.com/v1beta2/{+name}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta2/{+name}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -4768,7 +4787,7 @@ impl<'a, C, A> ProjectSubscriptionAcknowledgeCall<'a, C, A> where C: BorrowMut<h
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://pubsub.googleapis.com/v1beta2/{+subscription}:acknowledge".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta2/{+subscription}:acknowledge";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5039,7 +5058,7 @@ impl<'a, C, A> ProjectSubscriptionGetIamPolicyCall<'a, C, A> where C: BorrowMut<
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://pubsub.googleapis.com/v1beta2/{+resource}:getIamPolicy".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta2/{+resource}:getIamPolicy";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5298,7 +5317,7 @@ impl<'a, C, A> ProjectSubscriptionTestIamPermissionCall<'a, C, A> where C: Borro
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://pubsub.googleapis.com/v1beta2/{+resource}:testIamPermissions".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta2/{+resource}:testIamPermissions";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5572,7 +5591,7 @@ impl<'a, C, A> ProjectTopicDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://pubsub.googleapis.com/v1beta2/{+topic}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta2/{+topic}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5817,7 +5836,7 @@ impl<'a, C, A> ProjectSubscriptionGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://pubsub.googleapis.com/v1beta2/{+subscription}".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta2/{+subscription}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -6072,7 +6091,7 @@ impl<'a, C, A> ProjectTopicSubscriptionListCall<'a, C, A> where C: BorrowMut<hyp
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://pubsub.googleapis.com/v1beta2/{+topic}/subscriptions".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta2/{+topic}/subscriptions";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -6343,7 +6362,7 @@ impl<'a, C, A> ProjectSubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://pubsub.googleapis.com/v1beta2/{+project}/subscriptions".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta2/{+project}/subscriptions";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -6612,7 +6631,7 @@ impl<'a, C, A> ProjectSubscriptionSetIamPolicyCall<'a, C, A> where C: BorrowMut<
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://pubsub.googleapis.com/v1beta2/{+resource}:setIamPolicy".to_string();
+        let mut url = self.hub._base_url.clone() + "v1beta2/{+resource}:setIamPolicy";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -6809,6 +6828,5 @@ impl<'a, C, A> ProjectSubscriptionSetIamPolicyCall<'a, C, A> where C: BorrowMut<
         self
     }
 }
-
 
 

@@ -248,7 +248,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -276,6 +276,7 @@ use std::collections::BTreeMap;
 use serde_json as json;
 use std::io;
 use std::fs;
+use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
@@ -495,6 +496,8 @@ pub struct Directory<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
+    _base_url: String,
+    _root_url: String,
 }
 
 impl<'a, C, A> Hub for Directory<C, A> {}
@@ -507,6 +510,8 @@ impl<'a, C, A> Directory<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
+            _base_url: "https://www.googleapis.com/admin/directory/v1/".to_string(),
+            _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
@@ -573,9 +578,23 @@ impl<'a, C, A> Directory<C, A>
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
-        let prev = self._user_agent.clone();
-        self._user_agent = agent_name;
-        prev
+        mem::replace(&mut self._user_agent, agent_name)
+    }
+
+    /// Set the base url to use in all requests to the server.
+    /// It defaults to `https://www.googleapis.com/admin/directory/v1/`.
+    ///
+    /// Returns the previously set base url.
+    pub fn base_url(&mut self, new_base_url: String) -> String {
+        mem::replace(&mut self._base_url, new_base_url)
+    }
+
+    /// Set the root url to use in all requests to the server.
+    /// It defaults to `https://www.googleapis.com/`.
+    ///
+    /// Returns the previously set root url.
+    pub fn root_url(&mut self, new_root_url: String) -> String {
+        mem::replace(&mut self._root_url, new_root_url)
     }
 }
 
@@ -5040,7 +5059,7 @@ impl<'a, C, A> VerificationCodeGenerateCall<'a, C, A> where C: BorrowMut<hyper::
         }
 
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/verificationCodes/generate".to_string();
+        let mut url = self.hub._base_url.clone() + "users/{userKey}/verificationCodes/generate";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryUserSecurity.as_ref().to_string(), ());
         }
@@ -5264,7 +5283,7 @@ impl<'a, C, A> VerificationCodeInvalidateCall<'a, C, A> where C: BorrowMut<hyper
         }
 
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/verificationCodes/invalidate".to_string();
+        let mut url = self.hub._base_url.clone() + "users/{userKey}/verificationCodes/invalidate";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryUserSecurity.as_ref().to_string(), ());
         }
@@ -5489,7 +5508,7 @@ impl<'a, C, A> VerificationCodeListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/verificationCodes".to_string();
+        let mut url = self.hub._base_url.clone() + "users/{userKey}/verificationCodes";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryUserSecurity.as_ref().to_string(), ());
         }
@@ -5731,7 +5750,7 @@ impl<'a, C, A> CustomerPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customers/{customerKey}".to_string();
+        let mut url = self.hub._base_url.clone() + "customers/{customerKey}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryCustomer.as_ref().to_string(), ());
         }
@@ -5990,7 +6009,7 @@ impl<'a, C, A> CustomerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customers/{customerKey}".to_string();
+        let mut url = self.hub._base_url.clone() + "customers/{customerKey}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryCustomerReadonly.as_ref().to_string(), ());
         }
@@ -6232,7 +6251,7 @@ impl<'a, C, A> CustomerUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customers/{customerKey}".to_string();
+        let mut url = self.hub._base_url.clone() + "customers/{customerKey}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryCustomer.as_ref().to_string(), ());
         }
@@ -6501,7 +6520,7 @@ impl<'a, C, A> OrgunitListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/orgunits".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customerId}/orgunits";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryOrgunitReadonly.as_ref().to_string(), ());
         }
@@ -6757,7 +6776,7 @@ impl<'a, C, A> OrgunitInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/orgunits".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customerId}/orgunits";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryOrgunit.as_ref().to_string(), ());
         }
@@ -7029,7 +7048,7 @@ impl<'a, C, A> OrgunitUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/orgunits{/orgUnitPath*}".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customerId}/orgunits{/orgUnitPath*}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryOrgunit.as_ref().to_string(), ());
         }
@@ -7304,7 +7323,7 @@ impl<'a, C, A> OrgunitDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         }
 
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/orgunits{/orgUnitPath*}".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customerId}/orgunits{/orgUnitPath*}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryOrgunit.as_ref().to_string(), ());
         }
@@ -7546,7 +7565,7 @@ impl<'a, C, A> OrgunitGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/orgunits{/orgUnitPath*}".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customerId}/orgunits{/orgUnitPath*}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryOrgunitReadonly.as_ref().to_string(), ());
         }
@@ -7805,7 +7824,7 @@ impl<'a, C, A> OrgunitPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/orgunits{/orgUnitPath*}".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customerId}/orgunits{/orgUnitPath*}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryOrgunit.as_ref().to_string(), ());
         }
@@ -8082,7 +8101,7 @@ impl<'a, C, A> MemberInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/groups/{groupKey}/members".to_string();
+        let mut url = self.hub._base_url.clone() + "groups/{groupKey}/members";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryGroup.as_ref().to_string(), ());
         }
@@ -8350,7 +8369,7 @@ impl<'a, C, A> MemberPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/groups/{groupKey}/members/{memberKey}".to_string();
+        let mut url = self.hub._base_url.clone() + "groups/{groupKey}/members/{memberKey}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryGroup.as_ref().to_string(), ());
         }
@@ -8628,7 +8647,7 @@ impl<'a, C, A> MemberUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/groups/{groupKey}/members/{memberKey}".to_string();
+        let mut url = self.hub._base_url.clone() + "groups/{groupKey}/members/{memberKey}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryGroup.as_ref().to_string(), ());
         }
@@ -8912,7 +8931,7 @@ impl<'a, C, A> MemberListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/groups/{groupKey}/members".to_string();
+        let mut url = self.hub._base_url.clone() + "groups/{groupKey}/members";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryGroupMemberReadonly.as_ref().to_string(), ());
         }
@@ -9170,7 +9189,7 @@ impl<'a, C, A> MemberGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/groups/{groupKey}/members/{memberKey}".to_string();
+        let mut url = self.hub._base_url.clone() + "groups/{groupKey}/members/{memberKey}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryGroupMemberReadonly.as_ref().to_string(), ());
         }
@@ -9416,7 +9435,7 @@ impl<'a, C, A> MemberDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         }
 
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/groups/{groupKey}/members/{memberKey}".to_string();
+        let mut url = self.hub._base_url.clone() + "groups/{groupKey}/members/{memberKey}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryGroup.as_ref().to_string(), ());
         }
@@ -9660,7 +9679,7 @@ impl<'a, C, A> RoleUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customer}/roles/{roleId}".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customer}/roles/{roleId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryRolemanagement.as_ref().to_string(), ());
         }
@@ -9931,7 +9950,7 @@ impl<'a, C, A> RoleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customer}/roles/{roleId}".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customer}/roles/{roleId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryRolemanagementReadonly.as_ref().to_string(), ());
         }
@@ -10177,7 +10196,7 @@ impl<'a, C, A> RoleDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         }
 
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customer}/roles/{roleId}".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customer}/roles/{roleId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryRolemanagement.as_ref().to_string(), ());
         }
@@ -10421,7 +10440,7 @@ impl<'a, C, A> RolePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customer}/roles/{roleId}".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customer}/roles/{roleId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryRolemanagement.as_ref().to_string(), ());
         }
@@ -10697,7 +10716,7 @@ impl<'a, C, A> RoleInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customer}/roles".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customer}/roles";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryRolemanagement.as_ref().to_string(), ());
         }
@@ -10966,7 +10985,7 @@ impl<'a, C, A> RoleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customer}/roles".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customer}/roles";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryRolemanagementReadonly.as_ref().to_string(), ());
         }
@@ -11230,7 +11249,7 @@ impl<'a, C, A> NotificationListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customer}/notifications".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customer}/notifications";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryNotification.as_ref().to_string(), ());
         }
@@ -11495,7 +11514,7 @@ impl<'a, C, A> NotificationUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customer}/notifications/{notificationId}".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customer}/notifications/{notificationId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryNotification.as_ref().to_string(), ());
         }
@@ -11765,7 +11784,7 @@ impl<'a, C, A> NotificationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
         }
 
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customer}/notifications/{notificationId}".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customer}/notifications/{notificationId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryNotification.as_ref().to_string(), ());
         }
@@ -12002,7 +12021,7 @@ impl<'a, C, A> NotificationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customer}/notifications/{notificationId}".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customer}/notifications/{notificationId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryNotification.as_ref().to_string(), ());
         }
@@ -12256,7 +12275,7 @@ impl<'a, C, A> NotificationPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customer}/notifications/{notificationId}".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customer}/notifications/{notificationId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryNotification.as_ref().to_string(), ());
         }
@@ -12525,7 +12544,7 @@ impl<'a, C, A> PrivilegeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customer}/roles/ALL/privileges".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customer}/roles/ALL/privileges";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryRolemanagementReadonly.as_ref().to_string(), ());
         }
@@ -12764,7 +12783,7 @@ impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         }
 
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1//admin/directory_v1/channels/stop".to_string();
+        let mut url = self.hub._base_url.clone() + "/admin/directory_v1/channels/stop";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryUser.as_ref().to_string(), ());
         }
@@ -12989,7 +13008,7 @@ impl<'a, C, A> MobiledeviceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/devices/mobile/{resourceId}".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customerId}/devices/mobile/{resourceId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryDeviceMobileReadonly.as_ref().to_string(), ());
         }
@@ -13271,7 +13290,7 @@ impl<'a, C, A> MobiledeviceListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/devices/mobile".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customerId}/devices/mobile";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryDeviceMobileReadonly.as_ref().to_string(), ());
         }
@@ -13549,7 +13568,7 @@ impl<'a, C, A> MobiledeviceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
         }
 
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/devices/mobile/{resourceId}".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customerId}/devices/mobile/{resourceId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryDeviceMobile.as_ref().to_string(), ());
         }
@@ -13792,7 +13811,7 @@ impl<'a, C, A> MobiledeviceActionCall<'a, C, A> where C: BorrowMut<hyper::Client
         }
 
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/devices/mobile/{resourceId}/action".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customerId}/devices/mobile/{resourceId}/action";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryDeviceMobile.as_ref().to_string(), ());
         }
@@ -14053,7 +14072,7 @@ impl<'a, C, A> TokenGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/tokens/{clientId}".to_string();
+        let mut url = self.hub._base_url.clone() + "users/{userKey}/tokens/{clientId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryUserSecurity.as_ref().to_string(), ());
         }
@@ -14298,7 +14317,7 @@ impl<'a, C, A> TokenListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/tokens".to_string();
+        let mut url = self.hub._base_url.clone() + "users/{userKey}/tokens";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryUserSecurity.as_ref().to_string(), ());
         }
@@ -14534,7 +14553,7 @@ impl<'a, C, A> TokenDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         }
 
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/tokens/{clientId}".to_string();
+        let mut url = self.hub._base_url.clone() + "users/{userKey}/tokens/{clientId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryUserSecurity.as_ref().to_string(), ());
         }
@@ -14776,7 +14795,7 @@ impl<'a, C, A> RoleAssignmentInsertCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customer}/roleassignments".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customer}/roleassignments";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryRolemanagement.as_ref().to_string(), ());
         }
@@ -15037,7 +15056,7 @@ impl<'a, C, A> RoleAssignmentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customer}/roleassignments/{roleAssignmentId}".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customer}/roleassignments/{roleAssignmentId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryRolemanagementReadonly.as_ref().to_string(), ());
         }
@@ -15283,7 +15302,7 @@ impl<'a, C, A> RoleAssignmentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clie
         }
 
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customer}/roleassignments/{roleAssignmentId}".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customer}/roleassignments/{roleAssignmentId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryRolemanagement.as_ref().to_string(), ());
         }
@@ -15538,7 +15557,7 @@ impl<'a, C, A> RoleAssignmentListCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customer}/roleassignments".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customer}/roleassignments";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryRolemanagementReadonly.as_ref().to_string(), ());
         }
@@ -15831,7 +15850,7 @@ impl<'a, C, A> ChromeosdeviceListCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/devices/chromeos".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customerId}/devices/chromeos";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_ref().to_string(), ());
         }
@@ -16122,7 +16141,7 @@ impl<'a, C, A> ChromeosdevicePatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/devices/chromeos/{deviceId}".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customerId}/devices/chromeos/{deviceId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
         }
@@ -16412,7 +16431,7 @@ impl<'a, C, A> ChromeosdeviceUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/devices/chromeos/{deviceId}".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customerId}/devices/chromeos/{deviceId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
         }
@@ -16695,7 +16714,7 @@ impl<'a, C, A> ChromeosdeviceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/devices/chromeos/{deviceId}".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customerId}/devices/chromeos/{deviceId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_ref().to_string(), ());
         }
@@ -16955,7 +16974,7 @@ impl<'a, C, A> ChromeosdeviceActionCall<'a, C, A> where C: BorrowMut<hyper::Clie
         }
 
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/devices/chromeos/{resourceId}/action".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customerId}/devices/chromeos/{resourceId}/action";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
         }
@@ -17213,7 +17232,7 @@ impl<'a, C, A> GroupDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         }
 
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/groups/{groupKey}".to_string();
+        let mut url = self.hub._base_url.clone() + "groups/{groupKey}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryGroup.as_ref().to_string(), ());
         }
@@ -17461,7 +17480,7 @@ impl<'a, C, A> GroupListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/groups".to_string();
+        let mut url = self.hub._base_url.clone() + "groups";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryGroupReadonly.as_ref().to_string(), ());
         }
@@ -17707,7 +17726,7 @@ impl<'a, C, A> GroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/groups/{groupKey}".to_string();
+        let mut url = self.hub._base_url.clone() + "groups/{groupKey}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryGroup.as_ref().to_string(), ());
         }
@@ -17971,7 +17990,7 @@ impl<'a, C, A> GroupInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/groups".to_string();
+        let mut url = self.hub._base_url.clone() + "groups";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryGroup.as_ref().to_string(), ());
         }
@@ -18206,7 +18225,7 @@ impl<'a, C, A> GroupAliaseInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/groups/{groupKey}/aliases".to_string();
+        let mut url = self.hub._base_url.clone() + "groups/{groupKey}/aliases";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryGroup.as_ref().to_string(), ());
         }
@@ -18465,7 +18484,7 @@ impl<'a, C, A> GroupAliaseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/groups/{groupKey}/aliases".to_string();
+        let mut url = self.hub._base_url.clone() + "groups/{groupKey}/aliases";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryGroupReadonly.as_ref().to_string(), ());
         }
@@ -18700,7 +18719,7 @@ impl<'a, C, A> GroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/groups/{groupKey}".to_string();
+        let mut url = self.hub._base_url.clone() + "groups/{groupKey}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryGroupReadonly.as_ref().to_string(), ());
         }
@@ -18942,7 +18961,7 @@ impl<'a, C, A> GroupPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/groups/{groupKey}".to_string();
+        let mut url = self.hub._base_url.clone() + "groups/{groupKey}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryGroup.as_ref().to_string(), ());
         }
@@ -19202,7 +19221,7 @@ impl<'a, C, A> GroupAliaseDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
         }
 
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/groups/{groupKey}/aliases/{alias}".to_string();
+        let mut url = self.hub._base_url.clone() + "groups/{groupKey}/aliases/{alias}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryGroup.as_ref().to_string(), ());
         }
@@ -19439,7 +19458,7 @@ impl<'a, C, A> AspGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/asps/{codeId}".to_string();
+        let mut url = self.hub._base_url.clone() + "users/{userKey}/asps/{codeId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryUserSecurity.as_ref().to_string(), ());
         }
@@ -19685,7 +19704,7 @@ impl<'a, C, A> AspDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         }
 
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/asps/{codeId}".to_string();
+        let mut url = self.hub._base_url.clone() + "users/{userKey}/asps/{codeId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryUserSecurity.as_ref().to_string(), ());
         }
@@ -19920,7 +19939,7 @@ impl<'a, C, A> AspListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/asps".to_string();
+        let mut url = self.hub._base_url.clone() + "users/{userKey}/asps";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryUserSecurity.as_ref().to_string(), ());
         }
@@ -20155,7 +20174,7 @@ impl<'a, C, A> DomainListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customer}/domains".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customer}/domains";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryDomainReadonly.as_ref().to_string(), ());
         }
@@ -20392,7 +20411,7 @@ impl<'a, C, A> DomainGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customer}/domains/{domainName}".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customer}/domains/{domainName}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryDomainReadonly.as_ref().to_string(), ());
         }
@@ -20644,7 +20663,7 @@ impl<'a, C, A> DomainInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customer}/domains".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customer}/domains";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryDomain.as_ref().to_string(), ());
         }
@@ -20904,7 +20923,7 @@ impl<'a, C, A> DomainDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         }
 
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customer}/domains/{domainName}".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customer}/domains/{domainName}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryDomain.as_ref().to_string(), ());
         }
@@ -21146,7 +21165,7 @@ impl<'a, C, A> DomainAliaseInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customer}/domainaliases".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customer}/domainaliases";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryDomain.as_ref().to_string(), ());
         }
@@ -21407,7 +21426,7 @@ impl<'a, C, A> DomainAliaseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customer}/domainaliases/{domainAliasName}".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customer}/domainaliases/{domainAliasName}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryDomainReadonly.as_ref().to_string(), ());
         }
@@ -21657,7 +21676,7 @@ impl<'a, C, A> DomainAliaseListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customer}/domainaliases".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customer}/domainaliases";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryDomainReadonly.as_ref().to_string(), ());
         }
@@ -21900,7 +21919,7 @@ impl<'a, C, A> DomainAliaseDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
         }
 
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customer}/domainaliases/{domainAliasName}".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customer}/domainaliases/{domainAliasName}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryDomain.as_ref().to_string(), ());
         }
@@ -22137,7 +22156,7 @@ impl<'a, C, A> SchemaGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/schemas/{schemaKey}".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customerId}/schemas/{schemaKey}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryUserschemaReadonly.as_ref().to_string(), ());
         }
@@ -22391,7 +22410,7 @@ impl<'a, C, A> SchemaUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/schemas/{schemaKey}".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customerId}/schemas/{schemaKey}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryUserschema.as_ref().to_string(), ());
         }
@@ -22660,7 +22679,7 @@ impl<'a, C, A> SchemaListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/schemas".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customerId}/schemas";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryUserschemaReadonly.as_ref().to_string(), ());
         }
@@ -22904,7 +22923,7 @@ impl<'a, C, A> SchemaPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/schemas/{schemaKey}".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customerId}/schemas/{schemaKey}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryUserschema.as_ref().to_string(), ());
         }
@@ -23174,7 +23193,7 @@ impl<'a, C, A> SchemaDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         }
 
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/schemas/{schemaKey}".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customerId}/schemas/{schemaKey}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryUserschema.as_ref().to_string(), ());
         }
@@ -23416,7 +23435,7 @@ impl<'a, C, A> SchemaInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/schemas".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customerId}/schemas";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryUserschema.as_ref().to_string(), ());
         }
@@ -23685,7 +23704,7 @@ impl<'a, C, A> ResourceCalendarListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customer}/resources/calendars".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customer}/resources/calendars";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryResourceCalendarReadonly.as_ref().to_string(), ());
         }
@@ -23936,7 +23955,7 @@ impl<'a, C, A> ResourceCalendarGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customer}/resources/calendars/{calendarResourceId}".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customer}/resources/calendars/{calendarResourceId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryResourceCalendarReadonly.as_ref().to_string(), ());
         }
@@ -24188,7 +24207,7 @@ impl<'a, C, A> ResourceCalendarInsertCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customer}/resources/calendars".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customer}/resources/calendars";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryResourceCalendar.as_ref().to_string(), ());
         }
@@ -24456,7 +24475,7 @@ impl<'a, C, A> ResourceCalendarPatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customer}/resources/calendars/{calendarResourceId}".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customer}/resources/calendars/{calendarResourceId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryResourceCalendar.as_ref().to_string(), ());
         }
@@ -24734,7 +24753,7 @@ impl<'a, C, A> ResourceCalendarUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customer}/resources/calendars/{calendarResourceId}".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customer}/resources/calendars/{calendarResourceId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryResourceCalendar.as_ref().to_string(), ());
         }
@@ -25004,7 +25023,7 @@ impl<'a, C, A> ResourceCalendarDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
         }
 
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customer}/resources/calendars/{calendarResourceId}".to_string();
+        let mut url = self.hub._base_url.clone() + "customer/{customer}/resources/calendars/{calendarResourceId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryResourceCalendar.as_ref().to_string(), ());
         }
@@ -25245,7 +25264,7 @@ impl<'a, C, A> UserUndeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         }
 
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/undelete".to_string();
+        let mut url = self.hub._base_url.clone() + "users/{userKey}/undelete";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryUser.as_ref().to_string(), ());
         }
@@ -25493,7 +25512,7 @@ impl<'a, C, A> UserPhotoDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         }
 
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/photos/thumbnail".to_string();
+        let mut url = self.hub._base_url.clone() + "users/{userKey}/photos/thumbnail";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryUser.as_ref().to_string(), ());
         }
@@ -25725,7 +25744,7 @@ impl<'a, C, A> UserPhotoPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/photos/thumbnail".to_string();
+        let mut url = self.hub._base_url.clone() + "users/{userKey}/photos/thumbnail";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryUser.as_ref().to_string(), ());
         }
@@ -25989,7 +26008,7 @@ impl<'a, C, A> UserInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/users".to_string();
+        let mut url = self.hub._base_url.clone() + "users";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryUser.as_ref().to_string(), ());
         }
@@ -26229,7 +26248,7 @@ impl<'a, C, A> UserAliaseWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/aliases/watch".to_string();
+        let mut url = self.hub._base_url.clone() + "users/{userKey}/aliases/watch";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryUser.as_ref().to_string(), ());
         }
@@ -26502,7 +26521,7 @@ impl<'a, C, A> UserPhotoUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/photos/thumbnail".to_string();
+        let mut url = self.hub._base_url.clone() + "users/{userKey}/photos/thumbnail";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryUser.as_ref().to_string(), ());
         }
@@ -26826,7 +26845,7 @@ impl<'a, C, A> UserWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/users/watch".to_string();
+        let mut url = self.hub._base_url.clone() + "users/watch";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryUser.as_ref().to_string(), ());
         }
@@ -27145,7 +27164,7 @@ impl<'a, C, A> UserUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}".to_string();
+        let mut url = self.hub._base_url.clone() + "users/{userKey}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryUser.as_ref().to_string(), ());
         }
@@ -27404,7 +27423,7 @@ impl<'a, C, A> UserPhotoGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/photos/thumbnail".to_string();
+        let mut url = self.hub._base_url.clone() + "users/{userKey}/photos/thumbnail";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryUserReadonly.as_ref().to_string(), ());
         }
@@ -27697,7 +27716,7 @@ impl<'a, C, A> UserListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/users".to_string();
+        let mut url = self.hub._base_url.clone() + "users";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryUserReadonly.as_ref().to_string(), ());
         }
@@ -28000,7 +28019,7 @@ impl<'a, C, A> UserGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}".to_string();
+        let mut url = self.hub._base_url.clone() + "users/{userKey}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryUserReadonly.as_ref().to_string(), ());
         }
@@ -28263,7 +28282,7 @@ impl<'a, C, A> UserAliaseInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/aliases".to_string();
+        let mut url = self.hub._base_url.clone() + "users/{userKey}/aliases";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryUser.as_ref().to_string(), ());
         }
@@ -28527,7 +28546,7 @@ impl<'a, C, A> UserAliaseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/aliases".to_string();
+        let mut url = self.hub._base_url.clone() + "users/{userKey}/aliases";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryUserAliaReadonly.as_ref().to_string(), ());
         }
@@ -28775,7 +28794,7 @@ impl<'a, C, A> UserMakeAdminCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         }
 
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/makeAdmin".to_string();
+        let mut url = self.hub._base_url.clone() + "users/{userKey}/makeAdmin";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryUser.as_ref().to_string(), ());
         }
@@ -29031,7 +29050,7 @@ impl<'a, C, A> UserPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}".to_string();
+        let mut url = self.hub._base_url.clone() + "users/{userKey}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryUser.as_ref().to_string(), ());
         }
@@ -29291,7 +29310,7 @@ impl<'a, C, A> UserAliaseDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         }
 
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/aliases/{alias}".to_string();
+        let mut url = self.hub._base_url.clone() + "users/{userKey}/aliases/{alias}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryUser.as_ref().to_string(), ());
         }
@@ -29525,7 +29544,7 @@ impl<'a, C, A> UserDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         }
 
 
-        let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}".to_string();
+        let mut url = self.hub._base_url.clone() + "users/{userKey}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryUser.as_ref().to_string(), ());
         }
@@ -29678,6 +29697,5 @@ impl<'a, C, A> UserDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self
     }
 }
-
 
 

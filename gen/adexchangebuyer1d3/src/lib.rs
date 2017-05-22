@@ -191,7 +191,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -219,6 +219,7 @@ use std::collections::BTreeMap;
 use serde_json as json;
 use std::io;
 use std::fs;
+use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
@@ -322,6 +323,8 @@ pub struct AdExchangeBuyer<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
+    _base_url: String,
+    _root_url: String,
 }
 
 impl<'a, C, A> Hub for AdExchangeBuyer<C, A> {}
@@ -334,6 +337,8 @@ impl<'a, C, A> AdExchangeBuyer<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
+            _base_url: "https://www.googleapis.com/adexchangebuyer/v1.3/".to_string(),
+            _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
@@ -364,9 +369,23 @@ impl<'a, C, A> AdExchangeBuyer<C, A>
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
-        let prev = self._user_agent.clone();
-        self._user_agent = agent_name;
-        prev
+        mem::replace(&mut self._user_agent, agent_name)
+    }
+
+    /// Set the base url to use in all requests to the server.
+    /// It defaults to `https://www.googleapis.com/adexchangebuyer/v1.3/`.
+    ///
+    /// Returns the previously set base url.
+    pub fn base_url(&mut self, new_base_url: String) -> String {
+        mem::replace(&mut self._base_url, new_base_url)
+    }
+
+    /// Set the root url to use in all requests to the server.
+    /// It defaults to `https://www.googleapis.com/`.
+    ///
+    /// Returns the previously set root url.
+    pub fn root_url(&mut self, new_root_url: String) -> String {
+        mem::replace(&mut self._root_url, new_root_url)
     }
 }
 
@@ -1885,7 +1904,7 @@ impl<'a, C, A> BillingInfoGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.3/billinginfo/{accountId}".to_string();
+        let mut url = self.hub._base_url.clone() + "billinginfo/{accountId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -2118,7 +2137,7 @@ impl<'a, C, A> BillingInfoListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.3/billinginfo".to_string();
+        let mut url = self.hub._base_url.clone() + "billinginfo";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -2320,7 +2339,7 @@ impl<'a, C, A> DirectDealListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.3/directdeals".to_string();
+        let mut url = self.hub._base_url.clone() + "directdeals";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -2524,7 +2543,7 @@ impl<'a, C, A> DirectDealGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.3/directdeals/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "directdeals/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -2768,7 +2787,7 @@ impl<'a, C, A> BudgetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.3/billinginfo/{accountId}/{billingId}".to_string();
+        let mut url = self.hub._base_url.clone() + "billinginfo/{accountId}/{billingId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -3046,7 +3065,7 @@ impl<'a, C, A> BudgetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.3/billinginfo/{accountId}/{billingId}".to_string();
+        let mut url = self.hub._base_url.clone() + "billinginfo/{accountId}/{billingId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -3317,7 +3336,7 @@ impl<'a, C, A> BudgetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.3/billinginfo/{accountId}/{billingId}".to_string();
+        let mut url = self.hub._base_url.clone() + "billinginfo/{accountId}/{billingId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -3567,7 +3586,7 @@ impl<'a, C, A> CreativeInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.3/creatives".to_string();
+        let mut url = self.hub._base_url.clone() + "creatives";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -3822,7 +3841,7 @@ impl<'a, C, A> CreativeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.3/creatives".to_string();
+        let mut url = self.hub._base_url.clone() + "creatives";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -4065,7 +4084,7 @@ impl<'a, C, A> CreativeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.3/creatives/{accountId}/{buyerCreativeId}".to_string();
+        let mut url = self.hub._base_url.clone() + "creatives/{accountId}/{buyerCreativeId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -4317,7 +4336,7 @@ impl<'a, C, A> AccountUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.3/accounts/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "accounts/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -4583,7 +4602,7 @@ impl<'a, C, A> AccountPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.3/accounts/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "accounts/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -4840,7 +4859,7 @@ impl<'a, C, A> AccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.3/accounts".to_string();
+        let mut url = self.hub._base_url.clone() + "accounts";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -5044,7 +5063,7 @@ impl<'a, C, A> AccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.3/accounts/{id}".to_string();
+        let mut url = self.hub._base_url.clone() + "accounts/{id}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -5293,7 +5312,7 @@ impl<'a, C, A> PerformanceReportListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.3/performancereport".to_string();
+        let mut url = self.hub._base_url.clone() + "performancereport";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -5542,7 +5561,7 @@ impl<'a, C, A> PretargetingConfigDeleteCall<'a, C, A> where C: BorrowMut<hyper::
         }
 
 
-        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.3/pretargetingconfigs/{accountId}/{configId}".to_string();
+        let mut url = self.hub._base_url.clone() + "pretargetingconfigs/{accountId}/{configId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -5786,7 +5805,7 @@ impl<'a, C, A> PretargetingConfigPatchCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.3/pretargetingconfigs/{accountId}/{configId}".to_string();
+        let mut url = self.hub._base_url.clone() + "pretargetingconfigs/{accountId}/{configId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -6057,7 +6076,7 @@ impl<'a, C, A> PretargetingConfigGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.3/pretargetingconfigs/{accountId}/{configId}".to_string();
+        let mut url = self.hub._base_url.clone() + "pretargetingconfigs/{accountId}/{configId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -6309,7 +6328,7 @@ impl<'a, C, A> PretargetingConfigInsertCall<'a, C, A> where C: BorrowMut<hyper::
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.3/pretargetingconfigs/{accountId}".to_string();
+        let mut url = self.hub._base_url.clone() + "pretargetingconfigs/{accountId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -6568,7 +6587,7 @@ impl<'a, C, A> PretargetingConfigListCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.3/pretargetingconfigs/{accountId}".to_string();
+        let mut url = self.hub._base_url.clone() + "pretargetingconfigs/{accountId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -6812,7 +6831,7 @@ impl<'a, C, A> PretargetingConfigUpdateCall<'a, C, A> where C: BorrowMut<hyper::
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.3/pretargetingconfigs/{accountId}/{configId}".to_string();
+        let mut url = self.hub._base_url.clone() + "pretargetingconfigs/{accountId}/{configId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -7009,6 +7028,5 @@ impl<'a, C, A> PretargetingConfigUpdateCall<'a, C, A> where C: BorrowMut<hyper::
         self
     }
 }
-
 
 
