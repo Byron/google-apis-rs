@@ -60,6 +60,7 @@ use std::collections::BTreeMap;
 use serde_json as json;
 use std::io;
 use std::fs;
+use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
@@ -122,9 +123,7 @@ impl<'a, ${', '.join(HUB_TYPE_PARAMETERS)}> ${hub_type}${ht_params}
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
-        let prev = self._user_agent.clone();
-        self._user_agent = agent_name;
-        prev
+        mem::replace(&mut self._user_agent, agent_name)
     }
 
     /// Set the base url to use in all requests to the server.
@@ -132,9 +131,7 @@ impl<'a, ${', '.join(HUB_TYPE_PARAMETERS)}> ${hub_type}${ht_params}
     ///
     /// Returns the previously set base url.
     pub fn base_url(&mut self, new_base_url: String) -> String {
-        let prev = self._base_url.clone();
-        self._base_url = new_base_url;
-        prev
+        mem::replace(&mut self._base_url, new_base_url)
     }
 
     /// Set the root url to use in all requests to the server.
@@ -142,9 +139,7 @@ impl<'a, ${', '.join(HUB_TYPE_PARAMETERS)}> ${hub_type}${ht_params}
     ///
     /// Returns the previously set root url.
     pub fn root_url(&mut self, new_root_url: String) -> String {
-        let prev = self._root_url.clone();
-        self._root_url = new_root_url;
-        prev
+        mem::replace(&mut self._root_url, new_root_url)
     }
 }
 
