@@ -4,9 +4,9 @@
 [package]
 
 name = "google-pubsub1-cli"
-version = "1.0.4+20161122"
+version = "1.0.4+20170502"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
-description = "A complete library to interact with pubsub (protocol v1)"
+description = "A complete library to interact with Pubsub (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/pubsub1-cli"
 homepage = "https://cloud.google.com/pubsub/docs"
 documentation = "http://byron.github.io/google-apis-rs/google_pubsub1_cli"
@@ -24,7 +24,7 @@ serde_json = "^ 0.9"
 serde_derive = "^ 0.9"
 yup-oauth2 = "^ 1.0"
 strsim = "^0.5"
-hyper-rustls = "^0.3"
+hyper-rustls = "^0.6"
 yup-hyper-mock = "^2.0"
 clap = "^2.0"
 
@@ -34,4 +34,4 @@ clap = "^2.0"
 
 [dependencies.google-pubsub1]
 path = "../pubsub1"
-version = "1.0.4+20161122"
+version = "1.0.4+20170502"

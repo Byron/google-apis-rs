@@ -3586,7 +3586,7 @@ fn main() {
     
     let mut app = App::new("fusiontables2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.4+20160526")
+           .version("1.0.4+20170413")
            .about("API for working with Fusion Tables data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_fusiontables2_cli")
            .arg(Arg::with_name("url")

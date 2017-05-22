@@ -642,8 +642,8 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "filter" => Some(("filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["description", "filter", "name", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -893,8 +893,8 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "filter" => Some(("filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["description", "filter", "name", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -986,8 +986,9 @@ impl<'n> Engine<'n> {
                     "start-time" => Some(("startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "output-version-format" => Some(("outputVersionFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "writer-identity" => Some(("writerIdentity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "include-children" => Some(("includeChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["destination", "end-time", "filter", "name", "output-version-format", "start-time", "writer-identity"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["destination", "end-time", "filter", "include-children", "name", "output-version-format", "start-time", "writer-identity"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1244,8 +1245,9 @@ impl<'n> Engine<'n> {
                     "start-time" => Some(("startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "output-version-format" => Some(("outputVersionFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "writer-identity" => Some(("writerIdentity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "include-children" => Some(("includeChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["destination", "end-time", "filter", "name", "output-version-format", "start-time", "writer-identity"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["destination", "end-time", "filter", "include-children", "name", "output-version-format", "start-time", "writer-identity"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1499,7 +1501,7 @@ fn main() {
     let arg_data = [
         ("billing-accounts", "methods: 'logs-delete' and 'logs-list'", vec![
             ("logs-delete",
-                    Some(r##"Deletes all the log entries in a log. The log reappears if it receives new entries."##),
+                    Some(r##"Deletes all the log entries in a log. The log reappears if it receives new entries. Log entries written shortly before the delete operation might not be deleted."##),
                     "Details at http://byron.github.io/google-apis-rs/google_logging2_beta1_cli/billing-accounts_logs-delete",
                   vec![
                     (Some(r##"log-name"##),
@@ -1507,6 +1509,8 @@ fn main() {
                      Some(r##"Required. The resource name of the log to delete:
         "projects/[PROJECT_ID]/logs/[LOG_ID]"
         "organizations/[ORGANIZATION_ID]/logs/[LOG_ID]"
+        "billingAccounts/[BILLING_ACCOUNT_ID]/logs/[LOG_ID]"
+        "folders/[FOLDER_ID]/logs/[LOG_ID]"
         [LOG_ID] must be URL-encoded. For example, "projects/my-project-id/logs/syslog", "organizations/1234567890/logs/cloudresourcemanager.googleapis.com%2Factivity". For more information about log names, see LogEntry."##),
                      Some(true),
                      Some(false)),
@@ -1524,7 +1528,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("logs-list",
-                    Some(r##"Lists the logs in projects or organizations. Only logs that have entries are listed."##),
+                    Some(r##"Lists the logs in projects, organizations, folders, or billing accounts. Only logs that have entries are listed."##),
                     "Details at http://byron.github.io/google-apis-rs/google_logging2_beta1_cli/billing-accounts_logs-list",
                   vec![
                     (Some(r##"parent"##),
@@ -1532,6 +1536,8 @@ fn main() {
                      Some(r##"Required. The resource name that owns the logs:
         "projects/[PROJECT_ID]"
         "organizations/[ORGANIZATION_ID]"
+        "billingAccounts/[BILLING_ACCOUNT_ID]"
+        "folders/[FOLDER_ID]"
         "##),
                      Some(true),
                      Some(false)),
@@ -1574,7 +1580,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("write",
-                    Some(r##"Writes log entries to Stackdriver Logging. All log entries are written by this method."##),
+                    Some(r##"Writes log entries to Stackdriver Logging."##),
                     "Details at http://byron.github.io/google-apis-rs/google_logging2_beta1_cli/entries_write",
                   vec![
                     (Some(r##"kv"##),
@@ -1618,7 +1624,7 @@ fn main() {
         
         ("organizations", "methods: 'logs-delete' and 'logs-list'", vec![
             ("logs-delete",
-                    Some(r##"Deletes all the log entries in a log. The log reappears if it receives new entries."##),
+                    Some(r##"Deletes all the log entries in a log. The log reappears if it receives new entries. Log entries written shortly before the delete operation might not be deleted."##),
                     "Details at http://byron.github.io/google-apis-rs/google_logging2_beta1_cli/organizations_logs-delete",
                   vec![
                     (Some(r##"log-name"##),
@@ -1626,6 +1632,8 @@ fn main() {
                      Some(r##"Required. The resource name of the log to delete:
         "projects/[PROJECT_ID]/logs/[LOG_ID]"
         "organizations/[ORGANIZATION_ID]/logs/[LOG_ID]"
+        "billingAccounts/[BILLING_ACCOUNT_ID]/logs/[LOG_ID]"
+        "folders/[FOLDER_ID]/logs/[LOG_ID]"
         [LOG_ID] must be URL-encoded. For example, "projects/my-project-id/logs/syslog", "organizations/1234567890/logs/cloudresourcemanager.googleapis.com%2Factivity". For more information about log names, see LogEntry."##),
                      Some(true),
                      Some(false)),
@@ -1643,7 +1651,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("logs-list",
-                    Some(r##"Lists the logs in projects or organizations. Only logs that have entries are listed."##),
+                    Some(r##"Lists the logs in projects, organizations, folders, or billing accounts. Only logs that have entries are listed."##),
                     "Details at http://byron.github.io/google-apis-rs/google_logging2_beta1_cli/organizations_logs-list",
                   vec![
                     (Some(r##"parent"##),
@@ -1651,6 +1659,8 @@ fn main() {
                      Some(r##"Required. The resource name that owns the logs:
         "projects/[PROJECT_ID]"
         "organizations/[ORGANIZATION_ID]"
+        "billingAccounts/[BILLING_ACCOUNT_ID]"
+        "folders/[FOLDER_ID]"
         "##),
                      Some(true),
                      Some(false)),
@@ -1671,7 +1681,7 @@ fn main() {
         
         ("projects", "methods: 'logs-delete', 'logs-list', 'metrics-create', 'metrics-delete', 'metrics-get', 'metrics-list', 'metrics-update', 'sinks-create', 'sinks-delete', 'sinks-get', 'sinks-list' and 'sinks-update'", vec![
             ("logs-delete",
-                    Some(r##"Deletes all the log entries in a log. The log reappears if it receives new entries."##),
+                    Some(r##"Deletes all the log entries in a log. The log reappears if it receives new entries. Log entries written shortly before the delete operation might not be deleted."##),
                     "Details at http://byron.github.io/google-apis-rs/google_logging2_beta1_cli/projects_logs-delete",
                   vec![
                     (Some(r##"log-name"##),
@@ -1679,6 +1689,8 @@ fn main() {
                      Some(r##"Required. The resource name of the log to delete:
         "projects/[PROJECT_ID]/logs/[LOG_ID]"
         "organizations/[ORGANIZATION_ID]/logs/[LOG_ID]"
+        "billingAccounts/[BILLING_ACCOUNT_ID]/logs/[LOG_ID]"
+        "folders/[FOLDER_ID]/logs/[LOG_ID]"
         [LOG_ID] must be URL-encoded. For example, "projects/my-project-id/logs/syslog", "organizations/1234567890/logs/cloudresourcemanager.googleapis.com%2Factivity". For more information about log names, see LogEntry."##),
                      Some(true),
                      Some(false)),
@@ -1696,7 +1708,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("logs-list",
-                    Some(r##"Lists the logs in projects or organizations. Only logs that have entries are listed."##),
+                    Some(r##"Lists the logs in projects, organizations, folders, or billing accounts. Only logs that have entries are listed."##),
                     "Details at http://byron.github.io/google-apis-rs/google_logging2_beta1_cli/projects_logs-list",
                   vec![
                     (Some(r##"parent"##),
@@ -1704,6 +1716,8 @@ fn main() {
                      Some(r##"Required. The resource name that owns the logs:
         "projects/[PROJECT_ID]"
         "organizations/[ORGANIZATION_ID]"
+        "billingAccounts/[BILLING_ACCOUNT_ID]"
+        "folders/[FOLDER_ID]"
         "##),
                      Some(true),
                      Some(false)),
@@ -1861,6 +1875,8 @@ fn main() {
                      Some(r##"Required. The resource in which to create the sink:
         "projects/[PROJECT_ID]"
         "organizations/[ORGANIZATION_ID]"
+        "billingAccounts/[BILLING_ACCOUNT_ID]"
+        "folders/[FOLDER_ID]"
         Examples: "projects/my-logging-project", "organizations/123456789"."##),
                      Some(true),
                      Some(false)),
@@ -1892,7 +1908,9 @@ fn main() {
                      Some(r##"Required. The full resource name of the sink to delete, including the parent resource and the sink identifier:
         "projects/[PROJECT_ID]/sinks/[SINK_ID]"
         "organizations/[ORGANIZATION_ID]/sinks/[SINK_ID]"
-        It is an error if the sink does not exist. Example: "projects/my-project-id/sinks/my-sink-id". It is an error if the sink does not exist."##),
+        "billingAccounts/[BILLING_ACCOUNT_ID]/sinks/[SINK_ID]"
+        "folders/[FOLDER_ID]/sinks/[SINK_ID]"
+        Example: "projects/my-project-id/sinks/my-sink-id"."##),
                      Some(true),
                      Some(false)),
         
@@ -1914,9 +1932,11 @@ fn main() {
                   vec![
                     (Some(r##"sink-name"##),
                      None,
-                     Some(r##"Required. The parent resource name of the sink:
+                     Some(r##"Required. The resource name of the sink:
         "projects/[PROJECT_ID]/sinks/[SINK_ID]"
         "organizations/[ORGANIZATION_ID]/sinks/[SINK_ID]"
+        "billingAccounts/[BILLING_ACCOUNT_ID]/sinks/[SINK_ID]"
+        "folders/[FOLDER_ID]/sinks/[SINK_ID]"
         Example: "projects/my-project-id/sinks/my-sink-id"."##),
                      Some(true),
                      Some(false)),
@@ -1939,7 +1959,12 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent resource whose sinks are to be listed. Examples: "projects/my-logging-project", "organizations/123456789"."##),
+                     Some(r##"Required. The parent resource whose sinks are to be listed:
+        "projects/[PROJECT_ID]"
+        "organizations/[ORGANIZATION_ID]"
+        "billingAccounts/[BILLING_ACCOUNT_ID]"
+        "folders/[FOLDER_ID]"
+        "##),
                      Some(true),
                      Some(false)),
         
@@ -1964,6 +1989,8 @@ fn main() {
                      Some(r##"Required. The full resource name of the sink to update, including the parent resource and the sink identifier:
         "projects/[PROJECT_ID]/sinks/[SINK_ID]"
         "organizations/[ORGANIZATION_ID]/sinks/[SINK_ID]"
+        "billingAccounts/[BILLING_ACCOUNT_ID]/sinks/[SINK_ID]"
+        "folders/[FOLDER_ID]/sinks/[SINK_ID]"
         Example: "projects/my-project-id/sinks/my-sink-id"."##),
                      Some(true),
                      Some(false)),
@@ -1992,7 +2019,7 @@ fn main() {
     
     let mut app = App::new("logging2-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.4+20161206")
+           .version("1.0.4+20170516")
            .about("Writes log entries and manages your Stackdriver Logging configuration.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_logging2_beta1_cli")
            .arg(Arg::with_name("url")

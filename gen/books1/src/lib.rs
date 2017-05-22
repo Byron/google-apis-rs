@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *books* crate version *1.0.4+20161206*, where *20161206* is the exact revision of the *books:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
+//! This documentation was generated from *books* crate version *1.0.4+20170313*, where *20170313* is the exact revision of the *books:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
 //! 
 //! Everything else about the *books* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/books/docs/v1/getting_started).
@@ -212,7 +212,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -350,8 +350,6 @@ pub struct Books<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-    _base_url: String,
-    _root_url: String,
 }
 
 impl<'a, C, A> Hub for Books<C, A> {}
@@ -364,8 +362,6 @@ impl<'a, C, A> Books<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
-            _base_url: "https://www.googleapis.com/books/v1/".to_string(),
-            _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
@@ -413,26 +409,6 @@ impl<'a, C, A> Books<C, A>
     pub fn user_agent(&mut self, agent_name: String) -> String {
         let prev = self._user_agent.clone();
         self._user_agent = agent_name;
-        prev
-    }
-
-    /// Set the base url to use in all requests to the server.
-    /// It defaults to `https://www.googleapis.com/books/v1/`.
-    ///
-    /// Returns the previously set base url.
-    pub fn base_url(&mut self, new_base_url: String) -> String {
-        let prev = self._base_url.clone();
-        self._base_url = new_base_url;
-        prev
-    }
-
-    /// Set the root url to use in all requests to the server.
-    /// It defaults to `https://www.googleapis.com/`.
-    ///
-    /// Returns the previously set root url.
-    pub fn root_url(&mut self, new_root_url: String) -> String {
-        let prev = self._root_url.clone();
-        self._root_url = new_root_url;
         prev
     }
 }
@@ -2131,6 +2107,9 @@ pub struct UsersettingsNotification {
     #[serde(rename="moreFromSeries")]
     pub more_from_series: Option<UsersettingsNotificationMoreFromSeries>,
     /// no description provided
+    #[serde(rename="rewardExpirations")]
+    pub reward_expirations: Option<UsersettingsNotificationRewardExpirations>,
+    /// no description provided
     #[serde(rename="moreFromAuthors")]
     pub more_from_authors: Option<UsersettingsNotificationMoreFromAuthors>,
 }
@@ -2274,6 +2253,20 @@ pub struct VolumeUserInfo {
 
 impl NestedType for VolumeUserInfo {}
 impl Part for VolumeUserInfo {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UsersettingsNotificationRewardExpirations {
+    /// no description provided
+    pub opted_state: Option<String>,
+}
+
+impl NestedType for UsersettingsNotificationRewardExpirations {}
+impl Part for UsersettingsNotificationRewardExpirations {}
 
 
 /// There is no detailed description.
@@ -3637,6 +3630,7 @@ impl<'a, C, A> MylibraryMethods<'a, C, A> {
             _source: Default::default(),
             _show_only_summary_in_response: Default::default(),
             _country: Default::default(),
+            _annotation_id: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4047,7 +4041,7 @@ impl<'a, C, A> LayerAnnotationDataGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "volumes/{volumeId}/layers/{layerId}/data/{annotationDataId}";
+        let mut url = "https://www.googleapis.com/books/v1/volumes/{volumeId}/layers/{layerId}/data/{annotationDataId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -4368,7 +4362,7 @@ impl<'a, C, A> LayerVolumeAnnotationGetCall<'a, C, A> where C: BorrowMut<hyper::
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "volumes/{volumeId}/layers/{layerId}/annotations/{annotationId}";
+        let mut url = "https://www.googleapis.com/books/v1/volumes/{volumeId}/layers/{layerId}/annotations/{annotationId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -4657,7 +4651,7 @@ impl<'a, C, A> LayerListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "volumes/{volumeId}/layersummary";
+        let mut url = "https://www.googleapis.com/books/v1/volumes/{volumeId}/layersummary".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -4932,7 +4926,7 @@ impl<'a, C, A> LayerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "volumes/{volumeId}/layersummary/{summaryId}";
+        let mut url = "https://www.googleapis.com/books/v1/volumes/{volumeId}/layersummary/{summaryId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -5255,7 +5249,7 @@ impl<'a, C, A> LayerVolumeAnnotationListCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "volumes/{volumeId}/layers/{layerId}";
+        let mut url = "https://www.googleapis.com/books/v1/volumes/{volumeId}/layers/{layerId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -5650,7 +5644,7 @@ impl<'a, C, A> LayerAnnotationDataListCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "volumes/{volumeId}/layers/{layerId}/data";
+        let mut url = "https://www.googleapis.com/books/v1/volumes/{volumeId}/layers/{layerId}/data".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -5988,7 +5982,7 @@ impl<'a, C, A> VolumeRecommendedRateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "volumes/recommended/rate";
+        let mut url = "https://www.googleapis.com/books/v1/volumes/recommended/rate".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -6256,7 +6250,7 @@ impl<'a, C, A> VolumeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "volumes/{volumeId}";
+        let mut url = "https://www.googleapis.com/books/v1/volumes/{volumeId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -6569,7 +6563,7 @@ impl<'a, C, A> VolumeMybookListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "volumes/mybooks";
+        let mut url = "https://www.googleapis.com/books/v1/volumes/mybooks".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -6889,7 +6883,7 @@ impl<'a, C, A> VolumeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "volumes";
+        let mut url = "https://www.googleapis.com/books/v1/volumes".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -7226,7 +7220,7 @@ impl<'a, C, A> VolumeUseruploadedListCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "volumes/useruploaded";
+        let mut url = "https://www.googleapis.com/books/v1/volumes/useruploaded".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -7494,7 +7488,7 @@ impl<'a, C, A> VolumeAssociatedListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "volumes/{volumeId}/associated";
+        let mut url = "https://www.googleapis.com/books/v1/volumes/{volumeId}/associated".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -7770,7 +7764,7 @@ impl<'a, C, A> VolumeRecommendedListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "volumes/recommended";
+        let mut url = "https://www.googleapis.com/books/v1/volumes/recommended".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -7995,7 +7989,7 @@ impl<'a, C, A> DictionaryListOfflineMetadataCall<'a, C, A> where C: BorrowMut<hy
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "dictionary/listOfflineMetadata";
+        let mut url = "https://www.googleapis.com/books/v1/dictionary/listOfflineMetadata".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -8213,7 +8207,7 @@ impl<'a, C, A> SeryGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "series/get";
+        let mut url = "https://www.googleapis.com/books/v1/series/get".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -8438,7 +8432,7 @@ impl<'a, C, A> SeryMembershipGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "series/membership/get";
+        let mut url = "https://www.googleapis.com/books/v1/series/membership/get".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -8688,7 +8682,7 @@ impl<'a, C, A> BookshelveVolumeListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "users/{userId}/bookshelves/{shelf}/volumes";
+        let mut url = "https://www.googleapis.com/books/v1/users/{userId}/bookshelves/{shelf}/volumes".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -8966,7 +8960,7 @@ impl<'a, C, A> BookshelveListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "users/{userId}/bookshelves";
+        let mut url = "https://www.googleapis.com/books/v1/users/{userId}/bookshelves".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -9215,7 +9209,7 @@ impl<'a, C, A> BookshelveGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "users/{userId}/bookshelves/{shelf}";
+        let mut url = "https://www.googleapis.com/books/v1/users/{userId}/bookshelves/{shelf}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -9504,7 +9498,7 @@ impl<'a, C, A> PromoofferAcceptCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         }
 
 
-        let mut url = self.hub._base_url.clone() + "promooffer/accept";
+        let mut url = "https://www.googleapis.com/books/v1/promooffer/accept".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -9785,7 +9779,7 @@ impl<'a, C, A> PromoofferDismisCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         }
 
 
-        let mut url = self.hub._base_url.clone() + "promooffer/dismiss";
+        let mut url = "https://www.googleapis.com/books/v1/promooffer/dismiss".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -10056,7 +10050,7 @@ impl<'a, C, A> PromoofferGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "promooffer/get";
+        let mut url = "https://www.googleapis.com/books/v1/promooffer/get".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -10315,7 +10309,7 @@ impl<'a, C, A> PersonalizedstreamGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "personalizedstream/get";
+        let mut url = "https://www.googleapis.com/books/v1/personalizedstream/get".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -10543,7 +10537,7 @@ impl<'a, C, A> OnboardingListCategoryCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "onboarding/listCategories";
+        let mut url = "https://www.googleapis.com/books/v1/onboarding/listCategories".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -10779,7 +10773,7 @@ impl<'a, C, A> OnboardingListCategoryVolumeCall<'a, C, A> where C: BorrowMut<hyp
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "onboarding/listCategoryVolumes";
+        let mut url = "https://www.googleapis.com/books/v1/onboarding/listCategoryVolumes".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -11035,7 +11029,7 @@ impl<'a, C, A> MyconfigRequestAccesCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "myconfig/requestAccess";
+        let mut url = "https://www.googleapis.com/books/v1/myconfig/requestAccess".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -11309,7 +11303,7 @@ impl<'a, C, A> MyconfigReleaseDownloadAccesCall<'a, C, A> where C: BorrowMut<hyp
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "myconfig/releaseDownloadAccess";
+        let mut url = "https://www.googleapis.com/books/v1/myconfig/releaseDownloadAccess".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -11581,7 +11575,7 @@ impl<'a, C, A> MyconfigSyncVolumeLicenseCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "myconfig/syncVolumeLicenses";
+        let mut url = "https://www.googleapis.com/books/v1/myconfig/syncVolumeLicenses".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -11850,7 +11844,7 @@ impl<'a, C, A> MyconfigGetUserSettingCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "myconfig/getUserSettings";
+        let mut url = "https://www.googleapis.com/books/v1/myconfig/getUserSettings".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -12059,7 +12053,7 @@ impl<'a, C, A> MyconfigUpdateUserSettingCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "myconfig/updateUserSettings";
+        let mut url = "https://www.googleapis.com/books/v1/myconfig/updateUserSettings".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -12291,7 +12285,7 @@ impl<'a, C, A> MylibraryBookshelveClearVolumeCall<'a, C, A> where C: BorrowMut<h
         }
 
 
-        let mut url = self.hub._base_url.clone() + "mylibrary/bookshelves/{shelf}/clearVolumes";
+        let mut url = "https://www.googleapis.com/books/v1/mylibrary/bookshelves/{shelf}/clearVolumes".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -12531,7 +12525,7 @@ impl<'a, C, A> MylibraryBookshelveMoveVolumeCall<'a, C, A> where C: BorrowMut<hy
         }
 
 
-        let mut url = self.hub._base_url.clone() + "mylibrary/bookshelves/{shelf}/moveVolume";
+        let mut url = "https://www.googleapis.com/books/v1/mylibrary/bookshelves/{shelf}/moveVolume".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -12818,7 +12812,7 @@ impl<'a, C, A> MylibraryBookshelveVolumeListCall<'a, C, A> where C: BorrowMut<hy
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "mylibrary/bookshelves/{shelf}/volumes";
+        let mut url = "https://www.googleapis.com/books/v1/mylibrary/bookshelves/{shelf}/volumes".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -13108,7 +13102,7 @@ impl<'a, C, A> MylibraryAnnotationSummaryCall<'a, C, A> where C: BorrowMut<hyper
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "mylibrary/annotations/summary";
+        let mut url = "https://www.googleapis.com/books/v1/mylibrary/annotations/summary".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -13337,7 +13331,7 @@ impl<'a, C, A> MylibraryAnnotationDeleteCall<'a, C, A> where C: BorrowMut<hyper:
         }
 
 
-        let mut url = self.hub._base_url.clone() + "mylibrary/annotations/{annotationId}";
+        let mut url = "https://www.googleapis.com/books/v1/mylibrary/annotations/{annotationId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -13580,7 +13574,7 @@ impl<'a, C, A> MylibraryBookshelveAddVolumeCall<'a, C, A> where C: BorrowMut<hyp
         }
 
 
-        let mut url = self.hub._base_url.clone() + "mylibrary/bookshelves/{shelf}/addVolume";
+        let mut url = "https://www.googleapis.com/books/v1/mylibrary/bookshelves/{shelf}/addVolume".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -13795,6 +13789,7 @@ impl<'a, C, A> MylibraryBookshelveAddVolumeCall<'a, C, A> where C: BorrowMut<hyp
 ///              .source("Lorem")
 ///              .show_only_summary_in_response(true)
 ///              .country("et")
+///              .annotation_id("clita")
 ///              .doit();
 /// # }
 /// ```
@@ -13806,6 +13801,7 @@ pub struct MylibraryAnnotationInsertCall<'a, C, A>
     _source: Option<String>,
     _show_only_summary_in_response: Option<bool>,
     _country: Option<String>,
+    _annotation_id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -13827,7 +13823,7 @@ impl<'a, C, A> MylibraryAnnotationInsertCall<'a, C, A> where C: BorrowMut<hyper:
         };
         dlg.begin(MethodInfo { id: "books.mylibrary.annotations.insert",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
         if let Some(value) = self._source {
             params.push(("source", value.to_string()));
         }
@@ -13837,7 +13833,10 @@ impl<'a, C, A> MylibraryAnnotationInsertCall<'a, C, A> where C: BorrowMut<hyper:
         if let Some(value) = self._country {
             params.push(("country", value.to_string()));
         }
-        for &field in ["alt", "source", "showOnlySummaryInResponse", "country"].iter() {
+        if let Some(value) = self._annotation_id {
+            params.push(("annotationId", value.to_string()));
+        }
+        for &field in ["alt", "source", "showOnlySummaryInResponse", "country", "annotationId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -13849,7 +13848,7 @@ impl<'a, C, A> MylibraryAnnotationInsertCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "mylibrary/annotations";
+        let mut url = "https://www.googleapis.com/books/v1/mylibrary/annotations".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -13976,6 +13975,13 @@ impl<'a, C, A> MylibraryAnnotationInsertCall<'a, C, A> where C: BorrowMut<hyper:
         self._country = Some(new_value.to_string());
         self
     }
+    /// The ID for the annotation to insert.
+    ///
+    /// Sets the *annotation id* query property to the given value.
+    pub fn annotation_id(mut self, new_value: &str) -> MylibraryAnnotationInsertCall<'a, C, A> {
+        self._annotation_id = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -14055,8 +14061,8 @@ impl<'a, C, A> MylibraryAnnotationInsertCall<'a, C, A> where C: BorrowMut<hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().bookshelves_remove_volume("shelf", "volumeId")
-///              .source("dolores")
-///              .reason("vero")
+///              .source("vero")
+///              .reason("consetetur")
 ///              .doit();
 /// # }
 /// ```
@@ -14109,7 +14115,7 @@ impl<'a, C, A> MylibraryBookshelveRemoveVolumeCall<'a, C, A> where C: BorrowMut<
         }
 
 
-        let mut url = self.hub._base_url.clone() + "mylibrary/bookshelves/{shelf}/removeVolume";
+        let mut url = "https://www.googleapis.com/books/v1/mylibrary/bookshelves/{shelf}/removeVolume".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -14315,16 +14321,16 @@ impl<'a, C, A> MylibraryBookshelveRemoveVolumeCall<'a, C, A> where C: BorrowMut<
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().annotations_list()
-///              .volume_id("consetetur")
-///              .updated_min("vero")
-///              .updated_max("consetetur")
-///              .source("eos")
+///              .volume_id("vero")
+///              .updated_min("consetetur")
+///              .updated_max("eos")
+///              .source("justo")
 ///              .show_deleted(true)
-///              .page_token("tempor")
-///              .max_results(40)
-///              .add_layer_ids("dolore")
-///              .layer_id("amet.")
-///              .content_version("dolore")
+///              .page_token("gubergren")
+///              .max_results(17)
+///              .add_layer_ids("amet.")
+///              .layer_id("dolore")
+///              .content_version("magna")
 ///              .doit();
 /// # }
 /// ```
@@ -14408,7 +14414,7 @@ impl<'a, C, A> MylibraryAnnotationListCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "mylibrary/annotations";
+        let mut url = "https://www.googleapis.com/books/v1/mylibrary/annotations".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -14646,7 +14652,7 @@ impl<'a, C, A> MylibraryAnnotationListCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().annotations_update(req, "annotationId")
-///              .source("elitr")
+///              .source("magna")
 ///              .doit();
 /// # }
 /// ```
@@ -14695,7 +14701,7 @@ impl<'a, C, A> MylibraryAnnotationUpdateCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "mylibrary/annotations/{annotationId}";
+        let mut url = "https://www.googleapis.com/books/v1/mylibrary/annotations/{annotationId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -14918,10 +14924,10 @@ impl<'a, C, A> MylibraryAnnotationUpdateCall<'a, C, A> where C: BorrowMut<hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().readingpositions_set_position("volumeId", "timestamp", "position")
-///              .source("accusam")
-///              .device_cookie("labore")
-///              .content_version("diam")
-///              .action("nonumy")
+///              .source("labore")
+///              .device_cookie("diam")
+///              .content_version("nonumy")
+///              .action("sed")
 ///              .doit();
 /// # }
 /// ```
@@ -14984,7 +14990,7 @@ impl<'a, C, A> MylibraryReadingpositionSetPositionCall<'a, C, A> where C: Borrow
         }
 
 
-        let mut url = self.hub._base_url.clone() + "mylibrary/readingpositions/{volumeId}/setPosition";
+        let mut url = "https://www.googleapis.com/books/v1/mylibrary/readingpositions/{volumeId}/setPosition".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -15214,7 +15220,7 @@ impl<'a, C, A> MylibraryReadingpositionSetPositionCall<'a, C, A> where C: Borrow
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().bookshelves_get("shelf")
-///              .source("diam")
+///              .source("magna")
 ///              .doit();
 /// # }
 /// ```
@@ -15262,7 +15268,7 @@ impl<'a, C, A> MylibraryBookshelveGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "mylibrary/bookshelves/{shelf}";
+        let mut url = "https://www.googleapis.com/books/v1/mylibrary/bookshelves/{shelf}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -15461,7 +15467,7 @@ impl<'a, C, A> MylibraryBookshelveGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().bookshelves_list()
-///              .source("magna")
+///              .source("dolor")
 ///              .doit();
 /// # }
 /// ```
@@ -15507,7 +15513,7 @@ impl<'a, C, A> MylibraryBookshelveListCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "mylibrary/bookshelves";
+        let mut url = "https://www.googleapis.com/books/v1/mylibrary/bookshelves".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -15675,8 +15681,8 @@ impl<'a, C, A> MylibraryBookshelveListCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().readingpositions_get("volumeId")
-///              .source("Lorem")
-///              .content_version("dolor")
+///              .source("dolor")
+///              .content_version("vero")
 ///              .doit();
 /// # }
 /// ```
@@ -15728,7 +15734,7 @@ impl<'a, C, A> MylibraryReadingpositionGetCall<'a, C, A> where C: BorrowMut<hype
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "mylibrary/readingpositions/{volumeId}";
+        let mut url = "https://www.googleapis.com/books/v1/mylibrary/readingpositions/{volumeId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -15934,8 +15940,8 @@ impl<'a, C, A> MylibraryReadingpositionGetCall<'a, C, A> where C: BorrowMut<hype
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.notification().get("notification_id")
-///              .source("nonumy")
-///              .locale("takimata")
+///              .source("takimata")
+///              .locale("dolores")
 ///              .doit();
 /// # }
 /// ```
@@ -15987,7 +15993,7 @@ impl<'a, C, A> NotificationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "notification/get";
+        let mut url = "https://www.googleapis.com/books/v1/notification/get".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -16172,10 +16178,10 @@ impl<'a, C, A> NotificationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.cloudloading().add_book()
-///              .upload_client_token("dolores")
-///              .name("consetetur")
-///              .mime_type("erat")
-///              .drive_document_id("amet.")
+///              .upload_client_token("consetetur")
+///              .name("erat")
+///              .mime_type("amet.")
+///              .drive_document_id("dolores")
 ///              .doit();
 /// # }
 /// ```
@@ -16233,7 +16239,7 @@ impl<'a, C, A> CloudloadingAddBookCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "cloudloading/addBook";
+        let mut url = "https://www.googleapis.com/books/v1/cloudloading/addBook".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -16469,7 +16475,7 @@ impl<'a, C, A> CloudloadingUpdateBookCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "cloudloading/updateBook";
+        let mut url = "https://www.googleapis.com/books/v1/cloudloading/updateBook".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -16696,7 +16702,7 @@ impl<'a, C, A> CloudloadingDeleteBookCall<'a, C, A> where C: BorrowMut<hyper::Cl
         }
 
 
-        let mut url = self.hub._base_url.clone() + "cloudloading/deleteBook";
+        let mut url = "https://www.googleapis.com/books/v1/cloudloading/deleteBook".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -16828,5 +16834,6 @@ impl<'a, C, A> CloudloadingDeleteBookCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self
     }
 }
+
 
 

@@ -228,7 +228,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -386,8 +386,6 @@ pub struct TagManager<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-    _base_url: String,
-    _root_url: String,
 }
 
 impl<'a, C, A> Hub for TagManager<C, A> {}
@@ -400,8 +398,6 @@ impl<'a, C, A> TagManager<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
-            _base_url: "https://www.googleapis.com/tagmanager/v1/".to_string(),
-            _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
@@ -416,26 +412,6 @@ impl<'a, C, A> TagManager<C, A>
     pub fn user_agent(&mut self, agent_name: String) -> String {
         let prev = self._user_agent.clone();
         self._user_agent = agent_name;
-        prev
-    }
-
-    /// Set the base url to use in all requests to the server.
-    /// It defaults to `https://www.googleapis.com/tagmanager/v1/`.
-    ///
-    /// Returns the previously set base url.
-    pub fn base_url(&mut self, new_base_url: String) -> String {
-        let prev = self._base_url.clone();
-        self._base_url = new_base_url;
-        prev
-    }
-
-    /// Set the root url to use in all requests to the server.
-    /// It defaults to `https://www.googleapis.com/`.
-    ///
-    /// Returns the previously set root url.
-    pub fn root_url(&mut self, new_root_url: String) -> String {
-        let prev = self._root_url.clone();
-        self._root_url = new_root_url;
         prev
     }
 }
@@ -2578,7 +2554,7 @@ impl<'a, C, A> AccountContainerListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -2813,7 +2789,7 @@ impl<'a, C, A> AccountPermissionListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/permissions";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/permissions".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ManageUser.as_ref().to_string(), ());
         }
@@ -3057,7 +3033,7 @@ impl<'a, C, A> AccountContainerEnvironmentCreateCall<'a, C, A> where C: BorrowMu
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/environments";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/environments".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -3333,7 +3309,7 @@ impl<'a, C, A> AccountPermissionCreateCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/permissions";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/permissions".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ManageUser.as_ref().to_string(), ());
         }
@@ -3595,7 +3571,7 @@ impl<'a, C, A> AccountContainerEnvironmentDeleteCall<'a, C, A> where C: BorrowMu
         }
 
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/environments/{environmentId}";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/environments/{environmentId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -3841,7 +3817,7 @@ impl<'a, C, A> AccountPermissionDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
         }
 
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/permissions/{permissionId}";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/permissions/{permissionId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ManageUser.as_ref().to_string(), ());
         }
@@ -4078,7 +4054,7 @@ impl<'a, C, A> AccountContainerGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -4339,7 +4315,7 @@ impl<'a, C, A> AccountContainerEnvironmentPatchCall<'a, C, A> where C: BorrowMut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/environments/{environmentId}";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/environments/{environmentId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -4637,7 +4613,7 @@ impl<'a, C, A> AccountContainerVersionListCall<'a, C, A> where C: BorrowMut<hype
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/versions";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/versions".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -4912,7 +4888,7 @@ impl<'a, C, A> AccountContainerTriggerUpdateCall<'a, C, A> where C: BorrowMut<hy
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/triggers/{triggerId}";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/triggers/{triggerId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -5202,7 +5178,7 @@ impl<'a, C, A> AccountContainerTriggerGetCall<'a, C, A> where C: BorrowMut<hyper
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/triggers/{triggerId}";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/triggers/{triggerId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -5458,7 +5434,7 @@ impl<'a, C, A> AccountContainerDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
         }
 
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
         }
@@ -5696,7 +5672,7 @@ impl<'a, C, A> AccountContainerFolderDeleteCall<'a, C, A> where C: BorrowMut<hyp
         }
 
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/folders/{folderId}";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/folders/{folderId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -5948,7 +5924,7 @@ impl<'a, C, A> AccountContainerCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -6210,7 +6186,7 @@ impl<'a, C, A> AccountContainerTagDeleteCall<'a, C, A> where C: BorrowMut<hyper:
         }
 
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/tags/{tagId}";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/tags/{tagId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -6459,7 +6435,7 @@ impl<'a, C, A> AccountContainerFolderEntityListCall<'a, C, A> where C: BorrowMut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/folders/{folderId}/entities";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/folders/{folderId}/entities".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -6718,7 +6694,7 @@ impl<'a, C, A> AccountContainerVersionUndeleteCall<'a, C, A> where C: BorrowMut<
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/versions/{containerVersionId}/undelete";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/versions/{containerVersionId}/undelete".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainerversion.as_ref().to_string(), ());
         }
@@ -6975,7 +6951,7 @@ impl<'a, C, A> AccountContainerEnvironmentListCall<'a, C, A> where C: BorrowMut<
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/environments";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/environments".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -7222,7 +7198,7 @@ impl<'a, C, A> AccountContainerTagListCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/tags";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/tags".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -7476,7 +7452,7 @@ impl<'a, C, A> AccountContainerVersionPublishCall<'a, C, A> where C: BorrowMut<h
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/versions/{containerVersionId}/publish";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/versions/{containerVersionId}/publish".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Publish.as_ref().to_string(), ());
         }
@@ -7742,7 +7718,7 @@ impl<'a, C, A> AccountContainerFolderGetCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/folders/{folderId}";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/folders/{folderId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -8001,7 +7977,7 @@ impl<'a, C, A> AccountContainerEnvironmentGetCall<'a, C, A> where C: BorrowMut<h
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/environments/{environmentId}";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/environments/{environmentId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -8265,7 +8241,7 @@ impl<'a, C, A> AccountContainerTagCreateCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/tags";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/tags".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -8536,7 +8512,7 @@ impl<'a, C, A> AccountContainerTriggerListCall<'a, C, A> where C: BorrowMut<hype
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/triggers";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/triggers".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -8784,7 +8760,7 @@ impl<'a, C, A> AccountContainerVersionDeleteCall<'a, C, A> where C: BorrowMut<hy
         }
 
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/versions/{containerVersionId}";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/versions/{containerVersionId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainerversion.as_ref().to_string(), ());
         }
@@ -9041,7 +9017,7 @@ impl<'a, C, A> AccountUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ManageAccount.as_ref().to_string(), ());
         }
@@ -9316,7 +9292,7 @@ impl<'a, C, A> AccountContainerVersionCreateCall<'a, C, A> where C: BorrowMut<hy
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/versions";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/versions".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainerversion.as_ref().to_string(), ());
         }
@@ -9587,7 +9563,7 @@ impl<'a, C, A> AccountPermissionGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/permissions/{permissionId}";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/permissions/{permissionId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ManageUser.as_ref().to_string(), ());
         }
@@ -9863,7 +9839,7 @@ impl<'a, C, A> AccountContainerMoveFolderUpdateCall<'a, C, A> where C: BorrowMut
         }
 
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/move_folders/{folderId}";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/move_folders/{folderId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -10160,7 +10136,7 @@ impl<'a, C, A> AccountContainerVersionRestoreCall<'a, C, A> where C: BorrowMut<h
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/versions/{containerVersionId}/restore";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/versions/{containerVersionId}/restore".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -10424,7 +10400,7 @@ impl<'a, C, A> AccountContainerVariableCreateCall<'a, C, A> where C: BorrowMut<h
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/variables";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/variables".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -10695,7 +10671,7 @@ impl<'a, C, A> AccountContainerVariableListCall<'a, C, A> where C: BorrowMut<hyp
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/variables";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/variables".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -10944,7 +10920,7 @@ impl<'a, C, A> AccountContainerTagGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/tags/{tagId}";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/tags/{tagId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -11203,7 +11179,7 @@ impl<'a, C, A> AccountContainerVariableGetCall<'a, C, A> where C: BorrowMut<hype
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/variables/{variableId}";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/variables/{variableId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -11461,7 +11437,7 @@ impl<'a, C, A> AccountContainerTriggerDeleteCall<'a, C, A> where C: BorrowMut<hy
         }
 
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/triggers/{triggerId}";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/triggers/{triggerId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -11715,7 +11691,7 @@ impl<'a, C, A> AccountContainerTriggerCreateCall<'a, C, A> where C: BorrowMut<hy
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/triggers";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/triggers".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -12000,7 +11976,7 @@ impl<'a, C, A> AccountContainerFolderUpdateCall<'a, C, A> where C: BorrowMut<hyp
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/folders/{folderId}";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/folders/{folderId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -12284,7 +12260,7 @@ impl<'a, C, A> AccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -12497,7 +12473,7 @@ impl<'a, C, A> AccountPermissionUpdateCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/permissions/{permissionId}";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/permissions/{permissionId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ManageUser.as_ref().to_string(), ());
         }
@@ -12769,7 +12745,7 @@ impl<'a, C, A> AccountContainerVariableDeleteCall<'a, C, A> where C: BorrowMut<h
         }
 
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/variables/{variableId}";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/variables/{variableId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -13025,7 +13001,7 @@ impl<'a, C, A> AccountContainerReauthorizeEnvironmentUpdateCall<'a, C, A> where 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/reauthorize_environments/{environmentId}";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/reauthorize_environments/{environmentId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Publish.as_ref().to_string(), ());
         }
@@ -13304,7 +13280,7 @@ impl<'a, C, A> AccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -13553,7 +13529,7 @@ impl<'a, C, A> AccountContainerUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -13845,7 +13821,7 @@ impl<'a, C, A> AccountContainerTagUpdateCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/tags/{tagId}";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/tags/{tagId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -14147,7 +14123,7 @@ impl<'a, C, A> AccountContainerEnvironmentUpdateCall<'a, C, A> where C: BorrowMu
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/environments/{environmentId}";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/environments/{environmentId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -14442,7 +14418,7 @@ impl<'a, C, A> AccountContainerFolderCreateCall<'a, C, A> where C: BorrowMut<hyp
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/folders";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/folders".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -14713,7 +14689,7 @@ impl<'a, C, A> AccountContainerFolderListCall<'a, C, A> where C: BorrowMut<hyper
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/folders";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/folders".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -14974,7 +14950,7 @@ impl<'a, C, A> AccountContainerVersionUpdateCall<'a, C, A> where C: BorrowMut<hy
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/versions/{containerVersionId}";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/versions/{containerVersionId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainerversion.as_ref().to_string(), ());
         }
@@ -15276,7 +15252,7 @@ impl<'a, C, A> AccountContainerVariableUpdateCall<'a, C, A> where C: BorrowMut<h
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/variables/{variableId}";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/variables/{variableId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -15566,7 +15542,7 @@ impl<'a, C, A> AccountContainerVersionGetCall<'a, C, A> where C: BorrowMut<hyper
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/versions/{containerVersionId}";
+        let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/versions/{containerVersionId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -15749,5 +15725,6 @@ impl<'a, C, A> AccountContainerVersionGetCall<'a, C, A> where C: BorrowMut<hyper
         self
     }
 }
+
 
 

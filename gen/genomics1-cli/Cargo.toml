@@ -4,11 +4,11 @@
 [package]
 
 name = "google-genomics1-cli"
-version = "1.0.4+20160928"
+version = "1.0.4+20170520"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with genomics (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/genomics1-cli"
-homepage = "https://cloud.google.com/genomics/"
+homepage = "https://cloud.google.com/genomics"
 documentation = "http://byron.github.io/google-apis-rs/google_genomics1_cli"
 license = "MIT"
 keywords = ["genomics", "google", "cli"]
@@ -24,7 +24,7 @@ serde_json = "^ 0.9"
 serde_derive = "^ 0.9"
 yup-oauth2 = "^ 1.0"
 strsim = "^0.5"
-hyper-rustls = "^0.3"
+hyper-rustls = "^0.6"
 yup-hyper-mock = "^2.0"
 clap = "^2.0"
 
@@ -34,4 +34,4 @@ clap = "^2.0"
 
 [dependencies.google-genomics1]
 path = "../genomics1"
-version = "1.0.4+20160928"
+version = "1.0.4+20170520"

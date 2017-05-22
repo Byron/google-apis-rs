@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *doubleclicksearch* crate version *1.0.4+20161108*, where *20161108* is the exact revision of the *doubleclicksearch:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
+//! This documentation was generated from *doubleclicksearch* crate version *1.0.4+20170509*, where *20170509* is the exact revision of the *doubleclicksearch:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
 //! 
 //! Everything else about the *doubleclicksearch* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/doubleclick-search/).
@@ -181,7 +181,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -306,8 +306,6 @@ pub struct Doubleclicksearch<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-    _base_url: String,
-    _root_url: String,
 }
 
 impl<'a, C, A> Hub for Doubleclicksearch<C, A> {}
@@ -320,8 +318,6 @@ impl<'a, C, A> Doubleclicksearch<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
-            _base_url: "https://www.googleapis.com/doubleclicksearch/v2/".to_string(),
-            _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
@@ -342,26 +338,6 @@ impl<'a, C, A> Doubleclicksearch<C, A>
     pub fn user_agent(&mut self, agent_name: String) -> String {
         let prev = self._user_agent.clone();
         self._user_agent = agent_name;
-        prev
-    }
-
-    /// Set the base url to use in all requests to the server.
-    /// It defaults to `https://www.googleapis.com/doubleclicksearch/v2/`.
-    ///
-    /// Returns the previously set base url.
-    pub fn base_url(&mut self, new_base_url: String) -> String {
-        let prev = self._base_url.clone();
-        self._base_url = new_base_url;
-        prev
-    }
-
-    /// Set the root url to use in all requests to the server.
-    /// It defaults to `https://www.googleapis.com/`.
-    ///
-    /// Returns the previously set root url.
-    pub fn root_url(&mut self, new_root_url: String) -> String {
-        let prev = self._root_url.clone();
-        self._root_url = new_root_url;
         prev
     }
 }
@@ -450,7 +426,8 @@ pub struct Conversion {
     /// DS ad ID.
     #[serde(rename="adId")]
     pub ad_id: Option<String>,
-    /// For offline conversions, this is an ID that advertisers are required to provide. Advertisers can specify any ID that is meaningful to them. For online conversions, DS copies the dsConversionId or floodlightOrderId into this property depending on the advertiser's Floodlight instructions.
+    /// For offline conversions, advertisers provide this ID. Advertisers can specify any ID that is meaningful to them. Each conversion in a request must specify a unique ID, and the combination of ID and timestamp must be unique amongst all conversions within the advertiser.
+    /// For online conversions, DS copies the dsConversionId or floodlightOrderId into this property depending on the advertiser's Floodlight instructions.
     #[serde(rename="conversionId")]
     pub conversion_id: Option<String>,
     /// The time at which the conversion was last modified, in epoch millis UTC.
@@ -1318,7 +1295,7 @@ impl<'a, C, A> ConversionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "conversion";
+        let mut url = "https://www.googleapis.com/doubleclicksearch/v2/conversion".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -1578,7 +1555,7 @@ impl<'a, C, A> ConversionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "agency/{agencyId}/advertiser/{advertiserId}/engine/{engineAccountId}/conversion";
+        let mut url = "https://www.googleapis.com/doubleclicksearch/v2/agency/{agencyId}/advertiser/{advertiserId}/engine/{engineAccountId}/conversion".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -1906,7 +1883,7 @@ impl<'a, C, A> ConversionUpdateAvailabilityCall<'a, C, A> where C: BorrowMut<hyp
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "conversion/updateAvailability";
+        let mut url = "https://www.googleapis.com/doubleclicksearch/v2/conversion/updateAvailability".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -2153,7 +2130,7 @@ impl<'a, C, A> ConversionPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "conversion";
+        let mut url = "https://www.googleapis.com/doubleclicksearch/v2/conversion".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -2456,7 +2433,7 @@ impl<'a, C, A> ConversionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "conversion";
+        let mut url = "https://www.googleapis.com/doubleclicksearch/v2/conversion".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -2686,7 +2663,7 @@ impl<'a, C, A> SavedColumnListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "agency/{agencyId}/advertiser/{advertiserId}/savedcolumns";
+        let mut url = "https://www.googleapis.com/doubleclicksearch/v2/agency/{agencyId}/advertiser/{advertiserId}/savedcolumns".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -2935,7 +2912,7 @@ impl<'a, C, A> ReportGetFileCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         }
 
 
-        let mut url = self.hub._base_url.clone() + "reports/{reportId}/files/{reportFragment}";
+        let mut url = "https://www.googleapis.com/doubleclicksearch/v2/reports/{reportId}/files/{reportFragment}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -3175,7 +3152,7 @@ impl<'a, C, A> ReportGenerateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "reports/generate";
+        let mut url = "https://www.googleapis.com/doubleclicksearch/v2/reports/generate".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -3403,7 +3380,7 @@ impl<'a, C, A> ReportGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "reports/{reportId}";
+        let mut url = "https://www.googleapis.com/doubleclicksearch/v2/reports/{reportId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -3643,7 +3620,7 @@ impl<'a, C, A> ReportRequestCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "reports";
+        let mut url = "https://www.googleapis.com/doubleclicksearch/v2/reports".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -3799,5 +3776,6 @@ impl<'a, C, A> ReportRequestCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self
     }
 }
+
 
 

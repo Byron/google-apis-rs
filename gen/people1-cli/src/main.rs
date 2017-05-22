@@ -39,7 +39,7 @@ enum DoitError {
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::People<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
+    hub: api::PeopleService<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
@@ -57,6 +57,9 @@ impl<'n> Engine<'n> {
                 },
                 "sort-order" => {
                     call = call.sort_order(value.unwrap_or(""));
+                },
+                "request-sync-token" => {
+                    call = call.request_sync_token(arg_from_str(value.unwrap_or("false"), err, "request-sync-token", "boolean"));
                 },
                 "request-mask-include-field" => {
                     call = call.request_mask_include_field(value.unwrap_or(""));
@@ -80,7 +83,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["sync-token", "page-size", "sort-order", "page-token", "request-mask-include-field"].iter().map(|v|*v));
+                                                                           v.extend(["sync-token", "page-size", "request-mask-include-field", "page-token", "sort-order", "request-sync-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -305,7 +308,7 @@ impl<'n> Engine<'n> {
             };
         let engine = Engine {
             opt: opt,
-            hub: api::People::new(client, auth),
+            hub: api::PeopleService::new(client, auth),
             gp: vec!["$-xgafv", "access-token", "alt", "bearer-token", "callback", "fields", "key", "oauth-token", "pp", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
                     ("$-xgafv", "$.xgafv"),
@@ -339,7 +342,8 @@ fn main() {
     let arg_data = [
         ("people", "methods: 'connections-list', 'get' and 'get-batch-get'", vec![
             ("connections-list",
-                    Some(r##"Provides a list of the authenticated user's contacts merged with any linked profiles."##),
+                    Some(r##"Provides a list of the authenticated user's contacts merged with any
+        linked profiles."##),
                     "Details at http://byron.github.io/google-apis-rs/google_people1_cli/people_connections-list",
                   vec![
                     (Some(r##"resource-name"##),
@@ -361,12 +365,18 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Provides information about a person resource for a resource name. Use `people/me` to indicate the authenticated user."##),
+                    Some(r##"Provides information about a person for a resource name. Use
+        `people/me` to indicate the authenticated user."##),
                     "Details at http://byron.github.io/google-apis-rs/google_people1_cli/people_get",
                   vec![
                     (Some(r##"resource-name"##),
                      None,
-                     Some(r##"The resource name of the person to provide information about. - To get information about the authenticated user, specify `people/me`. - To get information about any user, specify the resource name that identifies the user, such as the resource names returned by [`people.connections.list`](/people/api/rest/v1/people.connections/list)."##),
+                     Some(r##"The resource name of the person to provide information about.
+        
+        - To get information about the authenticated user, specify `people/me`.
+        - To get information about any user, specify the resource name that
+          identifies the user, such as the resource names returned by
+          [`people.connections.list`](/people/api/rest/v1/people.connections/list)."##),
                      Some(true),
                      Some(false)),
         
@@ -383,7 +393,9 @@ fn main() {
                      Some(false)),
                   ]),
             ("get-batch-get",
-                    Some(r##"Provides information about a list of specific people by specifying a list of requested resource names. Use `people/me` to indicate the authenticated user."##),
+                    Some(r##"Provides information about a list of specific people by specifying a list
+        of requested resource names. Use `people/me` to indicate the authenticated
+        user."##),
                     "Details at http://byron.github.io/google-apis-rs/google_people1_cli/people_get-batch-get",
                   vec![
                     (Some(r##"v"##),
@@ -404,8 +416,8 @@ fn main() {
     
     let mut app = App::new("people1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.4+20160210")
-           .about("The Google People API service gives access to information about profiles and contacts.")
+           .version("1.0.4+20170518")
+           .about("Provides access to information about profiles and contacts.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_people1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *plus* crate version *1.0.4+20161214*, where *20161214* is the exact revision of the *plus:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
+//! This documentation was generated from *plus* crate version *1.0.4+20170410*, where *20170410* is the exact revision of the *plus:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
 //! 
 //! Everything else about the *plus* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/+/api/).
@@ -179,7 +179,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -319,8 +319,6 @@ pub struct Plus<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-    _base_url: String,
-    _root_url: String,
 }
 
 impl<'a, C, A> Hub for Plus<C, A> {}
@@ -333,8 +331,6 @@ impl<'a, C, A> Plus<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
-            _base_url: "https://www.googleapis.com/plus/v1/".to_string(),
-            _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
@@ -355,26 +351,6 @@ impl<'a, C, A> Plus<C, A>
     pub fn user_agent(&mut self, agent_name: String) -> String {
         let prev = self._user_agent.clone();
         self._user_agent = agent_name;
-        prev
-    }
-
-    /// Set the base url to use in all requests to the server.
-    /// It defaults to `https://www.googleapis.com/plus/v1/`.
-    ///
-    /// Returns the previously set base url.
-    pub fn base_url(&mut self, new_base_url: String) -> String {
-        let prev = self._base_url.clone();
-        self._base_url = new_base_url;
-        prev
-    }
-
-    /// Set the root url to use in all requests to the server.
-    /// It defaults to `https://www.googleapis.com/`.
-    ///
-    /// Returns the previously set root url.
-    pub fn root_url(&mut self, new_root_url: String) -> String {
-        let prev = self._root_url.clone();
-        self._root_url = new_root_url;
         prev
     }
 }
@@ -1973,7 +1949,7 @@ impl<'a, C, A> ActivitySearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "activities";
+        let mut url = "https://www.googleapis.com/plus/v1/activities".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Login.as_ref().to_string(), ());
         }
@@ -2215,7 +2191,7 @@ impl<'a, C, A> ActivityGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "activities/{activityId}";
+        let mut url = "https://www.googleapis.com/plus/v1/activities/{activityId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Login.as_ref().to_string(), ());
         }
@@ -2462,7 +2438,7 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "people/{userId}/activities/{collection}";
+        let mut url = "https://www.googleapis.com/plus/v1/people/{userId}/activities/{collection}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Login.as_ref().to_string(), ());
         }
@@ -2736,7 +2712,7 @@ impl<'a, C, A> CommentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "activities/{activityId}/comments";
+        let mut url = "https://www.googleapis.com/plus/v1/activities/{activityId}/comments".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Login.as_ref().to_string(), ());
         }
@@ -2992,7 +2968,7 @@ impl<'a, C, A> CommentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "comments/{commentId}";
+        let mut url = "https://www.googleapis.com/plus/v1/comments/{commentId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Login.as_ref().to_string(), ());
         }
@@ -3242,7 +3218,7 @@ impl<'a, C, A> PeopleSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "people";
+        let mut url = "https://www.googleapis.com/plus/v1/people".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Login.as_ref().to_string(), ());
         }
@@ -3489,7 +3465,7 @@ impl<'a, C, A> PeopleListByActivityCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "activities/{activityId}/people/{collection}";
+        let mut url = "https://www.googleapis.com/plus/v1/activities/{activityId}/people/{collection}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Login.as_ref().to_string(), ());
         }
@@ -3765,7 +3741,7 @@ impl<'a, C, A> PeopleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "people/{userId}/people/{collection}";
+        let mut url = "https://www.googleapis.com/plus/v1/people/{userId}/people/{collection}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Login.as_ref().to_string(), ());
         }
@@ -4031,7 +4007,7 @@ impl<'a, C, A> PeopleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "people/{userId}";
+        let mut url = "https://www.googleapis.com/plus/v1/people/{userId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Login.as_ref().to_string(), ());
         }
@@ -4194,5 +4170,6 @@ impl<'a, C, A> PeopleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self
     }
 }
+
 
 

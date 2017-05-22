@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Logging* crate version *1.0.4+20161206*, where *20161206* is the exact revision of the *logging:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
+//! This documentation was generated from *Logging* crate version *1.0.4+20170516*, where *20170516* is the exact revision of the *logging:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
 //! 
 //! Everything else about the *Logging* *v2* API can be found at the
 //! [official documentation site](https://cloud.google.com/logging/docs/).
@@ -198,7 +198,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -243,14 +243,14 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
 #[derive(PartialEq, Eq, Hash)]
 pub enum Scope {
+    /// Administrate log data for your projects
+    Admin,
+
     /// View log data for your projects
     Read,
 
     /// Submit log data for your projects
     Write,
-
-    /// Administrate log data for your projects
-    Admin,
 
     /// View and manage your data across Google Cloud Platform services
     CloudPlatform,
@@ -262,9 +262,9 @@ pub enum Scope {
 impl AsRef<str> for Scope {
     fn as_ref(&self) -> &str {
         match *self {
+            Scope::Admin => "https://www.googleapis.com/auth/logging.admin",
             Scope::Read => "https://www.googleapis.com/auth/logging.read",
             Scope::Write => "https://www.googleapis.com/auth/logging.write",
-            Scope::Admin => "https://www.googleapis.com/auth/logging.admin",
             Scope::CloudPlatform => "https://www.googleapis.com/auth/cloud-platform",
             Scope::CloudPlatformReadOnly => "https://www.googleapis.com/auth/cloud-platform.read-only",
         }
@@ -346,8 +346,6 @@ pub struct Logging<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-    _base_url: String,
-    _root_url: String,
 }
 
 impl<'a, C, A> Hub for Logging<C, A> {}
@@ -360,8 +358,6 @@ impl<'a, C, A> Logging<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
-            _base_url: "https://logging.googleapis.com/".to_string(),
-            _root_url: "https://logging.googleapis.com/".to_string(),
         }
     }
 
@@ -391,26 +387,6 @@ impl<'a, C, A> Logging<C, A>
     pub fn user_agent(&mut self, agent_name: String) -> String {
         let prev = self._user_agent.clone();
         self._user_agent = agent_name;
-        prev
-    }
-
-    /// Set the base url to use in all requests to the server.
-    /// It defaults to `https://logging.googleapis.com/`.
-    ///
-    /// Returns the previously set base url.
-    pub fn base_url(&mut self, new_base_url: String) -> String {
-        let prev = self._base_url.clone();
-        self._base_url = new_base_url;
-        prev
-    }
-
-    /// Set the root url to use in all requests to the server.
-    /// It defaults to `https://logging.googleapis.com/`.
-    ///
-    /// Returns the previously set root url.
-    pub fn root_url(&mut self, new_root_url: String) -> String {
-        let prev = self._root_url.clone();
-        self._root_url = new_root_url;
         prev
     }
 }
@@ -513,9 +489,9 @@ impl ResponseResult for ListLogMetricsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MonitoredResource {
-    /// Required. Values for all of the labels listed in the associated monitored resource descriptor. For example, Cloud SQL databases use the labels "database_id" and "zone".
+    /// Required. Values for all of the labels listed in the associated monitored resource descriptor. For example, Compute Engine VM instances use the labels "project_id", "instance_id", and "zone".
     pub labels: Option<HashMap<String, String>>,
-    /// Required. The monitored resource type. This field must match the type field of a MonitoredResourceDescriptor object. For example, the type of a Cloud SQL database is "cloudsql_database".
+    /// Required. The monitored resource type. This field must match the type field of a MonitoredResourceDescriptor object. For example, the type of a Compute Engine VM instance is gce_instance.
     #[serde(rename="type")]
     pub type_: Option<String>,
 }
@@ -542,7 +518,7 @@ pub struct LogEntryOperation {
 impl Part for LogEntryOperation {}
 
 
-/// Describes a sink used to export log entries to one of the following destinations in any project: a Cloud Storage bucket, a BigQuery dataset, or a Cloud Pub/Sub topic. A logs filter controls which log entries are exported. The sink must be created within a project or organization.
+/// Describes a sink used to export log entries to one of the following destinations in any project: a Cloud Storage bucket, a BigQuery dataset, or a Cloud Pub/Sub topic. A logs filter controls which log entries are exported. The sink must be created within a project, organization, billing account, or folder.
 /// 
 /// # Activities
 /// 
@@ -564,30 +540,36 @@ impl Part for LogEntryOperation {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LogSink {
-    /// Optional. An advanced logs filter. The only exported log entries are those that are in the resource owning the sink and that match the filter. The filter must use the log entry format specified by the output_version_format parameter. For example, in the v2 format:
-    /// logName="projects/[PROJECT_ID]/logs/[LOG_ID]" AND severity>=ERROR
-    /// 
-    pub filter: Option<String>,
+    /// Optional. The log entry format to use for this sink's exported log entries. The v2 format is used by default. The v1 format is deprecated and should be used only as part of a migration effort to v2. See Migration to the v2 API.
+    #[serde(rename="outputVersionFormat")]
+    pub output_version_format: Option<String>,
+    /// Required. The client-assigned sink identifier, unique within the project. Example: "my-syslog-errors-to-pubsub". Sink identifiers are limited to 100 characters and can include only the following characters: upper and lower-case alphanumeric characters, underscores, hyphens, and periods.
+    pub name: Option<String>,
     /// Required. The export destination:
     /// "storage.googleapis.com/[GCS_BUCKET]"
     /// "bigquery.googleapis.com/projects/[PROJECT_ID]/datasets/[DATASET]"
     /// "pubsub.googleapis.com/projects/[PROJECT_ID]/topics/[TOPIC_ID]"
     /// The sink's writer_identity, set when the sink is created, must have permission to write to the destination or else the log entries are not exported. For more information, see Exporting Logs With Sinks.
     pub destination: Option<String>,
-    /// Required. The client-assigned sink identifier, unique within the project. Example: "my-syslog-errors-to-pubsub". Sink identifiers are limited to 100 characters and can include only the following characters: upper and lower-case alphanumeric characters, underscores, hyphens, and periods.
-    pub name: Option<String>,
+    /// Optional. An advanced logs filter. The only exported log entries are those that are in the resource owning the sink and that match the filter. The filter must use the log entry format specified by the output_version_format parameter. For example, in the v2 format:
+    /// logName="projects/[PROJECT_ID]/logs/[LOG_ID]" AND severity>=ERROR
+    /// 
+    pub filter: Option<String>,
     /// Optional. The time at which this sink will begin exporting log entries. Log entries are exported only if their timestamp is not earlier than the start time. The default value of this field is the time the sink is created or updated.
     #[serde(rename="startTime")]
     pub start_time: Option<String>,
-    /// Optional. The log entry format to use for this sink's exported log entries. The v2 format is used by default. The v1 format is deprecated and should be used only as part of a migration effort to v2. See Migration to the v2 API.
-    #[serde(rename="outputVersionFormat")]
-    pub output_version_format: Option<String>,
-    /// Output only. An IAM identity&mdash;a service account or group&mdash;under which Stackdriver Logging writes the exported log entries to the sink's destination. This field is set by sinks.create and sinks.update, based on the setting of unique_writer_identity in those methods.Until you grant this identity write-access to the destination, log entry exports from this sink will fail. For more information, see Granting access for a resource. Consult the destination service's documentation to determine the appropriate IAM roles to assign to the identity.
-    #[serde(rename="writerIdentity")]
-    pub writer_identity: Option<String>,
     /// Optional. The time at which this sink will stop exporting log entries. Log entries are exported only if their timestamp is earlier than the end time. If this field is not supplied, there is no end time. If both a start time and an end time are provided, then the end time must be later than the start time.
     #[serde(rename="endTime")]
     pub end_time: Option<String>,
+    /// Output only. An IAM identity&mdash;a service account or group&mdash;under which Stackdriver Logging writes the exported log entries to the sink's destination. This field is set by sinks.create and sinks.update, based on the setting of unique_writer_identity in those methods.Until you grant this identity write-access to the destination, log entry exports from this sink will fail. For more information, see Granting access for a resource. Consult the destination service's documentation to determine the appropriate IAM roles to assign to the identity.
+    #[serde(rename="writerIdentity")]
+    pub writer_identity: Option<String>,
+    /// Optional. This field applies only to sinks owned by organizations and folders. If the field is false, the default, only the logs owned by the sink's parent resource are available for export. If the field is true, then logs from all the projects, folders, and billing accounts contained in the sink's parent resource are also available for export. Whether a particular log entry from the children is exported depends on the sink's filter expression. For example, if this field is true, then the filter resource.type=gce_instance would export all Compute Engine VM instance log entries from all projects in the sink's parent. To only export entries from certain child projects, filter on the project part of the log name:
+    /// logName:("projects/test-project1/" OR "projects/test-project2/") AND
+    /// resource.type=gce_instance
+    /// 
+    #[serde(rename="includeChildren")]
+    pub include_children: Option<bool>,
 }
 
 impl RequestValue for LogSink {}
@@ -605,19 +587,21 @@ impl ResponseResult for LogSink {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListLogEntriesRequest {
-    /// Optional. How the results should be sorted. Presently, the only permitted values are "timestamp asc" (default) and "timestamp desc". The first option returns entries in order of increasing values of LogEntry.timestamp (oldest first), and the second option returns entries in order of decreasing timestamps (newest first). Entries with equal timestamps are returned in order of LogEntry.insertId.
+    /// Optional. How the results should be sorted. Presently, the only permitted values are "timestamp asc" (default) and "timestamp desc". The first option returns entries in order of increasing values of LogEntry.timestamp (oldest first), and the second option returns entries in order of decreasing timestamps (newest first). Entries with equal timestamps are returned in order of their insert_id values.
     #[serde(rename="orderBy")]
     pub order_by: Option<String>,
-    /// Required. Names of one or more resources from which to retrieve log entries:
+    /// Required. Names of one or more parent resources from which to retrieve log entries:
     /// "projects/[PROJECT_ID]"
     /// "organizations/[ORGANIZATION_ID]"
+    /// "billingAccounts/[BILLING_ACCOUNT_ID]"
+    /// "folders/[FOLDER_ID]"
     /// Projects listed in the project_ids field are added to this list.
     #[serde(rename="resourceNames")]
     pub resource_names: Option<Vec<String>>,
-    /// Optional. The maximum number of results to return from this request. Non-positive values are ignored. The presence of nextPageToken in the response indicates that more results might be available.
+    /// Optional. The maximum number of results to return from this request. Non-positive values are ignored. The presence of next_page_token in the response indicates that more results might be available.
     #[serde(rename="pageSize")]
     pub page_size: Option<i32>,
-    /// Optional. If present, then retrieve the next batch of results from the preceding call to this method. pageToken must be the value of nextPageToken from the previous response. The values of other method parameters should be identical to those in the previous call.
+    /// Optional. If present, then retrieve the next batch of results from the preceding call to this method. page_token must be the value of next_page_token from the previous response. The values of other method parameters should be identical to those in the previous call.
     #[serde(rename="pageToken")]
     pub page_token: Option<String>,
     /// Deprecated. Use resource_names instead. One or more project identifiers or project numbers from which to retrieve log entries. Example: "my-project-1A". If present, these project identifiers are converted to resource name format and added to the list of resources in resource_names.
@@ -782,10 +766,12 @@ pub struct WriteLogEntriesRequest {
     /// Optional. A default log resource name that is assigned to all log entries in entries that do not specify a value for log_name:
     /// "projects/[PROJECT_ID]/logs/[LOG_ID]"
     /// "organizations/[ORGANIZATION_ID]/logs/[LOG_ID]"
+    /// "billingAccounts/[BILLING_ACCOUNT_ID]/logs/[LOG_ID]"
+    /// "folders/[FOLDER_ID]/logs/[LOG_ID]"
     /// [LOG_ID] must be URL-encoded. For example, "projects/my-project-id/logs/syslog" or "organizations/1234567890/logs/cloudresourcemanager.googleapis.com%2Factivity". For more information about log names, see LogEntry.
     #[serde(rename="logName")]
     pub log_name: Option<String>,
-    /// Optional. Whether valid entries should be written even if some other entries fail due to INVALID_ARGUMENT or PERMISSION_DENIED errors. If any entry is not written, the response status will be the error associated with one of the failed entries and include error details in the form of WriteLogEntriesPartialErrors.
+    /// Optional. Whether valid entries should be written even if some other entries fail due to INVALID_ARGUMENT or PERMISSION_DENIED errors. If any entry is not written, then the response status is the error associated with one of the failed entries and the response includes error details keyed by the entries' zero-based index in the entries.write method.
     #[serde(rename="partialSuccess")]
     pub partial_success: Option<bool>,
     /// Optional. Default labels that are added to the labels field of all log entries in entries. If a log entry already has a label with the same key as a label in this parameter, then the log entry's label is not changed. See LogEntry.
@@ -796,7 +782,7 @@ pub struct WriteLogEntriesRequest {
     ///     "zone": "us-central1-a", "instance_id": "00000000000000000000" }}
     /// See LogEntry.
     pub resource: Option<MonitoredResource>,
-    /// Required. The log entries to write. Values supplied for the fields log_name, resource, and labels in this entries.write request are added to those log entries that do not provide their own values for the fields.To improve throughput and to avoid exceeding the quota limit for calls to entries.write, you should write multiple log entries at once rather than calling this method for each individual log entry.
+    /// Required. The log entries to write. Values supplied for the fields log_name, resource, and labels in this entries.write request are inserted into those log entries in this list that do not provide their own values.Stackdriver Logging also creates and inserts values for timestamp and insert_id if the entries do not provide them. The created insert_id for the N'th entry in this list will be greater than earlier entries and less than later entries. Otherwise, the order of log entries in this list does not matter.To improve throughput and to avoid exceeding the quota limit for calls to entries.write, you should write multiple log entries at once rather than calling this method for each individual log entry.
     pub entries: Option<Vec<LogEntry>>,
 }
 
@@ -832,12 +818,14 @@ pub struct LogEntry {
     pub http_request: Option<HttpRequest>,
     /// Required. The monitored resource associated with this log entry. Example: a log entry that reports a database error would be associated with the monitored resource designating the particular database that reported the error.
     pub resource: Option<MonitoredResource>,
+    /// Optional. The severity of the log entry. The default value is LogSeverity.DEFAULT.
+    pub severity: Option<String>,
+    /// Optional. Resource name of the trace associated with the log entry, if any. If it contains a relative resource name, the name is assumed to be relative to //tracing.googleapis.com. Example: projects/my-projectid/traces/06796866738c859f2f19b7cfb3214824
+    pub trace: Option<String>,
     /// The log entry payload, represented as a Unicode string (UTF-8).
     #[serde(rename="textPayload")]
     pub text_payload: Option<String>,
-    /// Optional. Resource name of the trace associated with the log entry, if any. If it contains a relative resource name, the name is assumed to be relative to //tracing.googleapis.com. Example: projects/my-projectid/traces/06796866738c859f2f19b7cfb3214824
-    pub trace: Option<String>,
-    /// Optional. The time the event described by the log entry occurred. If omitted, Stackdriver Logging will use the time the log entry is received.
+    /// Optional. The time the event described by the log entry occurred. If omitted in a new log entry, Stackdriver Logging will insert the time the log entry is received. Stackdriver Logging might reject log entries whose time stamps are more than a couple of hours in the future. Log entries with time stamps in the past are accepted.
     pub timestamp: Option<String>,
     /// Optional. A set of user-defined (key, value) data that provides additional information about the log entry.
     pub labels: Option<HashMap<String, String>>,
@@ -850,10 +838,15 @@ pub struct LogEntry {
     /// Required. The resource name of the log to which this log entry belongs:
     /// "projects/[PROJECT_ID]/logs/[LOG_ID]"
     /// "organizations/[ORGANIZATION_ID]/logs/[LOG_ID]"
+    /// "billingAccounts/[BILLING_ACCOUNT_ID]/logs/[LOG_ID]"
+    /// "folders/[FOLDER_ID]/logs/[LOG_ID]"
     /// [LOG_ID] must be URL-encoded within log_name. Example: "organizations/1234567890/logs/cloudresourcemanager.googleapis.com%2Factivity". [LOG_ID] must be less than 512 characters long and can only include the following characters: upper and lower case alphanumeric characters, forward-slash, underscore, hyphen, and period.For backward compatibility, if log_name begins with a forward-slash, such as /projects/..., then the log entry is ingested as usual but the forward-slash is removed. Listing the log entry will not show the leading slash and filtering for a log name with a leading slash will never return any results.
     #[serde(rename="logName")]
     pub log_name: Option<String>,
-    /// Optional. A unique ID for the log entry. If you provide this field, the logging service considers other log entries in the same project with the same ID as duplicates which can be removed. If omitted, Stackdriver Logging will generate a unique ID for this log entry.
+    /// Output only. The time the log entry was received by Stackdriver Logging.
+    #[serde(rename="receiveTimestamp")]
+    pub receive_timestamp: Option<String>,
+    /// Optional. A unique identifier for the log entry. If you provide a value, then Stackdriver Logging considers other log entries in the same project, with the same timestamp, and with the same insert_id to be duplicates which can be removed. If omitted in new log entries, then Stackdriver Logging will insert its own unique identifier. The insert_id is used to order log entries that have the same timestamp value.
     #[serde(rename="insertId")]
     pub insert_id: Option<String>,
     /// Optional. Information about an operation associated with the log entry, if applicable.
@@ -861,8 +854,6 @@ pub struct LogEntry {
     /// Optional. Source code location information associated with the log entry, if any.
     #[serde(rename="sourceLocation")]
     pub source_location: Option<LogEntrySourceLocation>,
-    /// Optional. The severity of the log entry. The default value is LogSeverity.DEFAULT.
-    pub severity: Option<String>,
 }
 
 impl Part for LogEntry {}
@@ -876,8 +867,8 @@ impl Part for LogEntry {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [metrics create projects](struct.ProjectMetricCreateCall.html) (request|response)
-/// * [metrics get projects](struct.ProjectMetricGetCall.html) (response)
 /// * [metrics update projects](struct.ProjectMetricUpdateCall.html) (request|response)
+/// * [metrics get projects](struct.ProjectMetricGetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LogMetric {
@@ -887,10 +878,10 @@ pub struct LogMetric {
     pub filter: Option<String>,
     /// Output only. The API version that created or updated this metric. The version also dictates the syntax of the filter expression. When a value for this field is missing, the default value of V2 should be assumed.
     pub version: Option<String>,
-    /// Optional. A description of this metric, which is used in documentation.
-    pub description: Option<String>,
     /// Required. The client-assigned metric identifier. Examples: "error_count", "nginx/requests".Metric identifiers are limited to 100 characters and can include only the following characters: A-Z, a-z, 0-9, and the special characters _-.,+!*',()%/. The forward-slash character (/) denotes a hierarchy of name pieces, and it cannot be the first character of the name.The metric identifier in this field must not be URL-encoded (https://en.wikipedia.org/wiki/Percent-encoding). However, when the metric identifier appears as the [METRIC_ID] part of a metric_name API parameter, then the metric identifier must be URL-encoded. Example: "projects/my-project/metrics/nginx%2Frequests".
     pub name: Option<String>,
+    /// Optional. A description of this metric, which is used in documentation.
+    pub description: Option<String>,
 }
 
 impl RequestValue for LogMetric {}
@@ -916,10 +907,10 @@ pub struct MonitoredResourceDescriptor {
     /// Required. The monitored resource type. For example, the type "cloudsql_database" represents databases in Google Cloud SQL. The maximum length of this value is 256 characters.
     #[serde(rename="type")]
     pub type_: Option<String>,
-    /// Optional. A detailed description of the monitored resource type that might be used in documentation.
-    pub description: Option<String>,
     /// Optional. The resource name of the monitored resource descriptor: "projects/{project_id}/monitoredResourceDescriptors/{type}" where {type} is the value of the type field in this object and {project_id} is a project ID that provides API-specific context for accessing the type. APIs that do not use project information can use the resource name format "monitoredResourceDescriptors/{type}".
     pub name: Option<String>,
+    /// Optional. A detailed description of the monitored resource type that might be used in documentation.
+    pub description: Option<String>,
 }
 
 impl Resource for MonitoredResourceDescriptor {}
@@ -974,7 +965,12 @@ impl<'a, C, A> FolderMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required. The parent resource whose sinks are to be listed. Examples: "projects/my-logging-project", "organizations/123456789".
+    /// * `parent` - Required. The parent resource whose sinks are to be listed:
+    ///              "projects/[PROJECT_ID]"
+    ///              "organizations/[ORGANIZATION_ID]"
+    ///              "billingAccounts/[BILLING_ACCOUNT_ID]"
+    ///              "folders/[FOLDER_ID]"
+    ///              
     pub fn sinks_list(&self, parent: &str) -> FolderSinkListCall<'a, C, A> {
         FolderSinkListCall {
             hub: self.hub,
@@ -997,6 +993,8 @@ impl<'a, C, A> FolderMethods<'a, C, A> {
     /// * `sinkName` - Required. The full resource name of the sink to update, including the parent resource and the sink identifier:
     ///                "projects/[PROJECT_ID]/sinks/[SINK_ID]"
     ///                "organizations/[ORGANIZATION_ID]/sinks/[SINK_ID]"
+    ///                "billingAccounts/[BILLING_ACCOUNT_ID]/sinks/[SINK_ID]"
+    ///                "folders/[FOLDER_ID]/sinks/[SINK_ID]"
     ///                Example: "projects/my-project-id/sinks/my-sink-id".
     pub fn sinks_update(&self, request: LogSink, sink_name: &str) -> FolderSinkUpdateCall<'a, C, A> {
         FolderSinkUpdateCall {
@@ -1016,9 +1014,11 @@ impl<'a, C, A> FolderMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `sinkName` - Required. The parent resource name of the sink:
+    /// * `sinkName` - Required. The resource name of the sink:
     ///                "projects/[PROJECT_ID]/sinks/[SINK_ID]"
     ///                "organizations/[ORGANIZATION_ID]/sinks/[SINK_ID]"
+    ///                "billingAccounts/[BILLING_ACCOUNT_ID]/sinks/[SINK_ID]"
+    ///                "folders/[FOLDER_ID]/sinks/[SINK_ID]"
     ///                Example: "projects/my-project-id/sinks/my-sink-id".
     pub fn sinks_get(&self, sink_name: &str) -> FolderSinkGetCall<'a, C, A> {
         FolderSinkGetCall {
@@ -1040,6 +1040,8 @@ impl<'a, C, A> FolderMethods<'a, C, A> {
     /// * `parent` - Required. The resource in which to create the sink:
     ///              "projects/[PROJECT_ID]"
     ///              "organizations/[ORGANIZATION_ID]"
+    ///              "billingAccounts/[BILLING_ACCOUNT_ID]"
+    ///              "folders/[FOLDER_ID]"
     ///              Examples: "projects/my-logging-project", "organizations/123456789".
     pub fn sinks_create(&self, request: LogSink, parent: &str) -> FolderSinkCreateCall<'a, C, A> {
         FolderSinkCreateCall {
@@ -1062,7 +1064,9 @@ impl<'a, C, A> FolderMethods<'a, C, A> {
     /// * `sinkName` - Required. The full resource name of the sink to delete, including the parent resource and the sink identifier:
     ///                "projects/[PROJECT_ID]/sinks/[SINK_ID]"
     ///                "organizations/[ORGANIZATION_ID]/sinks/[SINK_ID]"
-    ///                It is an error if the sink does not exist. Example: "projects/my-project-id/sinks/my-sink-id". It is an error if the sink does not exist.
+    ///                "billingAccounts/[BILLING_ACCOUNT_ID]/sinks/[SINK_ID]"
+    ///                "folders/[FOLDER_ID]/sinks/[SINK_ID]"
+    ///                Example: "projects/my-project-id/sinks/my-sink-id".
     pub fn sinks_delete(&self, sink_name: &str) -> FolderSinkDeleteCall<'a, C, A> {
         FolderSinkDeleteCall {
             hub: self.hub,
@@ -1075,13 +1079,15 @@ impl<'a, C, A> FolderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the logs in projects or organizations. Only logs that have entries are listed.
+    /// Lists the logs in projects, organizations, folders, or billing accounts. Only logs that have entries are listed.
     /// 
     /// # Arguments
     ///
     /// * `parent` - Required. The resource name that owns the logs:
     ///              "projects/[PROJECT_ID]"
     ///              "organizations/[ORGANIZATION_ID]"
+    ///              "billingAccounts/[BILLING_ACCOUNT_ID]"
+    ///              "folders/[FOLDER_ID]"
     ///              
     pub fn logs_list(&self, parent: &str) -> FolderLogListCall<'a, C, A> {
         FolderLogListCall {
@@ -1097,13 +1103,15 @@ impl<'a, C, A> FolderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes all the log entries in a log. The log reappears if it receives new entries.
+    /// Deletes all the log entries in a log. The log reappears if it receives new entries. Log entries written shortly before the delete operation might not be deleted.
     /// 
     /// # Arguments
     ///
     /// * `logName` - Required. The resource name of the log to delete:
     ///               "projects/[PROJECT_ID]/logs/[LOG_ID]"
     ///               "organizations/[ORGANIZATION_ID]/logs/[LOG_ID]"
+    ///               "billingAccounts/[BILLING_ACCOUNT_ID]/logs/[LOG_ID]"
+    ///               "folders/[FOLDER_ID]/logs/[LOG_ID]"
     ///               [LOG_ID] must be URL-encoded. For example, "projects/my-project-id/logs/syslog", "organizations/1234567890/logs/cloudresourcemanager.googleapis.com%2Factivity". For more information about log names, see LogEntry.
     pub fn logs_delete(&self, log_name: &str) -> FolderLogDeleteCall<'a, C, A> {
         FolderLogDeleteCall {
@@ -1158,13 +1166,15 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the logs in projects or organizations. Only logs that have entries are listed.
+    /// Lists the logs in projects, organizations, folders, or billing accounts. Only logs that have entries are listed.
     /// 
     /// # Arguments
     ///
     /// * `parent` - Required. The resource name that owns the logs:
     ///              "projects/[PROJECT_ID]"
     ///              "organizations/[ORGANIZATION_ID]"
+    ///              "billingAccounts/[BILLING_ACCOUNT_ID]"
+    ///              "folders/[FOLDER_ID]"
     ///              
     pub fn logs_list(&self, parent: &str) -> OrganizationLogListCall<'a, C, A> {
         OrganizationLogListCall {
@@ -1180,13 +1190,15 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes all the log entries in a log. The log reappears if it receives new entries.
+    /// Deletes all the log entries in a log. The log reappears if it receives new entries. Log entries written shortly before the delete operation might not be deleted.
     /// 
     /// # Arguments
     ///
     /// * `logName` - Required. The resource name of the log to delete:
     ///               "projects/[PROJECT_ID]/logs/[LOG_ID]"
     ///               "organizations/[ORGANIZATION_ID]/logs/[LOG_ID]"
+    ///               "billingAccounts/[BILLING_ACCOUNT_ID]/logs/[LOG_ID]"
+    ///               "folders/[FOLDER_ID]/logs/[LOG_ID]"
     ///               [LOG_ID] must be URL-encoded. For example, "projects/my-project-id/logs/syslog", "organizations/1234567890/logs/cloudresourcemanager.googleapis.com%2Factivity". For more information about log names, see LogEntry.
     pub fn logs_delete(&self, log_name: &str) -> OrganizationLogDeleteCall<'a, C, A> {
         OrganizationLogDeleteCall {
@@ -1208,6 +1220,8 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     /// * `sinkName` - Required. The full resource name of the sink to update, including the parent resource and the sink identifier:
     ///                "projects/[PROJECT_ID]/sinks/[SINK_ID]"
     ///                "organizations/[ORGANIZATION_ID]/sinks/[SINK_ID]"
+    ///                "billingAccounts/[BILLING_ACCOUNT_ID]/sinks/[SINK_ID]"
+    ///                "folders/[FOLDER_ID]/sinks/[SINK_ID]"
     ///                Example: "projects/my-project-id/sinks/my-sink-id".
     pub fn sinks_update(&self, request: LogSink, sink_name: &str) -> OrganizationSinkUpdateCall<'a, C, A> {
         OrganizationSinkUpdateCall {
@@ -1227,9 +1241,11 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `sinkName` - Required. The parent resource name of the sink:
+    /// * `sinkName` - Required. The resource name of the sink:
     ///                "projects/[PROJECT_ID]/sinks/[SINK_ID]"
     ///                "organizations/[ORGANIZATION_ID]/sinks/[SINK_ID]"
+    ///                "billingAccounts/[BILLING_ACCOUNT_ID]/sinks/[SINK_ID]"
+    ///                "folders/[FOLDER_ID]/sinks/[SINK_ID]"
     ///                Example: "projects/my-project-id/sinks/my-sink-id".
     pub fn sinks_get(&self, sink_name: &str) -> OrganizationSinkGetCall<'a, C, A> {
         OrganizationSinkGetCall {
@@ -1247,7 +1263,12 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required. The parent resource whose sinks are to be listed. Examples: "projects/my-logging-project", "organizations/123456789".
+    /// * `parent` - Required. The parent resource whose sinks are to be listed:
+    ///              "projects/[PROJECT_ID]"
+    ///              "organizations/[ORGANIZATION_ID]"
+    ///              "billingAccounts/[BILLING_ACCOUNT_ID]"
+    ///              "folders/[FOLDER_ID]"
+    ///              
     pub fn sinks_list(&self, parent: &str) -> OrganizationSinkListCall<'a, C, A> {
         OrganizationSinkListCall {
             hub: self.hub,
@@ -1269,7 +1290,9 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     /// * `sinkName` - Required. The full resource name of the sink to delete, including the parent resource and the sink identifier:
     ///                "projects/[PROJECT_ID]/sinks/[SINK_ID]"
     ///                "organizations/[ORGANIZATION_ID]/sinks/[SINK_ID]"
-    ///                It is an error if the sink does not exist. Example: "projects/my-project-id/sinks/my-sink-id". It is an error if the sink does not exist.
+    ///                "billingAccounts/[BILLING_ACCOUNT_ID]/sinks/[SINK_ID]"
+    ///                "folders/[FOLDER_ID]/sinks/[SINK_ID]"
+    ///                Example: "projects/my-project-id/sinks/my-sink-id".
     pub fn sinks_delete(&self, sink_name: &str) -> OrganizationSinkDeleteCall<'a, C, A> {
         OrganizationSinkDeleteCall {
             hub: self.hub,
@@ -1290,6 +1313,8 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     /// * `parent` - Required. The resource in which to create the sink:
     ///              "projects/[PROJECT_ID]"
     ///              "organizations/[ORGANIZATION_ID]"
+    ///              "billingAccounts/[BILLING_ACCOUNT_ID]"
+    ///              "folders/[FOLDER_ID]"
     ///              Examples: "projects/my-logging-project", "organizations/123456789".
     pub fn sinks_create(&self, request: LogSink, parent: &str) -> OrganizationSinkCreateCall<'a, C, A> {
         OrganizationSinkCreateCall {
@@ -1346,7 +1371,7 @@ impl<'a, C, A> EntryMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Writes log entries to Stackdriver Logging. All log entries are written by this method.
+    /// Writes log entries to Stackdriver Logging.
     /// 
     /// # Arguments
     ///
@@ -1429,6 +1454,8 @@ impl<'a, C, A> BillingAccountMethods<'a, C, A> {
     /// * `parent` - Required. The resource in which to create the sink:
     ///              "projects/[PROJECT_ID]"
     ///              "organizations/[ORGANIZATION_ID]"
+    ///              "billingAccounts/[BILLING_ACCOUNT_ID]"
+    ///              "folders/[FOLDER_ID]"
     ///              Examples: "projects/my-logging-project", "organizations/123456789".
     pub fn sinks_create(&self, request: LogSink, parent: &str) -> BillingAccountSinkCreateCall<'a, C, A> {
         BillingAccountSinkCreateCall {
@@ -1444,13 +1471,15 @@ impl<'a, C, A> BillingAccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the logs in projects or organizations. Only logs that have entries are listed.
+    /// Lists the logs in projects, organizations, folders, or billing accounts. Only logs that have entries are listed.
     /// 
     /// # Arguments
     ///
     /// * `parent` - Required. The resource name that owns the logs:
     ///              "projects/[PROJECT_ID]"
     ///              "organizations/[ORGANIZATION_ID]"
+    ///              "billingAccounts/[BILLING_ACCOUNT_ID]"
+    ///              "folders/[FOLDER_ID]"
     ///              
     pub fn logs_list(&self, parent: &str) -> BillingAccountLogListCall<'a, C, A> {
         BillingAccountLogListCall {
@@ -1470,7 +1499,12 @@ impl<'a, C, A> BillingAccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required. The parent resource whose sinks are to be listed. Examples: "projects/my-logging-project", "organizations/123456789".
+    /// * `parent` - Required. The parent resource whose sinks are to be listed:
+    ///              "projects/[PROJECT_ID]"
+    ///              "organizations/[ORGANIZATION_ID]"
+    ///              "billingAccounts/[BILLING_ACCOUNT_ID]"
+    ///              "folders/[FOLDER_ID]"
+    ///              
     pub fn sinks_list(&self, parent: &str) -> BillingAccountSinkListCall<'a, C, A> {
         BillingAccountSinkListCall {
             hub: self.hub,
@@ -1492,7 +1526,9 @@ impl<'a, C, A> BillingAccountMethods<'a, C, A> {
     /// * `sinkName` - Required. The full resource name of the sink to delete, including the parent resource and the sink identifier:
     ///                "projects/[PROJECT_ID]/sinks/[SINK_ID]"
     ///                "organizations/[ORGANIZATION_ID]/sinks/[SINK_ID]"
-    ///                It is an error if the sink does not exist. Example: "projects/my-project-id/sinks/my-sink-id". It is an error if the sink does not exist.
+    ///                "billingAccounts/[BILLING_ACCOUNT_ID]/sinks/[SINK_ID]"
+    ///                "folders/[FOLDER_ID]/sinks/[SINK_ID]"
+    ///                Example: "projects/my-project-id/sinks/my-sink-id".
     pub fn sinks_delete(&self, sink_name: &str) -> BillingAccountSinkDeleteCall<'a, C, A> {
         BillingAccountSinkDeleteCall {
             hub: self.hub,
@@ -1509,9 +1545,11 @@ impl<'a, C, A> BillingAccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `sinkName` - Required. The parent resource name of the sink:
+    /// * `sinkName` - Required. The resource name of the sink:
     ///                "projects/[PROJECT_ID]/sinks/[SINK_ID]"
     ///                "organizations/[ORGANIZATION_ID]/sinks/[SINK_ID]"
+    ///                "billingAccounts/[BILLING_ACCOUNT_ID]/sinks/[SINK_ID]"
+    ///                "folders/[FOLDER_ID]/sinks/[SINK_ID]"
     ///                Example: "projects/my-project-id/sinks/my-sink-id".
     pub fn sinks_get(&self, sink_name: &str) -> BillingAccountSinkGetCall<'a, C, A> {
         BillingAccountSinkGetCall {
@@ -1533,6 +1571,8 @@ impl<'a, C, A> BillingAccountMethods<'a, C, A> {
     /// * `sinkName` - Required. The full resource name of the sink to update, including the parent resource and the sink identifier:
     ///                "projects/[PROJECT_ID]/sinks/[SINK_ID]"
     ///                "organizations/[ORGANIZATION_ID]/sinks/[SINK_ID]"
+    ///                "billingAccounts/[BILLING_ACCOUNT_ID]/sinks/[SINK_ID]"
+    ///                "folders/[FOLDER_ID]/sinks/[SINK_ID]"
     ///                Example: "projects/my-project-id/sinks/my-sink-id".
     pub fn sinks_update(&self, request: LogSink, sink_name: &str) -> BillingAccountSinkUpdateCall<'a, C, A> {
         BillingAccountSinkUpdateCall {
@@ -1548,13 +1588,15 @@ impl<'a, C, A> BillingAccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes all the log entries in a log. The log reappears if it receives new entries.
+    /// Deletes all the log entries in a log. The log reappears if it receives new entries. Log entries written shortly before the delete operation might not be deleted.
     /// 
     /// # Arguments
     ///
     /// * `logName` - Required. The resource name of the log to delete:
     ///               "projects/[PROJECT_ID]/logs/[LOG_ID]"
     ///               "organizations/[ORGANIZATION_ID]/logs/[LOG_ID]"
+    ///               "billingAccounts/[BILLING_ACCOUNT_ID]/logs/[LOG_ID]"
+    ///               "folders/[FOLDER_ID]/logs/[LOG_ID]"
     ///               [LOG_ID] must be URL-encoded. For example, "projects/my-project-id/logs/syslog", "organizations/1234567890/logs/cloudresourcemanager.googleapis.com%2Factivity". For more information about log names, see LogEntry.
     pub fn logs_delete(&self, log_name: &str) -> BillingAccountLogDeleteCall<'a, C, A> {
         BillingAccountLogDeleteCall {
@@ -1664,13 +1706,15 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes all the log entries in a log. The log reappears if it receives new entries.
+    /// Deletes all the log entries in a log. The log reappears if it receives new entries. Log entries written shortly before the delete operation might not be deleted.
     /// 
     /// # Arguments
     ///
     /// * `logName` - Required. The resource name of the log to delete:
     ///               "projects/[PROJECT_ID]/logs/[LOG_ID]"
     ///               "organizations/[ORGANIZATION_ID]/logs/[LOG_ID]"
+    ///               "billingAccounts/[BILLING_ACCOUNT_ID]/logs/[LOG_ID]"
+    ///               "folders/[FOLDER_ID]/logs/[LOG_ID]"
     ///               [LOG_ID] must be URL-encoded. For example, "projects/my-project-id/logs/syslog", "organizations/1234567890/logs/cloudresourcemanager.googleapis.com%2Factivity". For more information about log names, see LogEntry.
     pub fn logs_delete(&self, log_name: &str) -> ProjectLogDeleteCall<'a, C, A> {
         ProjectLogDeleteCall {
@@ -1703,13 +1747,15 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the logs in projects or organizations. Only logs that have entries are listed.
+    /// Lists the logs in projects, organizations, folders, or billing accounts. Only logs that have entries are listed.
     /// 
     /// # Arguments
     ///
     /// * `parent` - Required. The resource name that owns the logs:
     ///              "projects/[PROJECT_ID]"
     ///              "organizations/[ORGANIZATION_ID]"
+    ///              "billingAccounts/[BILLING_ACCOUNT_ID]"
+    ///              "folders/[FOLDER_ID]"
     ///              
     pub fn logs_list(&self, parent: &str) -> ProjectLogListCall<'a, C, A> {
         ProjectLogListCall {
@@ -1775,6 +1821,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// * `sinkName` - Required. The full resource name of the sink to update, including the parent resource and the sink identifier:
     ///                "projects/[PROJECT_ID]/sinks/[SINK_ID]"
     ///                "organizations/[ORGANIZATION_ID]/sinks/[SINK_ID]"
+    ///                "billingAccounts/[BILLING_ACCOUNT_ID]/sinks/[SINK_ID]"
+    ///                "folders/[FOLDER_ID]/sinks/[SINK_ID]"
     ///                Example: "projects/my-project-id/sinks/my-sink-id".
     pub fn sinks_update(&self, request: LogSink, sink_name: &str) -> ProjectSinkUpdateCall<'a, C, A> {
         ProjectSinkUpdateCall {
@@ -1794,7 +1842,12 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required. The parent resource whose sinks are to be listed. Examples: "projects/my-logging-project", "organizations/123456789".
+    /// * `parent` - Required. The parent resource whose sinks are to be listed:
+    ///              "projects/[PROJECT_ID]"
+    ///              "organizations/[ORGANIZATION_ID]"
+    ///              "billingAccounts/[BILLING_ACCOUNT_ID]"
+    ///              "folders/[FOLDER_ID]"
+    ///              
     pub fn sinks_list(&self, parent: &str) -> ProjectSinkListCall<'a, C, A> {
         ProjectSinkListCall {
             hub: self.hub,
@@ -1813,9 +1866,11 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `sinkName` - Required. The parent resource name of the sink:
+    /// * `sinkName` - Required. The resource name of the sink:
     ///                "projects/[PROJECT_ID]/sinks/[SINK_ID]"
     ///                "organizations/[ORGANIZATION_ID]/sinks/[SINK_ID]"
+    ///                "billingAccounts/[BILLING_ACCOUNT_ID]/sinks/[SINK_ID]"
+    ///                "folders/[FOLDER_ID]/sinks/[SINK_ID]"
     ///                Example: "projects/my-project-id/sinks/my-sink-id".
     pub fn sinks_get(&self, sink_name: &str) -> ProjectSinkGetCall<'a, C, A> {
         ProjectSinkGetCall {
@@ -1836,7 +1891,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// * `sinkName` - Required. The full resource name of the sink to delete, including the parent resource and the sink identifier:
     ///                "projects/[PROJECT_ID]/sinks/[SINK_ID]"
     ///                "organizations/[ORGANIZATION_ID]/sinks/[SINK_ID]"
-    ///                It is an error if the sink does not exist. Example: "projects/my-project-id/sinks/my-sink-id". It is an error if the sink does not exist.
+    ///                "billingAccounts/[BILLING_ACCOUNT_ID]/sinks/[SINK_ID]"
+    ///                "folders/[FOLDER_ID]/sinks/[SINK_ID]"
+    ///                Example: "projects/my-project-id/sinks/my-sink-id".
     pub fn sinks_delete(&self, sink_name: &str) -> ProjectSinkDeleteCall<'a, C, A> {
         ProjectSinkDeleteCall {
             hub: self.hub,
@@ -1857,6 +1914,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// * `parent` - Required. The resource in which to create the sink:
     ///              "projects/[PROJECT_ID]"
     ///              "organizations/[ORGANIZATION_ID]"
+    ///              "billingAccounts/[BILLING_ACCOUNT_ID]"
+    ///              "folders/[FOLDER_ID]"
     ///              Examples: "projects/my-logging-project", "organizations/123456789".
     pub fn sinks_create(&self, request: LogSink, parent: &str) -> ProjectSinkCreateCall<'a, C, A> {
         ProjectSinkCreateCall {
@@ -2000,7 +2059,7 @@ impl<'a, C, A> FolderSinkListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+parent}/sinks";
+        let mut url = "https://logging.googleapis.com/v2/{+parent}/sinks".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -2106,7 +2165,12 @@ impl<'a, C, A> FolderSinkListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
-    /// Required. The parent resource whose sinks are to be listed. Examples: "projects/my-logging-project", "organizations/123456789".
+    /// Required. The parent resource whose sinks are to be listed:
+    /// "projects/[PROJECT_ID]"
+    /// "organizations/[ORGANIZATION_ID]"
+    /// "billingAccounts/[BILLING_ACCOUNT_ID]"
+    /// "folders/[FOLDER_ID]"
+    /// 
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -2271,7 +2335,7 @@ impl<'a, C, A> FolderSinkUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+sinkName}";
+        let mut url = "https://logging.googleapis.com/v2/{+sinkName}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -2404,6 +2468,8 @@ impl<'a, C, A> FolderSinkUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// Required. The full resource name of the sink to update, including the parent resource and the sink identifier:
     /// "projects/[PROJECT_ID]/sinks/[SINK_ID]"
     /// "organizations/[ORGANIZATION_ID]/sinks/[SINK_ID]"
+    /// "billingAccounts/[BILLING_ACCOUNT_ID]/sinks/[SINK_ID]"
+    /// "folders/[FOLDER_ID]/sinks/[SINK_ID]"
     /// Example: "projects/my-project-id/sinks/my-sink-id".
     ///
     /// Sets the *sink name* path property to the given value.
@@ -2416,8 +2482,8 @@ impl<'a, C, A> FolderSinkUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
     /// Optional. See sinks.create for a description of this field. When updating a sink, the effect of this field on the value of writer_identity in the updated sink depends on both the old and new values of this field:
     /// If the old and new values of this field are both false or both true, then there is no change to the sink's writer_identity.
-    /// If the old value was false and the new value is true, then writer_identity is changed to a unique service account.
-    /// It is an error if the old value was true and the new value is false.
+    /// If the old value is false and the new value is true, then writer_identity is changed to a unique service account.
+    /// It is an error if the old value is true and the new value is false.
     ///
     /// Sets the *unique writer identity* query property to the given value.
     pub fn unique_writer_identity(mut self, new_value: bool) -> FolderSinkUpdateCall<'a, C, A> {
@@ -2553,7 +2619,7 @@ impl<'a, C, A> FolderSinkGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+sinkName}";
+        let mut url = "https://logging.googleapis.com/v2/{+sinkName}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -2659,9 +2725,11 @@ impl<'a, C, A> FolderSinkGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
-    /// Required. The parent resource name of the sink:
+    /// Required. The resource name of the sink:
     /// "projects/[PROJECT_ID]/sinks/[SINK_ID]"
     /// "organizations/[ORGANIZATION_ID]/sinks/[SINK_ID]"
+    /// "billingAccounts/[BILLING_ACCOUNT_ID]/sinks/[SINK_ID]"
+    /// "folders/[FOLDER_ID]/sinks/[SINK_ID]"
     /// Example: "projects/my-project-id/sinks/my-sink-id".
     ///
     /// Sets the *sink name* path property to the given value.
@@ -2813,7 +2881,7 @@ impl<'a, C, A> FolderSinkCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+parent}/sinks";
+        let mut url = "https://logging.googleapis.com/v2/{+parent}/sinks".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -2946,6 +3014,8 @@ impl<'a, C, A> FolderSinkCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// Required. The resource in which to create the sink:
     /// "projects/[PROJECT_ID]"
     /// "organizations/[ORGANIZATION_ID]"
+    /// "billingAccounts/[BILLING_ACCOUNT_ID]"
+    /// "folders/[FOLDER_ID]"
     /// Examples: "projects/my-logging-project", "organizations/123456789".
     ///
     /// Sets the *parent* path property to the given value.
@@ -2956,7 +3026,7 @@ impl<'a, C, A> FolderSinkCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._parent = new_value.to_string();
         self
     }
-    /// Optional. Determines the kind of IAM identity returned as writer_identity in the new sink. If this value is omitted or set to false, and if the sink's parent is a project, then the value returned as writer_identity is cloud-logs@google.com, the same identity used before the addition of writer identities to this API. The sink's destination must be in the same project as the sink itself.If this field is set to true, or if the sink is owned by a non-project resource such as an organization, then the value of writer_identity will be a unique service account used only for exports from the new sink. For more information, see writer_identity in LogSink.
+    /// Optional. Determines the kind of IAM identity returned as writer_identity in the new sink. If this value is omitted or set to false, and if the sink's parent is a project, then the value returned as writer_identity is the same group or service account used by Stackdriver Logging before the addition of writer identities to this API. The sink's destination must be in the same project as the sink itself.If this field is set to true, or if the sink is owned by a non-project resource such as an organization, then the value of writer_identity will be a unique service account used only for exports from the new sink. For more information, see writer_identity in LogSink.
     ///
     /// Sets the *unique writer identity* query property to the given value.
     pub fn unique_writer_identity(mut self, new_value: bool) -> FolderSinkCreateCall<'a, C, A> {
@@ -3092,7 +3162,7 @@ impl<'a, C, A> FolderSinkDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+sinkName}";
+        let mut url = "https://logging.googleapis.com/v2/{+sinkName}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -3201,7 +3271,9 @@ impl<'a, C, A> FolderSinkDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// Required. The full resource name of the sink to delete, including the parent resource and the sink identifier:
     /// "projects/[PROJECT_ID]/sinks/[SINK_ID]"
     /// "organizations/[ORGANIZATION_ID]/sinks/[SINK_ID]"
-    /// It is an error if the sink does not exist. Example: "projects/my-project-id/sinks/my-sink-id". It is an error if the sink does not exist.
+    /// "billingAccounts/[BILLING_ACCOUNT_ID]/sinks/[SINK_ID]"
+    /// "folders/[FOLDER_ID]/sinks/[SINK_ID]"
+    /// Example: "projects/my-project-id/sinks/my-sink-id".
     ///
     /// Sets the *sink name* path property to the given value.
     ///
@@ -3269,7 +3341,7 @@ impl<'a, C, A> FolderSinkDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 }
 
 
-/// Lists the logs in projects or organizations. Only logs that have entries are listed.
+/// Lists the logs in projects, organizations, folders, or billing accounts. Only logs that have entries are listed.
 ///
 /// A builder for the *logs.list* method supported by a *folder* resource.
 /// It is not used directly, but through a `FolderMethods` instance.
@@ -3350,7 +3422,7 @@ impl<'a, C, A> FolderLogListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+parent}/logs";
+        let mut url = "https://logging.googleapis.com/v2/{+parent}/logs".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -3459,6 +3531,8 @@ impl<'a, C, A> FolderLogListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// Required. The resource name that owns the logs:
     /// "projects/[PROJECT_ID]"
     /// "organizations/[ORGANIZATION_ID]"
+    /// "billingAccounts/[BILLING_ACCOUNT_ID]"
+    /// "folders/[FOLDER_ID]"
     /// 
     ///
     /// Sets the *parent* path property to the given value.
@@ -3541,7 +3615,7 @@ impl<'a, C, A> FolderLogListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
-/// Deletes all the log entries in a log. The log reappears if it receives new entries.
+/// Deletes all the log entries in a log. The log reappears if it receives new entries. Log entries written shortly before the delete operation might not be deleted.
 ///
 /// A builder for the *logs.delete* method supported by a *folder* resource.
 /// It is not used directly, but through a `FolderMethods` instance.
@@ -3612,7 +3686,7 @@ impl<'a, C, A> FolderLogDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+logName}";
+        let mut url = "https://logging.googleapis.com/v2/{+logName}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -3721,6 +3795,8 @@ impl<'a, C, A> FolderLogDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// Required. The resource name of the log to delete:
     /// "projects/[PROJECT_ID]/logs/[LOG_ID]"
     /// "organizations/[ORGANIZATION_ID]/logs/[LOG_ID]"
+    /// "billingAccounts/[BILLING_ACCOUNT_ID]/logs/[LOG_ID]"
+    /// "folders/[FOLDER_ID]/logs/[LOG_ID]"
     /// [LOG_ID] must be URL-encoded. For example, "projects/my-project-id/logs/syslog", "organizations/1234567890/logs/cloudresourcemanager.googleapis.com%2Factivity". For more information about log names, see LogEntry.
     ///
     /// Sets the *log name* path property to the given value.
@@ -3789,7 +3865,7 @@ impl<'a, C, A> FolderLogDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 }
 
 
-/// Lists the logs in projects or organizations. Only logs that have entries are listed.
+/// Lists the logs in projects, organizations, folders, or billing accounts. Only logs that have entries are listed.
 ///
 /// A builder for the *logs.list* method supported by a *organization* resource.
 /// It is not used directly, but through a `OrganizationMethods` instance.
@@ -3870,7 +3946,7 @@ impl<'a, C, A> OrganizationLogListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+parent}/logs";
+        let mut url = "https://logging.googleapis.com/v2/{+parent}/logs".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -3979,6 +4055,8 @@ impl<'a, C, A> OrganizationLogListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// Required. The resource name that owns the logs:
     /// "projects/[PROJECT_ID]"
     /// "organizations/[ORGANIZATION_ID]"
+    /// "billingAccounts/[BILLING_ACCOUNT_ID]"
+    /// "folders/[FOLDER_ID]"
     /// 
     ///
     /// Sets the *parent* path property to the given value.
@@ -4061,7 +4139,7 @@ impl<'a, C, A> OrganizationLogListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 }
 
 
-/// Deletes all the log entries in a log. The log reappears if it receives new entries.
+/// Deletes all the log entries in a log. The log reappears if it receives new entries. Log entries written shortly before the delete operation might not be deleted.
 ///
 /// A builder for the *logs.delete* method supported by a *organization* resource.
 /// It is not used directly, but through a `OrganizationMethods` instance.
@@ -4132,7 +4210,7 @@ impl<'a, C, A> OrganizationLogDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+logName}";
+        let mut url = "https://logging.googleapis.com/v2/{+logName}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -4241,6 +4319,8 @@ impl<'a, C, A> OrganizationLogDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// Required. The resource name of the log to delete:
     /// "projects/[PROJECT_ID]/logs/[LOG_ID]"
     /// "organizations/[ORGANIZATION_ID]/logs/[LOG_ID]"
+    /// "billingAccounts/[BILLING_ACCOUNT_ID]/logs/[LOG_ID]"
+    /// "folders/[FOLDER_ID]/logs/[LOG_ID]"
     /// [LOG_ID] must be URL-encoded. For example, "projects/my-project-id/logs/syslog", "organizations/1234567890/logs/cloudresourcemanager.googleapis.com%2Factivity". For more information about log names, see LogEntry.
     ///
     /// Sets the *log name* path property to the given value.
@@ -4392,7 +4472,7 @@ impl<'a, C, A> OrganizationSinkUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+sinkName}";
+        let mut url = "https://logging.googleapis.com/v2/{+sinkName}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -4525,6 +4605,8 @@ impl<'a, C, A> OrganizationSinkUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// Required. The full resource name of the sink to update, including the parent resource and the sink identifier:
     /// "projects/[PROJECT_ID]/sinks/[SINK_ID]"
     /// "organizations/[ORGANIZATION_ID]/sinks/[SINK_ID]"
+    /// "billingAccounts/[BILLING_ACCOUNT_ID]/sinks/[SINK_ID]"
+    /// "folders/[FOLDER_ID]/sinks/[SINK_ID]"
     /// Example: "projects/my-project-id/sinks/my-sink-id".
     ///
     /// Sets the *sink name* path property to the given value.
@@ -4537,8 +4619,8 @@ impl<'a, C, A> OrganizationSinkUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
     /// Optional. See sinks.create for a description of this field. When updating a sink, the effect of this field on the value of writer_identity in the updated sink depends on both the old and new values of this field:
     /// If the old and new values of this field are both false or both true, then there is no change to the sink's writer_identity.
-    /// If the old value was false and the new value is true, then writer_identity is changed to a unique service account.
-    /// It is an error if the old value was true and the new value is false.
+    /// If the old value is false and the new value is true, then writer_identity is changed to a unique service account.
+    /// It is an error if the old value is true and the new value is false.
     ///
     /// Sets the *unique writer identity* query property to the given value.
     pub fn unique_writer_identity(mut self, new_value: bool) -> OrganizationSinkUpdateCall<'a, C, A> {
@@ -4674,7 +4756,7 @@ impl<'a, C, A> OrganizationSinkGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+sinkName}";
+        let mut url = "https://logging.googleapis.com/v2/{+sinkName}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -4780,9 +4862,11 @@ impl<'a, C, A> OrganizationSinkGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
-    /// Required. The parent resource name of the sink:
+    /// Required. The resource name of the sink:
     /// "projects/[PROJECT_ID]/sinks/[SINK_ID]"
     /// "organizations/[ORGANIZATION_ID]/sinks/[SINK_ID]"
+    /// "billingAccounts/[BILLING_ACCOUNT_ID]/sinks/[SINK_ID]"
+    /// "folders/[FOLDER_ID]/sinks/[SINK_ID]"
     /// Example: "projects/my-project-id/sinks/my-sink-id".
     ///
     /// Sets the *sink name* path property to the given value.
@@ -4932,7 +5016,7 @@ impl<'a, C, A> OrganizationSinkListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+parent}/sinks";
+        let mut url = "https://logging.googleapis.com/v2/{+parent}/sinks".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5038,7 +5122,12 @@ impl<'a, C, A> OrganizationSinkListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
-    /// Required. The parent resource whose sinks are to be listed. Examples: "projects/my-logging-project", "organizations/123456789".
+    /// Required. The parent resource whose sinks are to be listed:
+    /// "projects/[PROJECT_ID]"
+    /// "organizations/[ORGANIZATION_ID]"
+    /// "billingAccounts/[BILLING_ACCOUNT_ID]"
+    /// "folders/[FOLDER_ID]"
+    /// 
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -5191,7 +5280,7 @@ impl<'a, C, A> OrganizationSinkDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+sinkName}";
+        let mut url = "https://logging.googleapis.com/v2/{+sinkName}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5300,7 +5389,9 @@ impl<'a, C, A> OrganizationSinkDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// Required. The full resource name of the sink to delete, including the parent resource and the sink identifier:
     /// "projects/[PROJECT_ID]/sinks/[SINK_ID]"
     /// "organizations/[ORGANIZATION_ID]/sinks/[SINK_ID]"
-    /// It is an error if the sink does not exist. Example: "projects/my-project-id/sinks/my-sink-id". It is an error if the sink does not exist.
+    /// "billingAccounts/[BILLING_ACCOUNT_ID]/sinks/[SINK_ID]"
+    /// "folders/[FOLDER_ID]/sinks/[SINK_ID]"
+    /// Example: "projects/my-project-id/sinks/my-sink-id".
     ///
     /// Sets the *sink name* path property to the given value.
     ///
@@ -5451,7 +5542,7 @@ impl<'a, C, A> OrganizationSinkCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+parent}/sinks";
+        let mut url = "https://logging.googleapis.com/v2/{+parent}/sinks".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5584,6 +5675,8 @@ impl<'a, C, A> OrganizationSinkCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// Required. The resource in which to create the sink:
     /// "projects/[PROJECT_ID]"
     /// "organizations/[ORGANIZATION_ID]"
+    /// "billingAccounts/[BILLING_ACCOUNT_ID]"
+    /// "folders/[FOLDER_ID]"
     /// Examples: "projects/my-logging-project", "organizations/123456789".
     ///
     /// Sets the *parent* path property to the given value.
@@ -5594,7 +5687,7 @@ impl<'a, C, A> OrganizationSinkCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._parent = new_value.to_string();
         self
     }
-    /// Optional. Determines the kind of IAM identity returned as writer_identity in the new sink. If this value is omitted or set to false, and if the sink's parent is a project, then the value returned as writer_identity is cloud-logs@google.com, the same identity used before the addition of writer identities to this API. The sink's destination must be in the same project as the sink itself.If this field is set to true, or if the sink is owned by a non-project resource such as an organization, then the value of writer_identity will be a unique service account used only for exports from the new sink. For more information, see writer_identity in LogSink.
+    /// Optional. Determines the kind of IAM identity returned as writer_identity in the new sink. If this value is omitted or set to false, and if the sink's parent is a project, then the value returned as writer_identity is the same group or service account used by Stackdriver Logging before the addition of writer identities to this API. The sink's destination must be in the same project as the sink itself.If this field is set to true, or if the sink is owned by a non-project resource such as an organization, then the value of writer_identity will be a unique service account used only for exports from the new sink. For more information, see writer_identity in LogSink.
     ///
     /// Sets the *unique writer identity* query property to the given value.
     pub fn unique_writer_identity(mut self, new_value: bool) -> OrganizationSinkCreateCall<'a, C, A> {
@@ -5659,7 +5752,7 @@ impl<'a, C, A> OrganizationSinkCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
 }
 
 
-/// Writes log entries to Stackdriver Logging. All log entries are written by this method.
+/// Writes log entries to Stackdriver Logging.
 ///
 /// A builder for the *write* method supported by a *entry* resource.
 /// It is not used directly, but through a `EntryMethods` instance.
@@ -5734,7 +5827,7 @@ impl<'a, C, A> EntryWriteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/entries:write";
+        let mut url = "https://logging.googleapis.com/v2/entries:write".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5973,7 +6066,7 @@ impl<'a, C, A> EntryListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/entries:list";
+        let mut url = "https://logging.googleapis.com/v2/entries:list".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -6220,7 +6313,7 @@ impl<'a, C, A> BillingAccountSinkCreateCall<'a, C, A> where C: BorrowMut<hyper::
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+parent}/sinks";
+        let mut url = "https://logging.googleapis.com/v2/{+parent}/sinks".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -6353,6 +6446,8 @@ impl<'a, C, A> BillingAccountSinkCreateCall<'a, C, A> where C: BorrowMut<hyper::
     /// Required. The resource in which to create the sink:
     /// "projects/[PROJECT_ID]"
     /// "organizations/[ORGANIZATION_ID]"
+    /// "billingAccounts/[BILLING_ACCOUNT_ID]"
+    /// "folders/[FOLDER_ID]"
     /// Examples: "projects/my-logging-project", "organizations/123456789".
     ///
     /// Sets the *parent* path property to the given value.
@@ -6363,7 +6458,7 @@ impl<'a, C, A> BillingAccountSinkCreateCall<'a, C, A> where C: BorrowMut<hyper::
         self._parent = new_value.to_string();
         self
     }
-    /// Optional. Determines the kind of IAM identity returned as writer_identity in the new sink. If this value is omitted or set to false, and if the sink's parent is a project, then the value returned as writer_identity is cloud-logs@google.com, the same identity used before the addition of writer identities to this API. The sink's destination must be in the same project as the sink itself.If this field is set to true, or if the sink is owned by a non-project resource such as an organization, then the value of writer_identity will be a unique service account used only for exports from the new sink. For more information, see writer_identity in LogSink.
+    /// Optional. Determines the kind of IAM identity returned as writer_identity in the new sink. If this value is omitted or set to false, and if the sink's parent is a project, then the value returned as writer_identity is the same group or service account used by Stackdriver Logging before the addition of writer identities to this API. The sink's destination must be in the same project as the sink itself.If this field is set to true, or if the sink is owned by a non-project resource such as an organization, then the value of writer_identity will be a unique service account used only for exports from the new sink. For more information, see writer_identity in LogSink.
     ///
     /// Sets the *unique writer identity* query property to the given value.
     pub fn unique_writer_identity(mut self, new_value: bool) -> BillingAccountSinkCreateCall<'a, C, A> {
@@ -6428,7 +6523,7 @@ impl<'a, C, A> BillingAccountSinkCreateCall<'a, C, A> where C: BorrowMut<hyper::
 }
 
 
-/// Lists the logs in projects or organizations. Only logs that have entries are listed.
+/// Lists the logs in projects, organizations, folders, or billing accounts. Only logs that have entries are listed.
 ///
 /// A builder for the *logs.list* method supported by a *billingAccount* resource.
 /// It is not used directly, but through a `BillingAccountMethods` instance.
@@ -6509,7 +6604,7 @@ impl<'a, C, A> BillingAccountLogListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+parent}/logs";
+        let mut url = "https://logging.googleapis.com/v2/{+parent}/logs".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -6618,6 +6713,8 @@ impl<'a, C, A> BillingAccountLogListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// Required. The resource name that owns the logs:
     /// "projects/[PROJECT_ID]"
     /// "organizations/[ORGANIZATION_ID]"
+    /// "billingAccounts/[BILLING_ACCOUNT_ID]"
+    /// "folders/[FOLDER_ID]"
     /// 
     ///
     /// Sets the *parent* path property to the given value.
@@ -6781,7 +6878,7 @@ impl<'a, C, A> BillingAccountSinkListCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+parent}/sinks";
+        let mut url = "https://logging.googleapis.com/v2/{+parent}/sinks".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -6887,7 +6984,12 @@ impl<'a, C, A> BillingAccountSinkListCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
-    /// Required. The parent resource whose sinks are to be listed. Examples: "projects/my-logging-project", "organizations/123456789".
+    /// Required. The parent resource whose sinks are to be listed:
+    /// "projects/[PROJECT_ID]"
+    /// "organizations/[ORGANIZATION_ID]"
+    /// "billingAccounts/[BILLING_ACCOUNT_ID]"
+    /// "folders/[FOLDER_ID]"
+    /// 
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -7040,7 +7142,7 @@ impl<'a, C, A> BillingAccountSinkDeleteCall<'a, C, A> where C: BorrowMut<hyper::
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+sinkName}";
+        let mut url = "https://logging.googleapis.com/v2/{+sinkName}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -7149,7 +7251,9 @@ impl<'a, C, A> BillingAccountSinkDeleteCall<'a, C, A> where C: BorrowMut<hyper::
     /// Required. The full resource name of the sink to delete, including the parent resource and the sink identifier:
     /// "projects/[PROJECT_ID]/sinks/[SINK_ID]"
     /// "organizations/[ORGANIZATION_ID]/sinks/[SINK_ID]"
-    /// It is an error if the sink does not exist. Example: "projects/my-project-id/sinks/my-sink-id". It is an error if the sink does not exist.
+    /// "billingAccounts/[BILLING_ACCOUNT_ID]/sinks/[SINK_ID]"
+    /// "folders/[FOLDER_ID]/sinks/[SINK_ID]"
+    /// Example: "projects/my-project-id/sinks/my-sink-id".
     ///
     /// Sets the *sink name* path property to the given value.
     ///
@@ -7288,7 +7392,7 @@ impl<'a, C, A> BillingAccountSinkGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+sinkName}";
+        let mut url = "https://logging.googleapis.com/v2/{+sinkName}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -7394,9 +7498,11 @@ impl<'a, C, A> BillingAccountSinkGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
-    /// Required. The parent resource name of the sink:
+    /// Required. The resource name of the sink:
     /// "projects/[PROJECT_ID]/sinks/[SINK_ID]"
     /// "organizations/[ORGANIZATION_ID]/sinks/[SINK_ID]"
+    /// "billingAccounts/[BILLING_ACCOUNT_ID]/sinks/[SINK_ID]"
+    /// "folders/[FOLDER_ID]/sinks/[SINK_ID]"
     /// Example: "projects/my-project-id/sinks/my-sink-id".
     ///
     /// Sets the *sink name* path property to the given value.
@@ -7548,7 +7654,7 @@ impl<'a, C, A> BillingAccountSinkUpdateCall<'a, C, A> where C: BorrowMut<hyper::
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+sinkName}";
+        let mut url = "https://logging.googleapis.com/v2/{+sinkName}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -7681,6 +7787,8 @@ impl<'a, C, A> BillingAccountSinkUpdateCall<'a, C, A> where C: BorrowMut<hyper::
     /// Required. The full resource name of the sink to update, including the parent resource and the sink identifier:
     /// "projects/[PROJECT_ID]/sinks/[SINK_ID]"
     /// "organizations/[ORGANIZATION_ID]/sinks/[SINK_ID]"
+    /// "billingAccounts/[BILLING_ACCOUNT_ID]/sinks/[SINK_ID]"
+    /// "folders/[FOLDER_ID]/sinks/[SINK_ID]"
     /// Example: "projects/my-project-id/sinks/my-sink-id".
     ///
     /// Sets the *sink name* path property to the given value.
@@ -7693,8 +7801,8 @@ impl<'a, C, A> BillingAccountSinkUpdateCall<'a, C, A> where C: BorrowMut<hyper::
     }
     /// Optional. See sinks.create for a description of this field. When updating a sink, the effect of this field on the value of writer_identity in the updated sink depends on both the old and new values of this field:
     /// If the old and new values of this field are both false or both true, then there is no change to the sink's writer_identity.
-    /// If the old value was false and the new value is true, then writer_identity is changed to a unique service account.
-    /// It is an error if the old value was true and the new value is false.
+    /// If the old value is false and the new value is true, then writer_identity is changed to a unique service account.
+    /// It is an error if the old value is true and the new value is false.
     ///
     /// Sets the *unique writer identity* query property to the given value.
     pub fn unique_writer_identity(mut self, new_value: bool) -> BillingAccountSinkUpdateCall<'a, C, A> {
@@ -7759,7 +7867,7 @@ impl<'a, C, A> BillingAccountSinkUpdateCall<'a, C, A> where C: BorrowMut<hyper::
 }
 
 
-/// Deletes all the log entries in a log. The log reappears if it receives new entries.
+/// Deletes all the log entries in a log. The log reappears if it receives new entries. Log entries written shortly before the delete operation might not be deleted.
 ///
 /// A builder for the *logs.delete* method supported by a *billingAccount* resource.
 /// It is not used directly, but through a `BillingAccountMethods` instance.
@@ -7830,7 +7938,7 @@ impl<'a, C, A> BillingAccountLogDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+logName}";
+        let mut url = "https://logging.googleapis.com/v2/{+logName}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -7939,6 +8047,8 @@ impl<'a, C, A> BillingAccountLogDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
     /// Required. The resource name of the log to delete:
     /// "projects/[PROJECT_ID]/logs/[LOG_ID]"
     /// "organizations/[ORGANIZATION_ID]/logs/[LOG_ID]"
+    /// "billingAccounts/[BILLING_ACCOUNT_ID]/logs/[LOG_ID]"
+    /// "folders/[FOLDER_ID]/logs/[LOG_ID]"
     /// [LOG_ID] must be URL-encoded. For example, "projects/my-project-id/logs/syslog", "organizations/1234567890/logs/cloudresourcemanager.googleapis.com%2Factivity". For more information about log names, see LogEntry.
     ///
     /// Sets the *log name* path property to the given value.
@@ -8085,7 +8195,7 @@ impl<'a, C, A> MonitoredResourceDescriptorListCall<'a, C, A> where C: BorrowMut<
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/monitoredResourceDescriptors";
+        let mut url = "https://logging.googleapis.com/v2/monitoredResourceDescriptors".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -8239,7 +8349,7 @@ impl<'a, C, A> MonitoredResourceDescriptorListCall<'a, C, A> where C: BorrowMut<
 }
 
 
-/// Deletes all the log entries in a log. The log reappears if it receives new entries.
+/// Deletes all the log entries in a log. The log reappears if it receives new entries. Log entries written shortly before the delete operation might not be deleted.
 ///
 /// A builder for the *logs.delete* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -8310,7 +8420,7 @@ impl<'a, C, A> ProjectLogDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+logName}";
+        let mut url = "https://logging.googleapis.com/v2/{+logName}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -8419,6 +8529,8 @@ impl<'a, C, A> ProjectLogDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// Required. The resource name of the log to delete:
     /// "projects/[PROJECT_ID]/logs/[LOG_ID]"
     /// "organizations/[ORGANIZATION_ID]/logs/[LOG_ID]"
+    /// "billingAccounts/[BILLING_ACCOUNT_ID]/logs/[LOG_ID]"
+    /// "folders/[FOLDER_ID]/logs/[LOG_ID]"
     /// [LOG_ID] must be URL-encoded. For example, "projects/my-project-id/logs/syslog", "organizations/1234567890/logs/cloudresourcemanager.googleapis.com%2Factivity". For more information about log names, see LogEntry.
     ///
     /// Sets the *log name* path property to the given value.
@@ -8558,7 +8670,7 @@ impl<'a, C, A> ProjectMetricGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+metricName}";
+        let mut url = "https://logging.googleapis.com/v2/{+metricName}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -8734,7 +8846,7 @@ impl<'a, C, A> ProjectMetricGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 }
 
 
-/// Lists the logs in projects or organizations. Only logs that have entries are listed.
+/// Lists the logs in projects, organizations, folders, or billing accounts. Only logs that have entries are listed.
 ///
 /// A builder for the *logs.list* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -8815,7 +8927,7 @@ impl<'a, C, A> ProjectLogListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+parent}/logs";
+        let mut url = "https://logging.googleapis.com/v2/{+parent}/logs".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -8924,6 +9036,8 @@ impl<'a, C, A> ProjectLogListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// Required. The resource name that owns the logs:
     /// "projects/[PROJECT_ID]"
     /// "organizations/[ORGANIZATION_ID]"
+    /// "billingAccounts/[BILLING_ACCOUNT_ID]"
+    /// "folders/[FOLDER_ID]"
     /// 
     ///
     /// Sets the *parent* path property to the given value.
@@ -9084,7 +9198,7 @@ impl<'a, C, A> ProjectMetricCreateCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+parent}/metrics";
+        let mut url = "https://logging.googleapis.com/v2/{+parent}/metrics".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -9365,7 +9479,7 @@ impl<'a, C, A> ProjectMetricListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+parent}/metrics";
+        let mut url = "https://logging.googleapis.com/v2/{+parent}/metrics".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -9638,7 +9752,7 @@ impl<'a, C, A> ProjectSinkUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+sinkName}";
+        let mut url = "https://logging.googleapis.com/v2/{+sinkName}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -9771,6 +9885,8 @@ impl<'a, C, A> ProjectSinkUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// Required. The full resource name of the sink to update, including the parent resource and the sink identifier:
     /// "projects/[PROJECT_ID]/sinks/[SINK_ID]"
     /// "organizations/[ORGANIZATION_ID]/sinks/[SINK_ID]"
+    /// "billingAccounts/[BILLING_ACCOUNT_ID]/sinks/[SINK_ID]"
+    /// "folders/[FOLDER_ID]/sinks/[SINK_ID]"
     /// Example: "projects/my-project-id/sinks/my-sink-id".
     ///
     /// Sets the *sink name* path property to the given value.
@@ -9783,8 +9899,8 @@ impl<'a, C, A> ProjectSinkUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
     /// Optional. See sinks.create for a description of this field. When updating a sink, the effect of this field on the value of writer_identity in the updated sink depends on both the old and new values of this field:
     /// If the old and new values of this field are both false or both true, then there is no change to the sink's writer_identity.
-    /// If the old value was false and the new value is true, then writer_identity is changed to a unique service account.
-    /// It is an error if the old value was true and the new value is false.
+    /// If the old value is false and the new value is true, then writer_identity is changed to a unique service account.
+    /// It is an error if the old value is true and the new value is false.
     ///
     /// Sets the *unique writer identity* query property to the given value.
     pub fn unique_writer_identity(mut self, new_value: bool) -> ProjectSinkUpdateCall<'a, C, A> {
@@ -9930,7 +10046,7 @@ impl<'a, C, A> ProjectSinkListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+parent}/sinks";
+        let mut url = "https://logging.googleapis.com/v2/{+parent}/sinks".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -10036,7 +10152,12 @@ impl<'a, C, A> ProjectSinkListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
-    /// Required. The parent resource whose sinks are to be listed. Examples: "projects/my-logging-project", "organizations/123456789".
+    /// Required. The parent resource whose sinks are to be listed:
+    /// "projects/[PROJECT_ID]"
+    /// "organizations/[ORGANIZATION_ID]"
+    /// "billingAccounts/[BILLING_ACCOUNT_ID]"
+    /// "folders/[FOLDER_ID]"
+    /// 
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -10189,7 +10310,7 @@ impl<'a, C, A> ProjectSinkGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+sinkName}";
+        let mut url = "https://logging.googleapis.com/v2/{+sinkName}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -10295,9 +10416,11 @@ impl<'a, C, A> ProjectSinkGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
-    /// Required. The parent resource name of the sink:
+    /// Required. The resource name of the sink:
     /// "projects/[PROJECT_ID]/sinks/[SINK_ID]"
     /// "organizations/[ORGANIZATION_ID]/sinks/[SINK_ID]"
+    /// "billingAccounts/[BILLING_ACCOUNT_ID]/sinks/[SINK_ID]"
+    /// "folders/[FOLDER_ID]/sinks/[SINK_ID]"
     /// Example: "projects/my-project-id/sinks/my-sink-id".
     ///
     /// Sets the *sink name* path property to the given value.
@@ -10437,7 +10560,7 @@ impl<'a, C, A> ProjectSinkDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+sinkName}";
+        let mut url = "https://logging.googleapis.com/v2/{+sinkName}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -10546,7 +10669,9 @@ impl<'a, C, A> ProjectSinkDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// Required. The full resource name of the sink to delete, including the parent resource and the sink identifier:
     /// "projects/[PROJECT_ID]/sinks/[SINK_ID]"
     /// "organizations/[ORGANIZATION_ID]/sinks/[SINK_ID]"
-    /// It is an error if the sink does not exist. Example: "projects/my-project-id/sinks/my-sink-id". It is an error if the sink does not exist.
+    /// "billingAccounts/[BILLING_ACCOUNT_ID]/sinks/[SINK_ID]"
+    /// "folders/[FOLDER_ID]/sinks/[SINK_ID]"
+    /// Example: "projects/my-project-id/sinks/my-sink-id".
     ///
     /// Sets the *sink name* path property to the given value.
     ///
@@ -10697,7 +10822,7 @@ impl<'a, C, A> ProjectSinkCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+parent}/sinks";
+        let mut url = "https://logging.googleapis.com/v2/{+parent}/sinks".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -10830,6 +10955,8 @@ impl<'a, C, A> ProjectSinkCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// Required. The resource in which to create the sink:
     /// "projects/[PROJECT_ID]"
     /// "organizations/[ORGANIZATION_ID]"
+    /// "billingAccounts/[BILLING_ACCOUNT_ID]"
+    /// "folders/[FOLDER_ID]"
     /// Examples: "projects/my-logging-project", "organizations/123456789".
     ///
     /// Sets the *parent* path property to the given value.
@@ -10840,7 +10967,7 @@ impl<'a, C, A> ProjectSinkCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._parent = new_value.to_string();
         self
     }
-    /// Optional. Determines the kind of IAM identity returned as writer_identity in the new sink. If this value is omitted or set to false, and if the sink's parent is a project, then the value returned as writer_identity is cloud-logs@google.com, the same identity used before the addition of writer identities to this API. The sink's destination must be in the same project as the sink itself.If this field is set to true, or if the sink is owned by a non-project resource such as an organization, then the value of writer_identity will be a unique service account used only for exports from the new sink. For more information, see writer_identity in LogSink.
+    /// Optional. Determines the kind of IAM identity returned as writer_identity in the new sink. If this value is omitted or set to false, and if the sink's parent is a project, then the value returned as writer_identity is the same group or service account used by Stackdriver Logging before the addition of writer identities to this API. The sink's destination must be in the same project as the sink itself.If this field is set to true, or if the sink is owned by a non-project resource such as an organization, then the value of writer_identity will be a unique service account used only for exports from the new sink. For more information, see writer_identity in LogSink.
     ///
     /// Sets the *unique writer identity* query property to the given value.
     pub fn unique_writer_identity(mut self, new_value: bool) -> ProjectSinkCreateCall<'a, C, A> {
@@ -10983,7 +11110,7 @@ impl<'a, C, A> ProjectMetricUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+metricName}";
+        let mut url = "https://logging.googleapis.com/v2/{+metricName}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -11254,7 +11381,7 @@ impl<'a, C, A> ProjectMetricDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+metricName}";
+        let mut url = "https://logging.googleapis.com/v2/{+metricName}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -11428,5 +11555,6 @@ impl<'a, C, A> ProjectMetricDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self
     }
 }
+
 
 

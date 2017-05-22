@@ -178,285 +178,6 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_components_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.accounts().components_list(opt.value_of("account-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "title-level-eidr" => {
-                    call = call.title_level_eidr(value.unwrap_or(""));
-                },
-                "studio-names" => {
-                    call = call.add_studio_names(value.unwrap_or(""));
-                },
-                "status" => {
-                    call = call.add_status(value.unwrap_or(""));
-                },
-                "presentation-id" => {
-                    call = call.presentation_id(value.unwrap_or(""));
-                },
-                "pph-names" => {
-                    call = call.add_pph_names(value.unwrap_or(""));
-                },
-                "playable-sequence-id" => {
-                    call = call.playable_sequence_id(value.unwrap_or(""));
-                },
-                "page-token" => {
-                    call = call.page_token(value.unwrap_or(""));
-                },
-                "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
-                },
-                "inventory-id" => {
-                    call = call.inventory_id(value.unwrap_or(""));
-                },
-                "filename" => {
-                    call = call.filename(value.unwrap_or(""));
-                },
-                "el-id" => {
-                    call = call.el_id(value.unwrap_or(""));
-                },
-                "edit-level-eidr" => {
-                    call = call.edit_level_eidr(value.unwrap_or(""));
-                },
-                "custom-id" => {
-                    call = call.custom_id(value.unwrap_or(""));
-                },
-                "alt-cut-id" => {
-                    call = call.alt_cut_id(value.unwrap_or(""));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["status", "presentation-id", "title-level-eidr", "page-size", "alt-cut-id", "studio-names", "filename", "page-token", "pph-names", "edit-level-eidr", "inventory-id", "el-id", "custom-id", "playable-sequence-id"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _accounts_components_type_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.accounts().components_type_get(opt.value_of("account-id").unwrap_or(""), opt.value_of("component-id").unwrap_or(""), opt.value_of("type").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _accounts_experience_locales_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.accounts().experience_locales_get(opt.value_of("account-id").unwrap_or(""), opt.value_of("el-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _accounts_experience_locales_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.accounts().experience_locales_list(opt.value_of("account-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "title-level-eidr" => {
-                    call = call.title_level_eidr(value.unwrap_or(""));
-                },
-                "studio-names" => {
-                    call = call.add_studio_names(value.unwrap_or(""));
-                },
-                "status" => {
-                    call = call.add_status(value.unwrap_or(""));
-                },
-                "pph-names" => {
-                    call = call.add_pph_names(value.unwrap_or(""));
-                },
-                "page-token" => {
-                    call = call.page_token(value.unwrap_or(""));
-                },
-                "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
-                },
-                "edit-level-eidr" => {
-                    call = call.edit_level_eidr(value.unwrap_or(""));
-                },
-                "custom-id" => {
-                    call = call.custom_id(value.unwrap_or(""));
-                },
-                "alt-cut-id" => {
-                    call = call.alt_cut_id(value.unwrap_or(""));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["status", "pph-names", "title-level-eidr", "page-size", "studio-names", "page-token", "edit-level-eidr", "custom-id", "alt-cut-id"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
     fn _accounts_orders_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.accounts().orders_get(opt.value_of("account-id").unwrap_or(""), opt.value_of("order-id").unwrap_or(""));
@@ -734,18 +455,6 @@ impl<'n> Engine<'n> {
                     ("avails-list", Some(opt)) => {
                         call_result = self._accounts_avails_list(opt, dry_run, &mut err);
                     },
-                    ("components-list", Some(opt)) => {
-                        call_result = self._accounts_components_list(opt, dry_run, &mut err);
-                    },
-                    ("components-type-get", Some(opt)) => {
-                        call_result = self._accounts_components_type_get(opt, dry_run, &mut err);
-                    },
-                    ("experience-locales-get", Some(opt)) => {
-                        call_result = self._accounts_experience_locales_get(opt, dry_run, &mut err);
-                    },
-                    ("experience-locales-list", Some(opt)) => {
-                        call_result = self._accounts_experience_locales_list(opt, dry_run, &mut err);
-                    },
                     ("orders-get", Some(opt)) => {
                         call_result = self._accounts_orders_get(opt, dry_run, &mut err);
                     },
@@ -850,7 +559,7 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("accounts", "methods: 'avails-get', 'avails-list', 'components-list', 'components-type-get', 'experience-locales-get', 'experience-locales-list', 'orders-get', 'orders-list', 'store-infos-country-get' and 'store-infos-list'", vec![
+        ("accounts", "methods: 'avails-get', 'avails-list', 'orders-get', 'orders-list', 'store-infos-country-get' and 'store-infos-list'", vec![
             ("avails-get",
                     Some(r##"Get an Avail given its avail group id and avail id."##),
                     "Details at http://byron.github.io/google-apis-rs/google_playmoviespartner1_cli/accounts_avails-get",
@@ -880,7 +589,10 @@ fn main() {
                      Some(false)),
                   ]),
             ("avails-list",
-                    Some(r##"List Avails owned or managed by the partner. See _Authentication and Authorization rules_ and _List methods rules_ for more information about this method."##),
+                    Some(r##"List Avails owned or managed by the partner.
+        
+        See _Authentication and Authorization rules_ and
+        _List methods rules_ for more information about this method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_playmoviespartner1_cli/accounts_avails-list",
                   vec![
                     (Some(r##"account-id"##),
@@ -901,114 +613,11 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("components-list",
-                    Some(r##"List Components owned or managed by the partner. See _Authentication and Authorization rules_ and _List methods rules_ for more information about this method."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_playmoviespartner1_cli/accounts_components-list",
-                  vec![
-                    (Some(r##"account-id"##),
-                     None,
-                     Some(r##"REQUIRED. See _General rules_ for more information about this field."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("components-type-get",
-                    Some(r##"Get a Component given its id."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_playmoviespartner1_cli/accounts_components-type-get",
-                  vec![
-                    (Some(r##"account-id"##),
-                     None,
-                     Some(r##"REQUIRED. See _General rules_ for more information about this field."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"component-id"##),
-                     None,
-                     Some(r##"REQUIRED. Component ID."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"type"##),
-                     None,
-                     Some(r##"REQUIRED. Component Type."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("experience-locales-get",
-                    Some(r##"Get an ExperienceLocale given its id. See _Authentication and Authorization rules_ and _Get methods rules_ for more information about this method."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_playmoviespartner1_cli/accounts_experience-locales-get",
-                  vec![
-                    (Some(r##"account-id"##),
-                     None,
-                     Some(r##"REQUIRED. See _General rules_ for more information about this field."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"el-id"##),
-                     None,
-                     Some(r##"REQUIRED. ExperienceLocale ID, as defined by Google."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("experience-locales-list",
-                    Some(r##"List ExperienceLocales owned or managed by the partner. See _Authentication and Authorization rules_ and _List methods rules_ for more information about this method."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_playmoviespartner1_cli/accounts_experience-locales-list",
-                  vec![
-                    (Some(r##"account-id"##),
-                     None,
-                     Some(r##"REQUIRED. See _General rules_ for more information about this field."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
             ("orders-get",
-                    Some(r##"Get an Order given its id. See _Authentication and Authorization rules_ and _Get methods rules_ for more information about this method."##),
+                    Some(r##"Get an Order given its id.
+        
+        See _Authentication and Authorization rules_ and
+        _Get methods rules_ for more information about this method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_playmoviespartner1_cli/accounts_orders-get",
                   vec![
                     (Some(r##"account-id"##),
@@ -1036,7 +645,10 @@ fn main() {
                      Some(false)),
                   ]),
             ("orders-list",
-                    Some(r##"List Orders owned or managed by the partner. See _Authentication and Authorization rules_ and _List methods rules_ for more information about this method."##),
+                    Some(r##"List Orders owned or managed by the partner.
+        
+        See _Authentication and Authorization rules_ and
+        _List methods rules_ for more information about this method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_playmoviespartner1_cli/accounts_orders-list",
                   vec![
                     (Some(r##"account-id"##),
@@ -1058,7 +670,10 @@ fn main() {
                      Some(false)),
                   ]),
             ("store-infos-country-get",
-                    Some(r##"Get a StoreInfo given its video id and country. See _Authentication and Authorization rules_ and _Get methods rules_ for more information about this method."##),
+                    Some(r##"Get a StoreInfo given its video id and country.
+        
+        See _Authentication and Authorization rules_ and
+        _Get methods rules_ for more information about this method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_playmoviespartner1_cli/accounts_store-infos-country-get",
                   vec![
                     (Some(r##"account-id"##),
@@ -1092,7 +707,10 @@ fn main() {
                      Some(false)),
                   ]),
             ("store-infos-list",
-                    Some(r##"List StoreInfos owned or managed by the partner. See _Authentication and Authorization rules_ and _List methods rules_ for more information about this method."##),
+                    Some(r##"List StoreInfos owned or managed by the partner.
+        
+        See _Authentication and Authorization rules_ and
+        _List methods rules_ for more information about this method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_playmoviespartner1_cli/accounts_store-infos-list",
                   vec![
                     (Some(r##"account-id"##),
@@ -1119,7 +737,7 @@ fn main() {
     
     let mut app = App::new("playmoviespartner1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.4+20160518")
+           .version("1.0.4+20170516")
            .about("Gets the delivery status of titles for Google Play Movies Partners.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_playmoviespartner1_cli")
            .arg(Arg::with_name("url")

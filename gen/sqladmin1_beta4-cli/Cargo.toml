@@ -4,7 +4,7 @@
 [package]
 
 name = "google-sqladmin1_beta4-cli"
-version = "1.0.4+20161213"
+version = "1.0.4+20170502"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with SQL Admin (protocol v1beta4)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/sqladmin1_beta4-cli"
@@ -24,7 +24,7 @@ serde_json = "^ 0.9"
 serde_derive = "^ 0.9"
 yup-oauth2 = "^ 1.0"
 strsim = "^0.5"
-hyper-rustls = "^0.3"
+hyper-rustls = "^0.6"
 yup-hyper-mock = "^2.0"
 clap = "^2.0"
 
@@ -34,4 +34,4 @@ clap = "^2.0"
 
 [dependencies.google-sqladmin1_beta4]
 path = "../sqladmin1_beta4"
-version = "1.0.4+20161213"
+version = "1.0.4+20170502"

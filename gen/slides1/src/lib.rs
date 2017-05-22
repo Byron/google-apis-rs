@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Slides* crate version *1.0.4+20161213*, where *20161213* is the exact revision of the *slides:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
+//! This documentation was generated from *Slides* crate version *1.0.4+20170509*, where *20170509* is the exact revision of the *slides:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
 //! 
 //! Everything else about the *Slides* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/slides/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.Slides.html) ... 
 //! 
 //! * [presentations](struct.Presentation.html)
-//!  * [*batch update*](struct.PresentationBatchUpdateCall.html), [*create*](struct.PresentationCreateCall.html), [*get*](struct.PresentationGetCall.html) and [*pages get*](struct.PresentationPageGetCall.html)
+//!  * [*batch update*](struct.PresentationBatchUpdateCall.html), [*create*](struct.PresentationCreateCall.html), [*get*](struct.PresentationGetCall.html), [*pages get*](struct.PresentationPageGetCall.html) and [*pages get thumbnail*](struct.PresentationPageGetThumbnailCall.html)
 //! 
 //! 
 //! 
@@ -51,6 +51,7 @@
 //! let r = hub.presentations().get(...).doit()
 //! let r = hub.presentations().batch_update(...).doit()
 //! let r = hub.presentations().pages_get(...).doit()
+//! let r = hub.presentations().pages_get_thumbnail(...).doit()
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -75,7 +76,6 @@
 //! extern crate hyper;
 //! extern crate yup_oauth2 as oauth2;
 //! extern crate google_slides1 as slides1;
-//! use slides1::BatchUpdatePresentationRequest;
 //! use slides1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
@@ -94,15 +94,12 @@
 //!                               hyper::Client::new(),
 //!                               <MemoryStorage as Default>::default(), None);
 //! let mut hub = Slides::new(hyper::Client::new(), auth);
-//! // As the method needs a request, you would usually fill it with the desired information
-//! // into the respective structure. Some of the parts shown here might not be applicable !
-//! // Values shown here are possibly random and not representative !
-//! let mut req = BatchUpdatePresentationRequest::default();
-//! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.presentations().batch_update(req, "presentationId")
+//! let result = hub.presentations().pages_get_thumbnail("presentationId", "pageObjectId")
+//!              .thumbnail_properties_thumbnail_size("kasd")
+//!              .thumbnail_properties_mime_type("accusam")
 //!              .doit();
 //! 
 //! match result {
@@ -179,7 +176,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -278,7 +275,6 @@ impl Default for Scope {
 /// extern crate hyper;
 /// extern crate yup_oauth2 as oauth2;
 /// extern crate google_slides1 as slides1;
-/// use slides1::BatchUpdatePresentationRequest;
 /// use slides1::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -297,15 +293,12 @@ impl Default for Scope {
 ///                               hyper::Client::new(),
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Slides::new(hyper::Client::new(), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = BatchUpdatePresentationRequest::default();
-/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.presentations().batch_update(req, "presentationId")
+/// let result = hub.presentations().pages_get_thumbnail("presentationId", "pageObjectId")
+///              .thumbnail_properties_thumbnail_size("amet.")
+///              .thumbnail_properties_mime_type("erat")
 ///              .doit();
 /// 
 /// match result {
@@ -330,8 +323,6 @@ pub struct Slides<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-    _base_url: String,
-    _root_url: String,
 }
 
 impl<'a, C, A> Hub for Slides<C, A> {}
@@ -344,8 +335,6 @@ impl<'a, C, A> Slides<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
-            _base_url: "https://slides.googleapis.com/".to_string(),
-            _root_url: "https://slides.googleapis.com/".to_string(),
         }
     }
 
@@ -360,26 +349,6 @@ impl<'a, C, A> Slides<C, A>
     pub fn user_agent(&mut self, agent_name: String) -> String {
         let prev = self._user_agent.clone();
         self._user_agent = agent_name;
-        prev
-    }
-
-    /// Set the base url to use in all requests to the server.
-    /// It defaults to `https://slides.googleapis.com/`.
-    ///
-    /// Returns the previously set base url.
-    pub fn base_url(&mut self, new_base_url: String) -> String {
-        let prev = self._base_url.clone();
-        self._base_url = new_base_url;
-        prev
-    }
-
-    /// Set the root url to use in all requests to the server.
-    /// It defaults to `https://slides.googleapis.com/`.
-    ///
-    /// Returns the previously set root url.
-    pub fn root_url(&mut self, new_root_url: String) -> String {
-        let prev = self._root_url.clone();
-        self._root_url = new_root_url;
         prev
     }
 }
@@ -412,6 +381,36 @@ pub struct ReplaceAllShapesWithImageRequest {
 }
 
 impl Part for ReplaceAllShapesWithImageRequest {}
+
+
+/// Replaces all shapes that match the given criteria with the provided Google
+/// Sheets chart. The chart will be scaled and centered to fit within the bounds
+/// of the original shape.
+/// 
+/// NOTE: Replacing shapes with a chart requires at least one of the
+/// spreadsheets.readonly, spreadsheets, drive.readonly, or drive OAuth scopes.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ReplaceAllShapesWithSheetsChartRequest {
+    /// The ID of the Google Sheets spreadsheet that contains the chart.
+    #[serde(rename="spreadsheetId")]
+    pub spreadsheet_id: Option<String>,
+    /// The ID of the specific chart in the Google Sheets spreadsheet.
+    #[serde(rename="chartId")]
+    pub chart_id: Option<i32>,
+    /// The mode with which the chart is linked to the source spreadsheet. When
+    /// not specified, the chart will be an image that is not linked.
+    #[serde(rename="linkingMode")]
+    pub linking_mode: Option<String>,
+    /// The criteria that the shapes must match in order to be replaced. The
+    /// request will replace all of the shapes that contain the given text.
+    #[serde(rename="containsText")]
+    pub contains_text: Option<SubstringMatchCriteria>,
+}
+
+impl Part for ReplaceAllShapesWithSheetsChartRequest {}
 
 
 /// A PageElement kind representing a
@@ -473,6 +472,32 @@ pub struct StretchedPictureFill {
 }
 
 impl Part for StretchedPictureFill {}
+
+
+/// Represents a font family and weight used to style a TextRun.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct WeightedFontFamily {
+    /// The font family of the text.
+    /// 
+    /// The font family can be any font from the Font menu in Slides or from
+    /// [Google Fonts] (https://fonts.google.com/). If the font name is
+    /// unrecognized, the text is rendered in `Arial`.
+    #[serde(rename="fontFamily")]
+    pub font_family: Option<String>,
+    /// The rendered weight of the text. This field can have any value that is a
+    /// multiple of `100` between `100` and `900`, inclusive. This range
+    /// corresponds to the numerical values described in the CSS 2.1
+    /// Specification, [section 15.6](https://www.w3.org/TR/CSS21/fonts.html#font-boldness),
+    /// with non-numerical values disallowed. Weights greater than or equal to
+    /// `700` are considered bold, and weights less than `700`are not bold. The
+    /// default value is `400` ("normal").
+    pub weight: Option<i32>,
+}
+
+impl Part for WeightedFontFamily {}
 
 
 /// Creates an image.
@@ -585,16 +610,16 @@ pub struct CropProperties {
     /// The rotation angle of the crop window around its center, in radians.
     /// Rotation angle is applied after the offset.
     pub angle: Option<f32>,
-    /// The offset specifies the bottom edge of the crop rectangle that is located
-    /// above the original bounding rectangle bottom edge, relative to the object's
-    /// original height.
-    #[serde(rename="bottomOffset")]
-    pub bottom_offset: Option<f32>,
     /// The offset specifies the right edge of the crop rectangle that is located
     /// to the left of the original bounding rectangle right edge, relative to the
     /// object's original width.
     #[serde(rename="rightOffset")]
     pub right_offset: Option<f32>,
+    /// The offset specifies the bottom edge of the crop rectangle that is located
+    /// above the original bounding rectangle bottom edge, relative to the object's
+    /// original height.
+    #[serde(rename="bottomOffset")]
+    pub bottom_offset: Option<f32>,
     /// The offset specifies the top edge of the crop rectangle that is located
     /// below the original bounding rectangle top edge, relative to the object's
     /// original height.
@@ -793,9 +818,6 @@ impl Part for SolidFill {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InsertTableColumnsRequest {
-    /// The table to insert columns into.
-    #[serde(rename="tableObjectId")]
-    pub table_object_id: Option<String>,
     /// Whether to insert new columns to the right of the reference cell location.
     /// 
     /// - `True`: insert to the right.
@@ -811,6 +833,9 @@ pub struct InsertTableColumnsRequest {
     /// column will be inserted to the left (or right) of the merged cell.
     #[serde(rename="cellLocation")]
     pub cell_location: Option<TableCellLocation>,
+    /// The table to insert columns into.
+    #[serde(rename="tableObjectId")]
+    pub table_object_id: Option<String>,
 }
 
 impl Part for InsertTableColumnsRequest {}
@@ -928,8 +953,8 @@ pub struct Response {
     /// The result of creating an image.
     #[serde(rename="createImage")]
     pub create_image: Option<CreateImageResponse>,
-    /// The result of replacing all shapes containing the specified text with
-    /// an image.
+    /// The result of replacing all shapes matching some criteria with an
+    /// image.
     #[serde(rename="replaceAllShapesWithImage")]
     pub replace_all_shapes_with_image: Option<ReplaceAllShapesWithImageResponse>,
     /// The result of duplicating an object.
@@ -956,6 +981,10 @@ pub struct Response {
     /// The result of creating a slide.
     #[serde(rename="createSlide")]
     pub create_slide: Option<CreateSlideResponse>,
+    /// The result of replacing all shapes matching some criteria with a Google
+    /// Sheets chart.
+    #[serde(rename="replaceAllShapesWithSheetsChart")]
+    pub replace_all_shapes_with_sheets_chart: Option<ReplaceAllShapesWithSheetsChartResponse>,
 }
 
 impl Part for Response {}
@@ -993,44 +1022,64 @@ impl Part for CreateTableResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ParagraphStyle {
-    /// The spacing mode for the paragraph. This property is read-only.
+    /// The spacing mode for the paragraph.
     #[serde(rename="spacingMode")]
     pub spacing_mode: Option<String>,
-    /// The text direction of this paragraph. This property is read-only.
+    /// The text direction of this paragraph. If unset, the value defaults to
+    /// LEFT_TO_RIGHT since
+    /// text direction is not inherited.
     pub direction: Option<String>,
     /// The amount of extra space above the paragraph. If unset, the value is
-    /// inherited from the parent. This property is read-only.
+    /// inherited from the parent.
     #[serde(rename="spaceBelow")]
     pub space_below: Option<Dimension>,
     /// The amount of space between lines, as a percentage of normal, where normal
     /// is represented as 100.0. If unset, the value is inherited from the parent.
-    /// This property is read-only.
     #[serde(rename="lineSpacing")]
     pub line_spacing: Option<f32>,
     /// The amount indentation for the paragraph on the side that corresponds to
     /// the start of the text, based on the current text direction. If unset, the
-    /// value is inherited from the parent. This property is read-only.
+    /// value is inherited from the parent.
     #[serde(rename="indentStart")]
     pub indent_start: Option<Dimension>,
     /// The amount of extra space above the paragraph. If unset, the value is
-    /// inherited from the parent. This property is read-only.
+    /// inherited from the parent.
     #[serde(rename="spaceAbove")]
     pub space_above: Option<Dimension>,
     /// The amount indentation for the paragraph on the side that corresponds to
     /// the end of the text, based on the current text direction. If unset, the
-    /// value is inherited from the parent. This property is read-only.
+    /// value is inherited from the parent.
     #[serde(rename="indentEnd")]
     pub indent_end: Option<Dimension>,
     /// The amount of indentation for the start of the first line of the paragraph.
-    /// If unset, the value is inherited from the parent. This property is
-    /// read-only.
+    /// If unset, the value is inherited from the parent.
     #[serde(rename="indentFirstLine")]
     pub indent_first_line: Option<Dimension>,
-    /// The text alignment for this paragraph. This property is read-only.
+    /// The text alignment for this paragraph.
     pub alignment: Option<String>,
 }
 
 impl Part for ParagraphStyle {}
+
+
+/// The properties of Page that are only
+/// relevant for pages with page_type NOTES.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct NotesProperties {
+    /// The object ID of the shape on this notes page that contains the speaker
+    /// notes for the corresponding slide.
+    /// The actual shape may not always exist on the notes page. Inserting text
+    /// using this object ID will automatically create the shape. In this case, the
+    /// actual shape may have different object ID. The `GetPresentation` or
+    /// `GetPage` action will always return the latest object ID.
+    #[serde(rename="speakerNotesObjectId")]
+    pub speaker_notes_object_id: Option<String>,
+}
+
+impl Part for NotesProperties {}
 
 
 /// Describes the bullet of a paragraph.
@@ -1241,19 +1290,19 @@ impl Part for LineFill {}
 
 /// Creates an embedded Google Sheets chart.
 /// 
-/// NOTE: Chart creation requires  at least one of the spreadsheets.readonly,
+/// NOTE: Chart creation requires at least one of the spreadsheets.readonly,
 /// spreadsheets, drive.readonly, or drive OAuth scopes.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreateSheetsChartRequest {
-    /// The ID of the specific chart in the Google Sheets spreadsheet.
-    #[serde(rename="chartId")]
-    pub chart_id: Option<i32>,
     /// The ID of the Google Sheets spreadsheet that contains the chart.
     #[serde(rename="spreadsheetId")]
     pub spreadsheet_id: Option<String>,
+    /// The ID of the specific chart in the Google Sheets spreadsheet.
+    #[serde(rename="chartId")]
+    pub chart_id: Option<i32>,
     /// The mode with which the chart is linked to the source spreadsheet. When
     /// not specified, the chart will be an image that is not linked.
     #[serde(rename="linkingMode")]
@@ -1301,6 +1350,17 @@ impl Part for ReplaceAllShapesWithImageResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SlideProperties {
+    /// The notes page that this slide is associated with. It defines the visual
+    /// appearance of a notes page when printing or exporting slides with speaker
+    /// notes. A notes page inherits properties from the
+    /// notes master.
+    /// The placeholder shape with type BODY on the notes page contains the speaker
+    /// notes for this slide. The ID of this shape is identified by the
+    /// speakerNotesObjectId field.
+    /// The notes page is read-only except for the text content and styles of the
+    /// speaker notes shape.
+    #[serde(rename="notesPage")]
+    pub notes_page: Option<Page>,
     /// The object ID of the layout that this slide is based on.
     #[serde(rename="layoutObjectId")]
     pub layout_object_id: Option<String>,
@@ -1329,11 +1389,28 @@ pub struct Page {
     /// The page elements rendered on the page.
     #[serde(rename="pageElements")]
     pub page_elements: Option<Vec<PageElement>>,
+    /// Notes specific properties. Only set if page_type = NOTES.
+    #[serde(rename="notesProperties")]
+    pub notes_properties: Option<NotesProperties>,
     /// The object ID for this page. Object IDs used by
     /// Page and
     /// PageElement share the same namespace.
     #[serde(rename="objectId")]
     pub object_id: Option<String>,
+    /// The revision ID of the presentation containing this page. Can be used in
+    /// update requests to assert that the presentation revision hasn't changed
+    /// since the last read operation. Only populated if the user has edit access
+    /// to the presentation.
+    /// 
+    /// The format of the revision ID may change over time, so it should be treated
+    /// opaquely. A returned revision ID is only guaranteed to be valid for 24
+    /// hours after it has been returned and cannot be shared across users. If the
+    /// revision ID is unchanged between calls, then the presentation has not
+    /// changed. Conversely, a changed ID (for the same presentation and user)
+    /// usually means the presentation has been updated; however, a changed ID can
+    /// also be due to internal factors such as ID format changes.
+    #[serde(rename="revisionId")]
+    pub revision_id: Option<String>,
     /// The properties of the page.
     #[serde(rename="pageProperties")]
     pub page_properties: Option<PageProperties>,
@@ -1455,12 +1532,6 @@ impl Part for PageElementProperties {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UpdateVideoPropertiesRequest {
-    /// The video properties to update.
-    #[serde(rename="videoProperties")]
-    pub video_properties: Option<VideoProperties>,
-    /// The object ID of the video the updates are applied to.
-    #[serde(rename="objectId")]
-    pub object_id: Option<String>,
     /// The fields that should be updated.
     /// 
     /// At least one field must be specified. The root `videoProperties` is
@@ -1473,6 +1544,12 @@ pub struct UpdateVideoPropertiesRequest {
     /// To reset a property to its default value, include its field name in the
     /// field mask but leave the field itself unset.
     pub fields: Option<String>,
+    /// The object ID of the video the updates are applied to.
+    #[serde(rename="objectId")]
+    pub object_id: Option<String>,
+    /// The video properties to update.
+    #[serde(rename="videoProperties")]
+    pub video_properties: Option<VideoProperties>,
 }
 
 impl Part for UpdateVideoPropertiesRequest {}
@@ -1528,6 +1605,32 @@ pub struct TableRow {
 impl Part for TableRow {}
 
 
+/// Deletes bullets from all of the paragraphs that overlap with the given text
+/// index range.
+/// 
+/// The nesting level of each paragraph will be visually preserved by adding
+/// indent to the start of the corresponding paragraph.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DeleteParagraphBulletsRequest {
+    /// The range of text to delete bullets from, based on TextElement indexes.
+    #[serde(rename="textRange")]
+    pub text_range: Option<Range>,
+    /// The object ID of the shape or table containing the text to delete bullets
+    /// from.
+    #[serde(rename="objectId")]
+    pub object_id: Option<String>,
+    /// The optional table cell location if the text to be modified is in a table
+    /// cell. If present, the object_id must refer to a table.
+    #[serde(rename="cellLocation")]
+    pub cell_location: Option<TableCellLocation>,
+}
+
+impl Part for DeleteParagraphBulletsRequest {}
+
+
 /// A PageElement kind representing
 /// a linked chart embedded from Google Sheets.
 /// 
@@ -1535,13 +1638,13 @@ impl Part for TableRow {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SheetsChart {
+    /// The ID of the Google Sheets spreadsheet that contains the source chart.
+    #[serde(rename="spreadsheetId")]
+    pub spreadsheet_id: Option<String>,
     /// The ID of the specific chart in the Google Sheets spreadsheet that is
     /// embedded.
     #[serde(rename="chartId")]
     pub chart_id: Option<i32>,
-    /// The ID of the Google Sheets spreadsheet that contains the source chart.
-    #[serde(rename="spreadsheetId")]
-    pub spreadsheet_id: Option<String>,
     /// The properties of the Sheets chart.
     #[serde(rename="sheetsChartProperties")]
     pub sheets_chart_properties: Option<SheetsChartProperties>,
@@ -1668,19 +1771,18 @@ pub struct AffineTransform {
 impl Part for AffineTransform {}
 
 
-/// A width and height.
+/// The result of creating an embedded Google Sheets chart.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Size {
-    /// The width of the object.
-    pub width: Option<Dimension>,
-    /// The height of the object.
-    pub height: Option<Dimension>,
+pub struct CreateSheetsChartResponse {
+    /// The object ID of the created chart.
+    #[serde(rename="objectId")]
+    pub object_id: Option<String>,
 }
 
-impl Part for Size {}
+impl Part for CreateSheetsChartResponse {}
 
 
 /// Inserts text into a shape or a table cell.
@@ -1752,8 +1854,8 @@ pub struct TextStyle {
     /// transparent, depending on if the `opaque_color` field in it is set.
     #[serde(rename="foregroundColor")]
     pub foreground_color: Option<OptionalColor>,
-    /// Whether or not the text is bold.
-    pub bold: Option<bool>,
+    /// Whether or not the text is italicized.
+    pub italic: Option<bool>,
     /// The text's vertical offset from its normal position.
     /// 
     /// Text with `SUPERSCRIPT` or `SUBSCRIPT` baseline offsets is automatically
@@ -1763,6 +1865,37 @@ pub struct TextStyle {
     pub baseline_offset: Option<String>,
     /// Whether or not the text is struck through.
     pub strikethrough: Option<bool>,
+    /// The font family and rendered weight of the text.
+    /// 
+    /// This field is an extension of `font_family` meant to support explicit font
+    /// weights without breaking backwards compatibility. As such, when reading the
+    /// style of a range of text, the value of `weighted_font_family#font_family`
+    /// will always be equal to that of `font_family`. However, when writing, if
+    /// both fields are included in the field mask (either explicitly or through
+    /// the wildcard `"*"`), their values are reconciled as follows:
+    /// 
+    /// * If `font_family` is set and `weighted_font_family` is not, the value of
+    ///   `font_family` is applied with weight `400` ("normal").
+    /// * If both fields are set, the value of `font_family` must match that of
+    ///   `weighted_font_family#font_family`. If so, the font family and weight of
+    ///   `weighted_font_family` is applied. Otherwise, a 400 bad request error is
+    ///   returned.
+    /// * If `weighted_font_family` is set and `font_family` is not, the font
+    ///   family and weight of `weighted_font_family` is applied.
+    /// * If neither field is set, the font family and weight of the text inherit
+    ///   from the parent. Note that these properties cannot inherit separately
+    ///   from each other.
+    /// 
+    /// If an update request specifies values for both `weighted_font_family` and
+    /// `bold`, the `weighted_font_family` is applied first, then `bold`.
+    /// 
+    /// If `weighted_font_family#weight` is not set, it defaults to `400`.
+    /// 
+    /// If `weighted_font_family` is set, then `weighted_font_family#font_family`
+    /// must also be set with a non-empty value. Otherwise, a 400 bad request error
+    /// is returned.
+    #[serde(rename="weightedFontFamily")]
+    pub weighted_font_family: Option<WeightedFontFamily>,
     /// Whether or not the text is in small capital letters.
     #[serde(rename="smallCaps")]
     pub small_caps: Option<bool>,
@@ -1777,6 +1910,14 @@ pub struct TextStyle {
     /// `bold` value is used.
     #[serde(rename="fontFamily")]
     pub font_family: Option<String>,
+    /// The size of the text's font. When read, the `font_size` will specified in
+    /// points.
+    #[serde(rename="fontSize")]
+    pub font_size: Option<Dimension>,
+    /// The background color of the text. If set, the color is either opaque or
+    /// transparent, depending on if the `opaque_color` field in it is set.
+    #[serde(rename="backgroundColor")]
+    pub background_color: Option<OptionalColor>,
     /// The hyperlink destination of the text. If unset, there is no link. Links
     /// are not inherited from parent text.
     /// 
@@ -1798,18 +1939,10 @@ pub struct TextStyle {
     ///   text is another link) unless different styles are being set in the same
     ///   request.
     pub link: Option<Link>,
-    /// Whether or not the text is italicized.
-    pub italic: Option<bool>,
-    /// The size of the text's font. When read, the `font_size` will specified in
-    /// points.
-    #[serde(rename="fontSize")]
-    pub font_size: Option<Dimension>,
     /// Whether or not the text is underlined.
     pub underline: Option<bool>,
-    /// The background color of the text. If set, the color is either opaque or
-    /// transparent, depending on if the `opaque_color` field in it is set.
-    #[serde(rename="backgroundColor")]
-    pub background_color: Option<OptionalColor>,
+    /// Whether or not the text is rendered as bold.
+    pub bold: Option<bool>,
 }
 
 impl Part for TextStyle {}
@@ -1913,53 +2046,51 @@ pub struct InsertTableRowsRequest {
 impl Part for InsertTableRowsRequest {}
 
 
-/// A Google Slides presentation.
+/// Provides control over how write requests are executed.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct WriteControl {
+    /// The revision ID of the presentation required for the write request. If
+    /// specified and the `required_revision_id` doesn't exactly match the
+    /// presentation's current `revision_id`, the request will not be processed and
+    /// will return a 400 bad request error.
+    #[serde(rename="requiredRevisionId")]
+    pub required_revision_id: Option<String>,
+}
+
+impl Part for WriteControl {}
+
+
+/// The thumbnail of a page.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [create presentations](struct.PresentationCreateCall.html) (request|response)
-/// * [get presentations](struct.PresentationGetCall.html) (response)
-/// * [batch update presentations](struct.PresentationBatchUpdateCall.html) (none)
-/// * [pages get presentations](struct.PresentationPageGetCall.html) (none)
+/// * [pages get thumbnail presentations](struct.PresentationPageGetThumbnailCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Presentation {
-    /// The slides in the presentation.
-    /// A slide inherits properties from a slide layout.
-    pub slides: Option<Vec<Page>>,
-    /// The ID of the presentation.
-    #[serde(rename="presentationId")]
-    pub presentation_id: Option<String>,
-    /// The slide masters in the presentation. A slide master contains all common
-    /// page elements and the common properties for a set of layouts. They serve
-    /// three purposes:
+pub struct Thumbnail {
+    /// The content URL of the thumbnail image.
     /// 
-    /// - Placeholder shapes on a master contain the default text styles and shape
-    ///   properties of all placeholder shapes on pages that use that master.
-    /// - The master page properties define the common page properties inherited by
-    ///   its layouts.
-    /// - Any other shapes on the master slide will appear on all slides using that
-    ///   master, regardless of their layout.
-    pub masters: Option<Vec<Page>>,
-    /// The size of pages in the presentation.
-    #[serde(rename="pageSize")]
-    pub page_size: Option<Size>,
-    /// The title of the presentation.
-    pub title: Option<String>,
-    /// The locale of the presentation, as an IETF BCP 47 language tag.
-    pub locale: Option<String>,
-    /// The layouts in the presentation. A layout is a template that determines
-    /// how content is arranged and styled on the slides that inherit from that
-    /// layout.
-    pub layouts: Option<Vec<Page>>,
+    /// The URL to the image has a default lifetime of 30 minutes.
+    /// This URL is tagged with the account of the requester. Anyone with the URL
+    /// effectively accesses the image as the original requester. Access to the
+    /// image may be lost if the presentation's sharing settings change.
+    /// The mime type of the thumbnail image is the same as specified in the
+    /// `GetPageThumbnailRequest`.
+    #[serde(rename="contentUrl")]
+    pub content_url: Option<String>,
+    /// The positive width in pixels of the thumbnail image.
+    pub width: Option<i32>,
+    /// The positive height in pixels of the thumbnail image.
+    pub height: Option<i32>,
 }
 
-impl RequestValue for Presentation {}
-impl Resource for Presentation {}
-impl ResponseResult for Presentation {}
+impl ResponseResult for Thumbnail {}
 
 
 /// A PageElement kind representing
@@ -2093,6 +2224,83 @@ pub struct DeleteTableRowRequest {
 impl Part for DeleteTableRowRequest {}
 
 
+/// A Google Slides presentation.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [create presentations](struct.PresentationCreateCall.html) (request|response)
+/// * [get presentations](struct.PresentationGetCall.html) (response)
+/// * [batch update presentations](struct.PresentationBatchUpdateCall.html) (none)
+/// * [pages get presentations](struct.PresentationPageGetCall.html) (none)
+/// * [pages get thumbnail presentations](struct.PresentationPageGetThumbnailCall.html) (none)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Presentation {
+    /// The ID of the presentation.
+    #[serde(rename="presentationId")]
+    pub presentation_id: Option<String>,
+    /// The slide masters in the presentation. A slide master contains all common
+    /// page elements and the common properties for a set of layouts. They serve
+    /// three purposes:
+    /// 
+    /// - Placeholder shapes on a master contain the default text styles and shape
+    ///   properties of all placeholder shapes on pages that use that master.
+    /// - The master page properties define the common page properties inherited by
+    ///   its layouts.
+    /// - Any other shapes on the master slide will appear on all slides using that
+    ///   master, regardless of their layout.
+    pub masters: Option<Vec<Page>>,
+    /// The size of pages in the presentation.
+    #[serde(rename="pageSize")]
+    pub page_size: Option<Size>,
+    /// The title of the presentation.
+    pub title: Option<String>,
+    /// The locale of the presentation, as an IETF BCP 47 language tag.
+    pub locale: Option<String>,
+    /// The revision ID of the presentation. Can be used in update requests
+    /// to assert that the presentation revision hasn't changed since the last
+    /// read operation. Only populated if the user has edit access to the
+    /// presentation.
+    /// 
+    /// The format of the revision ID may change over time, so it should be treated
+    /// opaquely. A returned revision ID is only guaranteed to be valid for 24
+    /// hours after it has been returned and cannot be shared across users. If the
+    /// revision ID is unchanged between calls, then the presentation has not
+    /// changed. Conversely, a changed ID (for the same presentation and user)
+    /// usually means the presentation has been updated; however, a changed ID can
+    /// also be due to internal factors such as ID format changes.
+    #[serde(rename="revisionId")]
+    pub revision_id: Option<String>,
+    /// The notes master in the presentation. It serves three purposes:
+    /// 
+    /// - Placeholder shapes on a notes master contain the default text styles and
+    ///   shape properties of all placeholder shapes on notes pages. Specifically,
+    ///   a `SLIDE_IMAGE` placeholder shape contains the slide thumbnail, and a
+    ///   `BODY` placeholder shape contains the speaker notes.
+    /// - The notes master page properties define the common page properties
+    ///   inherited by all notes pages.
+    /// - Any other shapes on the notes master will appear on all notes pages.
+    /// 
+    /// The notes master is read-only.
+    #[serde(rename="notesMaster")]
+    pub notes_master: Option<Page>,
+    /// The slides in the presentation.
+    /// A slide inherits properties from a slide layout.
+    pub slides: Option<Vec<Page>>,
+    /// The layouts in the presentation. A layout is a template that determines
+    /// how content is arranged and styled on the slides that inherit from that
+    /// layout.
+    pub layouts: Option<Vec<Page>>,
+}
+
+impl RequestValue for Presentation {}
+impl Resource for Presentation {}
+impl ResponseResult for Presentation {}
+
+
 /// The result of creating a video.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2134,6 +2342,43 @@ pub struct UpdateShapePropertiesRequest {
 }
 
 impl Part for UpdateShapePropertiesRequest {}
+
+
+/// Updates the styling for all of the paragraphs within a Shape or Table that
+/// overlap with the given text index range.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UpdateParagraphStyleRequest {
+    /// The fields that should be updated.
+    /// 
+    /// At least one field must be specified. The root `style` is implied and
+    /// should not be specified. A single `"*"` can be used as short-hand for
+    /// listing every field.
+    /// 
+    /// For example, to update the paragraph alignment, set `fields` to
+    /// `"alignment"`.
+    /// 
+    /// To reset a property to its default value, include its field name in the
+    /// field mask but leave the field itself unset.
+    pub fields: Option<String>,
+    /// The paragraph's style.
+    pub style: Option<ParagraphStyle>,
+    /// The location of the cell in the table containing the paragraph(s) to
+    /// style. If `object_id` refers to a table, `cell_location` must have a value.
+    /// Otherwise, it must not.
+    #[serde(rename="cellLocation")]
+    pub cell_location: Option<TableCellLocation>,
+    /// The object ID of the shape or table with the text to be styled.
+    #[serde(rename="objectId")]
+    pub object_id: Option<String>,
+    /// The range of text containing the paragraph(s) to style.
+    #[serde(rename="textRange")]
+    pub text_range: Option<Range>,
+}
+
+impl Part for UpdateParagraphStyleRequest {}
 
 
 /// A hypertext link.
@@ -2246,8 +2491,8 @@ pub struct Placeholder {
     /// not inherit properties from any other shape.
     #[serde(rename="parentObjectId")]
     pub parent_object_id: Option<String>,
-    /// The index of the placeholder. If the same placeholder types are the present
-    /// in the same page, they would have different index values.
+    /// The index of the placeholder. If the same placeholder types are present in
+    /// the same page, they would have different index values.
     pub index: Option<i32>,
     /// The type of the placeholder.
     #[serde(rename="type")]
@@ -2270,10 +2515,10 @@ pub struct UpdateTextStyleRequest {
     /// should not be specified. A single `"*"` can be used as short-hand for
     /// listing every field.
     /// 
-    /// For example to update the text style to bold, set `fields` to `"bold"`.
+    /// For example, to update the text style to bold, set `fields` to `"bold"`.
     /// 
-    /// To reset a property to its default value,
-    /// include its field name in the field mask but leave the field itself unset.
+    /// To reset a property to its default value, include its field name in the
+    /// field mask but leave the field itself unset.
     pub fields: Option<String>,
     /// The style(s) to set on the text.
     /// 
@@ -2295,8 +2540,9 @@ pub struct UpdateTextStyleRequest {
     /// The object ID of the shape or table with the text to be styled.
     #[serde(rename="objectId")]
     pub object_id: Option<String>,
-    /// The optional table cell location if the text to be styled is in a table
-    /// cell. If present, the object_id must refer to a table.
+    /// The location of the cell in the table containing the text to style. If
+    /// `object_id` refers to a table, `cell_location` must have a value.
+    /// Otherwise, it must not.
     #[serde(rename="cellLocation")]
     pub cell_location: Option<TableCellLocation>,
 }
@@ -2403,6 +2649,61 @@ pub struct CreateLineResponse {
 impl Part for CreateLineResponse {}
 
 
+/// A List describes the look and feel of bullets belonging to paragraphs
+/// associated with a list. A paragraph that is part of a list has an implicit
+/// reference to that list's ID.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct List {
+    /// A map of nesting levels to the properties of bullets at the associated
+    /// level. A list has at most nine levels of nesting, so the possible values
+    /// for the keys of this map are 0 through 8, inclusive.
+    #[serde(rename="nestingLevel")]
+    pub nesting_level: Option<HashMap<String, NestingLevel>>,
+    /// The ID of the list.
+    #[serde(rename="listId")]
+    pub list_id: Option<String>,
+}
+
+impl Part for List {}
+
+
+/// The user-specified ID mapping for a placeholder that will be created on a
+/// slide from a specified layout.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct LayoutPlaceholderIdMapping {
+    /// The placeholder on a layout that will be applied to a slide. Only type and index are needed. For example, a
+    /// predefined `TITLE_AND_BODY` layout may usually have a TITLE placeholder
+    /// with index 0 and a BODY placeholder with index 0.
+    #[serde(rename="layoutPlaceholder")]
+    pub layout_placeholder: Option<Placeholder>,
+    /// A user-supplied object ID for the placeholder identified above that to be
+    /// created onto a slide.
+    /// 
+    /// If you specify an ID, it must be unique among all pages and page elements
+    /// in the presentation. The ID must start with an alphanumeric character or an
+    /// underscore (matches regex `[a-zA-Z0-9_]`); remaining characters
+    /// may include those as well as a hyphen or colon (matches regex
+    /// `[a-zA-Z0-9_-:]`).
+    /// The length of the ID must not be less than 5 or greater than 50.
+    /// 
+    /// If you don't specify an ID, a unique one is generated.
+    #[serde(rename="objectId")]
+    pub object_id: Option<String>,
+    /// The object ID of the placeholder on a layout that will be applied
+    /// to a slide.
+    #[serde(rename="layoutPlaceholderObjectId")]
+    pub layout_placeholder_object_id: Option<String>,
+}
+
+impl Part for LayoutPlaceholderIdMapping {}
+
+
 /// A single kind of update to apply to a presentation.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2424,6 +2725,9 @@ pub struct Request {
     /// Duplicates a slide or page element.
     #[serde(rename="duplicateObject")]
     pub duplicate_object: Option<DuplicateObjectRequest>,
+    /// Updates the styling of paragraphs within a Shape or Table.
+    #[serde(rename="updateParagraphStyle")]
+    pub update_paragraph_style: Option<UpdateParagraphStyleRequest>,
     /// Refreshes a Google Sheets chart.
     #[serde(rename="refreshSheetsChart")]
     pub refresh_sheets_chart: Option<RefreshSheetsChartRequest>,
@@ -2454,6 +2758,9 @@ pub struct Request {
     /// Deletes a page or page element from the presentation.
     #[serde(rename="deleteObject")]
     pub delete_object: Option<DeleteObjectRequest>,
+    /// Replaces all shapes matching some criteria with a Google Sheets chart.
+    #[serde(rename="replaceAllShapesWithSheetsChart")]
+    pub replace_all_shapes_with_sheets_chart: Option<ReplaceAllShapesWithSheetsChartRequest>,
     /// Creates an image.
     #[serde(rename="createImage")]
     pub create_image: Option<CreateImageRequest>,
@@ -2466,57 +2773,39 @@ pub struct Request {
     /// Creates a new shape.
     #[serde(rename="createShape")]
     pub create_shape: Option<CreateShapeRequest>,
-    /// Updates the transform of a page element.
-    #[serde(rename="updatePageElementTransform")]
-    pub update_page_element_transform: Option<UpdatePageElementTransformRequest>,
+    /// Inserts columns into a table.
+    #[serde(rename="insertTableColumns")]
+    pub insert_table_columns: Option<InsertTableColumnsRequest>,
+    /// Deletes bullets from paragraphs.
+    #[serde(rename="deleteParagraphBullets")]
+    pub delete_paragraph_bullets: Option<DeleteParagraphBulletsRequest>,
     /// Creates bullets for paragraphs.
     #[serde(rename="createParagraphBullets")]
     pub create_paragraph_bullets: Option<CreateParagraphBulletsRequest>,
-    /// Updates the styling of text within a Shape or Table.
-    #[serde(rename="updateTextStyle")]
-    pub update_text_style: Option<UpdateTextStyleRequest>,
+    /// Updates the properties of a Line.
+    #[serde(rename="updateLineProperties")]
+    pub update_line_properties: Option<UpdateLinePropertiesRequest>,
     /// Deletes text from a shape or a table cell.
     #[serde(rename="deleteText")]
     pub delete_text: Option<DeleteTextRequest>,
     /// Updates the properties of a Page.
     #[serde(rename="updatePageProperties")]
     pub update_page_properties: Option<UpdatePagePropertiesRequest>,
-    /// Updates the properties of a Line.
-    #[serde(rename="updateLineProperties")]
-    pub update_line_properties: Option<UpdateLinePropertiesRequest>,
+    /// Updates the styling of text within a Shape or Table.
+    #[serde(rename="updateTextStyle")]
+    pub update_text_style: Option<UpdateTextStyleRequest>,
     /// Updates the properties of a TableCell.
     #[serde(rename="updateTableCellProperties")]
     pub update_table_cell_properties: Option<UpdateTableCellPropertiesRequest>,
     /// Deletes a column from a table.
     #[serde(rename="deleteTableColumn")]
     pub delete_table_column: Option<DeleteTableColumnRequest>,
-    /// Inserts columns into a table.
-    #[serde(rename="insertTableColumns")]
-    pub insert_table_columns: Option<InsertTableColumnsRequest>,
+    /// Updates the transform of a page element.
+    #[serde(rename="updatePageElementTransform")]
+    pub update_page_element_transform: Option<UpdatePageElementTransformRequest>,
 }
 
 impl Part for Request {}
-
-
-/// A List describes the look and feel of bullets belonging to paragraphs
-/// associated with a list. A paragraph that is part of a list has an implicit
-/// reference to that list's ID.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct List {
-    /// A map of nesting levels to the properties of bullets at the associated
-    /// level. A list has at most nine levels of nesting, so the possible values
-    /// for the keys of this map are 0 through 8, inclusive.
-    #[serde(rename="nestingLevel")]
-    pub nesting_level: Option<HashMap<String, NestingLevel>>,
-    /// The ID of the list.
-    #[serde(rename="listId")]
-    pub list_id: Option<String>,
-}
-
-impl Part for List {}
 
 
 /// Update the properties of a TableCell.
@@ -2525,17 +2814,6 @@ impl Part for List {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UpdateTableCellPropertiesRequest {
-    /// The table range representing the subset of the table to which the updates
-    /// are applied. If a table range is not specified, the updates will apply to
-    /// the entire table.
-    #[serde(rename="tableRange")]
-    pub table_range: Option<TableRange>,
-    /// The table cell properties to update.
-    #[serde(rename="tableCellProperties")]
-    pub table_cell_properties: Option<TableCellProperties>,
-    /// The object ID of the table.
-    #[serde(rename="objectId")]
-    pub object_id: Option<String>,
     /// The fields that should be updated.
     /// 
     /// At least one field must be specified. The root `tableCellProperties` is
@@ -2548,6 +2826,17 @@ pub struct UpdateTableCellPropertiesRequest {
     /// To reset a property to its default value, include its field name in the
     /// field mask but leave the field itself unset.
     pub fields: Option<String>,
+    /// The table cell properties to update.
+    #[serde(rename="tableCellProperties")]
+    pub table_cell_properties: Option<TableCellProperties>,
+    /// The object ID of the table.
+    #[serde(rename="objectId")]
+    pub object_id: Option<String>,
+    /// The table range representing the subset of the table to which the updates
+    /// are applied. If a table range is not specified, the updates will apply to
+    /// the entire table.
+    #[serde(rename="tableRange")]
+    pub table_range: Option<TableRange>,
 }
 
 impl Part for UpdateTableCellPropertiesRequest {}
@@ -2561,11 +2850,11 @@ impl Part for UpdateTableCellPropertiesRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Range {
     /// The optional zero-based index of the end of the collection.
-    /// Required for `SPECIFIC_RANGE` delete mode.
+    /// Required for `FIXED_RANGE` ranges.
     #[serde(rename="endIndex")]
     pub end_index: Option<i32>,
     /// The optional zero-based index of the beginning of the collection.
-    /// Required for `SPECIFIC_RANGE` and `FROM_START_INDEX` ranges.
+    /// Required for `FIXED_RANGE` and `FROM_START_INDEX` ranges.
     #[serde(rename="startIndex")]
     pub start_index: Option<i32>,
     /// The type of range.
@@ -2648,12 +2937,12 @@ impl Part for CreateShapeRequest {}
 pub struct ColorStop {
     /// The color of the gradient stop.
     pub color: Option<OpaqueColor>,
-    /// The relative position of the color stop in the gradient band measured
-    /// in percentage. The value should be in the interval [0.0, 1.0].
-    pub position: Option<f32>,
     /// The alpha value of this color in the gradient band. Defaults to 1.0,
     /// fully opaque.
     pub alpha: Option<f32>,
+    /// The relative position of the color stop in the gradient band measured
+    /// in percentage. The value should be in the interval [0.0, 1.0].
+    pub position: Option<f32>,
 }
 
 impl Part for ColorStop {}
@@ -2693,6 +2982,11 @@ pub struct CreateSlideRequest {
     /// predefined layout `BLANK`.
     #[serde(rename="slideLayoutReference")]
     pub slide_layout_reference: Option<LayoutReference>,
+    /// An optional list of object ID mappings from the placeholder(s) on the layout to the placeholder(s)
+    /// that will be created on the new slide from that specified layout. Can only
+    /// be used when `slide_layout_reference` is specified.
+    #[serde(rename="placeholderIdMappings")]
+    pub placeholder_id_mappings: Option<Vec<LayoutPlaceholderIdMapping>>,
     /// A user-supplied object ID.
     /// 
     /// If you specify an ID, it must be unique among all pages and page elements
@@ -2721,10 +3015,6 @@ impl Part for CreateSlideRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreateTableRequest {
-    /// Number of columns in the table.
-    pub columns: Option<i32>,
-    /// Number of rows in the table.
-    pub rows: Option<i32>,
     /// A user-supplied object ID.
     /// 
     /// If you specify an ID, it must be unique among all pages and page elements
@@ -2737,6 +3027,10 @@ pub struct CreateTableRequest {
     /// If you don't specify an ID, a unique one is generated.
     #[serde(rename="objectId")]
     pub object_id: Option<String>,
+    /// Number of rows in the table.
+    pub rows: Option<i32>,
+    /// Number of columns in the table.
+    pub columns: Option<i32>,
     /// The element properties for the table.
     /// 
     /// The table will be created at the provided size, subject to a minimum size.
@@ -2763,6 +3057,35 @@ pub struct OutlineFill {
 }
 
 impl Part for OutlineFill {}
+
+
+/// Updates the properties of a Page.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UpdatePagePropertiesRequest {
+    /// The page properties to update.
+    #[serde(rename="pageProperties")]
+    pub page_properties: Option<PageProperties>,
+    /// The fields that should be updated.
+    /// 
+    /// At least one field must be specified. The root `pageProperties` is
+    /// implied and should not be specified. A single `"*"` can be used as
+    /// short-hand for listing every field.
+    /// 
+    /// For example to update the page background solid fill color, set `fields`
+    /// to `"pageBackgroundFill.solidFill.color"`.
+    /// 
+    /// To reset a property to its default value, include its field name in the
+    /// field mask but leave the field itself unset.
+    pub fields: Option<String>,
+    /// The object ID of the page the update is applied to.
+    #[serde(rename="objectId")]
+    pub object_id: Option<String>,
+}
+
+impl Part for UpdatePagePropertiesRequest {}
 
 
 /// Deletes an object, either pages or
@@ -2830,9 +3153,19 @@ impl Part for TableCellProperties {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Recolor {
     /// The recolor effect is represented by a gradient, which is a list of color
-    /// stops. This property is read-only.
+    /// stops.
+    /// 
+    /// The colors in the gradient will replace the corresponding colors at
+    /// the same position in the color palette and apply to the image. This
+    /// property is read-only.
     #[serde(rename="recolorStops")]
     pub recolor_stops: Option<Vec<ColorStop>>,
+    /// The name of the recolor effect.
+    /// 
+    /// The name is determined from the `recolor_stops` by matching the gradient
+    /// against the colors in the page's current color scheme. This property is
+    /// read-only.
+    pub name: Option<String>,
 }
 
 impl Part for Recolor {}
@@ -2851,23 +3184,12 @@ impl Part for Recolor {}
 pub struct BatchUpdatePresentationRequest {
     /// A list of updates to apply to the presentation.
     pub requests: Option<Vec<Request>>,
+    /// Provides control over how write requests are executed.
+    #[serde(rename="writeControl")]
+    pub write_control: Option<WriteControl>,
 }
 
 impl RequestValue for BatchUpdatePresentationRequest {}
-
-
-/// The result of creating an embedded Google Sheets chart.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CreateSheetsChartResponse {
-    /// The object ID of the created chart.
-    #[serde(rename="objectId")]
-    pub object_id: Option<String>,
-}
-
-impl Part for CreateSheetsChartResponse {}
 
 
 /// A PageElement kind representing a
@@ -2936,16 +3258,16 @@ pub struct CreateParagraphBulletsRequest {
     /// `BULLET_DISC_CIRCLE_SQUARE` preset.
     #[serde(rename="bulletPreset")]
     pub bullet_preset: Option<String>,
-    /// The range of text to apply the bullet presets to, based on TextElement indexes.
-    #[serde(rename="textRange")]
-    pub text_range: Option<Range>,
-    /// The object ID of the shape or table containing the text to add bullets to.
-    #[serde(rename="objectId")]
-    pub object_id: Option<String>,
     /// The optional table cell location if the text to be modified is in a table
     /// cell. If present, the object_id must refer to a table.
     #[serde(rename="cellLocation")]
     pub cell_location: Option<TableCellLocation>,
+    /// The object ID of the shape or table containing the text to add bullets to.
+    #[serde(rename="objectId")]
+    pub object_id: Option<String>,
+    /// The range of text to apply the bullet presets to, based on TextElement indexes.
+    #[serde(rename="textRange")]
+    pub text_range: Option<Range>,
 }
 
 impl Part for CreateParagraphBulletsRequest {}
@@ -2983,6 +3305,20 @@ pub struct DeleteTextRequest {
 }
 
 impl Part for DeleteTextRequest {}
+
+
+/// The result of replacing shapes with a Google Sheets chart.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ReplaceAllShapesWithSheetsChartResponse {
+    /// The number of shapes replaced with charts.
+    #[serde(rename="occurrencesChanged")]
+    pub occurrences_changed: Option<i32>,
+}
+
+impl Part for ReplaceAllShapesWithSheetsChartResponse {}
 
 
 /// Update the properties of an Image.
@@ -3056,33 +3392,19 @@ pub struct ThemeColorPair {
 impl Part for ThemeColorPair {}
 
 
-/// Updates the properties of a Page.
+/// A width and height.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct UpdatePagePropertiesRequest {
-    /// The page properties to update.
-    #[serde(rename="pageProperties")]
-    pub page_properties: Option<PageProperties>,
-    /// The fields that should be updated.
-    /// 
-    /// At least one field must be specified. The root `pageProperties` is
-    /// implied and should not be specified. A single `"*"` can be used as
-    /// short-hand for listing every field.
-    /// 
-    /// For example to update the page background solid fill color, set `fields`
-    /// to `"pageBackgroundFill.solidFill.color"`.
-    /// 
-    /// To reset a property to its default value, include its field name in the
-    /// field mask but leave the field itself unset.
-    pub fields: Option<String>,
-    /// The object ID of the page the update is applied to.
-    #[serde(rename="objectId")]
-    pub object_id: Option<String>,
+pub struct Size {
+    /// The width of the object.
+    pub width: Option<Dimension>,
+    /// The height of the object.
+    pub height: Option<Dimension>,
 }
 
-impl Part for UpdatePagePropertiesRequest {}
+impl Part for Size {}
 
 
 
@@ -3113,7 +3435,7 @@ impl Part for UpdatePagePropertiesRequest {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Slides::new(hyper::Client::new(), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `batch_update(...)`, `create(...)`, `get(...)` and `pages_get(...)`
+/// // like `batch_update(...)`, `create(...)`, `get(...)`, `pages_get(...)` and `pages_get_thumbnail(...)`
 /// // to build up your call.
 /// let rb = hub.presentations();
 /// # }
@@ -3221,6 +3543,28 @@ impl<'a, C, A> PresentationMethods<'a, C, A> {
             _additional_params: Default::default(),
         }
     }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Generates a thumbnail of the latest version of the specified page in the
+    /// presentation and returns a URL to the thumbnail image.
+    /// 
+    /// # Arguments
+    ///
+    /// * `presentationId` - The ID of the presentation to retrieve.
+    /// * `pageObjectId` - The object ID of the page whose thumbnail to retrieve.
+    pub fn pages_get_thumbnail(&self, presentation_id: &str, page_object_id: &str) -> PresentationPageGetThumbnailCall<'a, C, A> {
+        PresentationPageGetThumbnailCall {
+            hub: self.hub,
+            _presentation_id: presentation_id.to_string(),
+            _page_object_id: page_object_id.to_string(),
+            _thumbnail_properties_thumbnail_size: Default::default(),
+            _thumbnail_properties_mime_type: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
 }
 
 
@@ -3308,7 +3652,7 @@ impl<'a, C, A> PresentationCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/presentations";
+        let mut url = "https://slides.googleapis.com/v1/presentations".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Drive.as_ref().to_string(), ());
         }
@@ -3434,10 +3778,10 @@ impl<'a, C, A> PresentationCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -3543,7 +3887,7 @@ impl<'a, C, A> PresentationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/presentations/{+presentationId}";
+        let mut url = "https://slides.googleapis.com/v1/presentations/{+presentationId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DriveReadonly.as_ref().to_string(), ());
         }
@@ -3679,10 +4023,10 @@ impl<'a, C, A> PresentationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -3814,7 +4158,7 @@ impl<'a, C, A> PresentationBatchUpdateCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/presentations/{presentationId}:batchUpdate";
+        let mut url = "https://slides.googleapis.com/v1/presentations/{presentationId}:batchUpdate".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Drive.as_ref().to_string(), ());
         }
@@ -3971,10 +4315,10 @@ impl<'a, C, A> PresentationBatchUpdateCall<'a, C, A> where C: BorrowMut<hyper::C
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -4081,7 +4425,7 @@ impl<'a, C, A> PresentationPageGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/presentations/{presentationId}/pages/{pageObjectId}";
+        let mut url = "https://slides.googleapis.com/v1/presentations/{presentationId}/pages/{pageObjectId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DriveReadonly.as_ref().to_string(), ());
         }
@@ -4224,10 +4568,10 @@ impl<'a, C, A> PresentationPageGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -4260,5 +4604,289 @@ impl<'a, C, A> PresentationPageGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self
     }
 }
+
+
+/// Generates a thumbnail of the latest version of the specified page in the
+/// presentation and returns a URL to the thumbnail image.
+///
+/// A builder for the *pages.getThumbnail* method supported by a *presentation* resource.
+/// It is not used directly, but through a `PresentationMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_slides1 as slides1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use slides1::Slides;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Slides::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.presentations().pages_get_thumbnail("presentationId", "pageObjectId")
+///              .thumbnail_properties_thumbnail_size("aliquyam")
+///              .thumbnail_properties_mime_type("ea")
+///              .doit();
+/// # }
+/// ```
+pub struct PresentationPageGetThumbnailCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Slides<C, A>,
+    _presentation_id: String,
+    _page_object_id: String,
+    _thumbnail_properties_thumbnail_size: Option<String>,
+    _thumbnail_properties_mime_type: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for PresentationPageGetThumbnailCall<'a, C, A> {}
+
+impl<'a, C, A> PresentationPageGetThumbnailCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Thumbnail)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "slides.presentations.pages.getThumbnail",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        params.push(("presentationId", self._presentation_id.to_string()));
+        params.push(("pageObjectId", self._page_object_id.to_string()));
+        if let Some(value) = self._thumbnail_properties_thumbnail_size {
+            params.push(("thumbnailProperties.thumbnailSize", value.to_string()));
+        }
+        if let Some(value) = self._thumbnail_properties_mime_type {
+            params.push(("thumbnailProperties.mimeType", value.to_string()));
+        }
+        for &field in ["alt", "presentationId", "pageObjectId", "thumbnailProperties.thumbnailSize", "thumbnailProperties.mimeType"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://slides.googleapis.com/v1/presentations/{presentationId}/pages/{pageObjectId}/thumbnail".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::DriveReadonly.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{presentationId}", "presentationId"), ("{pageObjectId}", "pageObjectId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["pageObjectId", "presentationId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The ID of the presentation to retrieve.
+    ///
+    /// Sets the *presentation id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn presentation_id(mut self, new_value: &str) -> PresentationPageGetThumbnailCall<'a, C, A> {
+        self._presentation_id = new_value.to_string();
+        self
+    }
+    /// The object ID of the page whose thumbnail to retrieve.
+    ///
+    /// Sets the *page object id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn page_object_id(mut self, new_value: &str) -> PresentationPageGetThumbnailCall<'a, C, A> {
+        self._page_object_id = new_value.to_string();
+        self
+    }
+    /// The optional thumbnail image size.
+    /// 
+    /// If you don't specify the size, the server chooses a default size of the
+    /// image.
+    ///
+    /// Sets the *thumbnail properties.thumbnail size* query property to the given value.
+    pub fn thumbnail_properties_thumbnail_size(mut self, new_value: &str) -> PresentationPageGetThumbnailCall<'a, C, A> {
+        self._thumbnail_properties_thumbnail_size = Some(new_value.to_string());
+        self
+    }
+    /// The optional mime type of the thumbnail image.
+    /// 
+    /// If you don't specify the mime type, the default mime type will be PNG.
+    ///
+    /// Sets the *thumbnail properties.mime type* query property to the given value.
+    pub fn thumbnail_properties_mime_type(mut self, new_value: &str) -> PresentationPageGetThumbnailCall<'a, C, A> {
+        self._thumbnail_properties_mime_type = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PresentationPageGetThumbnailCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> PresentationPageGetThumbnailCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DriveReadonly`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> PresentationPageGetThumbnailCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
 
 

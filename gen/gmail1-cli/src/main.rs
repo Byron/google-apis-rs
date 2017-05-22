@@ -590,6 +590,9 @@ impl<'n> Engine<'n> {
                 "label-id" => {
                     call = call.label_id(value.unwrap_or(""));
                 },
+                "history-types" => {
+                    call = call.add_history_types(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -603,7 +606,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "label-id", "start-history-id", "max-results"].iter().map(|v|*v));
+                                                                           v.extend(["page-token", "label-id", "start-history-id", "max-results", "history-types"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2988,6 +2991,289 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _users_settings_send_as_smime_info_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.users().settings_send_as_smime_info_delete(opt.value_of("user-id").unwrap_or(""), opt.value_of("send-as-email").unwrap_or(""), opt.value_of("id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok(mut response) => {
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _users_settings_send_as_smime_info_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.users().settings_send_as_smime_info_get(opt.value_of("user-id").unwrap_or(""), opt.value_of("send-as-email").unwrap_or(""), opt.value_of("id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _users_settings_send_as_smime_info_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "pkcs12" => Some(("pkcs12", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "pem" => Some(("pem", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "expiration" => Some(("expiration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "encrypted-key-password" => Some(("encryptedKeyPassword", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "issuer-cn" => Some(("issuerCn", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "is-default" => Some(("isDefault", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["encrypted-key-password", "expiration", "id", "is-default", "issuer-cn", "pem", "pkcs12"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::SmimeInfo = json::value::from_value(object).unwrap();
+        let mut call = self.hub.users().settings_send_as_smime_info_insert(request, opt.value_of("user-id").unwrap_or(""), opt.value_of("send-as-email").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _users_settings_send_as_smime_info_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.users().settings_send_as_smime_info_list(opt.value_of("user-id").unwrap_or(""), opt.value_of("send-as-email").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _users_settings_send_as_smime_info_set_default(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.users().settings_send_as_smime_info_set_default(opt.value_of("user-id").unwrap_or(""), opt.value_of("send-as-email").unwrap_or(""), opt.value_of("id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok(mut response) => {
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _users_settings_send_as_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -4110,6 +4396,21 @@ impl<'n> Engine<'n> {
                     ("settings-send-as-patch", Some(opt)) => {
                         call_result = self._users_settings_send_as_patch(opt, dry_run, &mut err);
                     },
+                    ("settings-send-as-smime-info-delete", Some(opt)) => {
+                        call_result = self._users_settings_send_as_smime_info_delete(opt, dry_run, &mut err);
+                    },
+                    ("settings-send-as-smime-info-get", Some(opt)) => {
+                        call_result = self._users_settings_send_as_smime_info_get(opt, dry_run, &mut err);
+                    },
+                    ("settings-send-as-smime-info-insert", Some(opt)) => {
+                        call_result = self._users_settings_send_as_smime_info_insert(opt, dry_run, &mut err);
+                    },
+                    ("settings-send-as-smime-info-list", Some(opt)) => {
+                        call_result = self._users_settings_send_as_smime_info_list(opt, dry_run, &mut err);
+                    },
+                    ("settings-send-as-smime-info-set-default", Some(opt)) => {
+                        call_result = self._users_settings_send_as_smime_info_set_default(opt, dry_run, &mut err);
+                    },
                     ("settings-send-as-update", Some(opt)) => {
                         call_result = self._users_settings_send_as_update(opt, dry_run, &mut err);
                     },
@@ -4241,7 +4542,7 @@ fn main() {
     let mut exit_status = 0i32;
     let upload_value_names = ["mode", "file"];
     let arg_data = [
-        ("users", "methods: 'drafts-create', 'drafts-delete', 'drafts-get', 'drafts-list', 'drafts-send', 'drafts-update', 'get-profile', 'history-list', 'labels-create', 'labels-delete', 'labels-get', 'labels-list', 'labels-patch', 'labels-update', 'messages-attachments-get', 'messages-batch-delete', 'messages-batch-modify', 'messages-delete', 'messages-get', 'messages-import', 'messages-insert', 'messages-list', 'messages-modify', 'messages-send', 'messages-trash', 'messages-untrash', 'settings-filters-create', 'settings-filters-delete', 'settings-filters-get', 'settings-filters-list', 'settings-forwarding-addresses-create', 'settings-forwarding-addresses-delete', 'settings-forwarding-addresses-get', 'settings-forwarding-addresses-list', 'settings-get-auto-forwarding', 'settings-get-imap', 'settings-get-pop', 'settings-get-vacation', 'settings-send-as-create', 'settings-send-as-delete', 'settings-send-as-get', 'settings-send-as-list', 'settings-send-as-patch', 'settings-send-as-update', 'settings-send-as-verify', 'settings-update-auto-forwarding', 'settings-update-imap', 'settings-update-pop', 'settings-update-vacation', 'stop', 'threads-delete', 'threads-get', 'threads-list', 'threads-modify', 'threads-trash', 'threads-untrash' and 'watch'", vec![
+        ("users", "methods: 'drafts-create', 'drafts-delete', 'drafts-get', 'drafts-list', 'drafts-send', 'drafts-update', 'get-profile', 'history-list', 'labels-create', 'labels-delete', 'labels-get', 'labels-list', 'labels-patch', 'labels-update', 'messages-attachments-get', 'messages-batch-delete', 'messages-batch-modify', 'messages-delete', 'messages-get', 'messages-import', 'messages-insert', 'messages-list', 'messages-modify', 'messages-send', 'messages-trash', 'messages-untrash', 'settings-filters-create', 'settings-filters-delete', 'settings-filters-get', 'settings-filters-list', 'settings-forwarding-addresses-create', 'settings-forwarding-addresses-delete', 'settings-forwarding-addresses-get', 'settings-forwarding-addresses-list', 'settings-get-auto-forwarding', 'settings-get-imap', 'settings-get-pop', 'settings-get-vacation', 'settings-send-as-create', 'settings-send-as-delete', 'settings-send-as-get', 'settings-send-as-list', 'settings-send-as-patch', 'settings-send-as-smime-info-delete', 'settings-send-as-smime-info-get', 'settings-send-as-smime-info-insert', 'settings-send-as-smime-info-list', 'settings-send-as-smime-info-set-default', 'settings-send-as-update', 'settings-send-as-verify', 'settings-update-auto-forwarding', 'settings-update-imap', 'settings-update-pop', 'settings-update-vacation', 'stop', 'threads-delete', 'threads-get', 'threads-list', 'threads-modify', 'threads-trash', 'threads-untrash' and 'watch'", vec![
             ("drafts-create",
                     Some(r##"Creates a new draft with the DRAFT label."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gmail1_cli/users_drafts-create",
@@ -5077,7 +5378,9 @@ fn main() {
                      Some(false)),
                   ]),
             ("settings-forwarding-addresses-create",
-                    Some(r##"Creates a forwarding address. If ownership verification is required, a message will be sent to the recipient and the resource's verification status will be set to pending; otherwise, the resource will be created with verification status set to accepted."##),
+                    Some(r##"Creates a forwarding address. If ownership verification is required, a message will be sent to the recipient and the resource's verification status will be set to pending; otherwise, the resource will be created with verification status set to accepted.
+        
+        This method is only available to service account clients that have been delegated domain-wide authority."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gmail1_cli/users_settings-forwarding-addresses-create",
                   vec![
                     (Some(r##"user-id"##),
@@ -5105,7 +5408,9 @@ fn main() {
                      Some(false)),
                   ]),
             ("settings-forwarding-addresses-delete",
-                    Some(r##"Deletes the specified forwarding address and revokes any verification that may have been required."##),
+                    Some(r##"Deletes the specified forwarding address and revokes any verification that may have been required.
+        
+        This method is only available to service account clients that have been delegated domain-wide authority."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gmail1_cli/users_settings-forwarding-addresses-delete",
                   vec![
                     (Some(r##"user-id"##),
@@ -5265,7 +5570,9 @@ fn main() {
                      Some(false)),
                   ]),
             ("settings-send-as-create",
-                    Some(r##"Creates a custom "from" send-as alias. If an SMTP MSA is specified, Gmail will attempt to connect to the SMTP service to validate the configuration before creating the alias. If ownership verification is required for the alias, a message will be sent to the email address and the resource's verification status will be set to pending; otherwise, the resource will be created with verification status set to accepted. If a signature is provided, Gmail will sanitize the HTML before saving it with the alias."##),
+                    Some(r##"Creates a custom "from" send-as alias. If an SMTP MSA is specified, Gmail will attempt to connect to the SMTP service to validate the configuration before creating the alias. If ownership verification is required for the alias, a message will be sent to the email address and the resource's verification status will be set to pending; otherwise, the resource will be created with verification status set to accepted. If a signature is provided, Gmail will sanitize the HTML before saving it with the alias.
+        
+        This method is only available to service account clients that have been delegated domain-wide authority."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gmail1_cli/users_settings-send-as-create",
                   vec![
                     (Some(r##"user-id"##),
@@ -5293,7 +5600,9 @@ fn main() {
                      Some(false)),
                   ]),
             ("settings-send-as-delete",
-                    Some(r##"Deletes the specified send-as alias. Revokes any verification that may have been required for using it."##),
+                    Some(r##"Deletes the specified send-as alias. Revokes any verification that may have been required for using it.
+        
+        This method is only available to service account clients that have been delegated domain-wide authority."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gmail1_cli/users_settings-send-as-delete",
                   vec![
                     (Some(r##"user-id"##),
@@ -5365,7 +5674,9 @@ fn main() {
                      Some(false)),
                   ]),
             ("settings-send-as-patch",
-                    Some(r##"Updates a send-as alias. If a signature is provided, Gmail will sanitize the HTML before saving it with the alias. This method supports patch semantics."##),
+                    Some(r##"Updates a send-as alias. If a signature is provided, Gmail will sanitize the HTML before saving it with the alias.
+        
+        Addresses other than the primary address for the account can only be updated by service account clients that have been delegated domain-wide authority. This method supports patch semantics."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gmail1_cli/users_settings-send-as-patch",
                   vec![
                     (Some(r##"user-id"##),
@@ -5398,8 +5709,162 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("settings-send-as-smime-info-delete",
+                    Some(r##"Deletes the specified S/MIME config for the specified send-as alias."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_gmail1_cli/users_settings-send-as-smime-info-delete",
+                  vec![
+                    (Some(r##"user-id"##),
+                     None,
+                     Some(r##"The user's email address. The special value me can be used to indicate the authenticated user."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"send-as-email"##),
+                     None,
+                     Some(r##"The email address that appears in the "From:" header for mail sent using this alias."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"id"##),
+                     None,
+                     Some(r##"The immutable ID for the SmimeInfo."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                  ]),
+            ("settings-send-as-smime-info-get",
+                    Some(r##"Gets the specified S/MIME config for the specified send-as alias."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_gmail1_cli/users_settings-send-as-smime-info-get",
+                  vec![
+                    (Some(r##"user-id"##),
+                     None,
+                     Some(r##"The user's email address. The special value me can be used to indicate the authenticated user."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"send-as-email"##),
+                     None,
+                     Some(r##"The email address that appears in the "From:" header for mail sent using this alias."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"id"##),
+                     None,
+                     Some(r##"The immutable ID for the SmimeInfo."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("settings-send-as-smime-info-insert",
+                    Some(r##"Insert (upload) the given S/MIME config for the specified send-as alias. Note that pkcs12 format is required for the key."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_gmail1_cli/users_settings-send-as-smime-info-insert",
+                  vec![
+                    (Some(r##"user-id"##),
+                     None,
+                     Some(r##"The user's email address. The special value me can be used to indicate the authenticated user."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"send-as-email"##),
+                     None,
+                     Some(r##"The email address that appears in the "From:" header for mail sent using this alias."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("settings-send-as-smime-info-list",
+                    Some(r##"Lists S/MIME configs for the specified send-as alias."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_gmail1_cli/users_settings-send-as-smime-info-list",
+                  vec![
+                    (Some(r##"user-id"##),
+                     None,
+                     Some(r##"The user's email address. The special value me can be used to indicate the authenticated user."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"send-as-email"##),
+                     None,
+                     Some(r##"The email address that appears in the "From:" header for mail sent using this alias."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("settings-send-as-smime-info-set-default",
+                    Some(r##"Sets the default S/MIME config for the specified send-as alias."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_gmail1_cli/users_settings-send-as-smime-info-set-default",
+                  vec![
+                    (Some(r##"user-id"##),
+                     None,
+                     Some(r##"The user's email address. The special value me can be used to indicate the authenticated user."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"send-as-email"##),
+                     None,
+                     Some(r##"The email address that appears in the "From:" header for mail sent using this alias."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"id"##),
+                     None,
+                     Some(r##"The immutable ID for the SmimeInfo."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                  ]),
             ("settings-send-as-update",
-                    Some(r##"Updates a send-as alias. If a signature is provided, Gmail will sanitize the HTML before saving it with the alias."##),
+                    Some(r##"Updates a send-as alias. If a signature is provided, Gmail will sanitize the HTML before saving it with the alias.
+        
+        Addresses other than the primary address for the account can only be updated by service account clients that have been delegated domain-wide authority."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gmail1_cli/users_settings-send-as-update",
                   vec![
                     (Some(r##"user-id"##),
@@ -5433,7 +5898,9 @@ fn main() {
                      Some(false)),
                   ]),
             ("settings-send-as-verify",
-                    Some(r##"Sends a verification email to the specified send-as alias address. The verification status must be pending."##),
+                    Some(r##"Sends a verification email to the specified send-as alias address. The verification status must be pending.
+        
+        This method is only available to service account clients that have been delegated domain-wide authority."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gmail1_cli/users_settings-send-as-verify",
                   vec![
                     (Some(r##"user-id"##),
@@ -5455,7 +5922,9 @@ fn main() {
                      Some(true)),
                   ]),
             ("settings-update-auto-forwarding",
-                    Some(r##"Updates the auto-forwarding setting for the specified account. A verified forwarding address must be specified when auto-forwarding is enabled."##),
+                    Some(r##"Updates the auto-forwarding setting for the specified account. A verified forwarding address must be specified when auto-forwarding is enabled.
+        
+        This method is only available to service account clients that have been delegated domain-wide authority."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gmail1_cli/users_settings-update-auto-forwarding",
                   vec![
                     (Some(r##"user-id"##),
@@ -5778,7 +6247,7 @@ fn main() {
     
     let mut app = App::new("gmail1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.4+20161206")
+           .version("1.0.4+20170510")
            .about("Access Gmail mailboxes including sending user email.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_gmail1_cli")
            .arg(Arg::with_name("url")

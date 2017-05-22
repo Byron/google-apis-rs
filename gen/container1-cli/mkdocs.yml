@@ -1,4 +1,4 @@
-site_name: container v1.0.4+20160421
+site_name: container v1.0.4+20170430
 site_url: http://byron.github.io/google-apis-rs/google-container1-cli
 site_description: A complete library to interact with container (protocol v1)
 
@@ -9,16 +9,24 @@ site_dir: build_html
 
 pages:
 - ['index.md', 'Home']
+- ['projects_zones-clusters-complete-ip-rotation.md', 'Projects', 'Zones Clusters Complete Ip Rotation']
 - ['projects_zones-clusters-create.md', 'Projects', 'Zones Clusters Create']
 - ['projects_zones-clusters-delete.md', 'Projects', 'Zones Clusters Delete']
 - ['projects_zones-clusters-get.md', 'Projects', 'Zones Clusters Get']
+- ['projects_zones-clusters-legacy-abac.md', 'Projects', 'Zones Clusters Legacy Abac']
 - ['projects_zones-clusters-list.md', 'Projects', 'Zones Clusters List']
 - ['projects_zones-clusters-node-pools-create.md', 'Projects', 'Zones Clusters Node Pools Create']
 - ['projects_zones-clusters-node-pools-delete.md', 'Projects', 'Zones Clusters Node Pools Delete']
 - ['projects_zones-clusters-node-pools-get.md', 'Projects', 'Zones Clusters Node Pools Get']
 - ['projects_zones-clusters-node-pools-list.md', 'Projects', 'Zones Clusters Node Pools List']
+- ['projects_zones-clusters-node-pools-rollback.md', 'Projects', 'Zones Clusters Node Pools Rollback']
+- ['projects_zones-clusters-node-pools-set-management.md', 'Projects', 'Zones Clusters Node Pools Set Management']
+- ['projects_zones-clusters-resource-labels.md', 'Projects', 'Zones Clusters Resource Labels']
+- ['projects_zones-clusters-set-master-auth.md', 'Projects', 'Zones Clusters Set Master Auth']
+- ['projects_zones-clusters-start-ip-rotation.md', 'Projects', 'Zones Clusters Start Ip Rotation']
 - ['projects_zones-clusters-update.md', 'Projects', 'Zones Clusters Update']
 - ['projects_zones-get-serverconfig.md', 'Projects', 'Zones Get Serverconfig']
+- ['projects_zones-operations-cancel.md', 'Projects', 'Zones Operations Cancel']
 - ['projects_zones-operations-get.md', 'Projects', 'Zones Operations Get']
 - ['projects_zones-operations-list.md', 'Projects', 'Zones Operations List']
 

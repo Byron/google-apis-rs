@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Identity Toolkit* crate version *1.0.4+20161206*, where *20161206* is the exact revision of the *identitytoolkit:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
+//! This documentation was generated from *Identity Toolkit* crate version *1.0.4+20170425*, where *20170425* is the exact revision of the *identitytoolkit:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
 //! 
 //! Everything else about the *Identity Toolkit* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/identity-toolkit/v3/).
@@ -176,7 +176,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -311,8 +311,6 @@ pub struct IdentityToolkit<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-    _base_url: String,
-    _root_url: String,
 }
 
 impl<'a, C, A> Hub for IdentityToolkit<C, A> {}
@@ -325,8 +323,6 @@ impl<'a, C, A> IdentityToolkit<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
-            _base_url: "https://www.googleapis.com/identitytoolkit/v3/relyingparty/".to_string(),
-            _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
@@ -341,26 +337,6 @@ impl<'a, C, A> IdentityToolkit<C, A>
     pub fn user_agent(&mut self, agent_name: String) -> String {
         let prev = self._user_agent.clone();
         self._user_agent = agent_name;
-        prev
-    }
-
-    /// Set the base url to use in all requests to the server.
-    /// It defaults to `https://www.googleapis.com/identitytoolkit/v3/relyingparty/`.
-    ///
-    /// Returns the previously set base url.
-    pub fn base_url(&mut self, new_base_url: String) -> String {
-        let prev = self._base_url.clone();
-        self._base_url = new_base_url;
-        prev
-    }
-
-    /// Set the root url to use in all requests to the server.
-    /// It defaults to `https://www.googleapis.com/`.
-    ///
-    /// Returns the previously set root url.
-    pub fn root_url(&mut self, new_root_url: String) -> String {
-        let prev = self._root_url.clone();
-        self._root_url = new_root_url;
         prev
     }
 }
@@ -505,7 +481,7 @@ pub struct IdentitytoolkitRelyingpartyGetAccountInfoRequest {
 impl RequestValue for IdentitytoolkitRelyingpartyGetAccountInfoRequest {}
 
 
-/// Respone of downloading accounts in batch.
+/// Response of downloading accounts in batch.
 /// 
 /// # Activities
 /// 
@@ -806,6 +782,9 @@ pub struct IdentitytoolkitRelyingpartySignupNewUserRequest {
     /// The name of the user.
     #[serde(rename="displayName")]
     pub display_name: Option<String>,
+    /// Privileged caller can create user with specified user id.
+    #[serde(rename="localId")]
+    pub local_id: Option<String>,
     /// The photo url of the user.
     #[serde(rename="photoUrl")]
     pub photo_url: Option<String>,
@@ -974,15 +953,18 @@ pub struct SetAccountInfoResponse {
     /// The photo url of the user.
     #[serde(rename="photoUrl")]
     pub photo_url: Option<String>,
-    /// The Gitkit id token to login the newly sign up user.
-    #[serde(rename="idToken")]
-    pub id_token: Option<String>,
+    /// If email has been verified.
+    #[serde(rename="emailVerified")]
+    pub email_verified: Option<bool>,
     /// The user's hashed password.
     #[serde(rename="passwordHash")]
     pub password_hash: Option<String>,
     /// The new email the user attempts to change to.
     #[serde(rename="newEmail")]
     pub new_email: Option<String>,
+    /// The Gitkit id token to login the newly sign up user.
+    #[serde(rename="idToken")]
+    pub id_token: Option<String>,
     /// If idToken is STS id token, then this field will be refresh token.
     #[serde(rename="refreshToken")]
     pub refresh_token: Option<String>,
@@ -1031,6 +1013,9 @@ pub struct IdentitytoolkitRelyingpartyVerifyAssertionRequest {
     /// Whether return sts id token and refresh token instead of gitkit token.
     #[serde(rename="returnSecureToken")]
     pub return_secure_token: Option<bool>,
+    /// When it's true, automatically creates a new account if the user doesn't exist. When it's false, allows existing user to sign in normally and throws exception if the user doesn't exist.
+    #[serde(rename="autoCreate")]
+    pub auto_create: Option<bool>,
     /// Whether to return refresh tokens.
     #[serde(rename="returnRefreshToken")]
     pub return_refresh_token: Option<bool>,
@@ -1053,16 +1038,37 @@ impl RequestValue for IdentitytoolkitRelyingpartyVerifyAssertionRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Relyingparty {
+    /// whether or not the app can handle the oob code without first going to web
+    #[serde(rename="canHandleCodeInApp")]
+    pub can_handle_code_in_app: Option<bool>,
     /// The fixed string "identitytoolkit#relyingparty".
     pub kind: Option<String>,
-    /// The request type.
-    #[serde(rename="requestType")]
-    pub request_type: Option<String>,
+    /// the iOS bundle id of iOS app to handle the action code
+    #[serde(rename="iOSBundleId")]
+    pub i_os_bundle_id: Option<String>,
+    /// minimum version of the app. if the version on the device is lower than this version then the user is taken to the play store to upgrade the app
+    #[serde(rename="androidMinimumVersion")]
+    pub android_minimum_version: Option<String>,
+    /// whether or not to install the android app on the device where the link is opened
+    #[serde(rename="androidInstallApp")]
+    pub android_install_app: Option<bool>,
+    /// android package name of the android app to handle the action code
+    #[serde(rename="androidPackageName")]
+    pub android_package_name: Option<String>,
     /// The user's Gitkit login token for email change.
     #[serde(rename="idToken")]
     pub id_token: Option<String>,
     /// The recaptcha challenge presented to the user.
     pub challenge: Option<String>,
+    /// iOS app store id to download the app if it's not already installed
+    #[serde(rename="iOSAppStoreId")]
+    pub i_os_app_store_id: Option<String>,
+    /// The url to continue to the Gitkit app
+    #[serde(rename="continueUrl")]
+    pub continue_url: Option<String>,
+    /// The request type.
+    #[serde(rename="requestType")]
+    pub request_type: Option<String>,
     /// The new email if the code is for email change.
     #[serde(rename="newEmail")]
     pub new_email: Option<String>,
@@ -1241,15 +1247,18 @@ pub struct UserInfoProviderUserInfo {
     /// User's identifier at IDP.
     #[serde(rename="federatedId")]
     pub federated_id: Option<String>,
-    /// The IdP ID. For white listed IdPs it's a short domain name, e.g., google.com, aol.com, live.net and yahoo.com. For other OpenID IdPs it's the OP identifier.
-    #[serde(rename="providerId")]
-    pub provider_id: Option<String>,
     /// The user's display name at the IDP.
     #[serde(rename="displayName")]
     pub display_name: Option<String>,
     /// The user's photo url at the IDP.
     #[serde(rename="photoUrl")]
     pub photo_url: Option<String>,
+    /// The IdP ID. For white listed IdPs it's a short domain name, e.g., google.com, aol.com, live.net and yahoo.com. For other OpenID IdPs it's the OP identifier.
+    #[serde(rename="providerId")]
+    pub provider_id: Option<String>,
+    /// User's phone number.
+    #[serde(rename="phoneNumber")]
+    pub phone_number: Option<String>,
     /// User's raw identifier directly returned from IDP.
     #[serde(rename="rawId")]
     pub raw_id: Option<String>,
@@ -1333,6 +1342,9 @@ pub struct VerifyAssertionResponse {
     /// The URI of the public accessible profiel picture.
     #[serde(rename="photoUrl")]
     pub photo_url: Option<String>,
+    /// True if it's a new user sign-in, false if it's a returning user.
+    #[serde(rename="isNewUser")]
+    pub is_new_user: Option<bool>,
     /// It's the identifier param in the createAuthUri request if the identifier is an email. It can be used to check whether the user input email is different from the asserted email.
     #[serde(rename="inputEmail")]
     pub input_email: Option<String>,
@@ -1587,6 +1599,9 @@ pub struct UserInfo {
     pub email_verified: Option<bool>,
     /// Version of the user's password.
     pub version: Option<i32>,
+    /// User's phone number.
+    #[serde(rename="phoneNumber")]
+    pub phone_number: Option<String>,
     /// The IDP of the user.
     #[serde(rename="providerUserInfo")]
     pub provider_user_info: Option<Vec<UserInfoProviderUserInfo>>,
@@ -2081,7 +2096,7 @@ impl<'a, C, A> RelyingpartyGetOobConfirmationCodeCall<'a, C, A> where C: BorrowM
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "getOobConfirmationCode";
+        let mut url = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/getOobConfirmationCode".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -2314,7 +2329,7 @@ impl<'a, C, A> RelyingpartySignupNewUserCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "signupNewUser";
+        let mut url = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -2547,7 +2562,7 @@ impl<'a, C, A> RelyingpartyCreateAuthUriCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "createAuthUri";
+        let mut url = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/createAuthUri".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -2780,7 +2795,7 @@ impl<'a, C, A> RelyingpartySignOutUserCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "signOutUser";
+        let mut url = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/signOutUser".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -3013,7 +3028,7 @@ impl<'a, C, A> RelyingpartyVerifyAssertionCall<'a, C, A> where C: BorrowMut<hype
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "verifyAssertion";
+        let mut url = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyAssertion".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -3246,7 +3261,7 @@ impl<'a, C, A> RelyingpartyUploadAccountCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "uploadAccount";
+        let mut url = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/uploadAccount".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -3479,7 +3494,7 @@ impl<'a, C, A> RelyingpartyGetAccountInfoCall<'a, C, A> where C: BorrowMut<hyper
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "getAccountInfo";
+        let mut url = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/getAccountInfo".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -3712,7 +3727,7 @@ impl<'a, C, A> RelyingpartyVerifyCustomTokenCall<'a, C, A> where C: BorrowMut<hy
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "verifyCustomToken";
+        let mut url = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyCustomToken".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -3945,7 +3960,7 @@ impl<'a, C, A> RelyingpartyResetPasswordCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "resetPassword";
+        let mut url = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/resetPassword".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -4178,7 +4193,7 @@ impl<'a, C, A> RelyingpartyDownloadAccountCall<'a, C, A> where C: BorrowMut<hype
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "downloadAccount";
+        let mut url = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/downloadAccount".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -4411,7 +4426,7 @@ impl<'a, C, A> RelyingpartySetAccountInfoCall<'a, C, A> where C: BorrowMut<hyper
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "setAccountInfo";
+        let mut url = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/setAccountInfo".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -4644,7 +4659,7 @@ impl<'a, C, A> RelyingpartyDeleteAccountCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "deleteAccount";
+        let mut url = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/deleteAccount".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -4870,7 +4885,7 @@ impl<'a, C, A> RelyingpartyGetPublicKeyCall<'a, C, A> where C: BorrowMut<hyper::
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "publicKeys";
+        let mut url = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/publicKeys".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5072,7 +5087,7 @@ impl<'a, C, A> RelyingpartyGetRecaptchaParamCall<'a, C, A> where C: BorrowMut<hy
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "getRecaptchaParam";
+        let mut url = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/getRecaptchaParam".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5281,7 +5296,7 @@ impl<'a, C, A> RelyingpartyVerifyPasswordCall<'a, C, A> where C: BorrowMut<hyper
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "verifyPassword";
+        let mut url = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5514,7 +5529,7 @@ impl<'a, C, A> RelyingpartySetProjectConfigCall<'a, C, A> where C: BorrowMut<hyp
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "setProjectConfig";
+        let mut url = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/setProjectConfig".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5750,7 +5765,7 @@ impl<'a, C, A> RelyingpartyGetProjectConfigCall<'a, C, A> where C: BorrowMut<hyp
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "getProjectConfig";
+        let mut url = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/getProjectConfig".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5896,5 +5911,6 @@ impl<'a, C, A> RelyingpartyGetProjectConfigCall<'a, C, A> where C: BorrowMut<hyp
         self
     }
 }
+
 
 

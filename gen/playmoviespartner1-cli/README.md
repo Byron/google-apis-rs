@@ -25,17 +25,13 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Play Movies* API at revision *20160518*. The CLI is at version *1.0.4*.
+This documentation was generated from the *Play Movies* API at revision *20170516*. The CLI is at version *1.0.4*.
 
 ```bash
 playmoviespartner1 [options]
         accounts
                 avails-get <account-id> <avail-id> [-p <v>]... [-o <out>]
                 avails-list <account-id> [-p <v>]... [-o <out>]
-                components-list <account-id> [-p <v>]... [-o <out>]
-                components-type-get <account-id> <component-id> <type> [-p <v>]... [-o <out>]
-                experience-locales-get <account-id> <el-id> [-p <v>]... [-o <out>]
-                experience-locales-list <account-id> [-p <v>]... [-o <out>]
                 orders-get <account-id> <order-id> [-p <v>]... [-o <out>]
                 orders-list <account-id> [-p <v>]... [-o <out>]
                 store-infos-country-get <account-id> <video-id> <country> [-p <v>]... [-o <out>]

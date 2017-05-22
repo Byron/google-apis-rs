@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *plusDomains* crate version *1.0.4+20161214*, where *20161214* is the exact revision of the *plusDomains:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
+//! This documentation was generated from *plusDomains* crate version *1.0.4+20170410*, where *20170410* is the exact revision of the *plusDomains:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
 //! 
 //! Everything else about the *plusDomains* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/+/domains/).
@@ -193,7 +193,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -356,8 +356,6 @@ pub struct PlusDomains<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-    _base_url: String,
-    _root_url: String,
 }
 
 impl<'a, C, A> Hub for PlusDomains<C, A> {}
@@ -370,8 +368,6 @@ impl<'a, C, A> PlusDomains<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
-            _base_url: "https://www.googleapis.com/plusDomains/v1/".to_string(),
-            _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
@@ -401,26 +397,6 @@ impl<'a, C, A> PlusDomains<C, A>
     pub fn user_agent(&mut self, agent_name: String) -> String {
         let prev = self._user_agent.clone();
         self._user_agent = agent_name;
-        prev
-    }
-
-    /// Set the base url to use in all requests to the server.
-    /// It defaults to `https://www.googleapis.com/plusDomains/v1/`.
-    ///
-    /// Returns the previously set base url.
-    pub fn base_url(&mut self, new_base_url: String) -> String {
-        let prev = self._base_url.clone();
-        self._base_url = new_base_url;
-        prev
-    }
-
-    /// Set the root url to use in all requests to the server.
-    /// It defaults to `https://www.googleapis.com/`.
-    ///
-    /// Returns the previously set root url.
-    pub fn root_url(&mut self, new_root_url: String) -> String {
-        let prev = self._root_url.clone();
-        self._root_url = new_root_url;
         prev
     }
 }
@@ -2651,7 +2627,7 @@ impl<'a, C, A> CircleRemovePeopleCall<'a, C, A> where C: BorrowMut<hyper::Client
         }
 
 
-        let mut url = self.hub._base_url.clone() + "circles/{circleId}/people";
+        let mut url = "https://www.googleapis.com/plusDomains/v1/circles/{circleId}/people".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::PluCircleWrite.as_ref().to_string(), ());
         }
@@ -2899,7 +2875,7 @@ impl<'a, C, A> CircleInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "people/{userId}/circles";
+        let mut url = "https://www.googleapis.com/plusDomains/v1/people/{userId}/circles".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::PluCircleWrite.as_ref().to_string(), ());
         }
@@ -3172,7 +3148,7 @@ impl<'a, C, A> CircleAddPeopleCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "circles/{circleId}/people";
+        let mut url = "https://www.googleapis.com/plusDomains/v1/circles/{circleId}/people".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::PluCircleWrite.as_ref().to_string(), ());
         }
@@ -3423,7 +3399,7 @@ impl<'a, C, A> CircleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "circles/{circleId}";
+        let mut url = "https://www.googleapis.com/plusDomains/v1/circles/{circleId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::PluCircleRead.as_ref().to_string(), ());
         }
@@ -3668,7 +3644,7 @@ impl<'a, C, A> CircleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "people/{userId}/circles";
+        let mut url = "https://www.googleapis.com/plusDomains/v1/people/{userId}/circles".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::PluCircleRead.as_ref().to_string(), ());
         }
@@ -3924,7 +3900,7 @@ impl<'a, C, A> CircleUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "circles/{circleId}";
+        let mut url = "https://www.googleapis.com/plusDomains/v1/circles/{circleId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::PluCircleWrite.as_ref().to_string(), ());
         }
@@ -4190,7 +4166,7 @@ impl<'a, C, A> CirclePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "circles/{circleId}";
+        let mut url = "https://www.googleapis.com/plusDomains/v1/circles/{circleId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::PluCircleWrite.as_ref().to_string(), ());
         }
@@ -4448,7 +4424,7 @@ impl<'a, C, A> CircleRemoveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         }
 
 
-        let mut url = self.hub._base_url.clone() + "circles/{circleId}";
+        let mut url = "https://www.googleapis.com/plusDomains/v1/circles/{circleId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::PluCircleWrite.as_ref().to_string(), ());
         }
@@ -4685,7 +4661,7 @@ impl<'a, C, A> ActivityInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "people/{userId}/activities";
+        let mut url = "https://www.googleapis.com/plusDomains/v1/people/{userId}/activities".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::PluLogin.as_ref().to_string(), ());
         }
@@ -4951,7 +4927,7 @@ impl<'a, C, A> ActivityGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "activities/{activityId}";
+        let mut url = "https://www.googleapis.com/plusDomains/v1/activities/{activityId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::PluLogin.as_ref().to_string(), ());
         }
@@ -5198,7 +5174,7 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "people/{userId}/activities/{collection}";
+        let mut url = "https://www.googleapis.com/plusDomains/v1/people/{userId}/activities/{collection}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::PluLogin.as_ref().to_string(), ());
         }
@@ -5467,7 +5443,7 @@ impl<'a, C, A> PeopleListByCircleCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "circles/{circleId}/people";
+        let mut url = "https://www.googleapis.com/plusDomains/v1/circles/{circleId}/people".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::PluCircleRead.as_ref().to_string(), ());
         }
@@ -5733,7 +5709,7 @@ impl<'a, C, A> PeopleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "people/{userId}/people/{collection}";
+        let mut url = "https://www.googleapis.com/plusDomains/v1/people/{userId}/people/{collection}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::PluCircleRead.as_ref().to_string(), ());
         }
@@ -5999,7 +5975,7 @@ impl<'a, C, A> PeopleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "people/{userId}";
+        let mut url = "https://www.googleapis.com/plusDomains/v1/people/{userId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::PluLogin.as_ref().to_string(), ());
         }
@@ -6246,7 +6222,7 @@ impl<'a, C, A> PeopleListByActivityCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "activities/{activityId}/people/{collection}";
+        let mut url = "https://www.googleapis.com/plusDomains/v1/activities/{activityId}/people/{collection}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::PluLogin.as_ref().to_string(), ());
         }
@@ -6518,9 +6494,9 @@ impl<'a, C, A> MediaInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         let (mut url, upload_type) =
             if protocol == "simple" {
-                (self.hub._root_url.clone() + "/upload/plusDomains/v1/people/{userId}/media/{collection}", "multipart")
+                ("https://www.googleapis.com/upload/plusDomains/v1/people/{userId}/media/{collection}".to_string(), "multipart")
             } else if protocol == "resumable" {
-                (self.hub._root_url.clone() + "/resumable/upload/plusDomains/v1/people/{userId}/media/{collection}", "resumable")
+                ("https://www.googleapis.com/resumable/upload/plusDomains/v1/people/{userId}/media/{collection}".to_string(), "resumable")
             } else {
                 unreachable!()
             };
@@ -6899,7 +6875,7 @@ impl<'a, C, A> CommentInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "activities/{activityId}/comments";
+        let mut url = "https://www.googleapis.com/plusDomains/v1/activities/{activityId}/comments".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::PluLogin.as_ref().to_string(), ());
         }
@@ -7173,7 +7149,7 @@ impl<'a, C, A> CommentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "activities/{activityId}/comments";
+        let mut url = "https://www.googleapis.com/plusDomains/v1/activities/{activityId}/comments".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::PluLogin.as_ref().to_string(), ());
         }
@@ -7429,7 +7405,7 @@ impl<'a, C, A> CommentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "comments/{commentId}";
+        let mut url = "https://www.googleapis.com/plusDomains/v1/comments/{commentId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::PluLogin.as_ref().to_string(), ());
         }
@@ -7674,7 +7650,7 @@ impl<'a, C, A> AudienceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "people/{userId}/audiences";
+        let mut url = "https://www.googleapis.com/plusDomains/v1/people/{userId}/audiences".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::PluCircleRead.as_ref().to_string(), ());
         }
@@ -7851,5 +7827,6 @@ impl<'a, C, A> AudienceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self
     }
 }
+
 
 

@@ -98,62 +98,6 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _methods_get_google_service_account(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.methods().get_google_service_account();
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "project-id" => {
-                    call = call.project_id(value.unwrap_or(""));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["project-id"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
     fn _transfer_jobs_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -192,21 +136,21 @@ impl<'n> Engine<'n> {
                     "transfer-spec.aws-s3-data-source.bucket-name" => Some(("transferSpec.awsS3DataSource.bucketName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "deletion-time" => Some(("deletionTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "schedule.start-time-of-day.hours" => Some(("schedule.startTimeOfDay.hours", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "schedule.start-time-of-day.nanos" => Some(("schedule.startTimeOfDay.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "schedule.start-time-of-day.minutes" => Some(("schedule.startTimeOfDay.minutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "schedule.start-time-of-day.seconds" => Some(("schedule.startTimeOfDay.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "schedule.schedule-start-date.month" => Some(("schedule.scheduleStartDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "schedule.schedule-start-date.day" => Some(("schedule.scheduleStartDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "schedule.schedule-start-date.year" => Some(("schedule.scheduleStartDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "schedule.start-time-of-day.hours" => Some(("schedule.startTimeOfDay.hours", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "schedule.start-time-of-day.seconds" => Some(("schedule.startTimeOfDay.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "schedule.start-time-of-day.minutes" => Some(("schedule.startTimeOfDay.minutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "schedule.start-time-of-day.nanos" => Some(("schedule.startTimeOfDay.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "schedule.schedule-end-date.month" => Some(("schedule.scheduleEndDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "schedule.schedule-end-date.day" => Some(("schedule.scheduleEndDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "schedule.schedule-end-date.year" => Some(("schedule.scheduleEndDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "last-modification-time" => Some(("lastModificationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["access-key-id", "aws-access-key", "aws-s3-data-source", "bucket-name", "creation-time", "day", "delete-objects-from-source-after-transfer", "delete-objects-unique-in-sink", "deletion-time", "description", "exclude-prefixes", "gcs-data-sink", "gcs-data-source", "hours", "http-data-source", "include-prefixes", "last-modification-time", "list-url", "max-time-elapsed-since-last-modification", "min-time-elapsed-since-last-modification", "minutes", "month", "name", "nanos", "object-conditions", "overwrite-objects-already-existing-in-sink", "project-id", "schedule", "schedule-end-date", "schedule-start-date", "seconds", "secret-access-key", "start-time-of-day", "status", "transfer-options", "transfer-spec", "year"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -426,21 +370,21 @@ impl<'n> Engine<'n> {
                     "transfer-job.transfer-spec.aws-s3-data-source.bucket-name" => Some(("transferJob.transferSpec.awsS3DataSource.bucketName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-job.status" => Some(("transferJob.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-job.deletion-time" => Some(("transferJob.deletionTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-job.schedule.start-time-of-day.hours" => Some(("transferJob.schedule.startTimeOfDay.hours", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "transfer-job.schedule.start-time-of-day.nanos" => Some(("transferJob.schedule.startTimeOfDay.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "transfer-job.schedule.start-time-of-day.minutes" => Some(("transferJob.schedule.startTimeOfDay.minutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "transfer-job.schedule.start-time-of-day.seconds" => Some(("transferJob.schedule.startTimeOfDay.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "transfer-job.schedule.schedule-start-date.month" => Some(("transferJob.schedule.scheduleStartDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "transfer-job.schedule.schedule-start-date.day" => Some(("transferJob.schedule.scheduleStartDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "transfer-job.schedule.schedule-start-date.year" => Some(("transferJob.schedule.scheduleStartDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "transfer-job.schedule.start-time-of-day.hours" => Some(("transferJob.schedule.startTimeOfDay.hours", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "transfer-job.schedule.start-time-of-day.seconds" => Some(("transferJob.schedule.startTimeOfDay.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "transfer-job.schedule.start-time-of-day.minutes" => Some(("transferJob.schedule.startTimeOfDay.minutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "transfer-job.schedule.start-time-of-day.nanos" => Some(("transferJob.schedule.startTimeOfDay.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "transfer-job.schedule.schedule-end-date.month" => Some(("transferJob.schedule.scheduleEndDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "transfer-job.schedule.schedule-end-date.day" => Some(("transferJob.schedule.scheduleEndDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "transfer-job.schedule.schedule-end-date.year" => Some(("transferJob.schedule.scheduleEndDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "transfer-job.project-id" => Some(("transferJob.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-job.description" => Some(("transferJob.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-job.last-modification-time" => Some(("transferJob.lastModificationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-job.creation-time" => Some(("transferJob.creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-job.name" => Some(("transferJob.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "transfer-job.description" => Some(("transferJob.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["access-key-id", "aws-access-key", "aws-s3-data-source", "bucket-name", "creation-time", "day", "delete-objects-from-source-after-transfer", "delete-objects-unique-in-sink", "deletion-time", "description", "exclude-prefixes", "gcs-data-sink", "gcs-data-source", "hours", "http-data-source", "include-prefixes", "last-modification-time", "list-url", "max-time-elapsed-since-last-modification", "min-time-elapsed-since-last-modification", "minutes", "month", "name", "nanos", "object-conditions", "overwrite-objects-already-existing-in-sink", "project-id", "schedule", "schedule-end-date", "schedule-start-date", "seconds", "secret-access-key", "start-time-of-day", "status", "transfer-job", "transfer-options", "transfer-spec", "update-transfer-job-field-mask", "year"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -904,17 +848,6 @@ impl<'n> Engine<'n> {
                     }
                 }
             },
-            ("methods", Some(opt)) => {
-                match opt.subcommand() {
-                    ("get-google-service-account", Some(opt)) => {
-                        call_result = self._methods_get_google_service_account(opt, dry_run, &mut err);
-                    },
-                    _ => {
-                        err.issues.push(CLIError::MissingMethodError("methods".to_string()));
-                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
-                    }
-                }
-            },
             ("transfer-jobs", Some(opt)) => {
                 match opt.subcommand() {
                     ("create", Some(opt)) => {
@@ -1049,34 +982,24 @@ fn main() {
     let arg_data = [
         ("google-service-accounts", "methods: 'get'", vec![
             ("get",
-                    Some(r##"Returns the Google service account that is used by Storage Transfer Service to access buckets in the project where transfers run or in other projects. Each Google service account is associated with one Google Developers Console project. Users should add this service account to the Google Cloud Storage bucket ACLs to grant access to Storage Transfer Service. This service account is created and owned by Storage Transfer Service and can only be used by Storage Transfer Service."##),
+                    Some(r##"Returns the Google service account that is used by Storage Transfer
+        Service to access buckets in the project where transfers
+        run or in other projects. Each Google service account is associated
+        with one Google Cloud Platform Console project. Users
+        should add this service account to the Google Cloud Storage bucket
+        ACLs to grant access to Storage Transfer Service. This service
+        account is created and owned by Storage Transfer Service and can
+        only be used by Storage Transfer Service."##),
                     "Details at http://byron.github.io/google-apis-rs/google_storagetransfer1_cli/google-service-accounts_get",
                   vec![
                     (Some(r##"project-id"##),
                      None,
-                     Some(r##"The ID of the Google Developers Console project that the Google service account is associated with. Required."##),
+                     Some(r##"The ID of the Google Cloud Platform Console project that the Google service
+        account is associated with.
+        Required."##),
                      Some(true),
                      Some(false)),
         
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ]),
-        
-        ("methods", "methods: 'get-google-service-account'", vec![
-            ("get-google-service-account",
-                    Some(r##"Returns the Google service account that is used by Storage Transfer Service to access buckets in the project where transfers run or in other projects. Each Google service account is associated with one Google Developers Console project. Users should add this service account to the Google Cloud Storage bucket ACLs to grant access to Storage Transfer Service. This service account is created and owned by Storage Transfer Service and can only be used by Storage Transfer Service."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_storagetransfer1_cli/methods_get-google-service-account",
-                  vec![
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -1120,7 +1043,8 @@ fn main() {
                   vec![
                     (Some(r##"job-name"##),
                      None,
-                     Some(r##"The job to get. Required."##),
+                     Some(r##"The job to get.
+        Required."##),
                      Some(true),
                      Some(false)),
         
@@ -1153,12 +1077,15 @@ fn main() {
                      Some(false)),
                   ]),
             ("patch",
-                    Some(r##"Updates a transfer job. Updating a job's transfer spec does not affect transfer operations that are running already. Updating the scheduling of a job is not allowed."##),
+                    Some(r##"Updates a transfer job. Updating a job's transfer spec does not affect
+        transfer operations that are running already. Updating the scheduling
+        of a job is not allowed."##),
                     "Details at http://byron.github.io/google-apis-rs/google_storagetransfer1_cli/transfer-jobs_patch",
                   vec![
                     (Some(r##"job-name"##),
                      None,
-                     Some(r##"The name of job to update. Required."##),
+                     Some(r##"The name of job to update.
+        Required."##),
                      Some(true),
                      Some(false)),
         
@@ -1228,7 +1155,9 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Gets the latest state of a long-running operation. Clients can use this method to poll the operation result at intervals as recommended by the API service."##),
+                    Some(r##"Gets the latest state of a long-running operation.  Clients can use this
+        method to poll the operation result at intervals as recommended by the API
+        service."##),
                     "Details at http://byron.github.io/google-apis-rs/google_storagetransfer1_cli/transfer-operations_get",
                   vec![
                     (Some(r##"name"##),
@@ -1250,7 +1179,11 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding below allows API services to override the binding to use different resource name schemes, such as `users/*/operations`."##),
+                    Some(r##"Lists operations that match the specified filter in the request. If the
+        server doesn't support this method, it returns `UNIMPLEMENTED`.
+        
+        NOTE: the `name` binding below allows API services to override the binding
+        to use different resource name schemes, such as `users/*/operations`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_storagetransfer1_cli/transfer-operations_list",
                   vec![
                     (Some(r##"name"##),
@@ -1277,7 +1210,8 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the transfer operation. Required."##),
+                     Some(r##"The name of the transfer operation.
+        Required."##),
                      Some(true),
                      Some(false)),
         
@@ -1305,7 +1239,8 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the transfer operation. Required."##),
+                     Some(r##"The name of the transfer operation.
+        Required."##),
                      Some(true),
                      Some(false)),
         
@@ -1333,7 +1268,7 @@ fn main() {
     
     let mut app = App::new("storagetransfer1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.4+20150811")
+           .version("1.0.4+20170515")
            .about("Transfers data from external data sources to a Google Cloud Storage bucket or between Google Cloud Storage buckets.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_storagetransfer1_cli")
            .arg(Arg::with_name("url")

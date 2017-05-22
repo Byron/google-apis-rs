@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Deployment Manager* crate version *1.0.4+20161209*, where *20161209* is the exact revision of the *deploymentmanager:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
+//! This documentation was generated from *Deployment Manager* crate version *1.0.4+20170501*, where *20170501* is the exact revision of the *deploymentmanager:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
 //! 
 //! Everything else about the *Deployment Manager* *v2* API can be found at the
 //! [official documentation site](https://cloud.google.com/deployment-manager/).
@@ -197,7 +197,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -343,8 +343,6 @@ pub struct DeploymentManager<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-    _base_url: String,
-    _root_url: String,
 }
 
 impl<'a, C, A> Hub for DeploymentManager<C, A> {}
@@ -357,8 +355,6 @@ impl<'a, C, A> DeploymentManager<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
-            _base_url: "https://www.googleapis.com/deploymentmanager/v2/projects/".to_string(),
-            _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
@@ -387,39 +383,23 @@ impl<'a, C, A> DeploymentManager<C, A>
         self._user_agent = agent_name;
         prev
     }
-
-    /// Set the base url to use in all requests to the server.
-    /// It defaults to `https://www.googleapis.com/deploymentmanager/v2/projects/`.
-    ///
-    /// Returns the previously set base url.
-    pub fn base_url(&mut self, new_base_url: String) -> String {
-        let prev = self._base_url.clone();
-        self._base_url = new_base_url;
-        prev
-    }
-
-    /// Set the root url to use in all requests to the server.
-    /// It defaults to `https://www.googleapis.com/`.
-    ///
-    /// Returns the previously set root url.
-    pub fn root_url(&mut self, new_root_url: String) -> String {
-        let prev = self._root_url.clone();
-        self._root_url = new_root_url;
-        prev
-    }
 }
 
 
 // ############
 // SCHEMAS ###
 // ##########
-/// Provides the configuration for a sub-type of logging.
+/// Provides the configuration for logging a type of permissions. Example:
+/// 
+/// { "audit_log_configs": [ { "log_type": "DATA_READ", "exempted_members": [ "user:foo@gmail.com" ] }, { "log_type": "DATA_WRITE", } ] }
+/// 
+/// This enables 'DATA_READ' and 'DATA_WRITE' logging, while exempting foo@gmail.com from DATA_READ logging.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AuditLogConfig {
-    /// Specifies the identities that are exempted from this type of logging Follows the same format of Binding.members.
+    /// Specifies the identities that do not cause logging for this type of permission. Follows the same format of [Binding.members][].
     #[serde(rename="exemptedMembers")]
     pub exempted_members: Option<Vec<String>>,
     /// The log type that this config enables.
@@ -533,7 +513,7 @@ pub struct Operation {
     /// [Output Only] Reserved for future use.
     #[serde(rename="clientOperationId")]
     pub client_operation_id: Option<String>,
-    /// [Output Only] Creation timestamp in RFC3339 text format.
+    /// [Deprecated] This field is deprecated.
     #[serde(rename="creationTimestamp")]
     pub creation_timestamp: Option<String>,
     /// [Output Only] The unique identifier for the resource. This identifier is defined by the server.
@@ -728,6 +708,8 @@ impl ResponseResult for Manifest {}
 pub struct DeploymentUpdate {
     /// [Output Only] Map of labels; provided by the client when the resource is created or updated. Specifically: Label keys must be between 1 and 63 characters long and must conform to the following regular expression: [a-z]([-a-z0-9]*[a-z0-9])? Label values must be between 0 and 63 characters long and must conform to the regular expression ([a-z]([-a-z0-9]*[a-z0-9])?)?
     pub labels: Option<Vec<DeploymentUpdateLabelEntry>>,
+    /// [Output Only] An optional user-provided description of the deployment after the current update has been applied.
+    pub description: Option<String>,
     /// [Output Only] URL of the manifest representing the update configuration of this deployment.
     pub manifest: Option<String>,
 }
@@ -840,9 +822,7 @@ impl Part for ResourceUpdate {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Policy {
-    /// Specifies audit logging configs for "data access". "data access": generally refers to data reads/writes and admin reads. "admin activity": generally refers to admin writes.
-    /// 
-    /// Note: `AuditConfig` doesn't apply to "admin activity", which always enables audit logging.
+    /// Specifies cloud audit logging configuration for this policy.
     #[serde(rename="auditConfigs")]
     pub audit_configs: Option<Vec<AuditConfig>>,
     /// Version of the `Policy`. The default version is 0.
@@ -1130,19 +1110,27 @@ impl NestedType for OperationError {}
 impl Part for OperationError {}
 
 
-/// Provides the configuration for non-admin_activity logging for a service. Controls exemptions and specific log sub-types.
+/// Specifies the audit configuration for a service. The configuration determines which permission types are logged, and what identities, if any, are exempted from logging. An AuditConfig must have one or more AuditLogConfigs.
+/// 
+/// If there are AuditConfigs for both `allServices` and a specific service, the union of the two AuditConfigs is used for that service: the log_types specified in each AuditConfig are enabled, and the exempted_members in each AuditConfig are exempted.
+/// 
+/// Example Policy with multiple AuditConfigs:
+/// 
+/// { "audit_configs": [ { "service": "allServices" "audit_log_configs": [ { "log_type": "DATA_READ", "exempted_members": [ "user:foo@gmail.com" ] }, { "log_type": "DATA_WRITE", }, { "log_type": "ADMIN_READ", } ] }, { "service": "fooservice.googleapis.com" "audit_log_configs": [ { "log_type": "DATA_READ", }, { "log_type": "DATA_WRITE", "exempted_members": [ "user:bar@gmail.com" ] } ] } ] }
+/// 
+/// For fooservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ logging. It also exempts foo@gmail.com from DATA_READ logging, and bar@gmail.com from DATA_WRITE logging.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AuditConfig {
-    /// Specifies the identities that are exempted from "data access" audit logging for the `service` specified above. Follows the same format of Binding.members.
+    /// 
     #[serde(rename="exemptedMembers")]
     pub exempted_members: Option<Vec<String>>,
-    /// The configuration for each type of logging
+    /// The configuration for logging of each type of permission.
     #[serde(rename="auditLogConfigs")]
     pub audit_log_configs: Option<Vec<AuditLogConfig>>,
-    /// Specifies a service that will be enabled for audit logging. For example, `resourcemanager`, `storage`, `compute`. `allServices` is a special value that covers all services.
+    /// Specifies a service that will be enabled for audit logging. For example, `storage.googleapis.com`, `cloudsql.googleapis.com`. `allServices` is a special value that covers all services.
     pub service: Option<String>,
 }
 
@@ -2002,7 +1990,7 @@ impl<'a, C, A> OperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{project}/global/operations/{operation}";
+        let mut url = "https://www.googleapis.com/deploymentmanager/v2/projects/{project}/global/operations/{operation}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::NdevCloudmanReadonly.as_ref().to_string(), ());
         }
@@ -2267,7 +2255,7 @@ impl<'a, C, A> OperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{project}/global/operations";
+        let mut url = "https://www.googleapis.com/deploymentmanager/v2/projects/{project}/global/operations".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::NdevCloudmanReadonly.as_ref().to_string(), ());
         }
@@ -2398,7 +2386,7 @@ impl<'a, C, A> OperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._order_by = Some(new_value.to_string());
         self
     }
-    /// The maximum number of results per page that should be returned. If the number of available results is larger than maxResults, Compute Engine returns a nextPageToken that can be used to get the next page of results in subsequent list requests.
+    /// The maximum number of results per page that should be returned. If the number of available results is larger than maxResults, Compute Engine returns a nextPageToken that can be used to get the next page of results in subsequent list requests. Acceptable values are 0 to 500, inclusive. (Default: 500)
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> OperationListCall<'a, C, A> {
@@ -2564,7 +2552,7 @@ impl<'a, C, A> ManifestListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{project}/global/deployments/{deployment}/manifests";
+        let mut url = "https://www.googleapis.com/deploymentmanager/v2/projects/{project}/global/deployments/{deployment}/manifests".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::NdevCloudmanReadonly.as_ref().to_string(), ());
         }
@@ -2705,7 +2693,7 @@ impl<'a, C, A> ManifestListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._order_by = Some(new_value.to_string());
         self
     }
-    /// The maximum number of results per page that should be returned. If the number of available results is larger than maxResults, Compute Engine returns a nextPageToken that can be used to get the next page of results in subsequent list requests.
+    /// The maximum number of results per page that should be returned. If the number of available results is larger than maxResults, Compute Engine returns a nextPageToken that can be used to get the next page of results in subsequent list requests. Acceptable values are 0 to 500, inclusive. (Default: 500)
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> ManifestListCall<'a, C, A> {
@@ -2853,7 +2841,7 @@ impl<'a, C, A> ManifestGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{project}/global/deployments/{deployment}/manifests/{manifest}";
+        let mut url = "https://www.googleapis.com/deploymentmanager/v2/projects/{project}/global/deployments/{deployment}/manifests/{manifest}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::NdevCloudmanReadonly.as_ref().to_string(), ());
         }
@@ -3128,7 +3116,7 @@ impl<'a, C, A> TypeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{project}/global/types";
+        let mut url = "https://www.googleapis.com/deploymentmanager/v2/projects/{project}/global/types".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::NdevCloudmanReadonly.as_ref().to_string(), ());
         }
@@ -3259,7 +3247,7 @@ impl<'a, C, A> TypeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         self._order_by = Some(new_value.to_string());
         self
     }
-    /// The maximum number of results per page that should be returned. If the number of available results is larger than maxResults, Compute Engine returns a nextPageToken that can be used to get the next page of results in subsequent list requests.
+    /// The maximum number of results per page that should be returned. If the number of available results is larger than maxResults, Compute Engine returns a nextPageToken that can be used to get the next page of results in subsequent list requests. Acceptable values are 0 to 500, inclusive. (Default: 500)
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> TypeListCall<'a, C, A> {
@@ -3407,7 +3395,7 @@ impl<'a, C, A> ResourceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{project}/global/deployments/{deployment}/resources/{resource}";
+        let mut url = "https://www.googleapis.com/deploymentmanager/v2/projects/{project}/global/deployments/{deployment}/resources/{resource}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::NdevCloudmanReadonly.as_ref().to_string(), ());
         }
@@ -3684,7 +3672,7 @@ impl<'a, C, A> ResourceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{project}/global/deployments/{deployment}/resources";
+        let mut url = "https://www.googleapis.com/deploymentmanager/v2/projects/{project}/global/deployments/{deployment}/resources".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::NdevCloudmanReadonly.as_ref().to_string(), ());
         }
@@ -3825,7 +3813,7 @@ impl<'a, C, A> ResourceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._order_by = Some(new_value.to_string());
         self
     }
-    /// The maximum number of results per page that should be returned. If the number of available results is larger than maxResults, Compute Engine returns a nextPageToken that can be used to get the next page of results in subsequent list requests.
+    /// The maximum number of results per page that should be returned. If the number of available results is larger than maxResults, Compute Engine returns a nextPageToken that can be used to get the next page of results in subsequent list requests. Acceptable values are 0 to 500, inclusive. (Default: 500)
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> ResourceListCall<'a, C, A> {
@@ -3993,7 +3981,7 @@ impl<'a, C, A> DeploymentUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{project}/global/deployments/{deployment}";
+        let mut url = "https://www.googleapis.com/deploymentmanager/v2/projects/{project}/global/deployments/{deployment}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -4285,7 +4273,7 @@ impl<'a, C, A> DeploymentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{project}/global/deployments/{deployment}";
+        let mut url = "https://www.googleapis.com/deploymentmanager/v2/projects/{project}/global/deployments/{deployment}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::NdevCloudmanReadonly.as_ref().to_string(), ());
         }
@@ -4542,7 +4530,7 @@ impl<'a, C, A> DeploymentInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{project}/global/deployments";
+        let mut url = "https://www.googleapis.com/deploymentmanager/v2/projects/{project}/global/deployments".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -4817,7 +4805,7 @@ impl<'a, C, A> DeploymentTestIamPermissionCall<'a, C, A> where C: BorrowMut<hype
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{project}/global/deployments/{resource}/testIamPermissions";
+        let mut url = "https://www.googleapis.com/deploymentmanager/v2/projects/{project}/global/deployments/{resource}/testIamPermissions".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5088,7 +5076,7 @@ impl<'a, C, A> DeploymentGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{project}/global/deployments/{resource}/getIamPolicy";
+        let mut url = "https://www.googleapis.com/deploymentmanager/v2/projects/{project}/global/deployments/{resource}/getIamPolicy".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5342,7 +5330,7 @@ impl<'a, C, A> DeploymentCancelPreviewCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{project}/global/deployments/{deployment}/cancelPreview";
+        let mut url = "https://www.googleapis.com/deploymentmanager/v2/projects/{project}/global/deployments/{deployment}/cancelPreview".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5631,7 +5619,7 @@ impl<'a, C, A> DeploymentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{project}/global/deployments";
+        let mut url = "https://www.googleapis.com/deploymentmanager/v2/projects/{project}/global/deployments".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::NdevCloudmanReadonly.as_ref().to_string(), ());
         }
@@ -5762,7 +5750,7 @@ impl<'a, C, A> DeploymentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._order_by = Some(new_value.to_string());
         self
     }
-    /// The maximum number of results per page that should be returned. If the number of available results is larger than maxResults, Compute Engine returns a nextPageToken that can be used to get the next page of results in subsequent list requests.
+    /// The maximum number of results per page that should be returned. If the number of available results is larger than maxResults, Compute Engine returns a nextPageToken that can be used to get the next page of results in subsequent list requests. Acceptable values are 0 to 500, inclusive. (Default: 500)
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> DeploymentListCall<'a, C, A> {
@@ -5930,7 +5918,7 @@ impl<'a, C, A> DeploymentPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{project}/global/deployments/{deployment}";
+        let mut url = "https://www.googleapis.com/deploymentmanager/v2/projects/{project}/global/deployments/{deployment}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -6229,7 +6217,7 @@ impl<'a, C, A> DeploymentStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{project}/global/deployments/{deployment}/stop";
+        let mut url = "https://www.googleapis.com/deploymentmanager/v2/projects/{project}/global/deployments/{deployment}/stop".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -6507,7 +6495,7 @@ impl<'a, C, A> DeploymentSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{project}/global/deployments/{resource}/setIamPolicy";
+        let mut url = "https://www.googleapis.com/deploymentmanager/v2/projects/{project}/global/deployments/{resource}/setIamPolicy".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -6783,7 +6771,7 @@ impl<'a, C, A> DeploymentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{project}/global/deployments/{deployment}";
+        let mut url = "https://www.googleapis.com/deploymentmanager/v2/projects/{project}/global/deployments/{deployment}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -6963,5 +6951,6 @@ impl<'a, C, A> DeploymentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self
     }
 }
+
 
 

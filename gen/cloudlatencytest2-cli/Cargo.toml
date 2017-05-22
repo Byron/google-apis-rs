@@ -23,7 +23,7 @@ serde_json = "^ 0.9"
 serde_derive = "^ 0.9"
 yup-oauth2 = "^ 1.0"
 strsim = "^0.5"
-hyper-rustls = "^0.3"
+hyper-rustls = "^0.6"
 yup-hyper-mock = "^2.0"
 clap = "^2.0"
 

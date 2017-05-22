@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *storage* API at revision *20161123*. The CLI is at version *1.0.4*.
+This documentation was generated from the *storage* API at revision *20170504*. The CLI is at version *1.0.4*.
 
 ```bash
 storage1 [options]
@@ -39,9 +39,12 @@ storage1 [options]
         buckets
                 delete <bucket> [-p <v>]...
                 get <bucket> [-p <v>]... [-o <out>]
+                get-iam-policy <bucket> [-p <v>]... [-o <out>]
                 insert <project> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <project> [-p <v>]... [-o <out>]
                 patch <bucket> (-r <kv>)... [-p <v>]... [-o <out>]
+                set-iam-policy <bucket> (-r <kv>)... [-p <v>]... [-o <out>]
+                test-iam-permissions <bucket> <permissions>... [-p <v>]... [-o <out>]
                 update <bucket> (-r <kv>)... [-p <v>]... [-o <out>]
         channels
                 stop (-r <kv>)... [-p <v>]...
@@ -52,6 +55,11 @@ storage1 [options]
                 list <bucket> [-p <v>]... [-o <out>]
                 patch <bucket> <entity> (-r <kv>)... [-p <v>]... [-o <out>]
                 update <bucket> <entity> (-r <kv>)... [-p <v>]... [-o <out>]
+        notifications
+                delete <bucket> <notification> [-p <v>]...
+                get <bucket> <notification> [-p <v>]... [-o <out>]
+                insert <bucket> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <bucket> [-p <v>]... [-o <out>]
         object-access-controls
                 delete <bucket> <object> <entity> [-p <v>]...
                 get <bucket> <object> <entity> [-p <v>]... [-o <out>]
@@ -64,12 +72,17 @@ storage1 [options]
                 copy <source-bucket> <source-object> <destination-bucket> <destination-object> (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <bucket> <object> [-p <v>]...
                 get <bucket> <object> [-p <v>]... [-o <out>]
+                get-iam-policy <bucket> <object> [-p <v>]... [-o <out>]
                 insert <bucket> (-r <kv>)... (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
                 list <bucket> [-p <v>]... [-o <out>]
                 patch <bucket> <object> (-r <kv>)... [-p <v>]... [-o <out>]
                 rewrite <source-bucket> <source-object> <destination-bucket> <destination-object> (-r <kv>)... [-p <v>]... [-o <out>]
+                set-iam-policy <bucket> <object> (-r <kv>)... [-p <v>]... [-o <out>]
+                test-iam-permissions <bucket> <object> <permissions>... [-p <v>]... [-o <out>]
                 update <bucket> <object> (-r <kv>)... [-p <v>]... [-o <out>]
                 watch-all <bucket> (-r <kv>)... [-p <v>]... [-o <out>]
+        projects
+                service-account-get <project-id> [-p <v>]... [-o <out>]
   storage1 --help
 
 Configuration:

@@ -46,6 +46,118 @@ struct Engine<'n> {
 
 
 impl<'n> Engine<'n> {
+    fn _encoded_full_hashes_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.encoded_full_hashes().get(opt.value_of("encoded-request").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "client-version" => {
+                    call = call.client_version(value.unwrap_or(""));
+                },
+                "client-id" => {
+                    call = call.client_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["client-id", "client-version"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _encoded_updates_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.encoded_updates().get(opt.value_of("encoded-request").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "client-version" => {
+                    call = call.client_version(value.unwrap_or(""));
+                },
+                "client-id" => {
+                    call = call.client_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["client-id", "client-version"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _full_hashes_find(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -71,12 +183,14 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "client.client-version" => Some(("client.clientVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "client.client-id" => Some(("client.clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "api-client.client-version" => Some(("apiClient.clientVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "api-client.client-id" => Some(("apiClient.clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "threat-info.threat-types" => Some(("threatInfo.threatTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "threat-info.platform-types" => Some(("threatInfo.platformTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "threat-info.threat-entry-types" => Some(("threatInfo.threatEntryTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "client-states" => Some(("clientStates", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["client", "client-id", "client-states", "client-version", "platform-types", "threat-entry-types", "threat-info", "threat-types"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["api-client", "client", "client-id", "client-states", "client-version", "platform-types", "threat-entry-types", "threat-info", "threat-types"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -356,6 +470,28 @@ impl<'n> Engine<'n> {
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
         match self.opt.subcommand() {
+            ("encoded-full-hashes", Some(opt)) => {
+                match opt.subcommand() {
+                    ("get", Some(opt)) => {
+                        call_result = self._encoded_full_hashes_get(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("encoded-full-hashes".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            ("encoded-updates", Some(opt)) => {
+                match opt.subcommand() {
+                    ("get", Some(opt)) => {
+                        call_result = self._encoded_updates_get(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("encoded-updates".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
             ("full-hashes", Some(opt)) => {
                 match opt.subcommand() {
                     ("find", Some(opt)) => {
@@ -486,6 +622,56 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
+        ("encoded-full-hashes", "methods: 'get'", vec![
+            ("get",
+                    Some(r##""##),
+                    "Details at http://byron.github.io/google-apis-rs/google_safebrowsing4_cli/encoded-full-hashes_get",
+                  vec![
+                    (Some(r##"encoded-request"##),
+                     None,
+                     Some(r##"A serialized FindFullHashesRequest proto."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+        ("encoded-updates", "methods: 'get'", vec![
+            ("get",
+                    Some(r##""##),
+                    "Details at http://byron.github.io/google-apis-rs/google_safebrowsing4_cli/encoded-updates_get",
+                  vec![
+                    (Some(r##"encoded-request"##),
+                     None,
+                     Some(r##"A serialized FetchThreatListUpdatesRequest proto."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
         ("full-hashes", "methods: 'find'", vec![
             ("find",
                     Some(r##"Finds the full hashes that match the requested hash prefixes."##),
@@ -513,7 +699,8 @@ fn main() {
         
         ("threat-list-updates", "methods: 'fetch'", vec![
             ("fetch",
-                    Some(r##"Fetches the most recent threat list updates. A client can request updates for multiple lists at once."##),
+                    Some(r##"Fetches the most recent threat list updates. A client can request updates
+        for multiple lists at once."##),
                     "Details at http://byron.github.io/google-apis-rs/google_safebrowsing4_cli/threat-list-updates_fetch",
                   vec![
                     (Some(r##"kv"##),
@@ -584,8 +771,8 @@ fn main() {
     
     let mut app = App::new("safebrowsing4")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.4+20160520")
-           .about("Enables client applications to check web resources (most commonly URLs) against Google-generated lists of unsafe web resources.")
+           .version("1.0.4+20170509")
+           .about("The Safe Browsing API is an experimental API that allows client applications to check URLs against Google's constantly-updated blacklists of suspected phishing and malware pages. Your client application can use the API to download an encrypted table for local, client-side lookups of URLs.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_safebrowsing4_cli")
            .arg(Arg::with_name("folder")
                    .long("config-dir")

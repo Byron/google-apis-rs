@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *cloudbilling* crate version *1.0.4+20151222*, where *20151222* is the exact revision of the *cloudbilling:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
+//! This documentation was generated from *cloudbilling* crate version *1.0.4+20170504*, where *20170504* is the exact revision of the *cloudbilling:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
 //! 
 //! Everything else about the *cloudbilling* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/billing/).
@@ -176,7 +176,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -303,8 +303,6 @@ pub struct Cloudbilling<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-    _base_url: String,
-    _root_url: String,
 }
 
 impl<'a, C, A> Hub for Cloudbilling<C, A> {}
@@ -317,8 +315,6 @@ impl<'a, C, A> Cloudbilling<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
-            _base_url: "https://cloudbilling.googleapis.com/".to_string(),
-            _root_url: "https://cloudbilling.googleapis.com/".to_string(),
         }
     }
 
@@ -338,33 +334,15 @@ impl<'a, C, A> Cloudbilling<C, A>
         self._user_agent = agent_name;
         prev
     }
-
-    /// Set the base url to use in all requests to the server.
-    /// It defaults to `https://cloudbilling.googleapis.com/`.
-    ///
-    /// Returns the previously set base url.
-    pub fn base_url(&mut self, new_base_url: String) -> String {
-        let prev = self._base_url.clone();
-        self._base_url = new_base_url;
-        prev
-    }
-
-    /// Set the root url to use in all requests to the server.
-    /// It defaults to `https://cloudbilling.googleapis.com/`.
-    ///
-    /// Returns the previously set root url.
-    pub fn root_url(&mut self, new_root_url: String) -> String {
-        let prev = self._root_url.clone();
-        self._root_url = new_root_url;
-        prev
-    }
 }
 
 
 // ############
 // SCHEMAS ###
 // ##########
-/// Encapsulation of billing information for a Developers Console project. A project has at most one associated billing account at a time (but a billing account can be assigned to multiple projects).
+/// Encapsulation of billing information for a Cloud Console project. A project
+/// has at most one associated billing account at a time (but a billing account
+/// can be assigned to multiple projects).
 /// 
 /// # Activities
 /// 
@@ -376,15 +354,24 @@ impl<'a, C, A> Cloudbilling<C, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProjectBillingInfo {
-    /// The ID of the project that this `ProjectBillingInfo` represents, such as `tokyo-rain-123`. This is a convenience field so that you don't need to parse the `name` field to obtain a project ID. This field is read-only.
+    /// The ID of the project that this `ProjectBillingInfo` represents, such as
+    /// `tokyo-rain-123`. This is a convenience field so that you don't need to
+    /// parse the `name` field to obtain a project ID. This field is read-only.
     #[serde(rename="projectId")]
     pub project_id: Option<String>,
-    /// The resource name for the `ProjectBillingInfo`; has the form `projects/{project_id}/billingInfo`. For example, the resource name for the billing information for project `tokyo-rain-123` would be `projects/tokyo-rain-123/billingInfo`. This field is read-only.
+    /// The resource name for the `ProjectBillingInfo`; has the form
+    /// `projects/{project_id}/billingInfo`. For example, the resource name for the
+    /// billing information for project `tokyo-rain-123` would be
+    /// `projects/tokyo-rain-123/billingInfo`. This field is read-only.
     pub name: Option<String>,
-    /// True if the project is associated with an open billing account, to which usage on the project is charged. False if the project is associated with a closed billing account, or no billing account at all, and therefore cannot use paid services. This field is read-only.
+    /// True if the project is associated with an open billing account, to which
+    /// usage on the project is charged. False if the project is associated with a
+    /// closed billing account, or no billing account at all, and therefore cannot
+    /// use paid services. This field is read-only.
     #[serde(rename="billingEnabled")]
     pub billing_enabled: Option<bool>,
-    /// The resource name of the billing account associated with the project, if any. For example, `billingAccounts/012345-567890-ABCDEF`.
+    /// The resource name of the billing account associated with the project, if
+    /// any. For example, `billingAccounts/012345-567890-ABCDEF`.
     #[serde(rename="billingAccountName")]
     pub billing_account_name: Option<String>,
 }
@@ -404,10 +391,13 @@ impl ResponseResult for ProjectBillingInfo {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListProjectBillingInfoResponse {
-    /// A token to retrieve the next page of results. To retrieve the next page, call `ListProjectBillingInfo` again with the `page_token` field set to this value. This field is empty if there are no more results to retrieve.
+    /// A token to retrieve the next page of results. To retrieve the next page,
+    /// call `ListProjectBillingInfo` again with the `page_token` field set to this
+    /// value. This field is empty if there are no more results to retrieve.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
-    /// A list of `ProjectBillingInfo` resources representing the projects associated with the billing account.
+    /// A list of `ProjectBillingInfo` resources representing the projects
+    /// associated with the billing account.
     #[serde(rename="projectBillingInfo")]
     pub project_billing_info: Option<Vec<ProjectBillingInfo>>,
 }
@@ -415,7 +405,9 @@ pub struct ListProjectBillingInfoResponse {
 impl ResponseResult for ListProjectBillingInfoResponse {}
 
 
-/// A billing account in [Google Developers Console](https://console.developers.google.com/). You can assign a billing account to one or more projects.
+/// A billing account in [Google Cloud
+/// Console](https://console.cloud.google.com/). You can assign a billing account
+/// to one or more projects.
 /// 
 /// # Activities
 /// 
@@ -428,12 +420,18 @@ impl ResponseResult for ListProjectBillingInfoResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BillingAccount {
-    /// True if the billing account is open, and will therefore be charged for any usage on associated projects. False if the billing account is closed, and therefore projects associated with it will be unable to use paid services.
-    pub open: Option<bool>,
-    /// The display name given to the billing account, such as `My Billing Account`. This name is displayed in the Google Developers Console.
+    /// The display name given to the billing account, such as `My Billing
+    /// Account`. This name is displayed in the Google Cloud Console.
     #[serde(rename="displayName")]
     pub display_name: Option<String>,
-    /// The resource name of the billing account. The resource name has the form `billingAccounts/{billing_account_id}`. For example, `billingAccounts/012345-567890-ABCDEF` would be the resource name for billing account `012345-567890-ABCDEF`.
+    /// True if the billing account is open, and will therefore be charged for any
+    /// usage on associated projects. False if the billing account is closed, and
+    /// therefore projects associated with it will be unable to use paid services.
+    pub open: Option<bool>,
+    /// The resource name of the billing account. The resource name has the form
+    /// `billingAccounts/{billing_account_id}`. For example,
+    /// `billingAccounts/012345-567890-ABCDEF` would be the resource name for
+    /// billing account `012345-567890-ABCDEF`.
     pub name: Option<String>,
 }
 
@@ -452,7 +450,9 @@ impl ResponseResult for BillingAccount {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListBillingAccountsResponse {
-    /// A token to retrieve the next page of results. To retrieve the next page, call `ListBillingAccounts` again with the `page_token` field set to this value. This field is empty if there are no more results to retrieve.
+    /// A token to retrieve the next page of results. To retrieve the next page,
+    /// call `ListBillingAccounts` again with the `page_token` field set to this
+    /// value. This field is empty if there are no more results to retrieve.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
     /// A list of billing accounts.
@@ -508,11 +508,14 @@ impl<'a, C, A> BillingAccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets information about a billing account. The current authenticated user must be an [owner of the billing account](https://support.google.com/cloud/answer/4430947).
+    /// Gets information about a billing account. The current authenticated user
+    /// must be an [owner of the billing
+    /// account](https://support.google.com/cloud/answer/4430947).
     /// 
     /// # Arguments
     ///
-    /// * `name` - The resource name of the billing account to retrieve. For example, `billingAccounts/012345-567890-ABCDEF`.
+    /// * `name` - The resource name of the billing account to retrieve. For example,
+    ///            `billingAccounts/012345-567890-ABCDEF`.
     pub fn get(&self, name: &str) -> BillingAccountGetCall<'a, C, A> {
         BillingAccountGetCall {
             hub: self.hub,
@@ -525,7 +528,8 @@ impl<'a, C, A> BillingAccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the billing accounts that the current authenticated user [owns](https://support.google.com/cloud/answer/4430947).
+    /// Lists the billing accounts that the current authenticated user
+    /// [owns](https://support.google.com/cloud/answer/4430947).
     pub fn list(&self) -> BillingAccountListCall<'a, C, A> {
         BillingAccountListCall {
             hub: self.hub,
@@ -539,11 +543,14 @@ impl<'a, C, A> BillingAccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the projects associated with a billing account. The current authenticated user must be an [owner of the billing account](https://support.google.com/cloud/answer/4430947).
+    /// Lists the projects associated with a billing account. The current
+    /// authenticated user must be an [owner of the billing
+    /// account](https://support.google.com/cloud/answer/4430947).
     /// 
     /// # Arguments
     ///
-    /// * `name` - The resource name of the billing account associated with the projects that you want to list. For example, `billingAccounts/012345-567890-ABCDEF`.
+    /// * `name` - The resource name of the billing account associated with the projects that
+    ///            you want to list. For example, `billingAccounts/012345-567890-ABCDEF`.
     pub fn projects_list(&self, name: &str) -> BillingAccountProjectListCall<'a, C, A> {
         BillingAccountProjectListCall {
             hub: self.hub,
@@ -599,11 +606,15 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the billing information for a project. The current authenticated user must have [permission to view the project](https://cloud.google.com/docs/permissions-overview#h.bgs0oxofvnoo ).
+    /// Gets the billing information for a project. The current authenticated user
+    /// must have [permission to view the
+    /// project](https://cloud.google.com/docs/permissions-overview#h.bgs0oxofvnoo
+    /// ).
     /// 
     /// # Arguments
     ///
-    /// * `name` - The resource name of the project for which billing information is retrieved. For example, `projects/tokyo-rain-123`.
+    /// * `name` - The resource name of the project for which billing information is
+    ///            retrieved. For example, `projects/tokyo-rain-123`.
     pub fn get_billing_info(&self, name: &str) -> ProjectGetBillingInfoCall<'a, C, A> {
         ProjectGetBillingInfoCall {
             hub: self.hub,
@@ -616,12 +627,43 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sets or updates the billing account associated with a project. You specify the new billing account by setting the `billing_account_name` in the `ProjectBillingInfo` resource to the resource name of a billing account. Associating a project with an open billing account enables billing on the project and allows charges for resource usage. If the project already had a billing account, this method changes the billing account used for resource usage charges. *Note:* Incurred charges that have not yet been reported in the transaction history of the Google Developers Console may be billed to the new billing account, even if the charge occurred before the new billing account was assigned to the project. The current authenticated user must have ownership privileges for both the [project](https://cloud.google.com/docs/permissions-overview#h.bgs0oxofvnoo ) and the [billing account](https://support.google.com/cloud/answer/4430947). You can disable billing on the project by setting the `billing_account_name` field to empty. This action disassociates the current billing account from the project. Any billable activity of your in-use services will stop, and your application could stop functioning as expected. Any unbilled charges to date will be billed to the previously associated account. The current authenticated user must be either an owner of the project or an owner of the billing account for the project. Note that associating a project with a *closed* billing account will have much the same effect as disabling billing on the project: any paid resources used by the project will be shut down. Thus, unless you wish to disable billing, you should always call this method with the name of an *open* billing account.
+    /// Sets or updates the billing account associated with a project. You specify
+    /// the new billing account by setting the `billing_account_name` in the
+    /// `ProjectBillingInfo` resource to the resource name of a billing account.
+    /// Associating a project with an open billing account enables billing on the
+    /// project and allows charges for resource usage. If the project already had a
+    /// billing account, this method changes the billing account used for resource
+    /// usage charges.
+    /// 
+    /// *Note:* Incurred charges that have not yet been reported in the transaction
+    /// history of the Google Cloud Console may be billed to the new billing
+    /// account, even if the charge occurred before the new billing account was
+    /// assigned to the project.
+    /// 
+    /// The current authenticated user must have ownership privileges for both the
+    /// [project](https://cloud.google.com/docs/permissions-overview#h.bgs0oxofvnoo
+    /// ) and the [billing
+    /// account](https://support.google.com/cloud/answer/4430947).
+    /// 
+    /// You can disable billing on the project by setting the
+    /// `billing_account_name` field to empty. This action disassociates the
+    /// current billing account from the project. Any billable activity of your
+    /// in-use services will stop, and your application could stop functioning as
+    /// expected. Any unbilled charges to date will be billed to the previously
+    /// associated account. The current authenticated user must be either an owner
+    /// of the project or an owner of the billing account for the project.
+    /// 
+    /// Note that associating a project with a *closed* billing account will have
+    /// much the same effect as disabling billing on the project: any paid
+    /// resources used by the project will be shut down. Thus, unless you wish to
+    /// disable billing, you should always call this method with the name of an
+    /// *open* billing account.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The resource name of the project associated with the billing information that you want to update. For example, `projects/tokyo-rain-123`.
+    /// * `name` - The resource name of the project associated with the billing information
+    ///            that you want to update. For example, `projects/tokyo-rain-123`.
     pub fn update_billing_info(&self, request: ProjectBillingInfo, name: &str) -> ProjectUpdateBillingInfoCall<'a, C, A> {
         ProjectUpdateBillingInfoCall {
             hub: self.hub,
@@ -642,7 +684,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 // CallBuilders   ###
 // #################
 
-/// Gets information about a billing account. The current authenticated user must be an [owner of the billing account](https://support.google.com/cloud/answer/4430947).
+/// Gets information about a billing account. The current authenticated user
+/// must be an [owner of the billing
+/// account](https://support.google.com/cloud/answer/4430947).
 ///
 /// A builder for the *get* method supported by a *billingAccount* resource.
 /// It is not used directly, but through a `BillingAccountMethods` instance.
@@ -713,7 +757,7 @@ impl<'a, C, A> BillingAccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        let mut url = "https://cloudbilling.googleapis.com/v1/{+name}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -819,7 +863,8 @@ impl<'a, C, A> BillingAccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
-    /// The resource name of the billing account to retrieve. For example, `billingAccounts/012345-567890-ABCDEF`.
+    /// The resource name of the billing account to retrieve. For example,
+    /// `billingAccounts/012345-567890-ABCDEF`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -887,7 +932,8 @@ impl<'a, C, A> BillingAccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
 }
 
 
-/// Lists the billing accounts that the current authenticated user [owns](https://support.google.com/cloud/answer/4430947).
+/// Lists the billing accounts that the current authenticated user
+/// [owns](https://support.google.com/cloud/answer/4430947).
 ///
 /// A builder for the *list* method supported by a *billingAccount* resource.
 /// It is not used directly, but through a `BillingAccountMethods` instance.
@@ -965,7 +1011,7 @@ impl<'a, C, A> BillingAccountListCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/billingAccounts";
+        let mut url = "https://cloudbilling.googleapis.com/v1/billingAccounts".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -1047,14 +1093,17 @@ impl<'a, C, A> BillingAccountListCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
-    /// A token identifying a page of results to return. This should be a `next_page_token` value returned from a previous `ListBillingAccounts` call. If unspecified, the first page of results is returned.
+    /// A token identifying a page of results to return. This should be a
+    /// `next_page_token` value returned from a previous `ListBillingAccounts`
+    /// call. If unspecified, the first page of results is returned.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> BillingAccountListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Requested page size. The maximum page size is 100; this is also the default.
+    /// Requested page size. The maximum page size is 100; this is also the
+    /// default.
     ///
     /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> BillingAccountListCall<'a, C, A> {
@@ -1119,7 +1168,9 @@ impl<'a, C, A> BillingAccountListCall<'a, C, A> where C: BorrowMut<hyper::Client
 }
 
 
-/// Lists the projects associated with a billing account. The current authenticated user must be an [owner of the billing account](https://support.google.com/cloud/answer/4430947).
+/// Lists the projects associated with a billing account. The current
+/// authenticated user must be an [owner of the billing
+/// account](https://support.google.com/cloud/answer/4430947).
 ///
 /// A builder for the *projects.list* method supported by a *billingAccount* resource.
 /// It is not used directly, but through a `BillingAccountMethods` instance.
@@ -1200,7 +1251,7 @@ impl<'a, C, A> BillingAccountProjectListCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+name}/projects";
+        let mut url = "https://cloudbilling.googleapis.com/v1/{+name}/projects".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -1306,7 +1357,8 @@ impl<'a, C, A> BillingAccountProjectListCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
-    /// The resource name of the billing account associated with the projects that you want to list. For example, `billingAccounts/012345-567890-ABCDEF`.
+    /// The resource name of the billing account associated with the projects that
+    /// you want to list. For example, `billingAccounts/012345-567890-ABCDEF`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -1316,14 +1368,17 @@ impl<'a, C, A> BillingAccountProjectListCall<'a, C, A> where C: BorrowMut<hyper:
         self._name = new_value.to_string();
         self
     }
-    /// A token identifying a page of results to be returned. This should be a `next_page_token` value returned from a previous `ListProjectBillingInfo` call. If unspecified, the first page of results is returned.
+    /// A token identifying a page of results to be returned. This should be a
+    /// `next_page_token` value returned from a previous `ListProjectBillingInfo`
+    /// call. If unspecified, the first page of results is returned.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> BillingAccountProjectListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Requested page size. The maximum page size is 100; this is also the default.
+    /// Requested page size. The maximum page size is 100; this is also the
+    /// default.
     ///
     /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> BillingAccountProjectListCall<'a, C, A> {
@@ -1388,7 +1443,10 @@ impl<'a, C, A> BillingAccountProjectListCall<'a, C, A> where C: BorrowMut<hyper:
 }
 
 
-/// Gets the billing information for a project. The current authenticated user must have [permission to view the project](https://cloud.google.com/docs/permissions-overview#h.bgs0oxofvnoo ).
+/// Gets the billing information for a project. The current authenticated user
+/// must have [permission to view the
+/// project](https://cloud.google.com/docs/permissions-overview#h.bgs0oxofvnoo
+/// ).
 ///
 /// A builder for the *getBillingInfo* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -1459,7 +1517,7 @@ impl<'a, C, A> ProjectGetBillingInfoCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+name}/billingInfo";
+        let mut url = "https://cloudbilling.googleapis.com/v1/{+name}/billingInfo".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -1565,7 +1623,8 @@ impl<'a, C, A> ProjectGetBillingInfoCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
-    /// The resource name of the project for which billing information is retrieved. For example, `projects/tokyo-rain-123`.
+    /// The resource name of the project for which billing information is
+    /// retrieved. For example, `projects/tokyo-rain-123`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -1633,7 +1692,37 @@ impl<'a, C, A> ProjectGetBillingInfoCall<'a, C, A> where C: BorrowMut<hyper::Cli
 }
 
 
-/// Sets or updates the billing account associated with a project. You specify the new billing account by setting the `billing_account_name` in the `ProjectBillingInfo` resource to the resource name of a billing account. Associating a project with an open billing account enables billing on the project and allows charges for resource usage. If the project already had a billing account, this method changes the billing account used for resource usage charges. *Note:* Incurred charges that have not yet been reported in the transaction history of the Google Developers Console may be billed to the new billing account, even if the charge occurred before the new billing account was assigned to the project. The current authenticated user must have ownership privileges for both the [project](https://cloud.google.com/docs/permissions-overview#h.bgs0oxofvnoo ) and the [billing account](https://support.google.com/cloud/answer/4430947). You can disable billing on the project by setting the `billing_account_name` field to empty. This action disassociates the current billing account from the project. Any billable activity of your in-use services will stop, and your application could stop functioning as expected. Any unbilled charges to date will be billed to the previously associated account. The current authenticated user must be either an owner of the project or an owner of the billing account for the project. Note that associating a project with a *closed* billing account will have much the same effect as disabling billing on the project: any paid resources used by the project will be shut down. Thus, unless you wish to disable billing, you should always call this method with the name of an *open* billing account.
+/// Sets or updates the billing account associated with a project. You specify
+/// the new billing account by setting the `billing_account_name` in the
+/// `ProjectBillingInfo` resource to the resource name of a billing account.
+/// Associating a project with an open billing account enables billing on the
+/// project and allows charges for resource usage. If the project already had a
+/// billing account, this method changes the billing account used for resource
+/// usage charges.
+/// 
+/// *Note:* Incurred charges that have not yet been reported in the transaction
+/// history of the Google Cloud Console may be billed to the new billing
+/// account, even if the charge occurred before the new billing account was
+/// assigned to the project.
+/// 
+/// The current authenticated user must have ownership privileges for both the
+/// [project](https://cloud.google.com/docs/permissions-overview#h.bgs0oxofvnoo
+/// ) and the [billing
+/// account](https://support.google.com/cloud/answer/4430947).
+/// 
+/// You can disable billing on the project by setting the
+/// `billing_account_name` field to empty. This action disassociates the
+/// current billing account from the project. Any billable activity of your
+/// in-use services will stop, and your application could stop functioning as
+/// expected. Any unbilled charges to date will be billed to the previously
+/// associated account. The current authenticated user must be either an owner
+/// of the project or an owner of the billing account for the project.
+/// 
+/// Note that associating a project with a *closed* billing account will have
+/// much the same effect as disabling billing on the project: any paid
+/// resources used by the project will be shut down. Thus, unless you wish to
+/// disable billing, you should always call this method with the name of an
+/// *open* billing account.
 ///
 /// A builder for the *updateBillingInfo* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -1711,7 +1800,7 @@ impl<'a, C, A> ProjectUpdateBillingInfoCall<'a, C, A> where C: BorrowMut<hyper::
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+name}/billingInfo";
+        let mut url = "https://cloudbilling.googleapis.com/v1/{+name}/billingInfo".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -1841,7 +1930,8 @@ impl<'a, C, A> ProjectUpdateBillingInfoCall<'a, C, A> where C: BorrowMut<hyper::
         self._request = new_value;
         self
     }
-    /// The resource name of the project associated with the billing information that you want to update. For example, `projects/tokyo-rain-123`.
+    /// The resource name of the project associated with the billing information
+    /// that you want to update. For example, `projects/tokyo-rain-123`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -1907,5 +1997,6 @@ impl<'a, C, A> ProjectUpdateBillingInfoCall<'a, C, A> where C: BorrowMut<hyper::
         self
     }
 }
+
 
 

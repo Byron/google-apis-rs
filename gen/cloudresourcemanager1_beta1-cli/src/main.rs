@@ -273,8 +273,9 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "policy.etag" => Some(("policy.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "policy.version" => Some(("policy.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "update-mask" => Some(("updateMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "policy", "version"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "policy", "update-mask", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -537,9 +538,9 @@ impl<'n> Engine<'n> {
                     "parent.id" => Some(("parent.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "lifecycle-state" => Some(("lifecycleState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "project-number" => Some(("projectNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "lifecycle-state" => Some(("lifecycleState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "id", "labels", "lifecycle-state", "name", "parent", "project-id", "project-number", "type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -964,8 +965,9 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "policy.etag" => Some(("policy.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "policy.version" => Some(("policy.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "update-mask" => Some(("updateMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "policy", "version"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "policy", "update-mask", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1222,9 +1224,9 @@ impl<'n> Engine<'n> {
                     "parent.id" => Some(("parent.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "lifecycle-state" => Some(("lifecycleState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "project-number" => Some(("projectNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "lifecycle-state" => Some(("lifecycleState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "id", "labels", "lifecycle-state", "name", "parent", "project-id", "project-number", "type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1473,8 +1475,7 @@ fn main() {
                     (Some(r##"resource"##),
                      None,
                      Some(r##"REQUIRED: The resource for which the policy is being requested.
-        `resource` is usually specified as a path. For example, a Project
-        resource is specified as `projects/{project}`."##),
+        See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -1523,8 +1524,7 @@ fn main() {
                     (Some(r##"resource"##),
                      None,
                      Some(r##"REQUIRED: The resource for which the policy is being specified.
-        `resource` is usually specified as a path. For example, a Project
-        resource is specified as `projects/{project}`."##),
+        See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -1555,8 +1555,7 @@ fn main() {
                     (Some(r##"resource"##),
                      None,
                      Some(r##"REQUIRED: The resource for which the policy detail is being requested.
-        `resource` is usually specified as a path. For example, a Project
-        resource is specified as `projects/{project}`."##),
+        See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -1755,8 +1754,7 @@ fn main() {
                     (Some(r##"resource"##),
                      None,
                      Some(r##"REQUIRED: The resource for which the policy is being requested.
-        `resource` is usually specified as a path. For example, a Project
-        resource is specified as `projects/{project}`."##),
+        See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -1815,15 +1813,15 @@ fn main() {
         must be granted the owner role using the Cloud Platform Console and must
         explicitly accept the invitation.
         
-        + Invitations to grant the owner role cannot be sent using `setIamPolicy()`;
-        they must be sent only using the Cloud Platform Console.
+        + Invitations to grant the owner role cannot be sent using
+        `setIamPolicy()`; they must be sent only using the Cloud Platform Console.
         
         + Membership changes that leave the project without any owners that have
         accepted the Terms of Service (ToS) will be rejected.
         
         + There must be at least one owner who has accepted the Terms of
         Service (ToS) agreement in the policy. Calling `setIamPolicy()` to
-        to remove the last ToS-accepted owner from the policy will fail. This
+        remove the last ToS-accepted owner from the policy will fail. This
         restriction also applies to legacy projects that no longer have owners
         who have accepted the ToS. Edits to IAM policies will be rejected until
         the lack of a ToS-accepting owner is rectified.
@@ -1832,14 +1830,14 @@ fn main() {
         
         Note: Removing service accounts from policies or changing their roles
         can render services completely inoperable. It is important to understand
-        how the service account is being used before removing or updating its roles."##),
+        how the service account is being used before removing or updating its
+        roles."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1_cli/projects_set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
                      None,
                      Some(r##"REQUIRED: The resource for which the policy is being specified.
-        `resource` is usually specified as a path. For example, a Project
-        resource is specified as `projects/{project}`."##),
+        See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -1868,8 +1866,7 @@ fn main() {
                     (Some(r##"resource"##),
                      None,
                      Some(r##"REQUIRED: The resource for which the policy detail is being requested.
-        `resource` is usually specified as a path. For example, a Project
-        resource is specified as `projects/{project}`."##),
+        See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -1966,7 +1963,7 @@ fn main() {
     
     let mut app = App::new("cloudresourcemanager1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.4+20161212")
+           .version("1.0.4+20170517")
            .about("The Google Cloud Resource Manager API provides methods for creating, reading, and updating project metadata.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1_cli")
            .arg(Arg::with_name("url")

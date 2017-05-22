@@ -1,4 +1,4 @@
-site_name: Cloud Resource Manager v1.0.4+20161212
+site_name: Cloud Resource Manager v1.0.4+20170517
 site_url: http://byron.github.io/google-apis-rs/google-cloudresourcemanager1-cli
 site_description: A complete library to interact with Cloud Resource Manager (protocol v1)
 
@@ -9,19 +9,40 @@ site_dir: build_html
 
 pages:
 - ['index.md', 'Home']
+- ['folders_clear-org-policy.md', 'Folders', 'Clear Org Policy']
+- ['folders_get-effective-org-policy.md', 'Folders', 'Get Effective Org Policy']
+- ['folders_get-org-policy.md', 'Folders', 'Get Org Policy']
+- ['folders_list-available-org-policy-constraints.md', 'Folders', 'List Available Org Policy Constraints']
+- ['folders_list-org-policies.md', 'Folders', 'List Org Policies']
+- ['folders_set-org-policy.md', 'Folders', 'Set Org Policy']
+- ['liens_create.md', 'Liens', 'Create']
+- ['liens_delete.md', 'Liens', 'Delete']
+- ['liens_list.md', 'Liens', 'List']
 - ['operations_get.md', 'Operations', 'Get']
+- ['organizations_clear-org-policy.md', 'Organizations', 'Clear Org Policy']
 - ['organizations_get.md', 'Organizations', 'Get']
+- ['organizations_get-effective-org-policy.md', 'Organizations', 'Get Effective Org Policy']
 - ['organizations_get-iam-policy.md', 'Organizations', 'Get Iam Policy']
+- ['organizations_get-org-policy.md', 'Organizations', 'Get Org Policy']
+- ['organizations_list-available-org-policy-constraints.md', 'Organizations', 'List Available Org Policy Constraints']
+- ['organizations_list-org-policies.md', 'Organizations', 'List Org Policies']
 - ['organizations_search.md', 'Organizations', 'Search']
 - ['organizations_set-iam-policy.md', 'Organizations', 'Set Iam Policy']
+- ['organizations_set-org-policy.md', 'Organizations', 'Set Org Policy']
 - ['organizations_test-iam-permissions.md', 'Organizations', 'Test Iam Permissions']
+- ['projects_clear-org-policy.md', 'Projects', 'Clear Org Policy']
 - ['projects_create.md', 'Projects', 'Create']
 - ['projects_delete.md', 'Projects', 'Delete']
 - ['projects_get.md', 'Projects', 'Get']
 - ['projects_get-ancestry.md', 'Projects', 'Get Ancestry']
+- ['projects_get-effective-org-policy.md', 'Projects', 'Get Effective Org Policy']
 - ['projects_get-iam-policy.md', 'Projects', 'Get Iam Policy']
+- ['projects_get-org-policy.md', 'Projects', 'Get Org Policy']
 - ['projects_list.md', 'Projects', 'List']
+- ['projects_list-available-org-policy-constraints.md', 'Projects', 'List Available Org Policy Constraints']
+- ['projects_list-org-policies.md', 'Projects', 'List Org Policies']
 - ['projects_set-iam-policy.md', 'Projects', 'Set Iam Policy']
+- ['projects_set-org-policy.md', 'Projects', 'Set Org Policy']
 - ['projects_test-iam-permissions.md', 'Projects', 'Test Iam Permissions']
 - ['projects_undelete.md', 'Projects', 'Undelete']
 - ['projects_update.md', 'Projects', 'Update']

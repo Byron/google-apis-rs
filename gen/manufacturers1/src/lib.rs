@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Manufacturer Center* crate version *1.0.4+20161028*, where *20161028* is the exact revision of the *manufacturers:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
+//! This documentation was generated from *Manufacturer Center* crate version *1.0.4+20170412*, where *20170412* is the exact revision of the *manufacturers:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
 //! 
 //! Everything else about the *Manufacturer Center* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/manufacturers/).
@@ -170,7 +170,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -295,8 +295,6 @@ pub struct ManufacturerCenter<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-    _base_url: String,
-    _root_url: String,
 }
 
 impl<'a, C, A> Hub for ManufacturerCenter<C, A> {}
@@ -309,8 +307,6 @@ impl<'a, C, A> ManufacturerCenter<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
-            _base_url: "https://manufacturers.googleapis.com/".to_string(),
-            _root_url: "https://manufacturers.googleapis.com/".to_string(),
         }
     }
 
@@ -327,72 +323,26 @@ impl<'a, C, A> ManufacturerCenter<C, A>
         self._user_agent = agent_name;
         prev
     }
-
-    /// Set the base url to use in all requests to the server.
-    /// It defaults to `https://manufacturers.googleapis.com/`.
-    ///
-    /// Returns the previously set base url.
-    pub fn base_url(&mut self, new_base_url: String) -> String {
-        let prev = self._base_url.clone();
-        self._base_url = new_base_url;
-        prev
-    }
-
-    /// Set the root url to use in all requests to the server.
-    /// It defaults to `https://manufacturers.googleapis.com/`.
-    ///
-    /// Returns the previously set root url.
-    pub fn root_url(&mut self, new_root_url: String) -> String {
-        let prev = self._root_url.clone();
-        self._root_url = new_root_url;
-        prev
-    }
 }
 
 
 // ############
 // SCHEMAS ###
 // ##########
-/// Attributes of the product. For more information, see
-/// https://support.google.com/manufacturers/answer/6124116.
+/// The number of products in a single package. For more information, see
+/// https://support.google.com/manufacturers/answer/6124116#count.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Attributes {
-    /// The name of the group of products related to the product. For more
-    /// information, see
-    /// https://support.google.com/manufacturers/answer/6124116#productline.
-    #[serde(rename="productLine")]
-    pub product_line: Option<String>,
-    /// The title of the product. For more information, see
-    /// https://support.google.com/manufacturers/answer/6124116#title.
-    pub title: Option<String>,
-    /// The Manufacturer Part Number (MPN) of the product. For more information,
-    /// see https://support.google.com/manufacturers/answer/6124116#mpn.
-    pub mpn: Option<String>,
-    /// The brand name of the product. For more information, see
-    /// https://support.google.com/manufacturers/answer/6124116#brand.
-    pub brand: Option<String>,
-    /// The canonical name of the product. For more information, see
-    /// https://support.google.com/manufacturers/answer/6124116#productname.
-    #[serde(rename="productName")]
-    pub product_name: Option<String>,
-    /// The URL of the manufacturer's detail page of the product. For more
-    /// information, see
-    /// https://support.google.com/manufacturers/answer/6124116#productpage.
-    #[serde(rename="productPageUrl")]
-    pub product_page_url: Option<String>,
-    /// The Global Trade Item Number (GTIN) of the product. For more information,
-    /// see https://support.google.com/manufacturers/answer/6124116#gtin.
-    pub gtin: Option<Vec<String>>,
-    /// The manufacturer's category of the product. For more information, see
-    /// https://support.google.com/manufacturers/answer/6124116#producttype.
-    #[serde(rename="productType")]
-    pub product_type: Option<Vec<String>>,
+pub struct Count {
+    /// The numeric value of the number of products in a package.
+    pub value: Option<String>,
+    /// The unit in which these products are counted.
+    pub unit: Option<String>,
 }
 
-impl Part for Attributes {}
+impl Part for Count {}
 
 
 /// Product data.
@@ -426,6 +376,18 @@ pub struct Product {
     /// @OutputOnly
     #[serde(rename="contentLanguage")]
     pub content_language: Option<String>,
+    /// Name in the format `{target_country}:{content_language}:{product_id}`.
+    /// 
+    /// `target_country`   - The target country of the product as a CLDR territory
+    ///                      code (for example, US).
+    /// 
+    /// `content_language` - The content language of the product as a two-letter
+    ///                      ISO 639-1 language code (for example, en).
+    /// 
+    /// `product_id`     -   The ID of the product. For more information, see
+    ///                      https://support.google.com/manufacturers/answer/6124116#id.
+    /// @OutputOnly
+    pub name: Option<String>,
     /// Attributes of the product provided manually via the Manufacturer Center UI.
     /// @OutputOnly
     #[serde(rename="manuallyProvidedAttributes")]
@@ -441,52 +403,56 @@ pub struct Product {
     /// feeds.
     #[serde(rename="uploadedAttributes")]
     pub uploaded_attributes: Option<Attributes>,
+    /// A server-generated list of issues associated with the product.
+    /// @OutputOnly
+    pub issues: Option<Vec<Issue>>,
     /// The ID of the product. For more information, see
     /// https://support.google.com/manufacturers/answer/6124116#id.
     /// @OutputOnly
     #[serde(rename="productId")]
     pub product_id: Option<String>,
-    /// A server-generated list of issues associated with the product.
-    /// @OutputOnly
-    pub issues: Option<Vec<Issue>>,
-    /// Name in the format `{target_country}:{content_language}:{product_id}`.
-    /// 
-    /// `target_country`   - The target country of the product as a CLDR territory
-    ///                      code (for example, US).
-    /// 
-    /// `content_language` - The content language of the product as a two-letter
-    ///                      ISO 639-1 language code (for example, en).
-    /// 
-    /// `product_id`     -   The ID of the product. For more information, see
-    ///                      https://support.google.com/manufacturers/answer/6124116#id.
-    /// @OutputOnly
-    pub name: Option<String>,
 }
 
 impl ResponseResult for Product {}
 
 
-/// Product issue.
+/// The capacity of a product. For more information, see
+/// https://support.google.com/manufacturers/answer/6124116#capacity.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Issue {
-    /// If present, the attribute that triggered the issue. For more information
-    /// about attributes, see
-    /// https://support.google.com/manufacturers/answer/6124116.
-    pub attribute: Option<String>,
-    /// The server-generated type of the issue, for example,
-    /// “INCORRECT_TEXT_FORMATTING”, “IMAGE_NOT_SERVEABLE”, etc.
-    #[serde(rename="type")]
-    pub type_: Option<String>,
-    /// The severity of the issue.
-    pub severity: Option<String>,
-    /// Description of the issue.
-    pub description: Option<String>,
+pub struct Capacity {
+    /// The numeric value of the capacity.
+    pub value: Option<String>,
+    /// The unit of the capacity, i.e., MB, GB, or TB.
+    pub unit: Option<String>,
 }
 
-impl Part for Issue {}
+impl Part for Capacity {}
+
+
+/// An image.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Image {
+    /// The status of the image.
+    /// @OutputOnly
+    pub status: Option<String>,
+    /// The URL of the image. For crawled images, this is the provided URL. For
+    /// uploaded images, this is a serving URL from Google if the image has been
+    /// processed successfully.
+    #[serde(rename="imageUrl")]
+    pub image_url: Option<String>,
+    /// The type of the image, i.e., crawled or uploaded.
+    /// @OutputOnly
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+}
+
+impl Part for Image {}
 
 
 /// There is no detailed description.
@@ -508,6 +474,210 @@ pub struct ListProductsResponse {
 }
 
 impl ResponseResult for ListProductsResponse {}
+
+
+/// A feature description of the product. For more information, see
+/// https://support.google.com/manufacturers/answer/6124116#featuredesc.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct FeatureDescription {
+    /// A short description of the feature.
+    pub headline: Option<String>,
+    /// A detailed description of the feature.
+    pub text: Option<String>,
+    /// An optional image describing the feature.
+    pub image: Option<Image>,
+}
+
+impl Part for FeatureDescription {}
+
+
+/// A product detail of the product. For more information, see
+/// https://support.google.com/manufacturers/answer/6124116#productdetail.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ProductDetail {
+    /// The name of the attribute.
+    #[serde(rename="attributeName")]
+    pub attribute_name: Option<String>,
+    /// The value of the attribute.
+    #[serde(rename="attributeValue")]
+    pub attribute_value: Option<String>,
+    /// A short section name that can be reused between multiple product details.
+    #[serde(rename="sectionName")]
+    pub section_name: Option<String>,
+}
+
+impl Part for ProductDetail {}
+
+
+/// Attributes of the product. For more information, see
+/// https://support.google.com/manufacturers/answer/6124116.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Attributes {
+    /// The name of the group of products related to the product. For more
+    /// information, see
+    /// https://support.google.com/manufacturers/answer/6124116#productline.
+    #[serde(rename="productLine")]
+    pub product_line: Option<String>,
+    /// The color of the product. For more information, see
+    /// https://support.google.com/manufacturers/answer/6124116#color.
+    pub color: Option<String>,
+    /// The release date of the product. For more information, see
+    /// https://support.google.com/manufacturers/answer/6124116#release.
+    #[serde(rename="releaseDate")]
+    pub release_date: Option<String>,
+    /// The item group id of the product. For more information, see
+    /// https://support.google.com/manufacturers/answer/6124116#itemgroupid.
+    #[serde(rename="itemGroupId")]
+    pub item_group_id: Option<String>,
+    /// The videos of the product. For more information, see
+    /// https://support.google.com/manufacturers/answer/6124116#video.
+    #[serde(rename="videoLink")]
+    pub video_link: Option<Vec<String>>,
+    /// The flavor of the product. For more information, see
+    /// https://support.google.com/manufacturers/answer/6124116#flavor.
+    pub flavor: Option<String>,
+    /// The scent of the product. For more information, see
+    ///  https://support.google.com/manufacturers/answer/6124116#scent.
+    pub scent: Option<String>,
+    /// The size of the product. For more information, see
+    /// https://support.google.com/manufacturers/answer/6124116#size.
+    pub size: Option<String>,
+    /// The capacity of the product. For more information, see
+    /// https://support.google.com/manufacturers/answer/6124116#capacity.
+    pub capacity: Option<Capacity>,
+    /// The title of the product. For more information, see
+    /// https://support.google.com/manufacturers/answer/6124116#title.
+    pub title: Option<String>,
+    /// The pattern of the product. For more information, see
+    /// https://support.google.com/manufacturers/answer/6124116#pattern.
+    pub pattern: Option<String>,
+    /// The disclosure date of the product. For more information, see
+    /// https://support.google.com/manufacturers/answer/6124116#disclosure.
+    #[serde(rename="disclosureDate")]
+    pub disclosure_date: Option<String>,
+    /// The theme of the product. For more information, see
+    /// https://support.google.com/manufacturers/answer/6124116#theme.
+    pub theme: Option<String>,
+    /// The suggested retail price (MSRP) of the product. For more information,
+    /// see https://support.google.com/manufacturers/answer/6124116#price.
+    #[serde(rename="suggestedRetailPrice")]
+    pub suggested_retail_price: Option<Price>,
+    /// The material of the product. For more information, see
+    /// https://support.google.com/manufacturers/answer/6124116#material.
+    pub material: Option<String>,
+    /// The description of the product. For more information, see
+    /// https://support.google.com/manufacturers/answer/6124116#description.
+    pub description: Option<String>,
+    /// The format of the product. For more information, see
+    /// https://support.google.com/manufacturers/answer/6124116#format.
+    pub format: Option<String>,
+    /// The Manufacturer Part Number (MPN) of the product. For more information,
+    /// see https://support.google.com/manufacturers/answer/6124116#mpn.
+    pub mpn: Option<String>,
+    /// The brand name of the product. For more information, see
+    /// https://support.google.com/manufacturers/answer/6124116#brand.
+    pub brand: Option<String>,
+    /// The details of the product. For more information, see
+    /// https://support.google.com/manufacturers/answer/6124116#productdetail.
+    #[serde(rename="productDetail")]
+    pub product_detail: Option<Vec<ProductDetail>>,
+    /// The canonical name of the product. For more information, see
+    /// https://support.google.com/manufacturers/answer/6124116#productname.
+    #[serde(rename="productName")]
+    pub product_name: Option<String>,
+    /// The rich format description of the product. For more information, see
+    /// https://support.google.com/manufacturers/answer/6124116#featuredesc.
+    #[serde(rename="featureDescription")]
+    pub feature_description: Option<Vec<FeatureDescription>>,
+    /// The size system of the product. For more information, see
+    /// https://support.google.com/manufacturers/answer/6124116#sizesystem.
+    #[serde(rename="sizeSystem")]
+    pub size_system: Option<String>,
+    /// The size type of the product. For more information, see
+    /// https://support.google.com/manufacturers/answer/6124116#sizetype.
+    #[serde(rename="sizeType")]
+    pub size_type: Option<String>,
+    /// The additional images of the product. For more information, see
+    /// https://support.google.com/manufacturers/answer/6124116#addlimage.
+    #[serde(rename="additionalImageLink")]
+    pub additional_image_link: Option<Vec<Image>>,
+    /// The count of the product. For more information, see
+    /// https://support.google.com/manufacturers/answer/6124116#count.
+    pub count: Option<Count>,
+    /// The target gender of the product. For more information, see
+    /// https://support.google.com/manufacturers/answer/6124116#gender.
+    pub gender: Option<String>,
+    /// The URL of the detail page of the product. For more information, see
+    /// https://support.google.com/manufacturers/answer/6124116#productpage.
+    #[serde(rename="productPageUrl")]
+    pub product_page_url: Option<String>,
+    /// The image of the product. For more information, see
+    /// https://support.google.com/manufacturers/answer/6124116#image.
+    #[serde(rename="imageLink")]
+    pub image_link: Option<Image>,
+    /// The category of the product. For more information, see
+    /// https://support.google.com/manufacturers/answer/6124116#producttype.
+    #[serde(rename="productType")]
+    pub product_type: Option<Vec<String>>,
+    /// The Global Trade Item Number (GTIN) of the product. For more information,
+    /// see https://support.google.com/manufacturers/answer/6124116#gtin.
+    pub gtin: Option<Vec<String>>,
+    /// The target age group of the product. For more information, see
+    /// https://support.google.com/manufacturers/answer/6124116#agegroup.
+    #[serde(rename="ageGroup")]
+    pub age_group: Option<String>,
+}
+
+impl Part for Attributes {}
+
+
+/// Product issue.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Issue {
+    /// If present, the attribute that triggered the issue. For more information
+    /// about attributes, see
+    /// https://support.google.com/manufacturers/answer/6124116.
+    pub attribute: Option<String>,
+    /// The server-generated type of the issue, for example,
+    /// “INCORRECT_TEXT_FORMATTING”, “IMAGE_NOT_SERVEABLE”, etc.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// Description of the issue.
+    pub description: Option<String>,
+    /// The severity of the issue.
+    pub severity: Option<String>,
+    /// The timestamp when this issue appeared.
+    pub timestamp: Option<String>,
+}
+
+impl Part for Issue {}
+
+
+/// A price.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Price {
+    /// The currency in which the price is denoted.
+    pub currency: Option<String>,
+    /// The numeric value of the price.
+    pub amount: Option<String>,
+}
+
+impl Part for Price {}
 
 
 
@@ -690,7 +860,7 @@ impl<'a, C, A> AccountProductListCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+parent}/products";
+        let mut url = "https://manufacturers.googleapis.com/v1/{+parent}/products".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Manufacturercenter.as_ref().to_string(), ());
         }
@@ -848,12 +1018,12 @@ impl<'a, C, A> AccountProductListCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountProductListCall<'a, C, A>
@@ -955,7 +1125,7 @@ impl<'a, C, A> AccountProductGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+parent}/products/{+name}";
+        let mut url = "https://manufacturers.googleapis.com/v1/{+parent}/products/{+name}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Manufacturercenter.as_ref().to_string(), ());
         }
@@ -1117,12 +1287,12 @@ impl<'a, C, A> AccountProductGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountProductGetCall<'a, C, A>
@@ -1148,5 +1318,6 @@ impl<'a, C, A> AccountProductGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self
     }
 }
+
 
 

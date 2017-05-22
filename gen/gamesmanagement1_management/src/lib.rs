@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Games Management* crate version *1.0.4+20161207*, where *20161207* is the exact revision of the *gamesManagement:v1management* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
+//! This documentation was generated from *Games Management* crate version *1.0.4+20170511*, where *20170511* is the exact revision of the *gamesManagement:v1management* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
 //! 
 //! Everything else about the *Games Management* *v1_management* API can be found at the
 //! [official documentation site](https://developers.google.com/games/services).
@@ -185,7 +185,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -314,8 +314,6 @@ pub struct GamesManagement<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-    _base_url: String,
-    _root_url: String,
 }
 
 impl<'a, C, A> Hub for GamesManagement<C, A> {}
@@ -328,8 +326,6 @@ impl<'a, C, A> GamesManagement<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
-            _base_url: "https://www.googleapis.com/games/v1management/".to_string(),
-            _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
@@ -365,26 +361,6 @@ impl<'a, C, A> GamesManagement<C, A>
     pub fn user_agent(&mut self, agent_name: String) -> String {
         let prev = self._user_agent.clone();
         self._user_agent = agent_name;
-        prev
-    }
-
-    /// Set the base url to use in all requests to the server.
-    /// It defaults to `https://www.googleapis.com/games/v1management/`.
-    ///
-    /// Returns the previously set base url.
-    pub fn base_url(&mut self, new_base_url: String) -> String {
-        let prev = self._base_url.clone();
-        self._base_url = new_base_url;
-        prev
-    }
-
-    /// Set the root url to use in all requests to the server.
-    /// It defaults to `https://www.googleapis.com/`.
-    ///
-    /// Returns the previously set root url.
-    pub fn root_url(&mut self, new_root_url: String) -> String {
-        let prev = self._root_url.clone();
-        self._root_url = new_root_url;
         prev
     }
 }
@@ -1567,7 +1543,7 @@ impl<'a, C, A> AchievementResetAllForAllPlayerCall<'a, C, A> where C: BorrowMut<
         }
 
 
-        let mut url = self.hub._base_url.clone() + "achievements/resetAllForAllPlayers";
+        let mut url = "https://www.googleapis.com/games/v1management/achievements/resetAllForAllPlayers".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Game.as_ref().to_string(), ());
         }
@@ -1760,7 +1736,7 @@ impl<'a, C, A> AchievementResetForAllPlayerCall<'a, C, A> where C: BorrowMut<hyp
         }
 
 
-        let mut url = self.hub._base_url.clone() + "achievements/{achievementId}/resetForAllPlayers";
+        let mut url = "https://www.googleapis.com/games/v1management/achievements/{achievementId}/resetForAllPlayers".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Game.as_ref().to_string(), ());
         }
@@ -1985,7 +1961,7 @@ impl<'a, C, A> AchievementResetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "achievements/{achievementId}/reset";
+        let mut url = "https://www.googleapis.com/games/v1management/achievements/{achievementId}/reset".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Game.as_ref().to_string(), ());
         }
@@ -2224,7 +2200,7 @@ impl<'a, C, A> AchievementResetMultipleForAllPlayerCall<'a, C, A> where C: Borro
         }
 
 
-        let mut url = self.hub._base_url.clone() + "achievements/resetMultipleForAllPlayers";
+        let mut url = "https://www.googleapis.com/games/v1management/achievements/resetMultipleForAllPlayers".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Game.as_ref().to_string(), ());
         }
@@ -2440,7 +2416,7 @@ impl<'a, C, A> AchievementResetAllCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "achievements/reset";
+        let mut url = "https://www.googleapis.com/games/v1management/achievements/reset".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Game.as_ref().to_string(), ());
         }
@@ -2645,7 +2621,7 @@ impl<'a, C, A> PlayerHideCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         }
 
 
-        let mut url = self.hub._base_url.clone() + "applications/{applicationId}/players/hidden/{playerId}";
+        let mut url = "https://www.googleapis.com/games/v1management/applications/{applicationId}/players/hidden/{playerId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Game.as_ref().to_string(), ());
         }
@@ -2881,7 +2857,7 @@ impl<'a, C, A> PlayerUnhideCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         }
 
 
-        let mut url = self.hub._base_url.clone() + "applications/{applicationId}/players/hidden/{playerId}";
+        let mut url = "https://www.googleapis.com/games/v1management/applications/{applicationId}/players/hidden/{playerId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Game.as_ref().to_string(), ());
         }
@@ -3120,7 +3096,7 @@ impl<'a, C, A> ScoreResetMultipleForAllPlayerCall<'a, C, A> where C: BorrowMut<h
         }
 
 
-        let mut url = self.hub._base_url.clone() + "scores/resetMultipleForAllPlayers";
+        let mut url = "https://www.googleapis.com/games/v1management/scores/resetMultipleForAllPlayers".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Game.as_ref().to_string(), ());
         }
@@ -3335,7 +3311,7 @@ impl<'a, C, A> ScoreResetAllForAllPlayerCall<'a, C, A> where C: BorrowMut<hyper:
         }
 
 
-        let mut url = self.hub._base_url.clone() + "scores/resetAllForAllPlayers";
+        let mut url = "https://www.googleapis.com/games/v1management/scores/resetAllForAllPlayers".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Game.as_ref().to_string(), ());
         }
@@ -3527,7 +3503,7 @@ impl<'a, C, A> ScoreResetAllCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "scores/reset";
+        let mut url = "https://www.googleapis.com/games/v1management/scores/reset".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Game.as_ref().to_string(), ());
         }
@@ -3730,7 +3706,7 @@ impl<'a, C, A> ScoreResetForAllPlayerCall<'a, C, A> where C: BorrowMut<hyper::Cl
         }
 
 
-        let mut url = self.hub._base_url.clone() + "leaderboards/{leaderboardId}/scores/resetForAllPlayers";
+        let mut url = "https://www.googleapis.com/games/v1management/leaderboards/{leaderboardId}/scores/resetForAllPlayers".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Game.as_ref().to_string(), ());
         }
@@ -3955,7 +3931,7 @@ impl<'a, C, A> ScoreResetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "leaderboards/{leaderboardId}/scores/reset";
+        let mut url = "https://www.googleapis.com/games/v1management/leaderboards/{leaderboardId}/scores/reset".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Game.as_ref().to_string(), ());
         }
@@ -4187,7 +4163,7 @@ impl<'a, C, A> TurnBasedMatcheResetCall<'a, C, A> where C: BorrowMut<hyper::Clie
         }
 
 
-        let mut url = self.hub._base_url.clone() + "turnbasedmatches/reset";
+        let mut url = "https://www.googleapis.com/games/v1management/turnbasedmatches/reset".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Game.as_ref().to_string(), ());
         }
@@ -4378,7 +4354,7 @@ impl<'a, C, A> TurnBasedMatcheResetForAllPlayerCall<'a, C, A> where C: BorrowMut
         }
 
 
-        let mut url = self.hub._base_url.clone() + "turnbasedmatches/resetForAllPlayers";
+        let mut url = "https://www.googleapis.com/games/v1management/turnbasedmatches/resetForAllPlayers".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Game.as_ref().to_string(), ());
         }
@@ -4582,7 +4558,7 @@ impl<'a, C, A> ApplicationListHiddenCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "applications/{applicationId}/players/hidden";
+        let mut url = "https://www.googleapis.com/games/v1management/applications/{applicationId}/players/hidden".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Game.as_ref().to_string(), ());
         }
@@ -4828,7 +4804,7 @@ impl<'a, C, A> RoomResetForAllPlayerCall<'a, C, A> where C: BorrowMut<hyper::Cli
         }
 
 
-        let mut url = self.hub._base_url.clone() + "rooms/resetForAllPlayers";
+        let mut url = "https://www.googleapis.com/games/v1management/rooms/resetForAllPlayers".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Game.as_ref().to_string(), ());
         }
@@ -5019,7 +4995,7 @@ impl<'a, C, A> RoomResetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         }
 
 
-        let mut url = self.hub._base_url.clone() + "rooms/reset";
+        let mut url = "https://www.googleapis.com/games/v1management/rooms/reset".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Game.as_ref().to_string(), ());
         }
@@ -5210,7 +5186,7 @@ impl<'a, C, A> QuestResetAllForAllPlayerCall<'a, C, A> where C: BorrowMut<hyper:
         }
 
 
-        let mut url = self.hub._base_url.clone() + "quests/resetAllForAllPlayers";
+        let mut url = "https://www.googleapis.com/games/v1management/quests/resetAllForAllPlayers".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Game.as_ref().to_string(), ());
         }
@@ -5408,7 +5384,7 @@ impl<'a, C, A> QuestResetMultipleForAllPlayerCall<'a, C, A> where C: BorrowMut<h
         }
 
 
-        let mut url = self.hub._base_url.clone() + "quests/resetMultipleForAllPlayers";
+        let mut url = "https://www.googleapis.com/games/v1management/quests/resetMultipleForAllPlayers".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Game.as_ref().to_string(), ());
         }
@@ -5623,7 +5599,7 @@ impl<'a, C, A> QuestResetAllCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         }
 
 
-        let mut url = self.hub._base_url.clone() + "quests/reset";
+        let mut url = "https://www.googleapis.com/games/v1management/quests/reset".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Game.as_ref().to_string(), ());
         }
@@ -5816,7 +5792,7 @@ impl<'a, C, A> QuestResetForAllPlayerCall<'a, C, A> where C: BorrowMut<hyper::Cl
         }
 
 
-        let mut url = self.hub._base_url.clone() + "quests/{questId}/resetForAllPlayers";
+        let mut url = "https://www.googleapis.com/games/v1management/quests/{questId}/resetForAllPlayers".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Game.as_ref().to_string(), ());
         }
@@ -6040,7 +6016,7 @@ impl<'a, C, A> QuestResetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         }
 
 
-        let mut url = self.hub._base_url.clone() + "quests/{questId}/reset";
+        let mut url = "https://www.googleapis.com/games/v1management/quests/{questId}/reset".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Game.as_ref().to_string(), ());
         }
@@ -6262,7 +6238,7 @@ impl<'a, C, A> EventResetAllForAllPlayerCall<'a, C, A> where C: BorrowMut<hyper:
         }
 
 
-        let mut url = self.hub._base_url.clone() + "events/resetAllForAllPlayers";
+        let mut url = "https://www.googleapis.com/games/v1management/events/resetAllForAllPlayers".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Game.as_ref().to_string(), ());
         }
@@ -6455,7 +6431,7 @@ impl<'a, C, A> EventResetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         }
 
 
-        let mut url = self.hub._base_url.clone() + "events/{eventId}/reset";
+        let mut url = "https://www.googleapis.com/games/v1management/events/{eventId}/reset".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Game.as_ref().to_string(), ());
         }
@@ -6677,7 +6653,7 @@ impl<'a, C, A> EventResetAllCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         }
 
 
-        let mut url = self.hub._base_url.clone() + "events/reset";
+        let mut url = "https://www.googleapis.com/games/v1management/events/reset".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Game.as_ref().to_string(), ());
         }
@@ -6875,7 +6851,7 @@ impl<'a, C, A> EventResetMultipleForAllPlayerCall<'a, C, A> where C: BorrowMut<h
         }
 
 
-        let mut url = self.hub._base_url.clone() + "events/resetMultipleForAllPlayers";
+        let mut url = "https://www.googleapis.com/games/v1management/events/resetMultipleForAllPlayers".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Game.as_ref().to_string(), ());
         }
@@ -7092,7 +7068,7 @@ impl<'a, C, A> EventResetForAllPlayerCall<'a, C, A> where C: BorrowMut<hyper::Cl
         }
 
 
-        let mut url = self.hub._base_url.clone() + "events/{eventId}/resetForAllPlayers";
+        let mut url = "https://www.googleapis.com/games/v1management/events/{eventId}/resetForAllPlayers".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Game.as_ref().to_string(), ());
         }
@@ -7245,5 +7221,6 @@ impl<'a, C, A> EventResetForAllPlayerCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self
     }
 }
+
 
 

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Ad Exchange Buyer* crate version *1.0.4+20161020*, where *20161020* is the exact revision of the *adexchangebuyer:v1.4* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
+//! This documentation was generated from *Ad Exchange Buyer* crate version *1.0.4+20170504*, where *20170504* is the exact revision of the *adexchangebuyer:v1.4* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
 //! 
 //! Everything else about the *Ad Exchange Buyer* *v1d4* API can be found at the
 //! [official documentation site](https://developers.google.com/ad-exchange/buyer-rest).
@@ -203,7 +203,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -334,8 +334,6 @@ pub struct AdExchangeBuyer<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-    _base_url: String,
-    _root_url: String,
 }
 
 impl<'a, C, A> Hub for AdExchangeBuyer<C, A> {}
@@ -348,8 +346,6 @@ impl<'a, C, A> AdExchangeBuyer<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
-            _base_url: "https://www.googleapis.com/adexchangebuyer/v1.4/".to_string(),
-            _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
@@ -397,26 +393,6 @@ impl<'a, C, A> AdExchangeBuyer<C, A>
     pub fn user_agent(&mut self, agent_name: String) -> String {
         let prev = self._user_agent.clone();
         self._user_agent = agent_name;
-        prev
-    }
-
-    /// Set the base url to use in all requests to the server.
-    /// It defaults to `https://www.googleapis.com/adexchangebuyer/v1.4/`.
-    ///
-    /// Returns the previously set base url.
-    pub fn base_url(&mut self, new_base_url: String) -> String {
-        let prev = self._base_url.clone();
-        self._base_url = new_base_url;
-        prev
-    }
-
-    /// Set the root url to use in all requests to the server.
-    /// It defaults to `https://www.googleapis.com/`.
-    ///
-    /// Returns the previously set root url.
-    pub fn root_url(&mut self, new_root_url: String) -> String {
-        let prev = self._root_url.clone();
-        self._root_url = new_root_url;
         prev
     }
 }
@@ -585,15 +561,15 @@ impl Part for CreativeDealIdsDealStatuses {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Creative {
-    /// Detected product categories, if any. Read-only. This field should not be set in requests.
+    /// Detected product categories, if any. Each category is represented by an integer as defined in  ad-product-categories.txt. Read-only. This field should not be set in requests.
     #[serde(rename="productCategories")]
     pub product_categories: Option<Vec<i32>>,
     /// The agency id for this creative.
     #[serde(rename="agencyId")]
     pub agency_id: Option<String>,
-    /// All attributes for the ads that may be shown from this snippet.
+    /// List of buyer selectable attributes for the ads that may be shown from this snippet. Each attribute is represented by an integer as defined in  buyer-declarable-creative-attributes.txt.
     pub attribute: Option<Vec<i32>>,
-    /// All restricted categories for the ads that may be shown from this snippet.
+    /// All restricted categories for the ads that may be shown from this snippet. Each category is represented by an integer as defined in the  ad-restricted-categories.txt.
     #[serde(rename="restrictedCategories")]
     pub restricted_categories: Option<Vec<i32>>,
     /// Detected domains for this creative. Read-only. This field should not be set in requests.
@@ -625,7 +601,7 @@ pub struct Creative {
     /// Account id.
     #[serde(rename="accountId")]
     pub account_id: Option<i32>,
-    /// The name of the company being advertised in the creative.
+    /// The name of the company being advertised in the creative. The value provided must exist in the advertisers.txt file.
     #[serde(rename="advertiserName")]
     pub advertiser_name: Option<String>,
     /// Resource type.
@@ -636,7 +612,7 @@ pub struct Creative {
     /// The set of destination urls for the snippet.
     #[serde(rename="clickThroughUrl")]
     pub click_through_url: Option<Vec<String>>,
-    /// The granular status of this ad in specific contexts. A context here relates to where something ultimately serves (for example, a physical location, a platform, an HTTPS vs HTTP request, or the type of auction). Read-only. This field should not be set in requests.
+    /// The granular status of this ad in specific contexts. A context here relates to where something ultimately serves (for example, a physical location, a platform, an HTTPS vs HTTP request, or the type of auction). Read-only. This field should not be set in requests. See the examples in the Creatives guide for more details.
     #[serde(rename="servingRestrictions")]
     pub serving_restrictions: Option<Vec<CreativeServingRestrictions>>,
     /// Shows any corrections that were applied to this creative. Read-only. This field should not be set in requests.
@@ -653,13 +629,13 @@ pub struct Creative {
     /// The last upload timestamp of this creative if it was uploaded via API. Read-only. The value of this field is generated, and will be ignored for uploads. (formatted RFC 3339 timestamp).
     #[serde(rename="apiUploadTimestamp")]
     pub api_upload_timestamp: Option<String>,
-    /// All vendor types for the ads that may be shown from this snippet.
+    /// List of vendor types for the ads that may be shown from this snippet. Each vendor type is represented by an integer as defined in vendors.txt.
     #[serde(rename="vendorType")]
     pub vendor_type: Option<Vec<i32>>,
     /// The filtering reasons for the creative. Read-only. This field should not be set in requests.
     #[serde(rename="filteringReasons")]
     pub filtering_reasons: Option<CreativeFilteringReasons>,
-    /// Detected sensitive categories, if any. Read-only. This field should not be set in requests.
+    /// Detected sensitive categories, if any. Each category is represented by an integer as defined in  ad-sensitive-categories.txt. Read-only. This field should not be set in requests.
     #[serde(rename="sensitiveCategories")]
     pub sensitive_categories: Option<Vec<i32>>,
 }
@@ -873,7 +849,7 @@ pub struct Proposal {
     /// True if the proposal is being renegotiated (readonly).
     #[serde(rename="isRenegotiating")]
     pub is_renegotiating: Option<bool>,
-    /// True, if the buyside inventory setup is complete for this proposal. (readonly, except via OrderSetupCompleted action)
+    /// True, if the buyside inventory setup is complete for this proposal. (readonly, except via OrderSetupCompleted action) Deprecated in favor of deal level setup complete flag.
     #[serde(rename="isSetupComplete")]
     pub is_setup_complete: Option<bool>,
     /// IDs of DBM advertisers permission to this proposal.
@@ -946,9 +922,14 @@ pub struct Product {
     /// What exchange will provide this inventory (readonly, except on create).
     #[serde(rename="inventorySource")]
     pub inventory_source: Option<String>,
+    /// The buyer that created the offer if this is a buyer initiated offer (readonly, except on create)
+    pub buyer: Option<Buyer>,
     /// Id of the publisher profile for a given seller. A (seller.account_id, publisher_profile_id) pair uniquely identifies a publisher profile. Buyers can call the PublisherProfiles::List endpoint to get a list of publisher profiles for a given seller.
     #[serde(rename="publisherProfileId")]
     pub publisher_profile_id: Option<String>,
+    /// The role that created the offer. Set to BUYER for buyer initiated offers.
+    #[serde(rename="creatorRole")]
+    pub creator_role: Option<String>,
     /// Time of last update in ms. since epoch (readonly)
     #[serde(rename="lastUpdateTimeMs")]
     pub last_update_time_ms: Option<String>,
@@ -960,11 +941,17 @@ pub struct Product {
     pub legacy_offer_id: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "adexchangebuyer#product".
     pub kind: Option<String>,
+    /// Marketplace publisher profile Id. This Id differs from the regular publisher_profile_id in that 1. This is a new id, the old Id will be deprecated in 2017. 2. This id uniquely identifies a publisher profile by itself.
+    #[serde(rename="marketplacePublisherProfileId")]
+    pub marketplace_publisher_profile_id: Option<String>,
     /// The name for this product as set by the seller. (buyer-readonly)
     pub name: Option<String>,
     /// The syndication product associated with the deal. (readonly, except on create)
     #[serde(rename="syndicationProduct")]
     pub syndication_product: Option<String>,
+    /// The billed buyer corresponding to the buyer that created the offer. (readonly, except on create)
+    #[serde(rename="billedBuyer")]
+    pub billed_buyer: Option<Buyer>,
     /// Optional private auction id if this offer is a private auction offer.
     #[serde(rename="privateAuctionId")]
     pub private_auction_id: Option<String>,
@@ -1154,7 +1141,7 @@ pub struct CreativeServingRestrictionsContexts {
     /// Only set when contextType=AUCTION_TYPE. Represents the auction types this restriction applies to.
     #[serde(rename="auctionType")]
     pub auction_type: Option<Vec<String>>,
-    /// Only set when contextType=LOCATION. Represents the geo criterias this restriction applies to.
+    /// Only set when contextType=LOCATION. Represents the geo criterias this restriction applies to. Impressions are considered to match a context if either the user location or publisher location matches a given geoCriteriaId.
     #[serde(rename="geoCriteriaId")]
     pub geo_criteria_id: Option<Vec<i32>>,
 }
@@ -1198,7 +1185,7 @@ pub struct DealTermsGuaranteedFixedPriceTermsBillingInfo {
     /// The original contracted quantity (# impressions) for this deal. To ensure delivery, sometimes the publisher will book the deal with a impression buffer, such that guaranteed_looks is greater than the contracted quantity. However clients are billed using the original contracted quantity.
     #[serde(rename="originalContractedQuantity")]
     pub original_contracted_quantity: Option<String>,
-    /// The timestamp (in ms since epoch) when the original reservation price for the deal was first converted to DFP currency. This is used to convert the contracted price into advertiser's currency without discrepancy.
+    /// The timestamp (in ms since epoch) when the original reservation price for the deal was first converted to DFP currency. This is used to convert the contracted price into buyer's currency without discrepancy.
     #[serde(rename="currencyConversionTimeMs")]
     pub currency_conversion_time_ms: Option<String>,
 }
@@ -1254,7 +1241,7 @@ pub struct CreativeFilteringReasonsReasons {
     /// The number of times the creative was filtered for the status. The count is aggregated across all publishers on the exchange.
     #[serde(rename="filteringCount")]
     pub filtering_count: Option<i64>,
-    /// The filtering status code. Please refer to the creative-status-codes.txt file for different statuses.
+    /// The filtering status code as defined in  creative-status-codes.txt.
     #[serde(rename="filteringStatus")]
     pub filtering_status: Option<i32>,
 }
@@ -1404,12 +1391,15 @@ pub struct AccountBidderLocation {
     /// - US_EAST 
     /// - US_WEST
     pub region: Option<String>,
-    /// The protocol that the bidder endpoint is using. By default, OpenRTB protocols use JSON, except PROTOCOL_OPENRTB_PROTOBUF. PROTOCOL_OPENRTB_PROTOBUF uses protobuf encoding over the latest OpenRTB protocol version, which is 2.4 right now. Allowed values:  
+    /// The protocol that the bidder endpoint is using. OpenRTB protocols with prefix PROTOCOL_OPENRTB_PROTOBUF use proto buffer, otherwise use JSON.  Allowed values:  
     /// - PROTOCOL_ADX 
     /// - PROTOCOL_OPENRTB_2_2 
     /// - PROTOCOL_OPENRTB_2_3 
     /// - PROTOCOL_OPENRTB_2_4 
-    /// - PROTOCOL_OPENRTB_PROTOBUF
+    /// - PROTOCOL_OPENRTB_2_5 
+    /// - PROTOCOL_OPENRTB_PROTOBUF_2_3 
+    /// - PROTOCOL_OPENRTB_PROTOBUF_2_4 
+    /// - PROTOCOL_OPENRTB_PROTOBUF_2_5
     #[serde(rename="bidProtocol")]
     pub bid_protocol: Option<String>,
     /// The maximum queries per second the Ad Exchange will send.
@@ -1481,7 +1471,7 @@ impl Resource for Account {}
 impl ResponseResult for Account {}
 
 
-/// The granular status of this ad in specific contexts. A context here relates to where something ultimately serves (for example, a physical location, a platform, an HTTPS vs HTTP request, or the type of auction). Read-only. This field should not be set in requests.
+/// The granular status of this ad in specific contexts. A context here relates to where something ultimately serves (for example, a physical location, a platform, an HTTPS vs HTTP request, or the type of auction). Read-only. This field should not be set in requests. See the examples in the Creatives guide for more details.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1818,6 +1808,9 @@ impl ResponseResult for GetOrderDealsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DealServingMetadata {
+    /// True if alcohol ads are allowed for this deal (read-only). This field is only populated when querying for finalized orders using the method GetFinalizedOrderDeals
+    #[serde(rename="alcoholAdsAllowed")]
+    pub alcohol_ads_allowed: Option<bool>,
     /// Tracks which parties (if any) have paused a deal. (readonly, except via PauseResumeOrderDeals action)
     #[serde(rename="dealPauseStatus")]
     pub deal_pause_status: Option<DealServingMetadataDealPauseStatus>,
@@ -1909,10 +1902,13 @@ pub struct MarketplaceDeal {
     /// Metadata about the serving status of this deal (readonly, writes via custom actions)
     #[serde(rename="dealServingMetadata")]
     pub deal_serving_metadata: Option<DealServingMetadata>,
+    /// True, if the buyside inventory setup is complete for this deal. (readonly, except via OrderSetupCompleted action)
+    #[serde(rename="isSetupComplete")]
+    pub is_setup_complete: Option<bool>,
     /// The time (ms since epoch) of the deal creation. (readonly)
     #[serde(rename="creationTimeMs")]
     pub creation_time_ms: Option<String>,
-    /// Description for the deal terms. (updatable)
+    /// Description for the deal terms. (buyer-readonly)
     #[serde(rename="inventoryDescription")]
     pub inventory_description: Option<String>,
     /// The product-id from which this deal was created. (readonly, except on create)
@@ -1974,6 +1970,9 @@ impl Part for Seller {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PretargetingConfig {
+    /// The name of the config. Must be unique. Required for all requests.
+    #[serde(rename="configName")]
+    pub config_name: Option<String>,
     /// The kind of the resource, i.e. "adexchangebuyer#pretargetingConfig".
     pub kind: Option<String>,
     /// Requests containing any of these vertical ids will match.
@@ -2001,9 +2000,9 @@ pub struct PretargetingConfig {
     /// Whether this config is active. Required for all requests.
     #[serde(rename="isActive")]
     pub is_active: Option<bool>,
-    /// The name of the config. Must be unique. Required for all requests.
-    #[serde(rename="configName")]
-    pub config_name: Option<String>,
+    /// Requests where the predicted viewability is below the specified decile will not match. E.g. if the buyer sets this value to 5, requests from slots where the predicted viewability is below 50% will not match. If the predicted viewability is unknown this field will be ignored.
+    #[serde(rename="minimumViewabilityDecile")]
+    pub minimum_viewability_decile: Option<i32>,
     /// Requests containing any of these vertical ids will not match. Values are from the publisher-verticals.txt file in the downloadable files section.
     #[serde(rename="excludedVerticals")]
     pub excluded_verticals: Option<Vec<String>>,
@@ -2172,7 +2171,7 @@ pub struct AddOrderDealsRequest {
 impl RequestValue for AddOrderDealsRequest {}
 
 
-/// Used to specify pricing rules for buyers/advertisers. Each PricePerBuyer in an product can become [0,1] deals. To check if there is a PricePerBuyer for a particular buyer or buyer/advertiser pair, we look for the most specific matching rule - we first look for a rule matching the buyer and advertiser, next a rule with the buyer but an empty advertiser list, and otherwise look for a matching rule where no buyer is set.
+/// Used to specify pricing rules for buyers. Each PricePerBuyer in a product can become [0,1] deals. To check if there is a PricePerBuyer for a particular buyer we look for the most specific matching rule - we first look for a rule matching the buyer and otherwise look for a matching rule where no buyer is set.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -2183,6 +2182,9 @@ pub struct PricePerBuyer {
     pub auction_tier: Option<String>,
     /// The buyer who will pay this price. If unset, all buyers can pay this price (if the advertisers match, and there's no more specific rule matching the buyer).
     pub buyer: Option<Buyer>,
+    /// Reference to the buyer that will get billed.
+    #[serde(rename="billedBuyer")]
+    pub billed_buyer: Option<Buyer>,
     /// The specified price
     pub price: Option<Price>,
 }
@@ -2402,6 +2404,9 @@ pub struct TargetingValueCreativeSize {
     /// The Creative size type.
     #[serde(rename="creativeSizeType")]
     pub creative_size_type: Option<String>,
+    /// The native template for native ad.
+    #[serde(rename="nativeTemplate")]
+    pub native_template: Option<String>,
     /// For video size type, the list of companion sizes.
     #[serde(rename="companionSizes")]
     pub companion_sizes: Option<Vec<TargetingValueSize>>,
@@ -3767,7 +3772,7 @@ impl<'a, C, A> PubprofileListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "publisher/{accountId}/profiles";
+        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.4/publisher/{accountId}/profiles".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -4002,7 +4007,7 @@ impl<'a, C, A> BillingInfoGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "billinginfo/{accountId}";
+        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.4/billinginfo/{accountId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -4235,7 +4240,7 @@ impl<'a, C, A> BillingInfoListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "billinginfo";
+        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.4/billinginfo".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -4446,7 +4451,7 @@ impl<'a, C, A> MarketplacedealDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "proposals/{proposalId}/deals/delete";
+        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.4/proposals/{proposalId}/deals/delete".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -4712,7 +4717,7 @@ impl<'a, C, A> MarketplacedealInsertCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "proposals/{proposalId}/deals/insert";
+        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.4/proposals/{proposalId}/deals/insert".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -4978,7 +4983,7 @@ impl<'a, C, A> MarketplacedealUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "proposals/{proposalId}/deals/update";
+        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.4/proposals/{proposalId}/deals/update".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -5242,7 +5247,7 @@ impl<'a, C, A> MarketplacedealListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "proposals/{proposalId}/deals";
+        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.4/proposals/{proposalId}/deals".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -5490,7 +5495,7 @@ impl<'a, C, A> MarketplaceprivateauctionUpdateproposalCall<'a, C, A> where C: Bo
         }
 
 
-        let mut url = self.hub._base_url.clone() + "privateauction/{privateAuctionId}/updateproposal";
+        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.4/privateauction/{privateAuctionId}/updateproposal".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -5742,7 +5747,7 @@ impl<'a, C, A> ProposalSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "proposals/search";
+        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.4/proposals/search".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -5958,7 +5963,7 @@ impl<'a, C, A> ProposalInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "proposals/insert";
+        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.4/proposals/insert".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -6197,7 +6202,7 @@ impl<'a, C, A> ProposalUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "proposals/{proposalId}/{revisionNumber}/{updateAction}";
+        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.4/proposals/{proposalId}/{revisionNumber}/{updateAction}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -6475,7 +6480,7 @@ impl<'a, C, A> ProposalSetupcompleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
         }
 
 
-        let mut url = self.hub._base_url.clone() + "proposals/{proposalId}/setupcomplete";
+        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.4/proposals/{proposalId}/setupcomplete".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -6711,7 +6716,7 @@ impl<'a, C, A> ProposalPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "proposals/{proposalId}/{revisionNumber}/{updateAction}";
+        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.4/proposals/{proposalId}/{revisionNumber}/{updateAction}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -6990,7 +6995,7 @@ impl<'a, C, A> ProposalGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "proposals/{proposalId}";
+        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.4/proposals/{proposalId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -7234,7 +7239,7 @@ impl<'a, C, A> BudgetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "billinginfo/{accountId}/{billingId}";
+        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.4/billinginfo/{accountId}/{billingId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -7505,7 +7510,7 @@ impl<'a, C, A> BudgetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "billinginfo/{accountId}/{billingId}";
+        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.4/billinginfo/{accountId}/{billingId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -7759,7 +7764,7 @@ impl<'a, C, A> BudgetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "billinginfo/{accountId}/{billingId}";
+        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.4/billinginfo/{accountId}/{billingId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -8042,7 +8047,7 @@ impl<'a, C, A> PerformanceReportListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "performancereport";
+        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.4/performancereport".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -8293,7 +8298,7 @@ impl<'a, C, A> ProductSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "products/search";
+        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.4/products/search".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -8504,7 +8509,7 @@ impl<'a, C, A> ProductGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "products/{productId}";
+        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.4/products/{productId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -8744,7 +8749,7 @@ impl<'a, C, A> MarketplacenoteListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "proposals/{proposalId}/notes";
+        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.4/proposals/{proposalId}/notes".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -8993,7 +8998,7 @@ impl<'a, C, A> MarketplacenoteInsertCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "proposals/{proposalId}/notes/insert";
+        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.4/proposals/{proposalId}/notes/insert".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -9264,7 +9269,7 @@ impl<'a, C, A> AccountPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{id}";
+        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.4/accounts/{id}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -9528,7 +9533,7 @@ impl<'a, C, A> AccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts";
+        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.4/accounts".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -9732,7 +9737,7 @@ impl<'a, C, A> AccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{id}";
+        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.4/accounts/{id}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -9979,7 +9984,7 @@ impl<'a, C, A> AccountUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{id}";
+        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.4/accounts/{id}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -10277,7 +10282,7 @@ impl<'a, C, A> CreativeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "creatives";
+        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.4/creatives".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -10528,7 +10533,7 @@ impl<'a, C, A> CreativeRemoveDealCall<'a, C, A> where C: BorrowMut<hyper::Client
         }
 
 
-        let mut url = self.hub._base_url.clone() + "creatives/{accountId}/{buyerCreativeId}/removeDeal/{dealId}";
+        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.4/creatives/{accountId}/{buyerCreativeId}/removeDeal/{dealId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -10776,7 +10781,7 @@ impl<'a, C, A> CreativeAddDealCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         }
 
 
-        let mut url = self.hub._base_url.clone() + "creatives/{accountId}/{buyerCreativeId}/addDeal/{dealId}";
+        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.4/creatives/{accountId}/{buyerCreativeId}/addDeal/{dealId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -11023,7 +11028,7 @@ impl<'a, C, A> CreativeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "creatives/{accountId}/{buyerCreativeId}";
+        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.4/creatives/{accountId}/{buyerCreativeId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -11273,7 +11278,7 @@ impl<'a, C, A> CreativeInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "creatives";
+        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.4/creatives".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -11503,7 +11508,7 @@ impl<'a, C, A> CreativeListDealCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "creatives/{accountId}/{buyerCreativeId}/listDeals";
+        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.4/creatives/{accountId}/{buyerCreativeId}/listDeals".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -11755,7 +11760,7 @@ impl<'a, C, A> PretargetingConfigInsertCall<'a, C, A> where C: BorrowMut<hyper::
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "pretargetingconfigs/{accountId}";
+        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.4/pretargetingconfigs/{accountId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -12014,7 +12019,7 @@ impl<'a, C, A> PretargetingConfigListCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "pretargetingconfigs/{accountId}";
+        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.4/pretargetingconfigs/{accountId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -12258,7 +12263,7 @@ impl<'a, C, A> PretargetingConfigUpdateCall<'a, C, A> where C: BorrowMut<hyper::
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "pretargetingconfigs/{accountId}/{configId}";
+        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.4/pretargetingconfigs/{accountId}/{configId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -12536,7 +12541,7 @@ impl<'a, C, A> PretargetingConfigPatchCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "pretargetingconfigs/{accountId}/{configId}";
+        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.4/pretargetingconfigs/{accountId}/{configId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -12806,7 +12811,7 @@ impl<'a, C, A> PretargetingConfigDeleteCall<'a, C, A> where C: BorrowMut<hyper::
         }
 
 
-        let mut url = self.hub._base_url.clone() + "pretargetingconfigs/{accountId}/{configId}";
+        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.4/pretargetingconfigs/{accountId}/{configId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -13043,7 +13048,7 @@ impl<'a, C, A> PretargetingConfigGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "pretargetingconfigs/{accountId}/{configId}";
+        let mut url = "https://www.googleapis.com/adexchangebuyer/v1.4/pretargetingconfigs/{accountId}/{configId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -13216,5 +13221,6 @@ impl<'a, C, A> PretargetingConfigGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
         self
     }
 }
+
 
 

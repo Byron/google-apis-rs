@@ -3,14 +3,14 @@ DO NOT EDIT !
 This file was generated automatically from 'src/mako/cli/README.md.mako'
 DO NOT EDIT !
 -->
-The `partners2` command-line interface *(CLI)* allows to use most features of the *Google partners* service from the comfort of your terminal.
+The `partners2` command-line interface *(CLI)* allows to use most features of the *Google Partners* service from the comfort of your terminal.
 
 By default all output is printed to standard out, but flags can be set to direct it into a file independent of your shell's
 capabilities. Errors will be printed to standard error, and cause the program's exit code to be non-zero.
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
-Everything else about the *partners* API can be found at the
+Everything else about the *Partners* API can be found at the
 [official documentation site](https://developers.google.com/partners/).
 
 # Installation and Source Code
@@ -25,20 +25,38 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *partners* API at revision *20151009*. The CLI is at version *1.0.4*.
+This documentation was generated from the *Partners* API at revision *20170503*. The CLI is at version *1.0.4*.
 
 ```bash
 partners2 [options]
+        analytics
+                list [-p <v>]... [-o <out>]
         client-messages
                 log (-r <kv>)... [-p <v>]... [-o <out>]
         companies
                 get <company-id> [-p <v>]... [-o <out>]
                 leads-create <company-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]
+        exams
+                get-token <exam-type> [-p <v>]... [-o <out>]
+        leads
+                list [-p <v>]... [-o <out>]
+        methods
+                get-partnersstatus [-p <v>]... [-o <out>]
+                update-companies (-r <kv>)... [-p <v>]... [-o <out>]
+                update-leads (-r <kv>)... [-p <v>]... [-o <out>]
+        offers
+                history-list [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
         user-events
                 log (-r <kv>)... [-p <v>]... [-o <out>]
         user-states
                 list [-p <v>]... [-o <out>]
+        users
+                create-company-relation <user-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                delete-company-relation <user-id> [-p <v>]... [-o <out>]
+                get <user-id> [-p <v>]... [-o <out>]
+                update-profile (-r <kv>)... [-p <v>]... [-o <out>]
   partners2 --help
 
 Configuration:

@@ -228,6 +228,12 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "team-drive-id" => {
+                    call = call.team_drive_id(value.unwrap_or(""));
+                },
+                "supports-team-drives" => {
+                    call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -241,6 +247,66 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["team-drive-id", "supports-team-drives"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _changes_get_start_page_token(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.changes().get_start_page_token();
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "team-drive-id" => {
+                    call = call.team_drive_id(value.unwrap_or(""));
+                },
+                "supports-team-drives" => {
+                    call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["team-drive-id", "supports-team-drives"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -280,6 +346,12 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "team-drive-id" => {
+                    call = call.team_drive_id(value.unwrap_or(""));
+                },
+                "supports-team-drives" => {
+                    call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
+                },
                 "start-change-id" => {
                     call = call.start_change_id(value.unwrap_or(""));
                 },
@@ -292,11 +364,17 @@ impl<'n> Engine<'n> {
                 "max-results" => {
                     call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
                 },
+                "include-team-drive-items" => {
+                    call = call.include_team_drive_items(arg_from_str(value.unwrap_or("false"), err, "include-team-drive-items", "boolean"));
+                },
                 "include-subscribed" => {
                     call = call.include_subscribed(arg_from_str(value.unwrap_or("false"), err, "include-subscribed", "boolean"));
                 },
                 "include-deleted" => {
                     call = call.include_deleted(arg_from_str(value.unwrap_or("false"), err, "include-deleted", "boolean"));
+                },
+                "include-corpus-removals" => {
+                    call = call.include_corpus_removals(arg_from_str(value.unwrap_or("false"), err, "include-corpus-removals", "boolean"));
                 },
                 _ => {
                     let mut found = false;
@@ -311,7 +389,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["include-subscribed", "include-deleted", "max-results", "page-token", "spaces", "start-change-id"].iter().map(|v|*v));
+                                                                           v.extend(["include-subscribed", "include-deleted", "include-team-drive-items", "max-results", "page-token", "spaces", "supports-team-drives", "start-change-id", "team-drive-id", "include-corpus-removals"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -393,6 +471,12 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "team-drive-id" => {
+                    call = call.team_drive_id(value.unwrap_or(""));
+                },
+                "supports-team-drives" => {
+                    call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
+                },
                 "start-change-id" => {
                     call = call.start_change_id(value.unwrap_or(""));
                 },
@@ -405,11 +489,17 @@ impl<'n> Engine<'n> {
                 "max-results" => {
                     call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
                 },
+                "include-team-drive-items" => {
+                    call = call.include_team_drive_items(arg_from_str(value.unwrap_or("false"), err, "include-team-drive-items", "boolean"));
+                },
                 "include-subscribed" => {
                     call = call.include_subscribed(arg_from_str(value.unwrap_or("false"), err, "include-subscribed", "boolean"));
                 },
                 "include-deleted" => {
                     call = call.include_deleted(arg_from_str(value.unwrap_or("false"), err, "include-deleted", "boolean"));
+                },
+                "include-corpus-removals" => {
+                    call = call.include_corpus_removals(arg_from_str(value.unwrap_or("false"), err, "include-corpus-removals", "boolean"));
                 },
                 _ => {
                     let mut found = false;
@@ -424,7 +514,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["include-subscribed", "include-deleted", "max-results", "page-token", "spaces", "start-change-id"].iter().map(|v|*v));
+                                                                           v.extend(["include-subscribed", "include-deleted", "include-team-drive-items", "max-results", "page-token", "spaces", "supports-team-drives", "start-change-id", "team-drive-id", "include-corpus-removals"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -682,6 +772,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "supports-team-drives" => {
+                    call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -695,6 +788,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["supports-team-drives"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1295,6 +1389,7 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "has-thumbnail" => Some(("hasThumbnail", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "mime-type" => Some(("mimeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-data-contents" => Some(("appDataContents", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "thumbnail-link" => Some(("thumbnailLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels.restricted" => Some(("labels.restricted", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1305,7 +1400,7 @@ impl<'n> Engine<'n> {
                     "labels.trashed" => Some(("labels.trashed", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "indexable-text.text" => Some(("indexableText.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "thumbnail-version" => Some(("thumbnailVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "explicitly-trashed" => Some(("explicitlyTrashed", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "spaces" => Some(("spaces", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "is-app-authorized" => Some(("isAppAuthorized", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "last-modifying-user-name" => Some(("lastModifyingUserName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "writers-can-share" => Some(("writersCanShare", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1317,6 +1412,12 @@ impl<'n> Engine<'n> {
                     "sharing-user.permission-id" => Some(("sharingUser.permissionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "sharing-user.is-authenticated-user" => Some(("sharingUser.isAuthenticatedUser", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "sharing-user.email-address" => Some(("sharingUser.emailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trashing-user.picture.url" => Some(("trashingUser.picture.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trashing-user.kind" => Some(("trashingUser.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trashing-user.display-name" => Some(("trashingUser.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trashing-user.permission-id" => Some(("trashingUser.permissionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trashing-user.is-authenticated-user" => Some(("trashingUser.isAuthenticatedUser", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "trashing-user.email-address" => Some(("trashingUser.emailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "video-media-metadata.width" => Some(("videoMediaMetadata.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "video-media-metadata.duration-millis" => Some(("videoMediaMetadata.durationMillis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "video-media-metadata.height" => Some(("videoMediaMetadata.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -1328,14 +1429,33 @@ impl<'n> Engine<'n> {
                     "last-modifying-user.email-address" => Some(("lastModifyingUser.emailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "copyable" => Some(("copyable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "folder-color-rgb" => Some(("folderColorRgb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "marked-viewed-by-me-date" => Some(("markedViewedByMeDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "owner-names" => Some(("ownerNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "capabilities.can-read-revisions" => Some(("capabilities.canReadRevisions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-untrash" => Some(("capabilities.canUntrash", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-copy" => Some(("capabilities.canCopy", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-share" => Some(("capabilities.canShare", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-delete" => Some(("capabilities.canDelete", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-move-team-drive-item" => Some(("capabilities.canMoveTeamDriveItem", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-add-children" => Some(("capabilities.canAddChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-change-restricted-download" => Some(("capabilities.canChangeRestrictedDownload", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-move-item-into-team-drive" => Some(("capabilities.canMoveItemIntoTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-download" => Some(("capabilities.canDownload", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-comment" => Some(("capabilities.canComment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-edit" => Some(("capabilities.canEdit", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-trash" => Some(("capabilities.canTrash", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-remove-children" => Some(("capabilities.canRemoveChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-read-team-drive" => Some(("capabilities.canReadTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-list-children" => Some(("capabilities.canListChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-rename" => Some(("capabilities.canRename", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "shared-with-me-date" => Some(("sharedWithMeDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "web-view-link" => Some(("webViewLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-viewed-by-me-date" => Some(("lastViewedByMeDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "export-links" => Some(("exportLinks", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "shared" => Some(("shared", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "full-file-extension" => Some(("fullFileExtension", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "open-with-links" => Some(("openWithLinks", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "full-file-extension" => Some(("fullFileExtension", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trashed-date" => Some(("trashedDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "can-read-revisions" => Some(("canReadRevisions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "image-media-metadata.exposure-bias" => Some(("imageMediaMetadata.exposureBias", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "image-media-metadata.exposure-time" => Some(("imageMediaMetadata.exposureTime", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -1362,18 +1482,17 @@ impl<'n> Engine<'n> {
                     "image-media-metadata.camera-model" => Some(("imageMediaMetadata.cameraModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "web-content-link" => Some(("webContentLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "file-size" => Some(("fileSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "editable" => Some(("editable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "marked-viewed-by-me-date" => Some(("markedViewedByMeDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "can-comment" => Some(("canComment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "quota-bytes-used" => Some(("quotaBytesUsed", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "embed-link" => Some(("embedLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "modified-date" => Some(("modifiedDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "created-date" => Some(("createdDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "last-viewed-by-me-date" => Some(("lastViewedByMeDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "team-drive-id" => Some(("teamDriveId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "md5-checksum" => Some(("md5Checksum", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "icon-link" => Some(("iconLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-open-with-link" => Some(("defaultOpenWithLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "embed-link" => Some(("embedLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "alternate-link" => Some(("alternateLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1384,6 +1503,7 @@ impl<'n> Engine<'n> {
                     "user-permission.with-link" => Some(("userPermission.withLink", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "user-permission.domain" => Some(("userPermission.domain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-permission.name" => Some(("userPermission.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-permission.deleted" => Some(("userPermission.deleted", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "user-permission.kind" => Some(("userPermission.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-permission.value" => Some(("userPermission.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-permission.id" => Some(("userPermission.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1396,15 +1516,16 @@ impl<'n> Engine<'n> {
                     "user-permission.additional-roles" => Some(("userPermission.additionalRoles", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "user-permission.self-link" => Some(("userPermission.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-permission.photo-link" => Some(("userPermission.photoLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "spaces" => Some(("spaces", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "explicitly-trashed" => Some(("explicitlyTrashed", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "shareable" => Some(("shareable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "original-filename" => Some(("originalFilename", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "file-extension" => Some(("fileExtension", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "has-augmented-permissions" => Some(("hasAugmentedPermissions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "head-revision-id" => Some(("headRevisionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "modified-date" => Some(("modifiedDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "file-size" => Some(("fileSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "alternate-link", "altitude", "aperture", "app-data-contents", "auth-key", "camera-make", "camera-model", "can-comment", "can-read-revisions", "color-space", "copyable", "created-date", "date", "default-open-with-link", "description", "display-name", "domain", "download-url", "duration-millis", "editable", "email-address", "embed-link", "etag", "expiration-date", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "file-size", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "has-thumbnail", "head-revision-id", "height", "hidden", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "is-authenticated-user", "iso-speed", "kind", "labels", "last-modifying-user", "last-modifying-user-name", "last-viewed-by-me-date", "latitude", "lens", "location", "longitude", "marked-viewed-by-me-date", "max-aperture-value", "md5-checksum", "metering-mode", "mime-type", "modified", "modified-by-me-date", "modified-date", "name", "open-with-links", "original-filename", "owned-by-me", "owner-names", "permission-id", "photo-link", "picture", "quota-bytes-used", "restricted", "role", "rotation", "self-link", "sensor", "shareable", "shared", "shared-with-me-date", "sharing-user", "spaces", "starred", "subject-distance", "text", "thumbnail", "thumbnail-link", "thumbnail-version", "title", "trashed", "type", "url", "user-permission", "value", "version", "video-media-metadata", "viewed", "web-content-link", "web-view-link", "white-balance", "width", "with-link", "writers-can-share"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "alternate-link", "altitude", "aperture", "app-data-contents", "auth-key", "camera-make", "camera-model", "can-add-children", "can-change-restricted-download", "can-comment", "can-copy", "can-delete", "can-download", "can-edit", "can-list-children", "can-move-item-into-team-drive", "can-move-team-drive-item", "can-read-revisions", "can-read-team-drive", "can-remove-children", "can-rename", "can-share", "can-trash", "can-untrash", "capabilities", "color-space", "copyable", "created-date", "date", "default-open-with-link", "deleted", "description", "display-name", "domain", "download-url", "duration-millis", "editable", "email-address", "embed-link", "etag", "expiration-date", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "file-size", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "has-augmented-permissions", "has-thumbnail", "head-revision-id", "height", "hidden", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "is-authenticated-user", "iso-speed", "kind", "labels", "last-modifying-user", "last-modifying-user-name", "last-viewed-by-me-date", "latitude", "lens", "location", "longitude", "marked-viewed-by-me-date", "max-aperture-value", "md5-checksum", "metering-mode", "mime-type", "modified", "modified-by-me-date", "modified-date", "name", "open-with-links", "original-filename", "owned-by-me", "owner-names", "permission-id", "photo-link", "picture", "quota-bytes-used", "restricted", "role", "rotation", "self-link", "sensor", "shareable", "shared", "shared-with-me-date", "sharing-user", "spaces", "starred", "subject-distance", "team-drive-id", "text", "thumbnail", "thumbnail-link", "thumbnail-version", "title", "trashed", "trashed-date", "trashing-user", "type", "url", "user-permission", "value", "version", "video-media-metadata", "viewed", "web-content-link", "web-view-link", "white-balance", "width", "with-link", "writers-can-share"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1426,6 +1547,9 @@ impl<'n> Engine<'n> {
                 },
                 "timed-text-language" => {
                     call = call.timed_text_language(value.unwrap_or(""));
+                },
+                "supports-team-drives" => {
+                    call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
                 },
                 "pinned" => {
                     call = call.pinned(arg_from_str(value.unwrap_or("false"), err, "pinned", "boolean"));
@@ -1452,7 +1576,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["convert", "ocr-language", "visibility", "pinned", "ocr", "timed-text-track-name", "timed-text-language"].iter().map(|v|*v));
+                                                                           v.extend(["convert", "ocr-language", "supports-team-drives", "pinned", "visibility", "ocr", "timed-text-track-name", "timed-text-language"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1492,6 +1616,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "supports-team-drives" => {
+                    call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1505,6 +1632,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["supports-team-drives"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1700,6 +1828,9 @@ impl<'n> Engine<'n> {
                 "update-viewed-date" => {
                     call = call.update_viewed_date(arg_from_str(value.unwrap_or("false"), err, "update-viewed-date", "boolean"));
                 },
+                "supports-team-drives" => {
+                    call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
+                },
                 "revision-id" => {
                     call = call.revision_id(value.unwrap_or(""));
                 },
@@ -1725,7 +1856,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["revision-id", "update-viewed-date", "acknowledge-abuse", "projection"].iter().map(|v|*v));
+                                                                           v.extend(["revision-id", "update-viewed-date", "acknowledge-abuse", "projection", "supports-team-drives"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1789,6 +1920,7 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "has-thumbnail" => Some(("hasThumbnail", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "mime-type" => Some(("mimeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-data-contents" => Some(("appDataContents", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "thumbnail-link" => Some(("thumbnailLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels.restricted" => Some(("labels.restricted", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1799,7 +1931,7 @@ impl<'n> Engine<'n> {
                     "labels.trashed" => Some(("labels.trashed", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "indexable-text.text" => Some(("indexableText.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "thumbnail-version" => Some(("thumbnailVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "explicitly-trashed" => Some(("explicitlyTrashed", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "spaces" => Some(("spaces", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "is-app-authorized" => Some(("isAppAuthorized", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "last-modifying-user-name" => Some(("lastModifyingUserName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "writers-can-share" => Some(("writersCanShare", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1811,6 +1943,12 @@ impl<'n> Engine<'n> {
                     "sharing-user.permission-id" => Some(("sharingUser.permissionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "sharing-user.is-authenticated-user" => Some(("sharingUser.isAuthenticatedUser", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "sharing-user.email-address" => Some(("sharingUser.emailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trashing-user.picture.url" => Some(("trashingUser.picture.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trashing-user.kind" => Some(("trashingUser.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trashing-user.display-name" => Some(("trashingUser.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trashing-user.permission-id" => Some(("trashingUser.permissionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trashing-user.is-authenticated-user" => Some(("trashingUser.isAuthenticatedUser", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "trashing-user.email-address" => Some(("trashingUser.emailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "video-media-metadata.width" => Some(("videoMediaMetadata.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "video-media-metadata.duration-millis" => Some(("videoMediaMetadata.durationMillis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "video-media-metadata.height" => Some(("videoMediaMetadata.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -1822,14 +1960,33 @@ impl<'n> Engine<'n> {
                     "last-modifying-user.email-address" => Some(("lastModifyingUser.emailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "copyable" => Some(("copyable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "folder-color-rgb" => Some(("folderColorRgb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "marked-viewed-by-me-date" => Some(("markedViewedByMeDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "owner-names" => Some(("ownerNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "capabilities.can-read-revisions" => Some(("capabilities.canReadRevisions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-untrash" => Some(("capabilities.canUntrash", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-copy" => Some(("capabilities.canCopy", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-share" => Some(("capabilities.canShare", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-delete" => Some(("capabilities.canDelete", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-move-team-drive-item" => Some(("capabilities.canMoveTeamDriveItem", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-add-children" => Some(("capabilities.canAddChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-change-restricted-download" => Some(("capabilities.canChangeRestrictedDownload", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-move-item-into-team-drive" => Some(("capabilities.canMoveItemIntoTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-download" => Some(("capabilities.canDownload", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-comment" => Some(("capabilities.canComment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-edit" => Some(("capabilities.canEdit", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-trash" => Some(("capabilities.canTrash", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-remove-children" => Some(("capabilities.canRemoveChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-read-team-drive" => Some(("capabilities.canReadTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-list-children" => Some(("capabilities.canListChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-rename" => Some(("capabilities.canRename", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "shared-with-me-date" => Some(("sharedWithMeDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "web-view-link" => Some(("webViewLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-viewed-by-me-date" => Some(("lastViewedByMeDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "export-links" => Some(("exportLinks", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "shared" => Some(("shared", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "full-file-extension" => Some(("fullFileExtension", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "open-with-links" => Some(("openWithLinks", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "full-file-extension" => Some(("fullFileExtension", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trashed-date" => Some(("trashedDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "can-read-revisions" => Some(("canReadRevisions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "image-media-metadata.exposure-bias" => Some(("imageMediaMetadata.exposureBias", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "image-media-metadata.exposure-time" => Some(("imageMediaMetadata.exposureTime", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -1856,18 +2013,17 @@ impl<'n> Engine<'n> {
                     "image-media-metadata.camera-model" => Some(("imageMediaMetadata.cameraModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "web-content-link" => Some(("webContentLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "file-size" => Some(("fileSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "editable" => Some(("editable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "marked-viewed-by-me-date" => Some(("markedViewedByMeDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "can-comment" => Some(("canComment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "quota-bytes-used" => Some(("quotaBytesUsed", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "embed-link" => Some(("embedLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "modified-date" => Some(("modifiedDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "created-date" => Some(("createdDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "last-viewed-by-me-date" => Some(("lastViewedByMeDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "team-drive-id" => Some(("teamDriveId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "md5-checksum" => Some(("md5Checksum", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "icon-link" => Some(("iconLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-open-with-link" => Some(("defaultOpenWithLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "embed-link" => Some(("embedLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "alternate-link" => Some(("alternateLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1878,6 +2034,7 @@ impl<'n> Engine<'n> {
                     "user-permission.with-link" => Some(("userPermission.withLink", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "user-permission.domain" => Some(("userPermission.domain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-permission.name" => Some(("userPermission.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-permission.deleted" => Some(("userPermission.deleted", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "user-permission.kind" => Some(("userPermission.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-permission.value" => Some(("userPermission.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-permission.id" => Some(("userPermission.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1890,15 +2047,16 @@ impl<'n> Engine<'n> {
                     "user-permission.additional-roles" => Some(("userPermission.additionalRoles", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "user-permission.self-link" => Some(("userPermission.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-permission.photo-link" => Some(("userPermission.photoLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "spaces" => Some(("spaces", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "explicitly-trashed" => Some(("explicitlyTrashed", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "shareable" => Some(("shareable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "original-filename" => Some(("originalFilename", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "file-extension" => Some(("fileExtension", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "has-augmented-permissions" => Some(("hasAugmentedPermissions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "head-revision-id" => Some(("headRevisionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "modified-date" => Some(("modifiedDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "file-size" => Some(("fileSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "alternate-link", "altitude", "aperture", "app-data-contents", "auth-key", "camera-make", "camera-model", "can-comment", "can-read-revisions", "color-space", "copyable", "created-date", "date", "default-open-with-link", "description", "display-name", "domain", "download-url", "duration-millis", "editable", "email-address", "embed-link", "etag", "expiration-date", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "file-size", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "has-thumbnail", "head-revision-id", "height", "hidden", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "is-authenticated-user", "iso-speed", "kind", "labels", "last-modifying-user", "last-modifying-user-name", "last-viewed-by-me-date", "latitude", "lens", "location", "longitude", "marked-viewed-by-me-date", "max-aperture-value", "md5-checksum", "metering-mode", "mime-type", "modified", "modified-by-me-date", "modified-date", "name", "open-with-links", "original-filename", "owned-by-me", "owner-names", "permission-id", "photo-link", "picture", "quota-bytes-used", "restricted", "role", "rotation", "self-link", "sensor", "shareable", "shared", "shared-with-me-date", "sharing-user", "spaces", "starred", "subject-distance", "text", "thumbnail", "thumbnail-link", "thumbnail-version", "title", "trashed", "type", "url", "user-permission", "value", "version", "video-media-metadata", "viewed", "web-content-link", "web-view-link", "white-balance", "width", "with-link", "writers-can-share"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "alternate-link", "altitude", "aperture", "app-data-contents", "auth-key", "camera-make", "camera-model", "can-add-children", "can-change-restricted-download", "can-comment", "can-copy", "can-delete", "can-download", "can-edit", "can-list-children", "can-move-item-into-team-drive", "can-move-team-drive-item", "can-read-revisions", "can-read-team-drive", "can-remove-children", "can-rename", "can-share", "can-trash", "can-untrash", "capabilities", "color-space", "copyable", "created-date", "date", "default-open-with-link", "deleted", "description", "display-name", "domain", "download-url", "duration-millis", "editable", "email-address", "embed-link", "etag", "expiration-date", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "file-size", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "has-augmented-permissions", "has-thumbnail", "head-revision-id", "height", "hidden", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "is-authenticated-user", "iso-speed", "kind", "labels", "last-modifying-user", "last-modifying-user-name", "last-viewed-by-me-date", "latitude", "lens", "location", "longitude", "marked-viewed-by-me-date", "max-aperture-value", "md5-checksum", "metering-mode", "mime-type", "modified", "modified-by-me-date", "modified-date", "name", "open-with-links", "original-filename", "owned-by-me", "owner-names", "permission-id", "photo-link", "picture", "quota-bytes-used", "restricted", "role", "rotation", "self-link", "sensor", "shareable", "shared", "shared-with-me-date", "sharing-user", "spaces", "starred", "subject-distance", "team-drive-id", "text", "thumbnail", "thumbnail-link", "thumbnail-version", "title", "trashed", "trashed-date", "trashing-user", "type", "url", "user-permission", "value", "version", "video-media-metadata", "viewed", "web-content-link", "web-view-link", "white-balance", "width", "with-link", "writers-can-share"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1923,6 +2081,9 @@ impl<'n> Engine<'n> {
                 },
                 "timed-text-language" => {
                     call = call.timed_text_language(value.unwrap_or(""));
+                },
+                "supports-team-drives" => {
+                    call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
                 },
                 "pinned" => {
                     call = call.pinned(arg_from_str(value.unwrap_or("false"), err, "pinned", "boolean"));
@@ -1949,7 +2110,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["convert", "use-content-as-indexable-text", "ocr-language", "visibility", "pinned", "ocr", "timed-text-track-name", "timed-text-language"].iter().map(|v|*v));
+                                                                           v.extend(["convert", "use-content-as-indexable-text", "ocr-language", "supports-team-drives", "pinned", "visibility", "ocr", "timed-text-track-name", "timed-text-language"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1993,6 +2154,12 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "team-drive-id" => {
+                    call = call.team_drive_id(value.unwrap_or(""));
+                },
+                "supports-team-drives" => {
+                    call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
+                },
                 "spaces" => {
                     call = call.spaces(value.unwrap_or(""));
                 },
@@ -2011,8 +2178,14 @@ impl<'n> Engine<'n> {
                 "max-results" => {
                     call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
                 },
+                "include-team-drive-items" => {
+                    call = call.include_team_drive_items(arg_from_str(value.unwrap_or("false"), err, "include-team-drive-items", "boolean"));
+                },
                 "corpus" => {
                     call = call.corpus(value.unwrap_or(""));
+                },
+                "corpora" => {
+                    call = call.corpora(value.unwrap_or(""));
                 },
                 _ => {
                     let mut found = false;
@@ -2027,7 +2200,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["order-by", "projection", "max-results", "q", "page-token", "spaces", "corpus"].iter().map(|v|*v));
+                                                                           v.extend(["order-by", "projection", "include-team-drive-items", "corpora", "supports-team-drives", "q", "page-token", "spaces", "max-results", "team-drive-id", "corpus"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2086,6 +2259,7 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "has-thumbnail" => Some(("hasThumbnail", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "mime-type" => Some(("mimeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-data-contents" => Some(("appDataContents", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "thumbnail-link" => Some(("thumbnailLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels.restricted" => Some(("labels.restricted", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -2096,7 +2270,7 @@ impl<'n> Engine<'n> {
                     "labels.trashed" => Some(("labels.trashed", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "indexable-text.text" => Some(("indexableText.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "thumbnail-version" => Some(("thumbnailVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "explicitly-trashed" => Some(("explicitlyTrashed", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "spaces" => Some(("spaces", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "is-app-authorized" => Some(("isAppAuthorized", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "last-modifying-user-name" => Some(("lastModifyingUserName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "writers-can-share" => Some(("writersCanShare", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -2108,6 +2282,12 @@ impl<'n> Engine<'n> {
                     "sharing-user.permission-id" => Some(("sharingUser.permissionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "sharing-user.is-authenticated-user" => Some(("sharingUser.isAuthenticatedUser", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "sharing-user.email-address" => Some(("sharingUser.emailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trashing-user.picture.url" => Some(("trashingUser.picture.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trashing-user.kind" => Some(("trashingUser.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trashing-user.display-name" => Some(("trashingUser.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trashing-user.permission-id" => Some(("trashingUser.permissionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trashing-user.is-authenticated-user" => Some(("trashingUser.isAuthenticatedUser", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "trashing-user.email-address" => Some(("trashingUser.emailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "video-media-metadata.width" => Some(("videoMediaMetadata.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "video-media-metadata.duration-millis" => Some(("videoMediaMetadata.durationMillis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "video-media-metadata.height" => Some(("videoMediaMetadata.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -2119,14 +2299,33 @@ impl<'n> Engine<'n> {
                     "last-modifying-user.email-address" => Some(("lastModifyingUser.emailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "copyable" => Some(("copyable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "folder-color-rgb" => Some(("folderColorRgb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "marked-viewed-by-me-date" => Some(("markedViewedByMeDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "owner-names" => Some(("ownerNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "capabilities.can-read-revisions" => Some(("capabilities.canReadRevisions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-untrash" => Some(("capabilities.canUntrash", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-copy" => Some(("capabilities.canCopy", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-share" => Some(("capabilities.canShare", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-delete" => Some(("capabilities.canDelete", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-move-team-drive-item" => Some(("capabilities.canMoveTeamDriveItem", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-add-children" => Some(("capabilities.canAddChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-change-restricted-download" => Some(("capabilities.canChangeRestrictedDownload", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-move-item-into-team-drive" => Some(("capabilities.canMoveItemIntoTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-download" => Some(("capabilities.canDownload", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-comment" => Some(("capabilities.canComment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-edit" => Some(("capabilities.canEdit", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-trash" => Some(("capabilities.canTrash", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-remove-children" => Some(("capabilities.canRemoveChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-read-team-drive" => Some(("capabilities.canReadTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-list-children" => Some(("capabilities.canListChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-rename" => Some(("capabilities.canRename", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "shared-with-me-date" => Some(("sharedWithMeDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "web-view-link" => Some(("webViewLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-viewed-by-me-date" => Some(("lastViewedByMeDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "export-links" => Some(("exportLinks", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "shared" => Some(("shared", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "full-file-extension" => Some(("fullFileExtension", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "open-with-links" => Some(("openWithLinks", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "full-file-extension" => Some(("fullFileExtension", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trashed-date" => Some(("trashedDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "can-read-revisions" => Some(("canReadRevisions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "image-media-metadata.exposure-bias" => Some(("imageMediaMetadata.exposureBias", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "image-media-metadata.exposure-time" => Some(("imageMediaMetadata.exposureTime", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -2153,18 +2352,17 @@ impl<'n> Engine<'n> {
                     "image-media-metadata.camera-model" => Some(("imageMediaMetadata.cameraModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "web-content-link" => Some(("webContentLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "file-size" => Some(("fileSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "editable" => Some(("editable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "marked-viewed-by-me-date" => Some(("markedViewedByMeDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "can-comment" => Some(("canComment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "quota-bytes-used" => Some(("quotaBytesUsed", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "embed-link" => Some(("embedLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "modified-date" => Some(("modifiedDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "created-date" => Some(("createdDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "last-viewed-by-me-date" => Some(("lastViewedByMeDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "team-drive-id" => Some(("teamDriveId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "md5-checksum" => Some(("md5Checksum", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "icon-link" => Some(("iconLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-open-with-link" => Some(("defaultOpenWithLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "embed-link" => Some(("embedLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "alternate-link" => Some(("alternateLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2175,6 +2373,7 @@ impl<'n> Engine<'n> {
                     "user-permission.with-link" => Some(("userPermission.withLink", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "user-permission.domain" => Some(("userPermission.domain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-permission.name" => Some(("userPermission.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-permission.deleted" => Some(("userPermission.deleted", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "user-permission.kind" => Some(("userPermission.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-permission.value" => Some(("userPermission.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-permission.id" => Some(("userPermission.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2187,15 +2386,16 @@ impl<'n> Engine<'n> {
                     "user-permission.additional-roles" => Some(("userPermission.additionalRoles", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "user-permission.self-link" => Some(("userPermission.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-permission.photo-link" => Some(("userPermission.photoLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "spaces" => Some(("spaces", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "explicitly-trashed" => Some(("explicitlyTrashed", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "shareable" => Some(("shareable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "original-filename" => Some(("originalFilename", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "file-extension" => Some(("fileExtension", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "has-augmented-permissions" => Some(("hasAugmentedPermissions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "head-revision-id" => Some(("headRevisionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "modified-date" => Some(("modifiedDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "file-size" => Some(("fileSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "alternate-link", "altitude", "aperture", "app-data-contents", "auth-key", "camera-make", "camera-model", "can-comment", "can-read-revisions", "color-space", "copyable", "created-date", "date", "default-open-with-link", "description", "display-name", "domain", "download-url", "duration-millis", "editable", "email-address", "embed-link", "etag", "expiration-date", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "file-size", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "has-thumbnail", "head-revision-id", "height", "hidden", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "is-authenticated-user", "iso-speed", "kind", "labels", "last-modifying-user", "last-modifying-user-name", "last-viewed-by-me-date", "latitude", "lens", "location", "longitude", "marked-viewed-by-me-date", "max-aperture-value", "md5-checksum", "metering-mode", "mime-type", "modified", "modified-by-me-date", "modified-date", "name", "open-with-links", "original-filename", "owned-by-me", "owner-names", "permission-id", "photo-link", "picture", "quota-bytes-used", "restricted", "role", "rotation", "self-link", "sensor", "shareable", "shared", "shared-with-me-date", "sharing-user", "spaces", "starred", "subject-distance", "text", "thumbnail", "thumbnail-link", "thumbnail-version", "title", "trashed", "type", "url", "user-permission", "value", "version", "video-media-metadata", "viewed", "web-content-link", "web-view-link", "white-balance", "width", "with-link", "writers-can-share"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "alternate-link", "altitude", "aperture", "app-data-contents", "auth-key", "camera-make", "camera-model", "can-add-children", "can-change-restricted-download", "can-comment", "can-copy", "can-delete", "can-download", "can-edit", "can-list-children", "can-move-item-into-team-drive", "can-move-team-drive-item", "can-read-revisions", "can-read-team-drive", "can-remove-children", "can-rename", "can-share", "can-trash", "can-untrash", "capabilities", "color-space", "copyable", "created-date", "date", "default-open-with-link", "deleted", "description", "display-name", "domain", "download-url", "duration-millis", "editable", "email-address", "embed-link", "etag", "expiration-date", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "file-size", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "has-augmented-permissions", "has-thumbnail", "head-revision-id", "height", "hidden", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "is-authenticated-user", "iso-speed", "kind", "labels", "last-modifying-user", "last-modifying-user-name", "last-viewed-by-me-date", "latitude", "lens", "location", "longitude", "marked-viewed-by-me-date", "max-aperture-value", "md5-checksum", "metering-mode", "mime-type", "modified", "modified-by-me-date", "modified-date", "name", "open-with-links", "original-filename", "owned-by-me", "owner-names", "permission-id", "photo-link", "picture", "quota-bytes-used", "restricted", "role", "rotation", "self-link", "sensor", "shareable", "shared", "shared-with-me-date", "sharing-user", "spaces", "starred", "subject-distance", "team-drive-id", "text", "thumbnail", "thumbnail-link", "thumbnail-version", "title", "trashed", "trashed-date", "trashing-user", "type", "url", "user-permission", "value", "version", "video-media-metadata", "viewed", "web-content-link", "web-view-link", "white-balance", "width", "with-link", "writers-can-share"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2220,6 +2420,9 @@ impl<'n> Engine<'n> {
                 },
                 "timed-text-language" => {
                     call = call.timed_text_language(value.unwrap_or(""));
+                },
+                "supports-team-drives" => {
+                    call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
                 },
                 "set-modified-date" => {
                     call = call.set_modified_date(arg_from_str(value.unwrap_or("false"), err, "set-modified-date", "boolean"));
@@ -2261,7 +2464,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["add-parents", "convert", "ocr", "set-modified-date", "modified-date-behavior", "use-content-as-indexable-text", "ocr-language", "new-revision", "pinned", "remove-parents", "update-viewed-date", "timed-text-track-name", "timed-text-language"].iter().map(|v|*v));
+                                                                           v.extend(["add-parents", "new-revision", "ocr", "remove-parents", "convert", "modified-date-behavior", "use-content-as-indexable-text", "ocr-language", "supports-team-drives", "pinned", "set-modified-date", "update-viewed-date", "timed-text-track-name", "timed-text-language"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2301,6 +2504,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "supports-team-drives" => {
+                    call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2314,6 +2520,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["supports-team-drives"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2353,6 +2560,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "supports-team-drives" => {
+                    call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2366,6 +2576,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["supports-team-drives"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2405,6 +2616,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "supports-team-drives" => {
+                    call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2418,6 +2632,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["supports-team-drives"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2476,6 +2691,7 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "has-thumbnail" => Some(("hasThumbnail", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "mime-type" => Some(("mimeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-data-contents" => Some(("appDataContents", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "thumbnail-link" => Some(("thumbnailLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels.restricted" => Some(("labels.restricted", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -2486,7 +2702,7 @@ impl<'n> Engine<'n> {
                     "labels.trashed" => Some(("labels.trashed", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "indexable-text.text" => Some(("indexableText.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "thumbnail-version" => Some(("thumbnailVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "explicitly-trashed" => Some(("explicitlyTrashed", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "spaces" => Some(("spaces", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "is-app-authorized" => Some(("isAppAuthorized", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "last-modifying-user-name" => Some(("lastModifyingUserName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "writers-can-share" => Some(("writersCanShare", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -2498,6 +2714,12 @@ impl<'n> Engine<'n> {
                     "sharing-user.permission-id" => Some(("sharingUser.permissionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "sharing-user.is-authenticated-user" => Some(("sharingUser.isAuthenticatedUser", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "sharing-user.email-address" => Some(("sharingUser.emailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trashing-user.picture.url" => Some(("trashingUser.picture.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trashing-user.kind" => Some(("trashingUser.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trashing-user.display-name" => Some(("trashingUser.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trashing-user.permission-id" => Some(("trashingUser.permissionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trashing-user.is-authenticated-user" => Some(("trashingUser.isAuthenticatedUser", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "trashing-user.email-address" => Some(("trashingUser.emailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "video-media-metadata.width" => Some(("videoMediaMetadata.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "video-media-metadata.duration-millis" => Some(("videoMediaMetadata.durationMillis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "video-media-metadata.height" => Some(("videoMediaMetadata.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -2509,14 +2731,33 @@ impl<'n> Engine<'n> {
                     "last-modifying-user.email-address" => Some(("lastModifyingUser.emailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "copyable" => Some(("copyable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "folder-color-rgb" => Some(("folderColorRgb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "marked-viewed-by-me-date" => Some(("markedViewedByMeDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "owner-names" => Some(("ownerNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "capabilities.can-read-revisions" => Some(("capabilities.canReadRevisions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-untrash" => Some(("capabilities.canUntrash", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-copy" => Some(("capabilities.canCopy", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-share" => Some(("capabilities.canShare", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-delete" => Some(("capabilities.canDelete", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-move-team-drive-item" => Some(("capabilities.canMoveTeamDriveItem", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-add-children" => Some(("capabilities.canAddChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-change-restricted-download" => Some(("capabilities.canChangeRestrictedDownload", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-move-item-into-team-drive" => Some(("capabilities.canMoveItemIntoTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-download" => Some(("capabilities.canDownload", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-comment" => Some(("capabilities.canComment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-edit" => Some(("capabilities.canEdit", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-trash" => Some(("capabilities.canTrash", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-remove-children" => Some(("capabilities.canRemoveChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-read-team-drive" => Some(("capabilities.canReadTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-list-children" => Some(("capabilities.canListChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-rename" => Some(("capabilities.canRename", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "shared-with-me-date" => Some(("sharedWithMeDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "web-view-link" => Some(("webViewLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-viewed-by-me-date" => Some(("lastViewedByMeDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "export-links" => Some(("exportLinks", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "shared" => Some(("shared", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "full-file-extension" => Some(("fullFileExtension", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "open-with-links" => Some(("openWithLinks", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "full-file-extension" => Some(("fullFileExtension", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trashed-date" => Some(("trashedDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "can-read-revisions" => Some(("canReadRevisions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "image-media-metadata.exposure-bias" => Some(("imageMediaMetadata.exposureBias", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "image-media-metadata.exposure-time" => Some(("imageMediaMetadata.exposureTime", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -2543,18 +2784,17 @@ impl<'n> Engine<'n> {
                     "image-media-metadata.camera-model" => Some(("imageMediaMetadata.cameraModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "web-content-link" => Some(("webContentLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "file-size" => Some(("fileSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "editable" => Some(("editable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "marked-viewed-by-me-date" => Some(("markedViewedByMeDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "can-comment" => Some(("canComment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "quota-bytes-used" => Some(("quotaBytesUsed", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "embed-link" => Some(("embedLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "modified-date" => Some(("modifiedDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "created-date" => Some(("createdDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "last-viewed-by-me-date" => Some(("lastViewedByMeDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "team-drive-id" => Some(("teamDriveId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "md5-checksum" => Some(("md5Checksum", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "icon-link" => Some(("iconLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-open-with-link" => Some(("defaultOpenWithLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "embed-link" => Some(("embedLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "alternate-link" => Some(("alternateLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2565,6 +2805,7 @@ impl<'n> Engine<'n> {
                     "user-permission.with-link" => Some(("userPermission.withLink", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "user-permission.domain" => Some(("userPermission.domain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-permission.name" => Some(("userPermission.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-permission.deleted" => Some(("userPermission.deleted", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "user-permission.kind" => Some(("userPermission.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-permission.value" => Some(("userPermission.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-permission.id" => Some(("userPermission.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2577,15 +2818,16 @@ impl<'n> Engine<'n> {
                     "user-permission.additional-roles" => Some(("userPermission.additionalRoles", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "user-permission.self-link" => Some(("userPermission.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-permission.photo-link" => Some(("userPermission.photoLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "spaces" => Some(("spaces", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "explicitly-trashed" => Some(("explicitlyTrashed", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "shareable" => Some(("shareable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "original-filename" => Some(("originalFilename", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "file-extension" => Some(("fileExtension", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "has-augmented-permissions" => Some(("hasAugmentedPermissions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "head-revision-id" => Some(("headRevisionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "modified-date" => Some(("modifiedDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "file-size" => Some(("fileSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "alternate-link", "altitude", "aperture", "app-data-contents", "auth-key", "camera-make", "camera-model", "can-comment", "can-read-revisions", "color-space", "copyable", "created-date", "date", "default-open-with-link", "description", "display-name", "domain", "download-url", "duration-millis", "editable", "email-address", "embed-link", "etag", "expiration-date", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "file-size", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "has-thumbnail", "head-revision-id", "height", "hidden", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "is-authenticated-user", "iso-speed", "kind", "labels", "last-modifying-user", "last-modifying-user-name", "last-viewed-by-me-date", "latitude", "lens", "location", "longitude", "marked-viewed-by-me-date", "max-aperture-value", "md5-checksum", "metering-mode", "mime-type", "modified", "modified-by-me-date", "modified-date", "name", "open-with-links", "original-filename", "owned-by-me", "owner-names", "permission-id", "photo-link", "picture", "quota-bytes-used", "restricted", "role", "rotation", "self-link", "sensor", "shareable", "shared", "shared-with-me-date", "sharing-user", "spaces", "starred", "subject-distance", "text", "thumbnail", "thumbnail-link", "thumbnail-version", "title", "trashed", "type", "url", "user-permission", "value", "version", "video-media-metadata", "viewed", "web-content-link", "web-view-link", "white-balance", "width", "with-link", "writers-can-share"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "alternate-link", "altitude", "aperture", "app-data-contents", "auth-key", "camera-make", "camera-model", "can-add-children", "can-change-restricted-download", "can-comment", "can-copy", "can-delete", "can-download", "can-edit", "can-list-children", "can-move-item-into-team-drive", "can-move-team-drive-item", "can-read-revisions", "can-read-team-drive", "can-remove-children", "can-rename", "can-share", "can-trash", "can-untrash", "capabilities", "color-space", "copyable", "created-date", "date", "default-open-with-link", "deleted", "description", "display-name", "domain", "download-url", "duration-millis", "editable", "email-address", "embed-link", "etag", "expiration-date", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "file-size", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "has-augmented-permissions", "has-thumbnail", "head-revision-id", "height", "hidden", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "is-authenticated-user", "iso-speed", "kind", "labels", "last-modifying-user", "last-modifying-user-name", "last-viewed-by-me-date", "latitude", "lens", "location", "longitude", "marked-viewed-by-me-date", "max-aperture-value", "md5-checksum", "metering-mode", "mime-type", "modified", "modified-by-me-date", "modified-date", "name", "open-with-links", "original-filename", "owned-by-me", "owner-names", "permission-id", "photo-link", "picture", "quota-bytes-used", "restricted", "role", "rotation", "self-link", "sensor", "shareable", "shared", "shared-with-me-date", "sharing-user", "spaces", "starred", "subject-distance", "team-drive-id", "text", "thumbnail", "thumbnail-link", "thumbnail-version", "title", "trashed", "trashed-date", "trashing-user", "type", "url", "user-permission", "value", "version", "video-media-metadata", "viewed", "web-content-link", "web-view-link", "white-balance", "width", "with-link", "writers-can-share"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2610,6 +2852,9 @@ impl<'n> Engine<'n> {
                 },
                 "timed-text-language" => {
                     call = call.timed_text_language(value.unwrap_or(""));
+                },
+                "supports-team-drives" => {
+                    call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
                 },
                 "set-modified-date" => {
                     call = call.set_modified_date(arg_from_str(value.unwrap_or("false"), err, "set-modified-date", "boolean"));
@@ -2651,7 +2896,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["add-parents", "convert", "ocr", "set-modified-date", "modified-date-behavior", "use-content-as-indexable-text", "ocr-language", "new-revision", "pinned", "remove-parents", "update-viewed-date", "timed-text-track-name", "timed-text-language"].iter().map(|v|*v));
+                                                                           v.extend(["add-parents", "new-revision", "ocr", "remove-parents", "convert", "modified-date-behavior", "use-content-as-indexable-text", "ocr-language", "supports-team-drives", "pinned", "set-modified-date", "update-viewed-date", "timed-text-track-name", "timed-text-language"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2741,6 +2986,9 @@ impl<'n> Engine<'n> {
                 "update-viewed-date" => {
                     call = call.update_viewed_date(arg_from_str(value.unwrap_or("false"), err, "update-viewed-date", "boolean"));
                 },
+                "supports-team-drives" => {
+                    call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
+                },
                 "revision-id" => {
                     call = call.revision_id(value.unwrap_or(""));
                 },
@@ -2766,7 +3014,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["revision-id", "update-viewed-date", "acknowledge-abuse", "projection"].iter().map(|v|*v));
+                                                                           v.extend(["revision-id", "update-viewed-date", "acknowledge-abuse", "projection", "supports-team-drives"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2944,6 +3192,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "supports-team-drives" => {
+                    call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2957,6 +3208,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["supports-team-drives"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3048,6 +3300,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "supports-team-drives" => {
+                    call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -3061,6 +3316,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["supports-team-drives"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3092,6 +3348,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "supports-team-drives" => {
+                    call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -3105,6 +3364,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["supports-team-drives"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3216,6 +3476,7 @@ impl<'n> Engine<'n> {
                     "with-link" => Some(("withLink", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "domain" => Some(("domain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "deleted" => Some(("deleted", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "value" => Some(("value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3229,7 +3490,7 @@ impl<'n> Engine<'n> {
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "photo-link" => Some(("photoLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "auth-key", "domain", "email-address", "etag", "expiration-date", "id", "kind", "name", "photo-link", "role", "self-link", "type", "value", "with-link"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "auth-key", "deleted", "domain", "email-address", "etag", "expiration-date", "id", "kind", "name", "photo-link", "role", "self-link", "type", "value", "with-link"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3243,6 +3504,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "supports-team-drives" => {
+                    call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
+                },
                 "send-notification-emails" => {
                     call = call.send_notification_emails(arg_from_str(value.unwrap_or("false"), err, "send-notification-emails", "boolean"));
                 },
@@ -3262,7 +3526,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["email-message", "send-notification-emails"].iter().map(|v|*v));
+                                                                           v.extend(["email-message", "send-notification-emails", "supports-team-drives"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3302,6 +3566,15 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "supports-team-drives" => {
+                    call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
+                },
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "max-results" => {
+                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -3315,6 +3588,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "max-results", "supports-team-drives"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3374,6 +3648,7 @@ impl<'n> Engine<'n> {
                     "with-link" => Some(("withLink", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "domain" => Some(("domain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "deleted" => Some(("deleted", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "value" => Some(("value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3387,7 +3662,7 @@ impl<'n> Engine<'n> {
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "photo-link" => Some(("photoLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "auth-key", "domain", "email-address", "etag", "expiration-date", "id", "kind", "name", "photo-link", "role", "self-link", "type", "value", "with-link"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "auth-key", "deleted", "domain", "email-address", "etag", "expiration-date", "id", "kind", "name", "photo-link", "role", "self-link", "type", "value", "with-link"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3403,6 +3678,9 @@ impl<'n> Engine<'n> {
             match key {
                 "transfer-ownership" => {
                     call = call.transfer_ownership(arg_from_str(value.unwrap_or("false"), err, "transfer-ownership", "boolean"));
+                },
+                "supports-team-drives" => {
+                    call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
                 },
                 "remove-expiration" => {
                     call = call.remove_expiration(arg_from_str(value.unwrap_or("false"), err, "remove-expiration", "boolean"));
@@ -3420,7 +3698,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["transfer-ownership", "remove-expiration"].iter().map(|v|*v));
+                                                                           v.extend(["transfer-ownership", "supports-team-drives", "remove-expiration"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3480,6 +3758,7 @@ impl<'n> Engine<'n> {
                     "with-link" => Some(("withLink", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "domain" => Some(("domain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "deleted" => Some(("deleted", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "value" => Some(("value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3493,7 +3772,7 @@ impl<'n> Engine<'n> {
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "photo-link" => Some(("photoLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "auth-key", "domain", "email-address", "etag", "expiration-date", "id", "kind", "name", "photo-link", "role", "self-link", "type", "value", "with-link"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "auth-key", "deleted", "domain", "email-address", "etag", "expiration-date", "id", "kind", "name", "photo-link", "role", "self-link", "type", "value", "with-link"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3509,6 +3788,9 @@ impl<'n> Engine<'n> {
             match key {
                 "transfer-ownership" => {
                     call = call.transfer_ownership(arg_from_str(value.unwrap_or("false"), err, "transfer-ownership", "boolean"));
+                },
+                "supports-team-drives" => {
+                    call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
                 },
                 "remove-expiration" => {
                     call = call.remove_expiration(arg_from_str(value.unwrap_or("false"), err, "remove-expiration", "boolean"));
@@ -3526,7 +3808,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["transfer-ownership", "remove-expiration"].iter().map(|v|*v));
+                                                                           v.extend(["transfer-ownership", "supports-team-drives", "remove-expiration"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -4932,6 +5214,377 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _teamdrives_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.teamdrives().delete(opt.value_of("team-drive-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok(mut response) => {
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _teamdrives_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.teamdrives().get(opt.value_of("team-drive-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _teamdrives_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "background-image-link" => Some(("backgroundImageLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "theme-id" => Some(("themeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "color-rgb" => Some(("colorRgb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "capabilities.can-read-revisions" => Some(("capabilities.canReadRevisions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-copy" => Some(("capabilities.canCopy", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-rename" => Some(("capabilities.canRename", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-list-children" => Some(("capabilities.canListChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-share" => Some(("capabilities.canShare", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-manage-members" => Some(("capabilities.canManageMembers", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-download" => Some(("capabilities.canDownload", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-comment" => Some(("capabilities.canComment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-change-team-drive-background" => Some(("capabilities.canChangeTeamDriveBackground", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-delete-team-drive" => Some(("capabilities.canDeleteTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-rename-team-drive" => Some(("capabilities.canRenameTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-remove-children" => Some(("capabilities.canRemoveChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-add-children" => Some(("capabilities.canAddChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-edit" => Some(("capabilities.canEdit", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "background-image-file.width" => Some(("backgroundImageFile.width", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "background-image-file.y-coordinate" => Some(("backgroundImageFile.yCoordinate", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "background-image-file.id" => Some(("backgroundImageFile.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "background-image-file.x-coordinate" => Some(("backgroundImageFile.xCoordinate", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["background-image-file", "background-image-link", "can-add-children", "can-change-team-drive-background", "can-comment", "can-copy", "can-delete-team-drive", "can-download", "can-edit", "can-list-children", "can-manage-members", "can-read-revisions", "can-remove-children", "can-rename", "can-rename-team-drive", "can-share", "capabilities", "color-rgb", "id", "kind", "name", "theme-id", "width", "x-coordinate", "y-coordinate"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::TeamDrive = json::value::from_value(object).unwrap();
+        let mut call = self.hub.teamdrives().insert(request, opt.value_of("request-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _teamdrives_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.teamdrives().list();
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "max-results" => {
+                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _teamdrives_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "background-image-link" => Some(("backgroundImageLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "theme-id" => Some(("themeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "color-rgb" => Some(("colorRgb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "capabilities.can-read-revisions" => Some(("capabilities.canReadRevisions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-copy" => Some(("capabilities.canCopy", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-rename" => Some(("capabilities.canRename", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-list-children" => Some(("capabilities.canListChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-share" => Some(("capabilities.canShare", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-manage-members" => Some(("capabilities.canManageMembers", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-download" => Some(("capabilities.canDownload", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-comment" => Some(("capabilities.canComment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-change-team-drive-background" => Some(("capabilities.canChangeTeamDriveBackground", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-delete-team-drive" => Some(("capabilities.canDeleteTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-rename-team-drive" => Some(("capabilities.canRenameTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-remove-children" => Some(("capabilities.canRemoveChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-add-children" => Some(("capabilities.canAddChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-edit" => Some(("capabilities.canEdit", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "background-image-file.width" => Some(("backgroundImageFile.width", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "background-image-file.y-coordinate" => Some(("backgroundImageFile.yCoordinate", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "background-image-file.id" => Some(("backgroundImageFile.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "background-image-file.x-coordinate" => Some(("backgroundImageFile.xCoordinate", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["background-image-file", "background-image-link", "can-add-children", "can-change-team-drive-background", "can-comment", "can-copy", "can-delete-team-drive", "can-download", "can-edit", "can-list-children", "can-manage-members", "can-read-revisions", "can-remove-children", "can-rename", "can-rename-team-drive", "can-share", "capabilities", "color-rgb", "id", "kind", "name", "theme-id", "width", "x-coordinate", "y-coordinate"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::TeamDrive = json::value::from_value(object).unwrap();
+        let mut call = self.hub.teamdrives().update(request, opt.value_of("team-drive-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
@@ -4966,6 +5619,9 @@ impl<'n> Engine<'n> {
                 match opt.subcommand() {
                     ("get", Some(opt)) => {
                         call_result = self._changes_get(opt, dry_run, &mut err);
+                    },
+                    ("get-start-page-token", Some(opt)) => {
+                        call_result = self._changes_get_start_page_token(opt, dry_run, &mut err);
                     },
                     ("list", Some(opt)) => {
                         call_result = self._changes_list(opt, dry_run, &mut err);
@@ -5224,6 +5880,29 @@ impl<'n> Engine<'n> {
                     }
                 }
             },
+            ("teamdrives", Some(opt)) => {
+                match opt.subcommand() {
+                    ("delete", Some(opt)) => {
+                        call_result = self._teamdrives_delete(opt, dry_run, &mut err);
+                    },
+                    ("get", Some(opt)) => {
+                        call_result = self._teamdrives_get(opt, dry_run, &mut err);
+                    },
+                    ("insert", Some(opt)) => {
+                        call_result = self._teamdrives_insert(opt, dry_run, &mut err);
+                    },
+                    ("list", Some(opt)) => {
+                        call_result = self._teamdrives_list(opt, dry_run, &mut err);
+                    },
+                    ("update", Some(opt)) => {
+                        call_result = self._teamdrives_update(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("teamdrives".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
             _ => {
                 err.issues.push(CLIError::MissingCommandError);
                 writeln!(io::stderr(), "{}\n", self.opt.usage()).ok();
@@ -5367,7 +6046,7 @@ fn main() {
                   ]),
             ]),
         
-        ("changes", "methods: 'get', 'list' and 'watch'", vec![
+        ("changes", "methods: 'get', 'get-start-page-token', 'list' and 'watch'", vec![
             ("get",
                     Some(r##"Gets a specific change."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/changes_get",
@@ -5390,8 +6069,24 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("get-start-page-token",
+                    Some(r##"Gets the starting pageToken for listing future changes."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/changes_get-start-page-token",
+                  vec![
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("list",
-                    Some(r##"Lists the changes for a user."##),
+                    Some(r##"Lists the changes for a user or Team Drive."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/changes_list",
                   vec![
                     (Some(r##"v"##),
@@ -5753,7 +6448,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("delete",
-                    Some(r##"Permanently deletes a file by ID. Skips the trash. The currently authenticated user must own the file."##),
+                    Some(r##"Permanently deletes a file by ID. Skips the trash. The currently authenticated user must own the file or be an organizer on the parent for Team Drive files."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/files_delete",
                   vec![
                     (Some(r##"file-id"##),
@@ -5939,7 +6634,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("trash",
-                    Some(r##"Moves a file to the trash. The currently authenticated user must own the file."##),
+                    Some(r##"Moves a file to the trash. The currently authenticated user must own the file or be an organizer on the parent for Team Drive files."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/files_trash",
                   vec![
                     (Some(r##"file-id"##),
@@ -6151,12 +6846,12 @@ fn main() {
         
         ("permissions", "methods: 'delete', 'get', 'get-id-for-email', 'insert', 'list', 'patch' and 'update'", vec![
             ("delete",
-                    Some(r##"Deletes a permission from a file."##),
+                    Some(r##"Deletes a permission from a file or Team Drive."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/permissions_delete",
                   vec![
                     (Some(r##"file-id"##),
                      None,
-                     Some(r##"The ID for the file."##),
+                     Some(r##"The ID for the file or Team Drive."##),
                      Some(true),
                      Some(false)),
         
@@ -6178,7 +6873,7 @@ fn main() {
                   vec![
                     (Some(r##"file-id"##),
                      None,
-                     Some(r##"The ID for the file."##),
+                     Some(r##"The ID for the file or Team Drive."##),
                      Some(true),
                      Some(false)),
         
@@ -6223,12 +6918,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("insert",
-                    Some(r##"Inserts a permission for a file."##),
+                    Some(r##"Inserts a permission for a file or Team Drive."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/permissions_insert",
                   vec![
                     (Some(r##"file-id"##),
                      None,
-                     Some(r##"The ID for the file."##),
+                     Some(r##"The ID for the file or Team Drive."##),
                      Some(true),
                      Some(false)),
         
@@ -6251,12 +6946,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Lists a file's permissions."##),
+                    Some(r##"Lists a file's or Team Drive's permissions."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/permissions_list",
                   vec![
                     (Some(r##"file-id"##),
                      None,
-                     Some(r##"The ID for the file."##),
+                     Some(r##"The ID for the file or Team Drive."##),
                      Some(true),
                      Some(false)),
         
@@ -6278,7 +6973,7 @@ fn main() {
                   vec![
                     (Some(r##"file-id"##),
                      None,
-                     Some(r##"The ID for the file."##),
+                     Some(r##"The ID for the file or Team Drive."##),
                      Some(true),
                      Some(false)),
         
@@ -6312,7 +7007,7 @@ fn main() {
                   vec![
                     (Some(r##"file-id"##),
                      None,
-                     Some(r##"The ID for the file."##),
+                     Some(r##"The ID for the file or Team Drive."##),
                      Some(true),
                      Some(false)),
         
@@ -6910,11 +7605,124 @@ fn main() {
                   ]),
             ]),
         
+        ("teamdrives", "methods: 'delete', 'get', 'insert', 'list' and 'update'", vec![
+            ("delete",
+                    Some(r##"Permanently deletes a Team Drive for which the user is an organizer. The Team Drive cannot contain any untrashed items."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/teamdrives_delete",
+                  vec![
+                    (Some(r##"team-drive-id"##),
+                     None,
+                     Some(r##"The ID of the Team Drive"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                  ]),
+            ("get",
+                    Some(r##"Gets a Team Drive's metadata by ID."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/teamdrives_get",
+                  vec![
+                    (Some(r##"team-drive-id"##),
+                     None,
+                     Some(r##"The ID of the Team Drive"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("insert",
+                    Some(r##"Creates a new Team Drive."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/teamdrives_insert",
+                  vec![
+                    (Some(r##"request-id"##),
+                     None,
+                     Some(r##"An ID, such as a random UUID, which uniquely identifies this user's request for idempotent creation of a Team Drive. A repeated request by the same user and with the same request ID will avoid creating duplicates by attempting to create the same Team Drive. If the Team Drive already exists a 409 error will be returned."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("list",
+                    Some(r##"Lists the user's Team Drives."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/teamdrives_list",
+                  vec![
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("update",
+                    Some(r##"Updates a Team Drive's metadata"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/teamdrives_update",
+                  vec![
+                    (Some(r##"team-drive-id"##),
+                     None,
+                     Some(r##"The ID of the Team Drive"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
     ];
     
     let mut app = App::new("drive2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.4+20161212")
+           .version("1.0.4+20170512")
            .about("Manages files in Drive including uploading, downloading, searching, detecting changes, and updating sharing permissions.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_drive2_cli")
            .arg(Arg::with_name("url")

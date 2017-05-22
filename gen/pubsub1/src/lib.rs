@@ -2,9 +2,9 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *pubsub* crate version *1.0.4+20161122*, where *20161122* is the exact revision of the *pubsub:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
+//! This documentation was generated from *Pubsub* crate version *1.0.4+20170502*, where *20170502* is the exact revision of the *pubsub:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
 //! 
-//! Everything else about the *pubsub* *v1* API can be found at the
+//! Everything else about the *Pubsub* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/pubsub/docs).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/pubsub1).
 //! # Features
@@ -181,7 +181,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -316,8 +316,6 @@ pub struct Pubsub<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-    _base_url: String,
-    _root_url: String,
 }
 
 impl<'a, C, A> Hub for Pubsub<C, A> {}
@@ -330,8 +328,6 @@ impl<'a, C, A> Pubsub<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
-            _base_url: "https://pubsub.googleapis.com/".to_string(),
-            _root_url: "https://pubsub.googleapis.com/".to_string(),
         }
     }
 
@@ -346,26 +342,6 @@ impl<'a, C, A> Pubsub<C, A>
     pub fn user_agent(&mut self, agent_name: String) -> String {
         let prev = self._user_agent.clone();
         self._user_agent = agent_name;
-        prev
-    }
-
-    /// Set the base url to use in all requests to the server.
-    /// It defaults to `https://pubsub.googleapis.com/`.
-    ///
-    /// Returns the previously set base url.
-    pub fn base_url(&mut self, new_base_url: String) -> String {
-        let prev = self._base_url.clone();
-        self._base_url = new_base_url;
-        prev
-    }
-
-    /// Set the root url to use in all requests to the server.
-    /// It defaults to `https://pubsub.googleapis.com/`.
-    ///
-    /// Returns the previously set root url.
-    pub fn root_url(&mut self, new_root_url: String) -> String {
-        let prev = self._root_url.clone();
-        self._root_url = new_root_url;
         prev
     }
 }
@@ -491,10 +467,12 @@ impl RequestValue for AcknowledgeRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ModifyAckDeadlineRequest {
     /// The new ack deadline with respect to the time this request was sent to
-    /// the Pub/Sub system. Must be >= 0. For example, if the value is 10, the new
+    /// the Pub/Sub system. For example, if the value is 10, the new
     /// ack deadline will expire 10 seconds after the `ModifyAckDeadline` call
     /// was made. Specifying zero may immediately make the message available for
     /// another pull request.
+    /// The minimum deadline you can specify is 0 seconds.
+    /// The maximum deadline you can specify is 600 seconds (10 minutes).
     #[serde(rename="ackDeadlineSeconds")]
     pub ack_deadline_seconds: Option<i32>,
     /// List of acknowledgment IDs.
@@ -719,11 +697,12 @@ impl ResponseResult for TestIamPermissionsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PullRequest {
-    /// If this is specified as true the system will respond immediately even if
-    /// it is not able to return a message in the `Pull` response. Otherwise the
-    /// system is allowed to wait until at least one message is available rather
-    /// than returning no messages. The client may cancel the request if it does
-    /// not wish to wait any longer for the response.
+    /// If this field set to true, the system will respond immediately even if
+    /// it there are no messages available to return in the `Pull` response.
+    /// Otherwise, the system may wait (for a bounded amount of time) until at
+    /// least one message is available, rather than returning no messages. The
+    /// client may cancel the request if it does not wish to wait any longer for
+    /// the response.
     #[serde(rename="returnImmediately")]
     pub return_immediately: Option<bool>,
     /// The maximum number of messages returned for this request. The Pub/Sub
@@ -747,11 +726,10 @@ pub struct PushConfig {
     /// control different aspects of the message delivery.
     /// 
     /// The currently supported attribute is `x-goog-version`, which you can
-    /// use to change the format of the push message. This attribute
+    /// use to change the format of the pushed message. This attribute
     /// indicates the version of the data expected by the endpoint. This
-    /// controls the shape of the envelope (i.e. its fields and metadata).
-    /// The endpoint version is based on the version of the Pub/Sub
-    /// API.
+    /// controls the shape of the pushed message (i.e., its fields and metadata).
+    /// The endpoint version is based on the version of the Pub/Sub API.
     /// 
     /// If not present during the `CreateSubscription` call, it will default to
     /// the version of the API used to make such call. If not present during a
@@ -1053,13 +1031,18 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns permissions that a caller has on the specified resource.
+    /// If the resource does not exist, this will return an empty set of
+    /// permissions, not a NOT_FOUND error.
+    /// 
+    /// Note: This operation is designed to be used for building permission-aware
+    /// UIs and command-line tools, not for authorization checking. This operation
+    /// may "fail open" without warning.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy detail is being requested.
-    ///                `resource` is usually specified as a path. For example, a Project
-    ///                resource is specified as `projects/{project}`.
+    ///                See the operation documentation for the appropriate value for this field.
     pub fn topics_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectTopicTestIamPermissionCall<'a, C, A> {
         ProjectTopicTestIamPermissionCall {
             hub: self.hub,
@@ -1074,13 +1057,18 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns permissions that a caller has on the specified resource.
+    /// If the resource does not exist, this will return an empty set of
+    /// permissions, not a NOT_FOUND error.
+    /// 
+    /// Note: This operation is designed to be used for building permission-aware
+    /// UIs and command-line tools, not for authorization checking. This operation
+    /// may "fail open" without warning.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy detail is being requested.
-    ///                `resource` is usually specified as a path. For example, a Project
-    ///                resource is specified as `projects/{project}`.
+    ///                See the operation documentation for the appropriate value for this field.
     pub fn subscriptions_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectSubscriptionTestIamPermissionCall<'a, C, A> {
         ProjectSubscriptionTestIamPermissionCall {
             hub: self.hub,
@@ -1095,13 +1083,18 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns permissions that a caller has on the specified resource.
+    /// If the resource does not exist, this will return an empty set of
+    /// permissions, not a NOT_FOUND error.
+    /// 
+    /// Note: This operation is designed to be used for building permission-aware
+    /// UIs and command-line tools, not for authorization checking. This operation
+    /// may "fail open" without warning.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy detail is being requested.
-    ///                `resource` is usually specified as a path. For example, a Project
-    ///                resource is specified as `projects/{project}`.
+    ///                See the operation documentation for the appropriate value for this field.
     pub fn snapshots_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectSnapshotTestIamPermissionCall<'a, C, A> {
         ProjectSnapshotTestIamPermissionCall {
             hub: self.hub,
@@ -1170,8 +1163,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `resource` - REQUIRED: The resource for which the policy is being requested.
-    ///                `resource` is usually specified as a path. For example, a Project
-    ///                resource is specified as `projects/{project}`.
+    ///                See the operation documentation for the appropriate value for this field.
     pub fn snapshots_get_iam_policy(&self, resource: &str) -> ProjectSnapshotGetIamPolicyCall<'a, C, A> {
         ProjectSnapshotGetIamPolicyCall {
             hub: self.hub,
@@ -1215,8 +1207,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `resource` - REQUIRED: The resource for which the policy is being requested.
-    ///                `resource` is usually specified as a path. For example, a Project
-    ///                resource is specified as `projects/{project}`.
+    ///                See the operation documentation for the appropriate value for this field.
     pub fn topics_get_iam_policy(&self, resource: &str) -> ProjectTopicGetIamPolicyCall<'a, C, A> {
         ProjectTopicGetIamPolicyCall {
             hub: self.hub,
@@ -1284,8 +1275,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `resource` - REQUIRED: The resource for which the policy is being requested.
-    ///                `resource` is usually specified as a path. For example, a Project
-    ///                resource is specified as `projects/{project}`.
+    ///                See the operation documentation for the appropriate value for this field.
     pub fn subscriptions_get_iam_policy(&self, resource: &str) -> ProjectSubscriptionGetIamPolicyCall<'a, C, A> {
         ProjectSubscriptionGetIamPolicyCall {
             hub: self.hub,
@@ -1365,8 +1355,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being specified.
-    ///                `resource` is usually specified as a path. For example, a Project
-    ///                resource is specified as `projects/{project}`.
+    ///                See the operation documentation for the appropriate value for this field.
     pub fn topics_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectTopicSetIamPolicyCall<'a, C, A> {
         ProjectTopicSetIamPolicyCall {
             hub: self.hub,
@@ -1442,8 +1431,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being specified.
-    ///                `resource` is usually specified as a path. For example, a Project
-    ///                resource is specified as `projects/{project}`.
+    ///                See the operation documentation for the appropriate value for this field.
     pub fn snapshots_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectSnapshotSetIamPolicyCall<'a, C, A> {
         ProjectSnapshotSetIamPolicyCall {
             hub: self.hub,
@@ -1502,8 +1490,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being specified.
-    ///                `resource` is usually specified as a path. For example, a Project
-    ///                resource is specified as `projects/{project}`.
+    ///                See the operation documentation for the appropriate value for this field.
     pub fn subscriptions_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectSubscriptionSetIamPolicyCall<'a, C, A> {
         ProjectSubscriptionSetIamPolicyCall {
             hub: self.hub,
@@ -1605,7 +1592,7 @@ impl<'a, C, A> ProjectSubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+project}/subscriptions";
+        let mut url = "https://pubsub.googleapis.com/v1/{+project}/subscriptions".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -1874,7 +1861,7 @@ impl<'a, C, A> ProjectTopicCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        let mut url = "https://pubsub.googleapis.com/v1/{+name}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -2078,6 +2065,12 @@ impl<'a, C, A> ProjectTopicCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 
 /// Returns permissions that a caller has on the specified resource.
+/// If the resource does not exist, this will return an empty set of
+/// permissions, not a NOT_FOUND error.
+/// 
+/// Note: This operation is designed to be used for building permission-aware
+/// UIs and command-line tools, not for authorization checking. This operation
+/// may "fail open" without warning.
 ///
 /// A builder for the *topics.testIamPermissions* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -2155,7 +2148,7 @@ impl<'a, C, A> ProjectTopicTestIamPermissionCall<'a, C, A> where C: BorrowMut<hy
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+resource}:testIamPermissions";
+        let mut url = "https://pubsub.googleapis.com/v1/{+resource}:testIamPermissions".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -2286,8 +2279,7 @@ impl<'a, C, A> ProjectTopicTestIamPermissionCall<'a, C, A> where C: BorrowMut<hy
         self
     }
     /// REQUIRED: The resource for which the policy detail is being requested.
-    /// `resource` is usually specified as a path. For example, a Project
-    /// resource is specified as `projects/{project}`.
+    /// See the operation documentation for the appropriate value for this field.
     ///
     /// Sets the *resource* path property to the given value.
     ///
@@ -2356,6 +2348,12 @@ impl<'a, C, A> ProjectTopicTestIamPermissionCall<'a, C, A> where C: BorrowMut<hy
 
 
 /// Returns permissions that a caller has on the specified resource.
+/// If the resource does not exist, this will return an empty set of
+/// permissions, not a NOT_FOUND error.
+/// 
+/// Note: This operation is designed to be used for building permission-aware
+/// UIs and command-line tools, not for authorization checking. This operation
+/// may "fail open" without warning.
 ///
 /// A builder for the *subscriptions.testIamPermissions* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -2433,7 +2431,7 @@ impl<'a, C, A> ProjectSubscriptionTestIamPermissionCall<'a, C, A> where C: Borro
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+resource}:testIamPermissions";
+        let mut url = "https://pubsub.googleapis.com/v1/{+resource}:testIamPermissions".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -2564,8 +2562,7 @@ impl<'a, C, A> ProjectSubscriptionTestIamPermissionCall<'a, C, A> where C: Borro
         self
     }
     /// REQUIRED: The resource for which the policy detail is being requested.
-    /// `resource` is usually specified as a path. For example, a Project
-    /// resource is specified as `projects/{project}`.
+    /// See the operation documentation for the appropriate value for this field.
     ///
     /// Sets the *resource* path property to the given value.
     ///
@@ -2634,6 +2631,12 @@ impl<'a, C, A> ProjectSubscriptionTestIamPermissionCall<'a, C, A> where C: Borro
 
 
 /// Returns permissions that a caller has on the specified resource.
+/// If the resource does not exist, this will return an empty set of
+/// permissions, not a NOT_FOUND error.
+/// 
+/// Note: This operation is designed to be used for building permission-aware
+/// UIs and command-line tools, not for authorization checking. This operation
+/// may "fail open" without warning.
 ///
 /// A builder for the *snapshots.testIamPermissions* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -2711,7 +2714,7 @@ impl<'a, C, A> ProjectSnapshotTestIamPermissionCall<'a, C, A> where C: BorrowMut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+resource}:testIamPermissions";
+        let mut url = "https://pubsub.googleapis.com/v1/{+resource}:testIamPermissions".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -2842,8 +2845,7 @@ impl<'a, C, A> ProjectSnapshotTestIamPermissionCall<'a, C, A> where C: BorrowMut
         self
     }
     /// REQUIRED: The resource for which the policy detail is being requested.
-    /// `resource` is usually specified as a path. For example, a Project
-    /// resource is specified as `projects/{project}`.
+    /// See the operation documentation for the appropriate value for this field.
     ///
     /// Sets the *resource* path property to the given value.
     ///
@@ -2992,7 +2994,7 @@ impl<'a, C, A> ProjectSubscriptionPullCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+subscription}:pull";
+        let mut url = "https://pubsub.googleapis.com/v1/{+subscription}:pull".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -3274,7 +3276,7 @@ impl<'a, C, A> ProjectSubscriptionModifyPushConfigCall<'a, C, A> where C: Borrow
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+subscription}:modifyPushConfig";
+        let mut url = "https://pubsub.googleapis.com/v1/{+subscription}:modifyPushConfig".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -3546,7 +3548,7 @@ impl<'a, C, A> ProjectSnapshotGetIamPolicyCall<'a, C, A> where C: BorrowMut<hype
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+resource}:getIamPolicy";
+        let mut url = "https://pubsub.googleapis.com/v1/{+resource}:getIamPolicy".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -3653,8 +3655,7 @@ impl<'a, C, A> ProjectSnapshotGetIamPolicyCall<'a, C, A> where C: BorrowMut<hype
 
 
     /// REQUIRED: The resource for which the policy is being requested.
-    /// `resource` is usually specified as a path. For example, a Project
-    /// resource is specified as `projects/{project}`.
+    /// See the operation documentation for the appropriate value for this field.
     ///
     /// Sets the *resource* path property to the given value.
     ///
@@ -3804,7 +3805,7 @@ impl<'a, C, A> ProjectSubscriptionModifyAckDeadlineCall<'a, C, A> where C: Borro
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+subscription}:modifyAckDeadline";
+        let mut url = "https://pubsub.googleapis.com/v1/{+subscription}:modifyAckDeadline".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -4076,7 +4077,7 @@ impl<'a, C, A> ProjectTopicGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+resource}:getIamPolicy";
+        let mut url = "https://pubsub.googleapis.com/v1/{+resource}:getIamPolicy".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -4183,8 +4184,7 @@ impl<'a, C, A> ProjectTopicGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
 
 
     /// REQUIRED: The resource for which the policy is being requested.
-    /// `resource` is usually specified as a path. For example, a Project
-    /// resource is specified as `projects/{project}`.
+    /// See the operation documentation for the appropriate value for this field.
     ///
     /// Sets the *resource* path property to the given value.
     ///
@@ -4336,7 +4336,7 @@ impl<'a, C, A> ProjectSubscriptionAcknowledgeCall<'a, C, A> where C: BorrowMut<h
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+subscription}:acknowledge";
+        let mut url = "https://pubsub.googleapis.com/v1/{+subscription}:acknowledge".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -4610,7 +4610,7 @@ impl<'a, C, A> ProjectSubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+subscription}";
+        let mut url = "https://pubsub.googleapis.com/v1/{+subscription}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -4858,7 +4858,7 @@ impl<'a, C, A> ProjectSubscriptionGetIamPolicyCall<'a, C, A> where C: BorrowMut<
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+resource}:getIamPolicy";
+        let mut url = "https://pubsub.googleapis.com/v1/{+resource}:getIamPolicy".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -4965,8 +4965,7 @@ impl<'a, C, A> ProjectSubscriptionGetIamPolicyCall<'a, C, A> where C: BorrowMut<
 
 
     /// REQUIRED: The resource for which the policy is being requested.
-    /// `resource` is usually specified as a path. For example, a Project
-    /// resource is specified as `projects/{project}`.
+    /// See the operation documentation for the appropriate value for this field.
     ///
     /// Sets the *resource* path property to the given value.
     ///
@@ -5115,7 +5114,7 @@ impl<'a, C, A> ProjectTopicListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+project}/topics";
+        let mut url = "https://pubsub.googleapis.com/v1/{+project}/topics".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5386,7 +5385,7 @@ impl<'a, C, A> ProjectTopicPublishCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+topic}:publish";
+        let mut url = "https://pubsub.googleapis.com/v1/{+topic}:publish".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5656,7 +5655,7 @@ impl<'a, C, A> ProjectTopicGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+topic}";
+        let mut url = "https://pubsub.googleapis.com/v1/{+topic}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5910,7 +5909,7 @@ impl<'a, C, A> ProjectTopicSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+resource}:setIamPolicy";
+        let mut url = "https://pubsub.googleapis.com/v1/{+resource}:setIamPolicy".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -6041,8 +6040,7 @@ impl<'a, C, A> ProjectTopicSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
         self
     }
     /// REQUIRED: The resource for which the policy is being specified.
-    /// `resource` is usually specified as a path. For example, a Project
-    /// resource is specified as `projects/{project}`.
+    /// See the operation documentation for the appropriate value for this field.
     ///
     /// Sets the *resource* path property to the given value.
     ///
@@ -6185,7 +6183,7 @@ impl<'a, C, A> ProjectTopicDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+topic}";
+        let mut url = "https://pubsub.googleapis.com/v1/{+topic}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -6447,7 +6445,7 @@ impl<'a, C, A> ProjectSubscriptionCreateCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        let mut url = "https://pubsub.googleapis.com/v1/{+name}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -6729,7 +6727,7 @@ impl<'a, C, A> ProjectSnapshotSetIamPolicyCall<'a, C, A> where C: BorrowMut<hype
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+resource}:setIamPolicy";
+        let mut url = "https://pubsub.googleapis.com/v1/{+resource}:setIamPolicy".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -6860,8 +6858,7 @@ impl<'a, C, A> ProjectSnapshotSetIamPolicyCall<'a, C, A> where C: BorrowMut<hype
         self
     }
     /// REQUIRED: The resource for which the policy is being specified.
-    /// `resource` is usually specified as a path. For example, a Project
-    /// resource is specified as `projects/{project}`.
+    /// See the operation documentation for the appropriate value for this field.
     ///
     /// Sets the *resource* path property to the given value.
     ///
@@ -7000,7 +6997,7 @@ impl<'a, C, A> ProjectSubscriptionGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+subscription}";
+        let mut url = "https://pubsub.googleapis.com/v1/{+subscription}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -7256,7 +7253,7 @@ impl<'a, C, A> ProjectTopicSubscriptionListCall<'a, C, A> where C: BorrowMut<hyp
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+topic}/subscriptions";
+        let mut url = "https://pubsub.googleapis.com/v1/{+topic}/subscriptions".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -7526,7 +7523,7 @@ impl<'a, C, A> ProjectSubscriptionSetIamPolicyCall<'a, C, A> where C: BorrowMut<
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+resource}:setIamPolicy";
+        let mut url = "https://pubsub.googleapis.com/v1/{+resource}:setIamPolicy".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -7657,8 +7654,7 @@ impl<'a, C, A> ProjectSubscriptionSetIamPolicyCall<'a, C, A> where C: BorrowMut<
         self
     }
     /// REQUIRED: The resource for which the policy is being specified.
-    /// `resource` is usually specified as a path. For example, a Project
-    /// resource is specified as `projects/{project}`.
+    /// See the operation documentation for the appropriate value for this field.
     ///
     /// Sets the *resource* path property to the given value.
     ///
@@ -7724,5 +7720,6 @@ impl<'a, C, A> ProjectSubscriptionSetIamPolicyCall<'a, C, A> where C: BorrowMut<
         self
     }
 }
+
 
 

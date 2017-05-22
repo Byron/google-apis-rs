@@ -25,14 +25,12 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *storagetransfer* API at revision *20150811*. The CLI is at version *1.0.4*.
+This documentation was generated from the *storagetransfer* API at revision *20170515*. The CLI is at version *1.0.4*.
 
 ```bash
 storagetransfer1 [options]
         google-service-accounts
                 get <project-id> [-p <v>]... [-o <out>]
-        methods
-                get-google-service-account [-p <v>]... [-o <out>]
         transfer-jobs
                 create (-r <kv>)... [-p <v>]... [-o <out>]
                 get <job-name> [-p <v>]... [-o <out>]

@@ -1163,6 +1163,9 @@ impl<'n> Engine<'n> {
                 "start-index" => {
                     call = call.start_index(value.unwrap_or(""));
                 },
+                "selected-fields" => {
+                    call = call.selected_fields(value.unwrap_or(""));
+                },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
@@ -1182,7 +1185,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "start-index", "max-results"].iter().map(|v|*v));
+                                                                           v.extend(["page-token", "start-index", "max-results", "selected-fields"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1266,6 +1269,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "selected-fields" => {
+                    call = call.selected_fields(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1279,6 +1285,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["selected-fields"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2583,7 +2590,7 @@ fn main() {
     
     let mut app = App::new("bigquery2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.4+20161130")
+           .version("1.0.4+20170511")
            .about("A data platform for customers to create, manage, share and query data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_bigquery2_cli")
            .arg(Arg::with_name("url")

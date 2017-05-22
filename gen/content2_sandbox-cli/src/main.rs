@@ -1420,7 +1420,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("cancel",
-                    Some(r##"Cancels all line items in an order. This method can only be called for non-multi-client accounts."##),
+                    Some(r##"Cancels all line items in an order, making a full refund. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_sandbox_cli/orders_cancel",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -1454,7 +1454,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("cancellineitem",
-                    Some(r##"Cancels a line item. This method can only be called for non-multi-client accounts."##),
+                    Some(r##"Cancels a line item, making a full refund. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_sandbox_cli/orders_cancellineitem",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -1819,7 +1819,7 @@ fn main() {
     
     let mut app = App::new("content2-sandbox")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.4+20161205")
+           .version("1.0.4+20170519")
            .about("Manages product items, inventory, and Merchant Center accounts for Google Shopping.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_content2_sandbox_cli")
            .arg(Arg::with_name("url")

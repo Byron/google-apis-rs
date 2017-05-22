@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *dataproc* crate version *1.0.4+20161102*, where *20161102* is the exact revision of the *dataproc:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
+//! This documentation was generated from *dataproc* crate version *1.0.4+20170515*, where *20170515* is the exact revision of the *dataproc:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
 //! 
 //! Everything else about the *dataproc* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/dataproc/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.Dataproc.html) ... 
 //! 
 //! * projects
-//!  * [*regions clusters create*](struct.ProjectRegionClusterCreateCall.html), [*regions clusters delete*](struct.ProjectRegionClusterDeleteCall.html), [*regions clusters diagnose*](struct.ProjectRegionClusterDiagnoseCall.html), [*regions clusters get*](struct.ProjectRegionClusterGetCall.html), [*regions clusters list*](struct.ProjectRegionClusterListCall.html), [*regions clusters patch*](struct.ProjectRegionClusterPatchCall.html), [*regions jobs cancel*](struct.ProjectRegionJobCancelCall.html), [*regions jobs delete*](struct.ProjectRegionJobDeleteCall.html), [*regions jobs get*](struct.ProjectRegionJobGetCall.html), [*regions jobs list*](struct.ProjectRegionJobListCall.html), [*regions jobs submit*](struct.ProjectRegionJobSubmitCall.html), [*regions operations cancel*](struct.ProjectRegionOperationCancelCall.html), [*regions operations delete*](struct.ProjectRegionOperationDeleteCall.html), [*regions operations get*](struct.ProjectRegionOperationGetCall.html) and [*regions operations list*](struct.ProjectRegionOperationListCall.html)
+//!  * [*regions clusters create*](struct.ProjectRegionClusterCreateCall.html), [*regions clusters delete*](struct.ProjectRegionClusterDeleteCall.html), [*regions clusters diagnose*](struct.ProjectRegionClusterDiagnoseCall.html), [*regions clusters get*](struct.ProjectRegionClusterGetCall.html), [*regions clusters list*](struct.ProjectRegionClusterListCall.html), [*regions clusters patch*](struct.ProjectRegionClusterPatchCall.html), [*regions jobs cancel*](struct.ProjectRegionJobCancelCall.html), [*regions jobs delete*](struct.ProjectRegionJobDeleteCall.html), [*regions jobs get*](struct.ProjectRegionJobGetCall.html), [*regions jobs list*](struct.ProjectRegionJobListCall.html), [*regions jobs patch*](struct.ProjectRegionJobPatchCall.html), [*regions jobs submit*](struct.ProjectRegionJobSubmitCall.html), [*regions operations cancel*](struct.ProjectRegionOperationCancelCall.html), [*regions operations delete*](struct.ProjectRegionOperationDeleteCall.html), [*regions operations get*](struct.ProjectRegionOperationGetCall.html) and [*regions operations list*](struct.ProjectRegionOperationListCall.html)
 //! 
 //! 
 //! 
@@ -181,7 +181,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -313,8 +313,6 @@ pub struct Dataproc<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-    _base_url: String,
-    _root_url: String,
 }
 
 impl<'a, C, A> Hub for Dataproc<C, A> {}
@@ -327,8 +325,6 @@ impl<'a, C, A> Dataproc<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
-            _base_url: "https://dataproc.googleapis.com/".to_string(),
-            _root_url: "https://dataproc.googleapis.com/".to_string(),
         }
     }
 
@@ -345,33 +341,13 @@ impl<'a, C, A> Dataproc<C, A>
         self._user_agent = agent_name;
         prev
     }
-
-    /// Set the base url to use in all requests to the server.
-    /// It defaults to `https://dataproc.googleapis.com/`.
-    ///
-    /// Returns the previously set base url.
-    pub fn base_url(&mut self, new_base_url: String) -> String {
-        let prev = self._base_url.clone();
-        self._base_url = new_base_url;
-        prev
-    }
-
-    /// Set the root url to use in all requests to the server.
-    /// It defaults to `https://dataproc.googleapis.com/`.
-    ///
-    /// Returns the previously set root url.
-    pub fn root_url(&mut self, new_root_url: String) -> String {
-        let prev = self._root_url.clone();
-        self._root_url = new_root_url;
-        prev
-    }
 }
 
 
 // ############
 // SCHEMAS ###
 // ##########
-/// A Cloud Dataproc job for running [Apache Spark SQL](http://spark.apache.org/sql/) queries.
+/// A Cloud Dataproc job for running Apache Spark SQL (http://spark.apache.org/sql/) queries.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -380,50 +356,66 @@ pub struct SparkSqlJob {
     /// The HCFS URI of the script that contains SQL queries.
     #[serde(rename="queryFileUri")]
     pub query_file_uri: Option<String>,
-    /// [Optional] Mapping of query variable names to values (equivalent to the Spark SQL command: SET `name="value";`).
+    /// Optional. Mapping of query variable names to values (equivalent to the Spark SQL command: SET name="value";).
     #[serde(rename="scriptVariables")]
     pub script_variables: Option<HashMap<String, String>>,
-    /// [Optional] The runtime log config for job execution.
+    /// Optional. The runtime log config for job execution.
     #[serde(rename="loggingConfig")]
     pub logging_config: Option<LoggingConfig>,
-    /// [Optional] HCFS URIs of jar files to be added to the Spark CLASSPATH.
+    /// Optional. HCFS URIs of jar files to be added to the Spark CLASSPATH.
     #[serde(rename="jarFileUris")]
     pub jar_file_uris: Option<Vec<String>>,
     /// A list of queries.
     #[serde(rename="queryList")]
     pub query_list: Option<QueryList>,
-    /// [Optional] A mapping of property names to values, used to configure Spark SQL's SparkConf. Properties that conflict with values set by the Cloud Dataproc API may be overwritten.
+    /// Optional. A mapping of property names to values, used to configure Spark SQL's SparkConf. Properties that conflict with values set by the Cloud Dataproc API may be overwritten.
     pub properties: Option<HashMap<String, String>>,
 }
 
 impl Part for SparkSqlJob {}
 
 
-/// [Optional] The config settings for Google Compute Engine resources in an instance group, such as a master or worker group.
+/// Job scheduling options.Beta Feature: These options are available for testing purposes only. They may be changed before final release.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct JobScheduling {
+    /// Optional. Maximum number of times per hour a driver may be restarted as a result of driver terminating with non-zero code before job is reported failed.A job may be reported as thrashing if driver exits with non-zero code 4 times within 10 minute window.Maximum value is 10.
+    #[serde(rename="maxFailuresPerHour")]
+    pub max_failures_per_hour: Option<i32>,
+}
+
+impl Part for JobScheduling {}
+
+
+/// Optional. The config settings for Google Compute Engine resources in an instance group, such as a master or worker group.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InstanceGroupConfig {
-    /// [Required] The number of VM instances in the instance group. For master instance groups, must be set to 1.
-    #[serde(rename="numInstances")]
-    pub num_instances: Option<i32>,
-    /// [Optional] Specifies that this instance group contains preemptible instances.
+    /// Optional. Specifies that this instance group contains preemptible instances.
     #[serde(rename="isPreemptible")]
     pub is_preemptible: Option<bool>,
-    /// [Output-only] The config for Google Compute Engine Instance Group Manager that manages this group. This is only used for preemptible instance groups.
-    #[serde(rename="managedGroupConfig")]
-    pub managed_group_config: Option<ManagedGroupConfig>,
-    /// [Required] The Google Compute Engine machine type used for cluster instances. Example: `https://www.googleapis.com/compute/v1/projects/[project_id]/zones/us-east1-a/machineTypes/n1-standard-2`.
+    /// Required. The Google Compute Engine machine type used for cluster instances. Example: https://www.googleapis.com/compute/v1/projects/[project_id]/zones/us-east1-a/machineTypes/n1-standard-2.
     #[serde(rename="machineTypeUri")]
     pub machine_type_uri: Option<String>,
-    /// [Optional] Disk option config settings.
-    #[serde(rename="diskConfig")]
-    pub disk_config: Option<DiskConfig>,
-    /// [Optional] The list of instance names. Cloud Dataproc derives the names from `cluster_name`, `num_instances`, and the instance group if not set by user (recommended practice is to let Cloud Dataproc derive the name).
+    /// Optional. The list of instance names. Cloud Dataproc derives the names from cluster_name, num_instances, and the instance group if not set by user (recommended practice is to let Cloud Dataproc derive the name).
     #[serde(rename="instanceNames")]
     pub instance_names: Option<Vec<String>>,
-    /// [Output-only] The Google Compute Engine image resource used for cluster instances. Inferred from `SoftwareConfig.image_version`.
+    /// Optional. Disk option config settings.
+    #[serde(rename="diskConfig")]
+    pub disk_config: Option<DiskConfig>,
+    /// Optional. The Google Compute Engine accelerator configuration for these instances.Beta Feature: This feature is still under development. It may be changed before final release.
+    pub accelerators: Option<Vec<AcceleratorConfig>>,
+    /// Output-only. The config for Google Compute Engine Instance Group Manager that manages this group. This is only used for preemptible instance groups.
+    #[serde(rename="managedGroupConfig")]
+    pub managed_group_config: Option<ManagedGroupConfig>,
+    /// Required. The number of VM instances in the instance group. For master instance groups, must be set to 1.
+    #[serde(rename="numInstances")]
+    pub num_instances: Option<i32>,
+    /// Output-only. The Google Compute Engine image resource used for cluster instances. Inferred from SoftwareConfig.image_version.
     #[serde(rename="imageUri")]
     pub image_uri: Option<String>,
 }
@@ -431,19 +423,19 @@ pub struct InstanceGroupConfig {
 impl Part for InstanceGroupConfig {}
 
 
-/// A YARN application created by a job. Application information is a subset of org.apache.hadoop.yarn.proto.YarnProtos.ApplicationReportProto. **Beta Feature**: This report is available for testing purposes only. It may be changed before final release.
+/// A YARN application created by a job. Application information is a subset of <code>org.apache.hadoop.yarn.proto.YarnProtos.ApplicationReportProto</code>.Beta Feature: This report is available for testing purposes only. It may be changed before final release.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct YarnApplication {
-    /// [Required] The numerical progress of the application, from 1 to 100.
+    /// Required. The numerical progress of the application, from 1 to 100.
     pub progress: Option<f32>,
-    /// [Required] The application state.
+    /// Required. The application state.
     pub state: Option<String>,
-    /// [Required] The application name.
+    /// Required. The application name.
     pub name: Option<String>,
-    /// [Optional] The HTTP URL of the ApplicationMaster, HistoryServer, or TimelineServer that provides application-specific information. The URL uses the internal hostname, and requires a proxy server for resolution and, possibly, access.
+    /// Optional. The HTTP URL of the ApplicationMaster, HistoryServer, or TimelineServer that provides application-specific information. The URL uses the internal hostname, and requires a proxy server for resolution and, possibly, access.
     #[serde(rename="trackingUrl")]
     pub tracking_url: Option<String>,
 }
@@ -451,7 +443,11 @@ pub struct YarnApplication {
 impl Part for YarnApplication {}
 
 
-/// A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); } The JSON representation for `Empty` is empty JSON object `{}`.
+/// A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance:
+/// service Foo {
+///   rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+/// }
+/// The JSON representation for Empty is empty JSON object {}.
 /// 
 /// # Activities
 /// 
@@ -468,7 +464,14 @@ pub struct Empty { _never_set: Option<bool> }
 impl ResponseResult for Empty {}
 
 
-/// The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). The error model is designed to be: - Simple to use and understand for most users - Flexible enough to meet unexpected needs # Overview The `Status` message contains three pieces of data: error code, error message, and error details. The error code should be an enum value of google.rpc.Code, but it may accept additional error codes if needed. The error message should be a developer-facing English message that helps developers *understand* and *resolve* the error. If a localized user-facing error message is needed, put the localized message in the error details or localize it in the client. The optional error details may contain arbitrary information about the error. There is a predefined set of error detail types in the package `google.rpc` which can be used for common error conditions. # Language mapping The `Status` message is the logical representation of the error model, but it is not necessarily the actual wire format. When the `Status` message is exposed in different client libraries and different wire protocols, it can be mapped differently. For example, it will likely be mapped to some exceptions in Java, but more likely mapped to some error codes in C. # Other uses The error model and the `Status` message can be used in a variety of environments, either with or without APIs, to provide a consistent developer experience across different environments. Example uses of this error model include: - Partial errors. If a service needs to return partial errors to the client, it may embed the `Status` in the normal response to indicate the partial errors. - Workflow errors. A typical workflow has multiple steps. Each step may have a `Status` message for error reporting purpose. - Batch operations. If a client uses batch request and batch response, the `Status` message should be used directly inside batch response, one for each error sub-response. - Asynchronous operations. If an API call embeds asynchronous operation results in its response, the status of those operations should be represented directly using the `Status` message. - Logging. If some API errors are stored in logs, the message `Status` could be used directly after any stripping needed for security/privacy reasons.
+/// The Status type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by gRPC (https://github.com/grpc). The error model is designed to be:
+/// Simple to use and understand for most users
+/// Flexible enough to meet unexpected needsOverviewThe Status message contains three pieces of data: error code, error message, and error details. The error code should be an enum value of google.rpc.Code, but it may accept additional error codes if needed. The error message should be a developer-facing English message that helps developers understand and resolve the error. If a localized user-facing error message is needed, put the localized message in the error details or localize it in the client. The optional error details may contain arbitrary information about the error. There is a predefined set of error detail types in the package google.rpc that can be used for common error conditions.Language mappingThe Status message is the logical representation of the error model, but it is not necessarily the actual wire format. When the Status message is exposed in different client libraries and different wire protocols, it can be mapped differently. For example, it will likely be mapped to some exceptions in Java, but more likely mapped to some error codes in C.Other usesThe error model and the Status message can be used in a variety of environments, either with or without APIs, to provide a consistent developer experience across different environments.Example uses of this error model include:
+/// Partial errors. If a service needs to return partial errors to the client, it may embed the Status in the normal response to indicate the partial errors.
+/// Workflow errors. A typical workflow has multiple steps. Each step may have a Status message for error reporting.
+/// Batch operations. If a client uses batch request and batch response, the Status message should be used directly inside batch response, one for each error sub-response.
+/// Asynchronous operations. If an API call embeds asynchronous operation results in its response, the status of those operations should be represented directly using the Status message.
+/// Logging. If some API errors are stored in logs, the message Status could be used directly after any stripping needed for security/privacy reasons.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -485,21 +488,18 @@ pub struct Status {
 impl Part for Status {}
 
 
-/// Encapsulates the full scoping used to reference a job.
+/// The runtime logging config of the job.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct JobReference {
-    /// [Required] The ID of the Google Cloud Platform project that the job belongs to.
-    #[serde(rename="projectId")]
-    pub project_id: Option<String>,
-    /// [Optional] The job ID, which must be unique within the project. The job ID is generated by the server upon job submission or provided by the user as a means to perform retries without creating duplicate jobs. The ID must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), or hyphens (-). The maximum length is 512 characters.
-    #[serde(rename="jobId")]
-    pub job_id: Option<String>,
+pub struct LoggingConfig {
+    /// The per-package log levels for the driver. This may include "root" package name to configure rootLogger. Examples:  'com.google = FATAL', 'root = INFO', 'org.apache = DEBUG'
+    #[serde(rename="driverLogLevels")]
+    pub driver_log_levels: Option<HashMap<String, String>>,
 }
 
-impl Part for JobReference {}
+impl Part for LoggingConfig {}
 
 
 /// Common config settings for resources of Google Compute Engine cluster instances, applicable to all instances in the cluster.
@@ -508,28 +508,57 @@ impl Part for JobReference {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GceClusterConfig {
-    /// [Optional] If true, all instances in the cluster will only have internal IP addresses. By default, clusters are not restricted to internal IP addresses, and will have ephemeral external IP addresses assigned to each instance. This `internal_ip_only` restriction can only be enabled for subnetwork enabled networks, and all off-cluster dependencies must be configured to be accessible without external IP addresses.
+    /// Optional. If true, all instances in the cluster will only have internal IP addresses. By default, clusters are not restricted to internal IP addresses, and will have ephemeral external IP addresses assigned to each instance. This internal_ip_only restriction can only be enabled for subnetwork enabled networks, and all off-cluster dependencies must be configured to be accessible without external IP addresses.
     #[serde(rename="internalIpOnly")]
     pub internal_ip_only: Option<bool>,
-    /// [Optional] The Google Compute Engine network to be used for machine communications. Cannot be specified with subnetwork_uri. If neither `network_uri` nor `subnetwork_uri` is specified, the "default" network of the project is used, if it exists. Cannot be a "Custom Subnet Network" (see [Using Subnetworks](/compute/docs/subnetworks) for more information). Example: `https://www.googleapis.com/compute/v1/projects/[project_id]/regions/global/default`.
+    /// Optional. The Google Compute Engine network to be used for machine communications. Cannot be specified with subnetwork_uri. If neither network_uri nor subnetwork_uri is specified, the "default" network of the project is used, if it exists. Cannot be a "Custom Subnet Network" (see Using Subnetworks for more information). Example: https://www.googleapis.com/compute/v1/projects/[project_id]/regions/global/default.
     #[serde(rename="networkUri")]
     pub network_uri: Option<String>,
-    /// [Optional] The Google Compute Engine subnetwork to be used for machine communications. Cannot be specified with network_uri. Example: `https://www.googleapis.com/compute/v1/projects/[project_id]/regions/us-east1/sub0`.
-    #[serde(rename="subnetworkUri")]
-    pub subnetwork_uri: Option<String>,
-    /// [Optional] The URIs of service account scopes to be included in Google Compute Engine instances. The following base set of scopes is always included: * https://www.googleapis.com/auth/cloud.useraccounts.readonly * https://www.googleapis.com/auth/devstorage.read_write * https://www.googleapis.com/auth/logging.write If no scopes are specified, the following defaults are also provided: * https://www.googleapis.com/auth/bigquery * https://www.googleapis.com/auth/bigtable.admin.table * https://www.googleapis.com/auth/bigtable.data * https://www.googleapis.com/auth/devstorage.full_control
-    #[serde(rename="serviceAccountScopes")]
-    pub service_account_scopes: Option<Vec<String>>,
-    /// The Google Compute Engine tags to add to all instances (see [Tagging instances](/compute/docs/label-or-tag-resources#tags)).
+    /// The Google Compute Engine tags to add to all instances (see Tagging instances).
     pub tags: Option<Vec<String>>,
-    /// The Google Compute Engine metadata entries to add to all instances (see [Project and instance metadata](https://cloud.google.com/compute/docs/storing-retrieving-metadata#project_and_instance_metadata)).
-    pub metadata: Option<HashMap<String, String>>,
-    /// [Required] The zone where the Google Compute Engine cluster will be located. Example: `https://www.googleapis.com/compute/v1/projects/[project_id]/zones/[zone]`.
+    /// Optional. The service account of the instances. Defaults to the default Google Compute Engine service account. Custom service accounts need permissions equivalent to the folloing IAM roles:
+    /// roles/logging.logWriter
+    /// roles/storage.objectAdmin(see https://cloud.google.com/compute/docs/access/service-accounts#custom_service_accounts for more information). Example: [account_id]@[project_id].iam.gserviceaccount.com
+    #[serde(rename="serviceAccount")]
+    pub service_account: Option<String>,
+    /// Required. The zone where the Google Compute Engine cluster will be located. Example: https://www.googleapis.com/compute/v1/projects/[project_id]/zones/[zone].
     #[serde(rename="zoneUri")]
     pub zone_uri: Option<String>,
+    /// Optional. The Google Compute Engine subnetwork to be used for machine communications. Cannot be specified with network_uri. Example: https://www.googleapis.com/compute/v1/projects/[project_id]/regions/us-east1/sub0.
+    #[serde(rename="subnetworkUri")]
+    pub subnetwork_uri: Option<String>,
+    /// Optional. The URIs of service account scopes to be included in Google Compute Engine instances. The following base set of scopes is always included:
+    /// https://www.googleapis.com/auth/cloud.useraccounts.readonly
+    /// https://www.googleapis.com/auth/devstorage.read_write
+    /// https://www.googleapis.com/auth/logging.writeIf no scopes are specified, the following defaults are also provided:
+    /// https://www.googleapis.com/auth/bigquery
+    /// https://www.googleapis.com/auth/bigtable.admin.table
+    /// https://www.googleapis.com/auth/bigtable.data
+    /// https://www.googleapis.com/auth/devstorage.full_control
+    #[serde(rename="serviceAccountScopes")]
+    pub service_account_scopes: Option<Vec<String>>,
+    /// The Google Compute Engine metadata entries to add to all instances (see Project and instance metadata (https://cloud.google.com/compute/docs/storing-retrieving-metadata#project_and_instance_metadata)).
+    pub metadata: Option<HashMap<String, String>>,
 }
 
 impl Part for GceClusterConfig {}
+
+
+/// Specifies the type and number of accelerator cards attached to the instances of an instance group (see GPUs on Compute Engine).
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AcceleratorConfig {
+    /// The number of the accelerator cards of this type exposed to this instance.
+    #[serde(rename="acceleratorCount")]
+    pub accelerator_count: Option<i32>,
+    /// Full or partial URI of the accelerator type resource to expose to this instance. See Google Compute Engine AcceleratorTypes( /compute/docs/reference/beta/acceleratorTypes)
+    #[serde(rename="acceleratorTypeUri")]
+    pub accelerator_type_uri: Option<String>,
+}
+
+impl Part for AcceleratorConfig {}
 
 
 /// The cluster config.
@@ -538,25 +567,32 @@ impl Part for GceClusterConfig {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ClusterConfig {
-    /// [Optional] The config settings for software inside the cluster.
+    /// Optional. The config settings for software inside the cluster.
     #[serde(rename="softwareConfig")]
     pub software_config: Option<SoftwareConfig>,
-    /// [Optional] A Google Cloud Storage staging bucket used for sharing generated SSH keys and config. If you do not specify a staging bucket, Cloud Dataproc will determine an appropriate Cloud Storage location (US, ASIA, or EU) for your cluster's staging bucket according to the Google Compute Engine zone where your cluster is deployed, and then it will create and manage this project-level, per-location bucket for you.
+    /// Optional. A Google Cloud Storage staging bucket used for sharing generated SSH keys and config. If you do not specify a staging bucket, Cloud Dataproc will determine an appropriate Cloud Storage location (US, ASIA, or EU) for your cluster's staging bucket according to the Google Compute Engine zone where your cluster is deployed, and then it will create and manage this project-level, per-location bucket for you.
     #[serde(rename="configBucket")]
     pub config_bucket: Option<String>,
-    /// [Required] The shared Google Compute Engine config settings for all instances in a cluster.
+    /// Required. The shared Google Compute Engine config settings for all instances in a cluster.
     #[serde(rename="gceClusterConfig")]
     pub gce_cluster_config: Option<GceClusterConfig>,
-    /// [Optional] Commands to execute on each node after config is completed. By default, executables are run on master and all worker nodes. You can test a node's role metadata to run an executable on a master or worker node, as shown below using `curl` (you can also use `wget`): ROLE=$(curl -H Metadata-Flavor:Google http://metadata/computeMetadata/v1/instance/attributes/dataproc-role) if [[ "${ROLE}" == 'Master' ]]; then ... master specific actions ... else ... worker specific actions ... fi
+    /// Optional. Commands to execute on each node after config is completed. By default, executables are run on master and all worker nodes. You can test a node's role metadata to run an executable on a master or worker node, as shown below using curl (you can also use wget):
+    /// ROLE=$(curl -H Metadata-Flavor:Google http://metadata/computeMetadata/v1/instance/attributes/dataproc-role)
+    /// if [[ "${ROLE}" == 'Master' ]]; then
+    ///   ... master specific actions ...
+    /// else
+    ///   ... worker specific actions ...
+    /// fi
+    /// 
     #[serde(rename="initializationActions")]
     pub initialization_actions: Option<Vec<NodeInitializationAction>>,
-    /// [Optional] The Google Compute Engine config settings for worker instances in a cluster.
+    /// Optional. The Google Compute Engine config settings for worker instances in a cluster.
     #[serde(rename="workerConfig")]
     pub worker_config: Option<InstanceGroupConfig>,
-    /// [Optional] The Google Compute Engine config settings for additional worker instances in a cluster.
+    /// Optional. The Google Compute Engine config settings for additional worker instances in a cluster.
     #[serde(rename="secondaryWorkerConfig")]
     pub secondary_worker_config: Option<InstanceGroupConfig>,
-    /// [Optional] The Google Compute Engine config settings for the master instance in a cluster.
+    /// Optional. The Google Compute Engine config settings for the master instance in a cluster.
     #[serde(rename="masterConfig")]
     pub master_config: Option<InstanceGroupConfig>,
 }
@@ -575,7 +611,7 @@ impl Part for ClusterConfig {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SubmitJobRequest {
-    /// [Required] The job resource.
+    /// Required. The job resource.
     pub job: Option<Job>,
 }
 
@@ -588,7 +624,17 @@ impl RequestValue for SubmitJobRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct QueryList {
-    /// [Required] The queries to execute. You do not need to terminate a query with a semicolon. Multiple queries can be specified in one string by separating each with a semicolon. Here is an example of an Cloud Dataproc API snippet that uses a QueryList to specify a HiveJob: "hiveJob": { "queryList": { "queries": [ "query1", "query2", "query3;query4", ] } }
+    /// Required. The queries to execute. You do not need to terminate a query with a semicolon. Multiple queries can be specified in one string by separating each with a semicolon. Here is an example of an Cloud Dataproc API snippet that uses a QueryList to specify a HiveJob:
+    /// "hiveJob": {
+    ///   "queryList": {
+    ///     "queries": [
+    ///       "query1",
+    ///       "query2",
+    ///       "query3;query4",
+    ///     ]
+    ///   }
+    /// }
+    /// 
     pub queries: Option<Vec<String>>,
 }
 
@@ -601,10 +647,10 @@ impl Part for QueryList {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DiskConfig {
-    /// [Optional] Number of attached SSDs, from 0 to 4 (default is 0). If SSDs are not attached, the boot disk is used to store runtime logs and [HDFS](https://hadoop.apache.org/docs/r1.2.1/hdfs_user_guide.html) data. If one or more SSDs are attached, this runtime bulk data is spread across them, and the boot disk contains only basic config and installed binaries.
+    /// Optional. Number of attached SSDs, from 0 to 4 (default is 0). If SSDs are not attached, the boot disk is used to store runtime logs and HDFS (https://hadoop.apache.org/docs/r1.2.1/hdfs_user_guide.html) data. If one or more SSDs are attached, this runtime bulk data is spread across them, and the boot disk contains only basic config and installed binaries.
     #[serde(rename="numLocalSsds")]
     pub num_local_ssds: Option<i32>,
-    /// [Optional] Size in GB of the boot disk (default is 500GB).
+    /// Optional. Size in GB of the boot disk (default is 500GB).
     #[serde(rename="bootDiskSizeGb")]
     pub boot_disk_size_gb: Option<i32>,
 }
@@ -621,50 +667,54 @@ impl Part for DiskConfig {}
 /// 
 /// * [regions jobs submit projects](struct.ProjectRegionJobSubmitCall.html) (response)
 /// * [regions jobs get projects](struct.ProjectRegionJobGetCall.html) (response)
+/// * [regions jobs patch projects](struct.ProjectRegionJobPatchCall.html) (request|response)
 /// * [regions jobs cancel projects](struct.ProjectRegionJobCancelCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Job {
-    /// [Output-only] The job status. Additional application-specific status information may be contained in the type_job and yarn_applications fields.
+    /// Output-only. The job status. Additional application-specific status information may be contained in the <code>type_job</code> and <code>yarn_applications</code> fields.
     pub status: Option<JobStatus>,
-    /// Job is a Hadoop job.
-    #[serde(rename="hadoopJob")]
-    pub hadoop_job: Option<HadoopJob>,
-    /// [Optional] The labels to associate with this job. Label **keys** must contain 1 to 63 characters, and must conform to [RFC 1035](https://www.ietf.org/rfc/rfc1035.txt). Label **values** may be empty, but, if present, must contain 1 to 63 characters, and must conform to [RFC 1035](https://www.ietf.org/rfc/rfc1035.txt). No more than 32 labels can be associated with a job.
-    pub labels: Option<HashMap<String, String>>,
-    /// [Required] Job information, including how, when, and where to run the job.
-    pub placement: Option<JobPlacement>,
-    /// [Optional] The fully qualified reference to the job, which can be used to obtain the equivalent REST path of the job resource. If this property is not specified when a job is created, the server generates a job_id.
-    pub reference: Option<JobReference>,
     /// Job is a SparkSql job.
     #[serde(rename="sparkSqlJob")]
     pub spark_sql_job: Option<SparkSqlJob>,
+    /// Optional. The labels to associate with this job. Label keys must contain 1 to 63 characters, and must conform to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt). Label values may be empty, but, if present, must contain 1 to 63 characters, and must conform to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt). No more than 32 labels can be associated with a job.
+    pub labels: Option<HashMap<String, String>>,
+    /// Required. Job information, including how, when, and where to run the job.
+    pub placement: Option<JobPlacement>,
+    /// Optional. The fully qualified reference to the job, which can be used to obtain the equivalent REST path of the job resource. If this property is not specified when a job is created, the server generates a <code>job_id</code>.
+    pub reference: Option<JobReference>,
+    /// Job is a Hadoop job.
+    #[serde(rename="hadoopJob")]
+    pub hadoop_job: Option<HadoopJob>,
     /// Job is a Pig job.
     #[serde(rename="pigJob")]
     pub pig_job: Option<PigJob>,
-    /// [Output-only] A URI pointing to the location of the stdout of the job's driver program.
+    /// Output-only. A URI pointing to the location of the stdout of the job's driver program.
     #[serde(rename="driverOutputResourceUri")]
     pub driver_output_resource_uri: Option<String>,
-    /// Job is a Pyspark job.
-    #[serde(rename="pysparkJob")]
-    pub pyspark_job: Option<PySparkJob>,
-    /// [Output-only] If present, the location of miscellaneous control files which may be used as part of job setup and handling. If not present, control files may be placed in the same location as `driver_output_uri`.
+    /// Output-only. If present, the location of miscellaneous control files which may be used as part of job setup and handling. If not present, control files may be placed in the same location as driver_output_uri.
     #[serde(rename="driverControlFilesUri")]
     pub driver_control_files_uri: Option<String>,
     /// Job is a Spark job.
     #[serde(rename="sparkJob")]
     pub spark_job: Option<SparkJob>,
-    /// [Output-only] The collection of YARN applications spun up by this job. **Beta** Feature: This report is available for testing purposes only. It may be changed before final release.
+    /// Output-only. The collection of YARN applications spun up by this job.Beta Feature: This report is available for testing purposes only. It may be changed before final release.
     #[serde(rename="yarnApplications")]
     pub yarn_applications: Option<Vec<YarnApplication>>,
-    /// [Output-only] The previous job status.
+    /// Optional. Job scheduling configuration.
+    pub scheduling: Option<JobScheduling>,
+    /// Output-only. The previous job status.
     #[serde(rename="statusHistory")]
     pub status_history: Option<Vec<JobStatus>>,
+    /// Job is a Pyspark job.
+    #[serde(rename="pysparkJob")]
+    pub pyspark_job: Option<PySparkJob>,
     /// Job is a Hive job.
     #[serde(rename="hiveJob")]
     pub hive_job: Option<HiveJob>,
 }
 
+impl RequestValue for Job {}
 impl ResponseResult for Job {}
 
 
@@ -674,10 +724,10 @@ impl ResponseResult for Job {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ManagedGroupConfig {
-    /// [Output-only] The name of the Instance Template used for the Managed Instance Group.
+    /// Output-only. The name of the Instance Template used for the Managed Instance Group.
     #[serde(rename="instanceTemplateName")]
     pub instance_template_name: Option<String>,
-    /// [Output-only] The name of the Instance Group Manager for this group.
+    /// Output-only. The name of the Instance Group Manager for this group.
     #[serde(rename="instanceGroupManagerName")]
     pub instance_group_manager_name: Option<String>,
 }
@@ -685,33 +735,33 @@ pub struct ManagedGroupConfig {
 impl Part for ManagedGroupConfig {}
 
 
-/// A Cloud Dataproc job for running [Apache PySpark](https://spark.apache.org/docs/0.9.0/python-programming-guide.html) applications on YARN.
+/// A Cloud Dataproc job for running Apache PySpark (https://spark.apache.org/docs/0.9.0/python-programming-guide.html) applications on YARN.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PySparkJob {
-    /// [Required] The HCFS URI of the main Python file to use as the driver. Must be a .py file.
+    /// Required. The HCFS URI of the main Python file to use as the driver. Must be a .py file.
     #[serde(rename="mainPythonFileUri")]
     pub main_python_file_uri: Option<String>,
-    /// [Optional] HCFS URIs of jar files to add to the CLASSPATHs of the Python driver and tasks.
+    /// Optional. HCFS URIs of jar files to add to the CLASSPATHs of the Python driver and tasks.
     #[serde(rename="jarFileUris")]
     pub jar_file_uris: Option<Vec<String>>,
-    /// [Optional] The runtime log config for job execution.
+    /// Optional. The runtime log config for job execution.
     #[serde(rename="loggingConfig")]
     pub logging_config: Option<LoggingConfig>,
-    /// [Optional] The arguments to pass to the driver. Do not include arguments, such as `--conf`, that can be set as job properties, since a collision may occur that causes an incorrect job submission.
+    /// Optional. The arguments to pass to the driver. Do not include arguments, such as --conf, that can be set as job properties, since a collision may occur that causes an incorrect job submission.
     pub args: Option<Vec<String>>,
-    /// [Optional] HCFS URIs of files to be copied to the working directory of Python drivers and distributed tasks. Useful for naively parallel tasks.
+    /// Optional. HCFS URIs of files to be copied to the working directory of Python drivers and distributed tasks. Useful for naively parallel tasks.
     #[serde(rename="fileUris")]
     pub file_uris: Option<Vec<String>>,
-    /// [Optional] HCFS URIs of archives to be extracted in the working directory of .jar, .tar, .tar.gz, .tgz, and .zip.
+    /// Optional. HCFS URIs of archives to be extracted in the working directory of .jar, .tar, .tar.gz, .tgz, and .zip.
     #[serde(rename="archiveUris")]
     pub archive_uris: Option<Vec<String>>,
-    /// [Optional] HCFS file URIs of Python files to pass to the PySpark framework. Supported file types: .py, .egg, and .zip.
+    /// Optional. HCFS file URIs of Python files to pass to the PySpark framework. Supported file types: .py, .egg, and .zip.
     #[serde(rename="pythonFileUris")]
     pub python_file_uris: Option<Vec<String>>,
-    /// [Optional] A mapping of property names to values, used to configure PySpark. Properties that conflict with values set by the Cloud Dataproc API may be overwritten. Can include properties set in /etc/spark/conf/spark-defaults.conf and classes in user code.
+    /// Optional. A mapping of property names to values, used to configure PySpark. Properties that conflict with values set by the Cloud Dataproc API may be overwritten. Can include properties set in /etc/spark/conf/spark-defaults.conf and classes in user code.
     pub properties: Option<HashMap<String, String>>,
 }
 
@@ -724,10 +774,10 @@ impl Part for PySparkJob {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct NodeInitializationAction {
-    /// [Optional] Amount of time executable has to complete. Default is 10 minutes. Cluster creation fails with an explanatory error message (the name of the executable that caused the error and the exceeded timeout period) if the executable is not completed at end of the timeout period.
+    /// Optional. Amount of time executable has to complete. Default is 10 minutes. Cluster creation fails with an explanatory error message (the name of the executable that caused the error and the exceeded timeout period) if the executable is not completed at end of the timeout period.
     #[serde(rename="executionTimeout")]
     pub execution_timeout: Option<String>,
-    /// [Required] Google Cloud Storage URI of executable file.
+    /// Required. Google Cloud Storage URI of executable file.
     #[serde(rename="executableFile")]
     pub executable_file: Option<String>,
 }
@@ -761,10 +811,10 @@ impl RequestValue for DiagnoseClusterRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListClustersResponse {
-    /// [Output-only] This token is included in the response if there are more results to fetch. To fetch additional results, provide this value as the `page_token` in a subsequent ListClustersRequest.
+    /// Output-only. This token is included in the response if there are more results to fetch. To fetch additional results, provide this value as the page_token in a subsequent ListClustersRequest.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
-    /// [Output-only] The clusters in the project.
+    /// Output-only. The clusters in the project.
     pub clusters: Option<Vec<Cluster>>,
 }
 
@@ -782,10 +832,10 @@ impl ResponseResult for ListClustersResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListJobsResponse {
-    /// [Optional] This token is included in the response if there are more results to fetch. To fetch additional results, provide this value as the `page_token` in a subsequent ListJobsRequest.
+    /// Optional. This token is included in the response if there are more results to fetch. To fetch additional results, provide this value as the page_token in a subsequent <code>ListJobsRequest</code>.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
-    /// [Output-only] Jobs list.
+    /// Output-only. Jobs list.
     pub jobs: Option<Vec<Job>>,
 }
 
@@ -798,13 +848,15 @@ impl ResponseResult for ListJobsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobStatus {
-    /// [Output-only] A state message specifying the overall job state.
+    /// Output-only. A state message specifying the overall job state.
     pub state: Option<String>,
-    /// [Output-only] The time when this state was entered.
+    /// Output-only. The time when this state was entered.
     #[serde(rename="stateStartTime")]
     pub state_start_time: Option<String>,
-    /// [Output-only] Optional job state details, such as an error description if the state is ERROR.
+    /// Output-only. Optional job state details, such as an error description if the state is <code>ERROR</code>.
     pub details: Option<String>,
+    /// Output-only. Additional state information, which includes status reported by the agent.
+    pub substate: Option<String>,
 }
 
 impl Part for JobStatus {}
@@ -816,10 +868,10 @@ impl Part for JobStatus {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobPlacement {
-    /// [Required] The name of the cluster where the job will be submitted.
+    /// Required. The name of the cluster where the job will be submitted.
     #[serde(rename="clusterName")]
     pub cluster_name: Option<String>,
-    /// [Output-only] A cluster UUID generated by the Cloud Dataproc service when the job is submitted.
+    /// Output-only. A cluster UUID generated by the Cloud Dataproc service when the job is submitted.
     #[serde(rename="clusterUuid")]
     pub cluster_uuid: Option<String>,
 }
@@ -827,21 +879,24 @@ pub struct JobPlacement {
 impl Part for JobPlacement {}
 
 
-/// The runtime logging config of the job.
+/// Encapsulates the full scoping used to reference a job.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct LoggingConfig {
-    /// The per-package log levels for the driver. This may include "root" package name to configure rootLogger. Examples: 'com.google = FATAL', 'root = INFO', 'org.apache = DEBUG'
-    #[serde(rename="driverLogLevels")]
-    pub driver_log_levels: Option<HashMap<String, String>>,
+pub struct JobReference {
+    /// Required. The ID of the Google Cloud Platform project that the job belongs to.
+    #[serde(rename="projectId")]
+    pub project_id: Option<String>,
+    /// Optional. The job ID, which must be unique within the project. The job ID is generated by the server upon job submission or provided by the user as a means to perform retries without creating duplicate jobs. The ID must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), or hyphens (-). The maximum length is 100 characters.
+    #[serde(rename="jobId")]
+    pub job_id: Option<String>,
 }
 
-impl Part for LoggingConfig {}
+impl Part for JobReference {}
 
 
-/// Contains cluster daemon metrics, such as HDFS and YARN stats. **Beta Feature**: This report is available for testing purposes only. It may be changed before final release.
+/// Contains cluster daemon metrics, such as HDFS and YARN stats.Beta Feature: This report is available for testing purposes only. It may be changed before final release.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -858,7 +913,7 @@ pub struct ClusterMetrics {
 impl Part for ClusterMetrics {}
 
 
-/// A Cloud Dataproc job for running [Apache Hive](https://hive.apache.org/) queries on YARN.
+/// A Cloud Dataproc job for running Apache Hive (https://hive.apache.org/) queries on YARN.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -867,52 +922,52 @@ pub struct HiveJob {
     /// The HCFS URI of the script that contains Hive queries.
     #[serde(rename="queryFileUri")]
     pub query_file_uri: Option<String>,
-    /// [Optional] Mapping of query variable names to values (equivalent to the Hive command: `SET name="value";`).
+    /// Optional. Mapping of query variable names to values (equivalent to the Hive command: SET name="value";).
     #[serde(rename="scriptVariables")]
     pub script_variables: Option<HashMap<String, String>>,
-    /// [Optional] Whether to continue executing queries if a query fails. The default value is `false`. Setting to `true` can be useful when executing independent parallel queries.
+    /// Optional. Whether to continue executing queries if a query fails. The default value is false. Setting to true can be useful when executing independent parallel queries.
     #[serde(rename="continueOnFailure")]
     pub continue_on_failure: Option<bool>,
-    /// [Optional] HCFS URIs of jar files to add to the CLASSPATH of the Hive server and Hadoop MapReduce (MR) tasks. Can contain Hive SerDes and UDFs.
+    /// Optional. HCFS URIs of jar files to add to the CLASSPATH of the Hive server and Hadoop MapReduce (MR) tasks. Can contain Hive SerDes and UDFs.
     #[serde(rename="jarFileUris")]
     pub jar_file_uris: Option<Vec<String>>,
     /// A list of queries.
     #[serde(rename="queryList")]
     pub query_list: Option<QueryList>,
-    /// [Optional] A mapping of property names and values, used to configure Hive. Properties that conflict with values set by the Cloud Dataproc API may be overwritten. Can include properties set in /etc/hadoop/conf/*-site.xml, /etc/hive/conf/hive-site.xml, and classes in user code.
+    /// Optional. A mapping of property names and values, used to configure Hive. Properties that conflict with values set by the Cloud Dataproc API may be overwritten. Can include properties set in /etc/hadoop/conf/*-site.xml, /etc/hive/conf/hive-site.xml, and classes in user code.
     pub properties: Option<HashMap<String, String>>,
 }
 
 impl Part for HiveJob {}
 
 
-/// A Cloud Dataproc job for running [Apache Hadoop MapReduce](https://hadoop.apache.org/docs/current/hadoop-mapreduce-client/hadoop-mapreduce-client-core/MapReduceTutorial.html) jobs on [Apache Hadoop YARN](https://hadoop.apache.org/docs/r2.7.1/hadoop-yarn/hadoop-yarn-site/YARN.html).
+/// A Cloud Dataproc job for running Apache Hadoop MapReduce (https://hadoop.apache.org/docs/current/hadoop-mapreduce-client/hadoop-mapreduce-client-core/MapReduceTutorial.html) jobs on Apache Hadoop YARN (https://hadoop.apache.org/docs/r2.7.1/hadoop-yarn/hadoop-yarn-site/YARN.html).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct HadoopJob {
-    /// [Optional] Jar file URIs to add to the CLASSPATHs of the Hadoop driver and tasks.
+    /// Optional. Jar file URIs to add to the CLASSPATHs of the Hadoop driver and tasks.
     #[serde(rename="jarFileUris")]
     pub jar_file_uris: Option<Vec<String>>,
-    /// [Optional] The runtime log config for job execution.
+    /// Optional. The runtime log config for job execution.
     #[serde(rename="loggingConfig")]
     pub logging_config: Option<LoggingConfig>,
-    /// [Optional] The arguments to pass to the driver. Do not include arguments, such as `-libjars` or `-Dfoo=bar`, that can be set as job properties, since a collision may occur that causes an incorrect job submission.
+    /// Optional. The arguments to pass to the driver. Do not include arguments, such as -libjars or -Dfoo=bar, that can be set as job properties, since a collision may occur that causes an incorrect job submission.
     pub args: Option<Vec<String>>,
-    /// [Optional] HCFS (Hadoop Compatible Filesystem) URIs of files to be copied to the working directory of Hadoop drivers and distributed tasks. Useful for naively parallel tasks.
+    /// Optional. HCFS (Hadoop Compatible Filesystem) URIs of files to be copied to the working directory of Hadoop drivers and distributed tasks. Useful for naively parallel tasks.
     #[serde(rename="fileUris")]
     pub file_uris: Option<Vec<String>>,
-    /// The name of the driver's main class. The jar file containing the class must be in the default CLASSPATH or specified in `jar_file_uris`.
+    /// The name of the driver's main class. The jar file containing the class must be in the default CLASSPATH or specified in jar_file_uris.
     #[serde(rename="mainClass")]
     pub main_class: Option<String>,
-    /// [Optional] HCFS URIs of archives to be extracted in the working directory of Hadoop drivers and tasks. Supported file types: .jar, .tar, .tar.gz, .tgz, or .zip.
+    /// Optional. HCFS URIs of archives to be extracted in the working directory of Hadoop drivers and tasks. Supported file types: .jar, .tar, .tar.gz, .tgz, or .zip.
     #[serde(rename="archiveUris")]
     pub archive_uris: Option<Vec<String>>,
-    /// The HCFS URI of the jar file containing the main class. Examples: 'gs://foo-bucket/analytics-binaries/extract-useful-metrics-mr.jar' 'hdfs:/tmp/test-samples/custom-wordcount.jar' 'file:///home/usr/lib/hadoop-mapreduce/hadoop-mapreduce-examples.jar'
+    /// The HCFS URI of the jar file containing the main class. Examples:  'gs://foo-bucket/analytics-binaries/extract-useful-metrics-mr.jar'  'hdfs:/tmp/test-samples/custom-wordcount.jar'  'file:///home/usr/lib/hadoop-mapreduce/hadoop-mapreduce-examples.jar'
     #[serde(rename="mainJarFileUri")]
     pub main_jar_file_uri: Option<String>,
-    /// [Optional] A mapping of property names to values, used to configure Hadoop. Properties that conflict with values set by the Cloud Dataproc API may be overwritten. Can include properties set in /etc/hadoop/conf/*-site and classes in user code.
+    /// Optional. A mapping of property names to values, used to configure Hadoop. Properties that conflict with values set by the Cloud Dataproc API may be overwritten. Can include properties set in /etc/hadoop/conf/*-site and classes in user code.
     pub properties: Option<HashMap<String, String>>,
 }
 
@@ -925,10 +980,19 @@ impl Part for HadoopJob {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SoftwareConfig {
-    /// [Optional] The version of software inside the cluster. It must match the regular expression `[0-9]+\.[0-9]+`. If unspecified, it defaults to the latest version (see [Cloud Dataproc Versioning](/dataproc/versioning)).
+    /// Optional. The version of software inside the cluster. It must match the regular expression [0-9]+\.[0-9]+. If unspecified, it defaults to the latest version (see Cloud Dataproc Versioning).
     #[serde(rename="imageVersion")]
     pub image_version: Option<String>,
-    /// [Optional] The properties to set on daemon config files. Property keys are specified in `prefix:property` format, such as `core:fs.defaultFS`. The following are supported prefixes and their mappings: * core: `core-site.xml` * hdfs: `hdfs-site.xml` * mapred: `mapred-site.xml` * yarn: `yarn-site.xml` * hive: `hive-site.xml` * pig: `pig.properties` * spark: `spark-defaults.conf`
+    /// Optional. The properties to set on daemon config files.Property keys are specified in prefix:property format, such as core:fs.defaultFS. The following are supported prefixes and their mappings:
+    /// capacity-scheduler: capacity-scheduler.xml
+    /// core: core-site.xml
+    /// distcp: distcp-default.xml
+    /// hdfs: hdfs-site.xml
+    /// hive: hive-site.xml
+    /// mapred: mapred-site.xml
+    /// pig: pig.properties
+    /// spark: spark-defaults.conf
+    /// yarn: yarn-site.xml
     pub properties: Option<HashMap<String, String>>,
 }
 
@@ -956,7 +1020,7 @@ pub struct ListOperationsResponse {
 impl ResponseResult for ListOperationsResponse {}
 
 
-/// A Cloud Dataproc job for running [Apache Pig](https://pig.apache.org/) queries on YARN.
+/// A Cloud Dataproc job for running Apache Pig (https://pig.apache.org/) queries on YARN.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -965,22 +1029,22 @@ pub struct PigJob {
     /// The HCFS URI of the script that contains the Pig queries.
     #[serde(rename="queryFileUri")]
     pub query_file_uri: Option<String>,
-    /// [Optional] Mapping of query variable names to values (equivalent to the Pig command: `name=[value]`).
+    /// Optional. Mapping of query variable names to values (equivalent to the Pig command: name=[value]).
     #[serde(rename="scriptVariables")]
     pub script_variables: Option<HashMap<String, String>>,
-    /// [Optional] The runtime log config for job execution.
+    /// Optional. The runtime log config for job execution.
     #[serde(rename="loggingConfig")]
     pub logging_config: Option<LoggingConfig>,
-    /// [Optional] Whether to continue executing queries if a query fails. The default value is `false`. Setting to `true` can be useful when executing independent parallel queries.
+    /// Optional. Whether to continue executing queries if a query fails. The default value is false. Setting to true can be useful when executing independent parallel queries.
     #[serde(rename="continueOnFailure")]
     pub continue_on_failure: Option<bool>,
-    /// [Optional] HCFS URIs of jar files to add to the CLASSPATH of the Pig Client and Hadoop MapReduce (MR) tasks. Can contain Pig UDFs.
+    /// Optional. HCFS URIs of jar files to add to the CLASSPATH of the Pig Client and Hadoop MapReduce (MR) tasks. Can contain Pig UDFs.
     #[serde(rename="jarFileUris")]
     pub jar_file_uris: Option<Vec<String>>,
     /// A list of queries.
     #[serde(rename="queryList")]
     pub query_list: Option<QueryList>,
-    /// [Optional] A mapping of property names to values, used to configure Pig. Properties that conflict with values set by the Cloud Dataproc API may be overwritten. Can include properties set in /etc/hadoop/conf/*-site.xml, /etc/pig/conf/pig.properties, and classes in user code.
+    /// Optional. A mapping of property names to values, used to configure Pig. Properties that conflict with values set by the Cloud Dataproc API may be overwritten. Can include properties set in /etc/hadoop/conf/*-site.xml, /etc/pig/conf/pig.properties, and classes in user code.
     pub properties: Option<HashMap<String, String>>,
 }
 
@@ -1000,25 +1064,25 @@ impl Part for PigJob {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Cluster {
-    /// [Output-only] Cluster status.
+    /// Output-only. Cluster status.
     pub status: Option<ClusterStatus>,
-    /// [Output-only] A cluster UUID (Unique Universal Identifier). Cloud Dataproc generates this value when it creates the cluster.
+    /// Output-only. A cluster UUID (Unique Universal Identifier). Cloud Dataproc generates this value when it creates the cluster.
     #[serde(rename="clusterUuid")]
     pub cluster_uuid: Option<String>,
-    /// [Required] The cluster name. Cluster names within a project must be unique. Names of deleted clusters can be reused.
+    /// Required. The cluster name. Cluster names within a project must be unique. Names of deleted clusters can be reused.
     #[serde(rename="clusterName")]
     pub cluster_name: Option<String>,
-    /// [Required] The Google Cloud Platform project ID that the cluster belongs to.
+    /// Required. The Google Cloud Platform project ID that the cluster belongs to.
     #[serde(rename="projectId")]
     pub project_id: Option<String>,
-    /// [Optional] The labels to associate with this cluster. Label **keys** must contain 1 to 63 characters, and must conform to [RFC 1035](https://www.ietf.org/rfc/rfc1035.txt). Label **values** may be empty, but, if present, must contain 1 to 63 characters, and must conform to [RFC 1035](https://www.ietf.org/rfc/rfc1035.txt). No more than 32 labels can be associated with a cluster.
+    /// Optional. The labels to associate with this cluster. Label keys must contain 1 to 63 characters, and must conform to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt). Label values may be empty, but, if present, must contain 1 to 63 characters, and must conform to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt). No more than 32 labels can be associated with a cluster.
     pub labels: Option<HashMap<String, String>>,
-    /// Contains cluster daemon metrics such as HDFS and YARN stats. **Beta Feature**: This report is available for testing purposes only. It may be changed before final release.
+    /// Contains cluster daemon metrics such as HDFS and YARN stats.Beta Feature: This report is available for testing purposes only. It may be changed before final release.
     pub metrics: Option<ClusterMetrics>,
-    /// [Output-only] The previous cluster status.
+    /// Output-only. The previous cluster status.
     #[serde(rename="statusHistory")]
     pub status_history: Option<Vec<ClusterStatus>>,
-    /// [Required] The cluster config. Note that Cloud Dataproc may set default values, and values may change when clusters are updated.
+    /// Required. The cluster config. Note that Cloud Dataproc may set default values, and values may change when clusters are updated.
     pub config: Option<ClusterConfig>,
 }
 
@@ -1026,33 +1090,33 @@ impl RequestValue for Cluster {}
 impl ResponseResult for Cluster {}
 
 
-/// A Cloud Dataproc job for running [Apache Spark](http://spark.apache.org/) applications on YARN.
+/// A Cloud Dataproc job for running Apache Spark (http://spark.apache.org/) applications on YARN.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SparkJob {
-    /// [Optional] HCFS URIs of jar files to add to the CLASSPATHs of the Spark driver and tasks.
+    /// Optional. HCFS URIs of jar files to add to the CLASSPATHs of the Spark driver and tasks.
     #[serde(rename="jarFileUris")]
     pub jar_file_uris: Option<Vec<String>>,
-    /// [Optional] The runtime log config for job execution.
+    /// Optional. The runtime log config for job execution.
     #[serde(rename="loggingConfig")]
     pub logging_config: Option<LoggingConfig>,
-    /// [Optional] The arguments to pass to the driver. Do not include arguments, such as `--conf`, that can be set as job properties, since a collision may occur that causes an incorrect job submission.
+    /// Optional. The arguments to pass to the driver. Do not include arguments, such as --conf, that can be set as job properties, since a collision may occur that causes an incorrect job submission.
     pub args: Option<Vec<String>>,
-    /// [Optional] HCFS URIs of files to be copied to the working directory of Spark drivers and distributed tasks. Useful for naively parallel tasks.
+    /// Optional. HCFS URIs of files to be copied to the working directory of Spark drivers and distributed tasks. Useful for naively parallel tasks.
     #[serde(rename="fileUris")]
     pub file_uris: Option<Vec<String>>,
-    /// The name of the driver's main class. The jar file that contains the class must be in the default CLASSPATH or specified in `jar_file_uris`.
+    /// The name of the driver's main class. The jar file that contains the class must be in the default CLASSPATH or specified in jar_file_uris.
     #[serde(rename="mainClass")]
     pub main_class: Option<String>,
-    /// [Optional] HCFS URIs of archives to be extracted in the working directory of Spark drivers and tasks. Supported file types: .jar, .tar, .tar.gz, .tgz, and .zip.
+    /// Optional. HCFS URIs of archives to be extracted in the working directory of Spark drivers and tasks. Supported file types: .jar, .tar, .tar.gz, .tgz, and .zip.
     #[serde(rename="archiveUris")]
     pub archive_uris: Option<Vec<String>>,
     /// The HCFS URI of the jar file that contains the main class.
     #[serde(rename="mainJarFileUri")]
     pub main_jar_file_uri: Option<String>,
-    /// [Optional] A mapping of property names to values, used to configure Spark. Properties that conflict with values set by the Cloud Dataproc API may be overwritten. Can include properties set in /etc/spark/conf/spark-defaults.conf and classes in user code.
+    /// Optional. A mapping of property names to values, used to configure Spark. Properties that conflict with values set by the Cloud Dataproc API may be overwritten. Can include properties set in /etc/spark/conf/spark-defaults.conf and classes in user code.
     pub properties: Option<HashMap<String, String>>,
 }
 
@@ -1065,13 +1129,15 @@ impl Part for SparkJob {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ClusterStatus {
-    /// [Output-only] The cluster's state.
+    /// Output-only. The cluster's state.
     pub state: Option<String>,
-    /// [Output-only] Time when this state was entered.
+    /// Output-only. Time when this state was entered.
     #[serde(rename="stateStartTime")]
     pub state_start_time: Option<String>,
-    /// [Output-only] Optional details of cluster's state.
+    /// Output-only. Optional details of cluster's state.
     pub detail: Option<String>,
+    /// Output-only. Additional state information that includes status reported by the agent.
+    pub substate: Option<String>,
 }
 
 impl Part for ClusterStatus {}
@@ -1092,16 +1158,16 @@ impl Part for ClusterStatus {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Operation {
-    /// Service-specific metadata associated with the operation. It typically contains progress information and common metadata such as create time. Some services might not provide such metadata. Any method that returns a long-running operation should document the metadata type, if any.
-    pub metadata: Option<HashMap<String, String>>,
-    /// If the value is `false`, it means the operation is still in progress. If true, the operation is completed, and either `error` or `response` is available.
-    pub done: Option<bool>,
-    /// The normal response of the operation in case of success. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.
-    pub response: Option<HashMap<String, String>>,
-    /// The server-assigned name, which is only unique within the same service that originally returns it. If you use the default HTTP mapping, the `name` should have the format of `operations/some/unique/name`.
-    pub name: Option<String>,
     /// The error result of the operation in case of failure or cancellation.
     pub error: Option<Status>,
+    /// If the value is false, it means the operation is still in progress. If true, the operation is completed, and either error or response is available.
+    pub done: Option<bool>,
+    /// The normal response of the operation in case of success. If the original method returns no data on success, such as Delete, the response is google.protobuf.Empty. If the original method is standard Get/Create/Update, the response should be the resource. For other methods, the response should have the type XxxResponse, where Xxx is the original method name. For example, if the original method name is TakeSnapshot(), the inferred response type is TakeSnapshotResponse.
+    pub response: Option<HashMap<String, String>>,
+    /// The server-assigned name, which is only unique within the same service that originally returns it. If you use the default HTTP mapping, the name should have the format of operations/some/unique/name.
+    pub name: Option<String>,
+    /// Service-specific metadata associated with the operation. It typically contains progress information and common metadata such as create time. Some services might not provide such metadata. Any method that returns a long-running operation should document the metadata type, if any.
+    pub metadata: Option<HashMap<String, String>>,
 }
 
 impl ResponseResult for Operation {}
@@ -1150,7 +1216,7 @@ impl RequestValue for CancelJobRequest {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Dataproc::new(hyper::Client::new(), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `regions_clusters_create(...)`, `regions_clusters_delete(...)`, `regions_clusters_diagnose(...)`, `regions_clusters_get(...)`, `regions_clusters_list(...)`, `regions_clusters_patch(...)`, `regions_jobs_cancel(...)`, `regions_jobs_delete(...)`, `regions_jobs_get(...)`, `regions_jobs_list(...)`, `regions_jobs_submit(...)`, `regions_operations_cancel(...)`, `regions_operations_delete(...)`, `regions_operations_get(...)` and `regions_operations_list(...)`
+/// // like `regions_clusters_create(...)`, `regions_clusters_delete(...)`, `regions_clusters_diagnose(...)`, `regions_clusters_get(...)`, `regions_clusters_list(...)`, `regions_clusters_patch(...)`, `regions_jobs_cancel(...)`, `regions_jobs_delete(...)`, `regions_jobs_get(...)`, `regions_jobs_list(...)`, `regions_jobs_patch(...)`, `regions_jobs_submit(...)`, `regions_operations_cancel(...)`, `regions_operations_delete(...)`, `regions_operations_get(...)` and `regions_operations_list(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -1171,9 +1237,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `projectId` - [Required] The ID of the Google Cloud Platform project that the cluster belongs to.
-    /// * `region` - [Required] The Cloud Dataproc region in which to handle the request.
-    /// * `clusterName` - [Required] The cluster name.
+    /// * `projectId` - Required. The ID of the Google Cloud Platform project that the cluster belongs to.
+    /// * `region` - Required. The Cloud Dataproc region in which to handle the request.
+    /// * `clusterName` - Required. The cluster name.
     pub fn regions_clusters_get(&self, project_id: &str, region: &str, cluster_name: &str) -> ProjectRegionClusterGetCall<'a, C, A> {
         ProjectRegionClusterGetCall {
             hub: self.hub,
@@ -1192,8 +1258,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `projectId` - [Required] The ID of the Google Cloud Platform project that the cluster belongs to.
-    /// * `region` - [Required] The Cloud Dataproc region in which to handle the request.
+    /// * `projectId` - Required. The ID of the Google Cloud Platform project that the cluster belongs to.
+    /// * `region` - Required. The Cloud Dataproc region in which to handle the request.
     pub fn regions_clusters_list(&self, project_id: &str, region: &str) -> ProjectRegionClusterListCall<'a, C, A> {
         ProjectRegionClusterListCall {
             hub: self.hub,
@@ -1214,8 +1280,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `projectId` - [Required] The ID of the Google Cloud Platform project that the job belongs to.
-    /// * `region` - [Required] The Cloud Dataproc region in which to handle the request.
+    /// * `projectId` - Required. The ID of the Google Cloud Platform project that the job belongs to.
+    /// * `region` - Required. The Cloud Dataproc region in which to handle the request.
     pub fn regions_jobs_list(&self, project_id: &str, region: &str) -> ProjectRegionJobListCall<'a, C, A> {
         ProjectRegionJobListCall {
             hub: self.hub,
@@ -1239,9 +1305,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `projectId` - [Required] The ID of the Google Cloud Platform project the cluster belongs to.
-    /// * `region` - [Required] The Cloud Dataproc region in which to handle the request.
-    /// * `clusterName` - [Required] The cluster name.
+    /// * `projectId` - Required. The ID of the Google Cloud Platform project the cluster belongs to.
+    /// * `region` - Required. The Cloud Dataproc region in which to handle the request.
+    /// * `clusterName` - Required. The cluster name.
     pub fn regions_clusters_patch(&self, request: Cluster, project_id: &str, region: &str, cluster_name: &str) -> ProjectRegionClusterPatchCall<'a, C, A> {
         ProjectRegionClusterPatchCall {
             hub: self.hub,
@@ -1262,9 +1328,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `projectId` - [Required] The ID of the Google Cloud Platform project that the job belongs to.
-    /// * `region` - [Required] The Cloud Dataproc region in which to handle the request.
-    /// * `jobId` - [Required] The job ID.
+    /// * `projectId` - Required. The ID of the Google Cloud Platform project that the job belongs to.
+    /// * `region` - Required. The Cloud Dataproc region in which to handle the request.
+    /// * `jobId` - Required. The job ID.
     pub fn regions_jobs_get(&self, project_id: &str, region: &str, job_id: &str) -> ProjectRegionJobGetCall<'a, C, A> {
         ProjectRegionJobGetCall {
             hub: self.hub,
@@ -1279,7 +1345,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.
+    /// Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns google.rpc.Code.UNIMPLEMENTED. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to Code.CANCELLED.
     /// 
     /// # Arguments
     ///
@@ -1317,9 +1383,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `projectId` - [Required] The ID of the Google Cloud Platform project that the cluster belongs to.
-    /// * `region` - [Required] The Cloud Dataproc region in which to handle the request.
-    /// * `clusterName` - [Required] The cluster name.
+    /// * `projectId` - Required. The ID of the Google Cloud Platform project that the cluster belongs to.
+    /// * `region` - Required. The Cloud Dataproc region in which to handle the request.
+    /// * `clusterName` - Required. The cluster name.
     pub fn regions_clusters_delete(&self, project_id: &str, region: &str, cluster_name: &str) -> ProjectRegionClusterDeleteCall<'a, C, A> {
         ProjectRegionClusterDeleteCall {
             hub: self.hub,
@@ -1334,14 +1400,14 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets cluster diagnostic information. After the operation completes, the Operation.response field contains `DiagnoseClusterOutputLocation`.
+    /// Gets cluster diagnostic information. After the operation completes, the Operation.response field contains DiagnoseClusterOutputLocation.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `projectId` - [Required] The ID of the Google Cloud Platform project that the cluster belongs to.
-    /// * `region` - [Required] The Cloud Dataproc region in which to handle the request.
-    /// * `clusterName` - [Required] The cluster name.
+    /// * `projectId` - Required. The ID of the Google Cloud Platform project that the cluster belongs to.
+    /// * `region` - Required. The Cloud Dataproc region in which to handle the request.
+    /// * `clusterName` - Required. The cluster name.
     pub fn regions_clusters_diagnose(&self, request: DiagnoseClusterRequest, project_id: &str, region: &str, cluster_name: &str) -> ProjectRegionClusterDiagnoseCall<'a, C, A> {
         ProjectRegionClusterDiagnoseCall {
             hub: self.hub,
@@ -1362,8 +1428,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `projectId` - [Required] The ID of the Google Cloud Platform project that the job belongs to.
-    /// * `region` - [Required] The Cloud Dataproc region in which to handle the request.
+    /// * `projectId` - Required. The ID of the Google Cloud Platform project that the job belongs to.
+    /// * `region` - Required. The Cloud Dataproc region in which to handle the request.
     pub fn regions_jobs_submit(&self, request: SubmitJobRequest, project_id: &str, region: &str) -> ProjectRegionJobSubmitCall<'a, C, A> {
         ProjectRegionJobSubmitCall {
             hub: self.hub,
@@ -1383,8 +1449,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `projectId` - [Required] The ID of the Google Cloud Platform project that the cluster belongs to.
-    /// * `region` - [Required] The Cloud Dataproc region in which to handle the request.
+    /// * `projectId` - Required. The ID of the Google Cloud Platform project that the cluster belongs to.
+    /// * `region` - Required. The Cloud Dataproc region in which to handle the request.
     pub fn regions_clusters_create(&self, request: Cluster, project_id: &str, region: &str) -> ProjectRegionClusterCreateCall<'a, C, A> {
         ProjectRegionClusterCreateCall {
             hub: self.hub,
@@ -1399,13 +1465,13 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes the job from the project. If the job is active, the delete fails, and the response returns `FAILED_PRECONDITION`.
+    /// Deletes the job from the project. If the job is active, the delete fails, and the response returns FAILED_PRECONDITION.
     /// 
     /// # Arguments
     ///
-    /// * `projectId` - [Required] The ID of the Google Cloud Platform project that the job belongs to.
-    /// * `region` - [Required] The Cloud Dataproc region in which to handle the request.
-    /// * `jobId` - [Required] The job ID.
+    /// * `projectId` - Required. The ID of the Google Cloud Platform project that the job belongs to.
+    /// * `region` - Required. The Cloud Dataproc region in which to handle the request.
+    /// * `jobId` - Required. The job ID.
     pub fn regions_jobs_delete(&self, project_id: &str, region: &str, job_id: &str) -> ProjectRegionJobDeleteCall<'a, C, A> {
         ProjectRegionJobDeleteCall {
             hub: self.hub,
@@ -1420,7 +1486,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a long-running operation. This method indicates that the client is no longer interested in the operation result. It does not cancel the operation. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`.
+    /// Deletes a long-running operation. This method indicates that the client is no longer interested in the operation result. It does not cancel the operation. If the server doesn't support this method, it returns google.rpc.Code.UNIMPLEMENTED.
     /// 
     /// # Arguments
     ///
@@ -1437,7 +1503,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding below allows API services to override the binding to use different resource name schemes, such as `users/*/operations`.
+    /// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns UNIMPLEMENTED.NOTE: the name binding below allows API services to override the binding to use different resource name schemes, such as users/*/operations.
     /// 
     /// # Arguments
     ///
@@ -1457,14 +1523,38 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Starts a job cancellation request. To access the job resource after cancellation, call [regions/{region}/jobs.list](/dataproc/reference/rest/v1/projects.regions.jobs/list) or [regions/{region}/jobs.get](/dataproc/reference/rest/v1/projects.regions.jobs/get).
+    /// Updates a job in a project.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `projectId` - [Required] The ID of the Google Cloud Platform project that the job belongs to.
-    /// * `region` - [Required] The Cloud Dataproc region in which to handle the request.
-    /// * `jobId` - [Required] The job ID.
+    /// * `projectId` - Required. The ID of the Google Cloud Platform project that the job belongs to.
+    /// * `region` - Required. The Cloud Dataproc region in which to handle the request.
+    /// * `jobId` - Required. The job ID.
+    pub fn regions_jobs_patch(&self, request: Job, project_id: &str, region: &str, job_id: &str) -> ProjectRegionJobPatchCall<'a, C, A> {
+        ProjectRegionJobPatchCall {
+            hub: self.hub,
+            _request: request,
+            _project_id: project_id.to_string(),
+            _region: region.to_string(),
+            _job_id: job_id.to_string(),
+            _update_mask: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Starts a job cancellation request. To access the job resource after cancellation, call regions/{region}/jobs.list or regions/{region}/jobs.get.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `projectId` - Required. The ID of the Google Cloud Platform project that the job belongs to.
+    /// * `region` - Required. The Cloud Dataproc region in which to handle the request.
+    /// * `jobId` - Required. The job ID.
     pub fn regions_jobs_cancel(&self, request: CancelJobRequest, project_id: &str, region: &str, job_id: &str) -> ProjectRegionJobCancelCall<'a, C, A> {
         ProjectRegionJobCancelCall {
             hub: self.hub,
@@ -1561,7 +1651,7 @@ impl<'a, C, A> ProjectRegionClusterGetCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/projects/{projectId}/regions/{region}/clusters/{clusterName}";
+        let mut url = "https://dataproc.googleapis.com/v1/projects/{projectId}/regions/{region}/clusters/{clusterName}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -1664,7 +1754,7 @@ impl<'a, C, A> ProjectRegionClusterGetCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
-    /// [Required] The ID of the Google Cloud Platform project that the cluster belongs to.
+    /// Required. The ID of the Google Cloud Platform project that the cluster belongs to.
     ///
     /// Sets the *project id* path property to the given value.
     ///
@@ -1674,7 +1764,7 @@ impl<'a, C, A> ProjectRegionClusterGetCall<'a, C, A> where C: BorrowMut<hyper::C
         self._project_id = new_value.to_string();
         self
     }
-    /// [Required] The Cloud Dataproc region in which to handle the request.
+    /// Required. The Cloud Dataproc region in which to handle the request.
     ///
     /// Sets the *region* path property to the given value.
     ///
@@ -1684,7 +1774,7 @@ impl<'a, C, A> ProjectRegionClusterGetCall<'a, C, A> where C: BorrowMut<hyper::C
         self._region = new_value.to_string();
         self
     }
-    /// [Required] The cluster name.
+    /// Required. The cluster name.
     ///
     /// Sets the *cluster name* path property to the given value.
     ///
@@ -1839,7 +1929,7 @@ impl<'a, C, A> ProjectRegionClusterListCall<'a, C, A> where C: BorrowMut<hyper::
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/projects/{projectId}/regions/{region}/clusters";
+        let mut url = "https://dataproc.googleapis.com/v1/projects/{projectId}/regions/{region}/clusters".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -1942,7 +2032,7 @@ impl<'a, C, A> ProjectRegionClusterListCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
-    /// [Required] The ID of the Google Cloud Platform project that the cluster belongs to.
+    /// Required. The ID of the Google Cloud Platform project that the cluster belongs to.
     ///
     /// Sets the *project id* path property to the given value.
     ///
@@ -1952,7 +2042,7 @@ impl<'a, C, A> ProjectRegionClusterListCall<'a, C, A> where C: BorrowMut<hyper::
         self._project_id = new_value.to_string();
         self
     }
-    /// [Required] The Cloud Dataproc region in which to handle the request.
+    /// Required. The Cloud Dataproc region in which to handle the request.
     ///
     /// Sets the *region* path property to the given value.
     ///
@@ -1962,21 +2052,21 @@ impl<'a, C, A> ProjectRegionClusterListCall<'a, C, A> where C: BorrowMut<hyper::
         self._region = new_value.to_string();
         self
     }
-    /// [Optional] The standard List page token.
+    /// Optional. The standard List page token.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ProjectRegionClusterListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// [Optional] The standard List page size.
+    /// Optional. The standard List page size.
     ///
     /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> ProjectRegionClusterListCall<'a, C, A> {
         self._page_size = Some(new_value);
         self
     }
-    /// [Optional] A filter constraining the clusters to list. Filters are case-sensitive and have the following syntax: field:value [field:value] ... or field = value [AND [field = value]] ... where **field** is one of `status.state`, `clusterName`, or `labels.[KEY]`, and `[KEY]` is a label key. **value** can be `*` to match all values. `status.state` can be one of the following: `ACTIVE`, `INACTIVE`, `CREATING`, `RUNNING`, `ERROR`, `DELETING`, or `UPDATING`. `ACTIVE` contains the `CREATING`, `UPDATING`, and `RUNNING` states. `INACTIVE` contains the `DELETING` and `ERROR` states. `clusterName` is the name of the cluster provided at creation time. Only the logical `AND` operator is supported; space-separated items are treated as having an implicit `AND` operator. Example valid filters are: status.state:ACTIVE clusterName:mycluster labels.env:staging \ labels.starred:* and status.state = ACTIVE AND clusterName = mycluster \ AND labels.env = staging AND labels.starred = *
+    /// Optional. A filter constraining the clusters to list. Filters are case-sensitive and have the following syntax:field = value AND field = value ...where field is one of status.state, clusterName, or labels.[KEY], and [KEY] is a label key. value can be * to match all values. status.state can be one of the following: ACTIVE, INACTIVE, CREATING, RUNNING, ERROR, DELETING, or UPDATING. ACTIVE contains the CREATING, UPDATING, and RUNNING states. INACTIVE contains the DELETING and ERROR states. clusterName is the name of the cluster provided at creation time. Only the logical AND operator is supported; space-separated items are treated as having an implicit AND operator.Example filter:status.state = ACTIVE AND clusterName = mycluster AND labels.env = staging AND labels.starred = *
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> ProjectRegionClusterListCall<'a, C, A> {
@@ -2138,7 +2228,7 @@ impl<'a, C, A> ProjectRegionJobListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/projects/{projectId}/regions/{region}/jobs";
+        let mut url = "https://dataproc.googleapis.com/v1/projects/{projectId}/regions/{region}/jobs".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -2241,7 +2331,7 @@ impl<'a, C, A> ProjectRegionJobListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
-    /// [Required] The ID of the Google Cloud Platform project that the job belongs to.
+    /// Required. The ID of the Google Cloud Platform project that the job belongs to.
     ///
     /// Sets the *project id* path property to the given value.
     ///
@@ -2251,7 +2341,7 @@ impl<'a, C, A> ProjectRegionJobListCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._project_id = new_value.to_string();
         self
     }
-    /// [Required] The Cloud Dataproc region in which to handle the request.
+    /// Required. The Cloud Dataproc region in which to handle the request.
     ///
     /// Sets the *region* path property to the given value.
     ///
@@ -2261,35 +2351,35 @@ impl<'a, C, A> ProjectRegionJobListCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._region = new_value.to_string();
         self
     }
-    /// [Optional] The page token, returned by a previous call, to request the next page of results.
+    /// Optional. The page token, returned by a previous call, to request the next page of results.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ProjectRegionJobListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// [Optional] The number of results to return in each response.
+    /// Optional. The number of results to return in each response.
     ///
     /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> ProjectRegionJobListCall<'a, C, A> {
         self._page_size = Some(new_value);
         self
     }
-    /// [Optional] Specifies enumerated categories of jobs to list (default = match ALL jobs).
+    /// Optional. Specifies enumerated categories of jobs to list (default = match ALL jobs).
     ///
     /// Sets the *job state matcher* query property to the given value.
     pub fn job_state_matcher(mut self, new_value: &str) -> ProjectRegionJobListCall<'a, C, A> {
         self._job_state_matcher = Some(new_value.to_string());
         self
     }
-    /// [Optional] A filter constraining the jobs to list. Filters are case-sensitive and have the following syntax: field:value] ... or [field = value] AND [field [= value]] ... where **field** is `status.state` or `labels.[KEY]`, and `[KEY]` is a label key. **value** can be `*` to match all values. `status.state` can be either `ACTIVE` or `INACTIVE`. Only the logical `AND` operator is supported; space-separated items are treated as having an implicit `AND` operator. Example valid filters are: status.state:ACTIVE labels.env:staging labels.starred:* and status.state = ACTIVE AND labels.env = staging AND labels.starred = *
+    /// Optional. A filter constraining the jobs to list. Filters are case-sensitive and have the following syntax:field = value AND field = value ...where field is status.state or labels.[KEY], and [KEY] is a label key. value can be * to match all values. status.state can be either ACTIVE or INACTIVE. Only the logical AND operator is supported; space-separated items are treated as having an implicit AND operator.Example filter:status.state = ACTIVE AND labels.env = staging AND labels.starred = *
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> ProjectRegionJobListCall<'a, C, A> {
         self._filter = Some(new_value.to_string());
         self
     }
-    /// [Optional] If set, the returned jobs list includes only jobs that were submitted to the named cluster.
+    /// Optional. If set, the returned jobs list includes only jobs that were submitted to the named cluster.
     ///
     /// Sets the *cluster name* query property to the given value.
     pub fn cluster_name(mut self, new_value: &str) -> ProjectRegionJobListCall<'a, C, A> {
@@ -2440,7 +2530,7 @@ impl<'a, C, A> ProjectRegionClusterPatchCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/projects/{projectId}/regions/{region}/clusters/{clusterName}";
+        let mut url = "https://dataproc.googleapis.com/v1/projects/{projectId}/regions/{region}/clusters/{clusterName}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -2567,7 +2657,7 @@ impl<'a, C, A> ProjectRegionClusterPatchCall<'a, C, A> where C: BorrowMut<hyper:
         self._request = new_value;
         self
     }
-    /// [Required] The ID of the Google Cloud Platform project the cluster belongs to.
+    /// Required. The ID of the Google Cloud Platform project the cluster belongs to.
     ///
     /// Sets the *project id* path property to the given value.
     ///
@@ -2577,7 +2667,7 @@ impl<'a, C, A> ProjectRegionClusterPatchCall<'a, C, A> where C: BorrowMut<hyper:
         self._project_id = new_value.to_string();
         self
     }
-    /// [Required] The Cloud Dataproc region in which to handle the request.
+    /// Required. The Cloud Dataproc region in which to handle the request.
     ///
     /// Sets the *region* path property to the given value.
     ///
@@ -2587,7 +2677,7 @@ impl<'a, C, A> ProjectRegionClusterPatchCall<'a, C, A> where C: BorrowMut<hyper:
         self._region = new_value.to_string();
         self
     }
-    /// [Required] The cluster name.
+    /// Required. The cluster name.
     ///
     /// Sets the *cluster name* path property to the given value.
     ///
@@ -2597,7 +2687,23 @@ impl<'a, C, A> ProjectRegionClusterPatchCall<'a, C, A> where C: BorrowMut<hyper:
         self._cluster_name = new_value.to_string();
         self
     }
-    /// [Required] Specifies the path, relative to Cluster, of the field to update. For example, to change the number of workers in a cluster to 5, the update_mask parameter would be specified as config.worker_config.num_instances, and the `PATCH` request body would specify the new value, as follows: { "config":{ "workerConfig":{ "numInstances":"5" } } } Similarly, to change the number of preemptible workers in a cluster to 5, the update_mask parameter would be config.secondary_worker_config.num_instances, and the `PATCH` request body would be set as follows: { "config":{ "secondaryWorkerConfig":{ "numInstances":"5" } } } Note: Currently, config.worker_config.num_instances and config.secondary_worker_config.num_instances are the only fields that can be updated.
+    /// Required. Specifies the path, relative to Cluster, of the field to update. For example, to change the number of workers in a cluster to 5, the update_mask parameter would be specified as config.worker_config.num_instances, and the PATCH request body would specify the new value, as follows:
+    /// {
+    ///   "config":{
+    ///     "workerConfig":{
+    ///       "numInstances":"5"
+    ///     }
+    ///   }
+    /// }
+    /// Similarly, to change the number of preemptible workers in a cluster to 5, the update_mask parameter would be config.secondary_worker_config.num_instances, and the PATCH request body would be set as follows:
+    /// {
+    ///   "config":{
+    ///     "secondaryWorkerConfig":{
+    ///       "numInstances":"5"
+    ///     }
+    ///   }
+    /// }
+    /// <strong>Note:</strong> Currently, only the following fields can be updated:<table>  <tbody>  <tr>  <td><strong>Mask</strong></td>  <td><strong>Purpose</strong></td>  </tr>  <tr>  <td><strong><em>labels</em></strong></td>  <td>Update labels</td>  </tr>  <tr>  <td><strong><em>config.worker_config.num_instances</em></strong></td>  <td>Resize primary worker group</td>  </tr>  <tr>  <td><strong><em>config.secondary_worker_config.num_instances</em></strong></td>  <td>Resize secondary worker group</td>  </tr>  </tbody>  </table>
     ///
     /// Sets the *update mask* query property to the given value.
     pub fn update_mask(mut self, new_value: &str) -> ProjectRegionClusterPatchCall<'a, C, A> {
@@ -2736,7 +2842,7 @@ impl<'a, C, A> ProjectRegionJobGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/projects/{projectId}/regions/{region}/jobs/{jobId}";
+        let mut url = "https://dataproc.googleapis.com/v1/projects/{projectId}/regions/{region}/jobs/{jobId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -2839,7 +2945,7 @@ impl<'a, C, A> ProjectRegionJobGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
-    /// [Required] The ID of the Google Cloud Platform project that the job belongs to.
+    /// Required. The ID of the Google Cloud Platform project that the job belongs to.
     ///
     /// Sets the *project id* path property to the given value.
     ///
@@ -2849,7 +2955,7 @@ impl<'a, C, A> ProjectRegionJobGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self._project_id = new_value.to_string();
         self
     }
-    /// [Required] The Cloud Dataproc region in which to handle the request.
+    /// Required. The Cloud Dataproc region in which to handle the request.
     ///
     /// Sets the *region* path property to the given value.
     ///
@@ -2859,7 +2965,7 @@ impl<'a, C, A> ProjectRegionJobGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self._region = new_value.to_string();
         self
     }
-    /// [Required] The job ID.
+    /// Required. The job ID.
     ///
     /// Sets the *job id* path property to the given value.
     ///
@@ -2927,7 +3033,7 @@ impl<'a, C, A> ProjectRegionJobGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
 }
 
 
-/// Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.
+/// Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns google.rpc.Code.UNIMPLEMENTED. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to Code.CANCELLED.
 ///
 /// A builder for the *regions.operations.cancel* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -2998,7 +3104,7 @@ impl<'a, C, A> ProjectRegionOperationCancelCall<'a, C, A> where C: BorrowMut<hyp
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+name}:cancel";
+        let mut url = "https://dataproc.googleapis.com/v1/{+name}:cancel".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -3243,7 +3349,7 @@ impl<'a, C, A> ProjectRegionOperationGetCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        let mut url = "https://dataproc.googleapis.com/v1/{+name}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -3491,7 +3597,7 @@ impl<'a, C, A> ProjectRegionClusterDeleteCall<'a, C, A> where C: BorrowMut<hyper
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/projects/{projectId}/regions/{region}/clusters/{clusterName}";
+        let mut url = "https://dataproc.googleapis.com/v1/projects/{projectId}/regions/{region}/clusters/{clusterName}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -3594,7 +3700,7 @@ impl<'a, C, A> ProjectRegionClusterDeleteCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
-    /// [Required] The ID of the Google Cloud Platform project that the cluster belongs to.
+    /// Required. The ID of the Google Cloud Platform project that the cluster belongs to.
     ///
     /// Sets the *project id* path property to the given value.
     ///
@@ -3604,7 +3710,7 @@ impl<'a, C, A> ProjectRegionClusterDeleteCall<'a, C, A> where C: BorrowMut<hyper
         self._project_id = new_value.to_string();
         self
     }
-    /// [Required] The Cloud Dataproc region in which to handle the request.
+    /// Required. The Cloud Dataproc region in which to handle the request.
     ///
     /// Sets the *region* path property to the given value.
     ///
@@ -3614,7 +3720,7 @@ impl<'a, C, A> ProjectRegionClusterDeleteCall<'a, C, A> where C: BorrowMut<hyper
         self._region = new_value.to_string();
         self
     }
-    /// [Required] The cluster name.
+    /// Required. The cluster name.
     ///
     /// Sets the *cluster name* path property to the given value.
     ///
@@ -3682,7 +3788,7 @@ impl<'a, C, A> ProjectRegionClusterDeleteCall<'a, C, A> where C: BorrowMut<hyper
 }
 
 
-/// Gets cluster diagnostic information. After the operation completes, the Operation.response field contains `DiagnoseClusterOutputLocation`.
+/// Gets cluster diagnostic information. After the operation completes, the Operation.response field contains DiagnoseClusterOutputLocation.
 ///
 /// A builder for the *regions.clusters.diagnose* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -3763,7 +3869,7 @@ impl<'a, C, A> ProjectRegionClusterDiagnoseCall<'a, C, A> where C: BorrowMut<hyp
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/projects/{projectId}/regions/{region}/clusters/{clusterName}:diagnose";
+        let mut url = "https://dataproc.googleapis.com/v1/projects/{projectId}/regions/{region}/clusters/{clusterName}:diagnose".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -3890,7 +3996,7 @@ impl<'a, C, A> ProjectRegionClusterDiagnoseCall<'a, C, A> where C: BorrowMut<hyp
         self._request = new_value;
         self
     }
-    /// [Required] The ID of the Google Cloud Platform project that the cluster belongs to.
+    /// Required. The ID of the Google Cloud Platform project that the cluster belongs to.
     ///
     /// Sets the *project id* path property to the given value.
     ///
@@ -3900,7 +4006,7 @@ impl<'a, C, A> ProjectRegionClusterDiagnoseCall<'a, C, A> where C: BorrowMut<hyp
         self._project_id = new_value.to_string();
         self
     }
-    /// [Required] The Cloud Dataproc region in which to handle the request.
+    /// Required. The Cloud Dataproc region in which to handle the request.
     ///
     /// Sets the *region* path property to the given value.
     ///
@@ -3910,7 +4016,7 @@ impl<'a, C, A> ProjectRegionClusterDiagnoseCall<'a, C, A> where C: BorrowMut<hyp
         self._region = new_value.to_string();
         self
     }
-    /// [Required] The cluster name.
+    /// Required. The cluster name.
     ///
     /// Sets the *cluster name* path property to the given value.
     ///
@@ -4057,7 +4163,7 @@ impl<'a, C, A> ProjectRegionJobSubmitCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/projects/{projectId}/regions/{region}/jobs:submit";
+        let mut url = "https://dataproc.googleapis.com/v1/projects/{projectId}/regions/{region}/jobs:submit".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -4184,7 +4290,7 @@ impl<'a, C, A> ProjectRegionJobSubmitCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._request = new_value;
         self
     }
-    /// [Required] The ID of the Google Cloud Platform project that the job belongs to.
+    /// Required. The ID of the Google Cloud Platform project that the job belongs to.
     ///
     /// Sets the *project id* path property to the given value.
     ///
@@ -4194,7 +4300,7 @@ impl<'a, C, A> ProjectRegionJobSubmitCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._project_id = new_value.to_string();
         self
     }
-    /// [Required] The Cloud Dataproc region in which to handle the request.
+    /// Required. The Cloud Dataproc region in which to handle the request.
     ///
     /// Sets the *region* path property to the given value.
     ///
@@ -4341,7 +4447,7 @@ impl<'a, C, A> ProjectRegionClusterCreateCall<'a, C, A> where C: BorrowMut<hyper
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/projects/{projectId}/regions/{region}/clusters";
+        let mut url = "https://dataproc.googleapis.com/v1/projects/{projectId}/regions/{region}/clusters".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -4468,7 +4574,7 @@ impl<'a, C, A> ProjectRegionClusterCreateCall<'a, C, A> where C: BorrowMut<hyper
         self._request = new_value;
         self
     }
-    /// [Required] The ID of the Google Cloud Platform project that the cluster belongs to.
+    /// Required. The ID of the Google Cloud Platform project that the cluster belongs to.
     ///
     /// Sets the *project id* path property to the given value.
     ///
@@ -4478,7 +4584,7 @@ impl<'a, C, A> ProjectRegionClusterCreateCall<'a, C, A> where C: BorrowMut<hyper
         self._project_id = new_value.to_string();
         self
     }
-    /// [Required] The Cloud Dataproc region in which to handle the request.
+    /// Required. The Cloud Dataproc region in which to handle the request.
     ///
     /// Sets the *region* path property to the given value.
     ///
@@ -4546,7 +4652,7 @@ impl<'a, C, A> ProjectRegionClusterCreateCall<'a, C, A> where C: BorrowMut<hyper
 }
 
 
-/// Deletes the job from the project. If the job is active, the delete fails, and the response returns `FAILED_PRECONDITION`.
+/// Deletes the job from the project. If the job is active, the delete fails, and the response returns FAILED_PRECONDITION.
 ///
 /// A builder for the *regions.jobs.delete* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -4620,7 +4726,7 @@ impl<'a, C, A> ProjectRegionJobDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/projects/{projectId}/regions/{region}/jobs/{jobId}";
+        let mut url = "https://dataproc.googleapis.com/v1/projects/{projectId}/regions/{region}/jobs/{jobId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -4723,7 +4829,7 @@ impl<'a, C, A> ProjectRegionJobDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
-    /// [Required] The ID of the Google Cloud Platform project that the job belongs to.
+    /// Required. The ID of the Google Cloud Platform project that the job belongs to.
     ///
     /// Sets the *project id* path property to the given value.
     ///
@@ -4733,7 +4839,7 @@ impl<'a, C, A> ProjectRegionJobDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._project_id = new_value.to_string();
         self
     }
-    /// [Required] The Cloud Dataproc region in which to handle the request.
+    /// Required. The Cloud Dataproc region in which to handle the request.
     ///
     /// Sets the *region* path property to the given value.
     ///
@@ -4743,7 +4849,7 @@ impl<'a, C, A> ProjectRegionJobDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._region = new_value.to_string();
         self
     }
-    /// [Required] The job ID.
+    /// Required. The job ID.
     ///
     /// Sets the *job id* path property to the given value.
     ///
@@ -4811,7 +4917,7 @@ impl<'a, C, A> ProjectRegionJobDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
 }
 
 
-/// Deletes a long-running operation. This method indicates that the client is no longer interested in the operation result. It does not cancel the operation. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`.
+/// Deletes a long-running operation. This method indicates that the client is no longer interested in the operation result. It does not cancel the operation. If the server doesn't support this method, it returns google.rpc.Code.UNIMPLEMENTED.
 ///
 /// A builder for the *regions.operations.delete* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -4882,7 +4988,7 @@ impl<'a, C, A> ProjectRegionOperationDeleteCall<'a, C, A> where C: BorrowMut<hyp
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        let mut url = "https://dataproc.googleapis.com/v1/{+name}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5056,7 +5162,7 @@ impl<'a, C, A> ProjectRegionOperationDeleteCall<'a, C, A> where C: BorrowMut<hyp
 }
 
 
-/// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding below allows API services to override the binding to use different resource name schemes, such as `users/*/operations`.
+/// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns UNIMPLEMENTED.NOTE: the name binding below allows API services to override the binding to use different resource name schemes, such as users/*/operations.
 ///
 /// A builder for the *regions.operations.list* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -5142,7 +5248,7 @@ impl<'a, C, A> ProjectRegionOperationListCall<'a, C, A> where C: BorrowMut<hyper
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        let mut url = "https://dataproc.googleapis.com/v1/{+name}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5337,7 +5443,315 @@ impl<'a, C, A> ProjectRegionOperationListCall<'a, C, A> where C: BorrowMut<hyper
 }
 
 
-/// Starts a job cancellation request. To access the job resource after cancellation, call [regions/{region}/jobs.list](/dataproc/reference/rest/v1/projects.regions.jobs/list) or [regions/{region}/jobs.get](/dataproc/reference/rest/v1/projects.regions.jobs/get).
+/// Updates a job in a project.
+///
+/// A builder for the *regions.jobs.patch* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_dataproc1 as dataproc1;
+/// use dataproc1::Job;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use dataproc1::Dataproc;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Dataproc::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Job::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().regions_jobs_patch(req, "projectId", "region", "jobId")
+///              .update_mask("consetetur")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectRegionJobPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Dataproc<C, A>,
+    _request: Job,
+    _project_id: String,
+    _region: String,
+    _job_id: String,
+    _update_mask: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectRegionJobPatchCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectRegionJobPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Job)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "dataproc.projects.regions.jobs.patch",
+                               http_method: hyper::method::Method::Patch });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        params.push(("projectId", self._project_id.to_string()));
+        params.push(("region", self._region.to_string()));
+        params.push(("jobId", self._job_id.to_string()));
+        if let Some(value) = self._update_mask {
+            params.push(("updateMask", value.to_string()));
+        }
+        for &field in ["alt", "projectId", "region", "jobId", "updateMask"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://dataproc.googleapis.com/v1/projects/{projectId}/regions/{region}/jobs/{jobId}".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{projectId}", "projectId"), ("{region}", "region"), ("{jobId}", "jobId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
+            for param_name in ["jobId", "region", "projectId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: Job) -> ProjectRegionJobPatchCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The ID of the Google Cloud Platform project that the job belongs to.
+    ///
+    /// Sets the *project id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn project_id(mut self, new_value: &str) -> ProjectRegionJobPatchCall<'a, C, A> {
+        self._project_id = new_value.to_string();
+        self
+    }
+    /// Required. The Cloud Dataproc region in which to handle the request.
+    ///
+    /// Sets the *region* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn region(mut self, new_value: &str) -> ProjectRegionJobPatchCall<'a, C, A> {
+        self._region = new_value.to_string();
+        self
+    }
+    /// Required. The job ID.
+    ///
+    /// Sets the *job id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn job_id(mut self, new_value: &str) -> ProjectRegionJobPatchCall<'a, C, A> {
+        self._job_id = new_value.to_string();
+        self
+    }
+    /// Required. Specifies the path, relative to <code>Job</code>, of the field to update. For example, to update the labels of a Job the <code>update_mask</code> parameter would be specified as <code>labels</code>, and the PATCH request body would specify the new value. <strong>Note:</strong> Currently, <code>labels</code> is the only field that can be updated.
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(mut self, new_value: &str) -> ProjectRegionJobPatchCall<'a, C, A> {
+        self._update_mask = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectRegionJobPatchCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionJobPatchCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectRegionJobPatchCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+/// Starts a job cancellation request. To access the job resource after cancellation, call regions/{region}/jobs.list or regions/{region}/jobs.get.
 ///
 /// A builder for the *regions.jobs.cancel* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -5418,7 +5832,7 @@ impl<'a, C, A> ProjectRegionJobCancelCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/projects/{projectId}/regions/{region}/jobs/{jobId}:cancel";
+        let mut url = "https://dataproc.googleapis.com/v1/projects/{projectId}/regions/{region}/jobs/{jobId}:cancel".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5545,7 +5959,7 @@ impl<'a, C, A> ProjectRegionJobCancelCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._request = new_value;
         self
     }
-    /// [Required] The ID of the Google Cloud Platform project that the job belongs to.
+    /// Required. The ID of the Google Cloud Platform project that the job belongs to.
     ///
     /// Sets the *project id* path property to the given value.
     ///
@@ -5555,7 +5969,7 @@ impl<'a, C, A> ProjectRegionJobCancelCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._project_id = new_value.to_string();
         self
     }
-    /// [Required] The Cloud Dataproc region in which to handle the request.
+    /// Required. The Cloud Dataproc region in which to handle the request.
     ///
     /// Sets the *region* path property to the given value.
     ///
@@ -5565,7 +5979,7 @@ impl<'a, C, A> ProjectRegionJobCancelCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._region = new_value.to_string();
         self
     }
-    /// [Required] The job ID.
+    /// Required. The job ID.
     ///
     /// Sets the *job id* path property to the given value.
     ///
@@ -5631,5 +6045,6 @@ impl<'a, C, A> ProjectRegionJobCancelCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self
     }
 }
+
 
 

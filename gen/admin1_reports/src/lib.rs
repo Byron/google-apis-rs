@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *reports* crate version *1.0.4+20160704*, where *20160704* is the exact revision of the *admin:reports_v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
+//! This documentation was generated from *reports* crate version *1.0.4+20170320*, where *20170320* is the exact revision of the *admin:reports_v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
 //! 
 //! Everything else about the *reports* *v1_reports* API can be found at the
 //! [official documentation site](https://developers.google.com/admin-sdk/reports/).
@@ -196,7 +196,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -241,10 +241,10 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
 #[derive(PartialEq, Eq, Hash)]
 pub enum Scope {
-    /// View audit reports of Google Apps for your domain
+    /// View audit reports for your G Suite domain
     ReportAuditReadonly,
 
-    /// View usage reports of Google Apps for your domain
+    /// View usage reports for your G Suite domain
     ReportUsageReadonly,
 }
 
@@ -339,8 +339,6 @@ pub struct Reports<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-    _base_url: String,
-    _root_url: String,
 }
 
 impl<'a, C, A> Hub for Reports<C, A> {}
@@ -353,8 +351,6 @@ impl<'a, C, A> Reports<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
-            _base_url: "https://www.googleapis.com/admin/reports/v1/".to_string(),
-            _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
@@ -378,26 +374,6 @@ impl<'a, C, A> Reports<C, A>
     pub fn user_agent(&mut self, agent_name: String) -> String {
         let prev = self._user_agent.clone();
         self._user_agent = agent_name;
-        prev
-    }
-
-    /// Set the base url to use in all requests to the server.
-    /// It defaults to `https://www.googleapis.com/admin/reports/v1/`.
-    ///
-    /// Returns the previously set base url.
-    pub fn base_url(&mut self, new_base_url: String) -> String {
-        let prev = self._base_url.clone();
-        self._base_url = new_base_url;
-        prev
-    }
-
-    /// Set the root url to use in all requests to the server.
-    /// It defaults to `https://www.googleapis.com/`.
-    ///
-    /// Returns the previously set root url.
-    pub fn root_url(&mut self, new_root_url: String) -> String {
-        let prev = self._root_url.clone();
-        self._root_url = new_root_url;
         prev
     }
 }
@@ -1095,7 +1071,7 @@ impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         }
 
 
-        let mut url = self.hub._base_url.clone() + "/admin/reports_v1/channels/stop";
+        let mut url = "https://www.googleapis.com/admin/reports/v1//admin/reports_v1/channels/stop".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ReportAuditReadonly.as_ref().to_string(), ());
         }
@@ -1362,7 +1338,7 @@ impl<'a, C, A> ActivityWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "activity/users/{userKey}/applications/{applicationName}/watch";
+        let mut url = "https://www.googleapis.com/admin/reports/v1/activity/users/{userKey}/applications/{applicationName}/watch".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ReportAuditReadonly.as_ref().to_string(), ());
         }
@@ -1509,7 +1485,7 @@ impl<'a, C, A> ActivityWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._application_name = new_value.to_string();
         self
     }
-    /// Return events which occured at or after this time.
+    /// Return events which occurred at or after this time.
     ///
     /// Sets the *start time* query property to the given value.
     pub fn start_time(mut self, new_value: &str) -> ActivityWatchCall<'a, C, A> {
@@ -1544,7 +1520,7 @@ impl<'a, C, A> ActivityWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._event_name = Some(new_value.to_string());
         self
     }
-    /// Return events which occured at or before this time.
+    /// Return events which occurred at or before this time.
     ///
     /// Sets the *end time* query property to the given value.
     pub fn end_time(mut self, new_value: &str) -> ActivityWatchCall<'a, C, A> {
@@ -1729,7 +1705,7 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "activity/users/{userKey}/applications/{applicationName}";
+        let mut url = "https://www.googleapis.com/admin/reports/v1/activity/users/{userKey}/applications/{applicationName}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ReportAuditReadonly.as_ref().to_string(), ());
         }
@@ -1852,7 +1828,7 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._application_name = new_value.to_string();
         self
     }
-    /// Return events which occured at or after this time.
+    /// Return events which occurred at or after this time.
     ///
     /// Sets the *start time* query property to the given value.
     pub fn start_time(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
@@ -1887,7 +1863,7 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._event_name = Some(new_value.to_string());
         self
     }
-    /// Return events which occured at or before this time.
+    /// Return events which occurred at or before this time.
     ///
     /// Sets the *end time* query property to the given value.
     pub fn end_time(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
@@ -2045,7 +2021,7 @@ impl<'a, C, A> CustomerUsageReportGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "usage/dates/{date}";
+        let mut url = "https://www.googleapis.com/admin/reports/v1/usage/dates/{date}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ReportUsageReadonly.as_ref().to_string(), ());
         }
@@ -2328,7 +2304,7 @@ impl<'a, C, A> UserUsageReportGetCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "usage/users/{userKey}/dates/{date}";
+        let mut url = "https://www.googleapis.com/admin/reports/v1/usage/users/{userKey}/dates/{date}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ReportUsageReadonly.as_ref().to_string(), ());
         }
@@ -2536,5 +2512,6 @@ impl<'a, C, A> UserUsageReportGetCall<'a, C, A> where C: BorrowMut<hyper::Client
         self
     }
 }
+
 
 

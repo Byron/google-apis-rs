@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *dataproc* API at revision *20161102*. The CLI is at version *1.0.4*.
+This documentation was generated from the *dataproc* API at revision *20170515*. The CLI is at version *1.0.4*.
 
 ```bash
 dataproc1 [options]
@@ -40,6 +40,7 @@ dataproc1 [options]
                 regions-jobs-delete <project-id> <region> <job-id> [-p <v>]... [-o <out>]
                 regions-jobs-get <project-id> <region> <job-id> [-p <v>]... [-o <out>]
                 regions-jobs-list <project-id> <region> [-p <v>]... [-o <out>]
+                regions-jobs-patch <project-id> <region> <job-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 regions-jobs-submit <project-id> <region> (-r <kv>)... [-p <v>]... [-o <out>]
                 regions-operations-cancel <name> [-p <v>]... [-o <out>]
                 regions-operations-delete <name> [-p <v>]... [-o <out>]

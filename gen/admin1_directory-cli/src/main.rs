@@ -5674,14 +5674,16 @@ impl<'n> Engine<'n> {
                     "deletion-time" => Some(("deletionTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "suspension-reason" => Some(("suspensionReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "thumbnail-photo-url" => Some(("thumbnailPhotoUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "is-admin" => Some(("isAdmin", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "is-enrolled-in2-sv" => Some(("isEnrolledIn2Sv", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "include-in-global-address-list" => Some(("includeInGlobalAddressList", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "is-admin" => Some(("isAdmin", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "last-login-time" => Some(("lastLoginTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "org-unit-path" => Some(("orgUnitPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "agreed-to-terms" => Some(("agreedToTerms", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "ip-whitelisted" => Some(("ipWhitelisted", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "primary-email" => Some(("primaryEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "is-enforced-in2-sv" => Some(("isEnforcedIn2Sv", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "is-mailbox-setup" => Some(("isMailboxSetup", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "password" => Some(("password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -5693,7 +5695,7 @@ impl<'n> Engine<'n> {
                     "change-password-at-next-login" => Some(("changePasswordAtNextLogin", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "customer-id" => Some(("customerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agreed-to-terms", "aliases", "change-password-at-next-login", "creation-time", "customer-id", "deletion-time", "etag", "family-name", "full-name", "given-name", "hash-function", "id", "include-in-global-address-list", "ip-whitelisted", "is-admin", "is-delegated-admin", "is-mailbox-setup", "kind", "last-login-time", "name", "non-editable-aliases", "org-unit-path", "password", "primary-email", "suspended", "suspension-reason", "thumbnail-photo-etag", "thumbnail-photo-url"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agreed-to-terms", "aliases", "change-password-at-next-login", "creation-time", "customer-id", "deletion-time", "etag", "family-name", "full-name", "given-name", "hash-function", "id", "include-in-global-address-list", "ip-whitelisted", "is-admin", "is-delegated-admin", "is-enforced-in2-sv", "is-enrolled-in2-sv", "is-mailbox-setup", "kind", "last-login-time", "name", "non-editable-aliases", "org-unit-path", "password", "primary-email", "suspended", "suspension-reason", "thumbnail-photo-etag", "thumbnail-photo-url"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -5951,14 +5953,16 @@ impl<'n> Engine<'n> {
                     "deletion-time" => Some(("deletionTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "suspension-reason" => Some(("suspensionReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "thumbnail-photo-url" => Some(("thumbnailPhotoUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "is-admin" => Some(("isAdmin", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "is-enrolled-in2-sv" => Some(("isEnrolledIn2Sv", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "include-in-global-address-list" => Some(("includeInGlobalAddressList", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "is-admin" => Some(("isAdmin", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "last-login-time" => Some(("lastLoginTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "org-unit-path" => Some(("orgUnitPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "agreed-to-terms" => Some(("agreedToTerms", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "ip-whitelisted" => Some(("ipWhitelisted", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "primary-email" => Some(("primaryEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "is-enforced-in2-sv" => Some(("isEnforcedIn2Sv", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "is-mailbox-setup" => Some(("isMailboxSetup", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "password" => Some(("password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -5970,7 +5974,7 @@ impl<'n> Engine<'n> {
                     "change-password-at-next-login" => Some(("changePasswordAtNextLogin", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "customer-id" => Some(("customerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agreed-to-terms", "aliases", "change-password-at-next-login", "creation-time", "customer-id", "deletion-time", "etag", "family-name", "full-name", "given-name", "hash-function", "id", "include-in-global-address-list", "ip-whitelisted", "is-admin", "is-delegated-admin", "is-mailbox-setup", "kind", "last-login-time", "name", "non-editable-aliases", "org-unit-path", "password", "primary-email", "suspended", "suspension-reason", "thumbnail-photo-etag", "thumbnail-photo-url"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agreed-to-terms", "aliases", "change-password-at-next-login", "creation-time", "customer-id", "deletion-time", "etag", "family-name", "full-name", "given-name", "hash-function", "id", "include-in-global-address-list", "ip-whitelisted", "is-admin", "is-delegated-admin", "is-enforced-in2-sv", "is-enrolled-in2-sv", "is-mailbox-setup", "kind", "last-login-time", "name", "non-editable-aliases", "org-unit-path", "password", "primary-email", "suspended", "suspension-reason", "thumbnail-photo-etag", "thumbnail-photo-url"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -6419,14 +6423,16 @@ impl<'n> Engine<'n> {
                     "deletion-time" => Some(("deletionTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "suspension-reason" => Some(("suspensionReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "thumbnail-photo-url" => Some(("thumbnailPhotoUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "is-admin" => Some(("isAdmin", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "is-enrolled-in2-sv" => Some(("isEnrolledIn2Sv", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "include-in-global-address-list" => Some(("includeInGlobalAddressList", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "is-admin" => Some(("isAdmin", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "last-login-time" => Some(("lastLoginTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "org-unit-path" => Some(("orgUnitPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "agreed-to-terms" => Some(("agreedToTerms", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "ip-whitelisted" => Some(("ipWhitelisted", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "primary-email" => Some(("primaryEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "is-enforced-in2-sv" => Some(("isEnforcedIn2Sv", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "is-mailbox-setup" => Some(("isMailboxSetup", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "password" => Some(("password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -6438,7 +6444,7 @@ impl<'n> Engine<'n> {
                     "change-password-at-next-login" => Some(("changePasswordAtNextLogin", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "customer-id" => Some(("customerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agreed-to-terms", "aliases", "change-password-at-next-login", "creation-time", "customer-id", "deletion-time", "etag", "family-name", "full-name", "given-name", "hash-function", "id", "include-in-global-address-list", "ip-whitelisted", "is-admin", "is-delegated-admin", "is-mailbox-setup", "kind", "last-login-time", "name", "non-editable-aliases", "org-unit-path", "password", "primary-email", "suspended", "suspension-reason", "thumbnail-photo-etag", "thumbnail-photo-url"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agreed-to-terms", "aliases", "change-password-at-next-login", "creation-time", "customer-id", "deletion-time", "etag", "family-name", "full-name", "given-name", "hash-function", "id", "include-in-global-address-list", "ip-whitelisted", "is-admin", "is-delegated-admin", "is-enforced-in2-sv", "is-enrolled-in2-sv", "is-mailbox-setup", "kind", "last-login-time", "name", "non-editable-aliases", "org-unit-path", "password", "primary-email", "suspended", "suspension-reason", "thumbnail-photo-etag", "thumbnail-photo-url"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -7397,13 +7403,13 @@ fn main() {
                   vec![
                     (Some(r##"customer-id"##),
                      None,
-                     Some(r##"Immutable id of the Google Apps account"##),
+                     Some(r##"Immutable ID of the G Suite account"##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"resource-id"##),
                      None,
-                     Some(r##"Immutable id of Chrome OS Device"##),
+                     Some(r##"Immutable ID of Chrome OS Device"##),
                      Some(true),
                      Some(false)),
         
@@ -7425,13 +7431,13 @@ fn main() {
                   vec![
                     (Some(r##"customer-id"##),
                      None,
-                     Some(r##"Immutable id of the Google Apps account"##),
+                     Some(r##"Immutable ID of the G Suite account"##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"device-id"##),
                      None,
-                     Some(r##"Immutable id of Chrome OS Device"##),
+                     Some(r##"Immutable ID of Chrome OS Device"##),
                      Some(true),
                      Some(false)),
         
@@ -7453,7 +7459,7 @@ fn main() {
                   vec![
                     (Some(r##"customer-id"##),
                      None,
-                     Some(r##"Immutable id of the Google Apps account"##),
+                     Some(r##"Immutable ID of the G Suite account"##),
                      Some(true),
                      Some(false)),
         
@@ -7475,13 +7481,13 @@ fn main() {
                   vec![
                     (Some(r##"customer-id"##),
                      None,
-                     Some(r##"Immutable id of the Google Apps account"##),
+                     Some(r##"Immutable ID of the G Suite account"##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"device-id"##),
                      None,
-                     Some(r##"Immutable id of Chrome OS Device"##),
+                     Some(r##"Immutable ID of Chrome OS Device"##),
                      Some(true),
                      Some(false)),
         
@@ -7509,13 +7515,13 @@ fn main() {
                   vec![
                     (Some(r##"customer-id"##),
                      None,
-                     Some(r##"Immutable id of the Google Apps account"##),
+                     Some(r##"Immutable ID of the G Suite account"##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"device-id"##),
                      None,
-                     Some(r##"Immutable id of Chrome OS Device"##),
+                     Some(r##"Immutable ID of Chrome OS Device"##),
                      Some(true),
                      Some(false)),
         
@@ -7627,7 +7633,7 @@ fn main() {
                   vec![
                     (Some(r##"customer"##),
                      None,
-                     Some(r##"Immutable id of the Google Apps account."##),
+                     Some(r##"Immutable ID of the G Suite account."##),
                      Some(true),
                      Some(false)),
         
@@ -7649,7 +7655,7 @@ fn main() {
                   vec![
                     (Some(r##"customer"##),
                      None,
-                     Some(r##"Immutable id of the Google Apps account."##),
+                     Some(r##"Immutable ID of the G Suite account."##),
                      Some(true),
                      Some(false)),
         
@@ -7677,7 +7683,7 @@ fn main() {
                   vec![
                     (Some(r##"customer"##),
                      None,
-                     Some(r##"Immutable id of the Google Apps account."##),
+                     Some(r##"Immutable ID of the G Suite account."##),
                      Some(true),
                      Some(false)),
         
@@ -7705,7 +7711,7 @@ fn main() {
                   vec![
                     (Some(r##"customer"##),
                      None,
-                     Some(r##"Immutable id of the Google Apps account."##),
+                     Some(r##"Immutable ID of the G Suite account."##),
                      Some(true),
                      Some(false)),
         
@@ -7730,7 +7736,7 @@ fn main() {
                   vec![
                     (Some(r##"customer"##),
                      None,
-                     Some(r##"Immutable id of the Google Apps account."##),
+                     Some(r##"Immutable ID of the G Suite account."##),
                      Some(true),
                      Some(false)),
         
@@ -7752,7 +7758,7 @@ fn main() {
                   vec![
                     (Some(r##"customer"##),
                      None,
-                     Some(r##"Immutable id of the Google Apps account."##),
+                     Some(r##"Immutable ID of the G Suite account."##),
                      Some(true),
                      Some(false)),
         
@@ -7780,7 +7786,7 @@ fn main() {
                   vec![
                     (Some(r##"customer"##),
                      None,
-                     Some(r##"Immutable id of the Google Apps account."##),
+                     Some(r##"Immutable ID of the G Suite account."##),
                      Some(true),
                      Some(false)),
         
@@ -7808,7 +7814,7 @@ fn main() {
                   vec![
                     (Some(r##"customer"##),
                      None,
-                     Some(r##"Immutable id of the Google Apps account."##),
+                     Some(r##"Immutable ID of the G Suite account."##),
                      Some(true),
                      Some(false)),
         
@@ -8211,13 +8217,13 @@ fn main() {
                   vec![
                     (Some(r##"customer-id"##),
                      None,
-                     Some(r##"Immutable id of the Google Apps account"##),
+                     Some(r##"Immutable ID of the G Suite account"##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"resource-id"##),
                      None,
-                     Some(r##"Immutable id of Mobile Device"##),
+                     Some(r##"Immutable ID of Mobile Device"##),
                      Some(true),
                      Some(false)),
         
@@ -8239,13 +8245,13 @@ fn main() {
                   vec![
                     (Some(r##"customer-id"##),
                      None,
-                     Some(r##"Immutable id of the Google Apps account"##),
+                     Some(r##"Immutable ID of the G Suite account"##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"resource-id"##),
                      None,
-                     Some(r##"Immutable id of Mobile Device"##),
+                     Some(r##"Immutable ID of Mobile Device"##),
                      Some(true),
                      Some(false)),
         
@@ -8261,13 +8267,13 @@ fn main() {
                   vec![
                     (Some(r##"customer-id"##),
                      None,
-                     Some(r##"Immutable id of the Google Apps account"##),
+                     Some(r##"Immutable ID of the G Suite account"##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"resource-id"##),
                      None,
-                     Some(r##"Immutable id of Mobile Device"##),
+                     Some(r##"Immutable ID of Mobile Device"##),
                      Some(true),
                      Some(false)),
         
@@ -8289,7 +8295,7 @@ fn main() {
                   vec![
                     (Some(r##"customer-id"##),
                      None,
-                     Some(r##"Immutable id of the Google Apps account"##),
+                     Some(r##"Immutable ID of the G Suite account"##),
                      Some(true),
                      Some(false)),
         
@@ -8314,7 +8320,7 @@ fn main() {
                   vec![
                     (Some(r##"customer"##),
                      None,
-                     Some(r##"The unique ID for the customer's Google account. The customerId is also returned as part of the Users resource."##),
+                     Some(r##"The unique ID for the customer's G Suite account. The customerId is also returned as part of the Users resource."##),
                      Some(true),
                      Some(false)),
         
@@ -8336,7 +8342,7 @@ fn main() {
                   vec![
                     (Some(r##"customer"##),
                      None,
-                     Some(r##"The unique ID for the customer's Google account. The customerId is also returned as part of the Users resource."##),
+                     Some(r##"The unique ID for the customer's G Suite account. The customerId is also returned as part of the Users resource."##),
                      Some(true),
                      Some(false)),
         
@@ -8364,7 +8370,7 @@ fn main() {
                   vec![
                     (Some(r##"customer"##),
                      None,
-                     Some(r##"The unique ID for the customer's Google account."##),
+                     Some(r##"The unique ID for the customer's G Suite account."##),
                      Some(true),
                      Some(false)),
         
@@ -8386,7 +8392,7 @@ fn main() {
                   vec![
                     (Some(r##"customer"##),
                      None,
-                     Some(r##"The unique ID for the customer's Google account."##),
+                     Some(r##"The unique ID for the customer's G Suite account."##),
                      Some(true),
                      Some(false)),
         
@@ -8420,7 +8426,7 @@ fn main() {
                   vec![
                     (Some(r##"customer"##),
                      None,
-                     Some(r##"The unique ID for the customer's Google account."##),
+                     Some(r##"The unique ID for the customer's G Suite account."##),
                      Some(true),
                      Some(false)),
         
@@ -8457,7 +8463,7 @@ fn main() {
                   vec![
                     (Some(r##"customer-id"##),
                      None,
-                     Some(r##"Immutable id of the Google Apps account"##),
+                     Some(r##"Immutable ID of the G Suite account"##),
                      Some(true),
                      Some(false)),
         
@@ -8479,7 +8485,7 @@ fn main() {
                   vec![
                     (Some(r##"customer-id"##),
                      None,
-                     Some(r##"Immutable id of the Google Apps account"##),
+                     Some(r##"Immutable ID of the G Suite account"##),
                      Some(true),
                      Some(false)),
         
@@ -8507,7 +8513,7 @@ fn main() {
                   vec![
                     (Some(r##"customer-id"##),
                      None,
-                     Some(r##"Immutable id of the Google Apps account"##),
+                     Some(r##"Immutable ID of the G Suite account"##),
                      Some(true),
                      Some(false)),
         
@@ -8535,7 +8541,7 @@ fn main() {
                   vec![
                     (Some(r##"customer-id"##),
                      None,
-                     Some(r##"Immutable id of the Google Apps account"##),
+                     Some(r##"Immutable ID of the G Suite account"##),
                      Some(true),
                      Some(false)),
         
@@ -8557,7 +8563,7 @@ fn main() {
                   vec![
                     (Some(r##"customer-id"##),
                      None,
-                     Some(r##"Immutable id of the Google Apps account"##),
+                     Some(r##"Immutable ID of the G Suite account"##),
                      Some(true),
                      Some(false)),
         
@@ -8591,7 +8597,7 @@ fn main() {
                   vec![
                     (Some(r##"customer-id"##),
                      None,
-                     Some(r##"Immutable id of the Google Apps account"##),
+                     Some(r##"Immutable ID of the G Suite account"##),
                      Some(true),
                      Some(false)),
         
@@ -8628,7 +8634,7 @@ fn main() {
                   vec![
                     (Some(r##"customer"##),
                      None,
-                     Some(r##"Immutable ID of the Google Apps account."##),
+                     Some(r##"Immutable ID of the G Suite account."##),
                      Some(true),
                      Some(false)),
         
@@ -8653,7 +8659,7 @@ fn main() {
                   vec![
                     (Some(r##"customer"##),
                      None,
-                     Some(r##"The unique ID for the customer's Google account. As an account administrator, you can also use the my_customer alias to represent your account's customer ID."##),
+                     Some(r##"The unique ID for the customer's G Suite account. As an account administrator, you can also use the my_customer alias to represent your account's customer ID."##),
                      Some(true),
                      Some(false)),
         
@@ -8675,7 +8681,7 @@ fn main() {
                   vec![
                     (Some(r##"customer"##),
                      None,
-                     Some(r##"The unique ID for the customer's Google account. As an account administrator, you can also use the my_customer alias to represent your account's customer ID."##),
+                     Some(r##"The unique ID for the customer's G Suite account. As an account administrator, you can also use the my_customer alias to represent your account's customer ID."##),
                      Some(true),
                      Some(false)),
         
@@ -8703,7 +8709,7 @@ fn main() {
                   vec![
                     (Some(r##"customer"##),
                      None,
-                     Some(r##"The unique ID for the customer's Google account. As an account administrator, you can also use the my_customer alias to represent your account's customer ID."##),
+                     Some(r##"The unique ID for the customer's G Suite account. As an account administrator, you can also use the my_customer alias to represent your account's customer ID."##),
                      Some(true),
                      Some(false)),
         
@@ -8731,7 +8737,7 @@ fn main() {
                   vec![
                     (Some(r##"customer"##),
                      None,
-                     Some(r##"The unique ID for the customer's Google account. As an account administrator, you can also use the my_customer alias to represent your account's customer ID."##),
+                     Some(r##"The unique ID for the customer's G Suite account. As an account administrator, you can also use the my_customer alias to represent your account's customer ID."##),
                      Some(true),
                      Some(false)),
         
@@ -8753,7 +8759,7 @@ fn main() {
                   vec![
                     (Some(r##"customer"##),
                      None,
-                     Some(r##"The unique ID for the customer's Google account. As an account administrator, you can also use the my_customer alias to represent your account's customer ID."##),
+                     Some(r##"The unique ID for the customer's G Suite account. As an account administrator, you can also use the my_customer alias to represent your account's customer ID."##),
                      Some(true),
                      Some(false)),
         
@@ -8787,7 +8793,7 @@ fn main() {
                   vec![
                     (Some(r##"customer"##),
                      None,
-                     Some(r##"The unique ID for the customer's Google account. As an account administrator, you can also use the my_customer alias to represent your account's customer ID."##),
+                     Some(r##"The unique ID for the customer's G Suite account. As an account administrator, you can also use the my_customer alias to represent your account's customer ID."##),
                      Some(true),
                      Some(false)),
         
@@ -8824,7 +8830,7 @@ fn main() {
                   vec![
                     (Some(r##"customer"##),
                      None,
-                     Some(r##"Immutable ID of the Google Apps account."##),
+                     Some(r##"Immutable ID of the G Suite account."##),
                      Some(true),
                      Some(false)),
         
@@ -8846,7 +8852,7 @@ fn main() {
                   vec![
                     (Some(r##"customer"##),
                      None,
-                     Some(r##"Immutable ID of the Google Apps account."##),
+                     Some(r##"Immutable ID of the G Suite account."##),
                      Some(true),
                      Some(false)),
         
@@ -8874,7 +8880,7 @@ fn main() {
                   vec![
                     (Some(r##"customer"##),
                      None,
-                     Some(r##"Immutable ID of the Google Apps account."##),
+                     Some(r##"Immutable ID of the G Suite account."##),
                      Some(true),
                      Some(false)),
         
@@ -8902,7 +8908,7 @@ fn main() {
                   vec![
                     (Some(r##"customer"##),
                      None,
-                     Some(r##"Immutable ID of the Google Apps account."##),
+                     Some(r##"Immutable ID of the G Suite account."##),
                      Some(true),
                      Some(false)),
         
@@ -8927,7 +8933,7 @@ fn main() {
                   vec![
                     (Some(r##"customer"##),
                      None,
-                     Some(r##"Immutable ID of the Google Apps account."##),
+                     Some(r##"Immutable ID of the G Suite account."##),
                      Some(true),
                      Some(false)),
         
@@ -8949,7 +8955,7 @@ fn main() {
                   vec![
                     (Some(r##"customer"##),
                      None,
-                     Some(r##"Immutable ID of the Google Apps account."##),
+                     Some(r##"Immutable ID of the G Suite account."##),
                      Some(true),
                      Some(false)),
         
@@ -8977,7 +8983,7 @@ fn main() {
                   vec![
                     (Some(r##"customer"##),
                      None,
-                     Some(r##"Immutable ID of the Google Apps account."##),
+                     Some(r##"Immutable ID of the G Suite account."##),
                      Some(true),
                      Some(false)),
         
@@ -9005,7 +9011,7 @@ fn main() {
                   vec![
                     (Some(r##"customer"##),
                      None,
-                     Some(r##"Immutable id of the Google Apps account."##),
+                     Some(r##"Immutable ID of the G Suite account."##),
                      Some(true),
                      Some(false)),
         
@@ -9027,7 +9033,7 @@ fn main() {
                   vec![
                     (Some(r##"customer"##),
                      None,
-                     Some(r##"Immutable ID of the Google Apps account."##),
+                     Some(r##"Immutable ID of the G Suite account."##),
                      Some(true),
                      Some(false)),
         
@@ -9061,7 +9067,7 @@ fn main() {
                   vec![
                     (Some(r##"customer"##),
                      None,
-                     Some(r##"Immutable ID of the Google Apps account."##),
+                     Some(r##"Immutable ID of the G Suite account."##),
                      Some(true),
                      Some(false)),
         
@@ -9098,7 +9104,7 @@ fn main() {
                   vec![
                     (Some(r##"customer-id"##),
                      None,
-                     Some(r##"Immutable id of the Google Apps account"##),
+                     Some(r##"Immutable ID of the G Suite account"##),
                      Some(true),
                      Some(false)),
         
@@ -9120,7 +9126,7 @@ fn main() {
                   vec![
                     (Some(r##"customer-id"##),
                      None,
-                     Some(r##"Immutable id of the Google Apps account"##),
+                     Some(r##"Immutable ID of the G Suite account"##),
                      Some(true),
                      Some(false)),
         
@@ -9148,7 +9154,7 @@ fn main() {
                   vec![
                     (Some(r##"customer-id"##),
                      None,
-                     Some(r##"Immutable id of the Google Apps account"##),
+                     Some(r##"Immutable ID of the G Suite account"##),
                      Some(true),
                      Some(false)),
         
@@ -9176,7 +9182,7 @@ fn main() {
                   vec![
                     (Some(r##"customer-id"##),
                      None,
-                     Some(r##"Immutable id of the Google Apps account"##),
+                     Some(r##"Immutable ID of the G Suite account"##),
                      Some(true),
                      Some(false)),
         
@@ -9198,7 +9204,7 @@ fn main() {
                   vec![
                     (Some(r##"customer-id"##),
                      None,
-                     Some(r##"Immutable id of the Google Apps account"##),
+                     Some(r##"Immutable ID of the G Suite account"##),
                      Some(true),
                      Some(false)),
         
@@ -9232,7 +9238,7 @@ fn main() {
                   vec![
                     (Some(r##"customer-id"##),
                      None,
-                     Some(r##"Immutable id of the Google Apps account"##),
+                     Some(r##"Immutable ID of the G Suite account"##),
                      Some(true),
                      Some(false)),
         
@@ -9793,7 +9799,7 @@ fn main() {
     
     let mut app = App::new("admin1-directory")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.4+20161124")
+           .version("1.0.4+20170419")
            .about("The Admin SDK Directory API lets you view and manage enterprise resources such as users and groups, administrative notifications, security features, and more.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_admin1_directory_cli")
            .arg(Arg::with_name("url")

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *SQL Admin* crate version *1.0.4+20161213*, where *20161213* is the exact revision of the *sqladmin:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
+//! This documentation was generated from *SQL Admin* crate version *1.0.4+20170502*, where *20170502* is the exact revision of the *sqladmin:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
 //! 
 //! Everything else about the *SQL Admin* *v1_beta4* API can be found at the
 //! [official documentation site](https://cloud.google.com/sql/docs/reference/latest).
@@ -216,7 +216,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -351,8 +351,6 @@ pub struct SQLAdmin<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-    _base_url: String,
-    _root_url: String,
 }
 
 impl<'a, C, A> Hub for SQLAdmin<C, A> {}
@@ -365,8 +363,6 @@ impl<'a, C, A> SQLAdmin<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
-            _base_url: "https://www.googleapis.com/sql/v1beta4/".to_string(),
-            _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
@@ -402,26 +398,6 @@ impl<'a, C, A> SQLAdmin<C, A>
     pub fn user_agent(&mut self, agent_name: String) -> String {
         let prev = self._user_agent.clone();
         self._user_agent = agent_name;
-        prev
-    }
-
-    /// Set the base url to use in all requests to the server.
-    /// It defaults to `https://www.googleapis.com/sql/v1beta4/`.
-    ///
-    /// Returns the previously set base url.
-    pub fn base_url(&mut self, new_base_url: String) -> String {
-        let prev = self._base_url.clone();
-        self._base_url = new_base_url;
-        prev
-    }
-
-    /// Set the root url to use in all requests to the server.
-    /// It defaults to `https://www.googleapis.com/`.
-    ///
-    /// Returns the previously set root url.
-    pub fn root_url(&mut self, new_root_url: String) -> String {
-        let prev = self._root_url.clone();
-        self._root_url = new_root_url;
         prev
     }
 }
@@ -948,6 +924,22 @@ pub struct Flag {
 impl Resource for Flag {}
 
 
+/// Database Instance truncate log context.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TruncateLogContext {
+    /// The type of log to truncate. Valid values are MYSQL_GENERAL_TABLE and MYSQL_SLOW_TABLE.
+    #[serde(rename="logType")]
+    pub log_type: Option<String>,
+    /// This is always sql#truncateLogContext.
+    pub kind: Option<String>,
+}
+
+impl Part for TruncateLogContext {}
+
+
 /// A Cloud SQL user resource.
 /// 
 /// # Activities
@@ -1146,6 +1138,11 @@ impl Part for MySqlReplicaConfiguration {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Settings {
+    /// Reserved for future use.
+    #[serde(rename="availabilityType")]
+    pub availability_type: Option<String>,
+    /// Reserved for future use.
+    pub labels: Option<Vec<Labels>>,
     /// The activation policy specifies when the instance is activated; it is applicable only when the instance state is RUNNABLE. The activation policy cannot be updated together with other settings for Second Generation instances. Valid values:
     /// ALWAYS: The instance is on; it is not deactivated by inactivity.
     /// NEVER: The instance is off; it is not activated, even if a connection request arrives.
@@ -1189,6 +1186,9 @@ pub struct Settings {
     /// The daily backup configuration for the instance.
     #[serde(rename="backupConfiguration")]
     pub backup_configuration: Option<BackupConfiguration>,
+    /// The maximum size to which storage capacity can be automatically increased. The default value is 0, which specifies that there is no limit. Applies only to Second Generation instances.
+    #[serde(rename="storageAutoResizeLimit")]
+    pub storage_auto_resize_limit: Option<String>,
     /// Configuration specific to read replica instances. Indicates whether database flags for crash-safe replication are enabled. This property is only applicable to First Generation instances.
     #[serde(rename="crashSafeReplicationEnabled")]
     pub crash_safe_replication_enabled: Option<bool>,
@@ -1299,6 +1299,25 @@ pub struct SslCertsCreateEphemeralRequest {
 impl RequestValue for SslCertsCreateEphemeralRequest {}
 
 
+/// Instance truncate log request.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [truncate log instances](struct.InstanceTruncateLogCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct InstancesTruncateLogRequest {
+    /// Contains details about the truncate log operation.
+    #[serde(rename="truncateLogContext")]
+    pub truncate_log_context: Option<TruncateLogContext>,
+}
+
+impl RequestValue for InstancesTruncateLogRequest {}
+
+
 /// Maintenance window. This specifies when a v2 Cloud SQL instance should preferably be restarted for system maintenance puruposes.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1359,6 +1378,21 @@ pub struct InstancesExportRequest {
 }
 
 impl RequestValue for InstancesExportRequest {}
+
+
+/// Reserved for future use.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Labels {
+    /// Reserved for future use.
+    pub key: Option<String>,
+    /// Reserved for future use.
+    pub value: Option<String>,
+}
+
+impl Part for Labels {}
 
 
 /// User list response.
@@ -1615,7 +1649,7 @@ pub struct Operation {
     /// The time this operation was enqueued in UTC timezone in RFC 3339 format, for example 2012-11-15T16:19:00.094Z.
     #[serde(rename="insertTime")]
     pub insert_time: Option<String>,
-    /// The URI of the instance related to the operation.
+    /// no description provided
     #[serde(rename="targetLink")]
     pub target_link: Option<String>,
     /// The time this operation actually started in UTC timezone in RFC 3339 format, for example 2012-11-15T16:19:00.094Z.
@@ -2005,15 +2039,15 @@ impl<'a, C, A> InstanceMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
+    /// * `request` - No description provided.
     /// * `project` - Project ID of the Cloud SQL project.
     /// * `instance` - Cloud SQL instance ID. This does not include the project ID.
-    /// * `logType` - The type of Log Table to truncate. Valid values are MYSQL_GENERAL_TABLE and MYSQL_SLOW_TABLE
-    pub fn truncate_log(&self, project: &str, instance: &str, log_type: &str) -> InstanceTruncateLogCall<'a, C, A> {
+    pub fn truncate_log(&self, request: InstancesTruncateLogRequest, project: &str, instance: &str) -> InstanceTruncateLogCall<'a, C, A> {
         InstanceTruncateLogCall {
             hub: self.hub,
+            _request: request,
             _project: project.to_string(),
             _instance: instance.to_string(),
-            _log_type: log_type.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2229,6 +2263,7 @@ impl<'a, C, A> InstanceMethods<'a, C, A> {
             _project: project.to_string(),
             _page_token: Default::default(),
             _max_results: Default::default(),
+            _filter: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2385,6 +2420,7 @@ impl<'a, C, A> FlagMethods<'a, C, A> {
     pub fn list(&self) -> FlagListCall<'a, C, A> {
         FlagListCall {
             hub: self.hub,
+            _database_version: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2920,7 +2956,7 @@ impl<'a, C, A> OperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "projects/{project}/operations";
+        let mut url = "https://www.googleapis.com/sql/v1beta4/projects/{project}/operations".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -3181,7 +3217,7 @@ impl<'a, C, A> OperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "projects/{project}/operations/{operation}";
+        let mut url = "https://www.googleapis.com/sql/v1beta4/projects/{project}/operations/{operation}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -3426,7 +3462,7 @@ impl<'a, C, A> TierListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "projects/{project}/tiers";
+        let mut url = "https://www.googleapis.com/sql/v1beta4/projects/{project}/tiers".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -3663,7 +3699,7 @@ impl<'a, C, A> UserListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "projects/{project}/instances/{instance}/users";
+        let mut url = "https://www.googleapis.com/sql/v1beta4/projects/{project}/instances/{instance}/users".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -3914,7 +3950,7 @@ impl<'a, C, A> UserDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "projects/{project}/instances/{instance}/users";
+        let mut url = "https://www.googleapis.com/sql/v1beta4/projects/{project}/instances/{instance}/users".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -4192,7 +4228,7 @@ impl<'a, C, A> UserUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "projects/{project}/instances/{instance}/users";
+        let mut url = "https://www.googleapis.com/sql/v1beta4/projects/{project}/instances/{instance}/users".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -4490,7 +4526,7 @@ impl<'a, C, A> UserInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "projects/{project}/instances/{instance}/users";
+        let mut url = "https://www.googleapis.com/sql/v1beta4/projects/{project}/instances/{instance}/users".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -4702,6 +4738,7 @@ impl<'a, C, A> UserInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// # extern crate hyper;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
+/// use sqladmin1_beta4::InstancesTruncateLogRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -4712,10 +4749,15 @@ impl<'a, C, A> UserInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = SQLAdmin::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = InstancesTruncateLogRequest::default();
+/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.instances().truncate_log("project", "instance", "logType")
+/// let result = hub.instances().truncate_log(req, "project", "instance")
 ///              .doit();
 /// # }
 /// ```
@@ -4723,9 +4765,9 @@ pub struct InstanceTruncateLogCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a SQLAdmin<C, A>,
+    _request: InstancesTruncateLogRequest,
     _project: String,
     _instance: String,
-    _log_type: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -4750,8 +4792,7 @@ impl<'a, C, A> InstanceTruncateLogCall<'a, C, A> where C: BorrowMut<hyper::Clien
         let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("project", self._project.to_string()));
         params.push(("instance", self._instance.to_string()));
-        params.push(("logType", self._log_type.to_string()));
-        for &field in ["alt", "project", "instance", "logType"].iter() {
+        for &field in ["alt", "project", "instance"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -4763,7 +4804,7 @@ impl<'a, C, A> InstanceTruncateLogCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "projects/{project}/instances/{instance}/truncateLog";
+        let mut url = "https://www.googleapis.com/sql/v1beta4/projects/{project}/instances/{instance}/truncateLog".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -4795,6 +4836,17 @@ impl<'a, C, A> InstanceTruncateLogCall<'a, C, A> where C: BorrowMut<hyper::Clien
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
@@ -4811,11 +4863,15 @@ impl<'a, C, A> InstanceTruncateLogCall<'a, C, A> where C: BorrowMut<hyper::Clien
                 }
             };
             let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
 
                 dlg.pre_request();
                 req.send()
@@ -4866,6 +4922,15 @@ impl<'a, C, A> InstanceTruncateLogCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: InstancesTruncateLogRequest) -> InstanceTruncateLogCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
     /// Project ID of the Cloud SQL project.
     ///
     /// Sets the *project* path property to the given value.
@@ -4884,16 +4949,6 @@ impl<'a, C, A> InstanceTruncateLogCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// we provide this method for API completeness.
     pub fn instance(mut self, new_value: &str) -> InstanceTruncateLogCall<'a, C, A> {
         self._instance = new_value.to_string();
-        self
-    }
-    /// The type of Log Table to truncate. Valid values are MYSQL_GENERAL_TABLE and MYSQL_SLOW_TABLE
-    ///
-    /// Sets the *log type* query property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn log_type(mut self, new_value: &str) -> InstanceTruncateLogCall<'a, C, A> {
-        self._log_type = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -5027,7 +5082,7 @@ impl<'a, C, A> InstanceFailoverCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "projects/{project}/instances/{instance}/failover";
+        let mut url = "https://www.googleapis.com/sql/v1beta4/projects/{project}/instances/{instance}/failover".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5298,7 +5353,7 @@ impl<'a, C, A> InstanceResetSslConfigCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "projects/{project}/instances/{instance}/resetSslConfig";
+        let mut url = "https://www.googleapis.com/sql/v1beta4/projects/{project}/instances/{instance}/resetSslConfig".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5545,7 +5600,7 @@ impl<'a, C, A> InstancePromoteReplicaCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "projects/{project}/instances/{instance}/promoteReplica";
+        let mut url = "https://www.googleapis.com/sql/v1beta4/projects/{project}/instances/{instance}/promoteReplica".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5792,7 +5847,7 @@ impl<'a, C, A> InstanceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "projects/{project}/instances/{instance}";
+        let mut url = "https://www.googleapis.com/sql/v1beta4/projects/{project}/instances/{instance}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -6046,7 +6101,7 @@ impl<'a, C, A> InstancePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "projects/{project}/instances/{instance}";
+        let mut url = "https://www.googleapis.com/sql/v1beta4/projects/{project}/instances/{instance}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -6324,7 +6379,7 @@ impl<'a, C, A> InstanceCloneCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "projects/{project}/instances/{instance}/clone";
+        let mut url = "https://www.googleapis.com/sql/v1beta4/projects/{project}/instances/{instance}/clone".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -6595,7 +6650,7 @@ impl<'a, C, A> InstanceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "projects/{project}/instances/{instance}";
+        let mut url = "https://www.googleapis.com/sql/v1beta4/projects/{project}/instances/{instance}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -6842,7 +6897,7 @@ impl<'a, C, A> InstanceStopReplicaCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "projects/{project}/instances/{instance}/stopReplica";
+        let mut url = "https://www.googleapis.com/sql/v1beta4/projects/{project}/instances/{instance}/stopReplica".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -7089,7 +7144,7 @@ impl<'a, C, A> InstanceStartReplicaCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "projects/{project}/instances/{instance}/startReplica";
+        let mut url = "https://www.googleapis.com/sql/v1beta4/projects/{project}/instances/{instance}/startReplica".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -7341,7 +7396,7 @@ impl<'a, C, A> InstanceInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "projects/{project}/instances";
+        let mut url = "https://www.googleapis.com/sql/v1beta4/projects/{project}/instances".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -7557,8 +7612,9 @@ impl<'a, C, A> InstanceInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.instances().list("project")
-///              .page_token("et")
-///              .max_results(55)
+///              .page_token("sanctus")
+///              .max_results(79)
+///              .filter("amet")
 ///              .doit();
 /// # }
 /// ```
@@ -7569,6 +7625,7 @@ pub struct InstanceListCall<'a, C, A>
     _project: String,
     _page_token: Option<String>,
     _max_results: Option<u32>,
+    _filter: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -7590,7 +7647,7 @@ impl<'a, C, A> InstanceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         };
         dlg.begin(MethodInfo { id: "sql.instances.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("project", self._project.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -7598,7 +7655,10 @@ impl<'a, C, A> InstanceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         if let Some(value) = self._max_results {
             params.push(("maxResults", value.to_string()));
         }
-        for &field in ["alt", "project", "pageToken", "maxResults"].iter() {
+        if let Some(value) = self._filter {
+            params.push(("filter", value.to_string()));
+        }
+        for &field in ["alt", "project", "pageToken", "maxResults", "filter"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -7610,7 +7670,7 @@ impl<'a, C, A> InstanceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "projects/{project}/instances";
+        let mut url = "https://www.googleapis.com/sql/v1beta4/projects/{project}/instances".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -7735,6 +7795,13 @@ impl<'a, C, A> InstanceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> InstanceListCall<'a, C, A> {
         self._max_results = Some(new_value);
+        self
+    }
+    /// Reserved for future use.
+    ///
+    /// Sets the *filter* query property to the given value.
+    pub fn filter(mut self, new_value: &str) -> InstanceListCall<'a, C, A> {
+        self._filter = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -7868,7 +7935,7 @@ impl<'a, C, A> InstanceImportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "projects/{project}/instances/{instance}/import";
+        let mut url = "https://www.googleapis.com/sql/v1beta4/projects/{project}/instances/{instance}/import".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -8146,7 +8213,7 @@ impl<'a, C, A> InstanceUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "projects/{project}/instances/{instance}";
+        let mut url = "https://www.googleapis.com/sql/v1beta4/projects/{project}/instances/{instance}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -8417,7 +8484,7 @@ impl<'a, C, A> InstanceRestartCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "projects/{project}/instances/{instance}/restart";
+        let mut url = "https://www.googleapis.com/sql/v1beta4/projects/{project}/instances/{instance}/restart".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -8671,7 +8738,7 @@ impl<'a, C, A> InstanceExportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "projects/{project}/instances/{instance}/export";
+        let mut url = "https://www.googleapis.com/sql/v1beta4/projects/{project}/instances/{instance}/export".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -8949,7 +9016,7 @@ impl<'a, C, A> InstanceRestoreBackupCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "projects/{project}/instances/{instance}/restoreBackup";
+        let mut url = "https://www.googleapis.com/sql/v1beta4/projects/{project}/instances/{instance}/restoreBackup".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -9175,6 +9242,7 @@ impl<'a, C, A> InstanceRestoreBackupCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.flags().list()
+///              .database_version("amet.")
 ///              .doit();
 /// # }
 /// ```
@@ -9182,6 +9250,7 @@ pub struct FlagListCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a SQLAdmin<C, A>,
+    _database_version: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -9203,8 +9272,11 @@ impl<'a, C, A> FlagListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         };
         dlg.begin(MethodInfo { id: "sql.flags.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((2 + self._additional_params.len()));
-        for &field in ["alt"].iter() {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        if let Some(value) = self._database_version {
+            params.push(("databaseVersion", value.to_string()));
+        }
+        for &field in ["alt", "databaseVersion"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -9216,7 +9288,7 @@ impl<'a, C, A> FlagListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "flags";
+        let mut url = "https://www.googleapis.com/sql/v1beta4/flags".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -9298,6 +9370,13 @@ impl<'a, C, A> FlagListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
 
+    /// Database version for flag retrieval. Flags are specific to the database version.
+    ///
+    /// Sets the *database version* query property to the given value.
+    pub fn database_version(mut self, new_value: &str) -> FlagListCall<'a, C, A> {
+        self._database_version = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -9424,7 +9503,7 @@ impl<'a, C, A> DatabaseDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "projects/{project}/instances/{instance}/databases/{database}";
+        let mut url = "https://www.googleapis.com/sql/v1beta4/projects/{project}/instances/{instance}/databases/{database}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -9690,7 +9769,7 @@ impl<'a, C, A> DatabasePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "projects/{project}/instances/{instance}/databases/{database}";
+        let mut url = "https://www.googleapis.com/sql/v1beta4/projects/{project}/instances/{instance}/databases/{database}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -9971,7 +10050,7 @@ impl<'a, C, A> DatabaseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "projects/{project}/instances/{instance}/databases";
+        let mut url = "https://www.googleapis.com/sql/v1beta4/projects/{project}/instances/{instance}/databases".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -10225,7 +10304,7 @@ impl<'a, C, A> DatabaseInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "projects/{project}/instances/{instance}/databases";
+        let mut url = "https://www.googleapis.com/sql/v1beta4/projects/{project}/instances/{instance}/databases".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -10498,7 +10577,7 @@ impl<'a, C, A> DatabaseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "projects/{project}/instances/{instance}/databases/{database}";
+        let mut url = "https://www.googleapis.com/sql/v1beta4/projects/{project}/instances/{instance}/databases/{database}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -10764,7 +10843,7 @@ impl<'a, C, A> DatabaseUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "projects/{project}/instances/{instance}/databases/{database}";
+        let mut url = "https://www.googleapis.com/sql/v1beta4/projects/{project}/instances/{instance}/databases/{database}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -11052,7 +11131,7 @@ impl<'a, C, A> SslCertInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "projects/{project}/instances/{instance}/sslCerts";
+        let mut url = "https://www.googleapis.com/sql/v1beta4/projects/{project}/instances/{instance}/sslCerts".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -11325,7 +11404,7 @@ impl<'a, C, A> SslCertDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "projects/{project}/instances/{instance}/sslCerts/{sha1Fingerprint}";
+        let mut url = "https://www.googleapis.com/sql/v1beta4/projects/{project}/instances/{instance}/sslCerts/{sha1Fingerprint}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -11584,7 +11663,7 @@ impl<'a, C, A> SslCertGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "projects/{project}/instances/{instance}/sslCerts/{sha1Fingerprint}";
+        let mut url = "https://www.googleapis.com/sql/v1beta4/projects/{project}/instances/{instance}/sslCerts/{sha1Fingerprint}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -11848,7 +11927,7 @@ impl<'a, C, A> SslCertCreateEphemeralCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "projects/{project}/instances/{instance}/createEphemeral";
+        let mut url = "https://www.googleapis.com/sql/v1beta4/projects/{project}/instances/{instance}/createEphemeral".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -12119,7 +12198,7 @@ impl<'a, C, A> SslCertListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "projects/{project}/instances/{instance}/sslCerts";
+        let mut url = "https://www.googleapis.com/sql/v1beta4/projects/{project}/instances/{instance}/sslCerts".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -12321,8 +12400,8 @@ impl<'a, C, A> SslCertListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.backup_runs().list("project", "instance")
-///              .page_token("ea")
-///              .max_results(-95)
+///              .page_token("sadipscing")
+///              .max_results(-66)
 ///              .doit();
 /// # }
 /// ```
@@ -12376,7 +12455,7 @@ impl<'a, C, A> BackupRunListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "projects/{project}/instances/{instance}/backupRuns";
+        let mut url = "https://www.googleapis.com/sql/v1beta4/projects/{project}/instances/{instance}/backupRuns".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -12639,7 +12718,7 @@ impl<'a, C, A> BackupRunGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "projects/{project}/instances/{instance}/backupRuns/{id}";
+        let mut url = "https://www.googleapis.com/sql/v1beta4/projects/{project}/instances/{instance}/backupRuns/{id}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -12898,7 +12977,7 @@ impl<'a, C, A> BackupRunDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "projects/{project}/instances/{instance}/backupRuns/{id}";
+        let mut url = "https://www.googleapis.com/sql/v1beta4/projects/{project}/instances/{instance}/backupRuns/{id}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -13162,7 +13241,7 @@ impl<'a, C, A> BackupRunInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "projects/{project}/instances/{instance}/backupRuns";
+        let mut url = "https://www.googleapis.com/sql/v1beta4/projects/{project}/instances/{instance}/backupRuns".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -13359,5 +13438,6 @@ impl<'a, C, A> BackupRunInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self
     }
 }
+
 
 

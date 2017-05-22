@@ -821,7 +821,8 @@ fn main() {
                      Some(false)),
                   ]),
             ("reports-list",
-                    Some(r##"Lists reports created by a specific job. Returns NOT_FOUND if the job does not exist."##),
+                    Some(r##"Lists reports created by a specific job.
+        Returns NOT_FOUND if the job does not exist."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtubereporting1_cli/jobs_reports-list",
                   vec![
                     (Some(r##"job-id"##),
@@ -846,12 +847,14 @@ fn main() {
         
         ("media", "methods: 'download'", vec![
             ("download",
-                    Some(r##"Method for media download. Download is supported on the URI `/v1/media/{+name}?alt=media`."##),
+                    Some(r##"Method for media download. Download is supported
+        on the URI `/v1/media/{+name}?alt=media`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtubereporting1_cli/media_download",
                   vec![
                     (Some(r##"resource-name"##),
                      None,
-                     Some(r##"Name of the media that is being downloaded. See ReadRequest.resource_name."##),
+                     Some(r##"Name of the media that is being downloaded.  See
+        ReadRequest.resource_name."##),
                      Some(true),
                      Some(false)),
         
@@ -892,7 +895,7 @@ fn main() {
     
     let mut app = App::new("youtubereporting1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.4+20160719")
+           .version("1.0.4+20170520")
            .about("Schedules reporting jobs containing your YouTube Analytics data and downloads the resulting bulk data reports in the form of CSV files.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_youtubereporting1_cli")
            .arg(Arg::with_name("url")

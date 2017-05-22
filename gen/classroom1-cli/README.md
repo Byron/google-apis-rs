@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *classroom* API at revision *20161006*. The CLI is at version *1.0.4*.
+This documentation was generated from the *classroom* API at revision *20170510*. The CLI is at version *1.0.4*.
 
 ```bash
 classroom1 [options]
@@ -34,8 +34,10 @@ classroom1 [options]
                 aliases-delete <course-id> <alias> [-p <v>]... [-o <out>]
                 aliases-list <course-id> [-p <v>]... [-o <out>]
                 course-work-create <course-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                course-work-delete <course-id> <id> [-p <v>]... [-o <out>]
                 course-work-get <course-id> <id> [-p <v>]... [-o <out>]
                 course-work-list <course-id> [-p <v>]... [-o <out>]
+                course-work-patch <course-id> <id> (-r <kv>)... [-p <v>]... [-o <out>]
                 course-work-student-submissions-get <course-id> <course-work-id> <id> [-p <v>]... [-o <out>]
                 course-work-student-submissions-list <course-id> <course-work-id> [-p <v>]... [-o <out>]
                 course-work-student-submissions-modify-attachments <course-id> <course-work-id> <id> (-r <kv>)... [-p <v>]... [-o <out>]

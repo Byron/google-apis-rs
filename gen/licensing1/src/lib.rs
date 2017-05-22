@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *licensing* crate version *1.0.4+20150901*, where *20150901* is the exact revision of the *licensing:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
+//! This documentation was generated from *licensing* crate version *1.0.4+20170213*, where *20170213* is the exact revision of the *licensing:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
 //! 
 //! Everything else about the *licensing* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/google-apps/licensing/).
@@ -178,7 +178,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -223,7 +223,7 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
 #[derive(PartialEq, Eq, Hash)]
 pub enum Scope {
-    /// View and manage Google Apps licenses for your domain
+    /// View and manage G Suite licenses for your domain
     AppLicensing,
 }
 
@@ -305,8 +305,6 @@ pub struct Licensing<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-    _base_url: String,
-    _root_url: String,
 }
 
 impl<'a, C, A> Hub for Licensing<C, A> {}
@@ -319,8 +317,6 @@ impl<'a, C, A> Licensing<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
-            _base_url: "https://www.googleapis.com/apps/licensing/v1/product/".to_string(),
-            _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
@@ -335,26 +331,6 @@ impl<'a, C, A> Licensing<C, A>
     pub fn user_agent(&mut self, agent_name: String) -> String {
         let prev = self._user_agent.clone();
         self._user_agent = agent_name;
-        prev
-    }
-
-    /// Set the base url to use in all requests to the server.
-    /// It defaults to `https://www.googleapis.com/apps/licensing/v1/product/`.
-    ///
-    /// Returns the previously set base url.
-    pub fn base_url(&mut self, new_base_url: String) -> String {
-        let prev = self._base_url.clone();
-        self._base_url = new_base_url;
-        prev
-    }
-
-    /// Set the root url to use in all requests to the server.
-    /// It defaults to `https://www.googleapis.com/`.
-    ///
-    /// Returns the previously set root url.
-    pub fn root_url(&mut self, new_root_url: String) -> String {
-        let prev = self._root_url.clone();
-        self._root_url = new_root_url;
         prev
     }
 }
@@ -380,20 +356,26 @@ impl<'a, C, A> Licensing<C, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LicenseAssignment {
-    /// Name of the sku of the product.
+    /// Id of the sku of the product.
     #[serde(rename="skuId")]
     pub sku_id: Option<String>,
     /// Identifies the resource as a LicenseAssignment.
     pub kind: Option<String>,
-    /// ETag of the resource.
-    pub etags: Option<String>,
     /// Email id of the user.
     #[serde(rename="userId")]
     pub user_id: Option<String>,
+    /// Display Name of the product.
+    #[serde(rename="productName")]
+    pub product_name: Option<String>,
+    /// Display Name of the sku of the product.
+    #[serde(rename="skuName")]
+    pub sku_name: Option<String>,
+    /// ETag of the resource.
+    pub etags: Option<String>,
     /// Link to this page.
     #[serde(rename="selfLink")]
     pub self_link: Option<String>,
-    /// Name of the product.
+    /// Id of the product.
     #[serde(rename="productId")]
     pub product_id: Option<String>,
 }
@@ -726,7 +708,7 @@ impl<'a, C, A> LicenseAssignmentDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
         }
 
 
-        let mut url = self.hub._base_url.clone() + "{productId}/sku/{skuId}/user/{userId}";
+        let mut url = "https://www.googleapis.com/apps/licensing/v1/product/{productId}/sku/{skuId}/user/{userId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AppLicensing.as_ref().to_string(), ());
         }
@@ -983,7 +965,7 @@ impl<'a, C, A> LicenseAssignmentListForProductCall<'a, C, A> where C: BorrowMut<
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{productId}/users";
+        let mut url = "https://www.googleapis.com/apps/licensing/v1/product/{productId}/users".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AppLicensing.as_ref().to_string(), ());
         }
@@ -1246,7 +1228,7 @@ impl<'a, C, A> LicenseAssignmentGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{productId}/sku/{skuId}/user/{userId}";
+        let mut url = "https://www.googleapis.com/apps/licensing/v1/product/{productId}/sku/{skuId}/user/{userId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AppLicensing.as_ref().to_string(), ());
         }
@@ -1515,7 +1497,7 @@ impl<'a, C, A> LicenseAssignmentListForProductAndSkuCall<'a, C, A> where C: Borr
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{productId}/sku/{skuId}/users";
+        let mut url = "https://www.googleapis.com/apps/licensing/v1/product/{productId}/sku/{skuId}/users".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AppLicensing.as_ref().to_string(), ());
         }
@@ -1795,7 +1777,7 @@ impl<'a, C, A> LicenseAssignmentUpdateCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{productId}/sku/{skuId}/user/{userId}";
+        let mut url = "https://www.googleapis.com/apps/licensing/v1/product/{productId}/sku/{skuId}/user/{userId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AppLicensing.as_ref().to_string(), ());
         }
@@ -2085,7 +2067,7 @@ impl<'a, C, A> LicenseAssignmentPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{productId}/sku/{skuId}/user/{userId}";
+        let mut url = "https://www.googleapis.com/apps/licensing/v1/product/{productId}/sku/{skuId}/user/{userId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AppLicensing.as_ref().to_string(), ());
         }
@@ -2373,7 +2355,7 @@ impl<'a, C, A> LicenseAssignmentInsertCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{productId}/sku/{skuId}/user";
+        let mut url = "https://www.googleapis.com/apps/licensing/v1/product/{productId}/sku/{skuId}/user".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AppLicensing.as_ref().to_string(), ());
         }
@@ -2570,5 +2552,6 @@ impl<'a, C, A> LicenseAssignmentInsertCall<'a, C, A> where C: BorrowMut<hyper::C
         self
     }
 }
+
 
 

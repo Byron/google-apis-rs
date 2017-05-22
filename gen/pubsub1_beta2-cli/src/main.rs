@@ -154,8 +154,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "topic" => Some(("topic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "ack-deadline-seconds" => Some(("ackDeadlineSeconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "topic" => Some(("topic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "push-config.attributes" => Some(("pushConfig.attributes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "push-config.push-endpoint" => Some(("pushConfig.pushEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1769,8 +1769,7 @@ fn main() {
                     (Some(r##"resource"##),
                      None,
                      Some(r##"REQUIRED: The resource for which the policy is being requested.
-        `resource` is usually specified as a path. For example, a Project
-        resource is specified as `projects/{project}`."##),
+        See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -1912,8 +1911,7 @@ fn main() {
                     (Some(r##"resource"##),
                      None,
                      Some(r##"REQUIRED: The resource for which the policy is being specified.
-        `resource` is usually specified as a path. For example, a Project
-        resource is specified as `projects/{project}`."##),
+        See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -1936,14 +1934,19 @@ fn main() {
                      Some(false)),
                   ]),
             ("subscriptions-test-iam-permissions",
-                    Some(r##"Returns permissions that a caller has on the specified resource."##),
+                    Some(r##"Returns permissions that a caller has on the specified resource.
+        If the resource does not exist, this will return an empty set of
+        permissions, not a NOT_FOUND error.
+        
+        Note: This operation is designed to be used for building permission-aware
+        UIs and command-line tools, not for authorization checking. This operation
+        may "fail open" without warning."##),
                     "Details at http://byron.github.io/google-apis-rs/google_pubsub1_beta2_cli/projects_subscriptions-test-iam-permissions",
                   vec![
                     (Some(r##"resource"##),
                      None,
                      Some(r##"REQUIRED: The resource for which the policy detail is being requested.
-        `resource` is usually specified as a path. For example, a Project
-        resource is specified as `projects/{project}`."##),
+        See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -2055,8 +2058,7 @@ fn main() {
                     (Some(r##"resource"##),
                      None,
                      Some(r##"REQUIRED: The resource for which the policy is being requested.
-        `resource` is usually specified as a path. For example, a Project
-        resource is specified as `projects/{project}`."##),
+        See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -2132,8 +2134,7 @@ fn main() {
                     (Some(r##"resource"##),
                      None,
                      Some(r##"REQUIRED: The resource for which the policy is being specified.
-        `resource` is usually specified as a path. For example, a Project
-        resource is specified as `projects/{project}`."##),
+        See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -2178,14 +2179,19 @@ fn main() {
                      Some(false)),
                   ]),
             ("topics-test-iam-permissions",
-                    Some(r##"Returns permissions that a caller has on the specified resource."##),
+                    Some(r##"Returns permissions that a caller has on the specified resource.
+        If the resource does not exist, this will return an empty set of
+        permissions, not a NOT_FOUND error.
+        
+        Note: This operation is designed to be used for building permission-aware
+        UIs and command-line tools, not for authorization checking. This operation
+        may "fail open" without warning."##),
                     "Details at http://byron.github.io/google-apis-rs/google_pubsub1_beta2_cli/projects_topics-test-iam-permissions",
                   vec![
                     (Some(r##"resource"##),
                      None,
                      Some(r##"REQUIRED: The resource for which the policy detail is being requested.
-        `resource` is usually specified as a path. For example, a Project
-        resource is specified as `projects/{project}`."##),
+        See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -2213,7 +2219,7 @@ fn main() {
     
     let mut app = App::new("pubsub1-beta2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.4+20161122")
+           .version("1.0.4+20170502")
            .about("Provides reliable, many-to-many, asynchronous messaging between applications.
            ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_pubsub1_beta2_cli")

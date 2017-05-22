@@ -1,4 +1,4 @@
-site_name: storage v1.0.4+20161123
+site_name: storage v1.0.4+20170504
 site_url: http://byron.github.io/google-apis-rs/google-storage1-cli
 site_description: A complete library to interact with storage (protocol v1)
 
@@ -17,9 +17,12 @@ pages:
 - ['bucket-access-controls_update.md', 'Bucket Access Controls', 'Update']
 - ['buckets_delete.md', 'Buckets', 'Delete']
 - ['buckets_get.md', 'Buckets', 'Get']
+- ['buckets_get-iam-policy.md', 'Buckets', 'Get Iam Policy']
 - ['buckets_insert.md', 'Buckets', 'Insert']
 - ['buckets_list.md', 'Buckets', 'List']
 - ['buckets_patch.md', 'Buckets', 'Patch']
+- ['buckets_set-iam-policy.md', 'Buckets', 'Set Iam Policy']
+- ['buckets_test-iam-permissions.md', 'Buckets', 'Test Iam Permissions']
 - ['buckets_update.md', 'Buckets', 'Update']
 - ['channels_stop.md', 'Channels', 'Stop']
 - ['default-object-access-controls_delete.md', 'Default Object Access Controls', 'Delete']
@@ -28,6 +31,10 @@ pages:
 - ['default-object-access-controls_list.md', 'Default Object Access Controls', 'List']
 - ['default-object-access-controls_patch.md', 'Default Object Access Controls', 'Patch']
 - ['default-object-access-controls_update.md', 'Default Object Access Controls', 'Update']
+- ['notifications_delete.md', 'Notifications', 'Delete']
+- ['notifications_get.md', 'Notifications', 'Get']
+- ['notifications_insert.md', 'Notifications', 'Insert']
+- ['notifications_list.md', 'Notifications', 'List']
 - ['object-access-controls_delete.md', 'Object Access Controls', 'Delete']
 - ['object-access-controls_get.md', 'Object Access Controls', 'Get']
 - ['object-access-controls_insert.md', 'Object Access Controls', 'Insert']
@@ -38,12 +45,16 @@ pages:
 - ['objects_copy.md', 'Objects', 'Copy']
 - ['objects_delete.md', 'Objects', 'Delete']
 - ['objects_get.md', 'Objects', 'Get']
+- ['objects_get-iam-policy.md', 'Objects', 'Get Iam Policy']
 - ['objects_insert.md', 'Objects', 'Insert']
 - ['objects_list.md', 'Objects', 'List']
 - ['objects_patch.md', 'Objects', 'Patch']
 - ['objects_rewrite.md', 'Objects', 'Rewrite']
+- ['objects_set-iam-policy.md', 'Objects', 'Set Iam Policy']
+- ['objects_test-iam-permissions.md', 'Objects', 'Test Iam Permissions']
 - ['objects_update.md', 'Objects', 'Update']
 - ['objects_watch-all.md', 'Objects', 'Watch All']
+- ['projects_service-account-get.md', 'Projects', 'Service Account Get']
 
 theme: readthedocs
 

@@ -268,25 +268,25 @@ impl<'n> Engine<'n> {
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "submission-modification-mode" => Some(("submissionModificationMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "alternate-link" => Some(("alternateLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "course-id" => Some(("courseId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "assignment.student-work-folder.alternate-link" => Some(("assignment.studentWorkFolder.alternateLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "assignment.student-work-folder.id" => Some(("assignment.studentWorkFolder.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "assignment.student-work-folder.title" => Some(("assignment.studentWorkFolder.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "alternate-link" => Some(("alternateLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "associated-with-developer" => Some(("associatedWithDeveloper", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "max-points" => Some(("maxPoints", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "multiple-choice-question.choices" => Some(("multipleChoiceQuestion.choices", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "due-date.month" => Some(("dueDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "due-date.day" => Some(("dueDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "due-date.year" => Some(("dueDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "max-points" => Some(("maxPoints", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "multiple-choice-question.choices" => Some(("multipleChoiceQuestion.choices", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "due-time.hours" => Some(("dueTime.hours", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-time.nanos" => Some(("dueTime.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "due-time.seconds" => Some(("dueTime.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "due-time.minutes" => Some(("dueTime.minutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "due-time.nanos" => Some(("dueTime.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "work-type" => Some(("workType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["alternate-link", "assignment", "associated-with-developer", "choices", "course-id", "creation-time", "day", "description", "due-date", "due-time", "hours", "id", "max-points", "minutes", "month", "multiple-choice-question", "nanos", "seconds", "state", "student-work-folder", "submission-modification-mode", "title", "update-time", "work-type", "year"]);
@@ -300,6 +300,58 @@ impl<'n> Engine<'n> {
         }
         let mut request: api::CourseWork = json::value::from_value(object).unwrap();
         let mut call = self.hub.courses().course_work_create(request, opt.value_of("course-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _courses_course_work_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.courses().course_work_delete(opt.value_of("course-id").unwrap_or(""), opt.value_of("id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -433,6 +485,117 @@ impl<'n> Engine<'n> {
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["order-by", "page-token", "course-work-states", "page-size"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _courses_course_work_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "submission-modification-mode" => Some(("submissionModificationMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "alternate-link" => Some(("alternateLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "course-id" => Some(("courseId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "assignment.student-work-folder.alternate-link" => Some(("assignment.studentWorkFolder.alternateLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "assignment.student-work-folder.id" => Some(("assignment.studentWorkFolder.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "assignment.student-work-folder.title" => Some(("assignment.studentWorkFolder.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "associated-with-developer" => Some(("associatedWithDeveloper", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "max-points" => Some(("maxPoints", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "multiple-choice-question.choices" => Some(("multipleChoiceQuestion.choices", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "due-date.month" => Some(("dueDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-date.day" => Some(("dueDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-date.year" => Some(("dueDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-time.hours" => Some(("dueTime.hours", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-time.nanos" => Some(("dueTime.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-time.seconds" => Some(("dueTime.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-time.minutes" => Some(("dueTime.minutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "work-type" => Some(("workType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["alternate-link", "assignment", "associated-with-developer", "choices", "course-id", "creation-time", "day", "description", "due-date", "due-time", "hours", "id", "max-points", "minutes", "month", "multiple-choice-question", "nanos", "seconds", "state", "student-work-folder", "submission-modification-mode", "title", "update-time", "work-type", "year"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::CourseWork = json::value::from_value(object).unwrap();
+        let mut call = self.hub.courses().course_work_patch(request, opt.value_of("course-id").unwrap_or(""), opt.value_of("id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["update-mask"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1050,22 +1213,22 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "alternate-link" => Some(("alternateLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "room" => Some(("room", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "enrollment-code" => Some(("enrollmentCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "section" => Some(("section", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "guardians-enabled" => Some(("guardiansEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "course-group-email" => Some(("courseGroupEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "teacher-group-email" => Some(("teacherGroupEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "owner-id" => Some(("ownerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "teacher-folder.alternate-link" => Some(("teacherFolder.alternateLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "teacher-folder.id" => Some(("teacherFolder.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "teacher-folder.title" => Some(("teacherFolder.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "course-state" => Some(("courseState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "alternate-link" => Some(("alternateLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description-heading" => Some(("descriptionHeading", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "room" => Some(("room", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["alternate-link", "course-group-email", "course-state", "creation-time", "description", "description-heading", "enrollment-code", "guardians-enabled", "id", "name", "owner-id", "room", "section", "teacher-folder", "teacher-group-email", "title", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1324,22 +1487,22 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "alternate-link" => Some(("alternateLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "room" => Some(("room", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "enrollment-code" => Some(("enrollmentCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "section" => Some(("section", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "guardians-enabled" => Some(("guardiansEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "course-group-email" => Some(("courseGroupEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "teacher-group-email" => Some(("teacherGroupEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "owner-id" => Some(("ownerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "teacher-folder.alternate-link" => Some(("teacherFolder.alternateLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "teacher-folder.id" => Some(("teacherFolder.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "teacher-folder.title" => Some(("teacherFolder.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "course-state" => Some(("courseState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "alternate-link" => Some(("alternateLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description-heading" => Some(("descriptionHeading", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "room" => Some(("room", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["alternate-link", "course-group-email", "course-state", "creation-time", "description", "description-heading", "enrollment-code", "guardians-enabled", "id", "name", "owner-id", "room", "section", "teacher-folder", "teacher-group-email", "title", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1947,22 +2110,22 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "alternate-link" => Some(("alternateLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "room" => Some(("room", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "enrollment-code" => Some(("enrollmentCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "section" => Some(("section", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "guardians-enabled" => Some(("guardiansEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "course-group-email" => Some(("courseGroupEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "teacher-group-email" => Some(("teacherGroupEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "owner-id" => Some(("ownerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "teacher-folder.alternate-link" => Some(("teacherFolder.alternateLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "teacher-folder.id" => Some(("teacherFolder.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "teacher-folder.title" => Some(("teacherFolder.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "course-state" => Some(("courseState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "alternate-link" => Some(("alternateLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description-heading" => Some(("descriptionHeading", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "room" => Some(("room", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["alternate-link", "course-group-email", "course-state", "creation-time", "description", "description-heading", "enrollment-code", "guardians-enabled", "id", "name", "owner-id", "room", "section", "teacher-folder", "teacher-group-email", "title", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -2100,8 +2263,8 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "course-id" => Some(("courseId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "role" => Some(("role", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-id" => Some(("userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "role" => Some(("role", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["course-id", "id", "role", "user-id"]);
@@ -2408,11 +2571,11 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "invitation-id" => Some(("invitationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "student-id" => Some(("studentId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "invited-email-address" => Some(("invitedEmailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "invitation-id" => Some(("invitationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "invitation-id", "invited-email-address", "state", "student-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -2605,11 +2768,11 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "invitation-id" => Some(("invitationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "student-id" => Some(("studentId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "invited-email-address" => Some(("invitedEmailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "invitation-id" => Some(("invitationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "invitation-id", "invited-email-address", "state", "student-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -2848,11 +3011,17 @@ impl<'n> Engine<'n> {
                     ("course-work-create", Some(opt)) => {
                         call_result = self._courses_course_work_create(opt, dry_run, &mut err);
                     },
+                    ("course-work-delete", Some(opt)) => {
+                        call_result = self._courses_course_work_delete(opt, dry_run, &mut err);
+                    },
                     ("course-work-get", Some(opt)) => {
                         call_result = self._courses_course_work_get(opt, dry_run, &mut err);
                     },
                     ("course-work-list", Some(opt)) => {
                         call_result = self._courses_course_work_list(opt, dry_run, &mut err);
+                    },
+                    ("course-work-patch", Some(opt)) => {
+                        call_result = self._courses_course_work_patch(opt, dry_run, &mut err);
                     },
                     ("course-work-student-submissions-get", Some(opt)) => {
                         call_result = self._courses_course_work_student_submissions_get(opt, dry_run, &mut err);
@@ -3064,14 +3233,26 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("courses", "methods: 'aliases-create', 'aliases-delete', 'aliases-list', 'course-work-create', 'course-work-get', 'course-work-list', 'course-work-student-submissions-get', 'course-work-student-submissions-list', 'course-work-student-submissions-modify-attachments', 'course-work-student-submissions-patch', 'course-work-student-submissions-reclaim', 'course-work-student-submissions-return', 'course-work-student-submissions-turn-in', 'create', 'delete', 'get', 'list', 'patch', 'students-create', 'students-delete', 'students-get', 'students-list', 'teachers-create', 'teachers-delete', 'teachers-get', 'teachers-list' and 'update'", vec![
+        ("courses", "methods: 'aliases-create', 'aliases-delete', 'aliases-list', 'course-work-create', 'course-work-delete', 'course-work-get', 'course-work-list', 'course-work-patch', 'course-work-student-submissions-get', 'course-work-student-submissions-list', 'course-work-student-submissions-modify-attachments', 'course-work-student-submissions-patch', 'course-work-student-submissions-reclaim', 'course-work-student-submissions-return', 'course-work-student-submissions-turn-in', 'create', 'delete', 'get', 'list', 'patch', 'students-create', 'students-delete', 'students-get', 'students-list', 'teachers-create', 'teachers-delete', 'teachers-get', 'teachers-list' and 'update'", vec![
             ("aliases-create",
-                    Some(r##"Creates an alias for a course. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to create the alias or for access errors. * `NOT_FOUND` if the course does not exist. * `ALREADY_EXISTS` if the alias already exists."##),
+                    Some(r##"Creates an alias for a course.
+        
+        This method returns the following error codes:
+        
+        * `PERMISSION_DENIED` if the requesting user is not permitted to create the
+        alias or for access errors.
+        * `NOT_FOUND` if the course does not exist.
+        * `ALREADY_EXISTS` if the alias already exists.
+        * `FAILED_PRECONDITION` if the alias requested does not make sense for the
+          requesting user or course (for example, if a user not in a domain
+          attempts to access a domain-scoped alias)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_aliases-create",
                   vec![
                     (Some(r##"course-id"##),
                      None,
-                     Some(r##"Identifier of the course to alias. This identifier can be either the Classroom-assigned identifier or an alias."##),
+                     Some(r##"Identifier of the course to alias.
+        This identifier can be either the Classroom-assigned identifier or an
+        alias."##),
                      Some(true),
                      Some(false)),
         
@@ -3094,18 +3275,30 @@ fn main() {
                      Some(false)),
                   ]),
             ("aliases-delete",
-                    Some(r##"Deletes an alias of a course. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to remove the alias or for access errors. * `NOT_FOUND` if the alias does not exist."##),
+                    Some(r##"Deletes an alias of a course.
+        
+        This method returns the following error codes:
+        
+        * `PERMISSION_DENIED` if the requesting user is not permitted to remove the
+        alias or for access errors.
+        * `NOT_FOUND` if the alias does not exist.
+        * `FAILED_PRECONDITION` if the alias requested does not make sense for the
+          requesting user or course (for example, if a user not in a domain
+          attempts to delete a domain-scoped alias)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_aliases-delete",
                   vec![
                     (Some(r##"course-id"##),
                      None,
-                     Some(r##"Identifier of the course whose alias should be deleted. This identifier can be either the Classroom-assigned identifier or an alias."##),
+                     Some(r##"Identifier of the course whose alias should be deleted.
+        This identifier can be either the Classroom-assigned identifier or an
+        alias."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"alias"##),
                      None,
-                     Some(r##"Alias to delete. This may not be the Classroom-assigned identifier."##),
+                     Some(r##"Alias to delete.
+        This may not be the Classroom-assigned identifier."##),
                      Some(true),
                      Some(false)),
         
@@ -3122,12 +3315,20 @@ fn main() {
                      Some(false)),
                   ]),
             ("aliases-list",
-                    Some(r##"Returns a list of aliases for a course. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to access the course or for access errors. * `NOT_FOUND` if the course does not exist."##),
+                    Some(r##"Returns a list of aliases for a course.
+        
+        This method returns the following error codes:
+        
+        * `PERMISSION_DENIED` if the requesting user is not permitted to access the
+        course or for access errors.
+        * `NOT_FOUND` if the course does not exist."##),
                     "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_aliases-list",
                   vec![
                     (Some(r##"course-id"##),
                      None,
-                     Some(r##"The identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias."##),
+                     Some(r##"The identifier of the course.
+        This identifier can be either the Classroom-assigned identifier or an
+        alias."##),
                      Some(true),
                      Some(false)),
         
@@ -3144,12 +3345,31 @@ fn main() {
                      Some(false)),
                   ]),
             ("course-work-create",
-                    Some(r##"Creates course work. The resulting course work (and corresponding student submissions) are associated with the Developer Console project of the [OAuth client ID](https://support.google.com/cloud/answer/6158849) used to make the request. Classroom API requests to modify course work and student submissions must be made with an OAuth client ID from the associated Developer Console project. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to access the requested course, create course work in the requested course, or for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if the requested course does not exist."##),
+                    Some(r##"Creates course work.
+        
+        The resulting course work (and corresponding student submissions) are
+        associated with the Developer Console project of the
+        [OAuth client ID](https://support.google.com/cloud/answer/6158849) used to
+        make the request. Classroom API requests to modify course work and student
+        submissions must be made with an OAuth client ID from the associated
+        Developer Console project.
+        
+        This method returns the following error codes:
+        
+        * `PERMISSION_DENIED` if the requesting user is not permitted to access the
+        requested course, create course work in the requested course, share a
+        Drive attachment, or for access errors.
+        * `INVALID_ARGUMENT` if the request is malformed.
+        * `NOT_FOUND` if the requested course does not exist.
+        * `FAILED_PRECONDITION` for the following request error:
+            * AttachmentNotVisible"##),
                     "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_course-work-create",
                   vec![
                     (Some(r##"course-id"##),
                      None,
-                     Some(r##"Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias."##),
+                     Some(r##"Identifier of the course.
+        This identifier can be either the Classroom-assigned identifier or an
+        alias."##),
                      Some(true),
                      Some(false)),
         
@@ -3171,13 +3391,66 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("course-work-delete",
+                    Some(r##"Deletes a course work.
+        
+        This request must be made by the Developer Console project of the
+        [OAuth client ID](https://support.google.com/cloud/answer/6158849) used to
+        create the corresponding course work item.
+        
+        This method returns the following error codes:
+        
+        * `PERMISSION_DENIED` if the requesting developer project did not create
+        the corresponding course work, if the requesting user is not permitted
+        to delete the requested course or for access errors.
+        * `FAILED_PRECONDITION` if the requested course work has already been
+        deleted.
+        * `NOT_FOUND` if no course exists with the requested ID."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_course-work-delete",
+                  vec![
+                    (Some(r##"course-id"##),
+                     None,
+                     Some(r##"Identifier of the course.
+        This identifier can be either the Classroom-assigned identifier or an
+        alias."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"id"##),
+                     None,
+                     Some(r##"Identifier of the course work to delete.
+        This identifier is a Classroom-assigned identifier."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("course-work-get",
-                    Some(r##"Returns course work. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to access the requested course or course work, or for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if the requested course or course work does not exist."##),
+                    Some(r##"Returns course work.
+        
+        This method returns the following error codes:
+        
+        * `PERMISSION_DENIED` if the requesting user is not permitted to access the
+        requested course or course work, or for access errors.
+        * `INVALID_ARGUMENT` if the request is malformed.
+        * `NOT_FOUND` if the requested course or course work does not exist."##),
                     "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_course-work-get",
                   vec![
                     (Some(r##"course-id"##),
                      None,
-                     Some(r##"Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias."##),
+                     Some(r##"Identifier of the course.
+        This identifier can be either the Classroom-assigned identifier or an
+        alias."##),
                      Some(true),
                      Some(false)),
         
@@ -3200,12 +3473,24 @@ fn main() {
                      Some(false)),
                   ]),
             ("course-work-list",
-                    Some(r##"Returns a list of course work that the requester is permitted to view. Course students may only view `PUBLISHED` course work. Course teachers and domain administrators may view all course work. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to access the requested course or for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if the requested course does not exist."##),
+                    Some(r##"Returns a list of course work that the requester is permitted to view.
+        
+        Course students may only view `PUBLISHED` course work. Course teachers
+        and domain administrators may view all course work.
+        
+        This method returns the following error codes:
+        
+        * `PERMISSION_DENIED` if the requesting user is not permitted to access
+        the requested course or for access errors.
+        * `INVALID_ARGUMENT` if the request is malformed.
+        * `NOT_FOUND` if the requested course does not exist."##),
                     "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_course-work-list",
                   vec![
                     (Some(r##"course-id"##),
                      None,
-                     Some(r##"Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias."##),
+                     Some(r##"Identifier of the course.
+        This identifier can be either the Classroom-assigned identifier or an
+        alias."##),
                      Some(true),
                      Some(false)),
         
@@ -3221,13 +3506,77 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("course-work-patch",
+                    Some(r##"Updates one or more fields of a course work.
+        
+        See google.classroom.v1.CourseWork for details
+        of which fields may be updated and who may change them.
+        
+        This request must be made by the Developer Console project of the
+        [OAuth client ID](https://support.google.com/cloud/answer/6158849) used to
+        create the corresponding course work item.
+        
+        This method returns the following error codes:
+        
+        * `PERMISSION_DENIED` if the requesting developer project did not create
+        the corresponding course work, if the user is not permitted to make the
+        requested modification to the student submission, or for
+        access errors.
+        * `INVALID_ARGUMENT` if the request is malformed.
+        * `FAILED_PRECONDITION` if the requested course work has already been
+        deleted.
+        * `NOT_FOUND` if the requested course, course work, or student submission
+        does not exist."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_course-work-patch",
+                  vec![
+                    (Some(r##"course-id"##),
+                     None,
+                     Some(r##"Identifier of the course.
+        This identifier can be either the Classroom-assigned identifier or an
+        alias."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"id"##),
+                     None,
+                     Some(r##"Identifier of the course work."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("course-work-student-submissions-get",
-                    Some(r##"Returns a student submission. * `PERMISSION_DENIED` if the requesting user is not permitted to access the requested course, course work, or student submission or for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if the requested course, course work, or student submission does not exist."##),
+                    Some(r##"Returns a student submission.
+        
+        * `PERMISSION_DENIED` if the requesting user is not permitted to access the
+        requested course, course work, or student submission or for
+        access errors.
+        * `INVALID_ARGUMENT` if the request is malformed.
+        * `NOT_FOUND` if the requested course, course work, or student submission
+        does not exist."##),
                     "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_course-work-student-submissions-get",
                   vec![
                     (Some(r##"course-id"##),
                      None,
-                     Some(r##"Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias."##),
+                     Some(r##"Identifier of the course.
+        This identifier can be either the Classroom-assigned identifier or an
+        alias."##),
                      Some(true),
                      Some(false)),
         
@@ -3256,18 +3605,35 @@ fn main() {
                      Some(false)),
                   ]),
             ("course-work-student-submissions-list",
-                    Some(r##"Returns a list of student submissions that the requester is permitted to view, factoring in the OAuth scopes of the request. `-` may be specified as the `course_work_id` to include student submissions for multiple course work items. Course students may only view their own work. Course teachers and domain administrators may view all student submissions. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to access the requested course or course work, or for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if the requested course does not exist."##),
+                    Some(r##"Returns a list of student submissions that the requester is permitted to
+        view, factoring in the OAuth scopes of the request.
+        `-` may be specified as the `course_work_id` to include student
+        submissions for multiple course work items.
+        
+        Course students may only view their own work. Course teachers
+        and domain administrators may view all student submissions.
+        
+        This method returns the following error codes:
+        
+        * `PERMISSION_DENIED` if the requesting user is not permitted to access the
+        requested course or course work, or for access errors.
+        * `INVALID_ARGUMENT` if the request is malformed.
+        * `NOT_FOUND` if the requested course does not exist."##),
                     "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_course-work-student-submissions-list",
                   vec![
                     (Some(r##"course-id"##),
                      None,
-                     Some(r##"Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias."##),
+                     Some(r##"Identifier of the course.
+        This identifier can be either the Classroom-assigned identifier or an
+        alias."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"course-work-id"##),
                      None,
-                     Some(r##"Identifer of the student work to request. This may be set to the string literal `"-"` to request student work for all course work in the specified course."##),
+                     Some(r##"Identifer of the student work to request.
+        This may be set to the string literal `"-"` to request student work for
+        all course work in the specified course."##),
                      Some(true),
                      Some(false)),
         
@@ -3284,12 +3650,31 @@ fn main() {
                      Some(false)),
                   ]),
             ("course-work-student-submissions-modify-attachments",
-                    Some(r##"Modifies attachments of student submission. Attachments may only be added to student submissions whose type is `ASSIGNMENT`. This request must be made by the Developer Console project of the [OAuth client ID](https://support.google.com/cloud/answer/6158849) used to create the corresponding course work item. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to access the requested course or course work, if the user is not permitted to modify attachments on the requested student submission, or for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if the requested course, course work, or student submission does not exist."##),
+                    Some(r##"Modifies attachments of student submission.
+        
+        Attachments may only be added to student submissions belonging to course
+        work objects with a `workType` of `ASSIGNMENT`.
+        
+        This request must be made by the Developer Console project of the
+        [OAuth client ID](https://support.google.com/cloud/answer/6158849) used to
+        create the corresponding course work item.
+        
+        This method returns the following error codes:
+        
+        * `PERMISSION_DENIED` if the requesting user is not permitted to access the
+        requested course or course work, if the user is not permitted to modify
+        attachments on the requested student submission, or for
+        access errors.
+        * `INVALID_ARGUMENT` if the request is malformed.
+        * `NOT_FOUND` if the requested course, course work, or student submission
+        does not exist."##),
                     "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_course-work-student-submissions-modify-attachments",
                   vec![
                     (Some(r##"course-id"##),
                      None,
-                     Some(r##"Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias."##),
+                     Some(r##"Identifier of the course.
+        This identifier can be either the Classroom-assigned identifier or an
+        alias."##),
                      Some(true),
                      Some(false)),
         
@@ -3324,12 +3709,31 @@ fn main() {
                      Some(false)),
                   ]),
             ("course-work-student-submissions-patch",
-                    Some(r##"Updates one or more fields of a student submission. See google.classroom.v1.StudentSubmission for details of which fields may be updated and who may change them. This request must be made by the Developer Console project of the [OAuth client ID](https://support.google.com/cloud/answer/6158849) used to create the corresponding course work item. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting developer project did not create the corresponding course work, if the user is not permitted to make the requested modification to the student submission, or for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if the requested course, course work, or student submission does not exist."##),
+                    Some(r##"Updates one or more fields of a student submission.
+        
+        See google.classroom.v1.StudentSubmission for details
+        of which fields may be updated and who may change them.
+        
+        This request must be made by the Developer Console project of the
+        [OAuth client ID](https://support.google.com/cloud/answer/6158849) used to
+        create the corresponding course work item.
+        
+        This method returns the following error codes:
+        
+        * `PERMISSION_DENIED` if the requesting developer project did not create
+        the corresponding course work, if the user is not permitted to make the
+        requested modification to the student submission, or for
+        access errors.
+        * `INVALID_ARGUMENT` if the request is malformed.
+        * `NOT_FOUND` if the requested course, course work, or student submission
+        does not exist."##),
                     "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_course-work-student-submissions-patch",
                   vec![
                     (Some(r##"course-id"##),
                      None,
-                     Some(r##"Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias."##),
+                     Some(r##"Identifier of the course.
+        This identifier can be either the Classroom-assigned identifier or an
+        alias."##),
                      Some(true),
                      Some(false)),
         
@@ -3364,12 +3768,34 @@ fn main() {
                      Some(false)),
                   ]),
             ("course-work-student-submissions-reclaim",
-                    Some(r##"Reclaims a student submission on behalf of the student that owns it. Reclaiming a student submission transfers ownership of attached Drive files to the student and update the submission state. Only the student that ownes the requested student submission may call this method, and only for a student submission that has been turned in. This request must be made by the Developer Console project of the [OAuth client ID](https://support.google.com/cloud/answer/6158849) used to create the corresponding course work item. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to access the requested course or course work, unsubmit the requested student submission, or for access errors. * `FAILED_PRECONDITION` if the student submission has not been turned in. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if the requested course, course work, or student submission does not exist."##),
+                    Some(r##"Reclaims a student submission on behalf of the student that owns it.
+        
+        Reclaiming a student submission transfers ownership of attached Drive
+        files to the student and update the submission state.
+        
+        Only the student that owns the requested student submission may call this
+        method, and only for a student submission that has been turned in.
+        
+        This request must be made by the Developer Console project of the
+        [OAuth client ID](https://support.google.com/cloud/answer/6158849) used to
+        create the corresponding course work item.
+        
+        This method returns the following error codes:
+        
+        * `PERMISSION_DENIED` if the requesting user is not permitted to access the
+        requested course or course work, unsubmit the requested student submission,
+        or for access errors.
+        * `FAILED_PRECONDITION` if the student submission has not been turned in.
+        * `INVALID_ARGUMENT` if the request is malformed.
+        * `NOT_FOUND` if the requested course, course work, or student submission
+        does not exist."##),
                     "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_course-work-student-submissions-reclaim",
                   vec![
                     (Some(r##"course-id"##),
                      None,
-                     Some(r##"Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias."##),
+                     Some(r##"Identifier of the course.
+        This identifier can be either the Classroom-assigned identifier or an
+        alias."##),
                      Some(true),
                      Some(false)),
         
@@ -3404,12 +3830,35 @@ fn main() {
                      Some(false)),
                   ]),
             ("course-work-student-submissions-return",
-                    Some(r##"Returns a student submission. Returning a student submission transfers ownership of attached Drive files to the student and may also update the submission state. Unlike the Classroom application, returning a student submission does not set assignedGrade to the draftGrade value. Only a teacher of the course that contains the requested student submission may call this method. This request must be made by the Developer Console project of the [OAuth client ID](https://support.google.com/cloud/answer/6158849) used to create the corresponding course work item. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to access the requested course or course work, return the requested student submission, or for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if the requested course, course work, or student submission does not exist."##),
+                    Some(r##"Returns a student submission.
+        
+        Returning a student submission transfers ownership of attached Drive
+        files to the student and may also update the submission state.
+        Unlike the Classroom application, returning a student submission does not
+        set assignedGrade to the draftGrade value.
+        
+        Only a teacher of the course that contains the requested student submission
+        may call this method.
+        
+        This request must be made by the Developer Console project of the
+        [OAuth client ID](https://support.google.com/cloud/answer/6158849) used to
+        create the corresponding course work item.
+        
+        This method returns the following error codes:
+        
+        * `PERMISSION_DENIED` if the requesting user is not permitted to access the
+        requested course or course work, return the requested student submission,
+        or for access errors.
+        * `INVALID_ARGUMENT` if the request is malformed.
+        * `NOT_FOUND` if the requested course, course work, or student submission
+        does not exist."##),
                     "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_course-work-student-submissions-return",
                   vec![
                     (Some(r##"course-id"##),
                      None,
-                     Some(r##"Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias."##),
+                     Some(r##"Identifier of the course.
+        This identifier can be either the Classroom-assigned identifier or an
+        alias."##),
                      Some(true),
                      Some(false)),
         
@@ -3444,12 +3893,33 @@ fn main() {
                      Some(false)),
                   ]),
             ("course-work-student-submissions-turn-in",
-                    Some(r##"Turns in a student submission. Turning in a student submission transfers ownership of attached Drive files to the teacher and may also update the submission state. This may only be called by the student that owns the specified student submission. This request must be made by the Developer Console project of the [OAuth client ID](https://support.google.com/cloud/answer/6158849) used to create the corresponding course work item. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to access the requested course or course work, turn in the requested student submission, or for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if the requested course, course work, or student submission does not exist."##),
+                    Some(r##"Turns in a student submission.
+        
+        Turning in a student submission transfers ownership of attached Drive
+        files to the teacher and may also update the submission state.
+        
+        This may only be called by the student that owns the specified student
+        submission.
+        
+        This request must be made by the Developer Console project of the
+        [OAuth client ID](https://support.google.com/cloud/answer/6158849) used to
+        create the corresponding course work item.
+        
+        This method returns the following error codes:
+        
+        * `PERMISSION_DENIED` if the requesting user is not permitted to access the
+        requested course or course work, turn in the requested student submission,
+        or for access errors.
+        * `INVALID_ARGUMENT` if the request is malformed.
+        * `NOT_FOUND` if the requested course, course work, or student submission
+        does not exist."##),
                     "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_course-work-student-submissions-turn-in",
                   vec![
                     (Some(r##"course-id"##),
                      None,
-                     Some(r##"Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias."##),
+                     Some(r##"Identifier of the course.
+        This identifier can be either the Classroom-assigned identifier or an
+        alias."##),
                      Some(true),
                      Some(false)),
         
@@ -3484,7 +3954,21 @@ fn main() {
                      Some(false)),
                   ]),
             ("create",
-                    Some(r##"Creates a course. The user specified in `ownerId` is the owner of the created course and added as a teacher. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to create courses or for access errors. * `NOT_FOUND` if the primary teacher is not a valid user. * `FAILED_PRECONDITION` if the course owner's account is disabled or for the following request errors: * UserGroupsMembershipLimitReached * `ALREADY_EXISTS` if an alias was specified in the `id` and already exists."##),
+                    Some(r##"Creates a course.
+        
+        The user specified in `ownerId` is the owner of the created course
+        and added as a teacher.
+        
+        This method returns the following error codes:
+        
+        * `PERMISSION_DENIED` if the requesting user is not permitted to create
+        courses or for access errors.
+        * `NOT_FOUND` if the primary teacher is not a valid user.
+        * `FAILED_PRECONDITION` if the course owner's account is disabled or for
+        the following request errors:
+            * UserGroupsMembershipLimitReached
+        * `ALREADY_EXISTS` if an alias was specified in the `id` and
+        already exists."##),
                     "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_create",
                   vec![
                     (Some(r##"kv"##),
@@ -3506,12 +3990,20 @@ fn main() {
                      Some(false)),
                   ]),
             ("delete",
-                    Some(r##"Deletes a course. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to delete the requested course or for access errors. * `NOT_FOUND` if no course exists with the requested ID."##),
+                    Some(r##"Deletes a course.
+        
+        This method returns the following error codes:
+        
+        * `PERMISSION_DENIED` if the requesting user is not permitted to delete the
+        requested course or for access errors.
+        * `NOT_FOUND` if no course exists with the requested ID."##),
                     "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_delete",
                   vec![
                     (Some(r##"id"##),
                      None,
-                     Some(r##"Identifier of the course to delete. This identifier can be either the Classroom-assigned identifier or an alias."##),
+                     Some(r##"Identifier of the course to delete.
+        This identifier can be either the Classroom-assigned identifier or an
+        alias."##),
                      Some(true),
                      Some(false)),
         
@@ -3528,12 +4020,20 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Returns a course. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to access the requested course or for access errors. * `NOT_FOUND` if no course exists with the requested ID."##),
+                    Some(r##"Returns a course.
+        
+        This method returns the following error codes:
+        
+        * `PERMISSION_DENIED` if the requesting user is not permitted to access the
+        requested course or for access errors.
+        * `NOT_FOUND` if no course exists with the requested ID."##),
                     "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_get",
                   vec![
                     (Some(r##"id"##),
                      None,
-                     Some(r##"Identifier of the course to return. This identifier can be either the Classroom-assigned identifier or an alias."##),
+                     Some(r##"Identifier of the course to return.
+        This identifier can be either the Classroom-assigned identifier or an
+        alias."##),
                      Some(true),
                      Some(false)),
         
@@ -3550,7 +4050,14 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Returns a list of courses that the requesting user is permitted to view, restricted to those that match the request. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the query argument is malformed. * `NOT_FOUND` if any users specified in the query arguments do not exist."##),
+                    Some(r##"Returns a list of courses that the requesting user is permitted to view,
+        restricted to those that match the request.
+        
+        This method returns the following error codes:
+        
+        * `PERMISSION_DENIED` for access errors.
+        * `INVALID_ARGUMENT` if the query argument is malformed.
+        * `NOT_FOUND` if any users specified in the query arguments do not exist."##),
                     "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_list",
                   vec![
                     (Some(r##"v"##),
@@ -3566,12 +4073,24 @@ fn main() {
                      Some(false)),
                   ]),
             ("patch",
-                    Some(r##"Updates one or more fields in a course. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to modify the requested course or for access errors. * `NOT_FOUND` if no course exists with the requested ID. * `INVALID_ARGUMENT` if invalid fields are specified in the update mask or if no update mask is supplied. * `FAILED_PRECONDITION` for the following request errors: * CourseNotModifiable"##),
+                    Some(r##"Updates one or more fields in a course.
+        
+        This method returns the following error codes:
+        
+        * `PERMISSION_DENIED` if the requesting user is not permitted to modify the
+        requested course or for access errors.
+        * `NOT_FOUND` if no course exists with the requested ID.
+        * `INVALID_ARGUMENT` if invalid fields are specified in the update mask or
+        if no update mask is supplied.
+        * `FAILED_PRECONDITION` for the following request errors:
+            * CourseNotModifiable"##),
                     "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_patch",
                   vec![
                     (Some(r##"id"##),
                      None,
-                     Some(r##"Identifier of the course to update. This identifier can be either the Classroom-assigned identifier or an alias."##),
+                     Some(r##"Identifier of the course to update.
+        This identifier can be either the Classroom-assigned identifier or an
+        alias."##),
                      Some(true),
                      Some(false)),
         
@@ -3594,12 +4113,27 @@ fn main() {
                      Some(false)),
                   ]),
             ("students-create",
-                    Some(r##"Adds a user as a student of a course. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to create students in this course or for access errors. * `NOT_FOUND` if the requested course ID does not exist. * `FAILED_PRECONDITION` if the requested user's account is disabled, for the following request errors: * CourseMemberLimitReached * CourseNotModifiable * UserGroupsMembershipLimitReached * `ALREADY_EXISTS` if the user is already a student or teacher in the course."##),
+                    Some(r##"Adds a user as a student of a course.
+        
+        This method returns the following error codes:
+        
+        * `PERMISSION_DENIED` if the requesting user is not permitted to create
+        students in this course or for access errors.
+        * `NOT_FOUND` if the requested course ID does not exist.
+        * `FAILED_PRECONDITION` if the requested user's account is disabled,
+        for the following request errors:
+            * CourseMemberLimitReached
+            * CourseNotModifiable
+            * UserGroupsMembershipLimitReached
+        * `ALREADY_EXISTS` if the user is already a student or teacher in the
+        course."##),
                     "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_students-create",
                   vec![
                     (Some(r##"course-id"##),
                      None,
-                     Some(r##"Identifier of the course to create the student in. This identifier can be either the Classroom-assigned identifier or an alias."##),
+                     Some(r##"Identifier of the course to create the student in.
+        This identifier can be either the Classroom-assigned identifier or an
+        alias."##),
                      Some(true),
                      Some(false)),
         
@@ -3622,18 +4156,32 @@ fn main() {
                      Some(false)),
                   ]),
             ("students-delete",
-                    Some(r##"Deletes a student of a course. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to delete students of this course or for access errors. * `NOT_FOUND` if no student of this course has the requested ID or if the course does not exist."##),
+                    Some(r##"Deletes a student of a course.
+        
+        This method returns the following error codes:
+        
+        * `PERMISSION_DENIED` if the requesting user is not permitted to delete
+        students of this course or for access errors.
+        * `NOT_FOUND` if no student of this course has the requested ID or if the
+        course does not exist."##),
                     "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_students-delete",
                   vec![
                     (Some(r##"course-id"##),
                      None,
-                     Some(r##"Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias."##),
+                     Some(r##"Identifier of the course.
+        This identifier can be either the Classroom-assigned identifier or an
+        alias."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"user-id"##),
                      None,
-                     Some(r##"Identifier of the student to delete. The identifier can be one of the following: * the numeric identifier for the user * the email address of the user * the string literal `"me"`, indicating the requesting user"##),
+                     Some(r##"Identifier of the student to delete. The identifier can be one of the
+        following:
+        
+        * the numeric identifier for the user
+        * the email address of the user
+        * the string literal `"me"`, indicating the requesting user"##),
                      Some(true),
                      Some(false)),
         
@@ -3650,18 +4198,32 @@ fn main() {
                      Some(false)),
                   ]),
             ("students-get",
-                    Some(r##"Returns a student of a course. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to view students of this course or for access errors. * `NOT_FOUND` if no student of this course has the requested ID or if the course does not exist."##),
+                    Some(r##"Returns a student of a course.
+        
+        This method returns the following error codes:
+        
+        * `PERMISSION_DENIED` if the requesting user is not permitted to view
+        students of this course or for access errors.
+        * `NOT_FOUND` if no student of this course has the requested ID or if the
+        course does not exist."##),
                     "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_students-get",
                   vec![
                     (Some(r##"course-id"##),
                      None,
-                     Some(r##"Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias."##),
+                     Some(r##"Identifier of the course.
+        This identifier can be either the Classroom-assigned identifier or an
+        alias."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"user-id"##),
                      None,
-                     Some(r##"Identifier of the student to return. The identifier can be one of the following: * the numeric identifier for the user * the email address of the user * the string literal `"me"`, indicating the requesting user"##),
+                     Some(r##"Identifier of the student to return. The identifier can be one of the
+        following:
+        
+        * the numeric identifier for the user
+        * the email address of the user
+        * the string literal `"me"`, indicating the requesting user"##),
                      Some(true),
                      Some(false)),
         
@@ -3678,12 +4240,20 @@ fn main() {
                      Some(false)),
                   ]),
             ("students-list",
-                    Some(r##"Returns a list of students of this course that the requester is permitted to view. This method returns the following error codes: * `NOT_FOUND` if the course does not exist. * `PERMISSION_DENIED` for access errors."##),
+                    Some(r##"Returns a list of students of this course that the requester
+        is permitted to view.
+        
+        This method returns the following error codes:
+        
+        * `NOT_FOUND` if the course does not exist.
+        * `PERMISSION_DENIED` for access errors."##),
                     "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_students-list",
                   vec![
                     (Some(r##"course-id"##),
                      None,
-                     Some(r##"Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias."##),
+                     Some(r##"Identifier of the course.
+        This identifier can be either the Classroom-assigned identifier or an
+        alias."##),
                      Some(true),
                      Some(false)),
         
@@ -3700,12 +4270,28 @@ fn main() {
                      Some(false)),
                   ]),
             ("teachers-create",
-                    Some(r##"Creates a teacher of a course. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to create teachers in this course or for access errors. * `NOT_FOUND` if the requested course ID does not exist. * `FAILED_PRECONDITION` if the requested user's account is disabled, for the following request errors: * CourseMemberLimitReached * CourseNotModifiable * CourseTeacherLimitReached * UserGroupsMembershipLimitReached * `ALREADY_EXISTS` if the user is already a teacher or student in the course."##),
+                    Some(r##"Creates a teacher of a course.
+        
+        This method returns the following error codes:
+        
+        * `PERMISSION_DENIED` if the requesting user is not  permitted to create
+        teachers in this course or for access errors.
+        * `NOT_FOUND` if the requested course ID does not exist.
+        * `FAILED_PRECONDITION` if the requested user's account is disabled,
+        for the following request errors:
+            * CourseMemberLimitReached
+            * CourseNotModifiable
+            * CourseTeacherLimitReached
+            * UserGroupsMembershipLimitReached
+        * `ALREADY_EXISTS` if the user is already a teacher or student in the
+        course."##),
                     "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_teachers-create",
                   vec![
                     (Some(r##"course-id"##),
                      None,
-                     Some(r##"Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias."##),
+                     Some(r##"Identifier of the course.
+        This identifier can be either the Classroom-assigned identifier or an
+        alias."##),
                      Some(true),
                      Some(false)),
         
@@ -3728,18 +4314,34 @@ fn main() {
                      Some(false)),
                   ]),
             ("teachers-delete",
-                    Some(r##"Deletes a teacher of a course. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to delete teachers of this course or for access errors. * `NOT_FOUND` if no teacher of this course has the requested ID or if the course does not exist. * `FAILED_PRECONDITION` if the requested ID belongs to the primary teacher of this course."##),
+                    Some(r##"Deletes a teacher of a course.
+        
+        This method returns the following error codes:
+        
+        * `PERMISSION_DENIED` if the requesting user is not permitted to delete
+        teachers of this course or for access errors.
+        * `NOT_FOUND` if no teacher of this course has the requested ID or if the
+        course does not exist.
+        * `FAILED_PRECONDITION` if the requested ID belongs to the primary teacher
+        of this course."##),
                     "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_teachers-delete",
                   vec![
                     (Some(r##"course-id"##),
                      None,
-                     Some(r##"Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias."##),
+                     Some(r##"Identifier of the course.
+        This identifier can be either the Classroom-assigned identifier or an
+        alias."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"user-id"##),
                      None,
-                     Some(r##"Identifier of the teacher to delete. The identifier can be one of the following: * the numeric identifier for the user * the email address of the user * the string literal `"me"`, indicating the requesting user"##),
+                     Some(r##"Identifier of the teacher to delete. The identifier can be one of the
+        following:
+        
+        * the numeric identifier for the user
+        * the email address of the user
+        * the string literal `"me"`, indicating the requesting user"##),
                      Some(true),
                      Some(false)),
         
@@ -3756,18 +4358,32 @@ fn main() {
                      Some(false)),
                   ]),
             ("teachers-get",
-                    Some(r##"Returns a teacher of a course. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to view teachers of this course or for access errors. * `NOT_FOUND` if no teacher of this course has the requested ID or if the course does not exist."##),
+                    Some(r##"Returns a teacher of a course.
+        
+        This method returns the following error codes:
+        
+        * `PERMISSION_DENIED` if the requesting user is not permitted to view
+        teachers of this course or for access errors.
+        * `NOT_FOUND` if no teacher of this course has the requested ID or if the
+        course does not exist."##),
                     "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_teachers-get",
                   vec![
                     (Some(r##"course-id"##),
                      None,
-                     Some(r##"Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias."##),
+                     Some(r##"Identifier of the course.
+        This identifier can be either the Classroom-assigned identifier or an
+        alias."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"user-id"##),
                      None,
-                     Some(r##"Identifier of the teacher to return. The identifier can be one of the following: * the numeric identifier for the user * the email address of the user * the string literal `"me"`, indicating the requesting user"##),
+                     Some(r##"Identifier of the teacher to return. The identifier can be one of the
+        following:
+        
+        * the numeric identifier for the user
+        * the email address of the user
+        * the string literal `"me"`, indicating the requesting user"##),
                      Some(true),
                      Some(false)),
         
@@ -3784,12 +4400,20 @@ fn main() {
                      Some(false)),
                   ]),
             ("teachers-list",
-                    Some(r##"Returns a list of teachers of this course that the requester is permitted to view. This method returns the following error codes: * `NOT_FOUND` if the course does not exist. * `PERMISSION_DENIED` for access errors."##),
+                    Some(r##"Returns a list of teachers of this course that the requester
+        is permitted to view.
+        
+        This method returns the following error codes:
+        
+        * `NOT_FOUND` if the course does not exist.
+        * `PERMISSION_DENIED` for access errors."##),
                     "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_teachers-list",
                   vec![
                     (Some(r##"course-id"##),
                      None,
-                     Some(r##"Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias."##),
+                     Some(r##"Identifier of the course.
+        This identifier can be either the Classroom-assigned identifier or an
+        alias."##),
                      Some(true),
                      Some(false)),
         
@@ -3806,12 +4430,22 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Updates a course. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to modify the requested course or for access errors. * `NOT_FOUND` if no course exists with the requested ID. * `FAILED_PRECONDITION` for the following request errors: * CourseNotModifiable"##),
+                    Some(r##"Updates a course.
+        
+        This method returns the following error codes:
+        
+        * `PERMISSION_DENIED` if the requesting user is not permitted to modify the
+        requested course or for access errors.
+        * `NOT_FOUND` if no course exists with the requested ID.
+        * `FAILED_PRECONDITION` for the following request errors:
+            * CourseNotModifiable"##),
                     "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_update",
                   vec![
                     (Some(r##"id"##),
                      None,
-                     Some(r##"Identifier of the course to update. This identifier can be either the Classroom-assigned identifier or an alias."##),
+                     Some(r##"Identifier of the course to update.
+        This identifier can be either the Classroom-assigned identifier or an
+        alias."##),
                      Some(true),
                      Some(false)),
         
@@ -3837,7 +4471,20 @@ fn main() {
         
         ("invitations", "methods: 'accept', 'create', 'delete', 'get' and 'list'", vec![
             ("accept",
-                    Some(r##"Accepts an invitation, removing it and adding the invited user to the teachers or students (as appropriate) of the specified course. Only the invited user may accept an invitation. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to accept the requested invitation or for access errors. * `FAILED_PRECONDITION` for the following request errors: * CourseMemberLimitReached * CourseNotModifiable * CourseTeacherLimitReached * UserGroupsMembershipLimitReached * `NOT_FOUND` if no invitation exists with the requested ID."##),
+                    Some(r##"Accepts an invitation, removing it and adding the invited user to the
+        teachers or students (as appropriate) of the specified course. Only the
+        invited user may accept an invitation.
+        
+        This method returns the following error codes:
+        
+        * `PERMISSION_DENIED` if the requesting user is not permitted to accept the
+        requested invitation or for access errors.
+        * `FAILED_PRECONDITION` for the following request errors:
+            * CourseMemberLimitReached
+            * CourseNotModifiable
+            * CourseTeacherLimitReached
+            * UserGroupsMembershipLimitReached
+        * `NOT_FOUND` if no invitation exists with the requested ID."##),
                     "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/invitations_accept",
                   vec![
                     (Some(r##"id"##),
@@ -3859,7 +4506,18 @@ fn main() {
                      Some(false)),
                   ]),
             ("create",
-                    Some(r##"Creates an invitation. Only one invitation for a user and course may exist at a time. Delete and re-create an invitation to make changes. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to create invitations for this course or for access errors. * `NOT_FOUND` if the course or the user does not exist. * `FAILED_PRECONDITION` if the requested user's account is disabled or if the user already has this role or a role with greater permissions. * `ALREADY_EXISTS` if an invitation for the specified user and course already exists."##),
+                    Some(r##"Creates an invitation. Only one invitation for a user and course may exist
+        at a time. Delete and re-create an invitation to make changes.
+        
+        This method returns the following error codes:
+        
+        * `PERMISSION_DENIED` if the requesting user is not permitted to create
+        invitations for this course or for access errors.
+        * `NOT_FOUND` if the course or the user does not exist.
+        * `FAILED_PRECONDITION` if the requested user's account is disabled or if
+        the user already has this role or a role with greater permissions.
+        * `ALREADY_EXISTS` if an invitation for the specified user and course
+        already exists."##),
                     "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/invitations_create",
                   vec![
                     (Some(r##"kv"##),
@@ -3881,7 +4539,13 @@ fn main() {
                      Some(false)),
                   ]),
             ("delete",
-                    Some(r##"Deletes an invitation. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to delete the requested invitation or for access errors. * `NOT_FOUND` if no invitation exists with the requested ID."##),
+                    Some(r##"Deletes an invitation.
+        
+        This method returns the following error codes:
+        
+        * `PERMISSION_DENIED` if the requesting user is not permitted to delete the
+        requested invitation or for access errors.
+        * `NOT_FOUND` if no invitation exists with the requested ID."##),
                     "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/invitations_delete",
                   vec![
                     (Some(r##"id"##),
@@ -3903,7 +4567,13 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Returns an invitation. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to view the requested invitation or for access errors. * `NOT_FOUND` if no invitation exists with the requested ID."##),
+                    Some(r##"Returns an invitation.
+        
+        This method returns the following error codes:
+        
+        * `PERMISSION_DENIED` if the requesting user is not permitted to view the
+        requested invitation or for access errors.
+        * `NOT_FOUND` if no invitation exists with the requested ID."##),
                     "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/invitations_get",
                   vec![
                     (Some(r##"id"##),
@@ -3925,7 +4595,15 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Returns a list of invitations that the requesting user is permitted to view, restricted to those that match the list request. *Note:* At least one of `user_id` or `course_id` must be supplied. Both fields can be supplied. This method returns the following error codes: * `PERMISSION_DENIED` for access errors."##),
+                    Some(r##"Returns a list of invitations that the requesting user is permitted to
+        view, restricted to those that match the list request.
+        
+        *Note:* At least one of `user_id` or `course_id` must be supplied. Both
+        fields can be supplied.
+        
+        This method returns the following error codes:
+        
+        * `PERMISSION_DENIED` for access errors."##),
                     "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/invitations_list",
                   vec![
                     (Some(r##"v"##),
@@ -3944,12 +4622,23 @@ fn main() {
         
         ("user-profiles", "methods: 'get', 'guardian-invitations-create', 'guardian-invitations-get', 'guardian-invitations-list', 'guardian-invitations-patch', 'guardians-delete', 'guardians-get' and 'guardians-list'", vec![
             ("get",
-                    Some(r##"Returns a user profile. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to access this user profile or if no profile exists with the requested ID or for access errors."##),
+                    Some(r##"Returns a user profile.
+        
+        This method returns the following error codes:
+        
+        * `PERMISSION_DENIED` if the requesting user is not permitted to access
+        this user profile, if no profile exists with the requested ID, or for
+        access errors."##),
                     "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/user-profiles_get",
                   vec![
                     (Some(r##"user-id"##),
                      None,
-                     Some(r##"Identifier of the profile to return. The identifier can be one of the following: * the numeric identifier for the user * the email address of the user * the string literal `"me"`, indicating the requesting user"##),
+                     Some(r##"Identifier of the profile to return. The identifier can be one of the
+        following:
+        
+        * the numeric identifier for the user
+        * the email address of the user
+        * the string literal `"me"`, indicating the requesting user"##),
                      Some(true),
                      Some(false)),
         
@@ -3966,7 +4655,36 @@ fn main() {
                      Some(false)),
                   ]),
             ("guardian-invitations-create",
-                    Some(r##"Creates a guardian invitation, and sends an email to the guardian asking them to confirm that they are the student's guardian. Once the guardian accepts the invitation, their `state` will change to `COMPLETED` and they will start receiving guardian notifications. A `Guardian` resource will also be created to represent the active guardian. The request object must have the `student_id` and `invited_email_address` fields set. Failing to set these fields, or setting any other fields in the request, will result in an error. This method returns the following error codes: * `PERMISSION_DENIED` if the current user does not have permission to manage guardians, if the guardian in question has already rejected too many requests for that student, if guardians are not enabled for the domain in question, or for other access errors. * `RESOURCE_EXHAUSTED` if the student or guardian has exceeded the guardian link limit. * `INVALID_ARGUMENT` if the guardian email address is not valid (for example, if it is too long), or if the format of the student ID provided cannot be recognized (it is not an email address, nor a `user_id` from this API). This error will also be returned if read-only fields are set, or if the `state` field is set to to a value other than `PENDING`. * `NOT_FOUND` if the student ID provided is a valid student ID, but Classroom has no record of that student. * `ALREADY_EXISTS` if there is already a pending guardian invitation for the student and `invited_email_address` provided, or if the provided `invited_email_address` matches the Google account of an existing `Guardian` for this user."##),
+                    Some(r##"Creates a guardian invitation, and sends an email to the guardian asking
+        them to confirm that they are the student's guardian.
+        
+        Once the guardian accepts the invitation, their `state` will change to
+        `COMPLETED` and they will start receiving guardian notifications. A
+        `Guardian` resource will also be created to represent the active guardian.
+        
+        The request object must have the `student_id` and
+        `invited_email_address` fields set. Failing to set these fields, or
+        setting any other fields in the request, will result in an error.
+        
+        This method returns the following error codes:
+        
+        * `PERMISSION_DENIED` if the current user does not have permission to
+          manage guardians, if the guardian in question has already rejected
+          too many requests for that student, if guardians are not enabled for the
+          domain in question, or for other access errors.
+        * `RESOURCE_EXHAUSTED` if the student or guardian has exceeded the guardian
+          link limit.
+        * `INVALID_ARGUMENT` if the guardian email address is not valid (for
+          example, if it is too long), or if the format of the student ID provided
+          cannot be recognized (it is not an email address, nor a `user_id` from
+          this API). This error will also be returned if read-only fields are set,
+          or if the `state` field is set to to a value other than `PENDING`.
+        * `NOT_FOUND` if the student ID provided is a valid student ID, but
+          Classroom has no record of that student.
+        * `ALREADY_EXISTS` if there is already a pending guardian invitation for
+          the student and `invited_email_address` provided, or if the provided
+          `invited_email_address` matches the Google account of an existing
+          `Guardian` for this user."##),
                     "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/user-profiles_guardian-invitations-create",
                   vec![
                     (Some(r##"student-id"##),
@@ -3994,7 +4712,20 @@ fn main() {
                      Some(false)),
                   ]),
             ("guardian-invitations-get",
-                    Some(r##"Returns a specific guardian invitation. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to view guardian invitations for the student identified by the `student_id`, if guardians are not enabled for the domain in question, or for other access errors. * `INVALID_ARGUMENT` if a `student_id` is specified, but its format cannot be recognized (it is not an email address, nor a `student_id` from the API, nor the literal string `me`). * `NOT_FOUND` if Classroom cannot find any record of the given student or `invitation_id`. May also be returned if the student exists, but the requesting user does not have access to see that student."##),
+                    Some(r##"Returns a specific guardian invitation.
+        
+        This method returns the following error codes:
+        
+        * `PERMISSION_DENIED` if the requesting user is not permitted to view
+          guardian invitations for the student identified by the `student_id`, if
+          guardians are not enabled for the domain in question, or for other
+          access errors.
+        * `INVALID_ARGUMENT` if a `student_id` is specified, but its format cannot
+          be recognized (it is not an email address, nor a `student_id` from the
+          API, nor the literal string `me`).
+        * `NOT_FOUND` if Classroom cannot find any record of the given student or
+          `invitation_id`. May also be returned if the student exists, but the
+          requesting user does not have access to see that student."##),
                     "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/user-profiles_guardian-invitations-get",
                   vec![
                     (Some(r##"student-id"##),
@@ -4022,12 +4753,35 @@ fn main() {
                      Some(false)),
                   ]),
             ("guardian-invitations-list",
-                    Some(r##"Returns a list of guardian invitations that the requesting user is permitted to view, filtered by the parameters provided. This method returns the following error codes: * `PERMISSION_DENIED` if a `student_id` is specified, and the requesting user is not permitted to view guardian invitations for that student, if `"-"` is specified as the `student_id` and the user is not a domain administrator, if guardians are not enabled for the domain in question, or for other access errors. * `INVALID_ARGUMENT` if a `student_id` is specified, but its format cannot be recognized (it is not an email address, nor a `student_id` from the API, nor the literal string `me`). May also be returned if an invalid `page_token` or `state` is provided. * `NOT_FOUND` if a `student_id` is specified, and its format can be recognized, but Classroom has no record of that student."##),
+                    Some(r##"Returns a list of guardian invitations that the requesting user is
+        permitted to view, filtered by the parameters provided.
+        
+        This method returns the following error codes:
+        
+        * `PERMISSION_DENIED` if a `student_id` is specified, and the requesting
+          user is not permitted to view guardian invitations for that student, if
+          `"-"` is specified as the `student_id` and the user is not a domain
+          administrator, if guardians are not enabled for the domain in question,
+          or for other access errors.
+        * `INVALID_ARGUMENT` if a `student_id` is specified, but its format cannot
+          be recognized (it is not an email address, nor a `student_id` from the
+          API, nor the literal string `me`). May also be returned if an invalid
+          `page_token` or `state` is provided.
+        * `NOT_FOUND` if a `student_id` is specified, and its format can be
+          recognized, but Classroom has no record of that student."##),
                     "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/user-profiles_guardian-invitations-list",
                   vec![
                     (Some(r##"student-id"##),
                      None,
-                     Some(r##"The ID of the student whose guardian invitations are to be returned. The identifier can be one of the following: * the numeric identifier for the user * the email address of the user * the string literal `"me"`, indicating the requesting user * the string literal `"-"`, indicating that results should be returned for all students that the requesting user is permitted to view guardian invitations."##),
+                     Some(r##"The ID of the student whose guardian invitations are to be returned.
+        The identifier can be one of the following:
+        
+        * the numeric identifier for the user
+        * the email address of the user
+        * the string literal `"me"`, indicating the requesting user
+        * the string literal `"-"`, indicating that results should be returned for
+          all students that the requesting user is permitted to view guardian
+          invitations."##),
                      Some(true),
                      Some(false)),
         
@@ -4044,7 +4798,24 @@ fn main() {
                      Some(false)),
                   ]),
             ("guardian-invitations-patch",
-                    Some(r##"Modifies a guardian invitation. Currently, the only valid modification is to change the `state` from `PENDING` to `COMPLETE`. This has the effect of withdrawing the invitation. This method returns the following error codes: * `PERMISSION_DENIED` if the current user does not have permission to manage guardians, if guardians are not enabled for the domain in question or for other access errors. * `FAILED_PRECONDITION` if the guardian link is not in the `PENDING` state. * `INVALID_ARGUMENT` if the format of the student ID provided cannot be recognized (it is not an email address, nor a `user_id` from this API), or if the passed `GuardianInvitation` has a `state` other than `COMPLETE`, or if it modifies fields other than `state`. * `NOT_FOUND` if the student ID provided is a valid student ID, but Classroom has no record of that student, or if the `id` field does not refer to a guardian invitation known to Classroom."##),
+                    Some(r##"Modifies a guardian invitation.
+        
+        Currently, the only valid modification is to change the `state` from
+        `PENDING` to `COMPLETE`. This has the effect of withdrawing the invitation.
+        
+        This method returns the following error codes:
+        
+        * `PERMISSION_DENIED` if the current user does not have permission to
+          manage guardians, if guardians are not enabled for the domain in question
+          or for other access errors.
+        * `FAILED_PRECONDITION` if the guardian link is not in the `PENDING` state.
+        * `INVALID_ARGUMENT` if the format of the student ID provided
+          cannot be recognized (it is not an email address, nor a `user_id` from
+          this API), or if the passed `GuardianInvitation` has a `state` other than
+          `COMPLETE`, or if it modifies fields other than `state`.
+        * `NOT_FOUND` if the student ID provided is a valid student ID, but
+          Classroom has no record of that student, or if the `id` field does not
+          refer to a guardian invitation known to Classroom."##),
                     "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/user-profiles_guardian-invitations-patch",
                   vec![
                     (Some(r##"student-id"##),
@@ -4078,12 +4849,33 @@ fn main() {
                      Some(false)),
                   ]),
             ("guardians-delete",
-                    Some(r##"Deletes a guardian. The guardian will no longer receive guardian notifications and the guardian will no longer be accessible via the API. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to manage guardians for the student identified by the `student_id`, if guardians are not enabled for the domain in question, or for other access errors. * `INVALID_ARGUMENT` if a `student_id` is specified, but its format cannot be recognized (it is not an email address, nor a `student_id` from the API). * `NOT_FOUND` if Classroom cannot find any record of the given `student_id` or `guardian_id`, or if the guardian has already been disabled."##),
+                    Some(r##"Deletes a guardian.
+        
+        The guardian will no longer receive guardian notifications and the guardian
+        will no longer be accessible via the API.
+        
+        This method returns the following error codes:
+        
+        * `PERMISSION_DENIED` if no user that matches the provided `student_id`
+          is visible to the requesting user, if the requesting user is not
+          permitted to manage guardians for the student identified by the
+          `student_id`, if guardians are not enabled for the domain in question,
+          or for other access errors.
+        * `INVALID_ARGUMENT` if a `student_id` is specified, but its format cannot
+          be recognized (it is not an email address, nor a `student_id` from the
+          API).
+        * `NOT_FOUND` if the requesting user is permitted to modify guardians for
+          the requested `student_id`, but no `Guardian` record exists for that
+          student with the provided `guardian_id`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/user-profiles_guardians-delete",
                   vec![
                     (Some(r##"student-id"##),
                      None,
-                     Some(r##"The student whose guardian is to be deleted. One of the following: * the numeric identifier for the user * the email address of the user * the string literal `"me"`, indicating the requesting user"##),
+                     Some(r##"The student whose guardian is to be deleted. One of the following:
+        
+        * the numeric identifier for the user
+        * the email address of the user
+        * the string literal `"me"`, indicating the requesting user"##),
                      Some(true),
                      Some(false)),
         
@@ -4106,12 +4898,30 @@ fn main() {
                      Some(false)),
                   ]),
             ("guardians-get",
-                    Some(r##"Returns a specific guardian. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to view guardian information for the student identified by the `student_id`, if guardians are not enabled for the domain in question, or for other access errors. * `INVALID_ARGUMENT` if a `student_id` is specified, but its format cannot be recognized (it is not an email address, nor a `student_id` from the API, nor the literal string `me`). * `NOT_FOUND` if Classroom cannot find any record of the given student or `guardian_id`, or if the guardian has been disabled."##),
+                    Some(r##"Returns a specific guardian.
+        
+        This method returns the following error codes:
+        
+        * `PERMISSION_DENIED` if no user that matches the provided `student_id`
+          is visible to the requesting user, if the requesting user is not
+          permitted to view guardian information for the student identified by the
+          `student_id`, if guardians are not enabled for the domain in question,
+          or for other access errors.
+        * `INVALID_ARGUMENT` if a `student_id` is specified, but its format cannot
+          be recognized (it is not an email address, nor a `student_id` from the
+          API, nor the literal string `me`).
+        * `NOT_FOUND` if the requesting user is permitted to view guardians for
+          the requested `student_id`, but no `Guardian` record exists for that
+          student that matches the provided `guardian_id`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/user-profiles_guardians-get",
                   vec![
                     (Some(r##"student-id"##),
                      None,
-                     Some(r##"The student whose guardian is being requested. One of the following: * the numeric identifier for the user * the email address of the user * the string literal `"me"`, indicating the requesting user"##),
+                     Some(r##"The student whose guardian is being requested. One of the following:
+        
+        * the numeric identifier for the user
+        * the email address of the user
+        * the string literal `"me"`, indicating the requesting user"##),
                      Some(true),
                      Some(false)),
         
@@ -4134,12 +4944,38 @@ fn main() {
                      Some(false)),
                   ]),
             ("guardians-list",
-                    Some(r##"Returns a list of guardians that the requesting user is permitted to view, restricted to those that match the request. To list guardians for any student that the requesting user may view guardians for, use the literal character `-` for the student ID. This method returns the following error codes: * `PERMISSION_DENIED` if a `student_id` is specified, and the requesting user is not permitted to view guardian information for that student, if `"-"` is specified as the `student_id` and the user is not a domain administrator, if guardians are not enabled for the domain in question, if the `invited_email_address` filter is set by a user who is not a domain administrator, or for other access errors. * `INVALID_ARGUMENT` if a `student_id` is specified, but its format cannot be recognized (it is not an email address, nor a `student_id` from the API, nor the literal string `me`). May also be returned if an invalid `page_token` is provided. * `NOT_FOUND` if a `student_id` is specified, and its format can be recognized, but Classroom has no record of that student."##),
+                    Some(r##"Returns a list of guardians that the requesting user is permitted to
+        view, restricted to those that match the request.
+        
+        To list guardians for any student that the requesting user may view
+        guardians for, use the literal character `-` for the student ID.
+        
+        This method returns the following error codes:
+        
+        * `PERMISSION_DENIED` if a `student_id` is specified, and the requesting
+          user is not permitted to view guardian information for that student, if
+          `"-"` is specified as the `student_id` and the user is not a domain
+          administrator, if guardians are not enabled for the domain in question,
+          if the `invited_email_address` filter is set by a user who is not a
+          domain administrator, or for other access errors.
+        * `INVALID_ARGUMENT` if a `student_id` is specified, but its format cannot
+          be recognized (it is not an email address, nor a `student_id` from the
+          API, nor the literal string `me`). May also be returned if an invalid
+          `page_token` is provided.
+        * `NOT_FOUND` if a `student_id` is specified, and its format can be
+          recognized, but Classroom has no record of that student."##),
                     "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/user-profiles_guardians-list",
                   vec![
                     (Some(r##"student-id"##),
                      None,
-                     Some(r##"Filter results by the student who the guardian is linked to. The identifier can be one of the following: * the numeric identifier for the user * the email address of the user * the string literal `"me"`, indicating the requesting user * the string literal `"-"`, indicating that results should be returned for all students that the requesting user has access to view."##),
+                     Some(r##"Filter results by the student who the guardian is linked to.
+        The identifier can be one of the following:
+        
+        * the numeric identifier for the user
+        * the email address of the user
+        * the string literal `"me"`, indicating the requesting user
+        * the string literal `"-"`, indicating that results should be returned for
+          all students that the requesting user has access to view."##),
                      Some(true),
                      Some(false)),
         
@@ -4161,7 +4997,7 @@ fn main() {
     
     let mut app = App::new("classroom1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.4+20161006")
+           .version("1.0.4+20170510")
            .about("Manages classes, rosters, and invitations in Google Classroom.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_classroom1_cli")
            .arg(Arg::with_name("url")

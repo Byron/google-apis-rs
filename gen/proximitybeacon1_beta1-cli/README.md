@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *proximitybeacon* API at revision *20160429*. The CLI is at version *1.0.4*.
+This documentation was generated from the *proximitybeacon* API at revision *20170517*. The CLI is at version *1.0.4*.
 
 ```bash
 proximitybeacon1-beta1 [options]
@@ -39,6 +39,7 @@ proximitybeacon1-beta1 [options]
                 attachments-list <beacon-name> [-p <v>]... [-o <out>]
                 deactivate <beacon-name> [-p <v>]... [-o <out>]
                 decommission <beacon-name> [-p <v>]... [-o <out>]
+                delete <beacon-name> [-p <v>]... [-o <out>]
                 diagnostics-list <beacon-name> [-p <v>]... [-o <out>]
                 get <beacon-name> [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]

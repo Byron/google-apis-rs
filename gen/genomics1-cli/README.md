@@ -11,7 +11,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
 Everything else about the *genomics* API can be found at the
-[official documentation site](https://cloud.google.com/genomics/).
+[official documentation site](https://cloud.google.com/genomics).
 
 # Installation and Source Code
 
@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *genomics* API at revision *20160928*. The CLI is at version *1.0.4*.
+This documentation was generated from the *genomics* API at revision *20170520*. The CLI is at version *1.0.4*.
 
 ```bash
 genomics1 [options]
@@ -72,7 +72,6 @@ genomics1 [options]
                 search (-r <kv>)... [-p <v>]... [-o <out>]
         reads
                 search (-r <kv>)... [-p <v>]... [-o <out>]
-                stream (-r <kv>)... [-p <v>]... [-o <out>]
         references
                 bases-list <reference-id> [-p <v>]... [-o <out>]
                 get <reference-id> [-p <v>]... [-o <out>]
@@ -88,7 +87,6 @@ genomics1 [options]
                 merge (-r <kv>)... [-p <v>]... [-o <out>]
                 patch <variant-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 search (-r <kv>)... [-p <v>]... [-o <out>]
-                stream (-r <kv>)... [-p <v>]... [-o <out>]
         variantsets
                 create (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <variant-set-id> [-p <v>]... [-o <out>]

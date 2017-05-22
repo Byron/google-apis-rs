@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *storage* crate version *1.0.4+20161123*, where *20161123* is the exact revision of the *storage:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
+//! This documentation was generated from *storage* crate version *1.0.4+20170504*, where *20170504* is the exact revision of the *storage:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
 //! 
 //! Everything else about the *storage* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/storage/docs/json_api/).
@@ -14,15 +14,19 @@
 //! * [bucket access controls](struct.BucketAccessControl.html)
 //!  * [*delete*](struct.BucketAccessControlDeleteCall.html), [*get*](struct.BucketAccessControlGetCall.html), [*insert*](struct.BucketAccessControlInsertCall.html), [*list*](struct.BucketAccessControlListCall.html), [*patch*](struct.BucketAccessControlPatchCall.html) and [*update*](struct.BucketAccessControlUpdateCall.html)
 //! * [buckets](struct.Bucket.html)
-//!  * [*delete*](struct.BucketDeleteCall.html), [*get*](struct.BucketGetCall.html), [*insert*](struct.BucketInsertCall.html), [*list*](struct.BucketListCall.html), [*patch*](struct.BucketPatchCall.html) and [*update*](struct.BucketUpdateCall.html)
+//!  * [*delete*](struct.BucketDeleteCall.html), [*get*](struct.BucketGetCall.html), [*get iam policy*](struct.BucketGetIamPolicyCall.html), [*insert*](struct.BucketInsertCall.html), [*list*](struct.BucketListCall.html), [*patch*](struct.BucketPatchCall.html), [*set iam policy*](struct.BucketSetIamPolicyCall.html), [*test iam permissions*](struct.BucketTestIamPermissionCall.html) and [*update*](struct.BucketUpdateCall.html)
 //! * [channels](struct.Channel.html)
 //!  * [*stop*](struct.ChannelStopCall.html)
 //! * default object access controls
 //!  * [*delete*](struct.DefaultObjectAccessControlDeleteCall.html), [*get*](struct.DefaultObjectAccessControlGetCall.html), [*insert*](struct.DefaultObjectAccessControlInsertCall.html), [*list*](struct.DefaultObjectAccessControlListCall.html), [*patch*](struct.DefaultObjectAccessControlPatchCall.html) and [*update*](struct.DefaultObjectAccessControlUpdateCall.html)
+//! * [notifications](struct.Notification.html)
+//!  * [*delete*](struct.NotificationDeleteCall.html), [*get*](struct.NotificationGetCall.html), [*insert*](struct.NotificationInsertCall.html) and [*list*](struct.NotificationListCall.html)
 //! * [object access controls](struct.ObjectAccessControl.html)
 //!  * [*delete*](struct.ObjectAccessControlDeleteCall.html), [*get*](struct.ObjectAccessControlGetCall.html), [*insert*](struct.ObjectAccessControlInsertCall.html), [*list*](struct.ObjectAccessControlListCall.html), [*patch*](struct.ObjectAccessControlPatchCall.html) and [*update*](struct.ObjectAccessControlUpdateCall.html)
 //! * [objects](struct.Object.html)
-//!  * [*compose*](struct.ObjectComposeCall.html), [*copy*](struct.ObjectCopyCall.html), [*delete*](struct.ObjectDeleteCall.html), [*get*](struct.ObjectGetCall.html), [*insert*](struct.ObjectInsertCall.html), [*list*](struct.ObjectListCall.html), [*patch*](struct.ObjectPatchCall.html), [*rewrite*](struct.ObjectRewriteCall.html), [*update*](struct.ObjectUpdateCall.html) and [*watch all*](struct.ObjectWatchAllCall.html)
+//!  * [*compose*](struct.ObjectComposeCall.html), [*copy*](struct.ObjectCopyCall.html), [*delete*](struct.ObjectDeleteCall.html), [*get*](struct.ObjectGetCall.html), [*get iam policy*](struct.ObjectGetIamPolicyCall.html), [*insert*](struct.ObjectInsertCall.html), [*list*](struct.ObjectListCall.html), [*patch*](struct.ObjectPatchCall.html), [*rewrite*](struct.ObjectRewriteCall.html), [*set iam policy*](struct.ObjectSetIamPolicyCall.html), [*test iam permissions*](struct.ObjectTestIamPermissionCall.html), [*update*](struct.ObjectUpdateCall.html) and [*watch all*](struct.ObjectWatchAllCall.html)
+//! * projects
+//!  * [*service account get*](struct.ProjectServiceAccountGetCall.html)
 //! 
 //! 
 //! Upload supported by ...
@@ -74,11 +78,14 @@
 //! Or specifically ...
 //! 
 //! ```ignore
+//! let r = hub.objects().get_iam_policy(...).doit()
 //! let r = hub.objects().list(...).doit()
 //! let r = hub.objects().rewrite(...).doit()
+//! let r = hub.objects().test_iam_permissions(...).doit()
 //! let r = hub.objects().copy(...).doit()
 //! let r = hub.objects().watch_all(...).doit()
 //! let r = hub.objects().get(...).doit()
+//! let r = hub.objects().set_iam_policy(...).doit()
 //! let r = hub.objects().insert(...).doit()
 //! let r = hub.objects().compose(...).doit()
 //! let r = hub.objects().update(...).doit()
@@ -136,19 +143,20 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.objects().rewrite(req, "sourceBucket", "sourceObject", "destinationBucket", "destinationObject")
-//!              .source_generation("justo")
-//!              .rewrite_token("justo")
-//!              .projection("et")
-//!              .max_bytes_rewritten_per_call("et")
-//!              .if_source_metageneration_not_match("diam")
-//!              .if_source_metageneration_match("ipsum")
-//!              .if_source_generation_not_match("Lorem")
-//!              .if_source_generation_match("et")
-//!              .if_metageneration_not_match("duo")
-//!              .if_metageneration_match("aliquyam")
-//!              .if_generation_not_match("sea")
-//!              .if_generation_match("Lorem")
-//!              .destination_predefined_acl("eos")
+//!              .user_project("justo")
+//!              .source_generation("et")
+//!              .rewrite_token("et")
+//!              .projection("diam")
+//!              .max_bytes_rewritten_per_call("ipsum")
+//!              .if_source_metageneration_not_match("Lorem")
+//!              .if_source_metageneration_match("et")
+//!              .if_source_generation_not_match("duo")
+//!              .if_source_generation_match("aliquyam")
+//!              .if_metageneration_not_match("sea")
+//!              .if_metageneration_match("Lorem")
+//!              .if_generation_not_match("eos")
+//!              .if_generation_match("erat")
+//!              .destination_predefined_acl("sadipscing")
 //!              .doit();
 //! 
 //! match result {
@@ -225,7 +233,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -348,19 +356,20 @@ impl Default for Scope {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().rewrite(req, "sourceBucket", "sourceObject", "destinationBucket", "destinationObject")
-///              .source_generation("elitr")
-///              .rewrite_token("amet")
-///              .projection("no")
-///              .max_bytes_rewritten_per_call("labore")
-///              .if_source_metageneration_not_match("eirmod")
-///              .if_source_metageneration_match("dolore")
-///              .if_source_generation_not_match("invidunt")
-///              .if_source_generation_match("aliquyam")
-///              .if_metageneration_not_match("accusam")
-///              .if_metageneration_match("Lorem")
-///              .if_generation_not_match("sea")
-///              .if_generation_match("et")
-///              .destination_predefined_acl("duo")
+///              .user_project("no")
+///              .source_generation("labore")
+///              .rewrite_token("eirmod")
+///              .projection("dolore")
+///              .max_bytes_rewritten_per_call("invidunt")
+///              .if_source_metageneration_not_match("aliquyam")
+///              .if_source_metageneration_match("accusam")
+///              .if_source_generation_not_match("Lorem")
+///              .if_source_generation_match("sea")
+///              .if_metageneration_not_match("et")
+///              .if_metageneration_match("duo")
+///              .if_generation_not_match("et")
+///              .if_generation_match("eirmod")
+///              .destination_predefined_acl("sanctus")
 ///              .doit();
 /// 
 /// match result {
@@ -385,8 +394,6 @@ pub struct Storage<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-    _base_url: String,
-    _root_url: String,
 }
 
 impl<'a, C, A> Hub for Storage<C, A> {}
@@ -399,8 +406,6 @@ impl<'a, C, A> Storage<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
-            _base_url: "https://www.googleapis.com/storage/v1/".to_string(),
-            _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
@@ -416,11 +421,17 @@ impl<'a, C, A> Storage<C, A>
     pub fn default_object_access_controls(&'a self) -> DefaultObjectAccessControlMethods<'a, C, A> {
         DefaultObjectAccessControlMethods { hub: &self }
     }
+    pub fn notifications(&'a self) -> NotificationMethods<'a, C, A> {
+        NotificationMethods { hub: &self }
+    }
     pub fn object_access_controls(&'a self) -> ObjectAccessControlMethods<'a, C, A> {
         ObjectAccessControlMethods { hub: &self }
     }
     pub fn objects(&'a self) -> ObjectMethods<'a, C, A> {
         ObjectMethods { hub: &self }
+    }
+    pub fn projects(&'a self) -> ProjectMethods<'a, C, A> {
+        ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
@@ -432,32 +443,84 @@ impl<'a, C, A> Storage<C, A>
         self._user_agent = agent_name;
         prev
     }
-
-    /// Set the base url to use in all requests to the server.
-    /// It defaults to `https://www.googleapis.com/storage/v1/`.
-    ///
-    /// Returns the previously set base url.
-    pub fn base_url(&mut self, new_base_url: String) -> String {
-        let prev = self._base_url.clone();
-        self._base_url = new_base_url;
-        prev
-    }
-
-    /// Set the root url to use in all requests to the server.
-    /// It defaults to `https://www.googleapis.com/`.
-    ///
-    /// Returns the previously set root url.
-    pub fn root_url(&mut self, new_root_url: String) -> String {
-        let prev = self._root_url.clone();
-        self._root_url = new_root_url;
-        prev
-    }
 }
 
 
 // ############
 // SCHEMAS ###
 // ##########
+/// The action to take.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BucketLifecycleRuleAction {
+    /// Type of the action. Currently, only Delete and SetStorageClass are supported.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// Target storage class. Required iff the type of the action is SetStorageClass.
+    #[serde(rename="storageClass")]
+    pub storage_class: Option<String>,
+}
+
+impl NestedType for BucketLifecycleRuleAction {}
+impl Part for BucketLifecycleRuleAction {}
+
+
+/// Conditions that must be met for this operation to execute.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ComposeRequestSourceObjectsObjectPreconditions {
+    /// Only perform the composition if the generation of the source object that would be used matches this value. If this value and a generation are both specified, they must be the same value or the call will fail.
+    #[serde(rename="ifGenerationMatch")]
+    pub if_generation_match: Option<String>,
+}
+
+impl NestedType for ComposeRequestSourceObjectsObjectPreconditions {}
+impl Part for ComposeRequestSourceObjectsObjectPreconditions {}
+
+
+/// The list of source objects that will be concatenated into a single object.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ComposeRequestSourceObjects {
+    /// The generation of this object to use as the source.
+    pub generation: Option<String>,
+    /// The source object's name. The source object's bucket is implicitly the destination bucket.
+    pub name: Option<String>,
+    /// Conditions that must be met for this operation to execute.
+    #[serde(rename="objectPreconditions")]
+    pub object_preconditions: Option<ComposeRequestSourceObjectsObjectPreconditions>,
+}
+
+impl NestedType for ComposeRequestSourceObjects {}
+impl Part for ComposeRequestSourceObjects {}
+
+
+/// A subscription to receive Google PubSub notifications.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [service account get projects](struct.ProjectServiceAccountGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ServiceAccount {
+    /// The kind of item this is. For notifications, this is always storage#notification.
+    pub kind: Option<String>,
+    /// The ID of the notification.
+    pub email_address: Option<String>,
+}
+
+impl ResponseResult for ServiceAccount {}
+
+
 /// An access-control list.
 /// 
 /// # Activities
@@ -478,6 +541,101 @@ pub struct BucketAccessControls {
 impl ResponseResult for BucketAccessControls {}
 
 
+/// The bucket's Cross-Origin Resource Sharing (CORS) configuration.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BucketCors {
+    /// The list of Origins eligible to receive CORS response headers. Note: "*" is permitted in the list of origins, and means "any Origin".
+    pub origin: Option<Vec<String>>,
+    /// The list of HTTP headers other than the simple response headers to give permission for the user-agent to share across domains.
+    #[serde(rename="responseHeader")]
+    pub response_header: Option<Vec<String>>,
+    /// The list of HTTP methods on which to include CORS response headers, (GET, OPTIONS, POST, etc) Note: "*" is permitted in the list of methods, and means "any method".
+    pub method: Option<Vec<String>>,
+    /// The value, in seconds, to return in the  Access-Control-Max-Age header used in preflight responses.
+    #[serde(rename="maxAgeSeconds")]
+    pub max_age_seconds: Option<i32>,
+}
+
+impl NestedType for BucketCors {}
+impl Part for BucketCors {}
+
+
+/// A bucket.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [update buckets](struct.BucketUpdateCall.html) (request|response)
+/// * [test iam permissions buckets](struct.BucketTestIamPermissionCall.html) (none)
+/// * [insert buckets](struct.BucketInsertCall.html) (request|response)
+/// * [delete buckets](struct.BucketDeleteCall.html) (none)
+/// * [set iam policy buckets](struct.BucketSetIamPolicyCall.html) (none)
+/// * [get iam policy buckets](struct.BucketGetIamPolicyCall.html) (none)
+/// * [patch buckets](struct.BucketPatchCall.html) (request|response)
+/// * [list buckets](struct.BucketListCall.html) (none)
+/// * [get buckets](struct.BucketGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Bucket {
+    /// The bucket's website configuration, controlling how the service behaves when accessing bucket contents as a web site. See the Static Website Examples for more information.
+    pub website: Option<BucketWebsite>,
+    /// The URI of this bucket.
+    #[serde(rename="selfLink")]
+    pub self_link: Option<String>,
+    /// The modification time of the bucket in RFC 3339 format.
+    pub updated: Option<String>,
+    /// The creation time of the bucket in RFC 3339 format.
+    #[serde(rename="timeCreated")]
+    pub time_created: Option<String>,
+    /// User-provided labels, in key/value pairs.
+    pub labels: Option<HashMap<String, String>>,
+    /// Default access controls to apply to new objects when no ACL is provided.
+    #[serde(rename="defaultObjectAcl")]
+    pub default_object_acl: Option<Vec<ObjectAccessControl>>,
+    /// The metadata generation of this bucket.
+    pub metageneration: Option<String>,
+    /// The bucket's Cross-Origin Resource Sharing (CORS) configuration.
+    pub cors: Option<Vec<BucketCors>>,
+    /// The owner of the bucket. This is always the project team's owner group.
+    pub owner: Option<BucketOwner>,
+    /// Access controls on the bucket.
+    pub acl: Option<Vec<BucketAccessControl>>,
+    /// The ID of the bucket. For buckets, the id and name properities are the same.
+    pub id: Option<String>,
+    /// The kind of item this is. For buckets, this is always storage#bucket.
+    pub kind: Option<String>,
+    /// The bucket's logging configuration, which defines the destination bucket and optional name prefix for the current bucket's logs.
+    pub logging: Option<BucketLogging>,
+    /// The name of the bucket.
+    pub name: Option<String>,
+    /// The bucket's billing configuration.
+    pub billing: Option<BucketBilling>,
+    /// The project number of the project the bucket belongs to.
+    #[serde(rename="projectNumber")]
+    pub project_number: Option<String>,
+    /// HTTP 1.1 Entity tag for the bucket.
+    pub etag: Option<String>,
+    /// The bucket's default storage class, used whenever no storageClass is specified for a newly-created object. This defines how objects in the bucket are stored and determines the SLA and the cost of storage. Values include MULTI_REGIONAL, REGIONAL, STANDARD, NEARLINE, COLDLINE, and DURABLE_REDUCED_AVAILABILITY. If this value is not specified when the bucket is created, it will default to STANDARD. For more information, see storage classes.
+    #[serde(rename="storageClass")]
+    pub storage_class: Option<String>,
+    /// The bucket's lifecycle configuration. See lifecycle management for more information.
+    pub lifecycle: Option<BucketLifecycle>,
+    /// The bucket's versioning configuration.
+    pub versioning: Option<BucketVersioning>,
+    /// The location of the bucket. Object data for objects in the bucket resides in physical storage within this region. Defaults to US. See the developer's guide for the authoritative list.
+    pub location: Option<String>,
+}
+
+impl RequestValue for Bucket {}
+impl Resource for Bucket {}
+impl ResponseResult for Bucket {}
+
+
 /// A lifecycle management rule, which is made of an action to take and the condition(s) under which the action will be taken.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -492,6 +650,24 @@ pub struct BucketLifecycleRule {
 
 impl NestedType for BucketLifecycleRule {}
 impl Part for BucketLifecycleRule {}
+
+
+/// Metadata of customer-supplied encryption key, if the object is encrypted by such a key.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ObjectCustomerEncryption {
+    /// The encryption algorithm.
+    #[serde(rename="encryptionAlgorithm")]
+    pub encryption_algorithm: Option<String>,
+    /// SHA256 hash value of the encryption key.
+    #[serde(rename="keySha256")]
+    pub key_sha256: Option<String>,
+}
+
+impl NestedType for ObjectCustomerEncryption {}
+impl Part for ObjectCustomerEncryption {}
 
 
 /// The project team associated with the entity, if any.
@@ -537,467 +713,33 @@ impl NestedType for BucketLifecycleRuleCondition {}
 impl Part for BucketLifecycleRuleCondition {}
 
 
-/// The bucket's website configuration, controlling how the service behaves when accessing bucket contents as a web site. See the Static Website Examples for more information.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BucketWebsite {
-    /// If the requested object path is missing, and any mainPageSuffix object is missing, if applicable, the service will return the named object from this bucket as the content for a 404 Not Found result.
-    #[serde(rename="notFoundPage")]
-    pub not_found_page: Option<String>,
-    /// If the requested object path is missing, the service will ensure the path has a trailing '/', append this suffix, and attempt to retrieve the resulting object. This allows the creation of index.html objects to represent directory pages.
-    #[serde(rename="mainPageSuffix")]
-    pub main_page_suffix: Option<String>,
-}
-
-impl NestedType for BucketWebsite {}
-impl Part for BucketWebsite {}
-
-
-/// An notification channel used to watch for resource changes.
+/// A bucket/object IAM policy.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [stop channels](struct.ChannelStopCall.html) (request)
-/// * [watch all objects](struct.ObjectWatchAllCall.html) (request|response)
+/// * [get iam policy objects](struct.ObjectGetIamPolicyCall.html) (response)
+/// * [set iam policy buckets](struct.BucketSetIamPolicyCall.html) (request|response)
+/// * [set iam policy objects](struct.ObjectSetIamPolicyCall.html) (request|response)
+/// * [get iam policy buckets](struct.BucketGetIamPolicyCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Channel {
-    /// A version-specific identifier for the watched resource.
-    #[serde(rename="resourceUri")]
-    pub resource_uri: Option<String>,
-    /// Identifies this as a notification channel used to watch for changes to a resource. Value: the fixed string "api#channel".
-    pub kind: Option<String>,
-    /// An opaque ID that identifies the resource being watched on this channel. Stable across different API versions.
+pub struct Policy {
+    /// The ID of the resource to which this policy belongs. Will be of the form buckets/bucket for buckets, and buckets/bucket/objects/object for objects. A specific generation may be specified by appending #generationNumber to the end of the object name, e.g. buckets/my-bucket/objects/data.txt#17. The current generation can be denoted with #0. This field is ignored on input.
     #[serde(rename="resourceId")]
     pub resource_id: Option<String>,
-    /// A UUID or similar unique string that identifies this channel.
-    pub id: Option<String>,
-    /// An arbitrary string delivered to the target address with each notification delivered over this channel. Optional.
-    pub token: Option<String>,
-    /// Additional parameters controlling delivery channel behavior. Optional.
-    pub params: Option<HashMap<String, String>>,
-    /// Date and time of notification channel expiration, expressed as a Unix timestamp, in milliseconds. Optional.
-    pub expiration: Option<String>,
-    /// The address where notifications are delivered for this channel.
-    pub address: Option<String>,
-    /// The type of delivery mechanism used for this channel.
-    #[serde(rename="type")]
-    pub type_: Option<String>,
-    /// A Boolean value to indicate whether payload is wanted. Optional.
-    pub payload: Option<bool>,
-}
-
-impl RequestValue for Channel {}
-impl Resource for Channel {}
-impl ResponseResult for Channel {}
-
-
-/// The bucket's logging configuration, which defines the destination bucket and optional name prefix for the current bucket's logs.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BucketLogging {
-    /// A prefix for log object names.
-    #[serde(rename="logObjectPrefix")]
-    pub log_object_prefix: Option<String>,
-    /// The destination bucket where the current bucket's logs should be placed.
-    #[serde(rename="logBucket")]
-    pub log_bucket: Option<String>,
-}
-
-impl NestedType for BucketLogging {}
-impl Part for BucketLogging {}
-
-
-/// The bucket's lifecycle configuration. See lifecycle management for more information.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BucketLifecycle {
-    /// A lifecycle management rule, which is made of an action to take and the condition(s) under which the action will be taken.
-    pub rule: Option<Vec<BucketLifecycleRule>>,
-}
-
-impl NestedType for BucketLifecycle {}
-impl Part for BucketLifecycle {}
-
-
-/// The bucket's versioning configuration.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BucketVersioning {
-    /// While set to true, versioning is fully enabled for this bucket.
-    pub enabled: Option<bool>,
-}
-
-impl NestedType for BucketVersioning {}
-impl Part for BucketVersioning {}
-
-
-/// An object.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list objects](struct.ObjectListCall.html) (none)
-/// * [rewrite objects](struct.ObjectRewriteCall.html) (request)
-/// * [copy objects](struct.ObjectCopyCall.html) (request|response)
-/// * [watch all objects](struct.ObjectWatchAllCall.html) (none)
-/// * [get objects](struct.ObjectGetCall.html) (response)
-/// * [insert objects](struct.ObjectInsertCall.html) (request|response)
-/// * [compose objects](struct.ObjectComposeCall.html) (response)
-/// * [update objects](struct.ObjectUpdateCall.html) (request|response)
-/// * [delete objects](struct.ObjectDeleteCall.html) (none)
-/// * [patch objects](struct.ObjectPatchCall.html) (request|response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Object {
-    /// The link to this object.
-    #[serde(rename="selfLink")]
-    pub self_link: Option<String>,
-    /// The modification time of the object metadata in RFC 3339 format.
-    pub updated: Option<String>,
-    /// Content-Type of the object data. If contentType is not specified, object downloads will be served as application/octet-stream.
-    #[serde(rename="contentType")]
-    pub content_type: Option<String>,
-    /// The creation time of the object in RFC 3339 format.
-    #[serde(rename="timeCreated")]
-    pub time_created: Option<String>,
-    /// The content generation of this object. Used for object versioning.
-    pub generation: Option<String>,
-    /// Metadata of customer-supplied encryption key, if the object is encrypted by such a key.
-    #[serde(rename="customerEncryption")]
-    pub customer_encryption: Option<ObjectCustomerEncryption>,
-    /// Number of underlying components that make up this object. Components are accumulated by compose operations.
-    #[serde(rename="componentCount")]
-    pub component_count: Option<i32>,
-    /// The time at which the object's storage class was last changed. When the object is initially created, it will be set to timeCreated.
-    #[serde(rename="timeStorageClassUpdated")]
-    pub time_storage_class_updated: Option<String>,
-    /// The version of the metadata for this object at this generation. Used for preconditions and for detecting changes in metadata. A metageneration number is only meaningful in the context of a particular generation of a particular object.
-    pub metageneration: Option<String>,
-    /// Media download link.
-    #[serde(rename="mediaLink")]
-    pub media_link: Option<String>,
-    /// The owner of the object. This will always be the uploader of the object.
-    pub owner: Option<ObjectOwner>,
-    /// Cache-Control directive for the object data. If omitted, and the object is accessible to all anonymous users, the default will be public, max-age=3600.
-    #[serde(rename="cacheControl")]
-    pub cache_control: Option<String>,
-    /// Access controls on the object.
-    pub acl: Option<Vec<ObjectAccessControl>>,
-    /// The ID of the object.
-    pub id: Option<String>,
-    /// Content-Length of the data in bytes.
-    pub size: Option<String>,
-    /// The deletion time of the object in RFC 3339 format. Will be returned if and only if this version of the object has been deleted.
-    #[serde(rename="timeDeleted")]
-    pub time_deleted: Option<String>,
-    /// The kind of item this is. For objects, this is always storage#object.
-    pub kind: Option<String>,
-    /// Content-Language of the object data.
-    #[serde(rename="contentLanguage")]
-    pub content_language: Option<String>,
-    /// The name of this object. Required if not specified by URL parameter.
-    pub name: Option<String>,
-    /// MD5 hash of the data; encoded using base64. For more information about using the MD5 hash, see Hashes and ETags: Best Practices.
-    #[serde(rename="md5Hash")]
-    pub md5_hash: Option<String>,
-    /// The name of the bucket containing this object.
-    pub bucket: Option<String>,
-    /// Content-Encoding of the object data.
-    #[serde(rename="contentEncoding")]
-    pub content_encoding: Option<String>,
-    /// CRC32c checksum, as described in RFC 4960, Appendix B; encoded using base64 in big-endian byte order. For more information about using the CRC32c checksum, see Hashes and ETags: Best Practices.
-    pub crc32c: Option<String>,
-    /// HTTP 1.1 Entity tag for the object.
+    /// An association between a role, which comes with a set of permissions, and members who may assume that role.
+    pub bindings: Option<Vec<PolicyBindings>>,
+    /// HTTP 1.1  Entity tag for the policy.
     pub etag: Option<String>,
-    /// Storage class of the object.
-    #[serde(rename="storageClass")]
-    pub storage_class: Option<String>,
-    /// Content-Disposition of the object data.
-    #[serde(rename="contentDisposition")]
-    pub content_disposition: Option<String>,
-    /// User-provided metadata, in key/value pairs.
-    pub metadata: Option<HashMap<String, String>>,
-}
-
-impl RequestValue for Object {}
-impl Resource for Object {}
-impl ResponseResult for Object {}
-
-
-/// A list of objects.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list objects](struct.ObjectListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Objects {
-    /// The continuation token, used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The list of items.
-    pub items: Option<Vec<Object>>,
-    /// The kind of item this is. For lists of objects, this is always storage#objects.
-    pub kind: Option<String>,
-    /// The list of prefixes of objects matching-but-not-listed up to and including the requested delimiter.
-    pub prefixes: Option<Vec<String>>,
-}
-
-impl ResponseResult for Objects {}
-
-
-/// The bucket's Cross-Origin Resource Sharing (CORS) configuration.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BucketCors {
-    /// The list of Origins eligible to receive CORS response headers. Note: "*" is permitted in the list of origins, and means "any Origin".
-    pub origin: Option<Vec<String>>,
-    /// The list of HTTP headers other than the simple response headers to give permission for the user-agent to share across domains.
-    #[serde(rename="responseHeader")]
-    pub response_header: Option<Vec<String>>,
-    /// The list of HTTP methods on which to include CORS response headers, (GET, OPTIONS, POST, etc) Note: "*" is permitted in the list of methods, and means "any method".
-    pub method: Option<Vec<String>>,
-    /// The value, in seconds, to return in the  Access-Control-Max-Age header used in preflight responses.
-    #[serde(rename="maxAgeSeconds")]
-    pub max_age_seconds: Option<i32>,
-}
-
-impl NestedType for BucketCors {}
-impl Part for BucketCors {}
-
-
-/// An access-control list.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list object access controls](struct.ObjectAccessControlListCall.html) (response)
-/// * [list default object access controls](struct.DefaultObjectAccessControlListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ObjectAccessControls {
-    /// The list of items.
-    pub items: Option<Vec<ObjectAccessControl>>,
-    /// The kind of item this is. For lists of object access control entries, this is always storage#objectAccessControls.
+    /// The kind of item this is. For policies, this is always storage#policy. This field is ignored on input.
     pub kind: Option<String>,
 }
 
-impl ResponseResult for ObjectAccessControls {}
-
-
-/// The project team associated with the entity, if any.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BucketAccessControlProjectTeam {
-    /// The project number.
-    #[serde(rename="projectNumber")]
-    pub project_number: Option<String>,
-    /// The team.
-    pub team: Option<String>,
-}
-
-impl NestedType for BucketAccessControlProjectTeam {}
-impl Part for BucketAccessControlProjectTeam {}
-
-
-/// Conditions that must be met for this operation to execute.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ComposeRequestSourceObjectsObjectPreconditions {
-    /// Only perform the composition if the generation of the source object that would be used matches this value. If this value and a generation are both specified, they must be the same value or the call will fail.
-    #[serde(rename="ifGenerationMatch")]
-    pub if_generation_match: Option<String>,
-}
-
-impl NestedType for ComposeRequestSourceObjectsObjectPreconditions {}
-impl Part for ComposeRequestSourceObjectsObjectPreconditions {}
-
-
-/// The list of source objects that will be concatenated into a single object.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ComposeRequestSourceObjects {
-    /// The generation of this object to use as the source.
-    pub generation: Option<String>,
-    /// The source object's name. The source object's bucket is implicitly the destination bucket.
-    pub name: Option<String>,
-    /// Conditions that must be met for this operation to execute.
-    #[serde(rename="objectPreconditions")]
-    pub object_preconditions: Option<ComposeRequestSourceObjectsObjectPreconditions>,
-}
-
-impl NestedType for ComposeRequestSourceObjects {}
-impl Part for ComposeRequestSourceObjects {}
-
-
-/// A bucket.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [update buckets](struct.BucketUpdateCall.html) (request|response)
-/// * [insert buckets](struct.BucketInsertCall.html) (request|response)
-/// * [delete buckets](struct.BucketDeleteCall.html) (none)
-/// * [patch buckets](struct.BucketPatchCall.html) (request|response)
-/// * [list buckets](struct.BucketListCall.html) (none)
-/// * [get buckets](struct.BucketGetCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Bucket {
-    /// The bucket's website configuration, controlling how the service behaves when accessing bucket contents as a web site. See the Static Website Examples for more information.
-    pub website: Option<BucketWebsite>,
-    /// The modification time of the bucket in RFC 3339 format.
-    pub updated: Option<String>,
-    /// The creation time of the bucket in RFC 3339 format.
-    #[serde(rename="timeCreated")]
-    pub time_created: Option<String>,
-    /// The bucket's versioning configuration.
-    pub versioning: Option<BucketVersioning>,
-    /// Default access controls to apply to new objects when no ACL is provided.
-    #[serde(rename="defaultObjectAcl")]
-    pub default_object_acl: Option<Vec<ObjectAccessControl>>,
-    /// The metadata generation of this bucket.
-    pub metageneration: Option<String>,
-    /// The bucket's Cross-Origin Resource Sharing (CORS) configuration.
-    pub cors: Option<Vec<BucketCors>>,
-    /// The owner of the bucket. This is always the project team's owner group.
-    pub owner: Option<BucketOwner>,
-    /// Access controls on the bucket.
-    pub acl: Option<Vec<BucketAccessControl>>,
-    /// The ID of the bucket.
-    pub id: Option<String>,
-    /// The kind of item this is. For buckets, this is always storage#bucket.
-    pub kind: Option<String>,
-    /// The bucket's logging configuration, which defines the destination bucket and optional name prefix for the current bucket's logs.
-    pub logging: Option<BucketLogging>,
-    /// The name of the bucket.
-    pub name: Option<String>,
-    /// The project number of the project the bucket belongs to.
-    #[serde(rename="projectNumber")]
-    pub project_number: Option<String>,
-    /// HTTP 1.1 Entity tag for the bucket.
-    pub etag: Option<String>,
-    /// The bucket's default storage class, used whenever no storageClass is specified for a newly-created object. This defines how objects in the bucket are stored and determines the SLA and the cost of storage. Values include MULTI_REGIONAL, REGIONAL, STANDARD, NEARLINE, COLDLINE, and DURABLE_REDUCED_AVAILABILITY. If this value is not specified when the bucket is created, it will default to STANDARD. For more information, see storage classes.
-    #[serde(rename="storageClass")]
-    pub storage_class: Option<String>,
-    /// The bucket's lifecycle configuration. See lifecycle management for more information.
-    pub lifecycle: Option<BucketLifecycle>,
-    /// The URI of this bucket.
-    #[serde(rename="selfLink")]
-    pub self_link: Option<String>,
-    /// The location of the bucket. Object data for objects in the bucket resides in physical storage within this region. Defaults to US. See the developer's guide for the authoritative list.
-    pub location: Option<String>,
-}
-
-impl RequestValue for Bucket {}
-impl Resource for Bucket {}
-impl ResponseResult for Bucket {}
-
-
-/// Metadata of customer-supplied encryption key, if the object is encrypted by such a key.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ObjectCustomerEncryption {
-    /// The encryption algorithm.
-    #[serde(rename="encryptionAlgorithm")]
-    pub encryption_algorithm: Option<String>,
-    /// SHA256 hash value of the encryption key.
-    #[serde(rename="keySha256")]
-    pub key_sha256: Option<String>,
-}
-
-impl NestedType for ObjectCustomerEncryption {}
-impl Part for ObjectCustomerEncryption {}
-
-
-/// An access-control entry.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list bucket access controls](struct.BucketAccessControlListCall.html) (none)
-/// * [patch bucket access controls](struct.BucketAccessControlPatchCall.html) (request|response)
-/// * [delete bucket access controls](struct.BucketAccessControlDeleteCall.html) (none)
-/// * [update bucket access controls](struct.BucketAccessControlUpdateCall.html) (request|response)
-/// * [get bucket access controls](struct.BucketAccessControlGetCall.html) (response)
-/// * [insert bucket access controls](struct.BucketAccessControlInsertCall.html) (request|response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BucketAccessControl {
-    /// The domain associated with the entity, if any.
-    pub domain: Option<String>,
-    /// The name of the bucket.
-    pub bucket: Option<String>,
-    /// The kind of item this is. For bucket access control entries, this is always storage#bucketAccessControl.
-    pub kind: Option<String>,
-    /// The entity holding the permission, in one of the following forms: 
-    /// - user-userId 
-    /// - user-email 
-    /// - group-groupId 
-    /// - group-email 
-    /// - domain-domain 
-    /// - project-team-projectId 
-    /// - allUsers 
-    /// - allAuthenticatedUsers Examples: 
-    /// - The user liz@example.com would be user-liz@example.com. 
-    /// - The group example@googlegroups.com would be group-example@googlegroups.com. 
-    /// - To refer to all members of the Google Apps for Business domain example.com, the entity would be domain-example.com.
-    pub entity: Option<String>,
-    /// The email address associated with the entity, if any.
-    pub email: Option<String>,
-    /// HTTP 1.1 Entity tag for the access-control entry.
-    pub etag: Option<String>,
-    /// The access permission for the entity.
-    pub role: Option<String>,
-    /// The ID for the entity, if any.
-    #[serde(rename="entityId")]
-    pub entity_id: Option<String>,
-    /// The project team associated with the entity, if any.
-    #[serde(rename="projectTeam")]
-    pub project_team: Option<BucketAccessControlProjectTeam>,
-    /// The ID of the access-control entry.
-    pub id: Option<String>,
-    /// The link to this access-control entry.
-    #[serde(rename="selfLink")]
-    pub self_link: Option<String>,
-}
-
-impl RequestValue for BucketAccessControl {}
-impl Resource for BucketAccessControl {}
-impl ResponseResult for BucketAccessControl {}
+impl RequestValue for Policy {}
+impl ResponseResult for Policy {}
 
 
 /// An access-control entry.
@@ -1098,56 +840,207 @@ pub struct RewriteResponse {
 impl ResponseResult for RewriteResponse {}
 
 
-/// The owner of the object. This will always be the uploader of the object.
+/// An access-control entry.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list bucket access controls](struct.BucketAccessControlListCall.html) (none)
+/// * [patch bucket access controls](struct.BucketAccessControlPatchCall.html) (request|response)
+/// * [delete bucket access controls](struct.BucketAccessControlDeleteCall.html) (none)
+/// * [update bucket access controls](struct.BucketAccessControlUpdateCall.html) (request|response)
+/// * [get bucket access controls](struct.BucketAccessControlGetCall.html) (response)
+/// * [insert bucket access controls](struct.BucketAccessControlInsertCall.html) (request|response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ObjectOwner {
-    /// The ID for the entity.
+pub struct BucketAccessControl {
+    /// The domain associated with the entity, if any.
+    pub domain: Option<String>,
+    /// The name of the bucket.
+    pub bucket: Option<String>,
+    /// The kind of item this is. For bucket access control entries, this is always storage#bucketAccessControl.
+    pub kind: Option<String>,
+    /// The entity holding the permission, in one of the following forms: 
+    /// - user-userId 
+    /// - user-email 
+    /// - group-groupId 
+    /// - group-email 
+    /// - domain-domain 
+    /// - project-team-projectId 
+    /// - allUsers 
+    /// - allAuthenticatedUsers Examples: 
+    /// - The user liz@example.com would be user-liz@example.com. 
+    /// - The group example@googlegroups.com would be group-example@googlegroups.com. 
+    /// - To refer to all members of the Google Apps for Business domain example.com, the entity would be domain-example.com.
+    pub entity: Option<String>,
+    /// The email address associated with the entity, if any.
+    pub email: Option<String>,
+    /// HTTP 1.1 Entity tag for the access-control entry.
+    pub etag: Option<String>,
+    /// The access permission for the entity.
+    pub role: Option<String>,
+    /// The ID for the entity, if any.
     #[serde(rename="entityId")]
     pub entity_id: Option<String>,
-    /// The entity, in the form user-userId.
-    pub entity: Option<String>,
+    /// The project team associated with the entity, if any.
+    #[serde(rename="projectTeam")]
+    pub project_team: Option<BucketAccessControlProjectTeam>,
+    /// The ID of the access-control entry.
+    pub id: Option<String>,
+    /// The link to this access-control entry.
+    #[serde(rename="selfLink")]
+    pub self_link: Option<String>,
 }
 
-impl NestedType for ObjectOwner {}
-impl Part for ObjectOwner {}
+impl RequestValue for BucketAccessControl {}
+impl Resource for BucketAccessControl {}
+impl ResponseResult for BucketAccessControl {}
 
 
-/// The action to take.
+/// An association between a role, which comes with a set of permissions, and members who may assume that role.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BucketLifecycleRuleAction {
-    /// Type of the action. Currently, only Delete and SetStorageClass are supported.
+pub struct PolicyBindings {
+    /// The role to which members belong. Two types of roles are supported: new IAM roles, which grant permissions that do not map directly to those provided by ACLs, and legacy IAM roles, which do map directly to ACL permissions. All roles are of the format roles/storage.specificRole.
+    /// The new IAM roles are:  
+    /// - roles/storage.admin — Full control of Google Cloud Storage resources.  
+    /// - roles/storage.objectViewer — Read-Only access to Google Cloud Storage objects.  
+    /// - roles/storage.objectCreator — Access to create objects in Google Cloud Storage.  
+    /// - roles/storage.objectAdmin — Full control of Google Cloud Storage objects.   The legacy IAM roles are:  
+    /// - roles/storage.legacyObjectReader — Read-only access to objects without listing. Equivalent to an ACL entry on an object with the READER role.  
+    /// - roles/storage.legacyObjectOwner — Read/write access to existing objects without listing. Equivalent to an ACL entry on an object with the OWNER role.  
+    /// - roles/storage.legacyBucketReader — Read access to buckets with object listing. Equivalent to an ACL entry on a bucket with the READER role.  
+    /// - roles/storage.legacyBucketWriter — Read access to buckets with object listing/creation/deletion. Equivalent to an ACL entry on a bucket with the WRITER role.  
+    /// - roles/storage.legacyBucketOwner — Read and write access to existing buckets with object listing/creation/deletion. Equivalent to an ACL entry on a bucket with the OWNER role.
+    pub role: Option<String>,
+    /// A collection of identifiers for members who may assume the provided role. Recognized identifiers are as follows:  
+    /// - allUsers — A special identifier that represents anyone on the internet; with or without a Google account.  
+    /// - allAuthenticatedUsers — A special identifier that represents anyone who is authenticated with a Google account or a service account.  
+    /// - user:emailid — An email address that represents a specific account. For example, user:alice@gmail.com or user:joe@example.com.  
+    /// - serviceAccount:emailid — An email address that represents a service account. For example,  serviceAccount:my-other-app@appspot.gserviceaccount.com .  
+    /// - group:emailid — An email address that represents a Google group. For example, group:admins@example.com.  
+    /// - domain:domain — A Google Apps domain name that represents all the users of that domain. For example, domain:google.com or domain:example.com.  
+    /// - projectOwner:projectid — Owners of the given project. For example, projectOwner:my-example-project  
+    /// - projectEditor:projectid — Editors of the given project. For example, projectEditor:my-example-project  
+    /// - projectViewer:projectid — Viewers of the given project. For example, projectViewer:my-example-project
+    pub members: Option<Vec<String>>,
+}
+
+impl NestedType for PolicyBindings {}
+impl Part for PolicyBindings {}
+
+
+/// An notification channel used to watch for resource changes.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [stop channels](struct.ChannelStopCall.html) (request)
+/// * [watch all objects](struct.ObjectWatchAllCall.html) (request|response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Channel {
+    /// A version-specific identifier for the watched resource.
+    #[serde(rename="resourceUri")]
+    pub resource_uri: Option<String>,
+    /// Identifies this as a notification channel used to watch for changes to a resource. Value: the fixed string "api#channel".
+    pub kind: Option<String>,
+    /// An opaque ID that identifies the resource being watched on this channel. Stable across different API versions.
+    #[serde(rename="resourceId")]
+    pub resource_id: Option<String>,
+    /// A UUID or similar unique string that identifies this channel.
+    pub id: Option<String>,
+    /// An arbitrary string delivered to the target address with each notification delivered over this channel. Optional.
+    pub token: Option<String>,
+    /// Additional parameters controlling delivery channel behavior. Optional.
+    pub params: Option<HashMap<String, String>>,
+    /// Date and time of notification channel expiration, expressed as a Unix timestamp, in milliseconds. Optional.
+    pub expiration: Option<String>,
+    /// The address where notifications are delivered for this channel.
+    pub address: Option<String>,
+    /// The type of delivery mechanism used for this channel.
     #[serde(rename="type")]
     pub type_: Option<String>,
-    /// Target storage class. Required iff the type of the action is SetStorageClass.
-    #[serde(rename="storageClass")]
-    pub storage_class: Option<String>,
+    /// A Boolean value to indicate whether payload is wanted. Optional.
+    pub payload: Option<bool>,
 }
 
-impl NestedType for BucketLifecycleRuleAction {}
-impl Part for BucketLifecycleRuleAction {}
+impl RequestValue for Channel {}
+impl Resource for Channel {}
+impl ResponseResult for Channel {}
 
 
-/// The owner of the bucket. This is always the project team's owner group.
+/// The bucket's logging configuration, which defines the destination bucket and optional name prefix for the current bucket's logs.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BucketOwner {
-    /// The ID for the entity.
-    #[serde(rename="entityId")]
-    pub entity_id: Option<String>,
-    /// The entity, in the form project-owner-projectId.
-    pub entity: Option<String>,
+pub struct BucketLogging {
+    /// A prefix for log object names.
+    #[serde(rename="logObjectPrefix")]
+    pub log_object_prefix: Option<String>,
+    /// The destination bucket where the current bucket's logs should be placed.
+    #[serde(rename="logBucket")]
+    pub log_bucket: Option<String>,
 }
 
-impl NestedType for BucketOwner {}
-impl Part for BucketOwner {}
+impl NestedType for BucketLogging {}
+impl Part for BucketLogging {}
+
+
+/// A storage.(buckets|objects).testIamPermissions response.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [test iam permissions buckets](struct.BucketTestIamPermissionCall.html) (response)
+/// * [test iam permissions objects](struct.ObjectTestIamPermissionCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TestIamPermissionsResponse {
+    /// The kind of item this is.
+    pub kind: Option<String>,
+    /// The permissions held by the caller. Permissions are always of the format storage.resource.capability, where resource is one of buckets or objects. The supported permissions are as follows:  
+    /// - storage.buckets.delete — Delete bucket.  
+    /// - storage.buckets.get — Read bucket metadata.  
+    /// - storage.buckets.getIamPolicy — Read bucket IAM policy.  
+    /// - storage.buckets.create — Create bucket.  
+    /// - storage.buckets.list — List buckets.  
+    /// - storage.buckets.setIamPolicy — Update bucket IAM policy.  
+    /// - storage.buckets.update — Update bucket metadata.  
+    /// - storage.objects.delete — Delete object.  
+    /// - storage.objects.get — Read object data and metadata.  
+    /// - storage.objects.getIamPolicy — Read object IAM policy.  
+    /// - storage.objects.create — Create object.  
+    /// - storage.objects.list — List objects.  
+    /// - storage.objects.setIamPolicy — Update object IAM policy.  
+    /// - storage.objects.update — Update object metadata.
+    pub permissions: Option<Vec<String>>,
+}
+
+impl ResponseResult for TestIamPermissionsResponse {}
+
+
+/// The bucket's lifecycle configuration. See lifecycle management for more information.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BucketLifecycle {
+    /// A lifecycle management rule, which is made of an action to take and the condition(s) under which the action will be taken.
+    pub rule: Option<Vec<BucketLifecycleRule>>,
+}
+
+impl NestedType for BucketLifecycle {}
+impl Part for BucketLifecycle {}
 
 
 /// A Compose request.
@@ -1194,6 +1087,308 @@ pub struct Buckets {
 }
 
 impl ResponseResult for Buckets {}
+
+
+/// An object.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [get iam policy objects](struct.ObjectGetIamPolicyCall.html) (none)
+/// * [list objects](struct.ObjectListCall.html) (none)
+/// * [rewrite objects](struct.ObjectRewriteCall.html) (request)
+/// * [test iam permissions objects](struct.ObjectTestIamPermissionCall.html) (none)
+/// * [copy objects](struct.ObjectCopyCall.html) (request|response)
+/// * [watch all objects](struct.ObjectWatchAllCall.html) (none)
+/// * [get objects](struct.ObjectGetCall.html) (response)
+/// * [set iam policy objects](struct.ObjectSetIamPolicyCall.html) (none)
+/// * [insert objects](struct.ObjectInsertCall.html) (request|response)
+/// * [compose objects](struct.ObjectComposeCall.html) (response)
+/// * [update objects](struct.ObjectUpdateCall.html) (request|response)
+/// * [delete objects](struct.ObjectDeleteCall.html) (none)
+/// * [patch objects](struct.ObjectPatchCall.html) (request|response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Object {
+    /// The link to this object.
+    #[serde(rename="selfLink")]
+    pub self_link: Option<String>,
+    /// The modification time of the object metadata in RFC 3339 format.
+    pub updated: Option<String>,
+    /// Content-Type of the object data. If contentType is not specified, object downloads will be served as application/octet-stream.
+    #[serde(rename="contentType")]
+    pub content_type: Option<String>,
+    /// The creation time of the object in RFC 3339 format.
+    #[serde(rename="timeCreated")]
+    pub time_created: Option<String>,
+    /// The content generation of this object. Used for object versioning.
+    pub generation: Option<String>,
+    /// Metadata of customer-supplied encryption key, if the object is encrypted by such a key.
+    #[serde(rename="customerEncryption")]
+    pub customer_encryption: Option<ObjectCustomerEncryption>,
+    /// Number of underlying components that make up this object. Components are accumulated by compose operations.
+    #[serde(rename="componentCount")]
+    pub component_count: Option<i32>,
+    /// The time at which the object's storage class was last changed. When the object is initially created, it will be set to timeCreated.
+    #[serde(rename="timeStorageClassUpdated")]
+    pub time_storage_class_updated: Option<String>,
+    /// The version of the metadata for this object at this generation. Used for preconditions and for detecting changes in metadata. A metageneration number is only meaningful in the context of a particular generation of a particular object.
+    pub metageneration: Option<String>,
+    /// Media download link.
+    #[serde(rename="mediaLink")]
+    pub media_link: Option<String>,
+    /// The owner of the object. This will always be the uploader of the object.
+    pub owner: Option<ObjectOwner>,
+    /// Cache-Control directive for the object data. If omitted, and the object is accessible to all anonymous users, the default will be public, max-age=3600.
+    #[serde(rename="cacheControl")]
+    pub cache_control: Option<String>,
+    /// Access controls on the object.
+    pub acl: Option<Vec<ObjectAccessControl>>,
+    /// The ID of the object, including the bucket name, object name, and generation number.
+    pub id: Option<String>,
+    /// Content-Length of the data in bytes.
+    pub size: Option<String>,
+    /// The deletion time of the object in RFC 3339 format. Will be returned if and only if this version of the object has been deleted.
+    #[serde(rename="timeDeleted")]
+    pub time_deleted: Option<String>,
+    /// The kind of item this is. For objects, this is always storage#object.
+    pub kind: Option<String>,
+    /// Content-Language of the object data.
+    #[serde(rename="contentLanguage")]
+    pub content_language: Option<String>,
+    /// The name of the object. Required if not specified by URL parameter.
+    pub name: Option<String>,
+    /// MD5 hash of the data; encoded using base64. For more information about using the MD5 hash, see Hashes and ETags: Best Practices.
+    #[serde(rename="md5Hash")]
+    pub md5_hash: Option<String>,
+    /// The name of the bucket containing this object.
+    pub bucket: Option<String>,
+    /// Content-Encoding of the object data.
+    #[serde(rename="contentEncoding")]
+    pub content_encoding: Option<String>,
+    /// CRC32c checksum, as described in RFC 4960, Appendix B; encoded using base64 in big-endian byte order. For more information about using the CRC32c checksum, see Hashes and ETags: Best Practices.
+    pub crc32c: Option<String>,
+    /// HTTP 1.1 Entity tag for the object.
+    pub etag: Option<String>,
+    /// Storage class of the object.
+    #[serde(rename="storageClass")]
+    pub storage_class: Option<String>,
+    /// Content-Disposition of the object data.
+    #[serde(rename="contentDisposition")]
+    pub content_disposition: Option<String>,
+    /// User-provided metadata, in key/value pairs.
+    pub metadata: Option<HashMap<String, String>>,
+}
+
+impl RequestValue for Object {}
+impl Resource for Object {}
+impl ResponseResult for Object {}
+
+
+/// The bucket's website configuration, controlling how the service behaves when accessing bucket contents as a web site. See the Static Website Examples for more information.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BucketWebsite {
+    /// If the requested object path is missing, and any mainPageSuffix object is missing, if applicable, the service will return the named object from this bucket as the content for a 404 Not Found result.
+    #[serde(rename="notFoundPage")]
+    pub not_found_page: Option<String>,
+    /// If the requested object path is missing, the service will ensure the path has a trailing '/', append this suffix, and attempt to retrieve the resulting object. This allows the creation of index.html objects to represent directory pages.
+    #[serde(rename="mainPageSuffix")]
+    pub main_page_suffix: Option<String>,
+}
+
+impl NestedType for BucketWebsite {}
+impl Part for BucketWebsite {}
+
+
+/// The owner of the object. This will always be the uploader of the object.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ObjectOwner {
+    /// The ID for the entity.
+    #[serde(rename="entityId")]
+    pub entity_id: Option<String>,
+    /// The entity, in the form user-userId.
+    pub entity: Option<String>,
+}
+
+impl NestedType for ObjectOwner {}
+impl Part for ObjectOwner {}
+
+
+/// The owner of the bucket. This is always the project team's owner group.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BucketOwner {
+    /// The ID for the entity.
+    #[serde(rename="entityId")]
+    pub entity_id: Option<String>,
+    /// The entity, in the form project-owner-projectId.
+    pub entity: Option<String>,
+}
+
+impl NestedType for BucketOwner {}
+impl Part for BucketOwner {}
+
+
+/// A list of notification subscriptions.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list notifications](struct.NotificationListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Notifications {
+    /// The list of items.
+    pub items: Option<Vec<Notification>>,
+    /// The kind of item this is. For lists of notifications, this is always storage#notifications.
+    pub kind: Option<String>,
+}
+
+impl ResponseResult for Notifications {}
+
+
+/// A list of objects.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list objects](struct.ObjectListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Objects {
+    /// The continuation token, used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The list of items.
+    pub items: Option<Vec<Object>>,
+    /// The kind of item this is. For lists of objects, this is always storage#objects.
+    pub kind: Option<String>,
+    /// The list of prefixes of objects matching-but-not-listed up to and including the requested delimiter.
+    pub prefixes: Option<Vec<String>>,
+}
+
+impl ResponseResult for Objects {}
+
+
+/// The bucket's billing configuration.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BucketBilling {
+    /// When set to true, bucket is requester pays.
+    #[serde(rename="requesterPays")]
+    pub requester_pays: Option<bool>,
+}
+
+impl NestedType for BucketBilling {}
+impl Part for BucketBilling {}
+
+
+/// A subscription to receive Google PubSub notifications.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [insert notifications](struct.NotificationInsertCall.html) (request|response)
+/// * [list notifications](struct.NotificationListCall.html) (none)
+/// * [delete notifications](struct.NotificationDeleteCall.html) (none)
+/// * [get notifications](struct.NotificationGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Notification {
+    /// The kind of item this is. For notifications, this is always storage#notification.
+    pub kind: Option<String>,
+    /// An optional list of additional attributes to attach to each Cloud PubSub message published for this notification subscription.
+    pub custom_attributes: Option<HashMap<String, String>>,
+    /// The ID of the notification.
+    pub id: Option<String>,
+    /// The Cloud PubSub topic to which this subscription publishes. Formatted as: '//pubsub.googleapis.com/projects/{project-identifier}/topics/{my-topic}'
+    pub topic: Option<String>,
+    /// HTTP 1.1 Entity tag for this subscription notification.
+    pub etag: Option<String>,
+    /// If present, only send notifications about listed event types. If empty, sent notifications for all event types.
+    pub event_types: Option<Vec<String>>,
+    /// If present, only apply this notification configuration to object names that begin with this prefix.
+    pub object_name_prefix: Option<String>,
+    /// The desired content of the Payload.
+    pub payload_format: Option<String>,
+    /// The canonical URL of this notification.
+    #[serde(rename="selfLink")]
+    pub self_link: Option<String>,
+}
+
+impl RequestValue for Notification {}
+impl Resource for Notification {}
+impl ResponseResult for Notification {}
+
+
+/// An access-control list.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list object access controls](struct.ObjectAccessControlListCall.html) (response)
+/// * [list default object access controls](struct.DefaultObjectAccessControlListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ObjectAccessControls {
+    /// The list of items.
+    pub items: Option<Vec<ObjectAccessControl>>,
+    /// The kind of item this is. For lists of object access control entries, this is always storage#objectAccessControls.
+    pub kind: Option<String>,
+}
+
+impl ResponseResult for ObjectAccessControls {}
+
+
+/// The project team associated with the entity, if any.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BucketAccessControlProjectTeam {
+    /// The project number.
+    #[serde(rename="projectNumber")]
+    pub project_number: Option<String>,
+    /// The team.
+    pub team: Option<String>,
+}
+
+impl NestedType for BucketAccessControlProjectTeam {}
+impl Part for BucketAccessControlProjectTeam {}
+
+
+/// The bucket's versioning configuration.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BucketVersioning {
+    /// While set to true, versioning is fully enabled for this bucket.
+    pub enabled: Option<bool>,
+}
+
+impl NestedType for BucketVersioning {}
+impl Part for BucketVersioning {}
 
 
 
@@ -1252,27 +1447,7 @@ impl<'a, C, A> DefaultObjectAccessControlMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _bucket: bucket.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Updates a default object ACL entry on the specified bucket.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `bucket` - Name of a bucket.
-    /// * `entity` - The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
-    pub fn update(&self, request: ObjectAccessControl, bucket: &str, entity: &str) -> DefaultObjectAccessControlUpdateCall<'a, C, A> {
-        DefaultObjectAccessControlUpdateCall {
-            hub: self.hub,
-            _request: request,
-            _bucket: bucket.to_string(),
-            _entity: entity.to_string(),
+            _user_project: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1290,6 +1465,7 @@ impl<'a, C, A> DefaultObjectAccessControlMethods<'a, C, A> {
         DefaultObjectAccessControlListCall {
             hub: self.hub,
             _bucket: bucket.to_string(),
+            _user_project: Default::default(),
             _if_metageneration_not_match: Default::default(),
             _if_metageneration_match: Default::default(),
             _delegate: Default::default(),
@@ -1313,6 +1489,7 @@ impl<'a, C, A> DefaultObjectAccessControlMethods<'a, C, A> {
             _request: request,
             _bucket: bucket.to_string(),
             _entity: entity.to_string(),
+            _user_project: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1332,6 +1509,29 @@ impl<'a, C, A> DefaultObjectAccessControlMethods<'a, C, A> {
             hub: self.hub,
             _bucket: bucket.to_string(),
             _entity: entity.to_string(),
+            _user_project: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates a default object ACL entry on the specified bucket.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `bucket` - Name of a bucket.
+    /// * `entity` - The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
+    pub fn update(&self, request: ObjectAccessControl, bucket: &str, entity: &str) -> DefaultObjectAccessControlUpdateCall<'a, C, A> {
+        DefaultObjectAccessControlUpdateCall {
+            hub: self.hub,
+            _request: request,
+            _bucket: bucket.to_string(),
+            _entity: entity.to_string(),
+            _user_project: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1351,6 +1551,7 @@ impl<'a, C, A> DefaultObjectAccessControlMethods<'a, C, A> {
             hub: self.hub,
             _bucket: bucket.to_string(),
             _entity: entity.to_string(),
+            _user_project: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1413,6 +1614,7 @@ impl<'a, C, A> BucketAccessControlMethods<'a, C, A> {
             _request: request,
             _bucket: bucket.to_string(),
             _entity: entity.to_string(),
+            _user_project: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1432,6 +1634,7 @@ impl<'a, C, A> BucketAccessControlMethods<'a, C, A> {
             hub: self.hub,
             _bucket: bucket.to_string(),
             _entity: entity.to_string(),
+            _user_project: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1451,6 +1654,7 @@ impl<'a, C, A> BucketAccessControlMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _bucket: bucket.to_string(),
+            _user_project: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1470,6 +1674,7 @@ impl<'a, C, A> BucketAccessControlMethods<'a, C, A> {
             hub: self.hub,
             _bucket: bucket.to_string(),
             _entity: entity.to_string(),
+            _user_project: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1491,6 +1696,7 @@ impl<'a, C, A> BucketAccessControlMethods<'a, C, A> {
             _request: request,
             _bucket: bucket.to_string(),
             _entity: entity.to_string(),
+            _user_project: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1508,6 +1714,7 @@ impl<'a, C, A> BucketAccessControlMethods<'a, C, A> {
         BucketAccessControlListCall {
             hub: self.hub,
             _bucket: bucket.to_string(),
+            _user_project: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1575,6 +1782,125 @@ impl<'a, C, A> ChannelMethods<'a, C, A> {
 
 
 
+/// A builder providing access to all methods supported on *notification* resources.
+/// It is not used directly, but through the `Storage` hub.
+///
+/// # Example
+///
+/// Instantiate a resource builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_storage1 as storage1;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// use storage1::Storage;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = Storage::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
+/// // like `delete(...)`, `get(...)`, `insert(...)` and `list(...)`
+/// // to build up your call.
+/// let rb = hub.notifications();
+/// # }
+/// ```
+pub struct NotificationMethods<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Storage<C, A>,
+}
+
+impl<'a, C, A> MethodsBuilder for NotificationMethods<'a, C, A> {}
+
+impl<'a, C, A> NotificationMethods<'a, C, A> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Creates a notification subscription for a given bucket.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `bucket` - The parent bucket of the notification.
+    pub fn insert(&self, request: Notification, bucket: &str) -> NotificationInsertCall<'a, C, A> {
+        NotificationInsertCall {
+            hub: self.hub,
+            _request: request,
+            _bucket: bucket.to_string(),
+            _user_project: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Permanently deletes a notification subscription.
+    /// 
+    /// # Arguments
+    ///
+    /// * `bucket` - The parent bucket of the notification.
+    /// * `notification` - ID of the notification to delete.
+    pub fn delete(&self, bucket: &str, notification: &str) -> NotificationDeleteCall<'a, C, A> {
+        NotificationDeleteCall {
+            hub: self.hub,
+            _bucket: bucket.to_string(),
+            _notification: notification.to_string(),
+            _user_project: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// View a notification configuration.
+    /// 
+    /// # Arguments
+    ///
+    /// * `bucket` - The parent bucket of the notification.
+    /// * `notification` - Notification ID
+    pub fn get(&self, bucket: &str, notification: &str) -> NotificationGetCall<'a, C, A> {
+        NotificationGetCall {
+            hub: self.hub,
+            _bucket: bucket.to_string(),
+            _notification: notification.to_string(),
+            _user_project: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Retrieves a list of notification subscriptions for a given bucket.
+    /// 
+    /// # Arguments
+    ///
+    /// * `bucket` - Name of a GCS bucket.
+    pub fn list(&self, bucket: &str) -> NotificationListCall<'a, C, A> {
+        NotificationListCall {
+            hub: self.hub,
+            _bucket: bucket.to_string(),
+            _user_project: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+}
+
+
+
 /// A builder providing access to all methods supported on *object* resources.
 /// It is not used directly, but through the `Storage` hub.
 ///
@@ -1598,7 +1924,7 @@ impl<'a, C, A> ChannelMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Storage::new(hyper::Client::new(), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `compose(...)`, `copy(...)`, `delete(...)`, `get(...)`, `insert(...)`, `list(...)`, `patch(...)`, `rewrite(...)`, `update(...)` and `watch_all(...)`
+/// // like `compose(...)`, `copy(...)`, `delete(...)`, `get(...)`, `get_iam_policy(...)`, `insert(...)`, `list(...)`, `patch(...)`, `rewrite(...)`, `set_iam_policy(...)`, `test_iam_permissions(...)`, `update(...)` and `watch_all(...)`
 /// // to build up your call.
 /// let rb = hub.objects();
 /// # }
@@ -1632,6 +1958,7 @@ impl<'a, C, A> ObjectMethods<'a, C, A> {
             _source_object: source_object.to_string(),
             _destination_bucket: destination_bucket.to_string(),
             _destination_object: destination_object.to_string(),
+            _user_project: Default::default(),
             _source_generation: Default::default(),
             _rewrite_token: Default::default(),
             _projection: Default::default(),
@@ -1664,35 +1991,8 @@ impl<'a, C, A> ObjectMethods<'a, C, A> {
             hub: self.hub,
             _bucket: bucket.to_string(),
             _object: object.to_string(),
+            _user_project: Default::default(),
             _projection: Default::default(),
-            _if_metageneration_not_match: Default::default(),
-            _if_metageneration_match: Default::default(),
-            _if_generation_not_match: Default::default(),
-            _if_generation_match: Default::default(),
-            _generation: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Updates an object's metadata.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `bucket` - Name of the bucket in which the object resides.
-    /// * `object` - Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
-    pub fn update(&self, request: Object, bucket: &str, object: &str) -> ObjectUpdateCall<'a, C, A> {
-        ObjectUpdateCall {
-            hub: self.hub,
-            _request: request,
-            _bucket: bucket.to_string(),
-            _object: object.to_string(),
-            _projection: Default::default(),
-            _predefined_acl: Default::default(),
             _if_metageneration_not_match: Default::default(),
             _if_metageneration_match: Default::default(),
             _if_generation_not_match: Default::default(),
@@ -1718,11 +2018,85 @@ impl<'a, C, A> ObjectMethods<'a, C, A> {
             _request: request,
             _bucket: bucket.to_string(),
             _versions: Default::default(),
+            _user_project: Default::default(),
             _projection: Default::default(),
             _prefix: Default::default(),
             _page_token: Default::default(),
             _max_results: Default::default(),
             _delimiter: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates an IAM policy for the specified object.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `bucket` - Name of the bucket in which the object resides.
+    /// * `object` - Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
+    pub fn set_iam_policy(&self, request: Policy, bucket: &str, object: &str) -> ObjectSetIamPolicyCall<'a, C, A> {
+        ObjectSetIamPolicyCall {
+            hub: self.hub,
+            _request: request,
+            _bucket: bucket.to_string(),
+            _object: object.to_string(),
+            _user_project: Default::default(),
+            _generation: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns an IAM policy for the specified object.
+    /// 
+    /// # Arguments
+    ///
+    /// * `bucket` - Name of the bucket in which the object resides.
+    /// * `object` - Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
+    pub fn get_iam_policy(&self, bucket: &str, object: &str) -> ObjectGetIamPolicyCall<'a, C, A> {
+        ObjectGetIamPolicyCall {
+            hub: self.hub,
+            _bucket: bucket.to_string(),
+            _object: object.to_string(),
+            _user_project: Default::default(),
+            _generation: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates an object's metadata.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `bucket` - Name of the bucket in which the object resides.
+    /// * `object` - Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
+    pub fn update(&self, request: Object, bucket: &str, object: &str) -> ObjectUpdateCall<'a, C, A> {
+        ObjectUpdateCall {
+            hub: self.hub,
+            _request: request,
+            _bucket: bucket.to_string(),
+            _object: object.to_string(),
+            _user_project: Default::default(),
+            _projection: Default::default(),
+            _predefined_acl: Default::default(),
+            _if_metageneration_not_match: Default::default(),
+            _if_metageneration_match: Default::default(),
+            _if_generation_not_match: Default::default(),
+            _if_generation_match: Default::default(),
+            _generation: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1742,6 +2116,7 @@ impl<'a, C, A> ObjectMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _bucket: bucket.to_string(),
+            _user_project: Default::default(),
             _projection: Default::default(),
             _predefined_acl: Default::default(),
             _name: Default::default(),
@@ -1771,6 +2146,7 @@ impl<'a, C, A> ObjectMethods<'a, C, A> {
             _request: request,
             _destination_bucket: destination_bucket.to_string(),
             _destination_object: destination_object.to_string(),
+            _user_project: Default::default(),
             _if_metageneration_match: Default::default(),
             _if_generation_match: Default::default(),
             _destination_predefined_acl: Default::default(),
@@ -1793,6 +2169,7 @@ impl<'a, C, A> ObjectMethods<'a, C, A> {
             hub: self.hub,
             _bucket: bucket.to_string(),
             _object: object.to_string(),
+            _user_project: Default::default(),
             _if_metageneration_not_match: Default::default(),
             _if_metageneration_match: Default::default(),
             _if_generation_not_match: Default::default(),
@@ -1816,11 +2193,35 @@ impl<'a, C, A> ObjectMethods<'a, C, A> {
             hub: self.hub,
             _bucket: bucket.to_string(),
             _versions: Default::default(),
+            _user_project: Default::default(),
             _projection: Default::default(),
             _prefix: Default::default(),
             _page_token: Default::default(),
             _max_results: Default::default(),
             _delimiter: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Tests a set of permissions on the given object to see which, if any, are held by the caller.
+    /// 
+    /// # Arguments
+    ///
+    /// * `bucket` - Name of the bucket in which the object resides.
+    /// * `object` - Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
+    /// * `permissions` - Permissions to test.
+    pub fn test_iam_permissions(&self, bucket: &str, object: &str, permissions: &Vec<String>) -> ObjectTestIamPermissionCall<'a, C, A> {
+        ObjectTestIamPermissionCall {
+            hub: self.hub,
+            _bucket: bucket.to_string(),
+            _object: object.to_string(),
+            _permissions: permissions.clone(),
+            _user_project: Default::default(),
+            _generation: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1846,6 +2247,7 @@ impl<'a, C, A> ObjectMethods<'a, C, A> {
             _source_object: source_object.to_string(),
             _destination_bucket: destination_bucket.to_string(),
             _destination_object: destination_object.to_string(),
+            _user_project: Default::default(),
             _source_generation: Default::default(),
             _projection: Default::default(),
             _if_source_metageneration_not_match: Default::default(),
@@ -1878,6 +2280,7 @@ impl<'a, C, A> ObjectMethods<'a, C, A> {
             _request: request,
             _bucket: bucket.to_string(),
             _object: object.to_string(),
+            _user_project: Default::default(),
             _projection: Default::default(),
             _predefined_acl: Default::default(),
             _if_metageneration_not_match: Default::default(),
@@ -1934,19 +2337,20 @@ impl<'a, C, A> ObjectAccessControlMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new ACL entry on the specified object.
+    /// Returns the ACL entry for the specified entity on the specified object.
     /// 
     /// # Arguments
     ///
-    /// * `request` - No description provided.
     /// * `bucket` - Name of a bucket.
     /// * `object` - Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
-    pub fn insert(&self, request: ObjectAccessControl, bucket: &str, object: &str) -> ObjectAccessControlInsertCall<'a, C, A> {
-        ObjectAccessControlInsertCall {
+    /// * `entity` - The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
+    pub fn get(&self, bucket: &str, object: &str, entity: &str) -> ObjectAccessControlGetCall<'a, C, A> {
+        ObjectAccessControlGetCall {
             hub: self.hub,
-            _request: request,
             _bucket: bucket.to_string(),
             _object: object.to_string(),
+            _entity: entity.to_string(),
+            _user_project: Default::default(),
             _generation: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -1971,6 +2375,7 @@ impl<'a, C, A> ObjectAccessControlMethods<'a, C, A> {
             _bucket: bucket.to_string(),
             _object: object.to_string(),
             _entity: entity.to_string(),
+            _user_project: Default::default(),
             _generation: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -1991,6 +2396,7 @@ impl<'a, C, A> ObjectAccessControlMethods<'a, C, A> {
             hub: self.hub,
             _bucket: bucket.to_string(),
             _object: object.to_string(),
+            _user_project: Default::default(),
             _generation: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -2013,28 +2419,7 @@ impl<'a, C, A> ObjectAccessControlMethods<'a, C, A> {
             _bucket: bucket.to_string(),
             _object: object.to_string(),
             _entity: entity.to_string(),
-            _generation: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Returns the ACL entry for the specified entity on the specified object.
-    /// 
-    /// # Arguments
-    ///
-    /// * `bucket` - Name of a bucket.
-    /// * `object` - Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
-    /// * `entity` - The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
-    pub fn get(&self, bucket: &str, object: &str, entity: &str) -> ObjectAccessControlGetCall<'a, C, A> {
-        ObjectAccessControlGetCall {
-            hub: self.hub,
-            _bucket: bucket.to_string(),
-            _object: object.to_string(),
-            _entity: entity.to_string(),
+            _user_project: Default::default(),
             _generation: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -2059,6 +2444,30 @@ impl<'a, C, A> ObjectAccessControlMethods<'a, C, A> {
             _bucket: bucket.to_string(),
             _object: object.to_string(),
             _entity: entity.to_string(),
+            _user_project: Default::default(),
+            _generation: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Creates a new ACL entry on the specified object.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `bucket` - Name of a bucket.
+    /// * `object` - Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
+    pub fn insert(&self, request: ObjectAccessControl, bucket: &str, object: &str) -> ObjectAccessControlInsertCall<'a, C, A> {
+        ObjectAccessControlInsertCall {
+            hub: self.hub,
+            _request: request,
+            _bucket: bucket.to_string(),
+            _object: object.to_string(),
+            _user_project: Default::default(),
             _generation: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -2092,7 +2501,7 @@ impl<'a, C, A> ObjectAccessControlMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Storage::new(hyper::Client::new(), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `delete(...)`, `get(...)`, `insert(...)`, `list(...)`, `patch(...)` and `update(...)`
+/// // like `delete(...)`, `get(...)`, `get_iam_policy(...)`, `insert(...)`, `list(...)`, `patch(...)`, `set_iam_policy(...)`, `test_iam_permissions(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.buckets();
 /// # }
@@ -2109,6 +2518,31 @@ impl<'a, C, A> BucketMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Updates a bucket. Changes to the bucket will be readable immediately after writing, but configuration changes may take time to propagate. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `bucket` - Name of a bucket.
+    pub fn patch(&self, request: Bucket, bucket: &str) -> BucketPatchCall<'a, C, A> {
+        BucketPatchCall {
+            hub: self.hub,
+            _request: request,
+            _bucket: bucket.to_string(),
+            _user_project: Default::default(),
+            _projection: Default::default(),
+            _predefined_default_object_acl: Default::default(),
+            _predefined_acl: Default::default(),
+            _if_metageneration_not_match: Default::default(),
+            _if_metageneration_match: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Updates a bucket. Changes to the bucket will be readable immediately after writing, but configuration changes may take time to propagate.
     /// 
     /// # Arguments
@@ -2120,6 +2554,7 @@ impl<'a, C, A> BucketMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _bucket: bucket.to_string(),
+            _user_project: Default::default(),
             _projection: Default::default(),
             _predefined_default_object_acl: Default::default(),
             _predefined_acl: Default::default(),
@@ -2142,6 +2577,7 @@ impl<'a, C, A> BucketMethods<'a, C, A> {
         BucketGetCall {
             hub: self.hub,
             _bucket: bucket.to_string(),
+            _user_project: Default::default(),
             _projection: Default::default(),
             _if_metageneration_not_match: Default::default(),
             _if_metageneration_match: Default::default(),
@@ -2162,6 +2598,7 @@ impl<'a, C, A> BucketMethods<'a, C, A> {
         BucketDeleteCall {
             hub: self.hub,
             _bucket: bucket.to_string(),
+            _user_project: Default::default(),
             _if_metageneration_not_match: Default::default(),
             _if_metageneration_match: Default::default(),
             _delegate: Default::default(),
@@ -2194,22 +2631,56 @@ impl<'a, C, A> BucketMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a bucket. Changes to the bucket will be readable immediately after writing, but configuration changes may take time to propagate. This method supports patch semantics.
+    /// Tests a set of permissions on the given bucket to see which, if any, are held by the caller.
+    /// 
+    /// # Arguments
+    ///
+    /// * `bucket` - Name of a bucket.
+    /// * `permissions` - Permissions to test.
+    pub fn test_iam_permissions(&self, bucket: &str, permissions: &Vec<String>) -> BucketTestIamPermissionCall<'a, C, A> {
+        BucketTestIamPermissionCall {
+            hub: self.hub,
+            _bucket: bucket.to_string(),
+            _permissions: permissions.clone(),
+            _user_project: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates an IAM policy for the specified bucket.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
     /// * `bucket` - Name of a bucket.
-    pub fn patch(&self, request: Bucket, bucket: &str) -> BucketPatchCall<'a, C, A> {
-        BucketPatchCall {
+    pub fn set_iam_policy(&self, request: Policy, bucket: &str) -> BucketSetIamPolicyCall<'a, C, A> {
+        BucketSetIamPolicyCall {
             hub: self.hub,
             _request: request,
             _bucket: bucket.to_string(),
-            _projection: Default::default(),
-            _predefined_default_object_acl: Default::default(),
-            _predefined_acl: Default::default(),
-            _if_metageneration_not_match: Default::default(),
-            _if_metageneration_match: Default::default(),
+            _user_project: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns an IAM policy for the specified bucket.
+    /// 
+    /// # Arguments
+    ///
+    /// * `bucket` - Name of a bucket.
+    pub fn get_iam_policy(&self, bucket: &str) -> BucketGetIamPolicyCall<'a, C, A> {
+        BucketGetIamPolicyCall {
+            hub: self.hub,
+            _bucket: bucket.to_string(),
+            _user_project: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2231,6 +2702,64 @@ impl<'a, C, A> BucketMethods<'a, C, A> {
             _prefix: Default::default(),
             _page_token: Default::default(),
             _max_results: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+}
+
+
+
+/// A builder providing access to all methods supported on *project* resources.
+/// It is not used directly, but through the `Storage` hub.
+///
+/// # Example
+///
+/// Instantiate a resource builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_storage1 as storage1;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// use storage1::Storage;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = Storage::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
+/// // like `service_account_get(...)`
+/// // to build up your call.
+/// let rb = hub.projects();
+/// # }
+/// ```
+pub struct ProjectMethods<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Storage<C, A>,
+}
+
+impl<'a, C, A> MethodsBuilder for ProjectMethods<'a, C, A> {}
+
+impl<'a, C, A> ProjectMethods<'a, C, A> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Get the email address of this project's GCS service account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `projectId` - Project ID
+    pub fn service_account_get(&self, project_id: &str) -> ProjectServiceAccountGetCall<'a, C, A> {
+        ProjectServiceAccountGetCall {
+            hub: self.hub,
+            _project_id: project_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2279,6 +2808,7 @@ impl<'a, C, A> BucketMethods<'a, C, A> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.default_object_access_controls().insert(req, "bucket")
+///              .user_project("amet")
 ///              .doit();
 /// # }
 /// ```
@@ -2288,6 +2818,7 @@ pub struct DefaultObjectAccessControlInsertCall<'a, C, A>
     hub: &'a Storage<C, A>,
     _request: ObjectAccessControl,
     _bucket: String,
+    _user_project: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -2309,9 +2840,12 @@ impl<'a, C, A> DefaultObjectAccessControlInsertCall<'a, C, A> where C: BorrowMut
         };
         dlg.begin(MethodInfo { id: "storage.defaultObjectAccessControls.insert",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("bucket", self._bucket.to_string()));
-        for &field in ["alt", "bucket"].iter() {
+        if let Some(value) = self._user_project {
+            params.push(("userProject", value.to_string()));
+        }
+        for &field in ["alt", "bucket", "userProject"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -2323,7 +2857,7 @@ impl<'a, C, A> DefaultObjectAccessControlInsertCall<'a, C, A> where C: BorrowMut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "b/{bucket}/defaultObjectAcl";
+        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/defaultObjectAcl".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -2460,6 +2994,13 @@ impl<'a, C, A> DefaultObjectAccessControlInsertCall<'a, C, A> where C: BorrowMut
         self._bucket = new_value.to_string();
         self
     }
+    /// The project number to be billed for this request, for Requester Pays buckets.
+    ///
+    /// Sets the *user project* query property to the given value.
+    pub fn user_project(mut self, new_value: &str) -> DefaultObjectAccessControlInsertCall<'a, C, A> {
+        self._user_project = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -2512,284 +3053,6 @@ impl<'a, C, A> DefaultObjectAccessControlInsertCall<'a, C, A> where C: BorrowMut
 }
 
 
-/// Updates a default object ACL entry on the specified bucket.
-///
-/// A builder for the *update* method supported by a *defaultObjectAccessControl* resource.
-/// It is not used directly, but through a `DefaultObjectAccessControlMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_storage1 as storage1;
-/// use storage1::ObjectAccessControl;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use storage1::Storage;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::new(),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Storage::new(hyper::Client::new(), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = ObjectAccessControl::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.default_object_access_controls().update(req, "bucket", "entity")
-///              .doit();
-/// # }
-/// ```
-pub struct DefaultObjectAccessControlUpdateCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Storage<C, A>,
-    _request: ObjectAccessControl,
-    _bucket: String,
-    _entity: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for DefaultObjectAccessControlUpdateCall<'a, C, A> {}
-
-impl<'a, C, A> DefaultObjectAccessControlUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, ObjectAccessControl)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "storage.defaultObjectAccessControls.update",
-                               http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
-        params.push(("bucket", self._bucket.to_string()));
-        params.push(("entity", self._entity.to_string()));
-        for &field in ["alt", "bucket", "entity"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "b/{bucket}/defaultObjectAcl/{entity}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{bucket}", "bucket"), ("{entity}", "entity")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["entity", "bucket"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ObjectAccessControl) -> DefaultObjectAccessControlUpdateCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// Name of a bucket.
-    ///
-    /// Sets the *bucket* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn bucket(mut self, new_value: &str) -> DefaultObjectAccessControlUpdateCall<'a, C, A> {
-        self._bucket = new_value.to_string();
-        self
-    }
-    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
-    ///
-    /// Sets the *entity* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn entity(mut self, new_value: &str) -> DefaultObjectAccessControlUpdateCall<'a, C, A> {
-        self._entity = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DefaultObjectAccessControlUpdateCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> DefaultObjectAccessControlUpdateCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> DefaultObjectAccessControlUpdateCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._scopes.insert(scope.as_ref().to_string(), ());
-        self
-    }
-}
-
-
 /// Retrieves default object ACL entries on the specified bucket.
 ///
 /// A builder for the *list* method supported by a *defaultObjectAccessControl* resource.
@@ -2817,8 +3080,9 @@ impl<'a, C, A> DefaultObjectAccessControlUpdateCall<'a, C, A> where C: BorrowMut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.default_object_access_controls().list("bucket")
-///              .if_metageneration_not_match("amet")
-///              .if_metageneration_match("et")
+///              .user_project("consetetur")
+///              .if_metageneration_not_match("ut")
+///              .if_metageneration_match("ea")
 ///              .doit();
 /// # }
 /// ```
@@ -2827,6 +3091,7 @@ pub struct DefaultObjectAccessControlListCall<'a, C, A>
 
     hub: &'a Storage<C, A>,
     _bucket: String,
+    _user_project: Option<String>,
     _if_metageneration_not_match: Option<String>,
     _if_metageneration_match: Option<String>,
     _delegate: Option<&'a mut Delegate>,
@@ -2850,15 +3115,18 @@ impl<'a, C, A> DefaultObjectAccessControlListCall<'a, C, A> where C: BorrowMut<h
         };
         dlg.begin(MethodInfo { id: "storage.defaultObjectAccessControls.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("bucket", self._bucket.to_string()));
+        if let Some(value) = self._user_project {
+            params.push(("userProject", value.to_string()));
+        }
         if let Some(value) = self._if_metageneration_not_match {
             params.push(("ifMetagenerationNotMatch", value.to_string()));
         }
         if let Some(value) = self._if_metageneration_match {
             params.push(("ifMetagenerationMatch", value.to_string()));
         }
-        for &field in ["alt", "bucket", "ifMetagenerationNotMatch", "ifMetagenerationMatch"].iter() {
+        for &field in ["alt", "bucket", "userProject", "ifMetagenerationNotMatch", "ifMetagenerationMatch"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -2870,7 +3138,7 @@ impl<'a, C, A> DefaultObjectAccessControlListCall<'a, C, A> where C: BorrowMut<h
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "b/{bucket}/defaultObjectAcl";
+        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/defaultObjectAcl".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -2983,6 +3251,13 @@ impl<'a, C, A> DefaultObjectAccessControlListCall<'a, C, A> where C: BorrowMut<h
         self._bucket = new_value.to_string();
         self
     }
+    /// The project number to be billed for this request, for Requester Pays buckets.
+    ///
+    /// Sets the *user project* query property to the given value.
+    pub fn user_project(mut self, new_value: &str) -> DefaultObjectAccessControlListCall<'a, C, A> {
+        self._user_project = Some(new_value.to_string());
+        self
+    }
     /// If present, only return default ACL listing if the bucket's current metageneration does not match the given value.
     ///
     /// Sets the *if metageneration not match* query property to the given value.
@@ -3082,6 +3357,7 @@ impl<'a, C, A> DefaultObjectAccessControlListCall<'a, C, A> where C: BorrowMut<h
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.default_object_access_controls().patch(req, "bucket", "entity")
+///              .user_project("dolor")
 ///              .doit();
 /// # }
 /// ```
@@ -3092,6 +3368,7 @@ pub struct DefaultObjectAccessControlPatchCall<'a, C, A>
     _request: ObjectAccessControl,
     _bucket: String,
     _entity: String,
+    _user_project: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -3113,10 +3390,13 @@ impl<'a, C, A> DefaultObjectAccessControlPatchCall<'a, C, A> where C: BorrowMut<
         };
         dlg.begin(MethodInfo { id: "storage.defaultObjectAccessControls.patch",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("bucket", self._bucket.to_string()));
         params.push(("entity", self._entity.to_string()));
-        for &field in ["alt", "bucket", "entity"].iter() {
+        if let Some(value) = self._user_project {
+            params.push(("userProject", value.to_string()));
+        }
+        for &field in ["alt", "bucket", "entity", "userProject"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -3128,7 +3408,7 @@ impl<'a, C, A> DefaultObjectAccessControlPatchCall<'a, C, A> where C: BorrowMut<
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "b/{bucket}/defaultObjectAcl/{entity}";
+        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/defaultObjectAcl/{entity}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -3275,6 +3555,13 @@ impl<'a, C, A> DefaultObjectAccessControlPatchCall<'a, C, A> where C: BorrowMut<
         self._entity = new_value.to_string();
         self
     }
+    /// The project number to be billed for this request, for Requester Pays buckets.
+    ///
+    /// Sets the *user project* query property to the given value.
+    pub fn user_project(mut self, new_value: &str) -> DefaultObjectAccessControlPatchCall<'a, C, A> {
+        self._user_project = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -3354,6 +3641,7 @@ impl<'a, C, A> DefaultObjectAccessControlPatchCall<'a, C, A> where C: BorrowMut<
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.default_object_access_controls().delete("bucket", "entity")
+///              .user_project("consetetur")
 ///              .doit();
 /// # }
 /// ```
@@ -3363,6 +3651,7 @@ pub struct DefaultObjectAccessControlDeleteCall<'a, C, A>
     hub: &'a Storage<C, A>,
     _bucket: String,
     _entity: String,
+    _user_project: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -3384,10 +3673,13 @@ impl<'a, C, A> DefaultObjectAccessControlDeleteCall<'a, C, A> where C: BorrowMut
         };
         dlg.begin(MethodInfo { id: "storage.defaultObjectAccessControls.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("bucket", self._bucket.to_string()));
         params.push(("entity", self._entity.to_string()));
-        for &field in ["bucket", "entity"].iter() {
+        if let Some(value) = self._user_project {
+            params.push(("userProject", value.to_string()));
+        }
+        for &field in ["bucket", "entity", "userProject"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -3398,7 +3690,7 @@ impl<'a, C, A> DefaultObjectAccessControlDeleteCall<'a, C, A> where C: BorrowMut
         }
 
 
-        let mut url = self.hub._base_url.clone() + "b/{bucket}/defaultObjectAcl/{entity}";
+        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/defaultObjectAcl/{entity}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -3511,6 +3803,13 @@ impl<'a, C, A> DefaultObjectAccessControlDeleteCall<'a, C, A> where C: BorrowMut
         self._entity = new_value.to_string();
         self
     }
+    /// The project number to be billed for this request, for Requester Pays buckets.
+    ///
+    /// Sets the *user project* query property to the given value.
+    pub fn user_project(mut self, new_value: &str) -> DefaultObjectAccessControlDeleteCall<'a, C, A> {
+        self._user_project = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -3563,6 +3862,296 @@ impl<'a, C, A> DefaultObjectAccessControlDeleteCall<'a, C, A> where C: BorrowMut
 }
 
 
+/// Updates a default object ACL entry on the specified bucket.
+///
+/// A builder for the *update* method supported by a *defaultObjectAccessControl* resource.
+/// It is not used directly, but through a `DefaultObjectAccessControlMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storage1 as storage1;
+/// use storage1::ObjectAccessControl;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use storage1::Storage;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Storage::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = ObjectAccessControl::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.default_object_access_controls().update(req, "bucket", "entity")
+///              .user_project("Lorem")
+///              .doit();
+/// # }
+/// ```
+pub struct DefaultObjectAccessControlUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Storage<C, A>,
+    _request: ObjectAccessControl,
+    _bucket: String,
+    _entity: String,
+    _user_project: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for DefaultObjectAccessControlUpdateCall<'a, C, A> {}
+
+impl<'a, C, A> DefaultObjectAccessControlUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ObjectAccessControl)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "storage.defaultObjectAccessControls.update",
+                               http_method: hyper::method::Method::Put });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        params.push(("bucket", self._bucket.to_string()));
+        params.push(("entity", self._entity.to_string()));
+        if let Some(value) = self._user_project {
+            params.push(("userProject", value.to_string()));
+        }
+        for &field in ["alt", "bucket", "entity", "userProject"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/defaultObjectAcl/{entity}".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{bucket}", "bucket"), ("{entity}", "entity")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["entity", "bucket"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: ObjectAccessControl) -> DefaultObjectAccessControlUpdateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Name of a bucket.
+    ///
+    /// Sets the *bucket* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn bucket(mut self, new_value: &str) -> DefaultObjectAccessControlUpdateCall<'a, C, A> {
+        self._bucket = new_value.to_string();
+        self
+    }
+    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
+    ///
+    /// Sets the *entity* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn entity(mut self, new_value: &str) -> DefaultObjectAccessControlUpdateCall<'a, C, A> {
+        self._entity = new_value.to_string();
+        self
+    }
+    /// The project number to be billed for this request, for Requester Pays buckets.
+    ///
+    /// Sets the *user project* query property to the given value.
+    pub fn user_project(mut self, new_value: &str) -> DefaultObjectAccessControlUpdateCall<'a, C, A> {
+        self._user_project = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DefaultObjectAccessControlUpdateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> DefaultObjectAccessControlUpdateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> DefaultObjectAccessControlUpdateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
 /// Returns the default object ACL entry for the specified entity on the specified bucket.
 ///
 /// A builder for the *get* method supported by a *defaultObjectAccessControl* resource.
@@ -3590,6 +4179,7 @@ impl<'a, C, A> DefaultObjectAccessControlDeleteCall<'a, C, A> where C: BorrowMut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.default_object_access_controls().get("bucket", "entity")
+///              .user_project("sit")
 ///              .doit();
 /// # }
 /// ```
@@ -3599,6 +4189,7 @@ pub struct DefaultObjectAccessControlGetCall<'a, C, A>
     hub: &'a Storage<C, A>,
     _bucket: String,
     _entity: String,
+    _user_project: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -3620,10 +4211,13 @@ impl<'a, C, A> DefaultObjectAccessControlGetCall<'a, C, A> where C: BorrowMut<hy
         };
         dlg.begin(MethodInfo { id: "storage.defaultObjectAccessControls.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("bucket", self._bucket.to_string()));
         params.push(("entity", self._entity.to_string()));
-        for &field in ["alt", "bucket", "entity"].iter() {
+        if let Some(value) = self._user_project {
+            params.push(("userProject", value.to_string()));
+        }
+        for &field in ["alt", "bucket", "entity", "userProject"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -3635,7 +4229,7 @@ impl<'a, C, A> DefaultObjectAccessControlGetCall<'a, C, A> where C: BorrowMut<hy
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "b/{bucket}/defaultObjectAcl/{entity}";
+        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/defaultObjectAcl/{entity}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -3758,6 +4352,13 @@ impl<'a, C, A> DefaultObjectAccessControlGetCall<'a, C, A> where C: BorrowMut<hy
         self._entity = new_value.to_string();
         self
     }
+    /// The project number to be billed for this request, for Requester Pays buckets.
+    ///
+    /// Sets the *user project* query property to the given value.
+    pub fn user_project(mut self, new_value: &str) -> DefaultObjectAccessControlGetCall<'a, C, A> {
+        self._user_project = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -3843,6 +4444,7 @@ impl<'a, C, A> DefaultObjectAccessControlGetCall<'a, C, A> where C: BorrowMut<hy
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bucket_access_controls().patch(req, "bucket", "entity")
+///              .user_project("rebum.")
 ///              .doit();
 /// # }
 /// ```
@@ -3853,6 +4455,7 @@ pub struct BucketAccessControlPatchCall<'a, C, A>
     _request: BucketAccessControl,
     _bucket: String,
     _entity: String,
+    _user_project: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -3874,10 +4477,13 @@ impl<'a, C, A> BucketAccessControlPatchCall<'a, C, A> where C: BorrowMut<hyper::
         };
         dlg.begin(MethodInfo { id: "storage.bucketAccessControls.patch",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("bucket", self._bucket.to_string()));
         params.push(("entity", self._entity.to_string()));
-        for &field in ["alt", "bucket", "entity"].iter() {
+        if let Some(value) = self._user_project {
+            params.push(("userProject", value.to_string()));
+        }
+        for &field in ["alt", "bucket", "entity", "userProject"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -3889,7 +4495,7 @@ impl<'a, C, A> BucketAccessControlPatchCall<'a, C, A> where C: BorrowMut<hyper::
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "b/{bucket}/acl/{entity}";
+        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/acl/{entity}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -4036,6 +4642,13 @@ impl<'a, C, A> BucketAccessControlPatchCall<'a, C, A> where C: BorrowMut<hyper::
         self._entity = new_value.to_string();
         self
     }
+    /// The project number to be billed for this request, for Requester Pays buckets.
+    ///
+    /// Sets the *user project* query property to the given value.
+    pub fn user_project(mut self, new_value: &str) -> BucketAccessControlPatchCall<'a, C, A> {
+        self._user_project = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -4115,6 +4728,7 @@ impl<'a, C, A> BucketAccessControlPatchCall<'a, C, A> where C: BorrowMut<hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bucket_access_controls().delete("bucket", "entity")
+///              .user_project("vero")
 ///              .doit();
 /// # }
 /// ```
@@ -4124,6 +4738,7 @@ pub struct BucketAccessControlDeleteCall<'a, C, A>
     hub: &'a Storage<C, A>,
     _bucket: String,
     _entity: String,
+    _user_project: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -4145,10 +4760,13 @@ impl<'a, C, A> BucketAccessControlDeleteCall<'a, C, A> where C: BorrowMut<hyper:
         };
         dlg.begin(MethodInfo { id: "storage.bucketAccessControls.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("bucket", self._bucket.to_string()));
         params.push(("entity", self._entity.to_string()));
-        for &field in ["bucket", "entity"].iter() {
+        if let Some(value) = self._user_project {
+            params.push(("userProject", value.to_string()));
+        }
+        for &field in ["bucket", "entity", "userProject"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -4159,7 +4777,7 @@ impl<'a, C, A> BucketAccessControlDeleteCall<'a, C, A> where C: BorrowMut<hyper:
         }
 
 
-        let mut url = self.hub._base_url.clone() + "b/{bucket}/acl/{entity}";
+        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/acl/{entity}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -4272,6 +4890,13 @@ impl<'a, C, A> BucketAccessControlDeleteCall<'a, C, A> where C: BorrowMut<hyper:
         self._entity = new_value.to_string();
         self
     }
+    /// The project number to be billed for this request, for Requester Pays buckets.
+    ///
+    /// Sets the *user project* query property to the given value.
+    pub fn user_project(mut self, new_value: &str) -> BucketAccessControlDeleteCall<'a, C, A> {
+        self._user_project = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -4357,6 +4982,7 @@ impl<'a, C, A> BucketAccessControlDeleteCall<'a, C, A> where C: BorrowMut<hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bucket_access_controls().insert(req, "bucket")
+///              .user_project("invidunt")
 ///              .doit();
 /// # }
 /// ```
@@ -4366,6 +4992,7 @@ pub struct BucketAccessControlInsertCall<'a, C, A>
     hub: &'a Storage<C, A>,
     _request: BucketAccessControl,
     _bucket: String,
+    _user_project: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -4387,9 +5014,12 @@ impl<'a, C, A> BucketAccessControlInsertCall<'a, C, A> where C: BorrowMut<hyper:
         };
         dlg.begin(MethodInfo { id: "storage.bucketAccessControls.insert",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("bucket", self._bucket.to_string()));
-        for &field in ["alt", "bucket"].iter() {
+        if let Some(value) = self._user_project {
+            params.push(("userProject", value.to_string()));
+        }
+        for &field in ["alt", "bucket", "userProject"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -4401,7 +5031,7 @@ impl<'a, C, A> BucketAccessControlInsertCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "b/{bucket}/acl";
+        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/acl".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -4538,6 +5168,13 @@ impl<'a, C, A> BucketAccessControlInsertCall<'a, C, A> where C: BorrowMut<hyper:
         self._bucket = new_value.to_string();
         self
     }
+    /// The project number to be billed for this request, for Requester Pays buckets.
+    ///
+    /// Sets the *user project* query property to the given value.
+    pub fn user_project(mut self, new_value: &str) -> BucketAccessControlInsertCall<'a, C, A> {
+        self._user_project = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -4617,6 +5254,7 @@ impl<'a, C, A> BucketAccessControlInsertCall<'a, C, A> where C: BorrowMut<hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bucket_access_controls().get("bucket", "entity")
+///              .user_project("duo")
 ///              .doit();
 /// # }
 /// ```
@@ -4626,6 +5264,7 @@ pub struct BucketAccessControlGetCall<'a, C, A>
     hub: &'a Storage<C, A>,
     _bucket: String,
     _entity: String,
+    _user_project: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -4647,10 +5286,13 @@ impl<'a, C, A> BucketAccessControlGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
         };
         dlg.begin(MethodInfo { id: "storage.bucketAccessControls.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("bucket", self._bucket.to_string()));
         params.push(("entity", self._entity.to_string()));
-        for &field in ["alt", "bucket", "entity"].iter() {
+        if let Some(value) = self._user_project {
+            params.push(("userProject", value.to_string()));
+        }
+        for &field in ["alt", "bucket", "entity", "userProject"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -4662,7 +5304,7 @@ impl<'a, C, A> BucketAccessControlGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "b/{bucket}/acl/{entity}";
+        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/acl/{entity}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -4785,6 +5427,13 @@ impl<'a, C, A> BucketAccessControlGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._entity = new_value.to_string();
         self
     }
+    /// The project number to be billed for this request, for Requester Pays buckets.
+    ///
+    /// Sets the *user project* query property to the given value.
+    pub fn user_project(mut self, new_value: &str) -> BucketAccessControlGetCall<'a, C, A> {
+        self._user_project = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -4870,6 +5519,7 @@ impl<'a, C, A> BucketAccessControlGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bucket_access_controls().update(req, "bucket", "entity")
+///              .user_project("et")
 ///              .doit();
 /// # }
 /// ```
@@ -4880,6 +5530,7 @@ pub struct BucketAccessControlUpdateCall<'a, C, A>
     _request: BucketAccessControl,
     _bucket: String,
     _entity: String,
+    _user_project: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -4901,10 +5552,13 @@ impl<'a, C, A> BucketAccessControlUpdateCall<'a, C, A> where C: BorrowMut<hyper:
         };
         dlg.begin(MethodInfo { id: "storage.bucketAccessControls.update",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("bucket", self._bucket.to_string()));
         params.push(("entity", self._entity.to_string()));
-        for &field in ["alt", "bucket", "entity"].iter() {
+        if let Some(value) = self._user_project {
+            params.push(("userProject", value.to_string()));
+        }
+        for &field in ["alt", "bucket", "entity", "userProject"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -4916,7 +5570,7 @@ impl<'a, C, A> BucketAccessControlUpdateCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "b/{bucket}/acl/{entity}";
+        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/acl/{entity}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5063,6 +5717,13 @@ impl<'a, C, A> BucketAccessControlUpdateCall<'a, C, A> where C: BorrowMut<hyper:
         self._entity = new_value.to_string();
         self
     }
+    /// The project number to be billed for this request, for Requester Pays buckets.
+    ///
+    /// Sets the *user project* query property to the given value.
+    pub fn user_project(mut self, new_value: &str) -> BucketAccessControlUpdateCall<'a, C, A> {
+        self._user_project = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -5142,6 +5803,7 @@ impl<'a, C, A> BucketAccessControlUpdateCall<'a, C, A> where C: BorrowMut<hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bucket_access_controls().list("bucket")
+///              .user_project("consetetur")
 ///              .doit();
 /// # }
 /// ```
@@ -5150,6 +5812,7 @@ pub struct BucketAccessControlListCall<'a, C, A>
 
     hub: &'a Storage<C, A>,
     _bucket: String,
+    _user_project: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -5171,9 +5834,12 @@ impl<'a, C, A> BucketAccessControlListCall<'a, C, A> where C: BorrowMut<hyper::C
         };
         dlg.begin(MethodInfo { id: "storage.bucketAccessControls.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("bucket", self._bucket.to_string()));
-        for &field in ["alt", "bucket"].iter() {
+        if let Some(value) = self._user_project {
+            params.push(("userProject", value.to_string()));
+        }
+        for &field in ["alt", "bucket", "userProject"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -5185,7 +5851,7 @@ impl<'a, C, A> BucketAccessControlListCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "b/{bucket}/acl";
+        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/acl".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5296,6 +5962,13 @@ impl<'a, C, A> BucketAccessControlListCall<'a, C, A> where C: BorrowMut<hyper::C
     /// we provide this method for API completeness.
     pub fn bucket(mut self, new_value: &str) -> BucketAccessControlListCall<'a, C, A> {
         self._bucket = new_value.to_string();
+        self
+    }
+    /// The project number to be billed for this request, for Requester Pays buckets.
+    ///
+    /// Sets the *user project* query property to the given value.
+    pub fn user_project(mut self, new_value: &str) -> BucketAccessControlListCall<'a, C, A> {
+        self._user_project = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -5424,7 +6097,7 @@ impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         }
 
 
-        let mut url = self.hub._base_url.clone() + "channels/stop";
+        let mut url = "https://www.googleapis.com/storage/v1/channels/stop".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5572,6 +6245,1038 @@ impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 }
 
 
+/// Creates a notification subscription for a given bucket.
+///
+/// A builder for the *insert* method supported by a *notification* resource.
+/// It is not used directly, but through a `NotificationMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storage1 as storage1;
+/// use storage1::Notification;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use storage1::Storage;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Storage::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Notification::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.notifications().insert(req, "bucket")
+///              .user_project("nonumy")
+///              .doit();
+/// # }
+/// ```
+pub struct NotificationInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Storage<C, A>,
+    _request: Notification,
+    _bucket: String,
+    _user_project: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for NotificationInsertCall<'a, C, A> {}
+
+impl<'a, C, A> NotificationInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Notification)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "storage.notifications.insert",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        params.push(("bucket", self._bucket.to_string()));
+        if let Some(value) = self._user_project {
+            params.push(("userProject", value.to_string()));
+        }
+        for &field in ["alt", "bucket", "userProject"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/notificationConfigs".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{bucket}", "bucket")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["bucket"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: Notification) -> NotificationInsertCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The parent bucket of the notification.
+    ///
+    /// Sets the *bucket* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn bucket(mut self, new_value: &str) -> NotificationInsertCall<'a, C, A> {
+        self._bucket = new_value.to_string();
+        self
+    }
+    /// The project number to be billed for this request, for Requester Pays buckets.
+    ///
+    /// Sets the *user project* query property to the given value.
+    pub fn user_project(mut self, new_value: &str) -> NotificationInsertCall<'a, C, A> {
+        self._user_project = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> NotificationInsertCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> NotificationInsertCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> NotificationInsertCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+/// Permanently deletes a notification subscription.
+///
+/// A builder for the *delete* method supported by a *notification* resource.
+/// It is not used directly, but through a `NotificationMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storage1 as storage1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use storage1::Storage;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Storage::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.notifications().delete("bucket", "notification")
+///              .user_project("takimata")
+///              .doit();
+/// # }
+/// ```
+pub struct NotificationDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Storage<C, A>,
+    _bucket: String,
+    _notification: String,
+    _user_project: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for NotificationDeleteCall<'a, C, A> {}
+
+impl<'a, C, A> NotificationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<hyper::client::Response> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "storage.notifications.delete",
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        params.push(("bucket", self._bucket.to_string()));
+        params.push(("notification", self._notification.to_string()));
+        if let Some(value) = self._user_project {
+            params.push(("userProject", value.to_string()));
+        }
+        for &field in ["bucket", "notification", "userProject"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+
+        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/notificationConfigs/{notification}".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{bucket}", "bucket"), ("{notification}", "notification")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["notification", "bucket"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = res;
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The parent bucket of the notification.
+    ///
+    /// Sets the *bucket* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn bucket(mut self, new_value: &str) -> NotificationDeleteCall<'a, C, A> {
+        self._bucket = new_value.to_string();
+        self
+    }
+    /// ID of the notification to delete.
+    ///
+    /// Sets the *notification* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn notification(mut self, new_value: &str) -> NotificationDeleteCall<'a, C, A> {
+        self._notification = new_value.to_string();
+        self
+    }
+    /// The project number to be billed for this request, for Requester Pays buckets.
+    ///
+    /// Sets the *user project* query property to the given value.
+    pub fn user_project(mut self, new_value: &str) -> NotificationDeleteCall<'a, C, A> {
+        self._user_project = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> NotificationDeleteCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> NotificationDeleteCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> NotificationDeleteCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+/// View a notification configuration.
+///
+/// A builder for the *get* method supported by a *notification* resource.
+/// It is not used directly, but through a `NotificationMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storage1 as storage1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use storage1::Storage;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Storage::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.notifications().get("bucket", "notification")
+///              .user_project("invidunt")
+///              .doit();
+/// # }
+/// ```
+pub struct NotificationGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Storage<C, A>,
+    _bucket: String,
+    _notification: String,
+    _user_project: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for NotificationGetCall<'a, C, A> {}
+
+impl<'a, C, A> NotificationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Notification)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "storage.notifications.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        params.push(("bucket", self._bucket.to_string()));
+        params.push(("notification", self._notification.to_string()));
+        if let Some(value) = self._user_project {
+            params.push(("userProject", value.to_string()));
+        }
+        for &field in ["alt", "bucket", "notification", "userProject"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/notificationConfigs/{notification}".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{bucket}", "bucket"), ("{notification}", "notification")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["notification", "bucket"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The parent bucket of the notification.
+    ///
+    /// Sets the *bucket* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn bucket(mut self, new_value: &str) -> NotificationGetCall<'a, C, A> {
+        self._bucket = new_value.to_string();
+        self
+    }
+    /// Notification ID
+    ///
+    /// Sets the *notification* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn notification(mut self, new_value: &str) -> NotificationGetCall<'a, C, A> {
+        self._notification = new_value.to_string();
+        self
+    }
+    /// The project number to be billed for this request, for Requester Pays buckets.
+    ///
+    /// Sets the *user project* query property to the given value.
+    pub fn user_project(mut self, new_value: &str) -> NotificationGetCall<'a, C, A> {
+        self._user_project = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> NotificationGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> NotificationGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> NotificationGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+/// Retrieves a list of notification subscriptions for a given bucket.
+///
+/// A builder for the *list* method supported by a *notification* resource.
+/// It is not used directly, but through a `NotificationMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storage1 as storage1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use storage1::Storage;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Storage::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.notifications().list("bucket")
+///              .user_project("sadipscing")
+///              .doit();
+/// # }
+/// ```
+pub struct NotificationListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Storage<C, A>,
+    _bucket: String,
+    _user_project: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for NotificationListCall<'a, C, A> {}
+
+impl<'a, C, A> NotificationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Notifications)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "storage.notifications.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        params.push(("bucket", self._bucket.to_string()));
+        if let Some(value) = self._user_project {
+            params.push(("userProject", value.to_string()));
+        }
+        for &field in ["alt", "bucket", "userProject"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/notificationConfigs".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{bucket}", "bucket")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["bucket"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Name of a GCS bucket.
+    ///
+    /// Sets the *bucket* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn bucket(mut self, new_value: &str) -> NotificationListCall<'a, C, A> {
+        self._bucket = new_value.to_string();
+        self
+    }
+    /// The project number to be billed for this request, for Requester Pays buckets.
+    ///
+    /// Sets the *user project* query property to the given value.
+    pub fn user_project(mut self, new_value: &str) -> NotificationListCall<'a, C, A> {
+        self._user_project = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> NotificationListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> NotificationListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> NotificationListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
 /// Rewrites a source object to a destination object. Optionally overrides metadata.
 ///
 /// A builder for the *rewrite* method supported by a *object* resource.
@@ -5605,19 +7310,20 @@ impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().rewrite(req, "sourceBucket", "sourceObject", "destinationBucket", "destinationObject")
-///              .source_generation("vero")
-///              .rewrite_token("sadipscing")
-///              .projection("invidunt")
-///              .max_bytes_rewritten_per_call("consetetur")
-///              .if_source_metageneration_not_match("dolore")
-///              .if_source_metageneration_match("duo")
-///              .if_source_generation_not_match("aliquyam")
-///              .if_source_generation_match("Lorem")
-///              .if_metageneration_not_match("et")
-///              .if_metageneration_match("clita")
-///              .if_generation_not_match("consetetur")
-///              .if_generation_match("takimata")
-///              .destination_predefined_acl("nonumy")
+///              .user_project("aliquyam")
+///              .source_generation("sit")
+///              .rewrite_token("eirmod")
+///              .projection("consetetur")
+///              .max_bytes_rewritten_per_call("labore")
+///              .if_source_metageneration_not_match("sed")
+///              .if_source_metageneration_match("ea")
+///              .if_source_generation_not_match("gubergren")
+///              .if_source_generation_match("aliquyam")
+///              .if_metageneration_not_match("eos")
+///              .if_metageneration_match("tempor")
+///              .if_generation_not_match("sea")
+///              .if_generation_match("labore")
+///              .destination_predefined_acl("ipsum")
 ///              .doit();
 /// # }
 /// ```
@@ -5630,6 +7336,7 @@ pub struct ObjectRewriteCall<'a, C, A>
     _source_object: String,
     _destination_bucket: String,
     _destination_object: String,
+    _user_project: Option<String>,
     _source_generation: Option<String>,
     _rewrite_token: Option<String>,
     _projection: Option<String>,
@@ -5664,11 +7371,14 @@ impl<'a, C, A> ObjectRewriteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "storage.objects.rewrite",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((20 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((21 + self._additional_params.len()));
         params.push(("sourceBucket", self._source_bucket.to_string()));
         params.push(("sourceObject", self._source_object.to_string()));
         params.push(("destinationBucket", self._destination_bucket.to_string()));
         params.push(("destinationObject", self._destination_object.to_string()));
+        if let Some(value) = self._user_project {
+            params.push(("userProject", value.to_string()));
+        }
         if let Some(value) = self._source_generation {
             params.push(("sourceGeneration", value.to_string()));
         }
@@ -5708,7 +7418,7 @@ impl<'a, C, A> ObjectRewriteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         if let Some(value) = self._destination_predefined_acl {
             params.push(("destinationPredefinedAcl", value.to_string()));
         }
-        for &field in ["alt", "sourceBucket", "sourceObject", "destinationBucket", "destinationObject", "sourceGeneration", "rewriteToken", "projection", "maxBytesRewrittenPerCall", "ifSourceMetagenerationNotMatch", "ifSourceMetagenerationMatch", "ifSourceGenerationNotMatch", "ifSourceGenerationMatch", "ifMetagenerationNotMatch", "ifMetagenerationMatch", "ifGenerationNotMatch", "ifGenerationMatch", "destinationPredefinedAcl"].iter() {
+        for &field in ["alt", "sourceBucket", "sourceObject", "destinationBucket", "destinationObject", "userProject", "sourceGeneration", "rewriteToken", "projection", "maxBytesRewrittenPerCall", "ifSourceMetagenerationNotMatch", "ifSourceMetagenerationMatch", "ifSourceGenerationNotMatch", "ifSourceGenerationMatch", "ifMetagenerationNotMatch", "ifMetagenerationMatch", "ifGenerationNotMatch", "ifGenerationMatch", "destinationPredefinedAcl"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -5720,7 +7430,7 @@ impl<'a, C, A> ObjectRewriteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "b/{sourceBucket}/o/{sourceObject}/rewriteTo/b/{destinationBucket}/o/{destinationObject}";
+        let mut url = "https://www.googleapis.com/storage/v1/b/{sourceBucket}/o/{sourceObject}/rewriteTo/b/{destinationBucket}/o/{destinationObject}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5885,6 +7595,13 @@ impl<'a, C, A> ObjectRewriteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// we provide this method for API completeness.
     pub fn destination_object(mut self, new_value: &str) -> ObjectRewriteCall<'a, C, A> {
         self._destination_object = new_value.to_string();
+        self
+    }
+    /// The project number to be billed for this request, for Requester Pays buckets.
+    ///
+    /// Sets the *user project* query property to the given value.
+    pub fn user_project(mut self, new_value: &str) -> ObjectRewriteCall<'a, C, A> {
+        self._user_project = Some(new_value.to_string());
         self
     }
     /// If present, selects a specific revision of the source object (as opposed to the latest version, the default).
@@ -6062,12 +7779,13 @@ impl<'a, C, A> ObjectRewriteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().get("bucket", "object")
-///              .projection("takimata")
-///              .if_metageneration_not_match("At")
-///              .if_metageneration_match("labore")
-///              .if_generation_not_match("invidunt")
-///              .if_generation_match("ea")
-///              .generation("sadipscing")
+///              .user_project("sit")
+///              .projection("diam")
+///              .if_metageneration_not_match("ut")
+///              .if_metageneration_match("justo")
+///              .if_generation_not_match("est")
+///              .if_generation_match("amet")
+///              .generation("accusam")
 ///              .doit();
 /// # }
 /// ```
@@ -6077,6 +7795,7 @@ pub struct ObjectGetCall<'a, C, A>
     hub: &'a Storage<C, A>,
     _bucket: String,
     _object: String,
+    _user_project: Option<String>,
     _projection: Option<String>,
     _if_metageneration_not_match: Option<String>,
     _if_metageneration_match: Option<String>,
@@ -6104,9 +7823,12 @@ impl<'a, C, A> ObjectGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         };
         dlg.begin(MethodInfo { id: "storage.objects.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((9 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((10 + self._additional_params.len()));
         params.push(("bucket", self._bucket.to_string()));
         params.push(("object", self._object.to_string()));
+        if let Some(value) = self._user_project {
+            params.push(("userProject", value.to_string()));
+        }
         if let Some(value) = self._projection {
             params.push(("projection", value.to_string()));
         }
@@ -6125,7 +7847,7 @@ impl<'a, C, A> ObjectGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         if let Some(value) = self._generation {
             params.push(("generation", value.to_string()));
         }
-        for &field in ["bucket", "object", "projection", "ifMetagenerationNotMatch", "ifMetagenerationMatch", "ifGenerationNotMatch", "ifGenerationMatch", "generation"].iter() {
+        for &field in ["bucket", "object", "userProject", "projection", "ifMetagenerationNotMatch", "ifMetagenerationMatch", "ifGenerationNotMatch", "ifGenerationMatch", "generation"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -6153,7 +7875,7 @@ impl<'a, C, A> ObjectGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             params.push(("alt", "json".to_string()));
         }
 
-        let mut url = self.hub._base_url.clone() + "b/{bucket}/o/{object}";
+        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/o/{object}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -6276,6 +7998,13 @@ impl<'a, C, A> ObjectGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._object = new_value.to_string();
         self
     }
+    /// The project number to be billed for this request, for Requester Pays buckets.
+    ///
+    /// Sets the *user project* query property to the given value.
+    pub fn user_project(mut self, new_value: &str) -> ObjectGetCall<'a, C, A> {
+        self._user_project = Some(new_value.to_string());
+        self
+    }
     /// Set of properties to return. Defaults to noAcl.
     ///
     /// Sets the *projection* query property to the given value.
@@ -6370,6 +8099,929 @@ impl<'a, C, A> ObjectGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 }
 
 
+/// Watch for changes on all objects in a bucket.
+///
+/// A builder for the *watchAll* method supported by a *object* resource.
+/// It is not used directly, but through a `ObjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storage1 as storage1;
+/// use storage1::Channel;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use storage1::Storage;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Storage::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Channel::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.objects().watch_all(req, "bucket")
+///              .versions(false)
+///              .user_project("justo")
+///              .projection("est")
+///              .prefix("clita")
+///              .page_token("invidunt")
+///              .max_results(14)
+///              .delimiter("dolores")
+///              .doit();
+/// # }
+/// ```
+pub struct ObjectWatchAllCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Storage<C, A>,
+    _request: Channel,
+    _bucket: String,
+    _versions: Option<bool>,
+    _user_project: Option<String>,
+    _projection: Option<String>,
+    _prefix: Option<String>,
+    _page_token: Option<String>,
+    _max_results: Option<u32>,
+    _delimiter: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ObjectWatchAllCall<'a, C, A> {}
+
+impl<'a, C, A> ObjectWatchAllCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Channel)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "storage.objects.watchAll",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((11 + self._additional_params.len()));
+        params.push(("bucket", self._bucket.to_string()));
+        if let Some(value) = self._versions {
+            params.push(("versions", value.to_string()));
+        }
+        if let Some(value) = self._user_project {
+            params.push(("userProject", value.to_string()));
+        }
+        if let Some(value) = self._projection {
+            params.push(("projection", value.to_string()));
+        }
+        if let Some(value) = self._prefix {
+            params.push(("prefix", value.to_string()));
+        }
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._max_results {
+            params.push(("maxResults", value.to_string()));
+        }
+        if let Some(value) = self._delimiter {
+            params.push(("delimiter", value.to_string()));
+        }
+        for &field in ["alt", "bucket", "versions", "userProject", "projection", "prefix", "pageToken", "maxResults", "delimiter"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/o/watch".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{bucket}", "bucket")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["bucket"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: Channel) -> ObjectWatchAllCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Name of the bucket in which to look for objects.
+    ///
+    /// Sets the *bucket* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn bucket(mut self, new_value: &str) -> ObjectWatchAllCall<'a, C, A> {
+        self._bucket = new_value.to_string();
+        self
+    }
+    /// If true, lists all versions of an object as distinct results. The default is false. For more information, see Object Versioning.
+    ///
+    /// Sets the *versions* query property to the given value.
+    pub fn versions(mut self, new_value: bool) -> ObjectWatchAllCall<'a, C, A> {
+        self._versions = Some(new_value);
+        self
+    }
+    /// The project number to be billed for this request, for Requester Pays buckets.
+    ///
+    /// Sets the *user project* query property to the given value.
+    pub fn user_project(mut self, new_value: &str) -> ObjectWatchAllCall<'a, C, A> {
+        self._user_project = Some(new_value.to_string());
+        self
+    }
+    /// Set of properties to return. Defaults to noAcl.
+    ///
+    /// Sets the *projection* query property to the given value.
+    pub fn projection(mut self, new_value: &str) -> ObjectWatchAllCall<'a, C, A> {
+        self._projection = Some(new_value.to_string());
+        self
+    }
+    /// Filter results to objects whose names begin with this prefix.
+    ///
+    /// Sets the *prefix* query property to the given value.
+    pub fn prefix(mut self, new_value: &str) -> ObjectWatchAllCall<'a, C, A> {
+        self._prefix = Some(new_value.to_string());
+        self
+    }
+    /// A previously-returned page token representing part of the larger set of results to view.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ObjectWatchAllCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Maximum number of items plus prefixes to return in a single page of responses. As duplicate prefixes are omitted, fewer total results may be returned than requested. The service will use this parameter or 1,000 items, whichever is smaller.
+    ///
+    /// Sets the *max results* query property to the given value.
+    pub fn max_results(mut self, new_value: u32) -> ObjectWatchAllCall<'a, C, A> {
+        self._max_results = Some(new_value);
+        self
+    }
+    /// Returns results in a directory-like mode. items will contain only objects whose names, aside from the prefix, do not contain delimiter. Objects whose names, aside from the prefix, contain delimiter will have their name, truncated after the delimiter, returned in prefixes. Duplicate prefixes are omitted.
+    ///
+    /// Sets the *delimiter* query property to the given value.
+    pub fn delimiter(mut self, new_value: &str) -> ObjectWatchAllCall<'a, C, A> {
+        self._delimiter = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectWatchAllCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> ObjectWatchAllCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> ObjectWatchAllCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+/// Updates an IAM policy for the specified object.
+///
+/// A builder for the *setIamPolicy* method supported by a *object* resource.
+/// It is not used directly, but through a `ObjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storage1 as storage1;
+/// use storage1::Policy;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use storage1::Storage;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Storage::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Policy::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.objects().set_iam_policy(req, "bucket", "object")
+///              .user_project("duo")
+///              .generation("sed")
+///              .doit();
+/// # }
+/// ```
+pub struct ObjectSetIamPolicyCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Storage<C, A>,
+    _request: Policy,
+    _bucket: String,
+    _object: String,
+    _user_project: Option<String>,
+    _generation: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ObjectSetIamPolicyCall<'a, C, A> {}
+
+impl<'a, C, A> ObjectSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Policy)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "storage.objects.setIamPolicy",
+                               http_method: hyper::method::Method::Put });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        params.push(("bucket", self._bucket.to_string()));
+        params.push(("object", self._object.to_string()));
+        if let Some(value) = self._user_project {
+            params.push(("userProject", value.to_string()));
+        }
+        if let Some(value) = self._generation {
+            params.push(("generation", value.to_string()));
+        }
+        for &field in ["alt", "bucket", "object", "userProject", "generation"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/o/{object}/iam".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{bucket}", "bucket"), ("{object}", "object")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["object", "bucket"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: Policy) -> ObjectSetIamPolicyCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Name of the bucket in which the object resides.
+    ///
+    /// Sets the *bucket* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn bucket(mut self, new_value: &str) -> ObjectSetIamPolicyCall<'a, C, A> {
+        self._bucket = new_value.to_string();
+        self
+    }
+    /// Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
+    ///
+    /// Sets the *object* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn object(mut self, new_value: &str) -> ObjectSetIamPolicyCall<'a, C, A> {
+        self._object = new_value.to_string();
+        self
+    }
+    /// The project number to be billed for this request, for Requester Pays buckets.
+    ///
+    /// Sets the *user project* query property to the given value.
+    pub fn user_project(mut self, new_value: &str) -> ObjectSetIamPolicyCall<'a, C, A> {
+        self._user_project = Some(new_value.to_string());
+        self
+    }
+    /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
+    ///
+    /// Sets the *generation* query property to the given value.
+    pub fn generation(mut self, new_value: &str) -> ObjectSetIamPolicyCall<'a, C, A> {
+        self._generation = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectSetIamPolicyCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> ObjectSetIamPolicyCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> ObjectSetIamPolicyCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+/// Returns an IAM policy for the specified object.
+///
+/// A builder for the *getIamPolicy* method supported by a *object* resource.
+/// It is not used directly, but through a `ObjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storage1 as storage1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use storage1::Storage;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Storage::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.objects().get_iam_policy("bucket", "object")
+///              .user_project("ea")
+///              .generation("et")
+///              .doit();
+/// # }
+/// ```
+pub struct ObjectGetIamPolicyCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Storage<C, A>,
+    _bucket: String,
+    _object: String,
+    _user_project: Option<String>,
+    _generation: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ObjectGetIamPolicyCall<'a, C, A> {}
+
+impl<'a, C, A> ObjectGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Policy)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "storage.objects.getIamPolicy",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        params.push(("bucket", self._bucket.to_string()));
+        params.push(("object", self._object.to_string()));
+        if let Some(value) = self._user_project {
+            params.push(("userProject", value.to_string()));
+        }
+        if let Some(value) = self._generation {
+            params.push(("generation", value.to_string()));
+        }
+        for &field in ["alt", "bucket", "object", "userProject", "generation"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/o/{object}/iam".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{bucket}", "bucket"), ("{object}", "object")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["object", "bucket"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Name of the bucket in which the object resides.
+    ///
+    /// Sets the *bucket* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn bucket(mut self, new_value: &str) -> ObjectGetIamPolicyCall<'a, C, A> {
+        self._bucket = new_value.to_string();
+        self
+    }
+    /// Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
+    ///
+    /// Sets the *object* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn object(mut self, new_value: &str) -> ObjectGetIamPolicyCall<'a, C, A> {
+        self._object = new_value.to_string();
+        self
+    }
+    /// The project number to be billed for this request, for Requester Pays buckets.
+    ///
+    /// Sets the *user project* query property to the given value.
+    pub fn user_project(mut self, new_value: &str) -> ObjectGetIamPolicyCall<'a, C, A> {
+        self._user_project = Some(new_value.to_string());
+        self
+    }
+    /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
+    ///
+    /// Sets the *generation* query property to the given value.
+    pub fn generation(mut self, new_value: &str) -> ObjectGetIamPolicyCall<'a, C, A> {
+        self._generation = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectGetIamPolicyCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> ObjectGetIamPolicyCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> ObjectGetIamPolicyCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
 /// Updates an object's metadata.
 ///
 /// This method supports **media download**. To enable it, adjust the builder like this:
@@ -6408,13 +9060,14 @@ impl<'a, C, A> ObjectGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().update(req, "bucket", "object")
-///              .projection("nonumy")
-///              .predefined_acl("sed")
-///              .if_metageneration_not_match("aliquyam")
-///              .if_metageneration_match("sit")
-///              .if_generation_not_match("eirmod")
-///              .if_generation_match("consetetur")
-///              .generation("labore")
+///              .user_project("kasd")
+///              .projection("invidunt")
+///              .predefined_acl("rebum.")
+///              .if_metageneration_not_match("Lorem")
+///              .if_metageneration_match("clita")
+///              .if_generation_not_match("invidunt")
+///              .if_generation_match("eirmod")
+///              .generation("At")
 ///              .doit();
 /// # }
 /// ```
@@ -6425,6 +9078,7 @@ pub struct ObjectUpdateCall<'a, C, A>
     _request: Object,
     _bucket: String,
     _object: String,
+    _user_project: Option<String>,
     _projection: Option<String>,
     _predefined_acl: Option<String>,
     _if_metageneration_not_match: Option<String>,
@@ -6453,9 +9107,12 @@ impl<'a, C, A> ObjectUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         };
         dlg.begin(MethodInfo { id: "storage.objects.update",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((11 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((12 + self._additional_params.len()));
         params.push(("bucket", self._bucket.to_string()));
         params.push(("object", self._object.to_string()));
+        if let Some(value) = self._user_project {
+            params.push(("userProject", value.to_string()));
+        }
         if let Some(value) = self._projection {
             params.push(("projection", value.to_string()));
         }
@@ -6477,7 +9134,7 @@ impl<'a, C, A> ObjectUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         if let Some(value) = self._generation {
             params.push(("generation", value.to_string()));
         }
-        for &field in ["bucket", "object", "projection", "predefinedAcl", "ifMetagenerationNotMatch", "ifMetagenerationMatch", "ifGenerationNotMatch", "ifGenerationMatch", "generation"].iter() {
+        for &field in ["bucket", "object", "userProject", "projection", "predefinedAcl", "ifMetagenerationNotMatch", "ifMetagenerationMatch", "ifGenerationNotMatch", "ifGenerationMatch", "generation"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -6505,7 +9162,7 @@ impl<'a, C, A> ObjectUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             params.push(("alt", "json".to_string()));
         }
 
-        let mut url = self.hub._base_url.clone() + "b/{bucket}/o/{object}";
+        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/o/{object}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -6652,6 +9309,13 @@ impl<'a, C, A> ObjectUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._object = new_value.to_string();
         self
     }
+    /// The project number to be billed for this request, for Requester Pays buckets.
+    ///
+    /// Sets the *user project* query property to the given value.
+    pub fn user_project(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, A> {
+        self._user_project = Some(new_value.to_string());
+        self
+    }
     /// Set of properties to return. Defaults to full.
     ///
     /// Sets the *projection* query property to the given value.
@@ -6753,344 +9417,6 @@ impl<'a, C, A> ObjectUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 }
 
 
-/// Watch for changes on all objects in a bucket.
-///
-/// A builder for the *watchAll* method supported by a *object* resource.
-/// It is not used directly, but through a `ObjectMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_storage1 as storage1;
-/// use storage1::Channel;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use storage1::Storage;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::new(),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Storage::new(hyper::Client::new(), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = Channel::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.objects().watch_all(req, "bucket")
-///              .versions(true)
-///              .projection("gubergren")
-///              .prefix("aliquyam")
-///              .page_token("eos")
-///              .max_results(63)
-///              .delimiter("sea")
-///              .doit();
-/// # }
-/// ```
-pub struct ObjectWatchAllCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Storage<C, A>,
-    _request: Channel,
-    _bucket: String,
-    _versions: Option<bool>,
-    _projection: Option<String>,
-    _prefix: Option<String>,
-    _page_token: Option<String>,
-    _max_results: Option<u32>,
-    _delimiter: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for ObjectWatchAllCall<'a, C, A> {}
-
-impl<'a, C, A> ObjectWatchAllCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Channel)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "storage.objects.watchAll",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((10 + self._additional_params.len()));
-        params.push(("bucket", self._bucket.to_string()));
-        if let Some(value) = self._versions {
-            params.push(("versions", value.to_string()));
-        }
-        if let Some(value) = self._projection {
-            params.push(("projection", value.to_string()));
-        }
-        if let Some(value) = self._prefix {
-            params.push(("prefix", value.to_string()));
-        }
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._max_results {
-            params.push(("maxResults", value.to_string()));
-        }
-        if let Some(value) = self._delimiter {
-            params.push(("delimiter", value.to_string()));
-        }
-        for &field in ["alt", "bucket", "versions", "projection", "prefix", "pageToken", "maxResults", "delimiter"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "b/{bucket}/o/watch";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{bucket}", "bucket")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["bucket"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Channel) -> ObjectWatchAllCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// Name of the bucket in which to look for objects.
-    ///
-    /// Sets the *bucket* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn bucket(mut self, new_value: &str) -> ObjectWatchAllCall<'a, C, A> {
-        self._bucket = new_value.to_string();
-        self
-    }
-    /// If true, lists all versions of an object as distinct results. The default is false. For more information, see Object Versioning.
-    ///
-    /// Sets the *versions* query property to the given value.
-    pub fn versions(mut self, new_value: bool) -> ObjectWatchAllCall<'a, C, A> {
-        self._versions = Some(new_value);
-        self
-    }
-    /// Set of properties to return. Defaults to noAcl.
-    ///
-    /// Sets the *projection* query property to the given value.
-    pub fn projection(mut self, new_value: &str) -> ObjectWatchAllCall<'a, C, A> {
-        self._projection = Some(new_value.to_string());
-        self
-    }
-    /// Filter results to objects whose names begin with this prefix.
-    ///
-    /// Sets the *prefix* query property to the given value.
-    pub fn prefix(mut self, new_value: &str) -> ObjectWatchAllCall<'a, C, A> {
-        self._prefix = Some(new_value.to_string());
-        self
-    }
-    /// A previously-returned page token representing part of the larger set of results to view.
-    ///
-    /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ObjectWatchAllCall<'a, C, A> {
-        self._page_token = Some(new_value.to_string());
-        self
-    }
-    /// Maximum number of items plus prefixes to return. As duplicate prefixes are omitted, fewer total results may be returned than requested. The default value of this parameter is 1,000 items.
-    ///
-    /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> ObjectWatchAllCall<'a, C, A> {
-        self._max_results = Some(new_value);
-        self
-    }
-    /// Returns results in a directory-like mode. items will contain only objects whose names, aside from the prefix, do not contain delimiter. Objects whose names, aside from the prefix, contain delimiter will have their name, truncated after the delimiter, returned in prefixes. Duplicate prefixes are omitted.
-    ///
-    /// Sets the *delimiter* query property to the given value.
-    pub fn delimiter(mut self, new_value: &str) -> ObjectWatchAllCall<'a, C, A> {
-        self._delimiter = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectWatchAllCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ObjectWatchAllCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ObjectWatchAllCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._scopes.insert(scope.as_ref().to_string(), ());
-        self
-    }
-}
-
-
 /// Stores a new object and metadata.
 ///
 /// This method supports **media download**. To enable it, adjust the builder like this:
@@ -7130,14 +9456,15 @@ impl<'a, C, A> ObjectWatchAllCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().insert(req, "bucket")
-///              .projection("ipsum")
-///              .predefined_acl("aliquyam")
-///              .name("dolores")
-///              .if_metageneration_not_match("sit")
-///              .if_metageneration_match("diam")
-///              .if_generation_not_match("ut")
-///              .if_generation_match("justo")
-///              .content_encoding("est")
+///              .user_project("et")
+///              .projection("sed")
+///              .predefined_acl("sit")
+///              .name("takimata")
+///              .if_metageneration_not_match("elitr")
+///              .if_metageneration_match("nonumy")
+///              .if_generation_not_match("rebum.")
+///              .if_generation_match("Lorem")
+///              .content_encoding("Lorem")
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
@@ -7147,6 +9474,7 @@ pub struct ObjectInsertCall<'a, C, A>
     hub: &'a Storage<C, A>,
     _request: Object,
     _bucket: String,
+    _user_project: Option<String>,
     _projection: Option<String>,
     _predefined_acl: Option<String>,
     _name: Option<String>,
@@ -7177,8 +9505,11 @@ impl<'a, C, A> ObjectInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         };
         dlg.begin(MethodInfo { id: "storage.objects.insert",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((11 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((12 + self._additional_params.len()));
         params.push(("bucket", self._bucket.to_string()));
+        if let Some(value) = self._user_project {
+            params.push(("userProject", value.to_string()));
+        }
         if let Some(value) = self._projection {
             params.push(("projection", value.to_string()));
         }
@@ -7203,7 +9534,7 @@ impl<'a, C, A> ObjectInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         if let Some(value) = self._content_encoding {
             params.push(("contentEncoding", value.to_string()));
         }
-        for &field in ["bucket", "projection", "predefinedAcl", "name", "ifMetagenerationNotMatch", "ifMetagenerationMatch", "ifGenerationNotMatch", "ifGenerationMatch", "contentEncoding"].iter() {
+        for &field in ["bucket", "userProject", "projection", "predefinedAcl", "name", "ifMetagenerationNotMatch", "ifMetagenerationMatch", "ifGenerationNotMatch", "ifGenerationMatch", "contentEncoding"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -7233,9 +9564,9 @@ impl<'a, C, A> ObjectInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         let (mut url, upload_type) =
             if protocol == "simple" {
-                (self.hub._root_url.clone() + "/upload/storage/v1/b/{bucket}/o", "multipart")
+                ("https://www.googleapis.com/upload/storage/v1/b/{bucket}/o".to_string(), "multipart")
             } else if protocol == "resumable" {
-                (self.hub._root_url.clone() + "/resumable/upload/storage/v1/b/{bucket}/o", "resumable")
+                ("https://www.googleapis.com/resumable/upload/storage/v1/b/{bucket}/o".to_string(), "resumable")
             } else {
                 unreachable!()
             };
@@ -7476,6 +9807,13 @@ impl<'a, C, A> ObjectInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._bucket = new_value.to_string();
         self
     }
+    /// The project number to be billed for this request, for Requester Pays buckets.
+    ///
+    /// Sets the *user project* query property to the given value.
+    pub fn user_project(mut self, new_value: &str) -> ObjectInsertCall<'a, C, A> {
+        self._user_project = Some(new_value.to_string());
+        self
+    }
     /// Set of properties to return. Defaults to noAcl, unless the object resource specifies the acl property, when it defaults to full.
     ///
     /// Sets the *projection* query property to the given value.
@@ -7622,9 +9960,10 @@ impl<'a, C, A> ObjectInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().compose(req, "destinationBucket", "destinationObject")
-///              .if_metageneration_match("clita")
-///              .if_generation_match("diam")
-///              .destination_predefined_acl("justo")
+///              .user_project("ut")
+///              .if_metageneration_match("amet.")
+///              .if_generation_match("ipsum")
+///              .destination_predefined_acl("ut")
 ///              .doit();
 /// # }
 /// ```
@@ -7635,6 +9974,7 @@ pub struct ObjectComposeCall<'a, C, A>
     _request: ComposeRequest,
     _destination_bucket: String,
     _destination_object: String,
+    _user_project: Option<String>,
     _if_metageneration_match: Option<String>,
     _if_generation_match: Option<String>,
     _destination_predefined_acl: Option<String>,
@@ -7659,9 +9999,12 @@ impl<'a, C, A> ObjectComposeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "storage.objects.compose",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
         params.push(("destinationBucket", self._destination_bucket.to_string()));
         params.push(("destinationObject", self._destination_object.to_string()));
+        if let Some(value) = self._user_project {
+            params.push(("userProject", value.to_string()));
+        }
         if let Some(value) = self._if_metageneration_match {
             params.push(("ifMetagenerationMatch", value.to_string()));
         }
@@ -7671,7 +10014,7 @@ impl<'a, C, A> ObjectComposeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         if let Some(value) = self._destination_predefined_acl {
             params.push(("destinationPredefinedAcl", value.to_string()));
         }
-        for &field in ["destinationBucket", "destinationObject", "ifMetagenerationMatch", "ifGenerationMatch", "destinationPredefinedAcl"].iter() {
+        for &field in ["destinationBucket", "destinationObject", "userProject", "ifMetagenerationMatch", "ifGenerationMatch", "destinationPredefinedAcl"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -7699,7 +10042,7 @@ impl<'a, C, A> ObjectComposeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             params.push(("alt", "json".to_string()));
         }
 
-        let mut url = self.hub._base_url.clone() + "b/{destinationBucket}/o/{destinationObject}/compose";
+        let mut url = "https://www.googleapis.com/storage/v1/b/{destinationBucket}/o/{destinationObject}/compose".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -7846,6 +10189,13 @@ impl<'a, C, A> ObjectComposeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._destination_object = new_value.to_string();
         self
     }
+    /// The project number to be billed for this request, for Requester Pays buckets.
+    ///
+    /// Sets the *user project* query property to the given value.
+    pub fn user_project(mut self, new_value: &str) -> ObjectComposeCall<'a, C, A> {
+        self._user_project = Some(new_value.to_string());
+        self
+    }
     /// Makes the operation conditional on whether the object's current metageneration matches the given value.
     ///
     /// Sets the *if metageneration match* query property to the given value.
@@ -7946,11 +10296,12 @@ impl<'a, C, A> ObjectComposeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().delete("bucket", "object")
-///              .if_metageneration_not_match("invidunt")
-///              .if_metageneration_match("ut")
-///              .if_generation_not_match("dolores")
-///              .if_generation_match("eos")
-///              .generation("voluptua.")
+///              .user_project("ut")
+///              .if_metageneration_not_match("eirmod")
+///              .if_metageneration_match("sanctus")
+///              .if_generation_not_match("voluptua.")
+///              .if_generation_match("dolor")
+///              .generation("et")
 ///              .doit();
 /// # }
 /// ```
@@ -7960,6 +10311,7 @@ pub struct ObjectDeleteCall<'a, C, A>
     hub: &'a Storage<C, A>,
     _bucket: String,
     _object: String,
+    _user_project: Option<String>,
     _if_metageneration_not_match: Option<String>,
     _if_metageneration_match: Option<String>,
     _if_generation_not_match: Option<String>,
@@ -7986,9 +10338,12 @@ impl<'a, C, A> ObjectDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         };
         dlg.begin(MethodInfo { id: "storage.objects.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((9 + self._additional_params.len()));
         params.push(("bucket", self._bucket.to_string()));
         params.push(("object", self._object.to_string()));
+        if let Some(value) = self._user_project {
+            params.push(("userProject", value.to_string()));
+        }
         if let Some(value) = self._if_metageneration_not_match {
             params.push(("ifMetagenerationNotMatch", value.to_string()));
         }
@@ -8004,7 +10359,7 @@ impl<'a, C, A> ObjectDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         if let Some(value) = self._generation {
             params.push(("generation", value.to_string()));
         }
-        for &field in ["bucket", "object", "ifMetagenerationNotMatch", "ifMetagenerationMatch", "ifGenerationNotMatch", "ifGenerationMatch", "generation"].iter() {
+        for &field in ["bucket", "object", "userProject", "ifMetagenerationNotMatch", "ifMetagenerationMatch", "ifGenerationNotMatch", "ifGenerationMatch", "generation"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -8015,7 +10370,7 @@ impl<'a, C, A> ObjectDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         }
 
 
-        let mut url = self.hub._base_url.clone() + "b/{bucket}/o/{object}";
+        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/o/{object}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -8126,6 +10481,13 @@ impl<'a, C, A> ObjectDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// we provide this method for API completeness.
     pub fn object(mut self, new_value: &str) -> ObjectDeleteCall<'a, C, A> {
         self._object = new_value.to_string();
+        self
+    }
+    /// The project number to be billed for this request, for Requester Pays buckets.
+    ///
+    /// Sets the *user project* query property to the given value.
+    pub fn user_project(mut self, new_value: &str) -> ObjectDeleteCall<'a, C, A> {
+        self._user_project = Some(new_value.to_string());
         self
     }
     /// Makes the operation conditional on whether the object's current metageneration does not match the given value.
@@ -8242,12 +10604,13 @@ impl<'a, C, A> ObjectDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().list("bucket")
-///              .versions(false)
-///              .projection("aliquyam")
-///              .prefix("ea")
-///              .page_token("ea")
-///              .max_results(27)
-///              .delimiter("dolor")
+///              .versions(true)
+///              .user_project("ut")
+///              .projection("sed")
+///              .prefix("et")
+///              .page_token("ipsum")
+///              .max_results(81)
+///              .delimiter("dolore")
 ///              .doit();
 /// # }
 /// ```
@@ -8257,6 +10620,7 @@ pub struct ObjectListCall<'a, C, A>
     hub: &'a Storage<C, A>,
     _bucket: String,
     _versions: Option<bool>,
+    _user_project: Option<String>,
     _projection: Option<String>,
     _prefix: Option<String>,
     _page_token: Option<String>,
@@ -8283,10 +10647,13 @@ impl<'a, C, A> ObjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         };
         dlg.begin(MethodInfo { id: "storage.objects.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((9 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((10 + self._additional_params.len()));
         params.push(("bucket", self._bucket.to_string()));
         if let Some(value) = self._versions {
             params.push(("versions", value.to_string()));
+        }
+        if let Some(value) = self._user_project {
+            params.push(("userProject", value.to_string()));
         }
         if let Some(value) = self._projection {
             params.push(("projection", value.to_string()));
@@ -8303,7 +10670,7 @@ impl<'a, C, A> ObjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         if let Some(value) = self._delimiter {
             params.push(("delimiter", value.to_string()));
         }
-        for &field in ["alt", "bucket", "versions", "projection", "prefix", "pageToken", "maxResults", "delimiter"].iter() {
+        for &field in ["alt", "bucket", "versions", "userProject", "projection", "prefix", "pageToken", "maxResults", "delimiter"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -8315,7 +10682,7 @@ impl<'a, C, A> ObjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "b/{bucket}/o";
+        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/o".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -8435,6 +10802,13 @@ impl<'a, C, A> ObjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._versions = Some(new_value);
         self
     }
+    /// The project number to be billed for this request, for Requester Pays buckets.
+    ///
+    /// Sets the *user project* query property to the given value.
+    pub fn user_project(mut self, new_value: &str) -> ObjectListCall<'a, C, A> {
+        self._user_project = Some(new_value.to_string());
+        self
+    }
     /// Set of properties to return. Defaults to noAcl.
     ///
     /// Sets the *projection* query property to the given value.
@@ -8456,7 +10830,7 @@ impl<'a, C, A> ObjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Maximum number of items plus prefixes to return. As duplicate prefixes are omitted, fewer total results may be returned than requested. The default value of this parameter is 1,000 items.
+    /// Maximum number of items plus prefixes to return in a single page of responses. As duplicate prefixes are omitted, fewer total results may be returned than requested. The service will use this parameter or 1,000 items, whichever is smaller.
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> ObjectListCall<'a, C, A> {
@@ -8522,6 +10896,294 @@ impl<'a, C, A> ObjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 }
 
 
+/// Tests a set of permissions on the given object to see which, if any, are held by the caller.
+///
+/// A builder for the *testIamPermissions* method supported by a *object* resource.
+/// It is not used directly, but through a `ObjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storage1 as storage1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use storage1::Storage;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Storage::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.objects().test_iam_permissions("bucket", "object", "permissions")
+///              .user_project("et")
+///              .generation("nonumy")
+///              .doit();
+/// # }
+/// ```
+pub struct ObjectTestIamPermissionCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Storage<C, A>,
+    _bucket: String,
+    _object: String,
+    _permissions: Vec<String>,
+    _user_project: Option<String>,
+    _generation: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ObjectTestIamPermissionCall<'a, C, A> {}
+
+impl<'a, C, A> ObjectTestIamPermissionCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, TestIamPermissionsResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "storage.objects.testIamPermissions",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        params.push(("bucket", self._bucket.to_string()));
+        params.push(("object", self._object.to_string()));
+        if self._permissions.len() > 0 {
+            for f in self._permissions.iter() {
+                params.push(("permissions", f.to_string()));
+            }
+        }
+        if let Some(value) = self._user_project {
+            params.push(("userProject", value.to_string()));
+        }
+        if let Some(value) = self._generation {
+            params.push(("generation", value.to_string()));
+        }
+        for &field in ["alt", "bucket", "object", "permissions", "userProject", "generation"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/o/{object}/iam/testPermissions".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{bucket}", "bucket"), ("{object}", "object")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["object", "bucket"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Name of the bucket in which the object resides.
+    ///
+    /// Sets the *bucket* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn bucket(mut self, new_value: &str) -> ObjectTestIamPermissionCall<'a, C, A> {
+        self._bucket = new_value.to_string();
+        self
+    }
+    /// Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
+    ///
+    /// Sets the *object* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn object(mut self, new_value: &str) -> ObjectTestIamPermissionCall<'a, C, A> {
+        self._object = new_value.to_string();
+        self
+    }
+    /// Permissions to test.
+    ///
+    /// Append the given value to the *permissions* query property.
+    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn add_permissions(mut self, new_value: &str) -> ObjectTestIamPermissionCall<'a, C, A> {
+        self._permissions.push(new_value.to_string());
+        self
+    }
+    /// The project number to be billed for this request, for Requester Pays buckets.
+    ///
+    /// Sets the *user project* query property to the given value.
+    pub fn user_project(mut self, new_value: &str) -> ObjectTestIamPermissionCall<'a, C, A> {
+        self._user_project = Some(new_value.to_string());
+        self
+    }
+    /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
+    ///
+    /// Sets the *generation* query property to the given value.
+    pub fn generation(mut self, new_value: &str) -> ObjectTestIamPermissionCall<'a, C, A> {
+        self._generation = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectTestIamPermissionCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> ObjectTestIamPermissionCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> ObjectTestIamPermissionCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
 /// Copies a source object to a destination object. Optionally overrides metadata.
 ///
 /// This method supports **media download**. To enable it, adjust the builder like this:
@@ -8560,17 +11222,18 @@ impl<'a, C, A> ObjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().copy(req, "sourceBucket", "sourceObject", "destinationBucket", "destinationObject")
-///              .source_generation("Lorem")
-///              .projection("clita")
-///              .if_source_metageneration_not_match("invidunt")
-///              .if_source_metageneration_match("eirmod")
-///              .if_source_generation_not_match("At")
-///              .if_source_generation_match("consetetur")
-///              .if_metageneration_not_match("et")
-///              .if_metageneration_match("sed")
-///              .if_generation_not_match("sit")
-///              .if_generation_match("takimata")
-///              .destination_predefined_acl("elitr")
+///              .user_project("rebum.")
+///              .source_generation("labore")
+///              .projection("aliquyam")
+///              .if_source_metageneration_not_match("elitr")
+///              .if_source_metageneration_match("consetetur")
+///              .if_source_generation_not_match("sea")
+///              .if_source_generation_match("elitr")
+///              .if_metageneration_not_match("At")
+///              .if_metageneration_match("sea")
+///              .if_generation_not_match("consetetur")
+///              .if_generation_match("diam")
+///              .destination_predefined_acl("accusam")
 ///              .doit();
 /// # }
 /// ```
@@ -8583,6 +11246,7 @@ pub struct ObjectCopyCall<'a, C, A>
     _source_object: String,
     _destination_bucket: String,
     _destination_object: String,
+    _user_project: Option<String>,
     _source_generation: Option<String>,
     _projection: Option<String>,
     _if_source_metageneration_not_match: Option<String>,
@@ -8615,11 +11279,14 @@ impl<'a, C, A> ObjectCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         };
         dlg.begin(MethodInfo { id: "storage.objects.copy",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((17 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((18 + self._additional_params.len()));
         params.push(("sourceBucket", self._source_bucket.to_string()));
         params.push(("sourceObject", self._source_object.to_string()));
         params.push(("destinationBucket", self._destination_bucket.to_string()));
         params.push(("destinationObject", self._destination_object.to_string()));
+        if let Some(value) = self._user_project {
+            params.push(("userProject", value.to_string()));
+        }
         if let Some(value) = self._source_generation {
             params.push(("sourceGeneration", value.to_string()));
         }
@@ -8653,7 +11320,7 @@ impl<'a, C, A> ObjectCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         if let Some(value) = self._destination_predefined_acl {
             params.push(("destinationPredefinedAcl", value.to_string()));
         }
-        for &field in ["sourceBucket", "sourceObject", "destinationBucket", "destinationObject", "sourceGeneration", "projection", "ifSourceMetagenerationNotMatch", "ifSourceMetagenerationMatch", "ifSourceGenerationNotMatch", "ifSourceGenerationMatch", "ifMetagenerationNotMatch", "ifMetagenerationMatch", "ifGenerationNotMatch", "ifGenerationMatch", "destinationPredefinedAcl"].iter() {
+        for &field in ["sourceBucket", "sourceObject", "destinationBucket", "destinationObject", "userProject", "sourceGeneration", "projection", "ifSourceMetagenerationNotMatch", "ifSourceMetagenerationMatch", "ifSourceGenerationNotMatch", "ifSourceGenerationMatch", "ifMetagenerationNotMatch", "ifMetagenerationMatch", "ifGenerationNotMatch", "ifGenerationMatch", "destinationPredefinedAcl"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -8681,7 +11348,7 @@ impl<'a, C, A> ObjectCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             params.push(("alt", "json".to_string()));
         }
 
-        let mut url = self.hub._base_url.clone() + "b/{sourceBucket}/o/{sourceObject}/copyTo/b/{destinationBucket}/o/{destinationObject}";
+        let mut url = "https://www.googleapis.com/storage/v1/b/{sourceBucket}/o/{sourceObject}/copyTo/b/{destinationBucket}/o/{destinationObject}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -8848,6 +11515,13 @@ impl<'a, C, A> ObjectCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._destination_object = new_value.to_string();
         self
     }
+    /// The project number to be billed for this request, for Requester Pays buckets.
+    ///
+    /// Sets the *user project* query property to the given value.
+    pub fn user_project(mut self, new_value: &str) -> ObjectCopyCall<'a, C, A> {
+        self._user_project = Some(new_value.to_string());
+        self
+    }
     /// If present, selects a specific revision of the source object (as opposed to the latest version, the default).
     ///
     /// Sets the *source generation* query property to the given value.
@@ -9010,13 +11684,14 @@ impl<'a, C, A> ObjectCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().patch(req, "bucket", "object")
-///              .projection("Lorem")
-///              .predefined_acl("Lorem")
-///              .if_metageneration_not_match("diam")
-///              .if_metageneration_match("ut")
-///              .if_generation_not_match("ut")
-///              .if_generation_match("amet.")
-///              .generation("ipsum")
+///              .user_project("dolor")
+///              .projection("aliquyam")
+///              .predefined_acl("elitr")
+///              .if_metageneration_not_match("ea")
+///              .if_metageneration_match("et")
+///              .if_generation_not_match("Stet")
+///              .if_generation_match("sed")
+///              .generation("dolor")
 ///              .doit();
 /// # }
 /// ```
@@ -9027,6 +11702,7 @@ pub struct ObjectPatchCall<'a, C, A>
     _request: Object,
     _bucket: String,
     _object: String,
+    _user_project: Option<String>,
     _projection: Option<String>,
     _predefined_acl: Option<String>,
     _if_metageneration_not_match: Option<String>,
@@ -9055,9 +11731,12 @@ impl<'a, C, A> ObjectPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         };
         dlg.begin(MethodInfo { id: "storage.objects.patch",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((12 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((13 + self._additional_params.len()));
         params.push(("bucket", self._bucket.to_string()));
         params.push(("object", self._object.to_string()));
+        if let Some(value) = self._user_project {
+            params.push(("userProject", value.to_string()));
+        }
         if let Some(value) = self._projection {
             params.push(("projection", value.to_string()));
         }
@@ -9079,7 +11758,7 @@ impl<'a, C, A> ObjectPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         if let Some(value) = self._generation {
             params.push(("generation", value.to_string()));
         }
-        for &field in ["alt", "bucket", "object", "projection", "predefinedAcl", "ifMetagenerationNotMatch", "ifMetagenerationMatch", "ifGenerationNotMatch", "ifGenerationMatch", "generation"].iter() {
+        for &field in ["alt", "bucket", "object", "userProject", "projection", "predefinedAcl", "ifMetagenerationNotMatch", "ifMetagenerationMatch", "ifGenerationNotMatch", "ifGenerationMatch", "generation"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -9091,7 +11770,7 @@ impl<'a, C, A> ObjectPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "b/{bucket}/o/{object}";
+        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/o/{object}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -9238,6 +11917,13 @@ impl<'a, C, A> ObjectPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._object = new_value.to_string();
         self
     }
+    /// The project number to be billed for this request, for Requester Pays buckets.
+    ///
+    /// Sets the *user project* query property to the given value.
+    pub fn user_project(mut self, new_value: &str) -> ObjectPatchCall<'a, C, A> {
+        self._user_project = Some(new_value.to_string());
+        self
+    }
     /// Set of properties to return. Defaults to full.
     ///
     /// Sets the *projection* query property to the given value.
@@ -9339,9 +12025,9 @@ impl<'a, C, A> ObjectPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 }
 
 
-/// Creates a new ACL entry on the specified object.
+/// Returns the ACL entry for the specified entity on the specified object.
 ///
-/// A builder for the *insert* method supported by a *objectAccessControl* resource.
+/// A builder for the *get* method supported by a *objectAccessControl* resource.
 /// It is not used directly, but through a `ObjectAccessControlMethods` instance.
 ///
 /// # Example
@@ -9352,7 +12038,6 @@ impl<'a, C, A> ObjectPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// # extern crate hyper;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_storage1 as storage1;
-/// use storage1::ObjectAccessControl;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -9363,35 +12048,32 @@ impl<'a, C, A> ObjectPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = Storage::new(hyper::Client::new(), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = ObjectAccessControl::default();
-/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.object_access_controls().insert(req, "bucket", "object")
-///              .generation("sea")
+/// let result = hub.object_access_controls().get("bucket", "object", "entity")
+///              .user_project("consetetur")
+///              .generation("consetetur")
 ///              .doit();
 /// # }
 /// ```
-pub struct ObjectAccessControlInsertCall<'a, C, A>
+pub struct ObjectAccessControlGetCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Storage<C, A>,
-    _request: ObjectAccessControl,
     _bucket: String,
     _object: String,
+    _entity: String,
+    _user_project: Option<String>,
     _generation: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ObjectAccessControlInsertCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ObjectAccessControlGetCall<'a, C, A> {}
 
-impl<'a, C, A> ObjectAccessControlInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ObjectAccessControlGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9403,15 +12085,19 @@ impl<'a, C, A> ObjectAccessControlInsertCall<'a, C, A> where C: BorrowMut<hyper:
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "storage.objectAccessControls.insert",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        dlg.begin(MethodInfo { id: "storage.objectAccessControls.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
         params.push(("bucket", self._bucket.to_string()));
         params.push(("object", self._object.to_string()));
+        params.push(("entity", self._entity.to_string()));
+        if let Some(value) = self._user_project {
+            params.push(("userProject", value.to_string()));
+        }
         if let Some(value) = self._generation {
             params.push(("generation", value.to_string()));
         }
-        for &field in ["alt", "bucket", "object", "generation"].iter() {
+        for &field in ["alt", "bucket", "object", "entity", "userProject", "generation"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -9423,12 +12109,12 @@ impl<'a, C, A> ObjectAccessControlInsertCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "b/{bucket}/o/{object}/acl";
+        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/o/{object}/acl/{entity}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{bucket}", "bucket"), ("{object}", "object")].iter() {
+        for &(find_this, param_name) in [("{bucket}", "bucket"), ("{object}", "object"), ("{entity}", "entity")].iter() {
             let mut replace_with: Option<&str> = None;
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -9439,8 +12125,8 @@ impl<'a, C, A> ObjectAccessControlInsertCall<'a, C, A> where C: BorrowMut<hyper:
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["object", "bucket"].iter() {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
+            for param_name in ["entity", "object", "bucket"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -9455,17 +12141,6 @@ impl<'a, C, A> ObjectAccessControlInsertCall<'a, C, A> where C: BorrowMut<hyper:
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
@@ -9482,15 +12157,11 @@ impl<'a, C, A> ObjectAccessControlInsertCall<'a, C, A> where C: BorrowMut<hyper:
                 }
             };
             let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -9541,22 +12212,13 @@ impl<'a, C, A> ObjectAccessControlInsertCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ObjectAccessControl) -> ObjectAccessControlInsertCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
     /// Name of a bucket.
     ///
     /// Sets the *bucket* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn bucket(mut self, new_value: &str) -> ObjectAccessControlInsertCall<'a, C, A> {
+    pub fn bucket(mut self, new_value: &str) -> ObjectAccessControlGetCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
@@ -9566,14 +12228,31 @@ impl<'a, C, A> ObjectAccessControlInsertCall<'a, C, A> where C: BorrowMut<hyper:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn object(mut self, new_value: &str) -> ObjectAccessControlInsertCall<'a, C, A> {
+    pub fn object(mut self, new_value: &str) -> ObjectAccessControlGetCall<'a, C, A> {
         self._object = new_value.to_string();
+        self
+    }
+    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
+    ///
+    /// Sets the *entity* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn entity(mut self, new_value: &str) -> ObjectAccessControlGetCall<'a, C, A> {
+        self._entity = new_value.to_string();
+        self
+    }
+    /// The project number to be billed for this request, for Requester Pays buckets.
+    ///
+    /// Sets the *user project* query property to the given value.
+    pub fn user_project(mut self, new_value: &str) -> ObjectAccessControlGetCall<'a, C, A> {
+        self._user_project = Some(new_value.to_string());
         self
     }
     /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
     ///
     /// Sets the *generation* query property to the given value.
-    pub fn generation(mut self, new_value: &str) -> ObjectAccessControlInsertCall<'a, C, A> {
+    pub fn generation(mut self, new_value: &str) -> ObjectAccessControlGetCall<'a, C, A> {
         self._generation = Some(new_value.to_string());
         self
     }
@@ -9583,7 +12262,7 @@ impl<'a, C, A> ObjectAccessControlInsertCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectAccessControlInsertCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectAccessControlGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9604,7 +12283,7 @@ impl<'a, C, A> ObjectAccessControlInsertCall<'a, C, A> where C: BorrowMut<hyper:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ObjectAccessControlInsertCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ObjectAccessControlGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9621,7 +12300,7 @@ impl<'a, C, A> ObjectAccessControlInsertCall<'a, C, A> where C: BorrowMut<hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ObjectAccessControlInsertCall<'a, C, A>
+    pub fn add_scope<T>(mut self, scope: T) -> ObjectAccessControlGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9662,7 +12341,8 @@ impl<'a, C, A> ObjectAccessControlInsertCall<'a, C, A> where C: BorrowMut<hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.object_access_controls().patch(req, "bucket", "object", "entity")
-///              .generation("voluptua.")
+///              .user_project("et")
+///              .generation("sadipscing")
 ///              .doit();
 /// # }
 /// ```
@@ -9674,6 +12354,7 @@ pub struct ObjectAccessControlPatchCall<'a, C, A>
     _bucket: String,
     _object: String,
     _entity: String,
+    _user_project: Option<String>,
     _generation: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
@@ -9696,14 +12377,17 @@ impl<'a, C, A> ObjectAccessControlPatchCall<'a, C, A> where C: BorrowMut<hyper::
         };
         dlg.begin(MethodInfo { id: "storage.objectAccessControls.patch",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
         params.push(("bucket", self._bucket.to_string()));
         params.push(("object", self._object.to_string()));
         params.push(("entity", self._entity.to_string()));
+        if let Some(value) = self._user_project {
+            params.push(("userProject", value.to_string()));
+        }
         if let Some(value) = self._generation {
             params.push(("generation", value.to_string()));
         }
-        for &field in ["alt", "bucket", "object", "entity", "generation"].iter() {
+        for &field in ["alt", "bucket", "object", "entity", "userProject", "generation"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -9715,7 +12399,7 @@ impl<'a, C, A> ObjectAccessControlPatchCall<'a, C, A> where C: BorrowMut<hyper::
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "b/{bucket}/o/{object}/acl/{entity}";
+        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/o/{object}/acl/{entity}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -9872,6 +12556,13 @@ impl<'a, C, A> ObjectAccessControlPatchCall<'a, C, A> where C: BorrowMut<hyper::
         self._entity = new_value.to_string();
         self
     }
+    /// The project number to be billed for this request, for Requester Pays buckets.
+    ///
+    /// Sets the *user project* query property to the given value.
+    pub fn user_project(mut self, new_value: &str) -> ObjectAccessControlPatchCall<'a, C, A> {
+        self._user_project = Some(new_value.to_string());
+        self
+    }
     /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
     ///
     /// Sets the *generation* query property to the given value.
@@ -9958,7 +12649,8 @@ impl<'a, C, A> ObjectAccessControlPatchCall<'a, C, A> where C: BorrowMut<hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.object_access_controls().list("bucket", "object")
-///              .generation("et")
+///              .user_project("Lorem")
+///              .generation("rebum.")
 ///              .doit();
 /// # }
 /// ```
@@ -9968,6 +12660,7 @@ pub struct ObjectAccessControlListCall<'a, C, A>
     hub: &'a Storage<C, A>,
     _bucket: String,
     _object: String,
+    _user_project: Option<String>,
     _generation: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
@@ -9990,13 +12683,16 @@ impl<'a, C, A> ObjectAccessControlListCall<'a, C, A> where C: BorrowMut<hyper::C
         };
         dlg.begin(MethodInfo { id: "storage.objectAccessControls.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("bucket", self._bucket.to_string()));
         params.push(("object", self._object.to_string()));
+        if let Some(value) = self._user_project {
+            params.push(("userProject", value.to_string()));
+        }
         if let Some(value) = self._generation {
             params.push(("generation", value.to_string()));
         }
-        for &field in ["alt", "bucket", "object", "generation"].iter() {
+        for &field in ["alt", "bucket", "object", "userProject", "generation"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -10008,7 +12704,7 @@ impl<'a, C, A> ObjectAccessControlListCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "b/{bucket}/o/{object}/acl";
+        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/o/{object}/acl".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -10131,6 +12827,13 @@ impl<'a, C, A> ObjectAccessControlListCall<'a, C, A> where C: BorrowMut<hyper::C
         self._object = new_value.to_string();
         self
     }
+    /// The project number to be billed for this request, for Requester Pays buckets.
+    ///
+    /// Sets the *user project* query property to the given value.
+    pub fn user_project(mut self, new_value: &str) -> ObjectAccessControlListCall<'a, C, A> {
+        self._user_project = Some(new_value.to_string());
+        self
+    }
     /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
     ///
     /// Sets the *generation* query property to the given value.
@@ -10217,7 +12920,8 @@ impl<'a, C, A> ObjectAccessControlListCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.object_access_controls().delete("bucket", "object", "entity")
-///              .generation("et")
+///              .user_project("dolores")
+///              .generation("vero")
 ///              .doit();
 /// # }
 /// ```
@@ -10228,6 +12932,7 @@ pub struct ObjectAccessControlDeleteCall<'a, C, A>
     _bucket: String,
     _object: String,
     _entity: String,
+    _user_project: Option<String>,
     _generation: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
@@ -10250,14 +12955,17 @@ impl<'a, C, A> ObjectAccessControlDeleteCall<'a, C, A> where C: BorrowMut<hyper:
         };
         dlg.begin(MethodInfo { id: "storage.objectAccessControls.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("bucket", self._bucket.to_string()));
         params.push(("object", self._object.to_string()));
         params.push(("entity", self._entity.to_string()));
+        if let Some(value) = self._user_project {
+            params.push(("userProject", value.to_string()));
+        }
         if let Some(value) = self._generation {
             params.push(("generation", value.to_string()));
         }
-        for &field in ["bucket", "object", "entity", "generation"].iter() {
+        for &field in ["bucket", "object", "entity", "userProject", "generation"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -10268,7 +12976,7 @@ impl<'a, C, A> ObjectAccessControlDeleteCall<'a, C, A> where C: BorrowMut<hyper:
         }
 
 
-        let mut url = self.hub._base_url.clone() + "b/{bucket}/o/{object}/acl/{entity}";
+        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/o/{object}/acl/{entity}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -10391,6 +13099,13 @@ impl<'a, C, A> ObjectAccessControlDeleteCall<'a, C, A> where C: BorrowMut<hyper:
         self._entity = new_value.to_string();
         self
     }
+    /// The project number to be billed for this request, for Requester Pays buckets.
+    ///
+    /// Sets the *user project* query property to the given value.
+    pub fn user_project(mut self, new_value: &str) -> ObjectAccessControlDeleteCall<'a, C, A> {
+        self._user_project = Some(new_value.to_string());
+        self
+    }
     /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
     ///
     /// Sets the *generation* query property to the given value.
@@ -10450,277 +13165,6 @@ impl<'a, C, A> ObjectAccessControlDeleteCall<'a, C, A> where C: BorrowMut<hyper:
 }
 
 
-/// Returns the ACL entry for the specified entity on the specified object.
-///
-/// A builder for the *get* method supported by a *objectAccessControl* resource.
-/// It is not used directly, but through a `ObjectAccessControlMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_storage1 as storage1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use storage1::Storage;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::new(),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Storage::new(hyper::Client::new(), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.object_access_controls().get("bucket", "object", "entity")
-///              .generation("vero")
-///              .doit();
-/// # }
-/// ```
-pub struct ObjectAccessControlGetCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Storage<C, A>,
-    _bucket: String,
-    _object: String,
-    _entity: String,
-    _generation: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for ObjectAccessControlGetCall<'a, C, A> {}
-
-impl<'a, C, A> ObjectAccessControlGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, ObjectAccessControl)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "storage.objectAccessControls.get",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
-        params.push(("bucket", self._bucket.to_string()));
-        params.push(("object", self._object.to_string()));
-        params.push(("entity", self._entity.to_string()));
-        if let Some(value) = self._generation {
-            params.push(("generation", value.to_string()));
-        }
-        for &field in ["alt", "bucket", "object", "entity", "generation"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "b/{bucket}/o/{object}/acl/{entity}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{bucket}", "bucket"), ("{object}", "object"), ("{entity}", "entity")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
-            for param_name in ["entity", "object", "bucket"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// Name of a bucket.
-    ///
-    /// Sets the *bucket* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn bucket(mut self, new_value: &str) -> ObjectAccessControlGetCall<'a, C, A> {
-        self._bucket = new_value.to_string();
-        self
-    }
-    /// Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
-    ///
-    /// Sets the *object* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn object(mut self, new_value: &str) -> ObjectAccessControlGetCall<'a, C, A> {
-        self._object = new_value.to_string();
-        self
-    }
-    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
-    ///
-    /// Sets the *entity* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn entity(mut self, new_value: &str) -> ObjectAccessControlGetCall<'a, C, A> {
-        self._entity = new_value.to_string();
-        self
-    }
-    /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
-    ///
-    /// Sets the *generation* query property to the given value.
-    pub fn generation(mut self, new_value: &str) -> ObjectAccessControlGetCall<'a, C, A> {
-        self._generation = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectAccessControlGetCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ObjectAccessControlGetCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ObjectAccessControlGetCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._scopes.insert(scope.as_ref().to_string(), ());
-        self
-    }
-}
-
-
 /// Updates an ACL entry on the specified object.
 ///
 /// A builder for the *update* method supported by a *objectAccessControl* resource.
@@ -10754,7 +13198,8 @@ impl<'a, C, A> ObjectAccessControlGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.object_access_controls().update(req, "bucket", "object", "entity")
-///              .generation("nonumy")
+///              .user_project("eos")
+///              .generation("justo")
 ///              .doit();
 /// # }
 /// ```
@@ -10766,6 +13211,7 @@ pub struct ObjectAccessControlUpdateCall<'a, C, A>
     _bucket: String,
     _object: String,
     _entity: String,
+    _user_project: Option<String>,
     _generation: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
@@ -10788,14 +13234,17 @@ impl<'a, C, A> ObjectAccessControlUpdateCall<'a, C, A> where C: BorrowMut<hyper:
         };
         dlg.begin(MethodInfo { id: "storage.objectAccessControls.update",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
         params.push(("bucket", self._bucket.to_string()));
         params.push(("object", self._object.to_string()));
         params.push(("entity", self._entity.to_string()));
+        if let Some(value) = self._user_project {
+            params.push(("userProject", value.to_string()));
+        }
         if let Some(value) = self._generation {
             params.push(("generation", value.to_string()));
         }
-        for &field in ["alt", "bucket", "object", "entity", "generation"].iter() {
+        for &field in ["alt", "bucket", "object", "entity", "userProject", "generation"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -10807,7 +13256,7 @@ impl<'a, C, A> ObjectAccessControlUpdateCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "b/{bucket}/o/{object}/acl/{entity}";
+        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/o/{object}/acl/{entity}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -10964,6 +13413,13 @@ impl<'a, C, A> ObjectAccessControlUpdateCall<'a, C, A> where C: BorrowMut<hyper:
         self._entity = new_value.to_string();
         self
     }
+    /// The project number to be billed for this request, for Requester Pays buckets.
+    ///
+    /// Sets the *user project* query property to the given value.
+    pub fn user_project(mut self, new_value: &str) -> ObjectAccessControlUpdateCall<'a, C, A> {
+        self._user_project = Some(new_value.to_string());
+        self
+    }
     /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
     ///
     /// Sets the *generation* query property to the given value.
@@ -11023,6 +13479,646 @@ impl<'a, C, A> ObjectAccessControlUpdateCall<'a, C, A> where C: BorrowMut<hyper:
 }
 
 
+/// Creates a new ACL entry on the specified object.
+///
+/// A builder for the *insert* method supported by a *objectAccessControl* resource.
+/// It is not used directly, but through a `ObjectAccessControlMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storage1 as storage1;
+/// use storage1::ObjectAccessControl;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use storage1::Storage;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Storage::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = ObjectAccessControl::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.object_access_controls().insert(req, "bucket", "object")
+///              .user_project("dolore")
+///              .generation("amet.")
+///              .doit();
+/// # }
+/// ```
+pub struct ObjectAccessControlInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Storage<C, A>,
+    _request: ObjectAccessControl,
+    _bucket: String,
+    _object: String,
+    _user_project: Option<String>,
+    _generation: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ObjectAccessControlInsertCall<'a, C, A> {}
+
+impl<'a, C, A> ObjectAccessControlInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ObjectAccessControl)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "storage.objectAccessControls.insert",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        params.push(("bucket", self._bucket.to_string()));
+        params.push(("object", self._object.to_string()));
+        if let Some(value) = self._user_project {
+            params.push(("userProject", value.to_string()));
+        }
+        if let Some(value) = self._generation {
+            params.push(("generation", value.to_string()));
+        }
+        for &field in ["alt", "bucket", "object", "userProject", "generation"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/o/{object}/acl".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{bucket}", "bucket"), ("{object}", "object")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["object", "bucket"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: ObjectAccessControl) -> ObjectAccessControlInsertCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Name of a bucket.
+    ///
+    /// Sets the *bucket* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn bucket(mut self, new_value: &str) -> ObjectAccessControlInsertCall<'a, C, A> {
+        self._bucket = new_value.to_string();
+        self
+    }
+    /// Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
+    ///
+    /// Sets the *object* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn object(mut self, new_value: &str) -> ObjectAccessControlInsertCall<'a, C, A> {
+        self._object = new_value.to_string();
+        self
+    }
+    /// The project number to be billed for this request, for Requester Pays buckets.
+    ///
+    /// Sets the *user project* query property to the given value.
+    pub fn user_project(mut self, new_value: &str) -> ObjectAccessControlInsertCall<'a, C, A> {
+        self._user_project = Some(new_value.to_string());
+        self
+    }
+    /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
+    ///
+    /// Sets the *generation* query property to the given value.
+    pub fn generation(mut self, new_value: &str) -> ObjectAccessControlInsertCall<'a, C, A> {
+        self._generation = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectAccessControlInsertCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> ObjectAccessControlInsertCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> ObjectAccessControlInsertCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+/// Updates a bucket. Changes to the bucket will be readable immediately after writing, but configuration changes may take time to propagate. This method supports patch semantics.
+///
+/// A builder for the *patch* method supported by a *bucket* resource.
+/// It is not used directly, but through a `BucketMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storage1 as storage1;
+/// use storage1::Bucket;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use storage1::Storage;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Storage::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Bucket::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.buckets().patch(req, "bucket")
+///              .user_project("magna")
+///              .projection("elitr")
+///              .predefined_default_object_acl("magna")
+///              .predefined_acl("ipsum")
+///              .if_metageneration_not_match("invidunt")
+///              .if_metageneration_match("accusam")
+///              .doit();
+/// # }
+/// ```
+pub struct BucketPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Storage<C, A>,
+    _request: Bucket,
+    _bucket: String,
+    _user_project: Option<String>,
+    _projection: Option<String>,
+    _predefined_default_object_acl: Option<String>,
+    _predefined_acl: Option<String>,
+    _if_metageneration_not_match: Option<String>,
+    _if_metageneration_match: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for BucketPatchCall<'a, C, A> {}
+
+impl<'a, C, A> BucketPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Bucket)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "storage.buckets.patch",
+                               http_method: hyper::method::Method::Patch });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((10 + self._additional_params.len()));
+        params.push(("bucket", self._bucket.to_string()));
+        if let Some(value) = self._user_project {
+            params.push(("userProject", value.to_string()));
+        }
+        if let Some(value) = self._projection {
+            params.push(("projection", value.to_string()));
+        }
+        if let Some(value) = self._predefined_default_object_acl {
+            params.push(("predefinedDefaultObjectAcl", value.to_string()));
+        }
+        if let Some(value) = self._predefined_acl {
+            params.push(("predefinedAcl", value.to_string()));
+        }
+        if let Some(value) = self._if_metageneration_not_match {
+            params.push(("ifMetagenerationNotMatch", value.to_string()));
+        }
+        if let Some(value) = self._if_metageneration_match {
+            params.push(("ifMetagenerationMatch", value.to_string()));
+        }
+        for &field in ["alt", "bucket", "userProject", "projection", "predefinedDefaultObjectAcl", "predefinedAcl", "ifMetagenerationNotMatch", "ifMetagenerationMatch"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{bucket}", "bucket")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["bucket"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: Bucket) -> BucketPatchCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Name of a bucket.
+    ///
+    /// Sets the *bucket* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn bucket(mut self, new_value: &str) -> BucketPatchCall<'a, C, A> {
+        self._bucket = new_value.to_string();
+        self
+    }
+    /// The project number to be billed for this request, for Requester Pays buckets.
+    ///
+    /// Sets the *user project* query property to the given value.
+    pub fn user_project(mut self, new_value: &str) -> BucketPatchCall<'a, C, A> {
+        self._user_project = Some(new_value.to_string());
+        self
+    }
+    /// Set of properties to return. Defaults to full.
+    ///
+    /// Sets the *projection* query property to the given value.
+    pub fn projection(mut self, new_value: &str) -> BucketPatchCall<'a, C, A> {
+        self._projection = Some(new_value.to_string());
+        self
+    }
+    /// Apply a predefined set of default object access controls to this bucket.
+    ///
+    /// Sets the *predefined default object acl* query property to the given value.
+    pub fn predefined_default_object_acl(mut self, new_value: &str) -> BucketPatchCall<'a, C, A> {
+        self._predefined_default_object_acl = Some(new_value.to_string());
+        self
+    }
+    /// Apply a predefined set of access controls to this bucket.
+    ///
+    /// Sets the *predefined acl* query property to the given value.
+    pub fn predefined_acl(mut self, new_value: &str) -> BucketPatchCall<'a, C, A> {
+        self._predefined_acl = Some(new_value.to_string());
+        self
+    }
+    /// Makes the return of the bucket metadata conditional on whether the bucket's current metageneration does not match the given value.
+    ///
+    /// Sets the *if metageneration not match* query property to the given value.
+    pub fn if_metageneration_not_match(mut self, new_value: &str) -> BucketPatchCall<'a, C, A> {
+        self._if_metageneration_not_match = Some(new_value.to_string());
+        self
+    }
+    /// Makes the return of the bucket metadata conditional on whether the bucket's current metageneration matches the given value.
+    ///
+    /// Sets the *if metageneration match* query property to the given value.
+    pub fn if_metageneration_match(mut self, new_value: &str) -> BucketPatchCall<'a, C, A> {
+        self._if_metageneration_match = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BucketPatchCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> BucketPatchCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> BucketPatchCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
 /// Updates a bucket. Changes to the bucket will be readable immediately after writing, but configuration changes may take time to propagate.
 ///
 /// A builder for the *update* method supported by a *bucket* resource.
@@ -11056,11 +14152,12 @@ impl<'a, C, A> ObjectAccessControlUpdateCall<'a, C, A> where C: BorrowMut<hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().update(req, "bucket")
-///              .projection("sed")
-///              .predefined_default_object_acl("no")
-///              .predefined_acl("invidunt")
-///              .if_metageneration_not_match("rebum.")
-///              .if_metageneration_match("labore")
+///              .user_project("diam")
+///              .projection("nonumy")
+///              .predefined_default_object_acl("sed")
+///              .predefined_acl("diam")
+///              .if_metageneration_not_match("magna")
+///              .if_metageneration_match("dolor")
 ///              .doit();
 /// # }
 /// ```
@@ -11070,6 +14167,7 @@ pub struct BucketUpdateCall<'a, C, A>
     hub: &'a Storage<C, A>,
     _request: Bucket,
     _bucket: String,
+    _user_project: Option<String>,
     _projection: Option<String>,
     _predefined_default_object_acl: Option<String>,
     _predefined_acl: Option<String>,
@@ -11096,8 +14194,11 @@ impl<'a, C, A> BucketUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         };
         dlg.begin(MethodInfo { id: "storage.buckets.update",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((9 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((10 + self._additional_params.len()));
         params.push(("bucket", self._bucket.to_string()));
+        if let Some(value) = self._user_project {
+            params.push(("userProject", value.to_string()));
+        }
         if let Some(value) = self._projection {
             params.push(("projection", value.to_string()));
         }
@@ -11113,7 +14214,7 @@ impl<'a, C, A> BucketUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         if let Some(value) = self._if_metageneration_match {
             params.push(("ifMetagenerationMatch", value.to_string()));
         }
-        for &field in ["alt", "bucket", "projection", "predefinedDefaultObjectAcl", "predefinedAcl", "ifMetagenerationNotMatch", "ifMetagenerationMatch"].iter() {
+        for &field in ["alt", "bucket", "userProject", "projection", "predefinedDefaultObjectAcl", "predefinedAcl", "ifMetagenerationNotMatch", "ifMetagenerationMatch"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -11125,7 +14226,7 @@ impl<'a, C, A> BucketUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "b/{bucket}";
+        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -11262,6 +14363,13 @@ impl<'a, C, A> BucketUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._bucket = new_value.to_string();
         self
     }
+    /// The project number to be billed for this request, for Requester Pays buckets.
+    ///
+    /// Sets the *user project* query property to the given value.
+    pub fn user_project(mut self, new_value: &str) -> BucketUpdateCall<'a, C, A> {
+        self._user_project = Some(new_value.to_string());
+        self
+    }
     /// Set of properties to return. Defaults to full.
     ///
     /// Sets the *projection* query property to the given value.
@@ -11376,9 +14484,10 @@ impl<'a, C, A> BucketUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().get("bucket")
-///              .projection("elitr")
-///              .if_metageneration_not_match("consetetur")
-///              .if_metageneration_match("sea")
+///              .user_project("dolor")
+///              .projection("vero")
+///              .if_metageneration_not_match("nonumy")
+///              .if_metageneration_match("takimata")
 ///              .doit();
 /// # }
 /// ```
@@ -11387,6 +14496,7 @@ pub struct BucketGetCall<'a, C, A>
 
     hub: &'a Storage<C, A>,
     _bucket: String,
+    _user_project: Option<String>,
     _projection: Option<String>,
     _if_metageneration_not_match: Option<String>,
     _if_metageneration_match: Option<String>,
@@ -11411,8 +14521,11 @@ impl<'a, C, A> BucketGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         };
         dlg.begin(MethodInfo { id: "storage.buckets.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
         params.push(("bucket", self._bucket.to_string()));
+        if let Some(value) = self._user_project {
+            params.push(("userProject", value.to_string()));
+        }
         if let Some(value) = self._projection {
             params.push(("projection", value.to_string()));
         }
@@ -11422,7 +14535,7 @@ impl<'a, C, A> BucketGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         if let Some(value) = self._if_metageneration_match {
             params.push(("ifMetagenerationMatch", value.to_string()));
         }
-        for &field in ["alt", "bucket", "projection", "ifMetagenerationNotMatch", "ifMetagenerationMatch"].iter() {
+        for &field in ["alt", "bucket", "userProject", "projection", "ifMetagenerationNotMatch", "ifMetagenerationMatch"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -11434,7 +14547,7 @@ impl<'a, C, A> BucketGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "b/{bucket}";
+        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -11547,6 +14660,13 @@ impl<'a, C, A> BucketGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._bucket = new_value.to_string();
         self
     }
+    /// The project number to be billed for this request, for Requester Pays buckets.
+    ///
+    /// Sets the *user project* query property to the given value.
+    pub fn user_project(mut self, new_value: &str) -> BucketGetCall<'a, C, A> {
+        self._user_project = Some(new_value.to_string());
+        self
+    }
     /// Set of properties to return. Defaults to noAcl.
     ///
     /// Sets the *projection* query property to the given value.
@@ -11647,8 +14767,9 @@ impl<'a, C, A> BucketGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().delete("bucket")
-///              .if_metageneration_not_match("At")
-///              .if_metageneration_match("sea")
+///              .user_project("consetetur")
+///              .if_metageneration_not_match("erat")
+///              .if_metageneration_match("amet.")
 ///              .doit();
 /// # }
 /// ```
@@ -11657,6 +14778,7 @@ pub struct BucketDeleteCall<'a, C, A>
 
     hub: &'a Storage<C, A>,
     _bucket: String,
+    _user_project: Option<String>,
     _if_metageneration_not_match: Option<String>,
     _if_metageneration_match: Option<String>,
     _delegate: Option<&'a mut Delegate>,
@@ -11680,15 +14802,18 @@ impl<'a, C, A> BucketDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         };
         dlg.begin(MethodInfo { id: "storage.buckets.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("bucket", self._bucket.to_string()));
+        if let Some(value) = self._user_project {
+            params.push(("userProject", value.to_string()));
+        }
         if let Some(value) = self._if_metageneration_not_match {
             params.push(("ifMetagenerationNotMatch", value.to_string()));
         }
         if let Some(value) = self._if_metageneration_match {
             params.push(("ifMetagenerationMatch", value.to_string()));
         }
-        for &field in ["bucket", "ifMetagenerationNotMatch", "ifMetagenerationMatch"].iter() {
+        for &field in ["bucket", "userProject", "ifMetagenerationNotMatch", "ifMetagenerationMatch"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -11699,7 +14824,7 @@ impl<'a, C, A> BucketDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         }
 
 
-        let mut url = self.hub._base_url.clone() + "b/{bucket}";
+        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -11802,6 +14927,13 @@ impl<'a, C, A> BucketDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._bucket = new_value.to_string();
         self
     }
+    /// The project number to be billed for this request, for Requester Pays buckets.
+    ///
+    /// Sets the *user project* query property to the given value.
+    pub fn user_project(mut self, new_value: &str) -> BucketDeleteCall<'a, C, A> {
+        self._user_project = Some(new_value.to_string());
+        self
+    }
     /// If set, only deletes the bucket if its metageneration does not match this value.
     ///
     /// Sets the *if metageneration not match* query property to the given value.
@@ -11901,9 +15033,9 @@ impl<'a, C, A> BucketDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().insert(req, "project")
-///              .projection("diam")
-///              .predefined_default_object_acl("accusam")
-///              .predefined_acl("dolores")
+///              .projection("dolores")
+///              .predefined_default_object_acl("et")
+///              .predefined_acl("sed")
 ///              .doit();
 /// # }
 /// ```
@@ -11960,7 +15092,7 @@ impl<'a, C, A> BucketInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "b";
+        let mut url = "https://www.googleapis.com/storage/v1/b".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -12149,9 +15281,9 @@ impl<'a, C, A> BucketInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 }
 
 
-/// Updates a bucket. Changes to the bucket will be readable immediately after writing, but configuration changes may take time to propagate. This method supports patch semantics.
+/// Tests a set of permissions on the given bucket to see which, if any, are held by the caller.
 ///
-/// A builder for the *patch* method supported by a *bucket* resource.
+/// A builder for the *testIamPermissions* method supported by a *bucket* resource.
 /// It is not used directly, but through a `BucketMethods` instance.
 ///
 /// # Example
@@ -12162,7 +15294,271 @@ impl<'a, C, A> BucketInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// # extern crate hyper;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_storage1 as storage1;
-/// use storage1::Bucket;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use storage1::Storage;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Storage::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.buckets().test_iam_permissions("bucket", "permissions")
+///              .user_project("nonumy")
+///              .doit();
+/// # }
+/// ```
+pub struct BucketTestIamPermissionCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Storage<C, A>,
+    _bucket: String,
+    _permissions: Vec<String>,
+    _user_project: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for BucketTestIamPermissionCall<'a, C, A> {}
+
+impl<'a, C, A> BucketTestIamPermissionCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, TestIamPermissionsResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "storage.buckets.testIamPermissions",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        params.push(("bucket", self._bucket.to_string()));
+        if self._permissions.len() > 0 {
+            for f in self._permissions.iter() {
+                params.push(("permissions", f.to_string()));
+            }
+        }
+        if let Some(value) = self._user_project {
+            params.push(("userProject", value.to_string()));
+        }
+        for &field in ["alt", "bucket", "permissions", "userProject"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/iam/testPermissions".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{bucket}", "bucket")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["bucket"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Name of a bucket.
+    ///
+    /// Sets the *bucket* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn bucket(mut self, new_value: &str) -> BucketTestIamPermissionCall<'a, C, A> {
+        self._bucket = new_value.to_string();
+        self
+    }
+    /// Permissions to test.
+    ///
+    /// Append the given value to the *permissions* query property.
+    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn add_permissions(mut self, new_value: &str) -> BucketTestIamPermissionCall<'a, C, A> {
+        self._permissions.push(new_value.to_string());
+        self
+    }
+    /// The project number to be billed for this request, for Requester Pays buckets.
+    ///
+    /// Sets the *user project* query property to the given value.
+    pub fn user_project(mut self, new_value: &str) -> BucketTestIamPermissionCall<'a, C, A> {
+        self._user_project = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BucketTestIamPermissionCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> BucketTestIamPermissionCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> BucketTestIamPermissionCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+/// Updates an IAM policy for the specified bucket.
+///
+/// A builder for the *setIamPolicy* method supported by a *bucket* resource.
+/// It is not used directly, but through a `BucketMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storage1 as storage1;
+/// use storage1::Policy;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -12176,43 +15572,35 @@ impl<'a, C, A> BucketInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = Bucket::default();
+/// let mut req = Policy::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.buckets().patch(req, "bucket")
-///              .projection("dolor")
-///              .predefined_default_object_acl("aliquyam")
-///              .predefined_acl("elitr")
-///              .if_metageneration_not_match("ea")
-///              .if_metageneration_match("et")
+/// let result = hub.buckets().set_iam_policy(req, "bucket")
+///              .user_project("aliquyam")
 ///              .doit();
 /// # }
 /// ```
-pub struct BucketPatchCall<'a, C, A>
+pub struct BucketSetIamPolicyCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Storage<C, A>,
-    _request: Bucket,
+    _request: Policy,
     _bucket: String,
-    _projection: Option<String>,
-    _predefined_default_object_acl: Option<String>,
-    _predefined_acl: Option<String>,
-    _if_metageneration_not_match: Option<String>,
-    _if_metageneration_match: Option<String>,
+    _user_project: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for BucketPatchCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for BucketSetIamPolicyCall<'a, C, A> {}
 
-impl<'a, C, A> BucketPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> BucketSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Bucket)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Policy)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -12220,26 +15608,14 @@ impl<'a, C, A> BucketPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "storage.buckets.patch",
-                               http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((9 + self._additional_params.len()));
+        dlg.begin(MethodInfo { id: "storage.buckets.setIamPolicy",
+                               http_method: hyper::method::Method::Put });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("bucket", self._bucket.to_string()));
-        if let Some(value) = self._projection {
-            params.push(("projection", value.to_string()));
+        if let Some(value) = self._user_project {
+            params.push(("userProject", value.to_string()));
         }
-        if let Some(value) = self._predefined_default_object_acl {
-            params.push(("predefinedDefaultObjectAcl", value.to_string()));
-        }
-        if let Some(value) = self._predefined_acl {
-            params.push(("predefinedAcl", value.to_string()));
-        }
-        if let Some(value) = self._if_metageneration_not_match {
-            params.push(("ifMetagenerationNotMatch", value.to_string()));
-        }
-        if let Some(value) = self._if_metageneration_match {
-            params.push(("ifMetagenerationMatch", value.to_string()));
-        }
-        for &field in ["alt", "bucket", "projection", "predefinedDefaultObjectAcl", "predefinedAcl", "ifMetagenerationNotMatch", "ifMetagenerationMatch"].iter() {
+        for &field in ["alt", "bucket", "userProject"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -12251,7 +15627,7 @@ impl<'a, C, A> BucketPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "b/{bucket}";
+        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/iam".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -12313,7 +15689,7 @@ impl<'a, C, A> BucketPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -12374,7 +15750,7 @@ impl<'a, C, A> BucketPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Bucket) -> BucketPatchCall<'a, C, A> {
+    pub fn request(mut self, new_value: Policy) -> BucketSetIamPolicyCall<'a, C, A> {
         self._request = new_value;
         self
     }
@@ -12384,43 +15760,15 @@ impl<'a, C, A> BucketPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn bucket(mut self, new_value: &str) -> BucketPatchCall<'a, C, A> {
+    pub fn bucket(mut self, new_value: &str) -> BucketSetIamPolicyCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
-    /// Set of properties to return. Defaults to full.
+    /// The project number to be billed for this request, for Requester Pays buckets.
     ///
-    /// Sets the *projection* query property to the given value.
-    pub fn projection(mut self, new_value: &str) -> BucketPatchCall<'a, C, A> {
-        self._projection = Some(new_value.to_string());
-        self
-    }
-    /// Apply a predefined set of default object access controls to this bucket.
-    ///
-    /// Sets the *predefined default object acl* query property to the given value.
-    pub fn predefined_default_object_acl(mut self, new_value: &str) -> BucketPatchCall<'a, C, A> {
-        self._predefined_default_object_acl = Some(new_value.to_string());
-        self
-    }
-    /// Apply a predefined set of access controls to this bucket.
-    ///
-    /// Sets the *predefined acl* query property to the given value.
-    pub fn predefined_acl(mut self, new_value: &str) -> BucketPatchCall<'a, C, A> {
-        self._predefined_acl = Some(new_value.to_string());
-        self
-    }
-    /// Makes the return of the bucket metadata conditional on whether the bucket's current metageneration does not match the given value.
-    ///
-    /// Sets the *if metageneration not match* query property to the given value.
-    pub fn if_metageneration_not_match(mut self, new_value: &str) -> BucketPatchCall<'a, C, A> {
-        self._if_metageneration_not_match = Some(new_value.to_string());
-        self
-    }
-    /// Makes the return of the bucket metadata conditional on whether the bucket's current metageneration matches the given value.
-    ///
-    /// Sets the *if metageneration match* query property to the given value.
-    pub fn if_metageneration_match(mut self, new_value: &str) -> BucketPatchCall<'a, C, A> {
-        self._if_metageneration_match = Some(new_value.to_string());
+    /// Sets the *user project* query property to the given value.
+    pub fn user_project(mut self, new_value: &str) -> BucketSetIamPolicyCall<'a, C, A> {
+        self._user_project = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -12429,7 +15777,7 @@ impl<'a, C, A> BucketPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BucketPatchCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BucketSetIamPolicyCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12450,7 +15798,7 @@ impl<'a, C, A> BucketPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> BucketPatchCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> BucketSetIamPolicyCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12467,7 +15815,254 @@ impl<'a, C, A> BucketPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> BucketPatchCall<'a, C, A>
+    pub fn add_scope<T>(mut self, scope: T) -> BucketSetIamPolicyCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+/// Returns an IAM policy for the specified bucket.
+///
+/// A builder for the *getIamPolicy* method supported by a *bucket* resource.
+/// It is not used directly, but through a `BucketMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storage1 as storage1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use storage1::Storage;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Storage::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.buckets().get_iam_policy("bucket")
+///              .user_project("magna")
+///              .doit();
+/// # }
+/// ```
+pub struct BucketGetIamPolicyCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Storage<C, A>,
+    _bucket: String,
+    _user_project: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for BucketGetIamPolicyCall<'a, C, A> {}
+
+impl<'a, C, A> BucketGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Policy)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "storage.buckets.getIamPolicy",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        params.push(("bucket", self._bucket.to_string()));
+        if let Some(value) = self._user_project {
+            params.push(("userProject", value.to_string()));
+        }
+        for &field in ["alt", "bucket", "userProject"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/iam".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{bucket}", "bucket")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["bucket"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Name of a bucket.
+    ///
+    /// Sets the *bucket* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn bucket(mut self, new_value: &str) -> BucketGetIamPolicyCall<'a, C, A> {
+        self._bucket = new_value.to_string();
+        self
+    }
+    /// The project number to be billed for this request, for Requester Pays buckets.
+    ///
+    /// Sets the *user project* query property to the given value.
+    pub fn user_project(mut self, new_value: &str) -> BucketGetIamPolicyCall<'a, C, A> {
+        self._user_project = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BucketGetIamPolicyCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> BucketGetIamPolicyCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> BucketGetIamPolicyCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -12502,10 +16097,10 @@ impl<'a, C, A> BucketPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().list("project")
-///              .projection("sed")
-///              .prefix("dolor")
-///              .page_token("sanctus")
-///              .max_results(68)
+///              .projection("sit")
+///              .prefix("gubergren")
+///              .page_token("sit")
+///              .max_results(4)
 ///              .doit();
 /// # }
 /// ```
@@ -12565,7 +16160,7 @@ impl<'a, C, A> BucketListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "b";
+        let mut url = "https://www.googleapis.com/storage/v1/b".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -12678,7 +16273,7 @@ impl<'a, C, A> BucketListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Maximum number of buckets to return.
+    /// Maximum number of buckets to return in a single response. The service will use this parameter or 1,000 items, whichever is smaller.
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> BucketListCall<'a, C, A> {
@@ -12735,5 +16330,241 @@ impl<'a, C, A> BucketListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self
     }
 }
+
+
+/// Get the email address of this project's GCS service account.
+///
+/// A builder for the *serviceAccount.get* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storage1 as storage1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use storage1::Storage;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Storage::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().service_account_get("projectId")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectServiceAccountGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Storage<C, A>,
+    _project_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectServiceAccountGetCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectServiceAccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ServiceAccount)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "storage.projects.serviceAccount.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        params.push(("projectId", self._project_id.to_string()));
+        for &field in ["alt", "projectId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/storage/v1/projects/{projectId}/serviceAccount".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{projectId}", "projectId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["projectId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Project ID
+    ///
+    /// Sets the *project id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn project_id(mut self, new_value: &str) -> ProjectServiceAccountGetCall<'a, C, A> {
+        self._project_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectServiceAccountGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceAccountGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectServiceAccountGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
 
 

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Firebase Dynamic Links* crate version *1.0.4+20161118*, where *20161118* is the exact revision of the *firebasedynamiclinks:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
+//! This documentation was generated from *Firebase Dynamic Links* crate version *1.0.4+20170517*, where *20170517* is the exact revision of the *firebasedynamiclinks:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
 //! 
 //! Everything else about the *Firebase Dynamic Links* *v1* API can be found at the
 //! [official documentation site](https://firebase.google.com/docs/dynamic-links/).
@@ -176,7 +176,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -307,8 +307,6 @@ pub struct FirebaseDynamicLinks<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-    _base_url: String,
-    _root_url: String,
 }
 
 impl<'a, C, A> Hub for FirebaseDynamicLinks<C, A> {}
@@ -321,8 +319,6 @@ impl<'a, C, A> FirebaseDynamicLinks<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
-            _base_url: "https://firebasedynamiclinks.googleapis.com/".to_string(),
-            _root_url: "https://firebasedynamiclinks.googleapis.com/".to_string(),
         }
     }
 
@@ -339,32 +335,27 @@ impl<'a, C, A> FirebaseDynamicLinks<C, A>
         self._user_agent = agent_name;
         prev
     }
-
-    /// Set the base url to use in all requests to the server.
-    /// It defaults to `https://firebasedynamiclinks.googleapis.com/`.
-    ///
-    /// Returns the previously set base url.
-    pub fn base_url(&mut self, new_base_url: String) -> String {
-        let prev = self._base_url.clone();
-        self._base_url = new_base_url;
-        prev
-    }
-
-    /// Set the root url to use in all requests to the server.
-    /// It defaults to `https://firebasedynamiclinks.googleapis.com/`.
-    ///
-    /// Returns the previously set root url.
-    pub fn root_url(&mut self, new_root_url: String) -> String {
-        let prev = self._root_url.clone();
-        self._root_url = new_root_url;
-        prev
-    }
 }
 
 
 // ############
 // SCHEMAS ###
 // ##########
+/// Information of navigation behavior.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct NavigationInfo {
+    /// If this option is on, FDL click will be forced to redirect rather than
+    /// show an interstitial page.
+    #[serde(rename="enableForcedRedirect")]
+    pub enable_forced_redirect: Option<bool>,
+}
+
+impl Part for NavigationInfo {}
+
+
 /// Tracking parameters supported by Dynamic Link.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -577,23 +568,26 @@ impl Part for GooglePlayAnalytics {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DynamicLinkInfo {
+    /// Information of navigation behavior of a Firebase Dynamic Links.
+    #[serde(rename="navigationInfo")]
+    pub navigation_info: Option<NavigationInfo>,
     /// Parameters used for tracking. See all tracking parameters in the
-    /// [documentation](https://firebase.google.com/docs/dynamic-links/android#create-a-dynamic-link-programmatically).
+    /// [documentation](https://firebase.google.com/docs/dynamic-links/create-manually).
     #[serde(rename="analyticsInfo")]
     pub analytics_info: Option<AnalyticsInfo>,
     /// The link your app will open, You can specify any URL your app can handle.
     /// This link must be a well-formatted URL, be properly URL-encoded, and use
     /// the HTTP or HTTPS scheme. See 'link' parameters in the
-    /// [documentation](https://firebase.google.com/docs/dynamic-links/android#create-a-dynamic-link-programmatically).
+    /// [documentation](https://firebase.google.com/docs/dynamic-links/create-manually).
     /// 
     /// Required.
     pub link: Option<String>,
     /// iOS related information. See iOS related parameters in the
-    /// [documentation](https://firebase.google.com/docs/dynamic-links/ios#create-a-dynamic-link-programmatically).
+    /// [documentation](https://firebase.google.com/docs/dynamic-links/create-manually).
     #[serde(rename="iosInfo")]
     pub ios_info: Option<IosInfo>,
     /// Android related information. See Android related parameters in the
-    /// [documentation](https://firebase.google.com/docs/dynamic-links/android#create-a-dynamic-link-programmatically).
+    /// [documentation](https://firebase.google.com/docs/dynamic-links/create-manually).
     #[serde(rename="androidInfo")]
     pub android_info: Option<AndroidInfo>,
     /// Parameters for social meta tag params.
@@ -601,7 +595,7 @@ pub struct DynamicLinkInfo {
     #[serde(rename="socialMetaTagInfo")]
     pub social_meta_tag_info: Option<SocialMetaTagInfo>,
     /// Dynamic Links domain that the project owns, e.g. abcd.app.goo.gl
-    /// [Learn more](https://firebase.google.com/docs/dynamic-links/android#set-up-firebase-and-the-dynamic-links-sdk)
+    /// [Learn more](https://firebase.google.com/docs/dynamic-links/android/receive)
     /// on how to set up Dynamic Link domain associated with your Firebase project.
     /// 
     /// Required.
@@ -623,14 +617,14 @@ impl Part for DynamicLinkInfo {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreateShortDynamicLinkResponse {
-    /// Preivew link to show the link flow chart.
-    #[serde(rename="previewLink")]
-    pub preview_link: Option<String>,
-    /// Information about potential warnings on link creation.
-    pub warning: Option<Vec<DynamicLinkWarning>>,
     /// Short Dynamic Link value. e.g. https://abcd.app.goo.gl/wxyz
     #[serde(rename="shortLink")]
     pub short_link: Option<String>,
+    /// Information about potential warnings on link creation.
+    pub warning: Option<Vec<DynamicLinkWarning>>,
+    /// Preivew link to show the link flow chart.
+    #[serde(rename="previewLink")]
+    pub preview_link: Option<String>,
 }
 
 impl ResponseResult for CreateShortDynamicLinkResponse {}
@@ -796,7 +790,7 @@ impl<'a, C, A> ShortLinkCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/shortLinks";
+        let mut url = "https://firebasedynamiclinks.googleapis.com/v1/shortLinks".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Firebase.as_ref().to_string(), ());
         }
@@ -958,5 +952,6 @@ impl<'a, C, A> ShortLinkCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self
     }
 }
+
 
 

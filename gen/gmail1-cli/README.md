@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *gmail* API at revision *20161206*. The CLI is at version *1.0.4*.
+This documentation was generated from the *gmail* API at revision *20170510*. The CLI is at version *1.0.4*.
 
 ```bash
 gmail1 [options]
@@ -73,6 +73,11 @@ gmail1 [options]
                 settings-send-as-get <user-id> <send-as-email> [-p <v>]... [-o <out>]
                 settings-send-as-list <user-id> [-p <v>]... [-o <out>]
                 settings-send-as-patch <user-id> <send-as-email> (-r <kv>)... [-p <v>]... [-o <out>]
+                settings-send-as-smime-info-delete <user-id> <send-as-email> <id> [-p <v>]...
+                settings-send-as-smime-info-get <user-id> <send-as-email> <id> [-p <v>]... [-o <out>]
+                settings-send-as-smime-info-insert <user-id> <send-as-email> (-r <kv>)... [-p <v>]... [-o <out>]
+                settings-send-as-smime-info-list <user-id> <send-as-email> [-p <v>]... [-o <out>]
+                settings-send-as-smime-info-set-default <user-id> <send-as-email> <id> [-p <v>]...
                 settings-send-as-update <user-id> <send-as-email> (-r <kv>)... [-p <v>]... [-o <out>]
                 settings-send-as-verify <user-id> <send-as-email> [-p <v>]...
                 settings-update-auto-forwarding <user-id> (-r <kv>)... [-p <v>]... [-o <out>]

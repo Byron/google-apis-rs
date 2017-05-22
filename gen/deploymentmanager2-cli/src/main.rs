@@ -315,6 +315,7 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.description" => Some(("update.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.manifest" => Some(("update.manifest", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "manifest" => Some(("manifest", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "insert-time" => Some(("insertTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -498,6 +499,7 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.description" => Some(("update.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.manifest" => Some(("update.manifest", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "manifest" => Some(("manifest", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "insert-time" => Some(("insertTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -879,6 +881,7 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.description" => Some(("update.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.manifest" => Some(("update.manifest", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "manifest" => Some(("manifest", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "insert-time" => Some(("insertTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2129,7 +2132,7 @@ fn main() {
     
     let mut app = App::new("deploymentmanager2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.4+20161209")
+           .version("1.0.4+20170501")
            .about("Declares, configures, and deploys complex solutions on Google Cloud Platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_deploymentmanager2_cli")
            .arg(Arg::with_name("url")

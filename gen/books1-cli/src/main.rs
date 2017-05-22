@@ -1160,12 +1160,13 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "notification.more-from-series.opted-state" => Some(("notification.moreFromSeries.opted_state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "notification.reward-expirations.opted-state" => Some(("notification.rewardExpirations.opted_state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "notification.more-from-authors.opted-state" => Some(("notification.moreFromAuthors.opted_state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "notes-export.is-enabled" => Some(("notesExport.isEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "notes-export.folder-name" => Some(("notesExport.folderName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["folder-name", "is-enabled", "kind", "more-from-authors", "more-from-series", "notes-export", "notification", "opted-state"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["folder-name", "is-enabled", "kind", "more-from-authors", "more-from-series", "notes-export", "notification", "opted-state", "reward-expirations"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1371,6 +1372,9 @@ impl<'n> Engine<'n> {
                 "country" => {
                     call = call.country(value.unwrap_or(""));
                 },
+                "annotation-id" => {
+                    call = call.annotation_id(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1384,7 +1388,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["source", "show-only-summary-in-response", "country"].iter().map(|v|*v));
+                                                                           v.extend(["source", "show-only-summary-in-response", "annotation-id", "country"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -4702,7 +4706,7 @@ fn main() {
     
     let mut app = App::new("books1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.4+20161206")
+           .version("1.0.4+20170313")
            .about("Searches for books and manages your Google Books library.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_books1_cli")
            .arg(Arg::with_name("url")

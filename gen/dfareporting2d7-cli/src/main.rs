@@ -20403,7 +20403,7 @@ fn main() {
         
         ("files", "methods: 'get' and 'list'", vec![
             ("get",
-                    Some(r##"Retrieves a report file by its report ID and file ID."##),
+                    Some(r##"Retrieves a report file by its report ID and file ID. This method supports media download."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dfareporting2d7_cli/files_get",
                   vec![
                     (Some(r##"report-id"##),
@@ -22455,7 +22455,7 @@ fn main() {
                      Some(true)),
                   ]),
             ("files-get",
-                    Some(r##"Retrieves a report file."##),
+                    Some(r##"Retrieves a report file. This method supports media download."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dfareporting2d7_cli/reports_files-get",
                   vec![
                     (Some(r##"profile-id"##),
@@ -23630,7 +23630,7 @@ fn main() {
     
     let mut app = App::new("dfareporting2d7")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.4+20161027")
+           .version("1.0.4+20170428")
            .about("Manages your DoubleClick Campaign Manager ad campaigns and reports.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_dfareporting2d7_cli")
            .arg(Arg::with_name("url")

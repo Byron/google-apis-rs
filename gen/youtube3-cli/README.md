@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *YouTube* API at revision *20161202*. The CLI is at version *1.0.4*.
+This documentation was generated from the *YouTube* API at revision *20170130*. The CLI is at version *1.0.4*.
 
 ```bash
 youtube3 [options]
@@ -108,6 +108,8 @@ youtube3 [options]
         subscriptions
                 delete <id> [-p <v>]...
                 insert (-r <kv>)... [-p <v>]... [-o <out>]
+                list <part> [-p <v>]... [-o <out>]
+        super-chat-events
                 list <part> [-p <v>]... [-o <out>]
         thumbnails
                 set <video-id> (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]

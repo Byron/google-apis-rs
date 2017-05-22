@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *drive* API at revision *20161212*. The CLI is at version *1.0.4*.
+This documentation was generated from the *drive* API at revision *20170512*. The CLI is at version *1.0.4*.
 
 ```bash
 drive3 [options]
@@ -71,6 +71,12 @@ drive3 [options]
                 get <file-id> <revision-id> [-p <v>]... [-o <out>]
                 list <file-id> [-p <v>]... [-o <out>]
                 update <file-id> <revision-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        teamdrives
+                create <request-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                delete <team-drive-id> [-p <v>]...
+                get <team-drive-id> [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+                update <team-drive-id> (-r <kv>)... [-p <v>]... [-o <out>]
   drive3 --help
 
 Configuration:

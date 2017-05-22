@@ -1,4 +1,4 @@
-site_name: iam v1.0.4+20160915
+site_name: iam v1.0.4+20170515
 site_url: http://byron.github.io/google-apis-rs/google-iam1-cli
 site_description: A complete library to interact with iam (protocol v1)
 
@@ -20,6 +20,7 @@ pages:
 - ['projects_service-accounts-list.md', 'Projects', 'Service Accounts List']
 - ['projects_service-accounts-set-iam-policy.md', 'Projects', 'Service Accounts Set Iam Policy']
 - ['projects_service-accounts-sign-blob.md', 'Projects', 'Service Accounts Sign Blob']
+- ['projects_service-accounts-sign-jwt.md', 'Projects', 'Service Accounts Sign Jwt']
 - ['projects_service-accounts-test-iam-permissions.md', 'Projects', 'Service Accounts Test Iam Permissions']
 - ['projects_service-accounts-update.md', 'Projects', 'Service Accounts Update']
 - ['roles_query-grantable-roles.md', 'Roles', 'Query Grantable Roles']

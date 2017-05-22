@@ -182,7 +182,7 @@
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 
@@ -314,8 +314,6 @@ pub struct AutoscalerHub<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-    _base_url: String,
-    _root_url: String,
 }
 
 impl<'a, C, A> Hub for AutoscalerHub<C, A> {}
@@ -328,8 +326,6 @@ impl<'a, C, A> AutoscalerHub<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.4".to_string(),
-            _base_url: "https://www.googleapis.com/autoscaler/v1beta2/".to_string(),
-            _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
@@ -350,26 +346,6 @@ impl<'a, C, A> AutoscalerHub<C, A>
     pub fn user_agent(&mut self, agent_name: String) -> String {
         let prev = self._user_agent.clone();
         self._user_agent = agent_name;
-        prev
-    }
-
-    /// Set the base url to use in all requests to the server.
-    /// It defaults to `https://www.googleapis.com/autoscaler/v1beta2/`.
-    ///
-    /// Returns the previously set base url.
-    pub fn base_url(&mut self, new_base_url: String) -> String {
-        let prev = self._base_url.clone();
-        self._base_url = new_base_url;
-        prev
-    }
-
-    /// Set the root url to use in all requests to the server.
-    /// It defaults to `https://www.googleapis.com/`.
-    ///
-    /// Returns the previously set root url.
-    pub fn root_url(&mut self, new_root_url: String) -> String {
-        let prev = self._root_url.clone();
-        self._root_url = new_root_url;
         prev
     }
 }
@@ -1233,7 +1209,7 @@ impl<'a, C, A> ZoneListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{project}/zones";
+        let mut url = "https://www.googleapis.com/autoscaler/v1beta2/{project}/zones".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ComputeReadonly.as_ref().to_string(), ());
         }
@@ -1502,7 +1478,7 @@ impl<'a, C, A> ZoneOperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{project}/zones/{zone}/operations";
+        let mut url = "https://www.googleapis.com/autoscaler/v1beta2/{project}/zones/{zone}/operations".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ComputeReadonly.as_ref().to_string(), ());
         }
@@ -1766,7 +1742,7 @@ impl<'a, C, A> ZoneOperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
         }
 
 
-        let mut url = self.hub._base_url.clone() + "{project}/zones/{zone}/operations/{operation}";
+        let mut url = "https://www.googleapis.com/autoscaler/v1beta2/{project}/zones/{zone}/operations/{operation}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Compute.as_ref().to_string(), ());
         }
@@ -2012,7 +1988,7 @@ impl<'a, C, A> ZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{project}/zones/{zone}/operations/{operation}";
+        let mut url = "https://www.googleapis.com/autoscaler/v1beta2/{project}/zones/{zone}/operations/{operation}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ComputeReadonly.as_ref().to_string(), ());
         }
@@ -2281,7 +2257,7 @@ impl<'a, C, A> AutoscalerListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "projects/{project}/zones/{zone}/autoscalers";
+        let mut url = "https://www.googleapis.com/autoscaler/v1beta2/projects/{project}/zones/{zone}/autoscalers".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ComputeReadonly.as_ref().to_string(), ());
         }
@@ -2555,7 +2531,7 @@ impl<'a, C, A> AutoscalerUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "projects/{project}/zones/{zone}/autoscalers/{autoscaler}";
+        let mut url = "https://www.googleapis.com/autoscaler/v1beta2/projects/{project}/zones/{zone}/autoscalers/{autoscaler}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Compute.as_ref().to_string(), ());
         }
@@ -2845,7 +2821,7 @@ impl<'a, C, A> AutoscalerPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "projects/{project}/zones/{zone}/autoscalers/{autoscaler}";
+        let mut url = "https://www.googleapis.com/autoscaler/v1beta2/projects/{project}/zones/{zone}/autoscalers/{autoscaler}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Compute.as_ref().to_string(), ());
         }
@@ -3128,7 +3104,7 @@ impl<'a, C, A> AutoscalerDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "projects/{project}/zones/{zone}/autoscalers/{autoscaler}";
+        let mut url = "https://www.googleapis.com/autoscaler/v1beta2/projects/{project}/zones/{zone}/autoscalers/{autoscaler}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Compute.as_ref().to_string(), ());
         }
@@ -3392,7 +3368,7 @@ impl<'a, C, A> AutoscalerInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "projects/{project}/zones/{zone}/autoscalers";
+        let mut url = "https://www.googleapis.com/autoscaler/v1beta2/projects/{project}/zones/{zone}/autoscalers".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Compute.as_ref().to_string(), ());
         }
@@ -3665,7 +3641,7 @@ impl<'a, C, A> AutoscalerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "projects/{project}/zones/{zone}/autoscalers/{autoscaler}";
+        let mut url = "https://www.googleapis.com/autoscaler/v1beta2/projects/{project}/zones/{zone}/autoscalers/{autoscaler}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ComputeReadonly.as_ref().to_string(), ());
         }
@@ -3848,5 +3824,6 @@ impl<'a, C, A> AutoscalerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self
     }
 }
+
 
 
