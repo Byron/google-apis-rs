@@ -5,9 +5,9 @@
 gen/doc
 *.go
 *.pyc
-**target/
-**docs/
-**build_html/
+**/target/
+**/docs/
+**/build_html/
 .*.deps
-**Cargo.lock
+**/Cargo.lock
 *.sublime-workspace
