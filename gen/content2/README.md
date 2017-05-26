@@ -102,6 +102,7 @@ google-content2 = "*"
 
 ```Rust
 extern crate hyper;
+extern crate hyper_rustls;
 extern crate yup_oauth2 as oauth2;
 extern crate google_content2 as content2;
 use content2::{Result, Error};
@@ -118,9 +119,9 @@ let secret: ApplicationSecret = Default::default();
 // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 // retrieve them from storage.
 let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-                              hyper::Client::new(),
+                              hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
                               <MemoryStorage as Default>::default(), None);
-let mut hub = ShoppingContent::new(hyper::Client::new(), auth);
+let mut hub = ShoppingContent::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !

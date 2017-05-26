@@ -83,6 +83,7 @@ google-gamesconfiguration1_configuration = "*"
 
 ```Rust
 extern crate hyper;
+extern crate hyper_rustls;
 extern crate yup_oauth2 as oauth2;
 extern crate google_gamesconfiguration1_configuration as gamesconfiguration1_configuration;
 use gamesconfiguration1_configuration::{Result, Error};
@@ -99,9 +100,9 @@ let secret: ApplicationSecret = Default::default();
 // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 // retrieve them from storage.
 let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-                              hyper::Client::new(),
+                              hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
                               <MemoryStorage as Default>::default(), None);
-let mut hub = GamesConfiguration::new(hyper::Client::new(), auth);
+let mut hub = GamesConfiguration::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !

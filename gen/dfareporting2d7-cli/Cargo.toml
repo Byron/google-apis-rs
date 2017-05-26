@@ -16,6 +16,9 @@ keywords = ["dfareporting", "google", "cli"]
 [[bin]]
 name = "dfareporting2d7"
 
+[dev-dependencies]
+hyper-rustls = "^0.6"
+
 [dependencies]
 hyper = "^ 0.10"
 mime = "^ 0.2.0"

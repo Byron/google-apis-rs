@@ -14,6 +14,9 @@ license = "MIT"
 keywords = ["androidpublisher", "google", "protocol", "web", "api"]
 
 
+[dev-dependencies]
+hyper-rustls = "^0.6"
+
 [dependencies]
 hyper = "^ 0.10"
 mime = "^ 0.2.0"

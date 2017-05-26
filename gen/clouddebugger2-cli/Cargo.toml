@@ -16,6 +16,9 @@ keywords = ["clouddebugger", "google", "cli"]
 [[bin]]
 name = "clouddebugger2"
 
+[dev-dependencies]
+hyper-rustls = "^0.6"
+
 [dependencies]
 hyper = "^ 0.10"
 mime = "^ 0.2.0"

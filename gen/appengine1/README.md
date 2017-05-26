@@ -80,6 +80,7 @@ google-appengine1 = "*"
 
 ```Rust
 extern crate hyper;
+extern crate hyper_rustls;
 extern crate yup_oauth2 as oauth2;
 extern crate google_appengine1 as appengine1;
 use appengine1::DebugInstanceRequest;
@@ -97,9 +98,9 @@ let secret: ApplicationSecret = Default::default();
 // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 // retrieve them from storage.
 let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-                              hyper::Client::new(),
+                              hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
                               <MemoryStorage as Default>::default(), None);
-let mut hub = Appengine::new(hyper::Client::new(), auth);
+let mut hub = Appengine::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 // As the method needs a request, you would usually fill it with the desired information
 // into the respective structure. Some of the parts shown here might not be applicable !
 // Values shown here are possibly random and not representative !
