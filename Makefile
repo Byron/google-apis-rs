@@ -44,6 +44,8 @@ help:
 	$(info regen-apis     -   clear out all generated apis, and regenerate them)
 	$(info license        -   regenerate the main license file)
 	$(info update-json    -   rediscover API schema json files and update api-list.yaml with latest versions)
+	$(info publish-api    -   publish all api crates to crates.io)
+	$(info publish-cli    -   publish all cli crates to crates.io, required for `cargo install` to work)
 	$(info deps           -   generate a file to tell how to build libraries and programs)
 	$(info help           -   print this help)
 
