@@ -258,9 +258,9 @@ let secret: ApplicationSecret = Default::default();
 // retrieve them from storage.
 % endif
 let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-                              hyper::Client::new(),
+                              hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
                               <MemoryStorage as Default>::default(), None);
-let mut hub = ${hub_type}::new(hyper::Client::new(), auth);\
+let mut hub = ${hub_type}::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);\
 </%def>
 
 ## You will still have to set the filter for your comment type - either nothing, or rust_doc_comment !

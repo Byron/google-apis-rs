@@ -22,6 +22,9 @@ keywords = ["${name[:20]}", ${", ".join(estr(cargo.keywords))}]
 name = "${util.program_name()}"
 % endif
 
+[dev-dependencies]
+hyper-rustls = "^0.6"
+
 [dependencies]
 hyper = "^ 0.10"
 ## Must match the one hyper uses, otherwise there are duplicate similarly named `Mime` structs
