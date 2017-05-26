@@ -8,6 +8,8 @@ api:
     # It doesn't generate due to a recursive data structure, that we currently don't handle it seems
     # Alternatively, it's too deep for our stack ;).
     - civicinfo
+    # It seems functions are containing illegal characters, like `@context`
+    - kgsearch
     - mapsengine
     - firebaserules
     - runtimeconfig
