@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *safebrowsing* crate version *1.0.4+20170509*, where *20170509* is the exact revision of the *safebrowsing:v4* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
+//! This documentation was generated from *safebrowsing* crate version *1.0.5+20170509*, where *20170509* is the exact revision of the *safebrowsing:v4* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.5*.
 //! 
 //! Everything else about the *safebrowsing* *v4* API can be found at the
 //! [official documentation site](https://developers.google.com/safe-browsing/).
@@ -304,7 +304,7 @@ impl<'a, C, A> Safebrowsing<C, A>
         Safebrowsing {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.4".to_string(),
+            _user_agent: "google-api-rust-client/1.0.5".to_string(),
             _base_url: "https://safebrowsing.googleapis.com/".to_string(),
             _root_url: "https://safebrowsing.googleapis.com/".to_string(),
         }
@@ -330,7 +330,7 @@ impl<'a, C, A> Safebrowsing<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.4`.
+    /// It defaults to `google-api-rust-client/1.0.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {

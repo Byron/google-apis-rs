@@ -4,12 +4,12 @@
 [package]
 
 name = "google-appengine1"
-version = "1.0.4+20170522"
+version = "1.0.5+20170522"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with appengine (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/appengine1"
 homepage = "https://cloud.google.com/appengine/docs/admin-api/"
-documentation = "https://docs.rs/google-appengine1/1.0.4+20170522"
+documentation = "https://docs.rs/google-appengine1/1.0.5+20170522"
 license = "MIT"
 keywords = ["appengine", "google", "protocol", "web", "api"]
 

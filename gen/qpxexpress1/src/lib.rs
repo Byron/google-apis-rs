@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *QPX Express* crate version *1.0.4+20160708*, where *20160708* is the exact revision of the *qpxExpress:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
+//! This documentation was generated from *QPX Express* crate version *1.0.5+20160708*, where *20160708* is the exact revision of the *qpxExpress:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.5*.
 //! 
 //! Everything else about the *QPX Express* *v1* API can be found at the
 //! [official documentation site](http://developers.google.com/qpx-express).
@@ -301,7 +301,7 @@ impl<'a, C, A> QPXExpress<C, A>
         QPXExpress {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.4".to_string(),
+            _user_agent: "google-api-rust-client/1.0.5".to_string(),
             _base_url: "https://www.googleapis.com/qpxExpress/v1/trips/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -312,7 +312,7 @@ impl<'a, C, A> QPXExpress<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.4`.
+    /// It defaults to `google-api-rust-client/1.0.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {

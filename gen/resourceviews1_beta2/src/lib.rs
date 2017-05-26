@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *resourceviews* crate version *1.0.4+20160512*, where *20160512* is the exact revision of the *resourceviews:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.4*.
+//! This documentation was generated from *resourceviews* crate version *1.0.5+20160512*, where *20160512* is the exact revision of the *resourceviews:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.5*.
 //! 
 //! Everything else about the *resourceviews* *v1_beta2* API can be found at the
 //! [official documentation site](https://developers.google.com/compute/).
@@ -350,7 +350,7 @@ impl<'a, C, A> Resourceviews<C, A>
         Resourceviews {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.4".to_string(),
+            _user_agent: "google-api-rust-client/1.0.5".to_string(),
             _base_url: "https://www.googleapis.com/resourceviews/v1beta2/projects/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -364,7 +364,7 @@ impl<'a, C, A> Resourceviews<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.4`.
+    /// It defaults to `google-api-rust-client/1.0.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {

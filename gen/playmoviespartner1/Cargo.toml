@@ -4,12 +4,12 @@
 [package]
 
 name = "google-playmoviespartner1"
-version = "1.0.4+20170516"
+version = "1.0.5+20170516"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Play Movies (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/playmoviespartner1"
 homepage = "https://developers.google.com/playmoviespartner/"
-documentation = "https://docs.rs/google-playmoviespartner1/1.0.4+20170516"
+documentation = "https://docs.rs/google-playmoviespartner1/1.0.5+20170516"
 license = "MIT"
 keywords = ["playmoviespartner", "google", "protocol", "web", "api"]
 
