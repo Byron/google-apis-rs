@@ -1,4 +1,4 @@
-site_name: Groups Migration v1.0.4+20140416
+site_name: Groups Migration v1.0.5+20140416
 site_url: http://byron.github.io/google-apis-rs/google-groupsmigration1-cli
 site_description: A complete library to interact with Groups Migration (protocol v1)
 

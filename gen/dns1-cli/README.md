@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *dns* API at revision *20170512*. The CLI is at version *1.0.4*.
+This documentation was generated from the *dns* API at revision *20170512*. The CLI is at version *1.0.5*.
 
 ```bash
 dns1 [options]

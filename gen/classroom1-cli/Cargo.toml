@@ -4,7 +4,7 @@
 [package]
 
 name = "google-classroom1-cli"
-version = "1.0.4+20170510"
+version = "1.0.5+20170510"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with classroom (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/classroom1-cli"
@@ -37,4 +37,4 @@ clap = "^2.0"
 
 [dependencies.google-classroom1]
 path = "../classroom1"
-version = "1.0.4+20170510"
+version = "1.0.5+20170510"

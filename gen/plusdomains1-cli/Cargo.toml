@@ -4,7 +4,7 @@
 [package]
 
 name = "google-plusdomains1-cli"
-version = "1.0.4+20170410"
+version = "1.0.5+20170410"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with plusDomains (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/plusdomains1-cli"
@@ -37,4 +37,4 @@ clap = "^2.0"
 
 [dependencies.google-plusdomains1]
 path = "../plusdomains1"
-version = "1.0.4+20170410"
+version = "1.0.5+20170410"

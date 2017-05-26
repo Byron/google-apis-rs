@@ -1,4 +1,4 @@
-site_name: SQL Admin v1.0.4+20170502
+site_name: SQL Admin v1.0.5+20170502
 site_url: http://byron.github.io/google-apis-rs/google-sqladmin1_beta4-cli
 site_description: A complete library to interact with SQL Admin (protocol v1beta4)
 

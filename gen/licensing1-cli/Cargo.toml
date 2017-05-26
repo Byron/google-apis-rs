@@ -4,7 +4,7 @@
 [package]
 
 name = "google-licensing1-cli"
-version = "1.0.4+20170213"
+version = "1.0.5+20170213"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with licensing (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/licensing1-cli"
@@ -37,4 +37,4 @@ clap = "^2.0"
 
 [dependencies.google-licensing1]
 path = "../licensing1"
-version = "1.0.4+20170213"
+version = "1.0.5+20170213"

@@ -1,4 +1,4 @@
-site_name: prediction v1.0.4+20160511
+site_name: prediction v1.0.5+20160511
 site_url: http://byron.github.io/google-apis-rs/google-prediction1d6-cli
 site_description: A complete library to interact with prediction (protocol v1.6)
 

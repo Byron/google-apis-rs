@@ -4,7 +4,7 @@
 [package]
 
 name = "google-adsense1d4-cli"
-version = "1.0.4+20170517"
+version = "1.0.5+20170517"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with AdSense (protocol v1.4)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/adsense1d4-cli"
@@ -37,4 +37,4 @@ clap = "^2.0"
 
 [dependencies.google-adsense1d4]
 path = "../adsense1d4"
-version = "1.0.4+20170517"
+version = "1.0.5+20170517"

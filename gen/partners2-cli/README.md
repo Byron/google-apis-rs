@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Partners* API at revision *20170503*. The CLI is at version *1.0.4*.
+This documentation was generated from the *Partners* API at revision *20170503*. The CLI is at version *1.0.5*.
 
 ```bash
 partners2 [options]
