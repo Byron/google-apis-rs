@@ -169,13 +169,20 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `${ADD_PARAM_FN}()`
+    /// function for details).
     ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn ${ADD_SCOPE_FN}<T>(mut self, scope: T) -> ${ThisType}
-                                                        where T: AsRef<str> {
-        self.${api.properties.scopes}.insert(scope.as_ref().to_string(), ());
+    pub fn ${ADD_SCOPE_FN}<T, S>(mut self, scope: T) -> ${ThisType}
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self.${api.properties.scopes}.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
         self
     }
     % endif
