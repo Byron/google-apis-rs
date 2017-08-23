@@ -584,7 +584,7 @@ match result {
 else if \
             % endif
 protocol == "${mp.protocol}" {
-                (self.hub._root_url.clone() + "${mp.path}", "${upload_type_map.get(mp.protocol, mp.protocol)}")
+                (self.hub._root_url.clone() + "${mp.path.lstrip('/')}", "${upload_type_map.get(mp.protocol, mp.protocol)}")
             } \
             % endfor
 else {
