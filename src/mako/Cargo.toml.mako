@@ -29,9 +29,9 @@ hyper-rustls = "^0.6"
 hyper = "^ 0.10"
 ## Must match the one hyper uses, otherwise there are duplicate similarly named `Mime` structs
 mime = "^ 0.2.0"
-serde = "^ 0.9"
-serde_json = "^ 0.9"
-serde_derive = "^ 0.9"
+serde = "^ 1.0"
+serde_json = "^ 1.0"
+serde_derive = "^ 1.0"
 yup-oauth2 = "^ 1.0"
 % for dep in cargo.get('dependencies', list()):
 ${dep}
