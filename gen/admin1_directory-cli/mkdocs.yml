@@ -1,4 +1,4 @@
-site_name: directory v1.0.5+20170419
+site_name: directory v1.0.6+20170419
 site_url: http://byron.github.io/google-apis-rs/google-admin1_directory-cli
 site_description: A complete library to interact with directory (protocol directory_v1)
 

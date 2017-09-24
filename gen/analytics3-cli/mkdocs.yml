@@ -1,4 +1,4 @@
-site_name: analytics v1.0.5+20170321
+site_name: analytics v1.0.6+20170321
 site_url: http://byron.github.io/google-apis-rs/google-analytics3-cli
 site_description: A complete library to interact with analytics (protocol v3)
 

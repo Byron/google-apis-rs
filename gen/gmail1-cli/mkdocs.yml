@@ -1,4 +1,4 @@
-site_name: gmail v1.0.5+20170510
+site_name: gmail v1.0.6+20170510
 site_url: http://byron.github.io/google-apis-rs/google-gmail1-cli
 site_description: A complete library to interact with gmail (protocol v1)
 

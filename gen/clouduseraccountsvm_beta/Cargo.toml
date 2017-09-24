@@ -4,12 +4,12 @@
 [package]
 
 name = "google-clouduseraccountsvm_beta"
-version = "1.0.5+20160316"
+version = "1.0.6+20160316"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud User Accounts (protocol vm_beta)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/clouduseraccountsvm_beta"
 homepage = "https://cloud.google.com/compute/docs/access/user-accounts/api/latest/"
-documentation = "https://docs.rs/google-clouduseraccountsvm_beta/1.0.5+20160316"
+documentation = "https://docs.rs/google-clouduseraccountsvm_beta/1.0.6+20160316"
 license = "MIT"
 keywords = ["clouduseraccounts", "google", "protocol", "web", "api"]
 
@@ -20,9 +20,9 @@ hyper-rustls = "^0.6"
 [dependencies]
 hyper = "^ 0.10"
 mime = "^ 0.2.0"
-serde = "^ 0.9"
-serde_json = "^ 0.9"
-serde_derive = "^ 0.9"
+serde = "^ 1.0"
+serde_json = "^ 1.0"
+serde_derive = "^ 1.0"
 yup-oauth2 = "^ 1.0"
 url = "= 0.5"
 

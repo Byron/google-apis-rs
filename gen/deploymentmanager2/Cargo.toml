@@ -4,12 +4,12 @@
 [package]
 
 name = "google-deploymentmanager2"
-version = "1.0.5+20170501"
+version = "1.0.6+20170501"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Deployment Manager (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/deploymentmanager2"
 homepage = "https://cloud.google.com/deployment-manager/"
-documentation = "https://docs.rs/google-deploymentmanager2/1.0.5+20170501"
+documentation = "https://docs.rs/google-deploymentmanager2/1.0.6+20170501"
 license = "MIT"
 keywords = ["deploymentmanager", "google", "protocol", "web", "api"]
 
@@ -20,9 +20,9 @@ hyper-rustls = "^0.6"
 [dependencies]
 hyper = "^ 0.10"
 mime = "^ 0.2.0"
-serde = "^ 0.9"
-serde_json = "^ 0.9"
-serde_derive = "^ 0.9"
+serde = "^ 1.0"
+serde_json = "^ 1.0"
+serde_derive = "^ 1.0"
 yup-oauth2 = "^ 1.0"
 url = "= 0.5"
 

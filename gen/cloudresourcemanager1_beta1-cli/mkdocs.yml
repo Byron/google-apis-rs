@@ -1,4 +1,4 @@
-site_name: Cloud Resource Manager v1.0.5+20170517
+site_name: Cloud Resource Manager v1.0.6+20170517
 site_url: http://byron.github.io/google-apis-rs/google-cloudresourcemanager1_beta1-cli
 site_description: A complete library to interact with Cloud Resource Manager (protocol v1beta1)
 
