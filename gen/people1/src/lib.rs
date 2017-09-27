@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *People Service* crate version *1.0.6+20170518*, where *20170518* is the exact revision of the *people:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *People Service* crate version *1.0.6+20170925*, where *20170925* is the exact revision of the *people:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *People Service* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/people/).
@@ -11,8 +11,10 @@
 //! 
 //! Handle the following *Resources* with ease from the central [hub](struct.PeopleService.html) ... 
 //! 
+//! * [contact groups](struct.ContactGroup.html)
+//!  * [*batch get*](struct.ContactGroupBatchGetCall.html), [*create*](struct.ContactGroupCreateCall.html), [*delete*](struct.ContactGroupDeleteCall.html), [*get*](struct.ContactGroupGetCall.html), [*list*](struct.ContactGroupListCall.html), [*members modify*](struct.ContactGroupMemberModifyCall.html) and [*update*](struct.ContactGroupUpdateCall.html)
 //! * people
-//!  * [*connections list*](struct.PeopleConnectionListCall.html), [*get*](struct.PeopleGetCall.html) and [*get batch get*](struct.PeopleGetBatchGetCall.html)
+//!  * [*connections list*](struct.PeopleConnectionListCall.html), [*create contact*](struct.PeopleCreateContactCall.html), [*delete contact*](struct.PeopleDeleteContactCall.html), [*get*](struct.PeopleGetCall.html), [*get batch get*](struct.PeopleGetBatchGetCall.html) and [*update contact*](struct.PeopleUpdateContactCall.html)
 //! 
 //! 
 //! 
@@ -47,7 +49,13 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.people().get(...).doit()
+//! let r = hub.contact_groups().batch_get(...).doit()
+//! let r = hub.contact_groups().list(...).doit()
+//! let r = hub.contact_groups().create(...).doit()
+//! let r = hub.contact_groups().update(...).doit()
+//! let r = hub.contact_groups().delete(...).doit()
+//! let r = hub.contact_groups().members_modify(...).doit()
+//! let r = hub.contact_groups().get(...).doit()
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -94,8 +102,10 @@
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.people().get("resourceName")
-//!              .request_mask_include_field("sed")
+//! let result = hub.contact_groups().list()
+//!              .sync_token("sed")
+//!              .page_token("et")
+//!              .page_size(-18)
 //!              .doit();
 //! 
 //! match result {
@@ -236,14 +246,14 @@ pub enum Scope {
     /// Manage your contacts
     Contact,
 
-    /// View your email address
-    UserinfoEmail,
+    /// View your phone numbers
+    UserPhonenumberRead,
 
     /// View your basic profile info
     UserinfoProfile,
 
-    /// View your phone numbers
-    UserPhonenumberRead,
+    /// View your email address
+    UserinfoEmail,
 }
 
 impl AsRef<str> for Scope {
@@ -255,9 +265,9 @@ impl AsRef<str> for Scope {
             Scope::UserEmailRead => "https://www.googleapis.com/auth/user.emails.read",
             Scope::UserAddresseRead => "https://www.googleapis.com/auth/user.addresses.read",
             Scope::Contact => "https://www.googleapis.com/auth/contacts",
-            Scope::UserinfoEmail => "https://www.googleapis.com/auth/userinfo.email",
-            Scope::UserinfoProfile => "https://www.googleapis.com/auth/userinfo.profile",
             Scope::UserPhonenumberRead => "https://www.googleapis.com/auth/user.phonenumbers.read",
+            Scope::UserinfoProfile => "https://www.googleapis.com/auth/userinfo.profile",
+            Scope::UserinfoEmail => "https://www.googleapis.com/auth/userinfo.email",
         }
     }
 }
@@ -306,8 +316,10 @@ impl Default for Scope {
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.people().get("resourceName")
-///              .request_mask_include_field("dolores")
+/// let result = hub.contact_groups().list()
+///              .sync_token("kasd")
+///              .page_token("accusam")
+///              .page_size(-8)
 ///              .doit();
 /// 
 /// match result {
@@ -351,6 +363,9 @@ impl<'a, C, A> PeopleService<C, A>
         }
     }
 
+    pub fn contact_groups(&'a self) -> ContactGroupMethods<'a, C, A> {
+        ContactGroupMethods { hub: &self }
+    }
     pub fn people(&'a self) -> PeopleMethods<'a, C, A> {
         PeopleMethods { hub: &self }
     }
@@ -384,6 +399,35 @@ impl<'a, C, A> PeopleService<C, A>
 // ############
 // SCHEMAS ###
 // ##########
+/// The response to a list contact groups request.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list contact groups](struct.ContactGroupListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListContactGroupsResponse {
+    /// The token that can be used to retrieve the next page of results.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The list of contact groups. Members of the contact groups are not
+    /// populated.
+    #[serde(rename="contactGroups")]
+    pub contact_groups: Option<Vec<ContactGroup>>,
+    /// The token that can be used to retrieve changes since the last request.
+    #[serde(rename="nextSyncToken")]
+    pub next_sync_token: Option<String>,
+    /// The total number of items in the list without pagination.
+    #[serde(rename="totalItems")]
+    pub total_items: Option<i32>,
+}
+
+impl ResponseResult for ListContactGroupsResponse {}
+
+
 /// There is no detailed description.
 /// 
 /// # Activities
@@ -406,8 +450,8 @@ pub struct ListConnectionsResponse {
     /// The total number of items in the list without pagination.
     #[serde(rename="totalItems")]
     pub total_items: Option<i32>,
-    /// DEPRECATED(Please use total_items). The total number of people in the list
-    /// without pagination.
+    /// **DEPRECATED** (Please use totalItems)
+    /// The total number of people in the list without pagination.
     #[serde(rename="totalPeople")]
     pub total_people: Option<i32>,
 }
@@ -451,15 +495,6 @@ impl Part for RelationshipStatus {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PersonResponse {
-    /// The status of the response.
-    pub status: Option<Status>,
-    /// The person.
-    pub person: Option<Person>,
-    /// DEPRECATED(Please use status instead).
-    /// [HTTP 1.1 status
-    /// code](http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html).
-    #[serde(rename="httpStatusCode")]
-    pub http_status_code: Option<i32>,
     /// The original requested resource name. May be different than the resource
     /// name on the returned person.
     /// 
@@ -468,9 +503,36 @@ pub struct PersonResponse {
     /// profile URL.
     #[serde(rename="requestedResourceName")]
     pub requested_resource_name: Option<String>,
+    /// The person.
+    pub person: Option<Person>,
+    /// **DEPRECATED** (Please use status instead)
+    /// 
+    /// [HTTP 1.1 status code]
+    /// (http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html).
+    #[serde(rename="httpStatusCode")]
+    pub http_status_code: Option<i32>,
+    /// The status of the response.
+    pub status: Option<Status>,
 }
 
 impl Part for PersonResponse {}
+
+
+/// Arbitrary user data that is populated by the end users.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UserDefined {
+    /// The end user specified value of the user defined data.
+    pub value: Option<String>,
+    /// The end user specified key of the user defined data.
+    pub key: Option<String>,
+    /// Metadata about the user defined data.
+    pub metadata: Option<FieldMetadata>,
+}
+
+impl Part for UserDefined {}
 
 
 /// A read-only brief one-line description of the person.
@@ -514,15 +576,23 @@ impl Part for ContactGroupMembership {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Source {
+    /// **Only populated in `person.metadata.sources`.**
+    /// 
+    /// Last update timestamp of this source.
+    #[serde(rename="updateTime")]
+    pub update_time: Option<String>,
+    /// **Only populated in `person.metadata.sources`.**
+    /// 
     /// The [HTTP entity tag](https://en.wikipedia.org/wiki/HTTP_ETag) of the
-    /// source. Used for web cache validation. Only populated in
-    /// person.metadata.sources.
+    /// source. Used for web cache validation.
     pub etag: Option<String>,
     /// The source type.
     #[serde(rename="type")]
     pub type_: Option<String>,
     /// The unique identifier within the source type generated by the server.
     pub id: Option<String>,
+    /// **Only populated in `person.metadata.sources`.**
+    /// 
     /// Metadata about a source of type PROFILE.
     #[serde(rename="profileMetadata")]
     pub profile_metadata: Option<ProfileMetadata>,
@@ -546,6 +616,25 @@ pub struct Interest {
 impl Part for Interest {}
 
 
+/// A request to update an existing contact group. Only the name can be updated.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [update contact groups](struct.ContactGroupUpdateCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UpdateContactGroupRequest {
+    /// The contact group to update.
+    #[serde(rename="contactGroup")]
+    pub contact_group: Option<ContactGroup>,
+}
+
+impl RequestValue for UpdateContactGroupRequest {}
+
+
 /// A person's read-only cover photo. A large image shown on the person's
 /// profile page that represents who they are or what they care about.
 /// 
@@ -553,11 +642,11 @@ impl Part for Interest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CoverPhoto {
+    /// The URL of the cover photo.
+    pub url: Option<String>,
     /// True if the cover photo is the default cover photo;
     /// false if the cover photo is a user-provided cover photo.
     pub default: Option<bool>,
-    /// The URL of the cover photo.
-    pub url: Option<String>,
     /// Metadata about the cover photo.
     pub metadata: Option<FieldMetadata>,
 }
@@ -597,18 +686,18 @@ pub struct Name {
     /// The honorific prefixes, such as `Mrs.` or `Dr.`
     #[serde(rename="honorificPrefix")]
     pub honorific_prefix: Option<String>,
-    /// The read-only display name with the last name first formatted according to
-    /// the locale specified by the viewer's account or the
-    /// <code>Accept-Language</code> HTTP header.
-    #[serde(rename="displayNameLastFirst")]
-    pub display_name_last_first: Option<String>,
-    /// The read-only display name formatted according to the locale specified by
-    /// the viewer's account or the <code>Accept-Language</code> HTTP header.
-    #[serde(rename="displayName")]
-    pub display_name: Option<String>,
     /// The family name spelled as it sounds.
     #[serde(rename="phoneticFamilyName")]
     pub phonetic_family_name: Option<String>,
+    /// The read-only display name formatted according to the locale specified by
+    /// the viewer's account or the `Accept-Language` HTTP header.
+    #[serde(rename="displayName")]
+    pub display_name: Option<String>,
+    /// The read-only display name with the last name first formatted according to
+    /// the locale specified by the viewer's account or the
+    /// `Accept-Language` HTTP header.
+    #[serde(rename="displayNameLastFirst")]
+    pub display_name_last_first: Option<String>,
     /// The middle name(s).
     #[serde(rename="middleName")]
     pub middle_name: Option<String>,
@@ -682,6 +771,59 @@ pub struct BraggingRights {
 impl Part for BraggingRights {}
 
 
+/// A contact group.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [batch get contact groups](struct.ContactGroupBatchGetCall.html) (none)
+/// * [list contact groups](struct.ContactGroupListCall.html) (none)
+/// * [create contact groups](struct.ContactGroupCreateCall.html) (response)
+/// * [update contact groups](struct.ContactGroupUpdateCall.html) (response)
+/// * [delete contact groups](struct.ContactGroupDeleteCall.html) (none)
+/// * [members modify contact groups](struct.ContactGroupMemberModifyCall.html) (none)
+/// * [get contact groups](struct.ContactGroupGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ContactGroup {
+    /// The read-only contact group type.
+    #[serde(rename="groupType")]
+    pub group_type: Option<String>,
+    /// The list of contact person resource names that are members of the contact
+    /// group. The field is not populated for LIST requests and can only be updated
+    /// through the
+    /// [ModifyContactGroupMembers](/people/api/rest/v1/contactgroups/members/modify).
+    #[serde(rename="memberResourceNames")]
+    pub member_resource_names: Option<Vec<String>>,
+    /// The contact group name set by the group owner or a system provided name
+    /// for system groups.
+    pub name: Option<String>,
+    /// The total number of contacts in the group irrespective of max members in
+    /// specified in the request.
+    #[serde(rename="memberCount")]
+    pub member_count: Option<i32>,
+    /// The read-only name translated and formatted in the viewer's account locale
+    /// or the `Accept-Language` HTTP header locale for system groups names.
+    /// Group names set by the owner are the same as name.
+    #[serde(rename="formattedName")]
+    pub formatted_name: Option<String>,
+    /// The [HTTP entity tag](https://en.wikipedia.org/wiki/HTTP_ETag) of the
+    /// resource. Used for web cache validation.
+    pub etag: Option<String>,
+    /// The resource name for the contact group, assigned by the server. An ASCII
+    /// string, in the form of `contactGroups/`<var>contact_group_id</var>.
+    #[serde(rename="resourceName")]
+    pub resource_name: Option<String>,
+    /// Metadata about the contact group.
+    pub metadata: Option<ContactGroupMetadata>,
+}
+
+impl Resource for ContactGroup {}
+impl ResponseResult for ContactGroup {}
+
+
 /// A person's read-only membership in a group.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -720,56 +862,54 @@ pub struct Birthday {
 impl Part for Birthday {}
 
 
-/// A person's physical address. May be a P.O. box or street address. All fields
-/// are optional.
+/// A generic empty message that you can re-use to avoid defining duplicated
+/// empty messages in your APIs. A typical example is to use it as the request
+/// or the response type of an API method. For instance:
+/// 
+///     service Foo {
+///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+///     }
+/// 
+/// The JSON representation for `Empty` is empty JSON object `{}`.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [delete contact groups](struct.ContactGroupDeleteCall.html) (response)
+/// * [delete contact people](struct.PeopleDeleteContactCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Empty { _never_set: Option<bool> }
+
+impl ResponseResult for Empty {}
+
+
+/// A person's gender.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Address {
-    /// The read-only type of the address translated and formatted in the viewer's
+pub struct Gender {
+    /// The read-only value of the gender translated and formatted in the viewer's
     /// account locale or the `Accept-Language` HTTP header locale.
-    #[serde(rename="formattedType")]
-    pub formatted_type: Option<String>,
-    /// The [ISO 3166-1 alpha-2](http://www.iso.org/iso/country_codes.htm) country
-    /// code of the address.
-    #[serde(rename="countryCode")]
-    pub country_code: Option<String>,
-    /// The city of the address.
-    pub city: Option<String>,
-    /// The unstructured value of the address. If this is not set by the user it
-    /// will be automatically constructed from structured values.
     #[serde(rename="formattedValue")]
     pub formatted_value: Option<String>,
-    /// The region of the address; for example, the state or province.
-    pub region: Option<String>,
-    /// The P.O. box of the address.
-    #[serde(rename="poBox")]
-    pub po_box: Option<String>,
-    /// The street address.
-    #[serde(rename="streetAddress")]
-    pub street_address: Option<String>,
-    /// The country of the address.
-    pub country: Option<String>,
-    /// The postal code of the address.
-    #[serde(rename="postalCode")]
-    pub postal_code: Option<String>,
-    /// The extended address of the address; for example, the apartment number.
-    #[serde(rename="extendedAddress")]
-    pub extended_address: Option<String>,
-    /// The type of the address. The type can be custom or predefined.
-    /// Possible values include, but are not limited to, the following:
+    /// The gender for the person. The gender can be custom or predefined.
+    /// Possible values include, but are not limited to, the
+    /// following:
     /// 
-    /// * `home`
-    /// * `work`
+    /// * `male`
+    /// * `female`
     /// * `other`
-    #[serde(rename="type")]
-    pub type_: Option<String>,
-    /// Metadata about the address.
+    /// * `unknown`
+    pub value: Option<String>,
+    /// Metadata about the gender.
     pub metadata: Option<FieldMetadata>,
 }
 
-impl Part for Address {}
+impl Part for Gender {}
 
 
 /// Represents a whole calendar date, for example a date of birth. The time
@@ -797,42 +937,34 @@ pub struct Date {
 impl Part for Date {}
 
 
-/// A person's relation to another person.
+/// A person's email address.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Relation {
-    /// The name of the other person this relation refers to.
-    pub person: Option<String>,
-    /// The type of the relation translated and formatted in the viewer's account
-    /// locale or the locale specified in the Accept-Language HTTP header.
+pub struct EmailAddress {
+    /// The read-only type of the email address translated and formatted in the
+    /// viewer's account locale or the `Accept-Language` HTTP header locale.
     #[serde(rename="formattedType")]
     pub formatted_type: Option<String>,
-    /// The person's relation to the other person. The type can be custom or predefined.
-    /// Possible values include, but are not limited to, the following values:
+    /// The type of the email address. The type can be custom or predefined.
+    /// Possible values include, but are not limited to, the following:
     /// 
-    /// * `spouse`
-    /// * `child`
-    /// * `mother`
-    /// * `father`
-    /// * `parent`
-    /// * `brother`
-    /// * `sister`
-    /// * `friend`
-    /// * `relative`
-    /// * `domesticPartner`
-    /// * `manager`
-    /// * `assistant`
-    /// * `referredBy`
-    /// * `partner`
+    /// * `home`
+    /// * `work`
+    /// * `other`
     #[serde(rename="type")]
     pub type_: Option<String>,
-    /// Metadata about the relation.
+    /// The display name of the email.
+    #[serde(rename="displayName")]
+    pub display_name: Option<String>,
+    /// The email address.
+    pub value: Option<String>,
+    /// Metadata about the email address.
     pub metadata: Option<FieldMetadata>,
 }
 
-impl Part for Relation {}
+impl Part for EmailAddress {}
 
 
 /// A person's nickname.
@@ -851,6 +983,25 @@ pub struct Nickname {
 }
 
 impl Part for Nickname {}
+
+
+/// The response for a specific contact group.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ContactGroupResponse {
+    /// The original requested resource name.
+    #[serde(rename="requestedResourceName")]
+    pub requested_resource_name: Option<String>,
+    /// The contact group.
+    #[serde(rename="contactGroup")]
+    pub contact_group: Option<ContactGroup>,
+    /// The status of the response.
+    pub status: Option<Status>,
+}
+
+impl Part for ContactGroupResponse {}
 
 
 /// The `Status` type defines a logical error model that is suitable for different
@@ -916,8 +1067,8 @@ pub struct Status {
     pub message: Option<String>,
     /// The status code, which should be an enum value of google.rpc.Code.
     pub code: Option<i32>,
-    /// A list of messages that carry the error details.  There will be a
-    /// common set of message types for APIs to use.
+    /// A list of messages that carry the error details.  There is a common set of
+    /// message types for APIs to use.
     pub details: Option<Vec<HashMap<String, String>>>,
 }
 
@@ -1053,6 +1204,100 @@ pub struct Residence {
 impl Part for Residence {}
 
 
+/// A person's physical address. May be a P.O. box or street address. All fields
+/// are optional.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Address {
+    /// The read-only type of the address translated and formatted in the viewer's
+    /// account locale or the `Accept-Language` HTTP header locale.
+    #[serde(rename="formattedType")]
+    pub formatted_type: Option<String>,
+    /// The [ISO 3166-1 alpha-2](http://www.iso.org/iso/country_codes.htm) country
+    /// code of the address.
+    #[serde(rename="countryCode")]
+    pub country_code: Option<String>,
+    /// The city of the address.
+    pub city: Option<String>,
+    /// The unstructured value of the address. If this is not set by the user it
+    /// will be automatically constructed from structured values.
+    #[serde(rename="formattedValue")]
+    pub formatted_value: Option<String>,
+    /// The region of the address; for example, the state or province.
+    pub region: Option<String>,
+    /// The P.O. box of the address.
+    #[serde(rename="poBox")]
+    pub po_box: Option<String>,
+    /// The street address.
+    #[serde(rename="streetAddress")]
+    pub street_address: Option<String>,
+    /// The country of the address.
+    pub country: Option<String>,
+    /// The postal code of the address.
+    #[serde(rename="postalCode")]
+    pub postal_code: Option<String>,
+    /// The extended address of the address; for example, the apartment number.
+    #[serde(rename="extendedAddress")]
+    pub extended_address: Option<String>,
+    /// The type of the address. The type can be custom or predefined.
+    /// Possible values include, but are not limited to, the following:
+    /// 
+    /// * `home`
+    /// * `work`
+    /// * `other`
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// Metadata about the address.
+    pub metadata: Option<FieldMetadata>,
+}
+
+impl Part for Address {}
+
+
+/// A request to modify an existing contact group's members.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [members modify contact groups](struct.ContactGroupMemberModifyCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ModifyContactGroupMembersRequest {
+    /// The resource names of the contact people to remove in the form of in the
+    /// form of `people/`<var>person_id</var>.
+    #[serde(rename="resourceNamesToRemove")]
+    pub resource_names_to_remove: Option<Vec<String>>,
+    /// The resource names of the contact people to add in the form of in the form
+    /// `people/`<var>person_id</var>.
+    #[serde(rename="resourceNamesToAdd")]
+    pub resource_names_to_add: Option<Vec<String>>,
+}
+
+impl RequestValue for ModifyContactGroupMembersRequest {}
+
+
+/// The response to a batch get contact groups request.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [batch get contact groups](struct.ContactGroupBatchGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BatchGetContactGroupsResponse {
+    /// The list of responses for each requested contact group resource.
+    pub responses: Option<Vec<ContactGroupResponse>>,
+}
+
+impl ResponseResult for BatchGetContactGroupsResponse {}
+
+
 /// Information about a person merged from various data sources such as the
 /// authenticated user's contacts and profile data.
 /// 
@@ -1065,12 +1310,16 @@ impl Part for Residence {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
+/// * [update contact people](struct.PeopleUpdateContactCall.html) (request|response)
+/// * [create contact people](struct.PeopleCreateContactCall.html) (request|response)
 /// * [get people](struct.PeopleGetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Person {
     /// The person's interests.
     pub interests: Option<Vec<Interest>>,
+    /// The person's read-only taglines.
+    pub taglines: Option<Vec<Tagline>>,
     /// The person's bragging rights.
     #[serde(rename="braggingRights")]
     pub bragging_rights: Option<Vec<BraggingRights>>,
@@ -1083,41 +1332,45 @@ pub struct Person {
     /// The person's phone numbers.
     #[serde(rename="phoneNumbers")]
     pub phone_numbers: Option<Vec<PhoneNumber>>,
-    /// The person's photos.
+    /// The person's read-only photos.
     pub photos: Option<Vec<Photo>>,
     /// The person's names.
     pub names: Option<Vec<Name>>,
-    /// DEPRECATED(Please read person.age_ranges instead). The person's age range.
+    /// **DEPRECATED** (Please use `person.ageRanges` instead)**
+    /// 
+    /// The person's read-only age range.
     #[serde(rename="ageRange")]
     pub age_range: Option<String>,
     /// The person's residences.
     pub residences: Option<Vec<Residence>>,
     /// The resource name for the person, assigned by the server. An ASCII string
-    /// with a max length of 27 characters, in the form of `people/<person_id>`.
+    /// with a max length of 27 characters, in the form of
+    /// `people/`<var>person_id</var>.
     #[serde(rename="resourceName")]
     pub resource_name: Option<String>,
-    /// The kind of relationship the person is looking for.
+    /// The person's read-only relationship interests.
     #[serde(rename="relationshipInterests")]
     pub relationship_interests: Option<Vec<RelationshipInterest>>,
-    /// The person's cover photos.
+    /// The person's read-only cover photos.
     #[serde(rename="coverPhotos")]
     pub cover_photos: Option<Vec<CoverPhoto>>,
     /// The person's locale preferences.
     pub locales: Option<Vec<Locale>>,
     /// The person's past or current organizations.
     pub organizations: Option<Vec<Organization>>,
-    /// The person's taglines.
-    pub taglines: Option<Vec<Tagline>>,
+    /// The person's user defined data.
+    #[serde(rename="userDefined")]
+    pub user_defined: Option<Vec<UserDefined>>,
     /// The person's skills.
     pub skills: Option<Vec<Skill>>,
-    /// The person's age ranges.
+    /// The person's read-only age ranges.
     #[serde(rename="ageRanges")]
     pub age_ranges: Option<Vec<AgeRangeType>>,
     /// The person's birthdays.
     pub birthdays: Option<Vec<Birthday>>,
     /// The person's relations.
     pub relations: Option<Vec<Relation>>,
-    /// The person's group memberships.
+    /// The person's read-only group memberships.
     pub memberships: Option<Vec<Membership>>,
     /// The person's biographies.
     pub biographies: Option<Vec<Biography>>,
@@ -1126,7 +1379,7 @@ pub struct Person {
     pub etag: Option<String>,
     /// The person's associated URLs.
     pub urls: Option<Vec<Url>>,
-    /// The person's relationship statuses.
+    /// The person's read-only relationship statuses.
     #[serde(rename="relationshipStatuses")]
     pub relationship_statuses: Option<Vec<RelationshipStatus>>,
     /// The person's genders.
@@ -1139,37 +1392,30 @@ pub struct Person {
     pub im_clients: Option<Vec<ImClient>>,
     /// The person's events.
     pub events: Option<Vec<Event>>,
-    /// Metadata about the person.
+    /// Read-only metadata about the person.
     pub metadata: Option<PersonMetadata>,
 }
 
+impl RequestValue for Person {}
 impl ResponseResult for Person {}
 
 
-/// A person's gender.
+/// The read-only metadata about a contact group.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Gender {
-    /// The read-only value of the gender translated and formatted in the viewer's
-    /// account locale or the `Accept-Language` HTTP header locale.
-    #[serde(rename="formattedValue")]
-    pub formatted_value: Option<String>,
-    /// The gender for the person. The gender can be custom or predefined.
-    /// Possible values include, but are not limited to, the
-    /// following:
-    /// 
-    /// * `male`
-    /// * `female`
-    /// * `other`
-    /// * `unknown`
-    pub value: Option<String>,
-    /// Metadata about the gender.
-    pub metadata: Option<FieldMetadata>,
+pub struct ContactGroupMetadata {
+    /// True if the contact group resource has been deleted. Populated only for
+    /// [`ListContactGroups`](/people/api/rest/v1/contactgroups/list) requests
+    /// that include a sync token.
+    pub deleted: Option<bool>,
+    /// The time the group was last updated.
+    #[serde(rename="updateTime")]
+    pub update_time: Option<String>,
 }
 
-impl Part for Gender {}
+impl Part for ContactGroupMetadata {}
 
 
 /// A person's phone number.
@@ -1179,11 +1425,13 @@ impl Part for Gender {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PhoneNumber {
     /// The read-only type of the phone number translated and formatted in the
-    /// viewer's account locale or the the `Accept-Language` HTTP header locale.
+    /// viewer's account locale or the `Accept-Language` HTTP header locale.
     #[serde(rename="formattedType")]
     pub formatted_type: Option<String>,
-    /// Metadata about the phone number.
-    pub metadata: Option<FieldMetadata>,
+    /// The read-only canonicalized [ITU-T E.164](https://law.resource.org/pub/us/cfr/ibr/004/itu-t.E.164.1.2008.pdf)
+    /// form of the phone number.
+    #[serde(rename="canonicalForm")]
+    pub canonical_form: Option<String>,
     /// The type of the phone number. The type can be custom or predefined.
     /// Possible values include, but are not limited to, the following:
     /// 
@@ -1203,10 +1451,8 @@ pub struct PhoneNumber {
     pub type_: Option<String>,
     /// The phone number.
     pub value: Option<String>,
-    /// The read-only canonicalized [ITU-T E.164](https://law.resource.org/pub/us/cfr/ibr/004/itu-t.E.164.1.2008.pdf)
-    /// form of the phone number.
-    #[serde(rename="canonicalForm")]
-    pub canonical_form: Option<String>,
+    /// Metadata about the phone number.
+    pub metadata: Option<FieldMetadata>,
 }
 
 impl Part for PhoneNumber {}
@@ -1219,10 +1465,9 @@ impl Part for PhoneNumber {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Organization {
-    /// The read-only type of the organization translated and formatted in the
-    /// viewer's account locale or the `Accept-Language` HTTP header locale.
-    #[serde(rename="formattedType")]
-    pub formatted_type: Option<String>,
+    /// The start date when the person joined the organization.
+    #[serde(rename="startDate")]
+    pub start_date: Option<Date>,
     /// The domain name associated with the organization; for example, `google.com`.
     pub domain: Option<String>,
     /// The end date when the person left the organization.
@@ -1230,18 +1475,15 @@ pub struct Organization {
     pub end_date: Option<Date>,
     /// The name of the organization.
     pub name: Option<String>,
-    /// The person's job title at the organization.
-    pub title: Option<String>,
-    /// The type of the organization. The type can be custom or predefined.
-    /// Possible values include, but are not limited to, the following:
-    /// 
-    /// * `work`
-    /// * `school`
-    #[serde(rename="type")]
-    pub type_: Option<String>,
+    /// The read-only type of the organization translated and formatted in the
+    /// viewer's account locale or the `Accept-Language` HTTP header locale.
+    #[serde(rename="formattedType")]
+    pub formatted_type: Option<String>,
     /// The symbol associated with the organization; for example, a stock ticker
     /// symbol, abbreviation, or acronym.
     pub symbol: Option<String>,
+    /// The person's job title at the organization.
+    pub title: Option<String>,
     /// True if the organization is the person's current organization;
     /// false if the organization is a past organization.
     pub current: Option<bool>,
@@ -1252,9 +1494,13 @@ pub struct Organization {
     pub location: Option<String>,
     /// The person's department at the organization.
     pub department: Option<String>,
-    /// The start date when the person joined the organization.
-    #[serde(rename="startDate")]
-    pub start_date: Option<Date>,
+    /// The type of the organization. The type can be custom or predefined.
+    /// Possible values include, but are not limited to, the following:
+    /// 
+    /// * `work`
+    /// * `school`
+    #[serde(rename="type")]
+    pub type_: Option<String>,
     /// The phonetic name of the organization.
     #[serde(rename="phoneticName")]
     pub phonetic_name: Option<String>,
@@ -1263,6 +1509,25 @@ pub struct Organization {
 }
 
 impl Part for Organization {}
+
+
+/// A request to create a new contact group.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [create contact groups](struct.ContactGroupCreateCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CreateContactGroupRequest {
+    /// The contact group to create.
+    #[serde(rename="contactGroup")]
+    pub contact_group: Option<ContactGroup>,
+}
+
+impl RequestValue for CreateContactGroupRequest {}
 
 
 /// A person's locale preference.
@@ -1288,8 +1553,13 @@ impl Part for Locale {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Photo {
-    /// The URL of the photo.
+    /// The URL of the photo. You can change the desired size by appending a query
+    /// parameter `sz=`<var>size</var> at the end of the url. Example:
+    /// `https://lh3.googleusercontent.com/-T_wVWLlmg7w/AAAAAAAAAAI/AAAAAAAABa8/00gzXvDBYqw/s100/photo.jpg?sz=50`
     pub url: Option<String>,
+    /// True if the photo is a default photo;
+    /// false if the photo is a user-provided photo.
+    pub default: Option<bool>,
     /// Metadata about the photo.
     pub metadata: Option<FieldMetadata>,
 }
@@ -1321,7 +1591,9 @@ pub struct PersonMetadata {
     /// [`connections.list`](/people/api/rest/v1/people.connections/list) requests
     /// that include a sync token.
     pub deleted: Option<bool>,
-    /// DEPRECATED(Please read person.metadata.sources.profile_metadata instead).
+    /// **DEPRECATED** (Please use
+    /// `person.metadata.sources.profileMetadata.objectType` instead)
+    /// 
     /// The type of the person object.
     #[serde(rename="objectType")]
     pub object_type: Option<String>,
@@ -1330,34 +1602,61 @@ pub struct PersonMetadata {
 impl Part for PersonMetadata {}
 
 
-/// A person's email address.
+/// The response to a modify contact group members request.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [members modify contact groups](struct.ContactGroupMemberModifyCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ModifyContactGroupMembersResponse {
+    /// The contact people resource names that were not found.
+    #[serde(rename="notFoundResourceNames")]
+    pub not_found_resource_names: Option<Vec<String>>,
+}
+
+impl ResponseResult for ModifyContactGroupMembersResponse {}
+
+
+/// A person's relation to another person.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct EmailAddress {
-    /// The read-only type of the email address translated and formatted in the
-    /// viewer's account locale or the `Accept-Language` HTTP header locale.
-    #[serde(rename="formattedType")]
-    pub formatted_type: Option<String>,
-    /// The type of the email address. The type can be custom or predefined.
-    /// Possible values include, but are not limited to, the following:
+pub struct Relation {
+    /// The name of the other person this relation refers to.
+    pub person: Option<String>,
+    /// Metadata about the relation.
+    pub metadata: Option<FieldMetadata>,
+    /// The person's relation to the other person. The type can be custom or predefined.
+    /// Possible values include, but are not limited to, the following values:
     /// 
-    /// * `home`
-    /// * `work`
-    /// * `other`
+    /// * `spouse`
+    /// * `child`
+    /// * `mother`
+    /// * `father`
+    /// * `parent`
+    /// * `brother`
+    /// * `sister`
+    /// * `friend`
+    /// * `relative`
+    /// * `domesticPartner`
+    /// * `manager`
+    /// * `assistant`
+    /// * `referredBy`
+    /// * `partner`
     #[serde(rename="type")]
     pub type_: Option<String>,
-    /// The display name of the email.
-    #[serde(rename="displayName")]
-    pub display_name: Option<String>,
-    /// The email address.
-    pub value: Option<String>,
-    /// Metadata about the email address.
-    pub metadata: Option<FieldMetadata>,
+    /// The type of the relation translated and formatted in the viewer's account
+    /// locale or the locale specified in the Accept-Language HTTP header.
+    #[serde(rename="formattedType")]
+    pub formatted_type: Option<String>,
 }
 
-impl Part for EmailAddress {}
+impl Part for Relation {}
 
 
 /// A skill that the person has.
@@ -1375,19 +1674,21 @@ pub struct Skill {
 impl Part for Skill {}
 
 
-/// A person's occupation.
+/// The read-only metadata about a profile.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Occupation {
-    /// The occupation; for example, `carpenter`.
-    pub value: Option<String>,
-    /// Metadata about the occupation.
-    pub metadata: Option<FieldMetadata>,
+pub struct ProfileMetadata {
+    /// The user types.
+    #[serde(rename="userTypes")]
+    pub user_types: Option<Vec<String>>,
+    /// The profile object type.
+    #[serde(rename="objectType")]
+    pub object_type: Option<String>,
 }
 
-impl Part for Occupation {}
+impl Part for ProfileMetadata {}
 
 
 /// A Google Apps Domain membership.
@@ -1448,24 +1749,193 @@ pub struct Biography {
 impl Part for Biography {}
 
 
-/// The read-only metadata about a profile.
+/// A person's occupation.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ProfileMetadata {
-    /// The profile object type.
-    #[serde(rename="objectType")]
-    pub object_type: Option<String>,
+pub struct Occupation {
+    /// The occupation; for example, `carpenter`.
+    pub value: Option<String>,
+    /// Metadata about the occupation.
+    pub metadata: Option<FieldMetadata>,
 }
 
-impl Part for ProfileMetadata {}
+impl Part for Occupation {}
 
 
 
 // ###################
 // MethodBuilders ###
 // #################
+
+/// A builder providing access to all methods supported on *contactGroup* resources.
+/// It is not used directly, but through the `PeopleService` hub.
+///
+/// # Example
+///
+/// Instantiate a resource builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate hyper_rustls;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_people1 as people1;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// use people1::PeopleService;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = PeopleService::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
+/// // like `batch_get(...)`, `create(...)`, `delete(...)`, `get(...)`, `list(...)`, `members_modify(...)` and `update(...)`
+/// // to build up your call.
+/// let rb = hub.contact_groups();
+/// # }
+/// ```
+pub struct ContactGroupMethods<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a PeopleService<C, A>,
+}
+
+impl<'a, C, A> MethodsBuilder for ContactGroupMethods<'a, C, A> {}
+
+impl<'a, C, A> ContactGroupMethods<'a, C, A> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Get a list of contact groups owned by the authenticated user by specifying
+    /// a list of contact group resource names.
+    pub fn batch_get(&self) -> ContactGroupBatchGetCall<'a, C, A> {
+        ContactGroupBatchGetCall {
+            hub: self.hub,
+            _resource_names: Default::default(),
+            _max_members: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// List all contact groups owned by the authenticated user. Members of the
+    /// contact groups are not populated.
+    pub fn list(&self) -> ContactGroupListCall<'a, C, A> {
+        ContactGroupListCall {
+            hub: self.hub,
+            _sync_token: Default::default(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Create a new contact group owned by the authenticated user.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    pub fn create(&self, request: CreateContactGroupRequest) -> ContactGroupCreateCall<'a, C, A> {
+        ContactGroupCreateCall {
+            hub: self.hub,
+            _request: request,
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Update the name of an existing contact group owned by the authenticated
+    /// user.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `resourceName` - The resource name for the contact group, assigned by the server. An ASCII
+    ///                    string, in the form of `contactGroups/`<var>contact_group_id</var>.
+    pub fn update(&self, request: UpdateContactGroupRequest, resource_name: &str) -> ContactGroupUpdateCall<'a, C, A> {
+        ContactGroupUpdateCall {
+            hub: self.hub,
+            _request: request,
+            _resource_name: resource_name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Delete an existing contact group owned by the authenticated user by
+    /// specifying a contact group resource name.
+    /// 
+    /// # Arguments
+    ///
+    /// * `resourceName` - The resource name of the contact group to delete.
+    pub fn delete(&self, resource_name: &str) -> ContactGroupDeleteCall<'a, C, A> {
+        ContactGroupDeleteCall {
+            hub: self.hub,
+            _resource_name: resource_name.to_string(),
+            _delete_contacts: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Modify the members of a contact group owned by the authenticated user.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `resourceName` - The resource name of the contact group to modify.
+    pub fn members_modify(&self, request: ModifyContactGroupMembersRequest, resource_name: &str) -> ContactGroupMemberModifyCall<'a, C, A> {
+        ContactGroupMemberModifyCall {
+            hub: self.hub,
+            _request: request,
+            _resource_name: resource_name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Get a specific contact group owned by the authenticated user by specifying
+    /// a contact group resource name.
+    /// 
+    /// # Arguments
+    ///
+    /// * `resourceName` - The resource name of the contact group to get.
+    pub fn get(&self, resource_name: &str) -> ContactGroupGetCall<'a, C, A> {
+        ContactGroupGetCall {
+            hub: self.hub,
+            _resource_name: resource_name.to_string(),
+            _max_members: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+}
+
+
 
 /// A builder providing access to all methods supported on *people* resources.
 /// It is not used directly, but through the `PeopleService` hub.
@@ -1491,7 +1961,7 @@ impl Part for ProfileMetadata {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = PeopleService::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `connections_list(...)`, `get(...)` and `get_batch_get(...)`
+/// // like `connections_list(...)`, `create_contact(...)`, `delete_contact(...)`, `get(...)`, `get_batch_get(...)` and `update_contact(...)`
 /// // to build up your call.
 /// let rb = hub.people();
 /// # }
@@ -1508,31 +1978,10 @@ impl<'a, C, A> PeopleMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Provides information about a person for a resource name. Use
-    /// `people/me` to indicate the authenticated user.
-    /// 
-    /// # Arguments
-    ///
-    /// * `resourceName` - The resource name of the person to provide information about.
-    ///                    - To get information about the authenticated user, specify `people/me`.
-    ///                    - To get information about any user, specify the resource name that
-    ///                      identifies the user, such as the resource names returned by
-    ///                      [`people.connections.list`](/people/api/rest/v1/people.connections/list).
-    pub fn get(&self, resource_name: &str) -> PeopleGetCall<'a, C, A> {
-        PeopleGetCall {
-            hub: self.hub,
-            _resource_name: resource_name.to_string(),
-            _request_mask_include_field: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
     /// Provides a list of the authenticated user's contacts merged with any
-    /// linked profiles.
+    /// connected profiles.
+    /// <br>
+    /// The request throws a 400 error if 'personFields' is not specified.
     /// 
     /// # Arguments
     ///
@@ -1545,8 +1994,105 @@ impl<'a, C, A> PeopleMethods<'a, C, A> {
             _sort_order: Default::default(),
             _request_sync_token: Default::default(),
             _request_mask_include_field: Default::default(),
+            _person_fields: Default::default(),
             _page_token: Default::default(),
             _page_size: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Create a new contact and return the person resource for that contact.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    pub fn create_contact(&self, request: Person) -> PeopleCreateContactCall<'a, C, A> {
+        PeopleCreateContactCall {
+            hub: self.hub,
+            _request: request,
+            _parent: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Delete a contact person. Any non-contact data will not be deleted.
+    /// 
+    /// # Arguments
+    ///
+    /// * `resourceName` - The resource name of the contact to delete.
+    pub fn delete_contact(&self, resource_name: &str) -> PeopleDeleteContactCall<'a, C, A> {
+        PeopleDeleteContactCall {
+            hub: self.hub,
+            _resource_name: resource_name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Provides information about a person by specifying a resource name. Use
+    /// `people/me` to indicate the authenticated user.
+    /// <br>
+    /// The request throws a 400 error if 'personFields' is not specified.
+    /// 
+    /// # Arguments
+    ///
+    /// * `resourceName` - The resource name of the person to provide information about.
+    ///                    - To get information about the authenticated user, specify `people/me`.
+    ///                    - To get information about a google account, specify
+    ///                     `people/`<var>account_id</var>.
+    ///                    - To get information about a contact, specify the resource name that
+    ///                      identifies the contact as returned by
+    ///                    [`people.connections.list`](/people/api/rest/v1/people.connections/list).
+    pub fn get(&self, resource_name: &str) -> PeopleGetCall<'a, C, A> {
+        PeopleGetCall {
+            hub: self.hub,
+            _resource_name: resource_name.to_string(),
+            _request_mask_include_field: Default::default(),
+            _person_fields: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Update contact data for an existing contact person. Any non-contact data
+    /// will not be modified.
+    /// 
+    /// The request throws a 400 error if `updatePersonFields` is not specified.
+    /// <br>
+    /// The request throws a 400 error if `person.metadata.sources` is not
+    /// specified for the contact to be updated.
+    /// <br>
+    /// The request throws a 412 error if `person.metadata.sources.etag` is
+    /// different than the contact's etag, which indicates the contact has changed
+    /// since its data was read. Clients should get the latest person and re-apply
+    /// their updates to the latest person.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `resourceName` - The resource name for the person, assigned by the server. An ASCII string
+    ///                    with a max length of 27 characters, in the form of
+    ///                    `people/`<var>person_id</var>.
+    pub fn update_contact(&self, request: Person, resource_name: &str) -> PeopleUpdateContactCall<'a, C, A> {
+        PeopleUpdateContactCall {
+            hub: self.hub,
+            _request: request,
+            _resource_name: resource_name.to_string(),
+            _update_person_fields: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1558,11 +2104,14 @@ impl<'a, C, A> PeopleMethods<'a, C, A> {
     /// Provides information about a list of specific people by specifying a list
     /// of requested resource names. Use `people/me` to indicate the authenticated
     /// user.
+    /// <br>
+    /// The request throws a 400 error if 'personFields' is not specified.
     pub fn get_batch_get(&self) -> PeopleGetBatchGetCall<'a, C, A> {
         PeopleGetBatchGetCall {
             hub: self.hub,
             _resource_names: Default::default(),
             _request_mask_include_field: Default::default(),
+            _person_fields: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1578,11 +2127,11 @@ impl<'a, C, A> PeopleMethods<'a, C, A> {
 // CallBuilders   ###
 // #################
 
-/// Provides information about a person for a resource name. Use
-/// `people/me` to indicate the authenticated user.
+/// Get a list of contact groups owned by the authenticated user by specifying
+/// a list of contact group resource names.
 ///
-/// A builder for the *get* method supported by a *people* resource.
-/// It is not used directly, but through a `PeopleMethods` instance.
+/// A builder for the *batchGet* method supported by a *contactGroup* resource.
+/// It is not used directly, but through a `ContactGroupMethods` instance.
 ///
 /// # Example
 ///
@@ -1606,29 +2155,781 @@ impl<'a, C, A> PeopleMethods<'a, C, A> {
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.people().get("resourceName")
-///              .request_mask_include_field("accusam")
+/// let result = hub.contact_groups().batch_get()
+///              .add_resource_names("justo")
+///              .max_members(-1)
 ///              .doit();
 /// # }
 /// ```
-pub struct PeopleGetCall<'a, C, A>
+pub struct ContactGroupBatchGetCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a PeopleService<C, A>,
-    _resource_name: String,
-    _request_mask_include_field: Option<String>,
+    _resource_names: Vec<String>,
+    _max_members: Option<i32>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for PeopleGetCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ContactGroupBatchGetCall<'a, C, A> {}
 
-impl<'a, C, A> PeopleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ContactGroupBatchGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Person)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, BatchGetContactGroupsResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "people.contactGroups.batchGet",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        if self._resource_names.len() > 0 {
+            for f in self._resource_names.iter() {
+                params.push(("resourceNames", f.to_string()));
+            }
+        }
+        if let Some(value) = self._max_members {
+            params.push(("maxMembers", value.to_string()));
+        }
+        for &field in ["alt", "resourceNames", "maxMembers"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/contactGroups:batchGet";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::ContactReadonly.as_ref().to_string(), ());
+        }
+
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The resource names of the contact groups to get.
+    ///
+    /// Append the given value to the *resource names* query property.
+    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
+    pub fn add_resource_names(mut self, new_value: &str) -> ContactGroupBatchGetCall<'a, C, A> {
+        self._resource_names.push(new_value.to_string());
+        self
+    }
+    /// Specifies the maximum number of members to return for each group.
+    ///
+    /// Sets the *max members* query property to the given value.
+    pub fn max_members(mut self, new_value: i32) -> ContactGroupBatchGetCall<'a, C, A> {
+        self._max_members = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ContactGroupBatchGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ContactGroupBatchGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ContactReadonly`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ContactGroupBatchGetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// List all contact groups owned by the authenticated user. Members of the
+/// contact groups are not populated.
+///
+/// A builder for the *list* method supported by a *contactGroup* resource.
+/// It is not used directly, but through a `ContactGroupMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_people1 as people1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use people1::PeopleService;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = PeopleService::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.contact_groups().list()
+///              .sync_token("erat")
+///              .page_token("labore")
+///              .page_size(-9)
+///              .doit();
+/// # }
+/// ```
+pub struct ContactGroupListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a PeopleService<C, A>,
+    _sync_token: Option<String>,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ContactGroupListCall<'a, C, A> {}
+
+impl<'a, C, A> ContactGroupListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListContactGroupsResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "people.contactGroups.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        if let Some(value) = self._sync_token {
+            params.push(("syncToken", value.to_string()));
+        }
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        for &field in ["alt", "syncToken", "pageToken", "pageSize"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/contactGroups";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::ContactReadonly.as_ref().to_string(), ());
+        }
+
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// A sync token, returned by a previous call to `contactgroups.list`.
+    /// Only resources changed since the sync token was created will be returned.
+    ///
+    /// Sets the *sync token* query property to the given value.
+    pub fn sync_token(mut self, new_value: &str) -> ContactGroupListCall<'a, C, A> {
+        self._sync_token = Some(new_value.to_string());
+        self
+    }
+    /// The next_page_token value returned from a previous call to
+    /// [ListContactGroups](/people/api/rest/v1/contactgroups/list).
+    /// Requests the next page of resources.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ContactGroupListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// The maximum number of resources to return.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ContactGroupListCall<'a, C, A> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ContactGroupListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ContactGroupListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ContactReadonly`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ContactGroupListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Create a new contact group owned by the authenticated user.
+///
+/// A builder for the *create* method supported by a *contactGroup* resource.
+/// It is not used directly, but through a `ContactGroupMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_people1 as people1;
+/// use people1::CreateContactGroupRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use people1::PeopleService;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = PeopleService::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = CreateContactGroupRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.contact_groups().create(req)
+///              .doit();
+/// # }
+/// ```
+pub struct ContactGroupCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a PeopleService<C, A>,
+    _request: CreateContactGroupRequest,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ContactGroupCreateCall<'a, C, A> {}
+
+impl<'a, C, A> ContactGroupCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ContactGroup)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "people.contactGroups.create",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        for &field in ["alt"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/contactGroups";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Contact.as_ref().to_string(), ());
+        }
+
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: CreateContactGroupRequest) -> ContactGroupCreateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ContactGroupCreateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ContactGroupCreateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Contact`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ContactGroupCreateCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Update the name of an existing contact group owned by the authenticated
+/// user.
+///
+/// A builder for the *update* method supported by a *contactGroup* resource.
+/// It is not used directly, but through a `ContactGroupMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_people1 as people1;
+/// use people1::UpdateContactGroupRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use people1::PeopleService;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = PeopleService::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = UpdateContactGroupRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.contact_groups().update(req, "resourceName")
+///              .doit();
+/// # }
+/// ```
+pub struct ContactGroupUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a PeopleService<C, A>,
+    _request: UpdateContactGroupRequest,
+    _resource_name: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ContactGroupUpdateCall<'a, C, A> {}
+
+impl<'a, C, A> ContactGroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ContactGroup)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -1637,14 +2938,845 @@ impl<'a, C, A> PeopleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "people.people.get",
+        dlg.begin(MethodInfo { id: "people.contactGroups.update",
+                               http_method: hyper::method::Method::Put });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        params.push(("resourceName", self._resource_name.to_string()));
+        for &field in ["alt", "resourceName"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+resourceName}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Contact.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+resourceName}", "resourceName")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["resourceName"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: UpdateContactGroupRequest) -> ContactGroupUpdateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The resource name for the contact group, assigned by the server. An ASCII
+    /// string, in the form of `contactGroups/`<var>contact_group_id</var>.
+    ///
+    /// Sets the *resource name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn resource_name(mut self, new_value: &str) -> ContactGroupUpdateCall<'a, C, A> {
+        self._resource_name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ContactGroupUpdateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ContactGroupUpdateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Contact`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ContactGroupUpdateCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Delete an existing contact group owned by the authenticated user by
+/// specifying a contact group resource name.
+///
+/// A builder for the *delete* method supported by a *contactGroup* resource.
+/// It is not used directly, but through a `ContactGroupMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_people1 as people1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use people1::PeopleService;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = PeopleService::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.contact_groups().delete("resourceName")
+///              .delete_contacts(false)
+///              .doit();
+/// # }
+/// ```
+pub struct ContactGroupDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a PeopleService<C, A>,
+    _resource_name: String,
+    _delete_contacts: Option<bool>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ContactGroupDeleteCall<'a, C, A> {}
+
+impl<'a, C, A> ContactGroupDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "people.contactGroups.delete",
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        params.push(("resourceName", self._resource_name.to_string()));
+        if let Some(value) = self._delete_contacts {
+            params.push(("deleteContacts", value.to_string()));
+        }
+        for &field in ["alt", "resourceName", "deleteContacts"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+resourceName}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Contact.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+resourceName}", "resourceName")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["resourceName"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The resource name of the contact group to delete.
+    ///
+    /// Sets the *resource name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn resource_name(mut self, new_value: &str) -> ContactGroupDeleteCall<'a, C, A> {
+        self._resource_name = new_value.to_string();
+        self
+    }
+    /// Set to true to also delete the contacts in the specified group.
+    ///
+    /// Sets the *delete contacts* query property to the given value.
+    pub fn delete_contacts(mut self, new_value: bool) -> ContactGroupDeleteCall<'a, C, A> {
+        self._delete_contacts = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ContactGroupDeleteCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ContactGroupDeleteCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Contact`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ContactGroupDeleteCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Modify the members of a contact group owned by the authenticated user.
+///
+/// A builder for the *members.modify* method supported by a *contactGroup* resource.
+/// It is not used directly, but through a `ContactGroupMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_people1 as people1;
+/// use people1::ModifyContactGroupMembersRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use people1::PeopleService;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = PeopleService::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = ModifyContactGroupMembersRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.contact_groups().members_modify(req, "resourceName")
+///              .doit();
+/// # }
+/// ```
+pub struct ContactGroupMemberModifyCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a PeopleService<C, A>,
+    _request: ModifyContactGroupMembersRequest,
+    _resource_name: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ContactGroupMemberModifyCall<'a, C, A> {}
+
+impl<'a, C, A> ContactGroupMemberModifyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ModifyContactGroupMembersResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "people.contactGroups.members.modify",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        params.push(("resourceName", self._resource_name.to_string()));
+        for &field in ["alt", "resourceName"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+resourceName}/members:modify";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Contact.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+resourceName}", "resourceName")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["resourceName"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: ModifyContactGroupMembersRequest) -> ContactGroupMemberModifyCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The resource name of the contact group to modify.
+    ///
+    /// Sets the *resource name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn resource_name(mut self, new_value: &str) -> ContactGroupMemberModifyCall<'a, C, A> {
+        self._resource_name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ContactGroupMemberModifyCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ContactGroupMemberModifyCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Contact`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ContactGroupMemberModifyCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Get a specific contact group owned by the authenticated user by specifying
+/// a contact group resource name.
+///
+/// A builder for the *get* method supported by a *contactGroup* resource.
+/// It is not used directly, but through a `ContactGroupMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_people1 as people1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use people1::PeopleService;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = PeopleService::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.contact_groups().get("resourceName")
+///              .max_members(-66)
+///              .doit();
+/// # }
+/// ```
+pub struct ContactGroupGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a PeopleService<C, A>,
+    _resource_name: String,
+    _max_members: Option<i32>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ContactGroupGetCall<'a, C, A> {}
+
+impl<'a, C, A> ContactGroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ContactGroup)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "people.contactGroups.get",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("resourceName", self._resource_name.to_string()));
-        if let Some(value) = self._request_mask_include_field {
-            params.push(("requestMask.includeField", value.to_string()));
+        if let Some(value) = self._max_members {
+            params.push(("maxMembers", value.to_string()));
         }
-        for &field in ["alt", "resourceName", "requestMask.includeField"].iter() {
+        for &field in ["alt", "resourceName", "maxMembers"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -1762,31 +3894,21 @@ impl<'a, C, A> PeopleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
-    /// The resource name of the person to provide information about.
-    /// 
-    /// - To get information about the authenticated user, specify `people/me`.
-    /// - To get information about any user, specify the resource name that
-    ///   identifies the user, such as the resource names returned by
-    ///   [`people.connections.list`](/people/api/rest/v1/people.connections/list).
+    /// The resource name of the contact group to get.
     ///
     /// Sets the *resource name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource_name(mut self, new_value: &str) -> PeopleGetCall<'a, C, A> {
+    pub fn resource_name(mut self, new_value: &str) -> ContactGroupGetCall<'a, C, A> {
         self._resource_name = new_value.to_string();
         self
     }
-    /// Comma-separated list of fields to be included in the response. Omitting
-    /// this field will include all fields except for connections.list requests,
-    /// which have a default mask that includes common fields like metadata, name,
-    /// photo, and profile url.
-    /// Each path should start with `person.`: for example, `person.names` or
-    /// `person.photos`.
+    /// Specifies the maximum number of members to return.
     ///
-    /// Sets the *request mask.include field* query property to the given value.
-    pub fn request_mask_include_field(mut self, new_value: &str) -> PeopleGetCall<'a, C, A> {
-        self._request_mask_include_field = Some(new_value.to_string());
+    /// Sets the *max members* query property to the given value.
+    pub fn max_members(mut self, new_value: i32) -> ContactGroupGetCall<'a, C, A> {
+        self._max_members = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -1795,7 +3917,7 @@ impl<'a, C, A> PeopleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PeopleGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ContactGroupGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1814,15 +3936,15 @@ impl<'a, C, A> PeopleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> PeopleGetCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ContactGroupGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1842,7 +3964,7 @@ impl<'a, C, A> PeopleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleGetCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ContactGroupGetCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1855,7 +3977,9 @@ impl<'a, C, A> PeopleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
 
 /// Provides a list of the authenticated user's contacts merged with any
-/// linked profiles.
+/// connected profiles.
+/// <br>
+/// The request throws a 400 error if 'personFields' is not specified.
 ///
 /// A builder for the *connections.list* method supported by a *people* resource.
 /// It is not used directly, but through a `PeopleMethods` instance.
@@ -1884,11 +4008,12 @@ impl<'a, C, A> PeopleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.people().connections_list("resourceName")
 ///              .sync_token("justo")
-///              .sort_order("amet.")
-///              .request_sync_token(false)
-///              .request_mask_include_field("labore")
-///              .page_token("sea")
-///              .page_size(-90)
+///              .sort_order("justo")
+///              .request_sync_token(true)
+///              .request_mask_include_field("et")
+///              .person_fields("diam")
+///              .page_token("ipsum")
+///              .page_size(-5)
 ///              .doit();
 /// # }
 /// ```
@@ -1901,6 +4026,7 @@ pub struct PeopleConnectionListCall<'a, C, A>
     _sort_order: Option<String>,
     _request_sync_token: Option<bool>,
     _request_mask_include_field: Option<String>,
+    _person_fields: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _delegate: Option<&'a mut Delegate>,
@@ -1925,7 +4051,7 @@ impl<'a, C, A> PeopleConnectionListCall<'a, C, A> where C: BorrowMut<hyper::Clie
         };
         dlg.begin(MethodInfo { id: "people.people.connections.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((9 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((10 + self._additional_params.len()));
         params.push(("resourceName", self._resource_name.to_string()));
         if let Some(value) = self._sync_token {
             params.push(("syncToken", value.to_string()));
@@ -1939,13 +4065,16 @@ impl<'a, C, A> PeopleConnectionListCall<'a, C, A> where C: BorrowMut<hyper::Clie
         if let Some(value) = self._request_mask_include_field {
             params.push(("requestMask.includeField", value.to_string()));
         }
+        if let Some(value) = self._person_fields {
+            params.push(("personFields", value.to_string()));
+        }
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
         }
         if let Some(value) = self._page_size {
             params.push(("pageSize", value.to_string()));
         }
-        for &field in ["alt", "resourceName", "syncToken", "sortOrder", "requestSyncToken", "requestMask.includeField", "pageToken", "pageSize"].iter() {
+        for &field in ["alt", "resourceName", "syncToken", "sortOrder", "requestSyncToken", "requestMask.includeField", "personFields", "pageToken", "pageSize"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -2097,16 +4226,49 @@ impl<'a, C, A> PeopleConnectionListCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._request_sync_token = Some(new_value);
         self
     }
-    /// Comma-separated list of fields to be included in the response. Omitting
-    /// this field will include all fields except for connections.list requests,
-    /// which have a default mask that includes common fields like metadata, name,
-    /// photo, and profile url.
-    /// Each path should start with `person.`: for example, `person.names` or
-    /// `person.photos`.
+    /// **Required.** Comma-separated list of person fields to be included in the
+    /// response. Each path should start with `person.`: for example,
+    /// `person.names` or `person.photos`.
     ///
     /// Sets the *request mask.include field* query property to the given value.
     pub fn request_mask_include_field(mut self, new_value: &str) -> PeopleConnectionListCall<'a, C, A> {
         self._request_mask_include_field = Some(new_value.to_string());
+        self
+    }
+    /// **Required.** A field mask to restrict which fields on each person are
+    /// returned. Valid values are:
+    /// 
+    /// * addresses
+    /// * ageRanges
+    /// * biographies
+    /// * birthdays
+    /// * braggingRights
+    /// * coverPhotos
+    /// * emailAddresses
+    /// * events
+    /// * genders
+    /// * imClients
+    /// * interests
+    /// * locales
+    /// * memberships
+    /// * metadata
+    /// * names
+    /// * nicknames
+    /// * occupations
+    /// * organizations
+    /// * phoneNumbers
+    /// * photos
+    /// * relations
+    /// * relationshipInterests
+    /// * relationshipStatuses
+    /// * residences
+    /// * skills
+    /// * taglines
+    /// * urls
+    ///
+    /// Sets the *person fields* query property to the given value.
+    pub fn person_fields(mut self, new_value: &str) -> PeopleConnectionListCall<'a, C, A> {
+        self._person_fields = Some(new_value.to_string());
         self
     }
     /// The token of the page to be returned.
@@ -2149,12 +4311,12 @@ impl<'a, C, A> PeopleConnectionListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> PeopleConnectionListCall<'a, C, A>
@@ -2189,9 +4351,1171 @@ impl<'a, C, A> PeopleConnectionListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 }
 
 
+/// Create a new contact and return the person resource for that contact.
+///
+/// A builder for the *createContact* method supported by a *people* resource.
+/// It is not used directly, but through a `PeopleMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_people1 as people1;
+/// use people1::Person;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use people1::PeopleService;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = PeopleService::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Person::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.people().create_contact(req)
+///              .parent("et")
+///              .doit();
+/// # }
+/// ```
+pub struct PeopleCreateContactCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a PeopleService<C, A>,
+    _request: Person,
+    _parent: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for PeopleCreateContactCall<'a, C, A> {}
+
+impl<'a, C, A> PeopleCreateContactCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Person)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "people.people.createContact",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        if let Some(value) = self._parent {
+            params.push(("parent", value.to_string()));
+        }
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/people:createContact";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Contact.as_ref().to_string(), ());
+        }
+
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: Person) -> PeopleCreateContactCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The resource name of the owning person resource.
+    ///
+    /// Sets the *parent* query property to the given value.
+    pub fn parent(mut self, new_value: &str) -> PeopleCreateContactCall<'a, C, A> {
+        self._parent = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PeopleCreateContactCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> PeopleCreateContactCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Contact`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleCreateContactCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Delete a contact person. Any non-contact data will not be deleted.
+///
+/// A builder for the *deleteContact* method supported by a *people* resource.
+/// It is not used directly, but through a `PeopleMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_people1 as people1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use people1::PeopleService;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = PeopleService::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.people().delete_contact("resourceName")
+///              .doit();
+/// # }
+/// ```
+pub struct PeopleDeleteContactCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a PeopleService<C, A>,
+    _resource_name: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for PeopleDeleteContactCall<'a, C, A> {}
+
+impl<'a, C, A> PeopleDeleteContactCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "people.people.deleteContact",
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        params.push(("resourceName", self._resource_name.to_string()));
+        for &field in ["alt", "resourceName"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+resourceName}:deleteContact";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Contact.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+resourceName}", "resourceName")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["resourceName"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The resource name of the contact to delete.
+    ///
+    /// Sets the *resource name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn resource_name(mut self, new_value: &str) -> PeopleDeleteContactCall<'a, C, A> {
+        self._resource_name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PeopleDeleteContactCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> PeopleDeleteContactCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Contact`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleDeleteContactCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Provides information about a person by specifying a resource name. Use
+/// `people/me` to indicate the authenticated user.
+/// <br>
+/// The request throws a 400 error if 'personFields' is not specified.
+///
+/// A builder for the *get* method supported by a *people* resource.
+/// It is not used directly, but through a `PeopleMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_people1 as people1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use people1::PeopleService;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = PeopleService::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.people().get("resourceName")
+///              .request_mask_include_field("sea")
+///              .person_fields("Lorem")
+///              .doit();
+/// # }
+/// ```
+pub struct PeopleGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a PeopleService<C, A>,
+    _resource_name: String,
+    _request_mask_include_field: Option<String>,
+    _person_fields: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for PeopleGetCall<'a, C, A> {}
+
+impl<'a, C, A> PeopleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Person)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "people.people.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        params.push(("resourceName", self._resource_name.to_string()));
+        if let Some(value) = self._request_mask_include_field {
+            params.push(("requestMask.includeField", value.to_string()));
+        }
+        if let Some(value) = self._person_fields {
+            params.push(("personFields", value.to_string()));
+        }
+        for &field in ["alt", "resourceName", "requestMask.includeField", "personFields"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+resourceName}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::ContactReadonly.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+resourceName}", "resourceName")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["resourceName"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The resource name of the person to provide information about.
+    /// 
+    /// - To get information about the authenticated user, specify `people/me`.
+    /// - To get information about a google account, specify
+    ///  `people/`<var>account_id</var>.
+    /// - To get information about a contact, specify the resource name that
+    ///   identifies the contact as returned by
+    /// [`people.connections.list`](/people/api/rest/v1/people.connections/list).
+    ///
+    /// Sets the *resource name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn resource_name(mut self, new_value: &str) -> PeopleGetCall<'a, C, A> {
+        self._resource_name = new_value.to_string();
+        self
+    }
+    /// **Required.** Comma-separated list of person fields to be included in the
+    /// response. Each path should start with `person.`: for example,
+    /// `person.names` or `person.photos`.
+    ///
+    /// Sets the *request mask.include field* query property to the given value.
+    pub fn request_mask_include_field(mut self, new_value: &str) -> PeopleGetCall<'a, C, A> {
+        self._request_mask_include_field = Some(new_value.to_string());
+        self
+    }
+    /// **Required.** A field mask to restrict which fields on the person are
+    /// returned. Valid values are:
+    /// 
+    /// * addresses
+    /// * ageRanges
+    /// * biographies
+    /// * birthdays
+    /// * braggingRights
+    /// * coverPhotos
+    /// * emailAddresses
+    /// * events
+    /// * genders
+    /// * imClients
+    /// * interests
+    /// * locales
+    /// * memberships
+    /// * metadata
+    /// * names
+    /// * nicknames
+    /// * occupations
+    /// * organizations
+    /// * phoneNumbers
+    /// * photos
+    /// * relations
+    /// * relationshipInterests
+    /// * relationshipStatuses
+    /// * residences
+    /// * skills
+    /// * taglines
+    /// * urls
+    ///
+    /// Sets the *person fields* query property to the given value.
+    pub fn person_fields(mut self, new_value: &str) -> PeopleGetCall<'a, C, A> {
+        self._person_fields = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PeopleGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> PeopleGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ContactReadonly`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleGetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Update contact data for an existing contact person. Any non-contact data
+/// will not be modified.
+/// 
+/// The request throws a 400 error if `updatePersonFields` is not specified.
+/// <br>
+/// The request throws a 400 error if `person.metadata.sources` is not
+/// specified for the contact to be updated.
+/// <br>
+/// The request throws a 412 error if `person.metadata.sources.etag` is
+/// different than the contact's etag, which indicates the contact has changed
+/// since its data was read. Clients should get the latest person and re-apply
+/// their updates to the latest person.
+///
+/// A builder for the *updateContact* method supported by a *people* resource.
+/// It is not used directly, but through a `PeopleMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_people1 as people1;
+/// use people1::Person;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use people1::PeopleService;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = PeopleService::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Person::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.people().update_contact(req, "resourceName")
+///              .update_person_fields("erat")
+///              .doit();
+/// # }
+/// ```
+pub struct PeopleUpdateContactCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a PeopleService<C, A>,
+    _request: Person,
+    _resource_name: String,
+    _update_person_fields: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for PeopleUpdateContactCall<'a, C, A> {}
+
+impl<'a, C, A> PeopleUpdateContactCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Person)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "people.people.updateContact",
+                               http_method: hyper::method::Method::Patch });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        params.push(("resourceName", self._resource_name.to_string()));
+        if let Some(value) = self._update_person_fields {
+            params.push(("updatePersonFields", value.to_string()));
+        }
+        for &field in ["alt", "resourceName", "updatePersonFields"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+resourceName}:updateContact";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Contact.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+resourceName}", "resourceName")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["resourceName"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: Person) -> PeopleUpdateContactCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The resource name for the person, assigned by the server. An ASCII string
+    /// with a max length of 27 characters, in the form of
+    /// `people/`<var>person_id</var>.
+    ///
+    /// Sets the *resource name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn resource_name(mut self, new_value: &str) -> PeopleUpdateContactCall<'a, C, A> {
+        self._resource_name = new_value.to_string();
+        self
+    }
+    /// **Required.** A field mask to restrict which fields on the person are
+    /// updated. Valid values are:
+    /// 
+    /// * addresses
+    /// * biographies
+    /// * birthdays
+    /// * braggingRights
+    /// * emailAddresses
+    /// * events
+    /// * genders
+    /// * imClients
+    /// * interests
+    /// * locales
+    /// * names
+    /// * nicknames
+    /// * occupations
+    /// * organizations
+    /// * phoneNumbers
+    /// * relations
+    /// * residences
+    /// * skills
+    /// * urls
+    ///
+    /// Sets the *update person fields* query property to the given value.
+    pub fn update_person_fields(mut self, new_value: &str) -> PeopleUpdateContactCall<'a, C, A> {
+        self._update_person_fields = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PeopleUpdateContactCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> PeopleUpdateContactCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Contact`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleUpdateContactCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Provides information about a list of specific people by specifying a list
 /// of requested resource names. Use `people/me` to indicate the authenticated
 /// user.
+/// <br>
+/// The request throws a 400 error if 'personFields' is not specified.
 ///
 /// A builder for the *getBatchGet* method supported by a *people* resource.
 /// It is not used directly, but through a `PeopleMethods` instance.
@@ -2219,8 +5543,9 @@ impl<'a, C, A> PeopleConnectionListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.people().get_batch_get()
-///              .add_resource_names("dolores")
-///              .request_mask_include_field("gubergren")
+///              .add_resource_names("sadipscing")
+///              .request_mask_include_field("dolor")
+///              .person_fields("eirmod")
 ///              .doit();
 /// # }
 /// ```
@@ -2230,6 +5555,7 @@ pub struct PeopleGetBatchGetCall<'a, C, A>
     hub: &'a PeopleService<C, A>,
     _resource_names: Vec<String>,
     _request_mask_include_field: Option<String>,
+    _person_fields: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -2251,7 +5577,7 @@ impl<'a, C, A> PeopleGetBatchGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
         };
         dlg.begin(MethodInfo { id: "people.people.getBatchGet",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         if self._resource_names.len() > 0 {
             for f in self._resource_names.iter() {
                 params.push(("resourceNames", f.to_string()));
@@ -2260,7 +5586,10 @@ impl<'a, C, A> PeopleGetBatchGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
         if let Some(value) = self._request_mask_include_field {
             params.push(("requestMask.includeField", value.to_string()));
         }
-        for &field in ["alt", "resourceNames", "requestMask.includeField"].iter() {
+        if let Some(value) = self._person_fields {
+            params.push(("personFields", value.to_string()));
+        }
+        for &field in ["alt", "resourceNames", "requestMask.includeField", "personFields"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -2354,10 +5683,16 @@ impl<'a, C, A> PeopleGetBatchGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
-    /// The resource name, such as one returned by
-    /// [`people.connections.list`](/people/api/rest/v1/people.connections/list),
-    /// of one of the people to provide information about. You can include this
-    /// parameter up to 50 times in one request.
+    /// The resource names of the people to provide information about.
+    /// 
+    /// - To get information about the authenticated user, specify `people/me`.
+    /// - To get information about a google account, specify
+    ///   `people/`<var>account_id</var>.
+    /// - To get information about a contact, specify the resource name that
+    ///   identifies the contact as returned by
+    /// [`people.connections.list`](/people/api/rest/v1/people.connections/list).
+    /// 
+    /// You can include up to 50 resource names in one request.
     ///
     /// Append the given value to the *resource names* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
@@ -2365,16 +5700,49 @@ impl<'a, C, A> PeopleGetBatchGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._resource_names.push(new_value.to_string());
         self
     }
-    /// Comma-separated list of fields to be included in the response. Omitting
-    /// this field will include all fields except for connections.list requests,
-    /// which have a default mask that includes common fields like metadata, name,
-    /// photo, and profile url.
-    /// Each path should start with `person.`: for example, `person.names` or
-    /// `person.photos`.
+    /// **Required.** Comma-separated list of person fields to be included in the
+    /// response. Each path should start with `person.`: for example,
+    /// `person.names` or `person.photos`.
     ///
     /// Sets the *request mask.include field* query property to the given value.
     pub fn request_mask_include_field(mut self, new_value: &str) -> PeopleGetBatchGetCall<'a, C, A> {
         self._request_mask_include_field = Some(new_value.to_string());
+        self
+    }
+    /// **Required.** A field mask to restrict which fields on each person are
+    /// returned. Valid values are:
+    /// 
+    /// * addresses
+    /// * ageRanges
+    /// * biographies
+    /// * birthdays
+    /// * braggingRights
+    /// * coverPhotos
+    /// * emailAddresses
+    /// * events
+    /// * genders
+    /// * imClients
+    /// * interests
+    /// * locales
+    /// * memberships
+    /// * metadata
+    /// * names
+    /// * nicknames
+    /// * occupations
+    /// * organizations
+    /// * phoneNumbers
+    /// * photos
+    /// * relations
+    /// * relationshipInterests
+    /// * relationshipStatuses
+    /// * residences
+    /// * skills
+    /// * taglines
+    /// * urls
+    ///
+    /// Sets the *person fields* query property to the given value.
+    pub fn person_fields(mut self, new_value: &str) -> PeopleGetBatchGetCall<'a, C, A> {
+        self._person_fields = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -2402,12 +5770,12 @@ impl<'a, C, A> PeopleGetBatchGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> PeopleGetBatchGetCall<'a, C, A>

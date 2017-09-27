@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *classroom* API at revision *20170510*. The CLI is at version *1.0.6*.
+This documentation was generated from the *classroom* API at revision *20170926*. The CLI is at version *1.0.6*.
 
 ```bash
 classroom1 [options]
@@ -33,10 +33,17 @@ classroom1 [options]
                 aliases-create <course-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 aliases-delete <course-id> <alias> [-p <v>]... [-o <out>]
                 aliases-list <course-id> [-p <v>]... [-o <out>]
+                announcements-create <course-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                announcements-delete <course-id> <id> [-p <v>]... [-o <out>]
+                announcements-get <course-id> <id> [-p <v>]... [-o <out>]
+                announcements-list <course-id> [-p <v>]... [-o <out>]
+                announcements-modify-assignees <course-id> <id> (-r <kv>)... [-p <v>]... [-o <out>]
+                announcements-patch <course-id> <id> (-r <kv>)... [-p <v>]... [-o <out>]
                 course-work-create <course-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 course-work-delete <course-id> <id> [-p <v>]... [-o <out>]
                 course-work-get <course-id> <id> [-p <v>]... [-o <out>]
                 course-work-list <course-id> [-p <v>]... [-o <out>]
+                course-work-modify-assignees <course-id> <id> (-r <kv>)... [-p <v>]... [-o <out>]
                 course-work-patch <course-id> <id> (-r <kv>)... [-p <v>]... [-o <out>]
                 course-work-student-submissions-get <course-id> <course-work-id> <id> [-p <v>]... [-o <out>]
                 course-work-student-submissions-list <course-id> <course-work-id> [-p <v>]... [-o <out>]
@@ -65,6 +72,9 @@ classroom1 [options]
                 delete <id> [-p <v>]... [-o <out>]
                 get <id> [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]
+        registrations
+                create (-r <kv>)... [-p <v>]... [-o <out>]
+                delete <registration-id> [-p <v>]... [-o <out>]
         user-profiles
                 get <user-id> [-p <v>]... [-o <out>]
                 guardian-invitations-create <student-id> (-r <kv>)... [-p <v>]... [-o <out>]

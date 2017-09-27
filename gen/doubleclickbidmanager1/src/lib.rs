@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *DoubleClick Bid Manager* crate version *1.0.6+20170224*, where *20170224* is the exact revision of the *doubleclickbidmanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *DoubleClick Bid Manager* crate version *1.0.6+20170705*, where *20170705* is the exact revision of the *doubleclickbidmanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *DoubleClick Bid Manager* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/bid-manager/).
@@ -789,7 +789,7 @@ impl ResponseResult for Query {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DownloadLineItemsResponse {
-    /// Retrieved line items in CSV format. Refer to  Entity Write File Format or  Structured Data File Format for more information on file formats.
+    /// Retrieved line items in CSV format. For more information about file formats, see  Entity Write File Format.
     #[serde(rename="lineItems")]
     pub line_items: Option<String>,
 }

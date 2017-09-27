@@ -1,4 +1,4 @@
-site_name: bigquery v1.0.6+20170511
+site_name: bigquery v1.0.6+20170917
 site_url: http://byron.github.io/google-apis-rs/google-bigquery2-cli
 site_description: A complete library to interact with bigquery (protocol v2)
 
@@ -21,6 +21,7 @@ pages:
 - ['jobs_insert.md', 'Jobs', 'Insert']
 - ['jobs_list.md', 'Jobs', 'List']
 - ['jobs_query.md', 'Jobs', 'Query']
+- ['projects_get-service-account.md', 'Projects', 'Get Service Account']
 - ['projects_list.md', 'Projects', 'List']
 - ['tabledata_insert-all.md', 'Tabledata', 'Insert All']
 - ['tabledata_list.md', 'Tabledata', 'List']

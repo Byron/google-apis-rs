@@ -18,6 +18,8 @@ api:
     - compute
     - servicecontrol
     - servicemanagement
+    # defines its own `Option` type
+    - serviceuser
     - language
     - speech
     - adexchangebuyer2
@@ -35,6 +37,8 @@ api:
     - datastore
     - consumersurveys
     - script
+    # redefinition of types apparently
+    - streetviewpublish
     - oauth2
     # Recursive type - we don't handle cycles yet it appears
     - slides

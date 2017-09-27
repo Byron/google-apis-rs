@@ -1,0 +1,40 @@
+# DO NOT EDIT !
+# This file was generated automatically from 'src/mako/Cargo.toml.mako'
+# DO NOT EDIT !
+[package]
+
+name = "google-oslogin1_beta-cli"
+version = "1.0.6+20170926"
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
+description = "A complete library to interact with Cloud OS Login (protocol v1beta)"
+repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/oslogin1_beta-cli"
+homepage = "https://cloud.google.com/compute/docs/oslogin/rest/"
+documentation = "http://byron.github.io/google-apis-rs/google_oslogin1_beta_cli"
+license = "MIT"
+keywords = ["oslogin", "google", "cli"]
+
+[[bin]]
+name = "oslogin1-beta"
+
+[dev-dependencies]
+hyper-rustls = "^0.6"
+
+[dependencies]
+hyper = "^ 0.10"
+mime = "^ 0.2.0"
+serde = "^ 1.0"
+serde_json = "^ 1.0"
+serde_derive = "^ 1.0"
+yup-oauth2 = "^ 1.0"
+strsim = "^0.5"
+hyper-rustls = "^0.6"
+yup-hyper-mock = "^2.0"
+clap = "^2.0"
+
+[features]
+
+
+
+[dependencies.google-oslogin1_beta]
+path = "../oslogin1_beta"
+version = "1.0.6+20170926"

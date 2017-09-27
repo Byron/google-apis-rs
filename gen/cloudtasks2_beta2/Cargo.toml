@@ -1,0 +1,31 @@
+# DO NOT EDIT !
+# This file was generated automatically from 'src/mako/Cargo.toml.mako'
+# DO NOT EDIT !
+[package]
+
+name = "google-cloudtasks2_beta2"
+version = "1.0.6+20170926"
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
+description = "A complete library to interact with Cloud Tasks (protocol v2beta2)"
+repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/cloudtasks2_beta2"
+homepage = "https://cloud.google.com/cloud-tasks/"
+documentation = "https://docs.rs/google-cloudtasks2_beta2/1.0.6+20170926"
+license = "MIT"
+keywords = ["cloudtasks", "google", "protocol", "web", "api"]
+
+
+[dev-dependencies]
+hyper-rustls = "^0.6"
+
+[dependencies]
+hyper = "^ 0.10"
+mime = "^ 0.2.0"
+serde = "^ 1.0"
+serde_json = "^ 1.0"
+serde_derive = "^ 1.0"
+yup-oauth2 = "^ 1.0"
+url = "= 0.5"
+
+[features]
+
+

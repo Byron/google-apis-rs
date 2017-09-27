@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *directory* crate version *1.0.6+20170419*, where *20170419* is the exact revision of the *admin:directory_v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *directory* crate version *1.0.6+20170830*, where *20170830* is the exact revision of the *admin:directory_v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *directory* *v1_directory* API can be found at the
 //! [official documentation site](https://developers.google.com/admin-sdk/directory/).
@@ -16,7 +16,7 @@
 //! * [channels](struct.Channel.html)
 //!  * [*stop*](struct.ChannelStopCall.html)
 //! * chromeosdevices
-//!  * [*action*](struct.ChromeosdeviceActionCall.html), [*get*](struct.ChromeosdeviceGetCall.html), [*list*](struct.ChromeosdeviceListCall.html), [*patch*](struct.ChromeosdevicePatchCall.html) and [*update*](struct.ChromeosdeviceUpdateCall.html)
+//!  * [*action*](struct.ChromeosdeviceActionCall.html), [*get*](struct.ChromeosdeviceGetCall.html), [*list*](struct.ChromeosdeviceListCall.html), [*move devices to ou*](struct.ChromeosdeviceMoveDevicesToOuCall.html), [*patch*](struct.ChromeosdevicePatchCall.html) and [*update*](struct.ChromeosdeviceUpdateCall.html)
 //! * [customers](struct.Customer.html)
 //!  * [*get*](struct.CustomerGetCall.html), [*patch*](struct.CustomerPatchCall.html) and [*update*](struct.CustomerUpdateCall.html)
 //! * domain aliases
@@ -818,42 +818,6 @@ impl Resource for Member {}
 impl ResponseResult for Member {}
 
 
-/// JSON template for Domain object in Directory API.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [insert domains](struct.DomainInsertCall.html) (request|response)
-/// * [get domains](struct.DomainGetCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Domains {
-    /// Kind of resource this is.
-    pub kind: Option<String>,
-    /// ETag of the resource.
-    pub etag: Option<String>,
-    /// Indicates the verification state of a domain. (Read-only).
-    pub verified: Option<bool>,
-    /// The domain name of the customer.
-    #[serde(rename="domainName")]
-    pub domain_name: Option<String>,
-    /// List of domain alias objects. (Read-only)
-    #[serde(rename="domainAliases")]
-    pub domain_aliases: Option<Vec<DomainAlias>>,
-    /// Indicates if the domain is a primary domain (Read-only).
-    #[serde(rename="isPrimary")]
-    pub is_primary: Option<bool>,
-    /// Creation time of the domain. (Read-only).
-    #[serde(rename="creationTime")]
-    pub creation_time: Option<String>,
-}
-
-impl RequestValue for Domains {}
-impl ResponseResult for Domains {}
-
-
 /// JSON response template for List Organization Units operation in Directory API.
 /// 
 /// # Activities
@@ -995,23 +959,26 @@ impl Resource for Privilege {}
 pub struct CalendarResource {
     /// The type of the resource. For calendar resources, the value is admin#directory#resources#calendars#CalendarResource.
     pub kind: Option<String>,
-    /// ETag of the resource.
-    pub etags: Option<String>,
-    /// The name of the calendar resource. For example, Training Room 1A
-    #[serde(rename="resourceName")]
-    pub resource_name: Option<String>,
-    /// The read-only email ID for the calendar resource. Generated as part of creating a new calendar resource.
-    #[serde(rename="resourceEmail")]
-    pub resource_email: Option<String>,
     /// The type of the calendar resource. Used for grouping resources in the calendar user interface.
     #[serde(rename="resourceType")]
     pub resource_type: Option<String>,
     /// The brief description of the calendar resource.
     #[serde(rename="resourceDescription")]
     pub resource_description: Option<String>,
+    /// The auto-generated name of the calendar resource which includes metadata about the resource such as building name, floor, capacity, etc. For example, NYC-2-Training Room 1A (16)
+    #[serde(rename="generatedResourceName")]
+    pub generated_resource_name: Option<String>,
+    /// The read-only email ID for the calendar resource. Generated as part of creating a new calendar resource.
+    #[serde(rename="resourceEmail")]
+    pub resource_email: Option<String>,
+    /// ETag of the resource.
+    pub etags: Option<String>,
     /// The unique ID for the calendar resource.
     #[serde(rename="resourceId")]
     pub resource_id: Option<String>,
+    /// The name of the calendar resource. For example, Training Room 1A
+    #[serde(rename="resourceName")]
+    pub resource_name: Option<String>,
 }
 
 impl RequestValue for CalendarResource {}
@@ -1452,6 +1419,8 @@ pub struct User {
     pub thumbnail_photo_etag: Option<String>,
     /// Indicates if user is suspended
     pub suspended: Option<bool>,
+    /// no description provided
+    pub keywords: Option<String>,
     /// Unique identifier of User (Read-only)
     pub id: Option<String>,
     /// List of aliases (Read-only)
@@ -1479,6 +1448,8 @@ pub struct User {
     pub include_in_global_address_list: Option<bool>,
     /// no description provided
     pub relations: Option<String>,
+    /// no description provided
+    pub languages: Option<String>,
     /// Boolean indicating if the user is admin (Read-only)
     #[serde(rename="isAdmin")]
     pub is_admin: Option<bool>,
@@ -1524,6 +1495,8 @@ pub struct User {
     pub hash_function: Option<String>,
     /// User's name
     pub name: Option<UserName>,
+    /// no description provided
+    pub gender: Option<String>,
     /// no description provided
     pub notes: Option<String>,
     /// User's G Suite account creation time. (Read-only)
@@ -1586,32 +1559,6 @@ pub struct ChromeOsDeviceRecentUsers {
 
 impl NestedType for ChromeOsDeviceRecentUsers {}
 impl Part for ChromeOsDeviceRecentUsers {}
-
-
-/// List of applications installed on Mobile Device
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct MobileDeviceApplications {
-    /// Version code of application
-    #[serde(rename="versionCode")]
-    pub version_code: Option<i32>,
-    /// Package name of application
-    #[serde(rename="packageName")]
-    pub package_name: Option<String>,
-    /// Display name of application
-    #[serde(rename="displayName")]
-    pub display_name: Option<String>,
-    /// Version name of application
-    #[serde(rename="versionName")]
-    pub version_name: Option<String>,
-    /// List of Permissions for application
-    pub permission: Option<Vec<String>>,
-}
-
-impl NestedType for MobileDeviceApplications {}
-impl Part for MobileDeviceApplications {}
 
 
 /// JSON response template to list aliases in Directory API.
@@ -1915,6 +1862,25 @@ pub struct Domains2 {
 impl ResponseResult for Domains2 {}
 
 
+/// JSON request template for moving ChromeOs Device to given OU in Directory Devices API.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [move devices to ou chromeosdevices](struct.ChromeosdeviceMoveDevicesToOuCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ChromeOsMoveDevicesToOu {
+    /// ChromeOs Devices to be moved to OU
+    #[serde(rename="deviceIds")]
+    pub device_ids: Option<Vec<String>>,
+}
+
+impl RequestValue for ChromeOsMoveDevicesToOu {}
+
+
 /// JSON template for Photo object in Directory API.
 /// 
 /// # Activities
@@ -1951,6 +1917,32 @@ pub struct UserPhoto {
 
 impl RequestValue for UserPhoto {}
 impl ResponseResult for UserPhoto {}
+
+
+/// List of applications installed on Mobile Device
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct MobileDeviceApplications {
+    /// Version code of application
+    #[serde(rename="versionCode")]
+    pub version_code: Option<i32>,
+    /// Package name of application
+    #[serde(rename="packageName")]
+    pub package_name: Option<String>,
+    /// Display name of application
+    #[serde(rename="displayName")]
+    pub display_name: Option<String>,
+    /// Version name of application
+    #[serde(rename="versionName")]
+    pub version_name: Option<String>,
+    /// List of Permissions for application
+    pub permission: Option<Vec<String>>,
+}
+
+impl NestedType for MobileDeviceApplications {}
+impl Part for MobileDeviceApplications {}
 
 
 /// JSON request template for firing commands on Mobile Device in Directory Devices API.
@@ -2014,6 +2006,42 @@ pub struct Users {
 }
 
 impl ResponseResult for Users {}
+
+
+/// JSON template for Domain object in Directory API.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [insert domains](struct.DomainInsertCall.html) (request|response)
+/// * [get domains](struct.DomainGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Domains {
+    /// Kind of resource this is.
+    pub kind: Option<String>,
+    /// ETag of the resource.
+    pub etag: Option<String>,
+    /// Indicates the verification state of a domain. (Read-only).
+    pub verified: Option<bool>,
+    /// The domain name of the customer.
+    #[serde(rename="domainName")]
+    pub domain_name: Option<String>,
+    /// List of domain alias objects. (Read-only)
+    #[serde(rename="domainAliases")]
+    pub domain_aliases: Option<Vec<DomainAlias>>,
+    /// Indicates if the domain is a primary domain (Read-only).
+    #[serde(rename="isPrimary")]
+    pub is_primary: Option<bool>,
+    /// Creation time of the domain. (Read-only).
+    #[serde(rename="creationTime")]
+    pub creation_time: Option<String>,
+}
+
+impl RequestValue for Domains {}
+impl ResponseResult for Domains {}
 
 
 /// JSON template for Mobile Device resource in Directory API.
@@ -2222,6 +2250,28 @@ impl Resource for OrgUnit {}
 impl ResponseResult for OrgUnit {}
 
 
+/// JSON response template for List Schema operation in Directory API.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list schemas](struct.SchemaListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Schemas {
+    /// Kind of resource this is.
+    pub kind: Option<String>,
+    /// ETag of the resource.
+    pub etag: Option<String>,
+    /// List of UserSchema objects.
+    pub schemas: Option<Vec<Schema>>,
+}
+
+impl ResponseResult for Schemas {}
+
+
 /// List of active time ranges (Read-only)
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2304,28 +2354,6 @@ pub struct SchemaFieldSpecNumericIndexingSpec {
 
 impl NestedType for SchemaFieldSpecNumericIndexingSpec {}
 impl Part for SchemaFieldSpecNumericIndexingSpec {}
-
-
-/// JSON response template for List Schema operation in Directory API.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list schemas](struct.SchemaListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Schemas {
-    /// Kind of resource this is.
-    pub kind: Option<String>,
-    /// ETag of the resource.
-    pub etag: Option<String>,
-    /// List of UserSchema objects.
-    pub schemas: Option<Vec<Schema>>,
-}
-
-impl ResponseResult for Schemas {}
 
 
 /// JSON template for Calendar Resource List Response object in Directory API.
@@ -3655,7 +3683,7 @@ impl<'a, C, A> RoleAssignmentMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Directory::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `action(...)`, `get(...)`, `list(...)`, `patch(...)` and `update(...)`
+/// // like `action(...)`, `get(...)`, `list(...)`, `move_devices_to_ou(...)`, `patch(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.chromeosdevices();
 /// # }
@@ -3685,6 +3713,7 @@ impl<'a, C, A> ChromeosdeviceMethods<'a, C, A> {
             _query: Default::default(),
             _projection: Default::default(),
             _page_token: Default::default(),
+            _org_unit_path: Default::default(),
             _order_by: Default::default(),
             _max_results: Default::default(),
             _delegate: Default::default(),
@@ -3772,6 +3801,27 @@ impl<'a, C, A> ChromeosdeviceMethods<'a, C, A> {
             _request: request,
             _customer_id: customer_id.to_string(),
             _resource_id: resource_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Move or insert multiple Chrome OS Devices to Organization Unit
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `customerId` - Immutable ID of the G Suite account
+    /// * `orgUnitPath` - Full path of the target organization unit or its Id
+    pub fn move_devices_to_ou(&self, request: ChromeOsMoveDevicesToOu, customer_id: &str, org_unit_path: &str) -> ChromeosdeviceMoveDevicesToOuCall<'a, C, A> {
+        ChromeosdeviceMoveDevicesToOuCall {
+            hub: self.hub,
+            _request: request,
+            _customer_id: customer_id.to_string(),
+            _org_unit_path: org_unit_path.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -16139,8 +16189,9 @@ impl<'a, C, A> RoleAssignmentListCall<'a, C, A> where C: BorrowMut<hyper::Client
 ///              .query("amet")
 ///              .projection("accusam")
 ///              .page_token("clita")
-///              .order_by("diam")
-///              .max_results(-71)
+///              .org_unit_path("diam")
+///              .order_by("justo")
+///              .max_results(-57)
 ///              .doit();
 /// # }
 /// ```
@@ -16153,6 +16204,7 @@ pub struct ChromeosdeviceListCall<'a, C, A>
     _query: Option<String>,
     _projection: Option<String>,
     _page_token: Option<String>,
+    _org_unit_path: Option<String>,
     _order_by: Option<String>,
     _max_results: Option<i32>,
     _delegate: Option<&'a mut Delegate>,
@@ -16176,7 +16228,7 @@ impl<'a, C, A> ChromeosdeviceListCall<'a, C, A> where C: BorrowMut<hyper::Client
         };
         dlg.begin(MethodInfo { id: "directory.chromeosdevices.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((9 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((10 + self._additional_params.len()));
         params.push(("customerId", self._customer_id.to_string()));
         if let Some(value) = self._sort_order {
             params.push(("sortOrder", value.to_string()));
@@ -16190,13 +16242,16 @@ impl<'a, C, A> ChromeosdeviceListCall<'a, C, A> where C: BorrowMut<hyper::Client
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
         }
+        if let Some(value) = self._org_unit_path {
+            params.push(("orgUnitPath", value.to_string()));
+        }
         if let Some(value) = self._order_by {
             params.push(("orderBy", value.to_string()));
         }
         if let Some(value) = self._max_results {
             params.push(("maxResults", value.to_string()));
         }
-        for &field in ["alt", "customerId", "sortOrder", "query", "projection", "pageToken", "orderBy", "maxResults"].iter() {
+        for &field in ["alt", "customerId", "sortOrder", "query", "projection", "pageToken", "orgUnitPath", "orderBy", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -16349,6 +16404,13 @@ impl<'a, C, A> ChromeosdeviceListCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._page_token = Some(new_value.to_string());
         self
     }
+    /// Full path of the organization unit or its Id
+    ///
+    /// Sets the *org unit path* query property to the given value.
+    pub fn org_unit_path(mut self, new_value: &str) -> ChromeosdeviceListCall<'a, C, A> {
+        self._org_unit_path = Some(new_value.to_string());
+        self
+    }
     /// Column to use for sorting results
     ///
     /// Sets the *order by* query property to the given value.
@@ -16456,7 +16518,7 @@ impl<'a, C, A> ChromeosdeviceListCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.chromeosdevices().patch(req, "customerId", "deviceId")
-///              .projection("invidunt")
+///              .projection("ut")
 ///              .doit();
 /// # }
 /// ```
@@ -16754,7 +16816,7 @@ impl<'a, C, A> ChromeosdevicePatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.chromeosdevices().update(req, "customerId", "deviceId")
-///              .projection("eos")
+///              .projection("voluptua.")
 ///              .doit();
 /// # }
 /// ```
@@ -17046,7 +17108,7 @@ impl<'a, C, A> ChromeosdeviceUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.chromeosdevices().get("customerId", "deviceId")
-///              .projection("sed")
+///              .projection("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -17560,6 +17622,281 @@ impl<'a, C, A> ChromeosdeviceActionCall<'a, C, A> where C: BorrowMut<hyper::Clie
 }
 
 
+/// Move or insert multiple Chrome OS Devices to Organization Unit
+///
+/// A builder for the *moveDevicesToOu* method supported by a *chromeosdevice* resource.
+/// It is not used directly, but through a `ChromeosdeviceMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
+/// use admin1_directory::ChromeOsMoveDevicesToOu;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use admin1_directory::Directory;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Directory::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = ChromeOsMoveDevicesToOu::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.chromeosdevices().move_devices_to_ou(req, "customerId", "orgUnitPath")
+///              .doit();
+/// # }
+/// ```
+pub struct ChromeosdeviceMoveDevicesToOuCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Directory<C, A>,
+    _request: ChromeOsMoveDevicesToOu,
+    _customer_id: String,
+    _org_unit_path: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ChromeosdeviceMoveDevicesToOuCall<'a, C, A> {}
+
+impl<'a, C, A> ChromeosdeviceMoveDevicesToOuCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<hyper::client::Response> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "directory.chromeosdevices.moveDevicesToOu",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        params.push(("customerId", self._customer_id.to_string()));
+        params.push(("orgUnitPath", self._org_unit_path.to_string()));
+        for &field in ["customerId", "orgUnitPath"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+
+        let mut url = self.hub._base_url.clone() + "customer/{customerId}/devices/chromeos/moveDevicesToOu";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{customerId}", "customerId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["customerId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = res;
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: ChromeOsMoveDevicesToOu) -> ChromeosdeviceMoveDevicesToOuCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Immutable ID of the G Suite account
+    ///
+    /// Sets the *customer id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn customer_id(mut self, new_value: &str) -> ChromeosdeviceMoveDevicesToOuCall<'a, C, A> {
+        self._customer_id = new_value.to_string();
+        self
+    }
+    /// Full path of the target organization unit or its Id
+    ///
+    /// Sets the *org unit path* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn org_unit_path(mut self, new_value: &str) -> ChromeosdeviceMoveDevicesToOuCall<'a, C, A> {
+        self._org_unit_path = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChromeosdeviceMoveDevicesToOuCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> ChromeosdeviceMoveDevicesToOuCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryDeviceChromeo`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ChromeosdeviceMoveDevicesToOuCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Delete Group
 ///
 /// A builder for the *delete* method supported by a *group* resource.
@@ -17820,11 +18157,11 @@ impl<'a, C, A> GroupDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.groups().list()
-///              .user_key("et")
-///              .page_token("dolor")
-///              .max_results(-41)
-///              .domain("kasd")
-///              .customer("invidunt")
+///              .user_key("kasd")
+///              .page_token("invidunt")
+///              .max_results(-15)
+///              .domain("Lorem")
+///              .customer("clita")
 ///              .doit();
 /// # }
 /// ```
@@ -19882,7 +20219,7 @@ impl<'a, C, A> GroupAliaseDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.asps().get("userKey", -80)
+/// let result = hub.asps().get("userKey", -43)
 ///              .doit();
 /// # }
 /// ```
@@ -20137,7 +20474,7 @@ impl<'a, C, A> AspGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.asps().delete("userKey", -8)
+/// let result = hub.asps().delete("userKey", -15)
 ///              .doit();
 /// # }
 /// ```
@@ -22170,7 +22507,7 @@ impl<'a, C, A> DomainAliaseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.domain_aliases().list("customer")
-///              .parent_domain_name("dolor")
+///              .parent_domain_name("eirmod")
 ///              .doit();
 /// # }
 /// ```
@@ -24257,8 +24594,8 @@ impl<'a, C, A> SchemaInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.resources().calendars_list("customer")
-///              .page_token("justo")
-///              .max_results(-34)
+///              .page_token("dolor")
+///              .max_results(-58)
 ///              .doit();
 /// # }
 /// ```
@@ -26885,7 +27222,7 @@ impl<'a, C, A> UserInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().aliases_watch(req, "userKey")
-///              .event("consetetur")
+///              .event("At")
 ///              .doit();
 /// # }
 /// ```
@@ -27445,18 +27782,18 @@ impl<'a, C, A> UserPhotoUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().watch(req)
-///              .view_type("elitr")
-///              .sort_order("At")
-///              .show_deleted("sea")
-///              .query("consetetur")
-///              .projection("diam")
-///              .page_token("accusam")
-///              .order_by("dolores")
-///              .max_results(-46)
-///              .event("dolor")
-///              .domain("aliquyam")
-///              .customer("elitr")
-///              .custom_field_mask("ea")
+///              .view_type("consetetur")
+///              .sort_order("diam")
+///              .show_deleted("accusam")
+///              .query("dolores")
+///              .projection("consetetur")
+///              .page_token("dolor")
+///              .order_by("aliquyam")
+///              .max_results(-94)
+///              .event("ea")
+///              .domain("et")
+///              .customer("Stet")
+///              .custom_field_mask("sed")
 ///              .doit();
 /// # }
 /// ```
@@ -28341,18 +28678,18 @@ impl<'a, C, A> UserPhotoGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().list()
-///              .view_type("sed")
-///              .sort_order("dolor")
-///              .show_deleted("sanctus")
-///              .query("dolore")
-///              .projection("Lorem")
-///              .page_token("consetetur")
-///              .order_by("consetetur")
-///              .max_results(-90)
-///              .event("labore")
-///              .domain("gubergren")
-///              .customer("et")
-///              .custom_field_mask("sadipscing")
+///              .view_type("dolore")
+///              .sort_order("Lorem")
+///              .show_deleted("consetetur")
+///              .query("consetetur")
+///              .projection("eirmod")
+///              .page_token("labore")
+///              .order_by("gubergren")
+///              .max_results(-73)
+///              .event("sadipscing")
+///              .domain("accusam")
+///              .customer("magna")
+///              .custom_field_mask("Lorem")
 ///              .doit();
 /// # }
 /// ```
@@ -28695,9 +29032,9 @@ impl<'a, C, A> UserListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().get("userKey")
-///              .view_type("magna")
-///              .projection("Lorem")
-///              .custom_field_mask("rebum.")
+///              .view_type("et")
+///              .projection("clita")
+///              .custom_field_mask("eos")
 ///              .doit();
 /// # }
 /// ```
@@ -29248,7 +29585,7 @@ impl<'a, C, A> UserAliaseInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().aliases_list("userKey")
-///              .event("eos")
+///              .event("consetetur")
 ///              .doit();
 /// # }
 /// ```

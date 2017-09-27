@@ -1,4 +1,4 @@
-site_name: directory v1.0.6+20170419
+site_name: directory v1.0.6+20170830
 site_url: http://byron.github.io/google-apis-rs/google-admin1_directory-cli
 site_description: A complete library to interact with directory (protocol directory_v1)
 
@@ -16,6 +16,7 @@ pages:
 - ['chromeosdevices_action.md', 'Chromeosdevices', 'Action']
 - ['chromeosdevices_get.md', 'Chromeosdevices', 'Get']
 - ['chromeosdevices_list.md', 'Chromeosdevices', 'List']
+- ['chromeosdevices_move-devices-to-ou.md', 'Chromeosdevices', 'Move Devices To Ou']
 - ['chromeosdevices_patch.md', 'Chromeosdevices', 'Patch']
 - ['chromeosdevices_update.md', 'Chromeosdevices', 'Update']
 - ['customers_get.md', 'Customers', 'Get']

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *dfareporting* crate version *1.0.6+20170428*, where *20170428* is the exact revision of the *dfareporting:v2.7* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *dfareporting* crate version *1.0.6+20170818*, where *20170818* is the exact revision of the *dfareporting:v2.7* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *dfareporting* *v2d7* API can be found at the
 //! [official documentation site](https://developers.google.com/doubleclick-advertisers/).
@@ -905,7 +905,7 @@ pub struct DirectorySiteSettings {
     /// Whether this directory site has disabled active view creatives.
     #[serde(rename="activeViewOptOut")]
     pub active_view_opt_out: Option<bool>,
-    /// Whether this directory site has disabled active view for in-stream video creatives.
+    /// Whether this directory site has disabled active view for in-stream video creatives. This is a read-only field.
     #[serde(rename="videoActiveViewOptOut")]
     pub video_active_view_opt_out: Option<bool>,
     /// Directory site DFP settings.
@@ -1162,7 +1162,9 @@ pub struct SiteSettings {
     /// Configuration settings for dynamic and image floodlight tags.
     #[serde(rename="tagSetting")]
     pub tag_setting: Option<TagSetting>,
-    /// Default VPAID adapter setting for new placements created under this site. This value will be used to populate the placements.vpaidAdapterChoice field, when no value is specified for the new placement. Controls which VPAID format the measurement adapter will use for in-stream video creatives assigned to the placement. The publisher's specifications will typically determine this setting. For VPAID creatives, the adapter format will match the VPAID format (HTML5 VPAID creatives use the HTML5 adapter, and Flash VPAID creatives use the Flash adapter).
+    /// Default VPAID adapter setting for new placements created under this site. This value will be used to populate the placements.vpaidAdapterChoice field, when no value is specified for the new placement. Controls which VPAID format the measurement adapter will use for in-stream video creatives assigned to the placement. The publisher's specifications will typically determine this setting. For VPAID creatives, the adapter format will match the VPAID format (HTML5 VPAID creatives use the HTML5 adapter).
+    /// 
+    /// Note: Flash is no longer supported. This field now defaults to HTML5 when the following values are provided: FLASH, BOTH.
     #[serde(rename="vpaidAdapterChoiceTemplate")]
     pub vpaid_adapter_choice_template: Option<String>,
     /// Site-wide creative settings.
@@ -2249,6 +2251,8 @@ pub struct Placement {
     #[serde(rename="pricingSchedule")]
     pub pricing_schedule: Option<PricingSchedule>,
     /// VPAID adapter setting for this placement. Controls which VPAID format the measurement adapter will use for in-stream video creatives assigned to this placement.
+    /// 
+    /// Note: Flash is no longer supported. This field now defaults to HTML5 when the following values are provided: FLASH, BOTH.
     #[serde(rename="vpaidAdapterChoice")]
     pub vpaid_adapter_choice: Option<String>,
 }
@@ -4144,7 +4148,7 @@ pub struct Creative {
     /// Required if dynamicAssetSelection is true.
     #[serde(rename="creativeAssetSelection")]
     pub creative_asset_selection: Option<CreativeAssetSelection>,
-    /// HTML code for the creative. This is a required field when applicable. This field is ignored if htmlCodeLocked is false. Applicable to the following creative types: all CUSTOM, FLASH_INPAGE, and HTML5_BANNER, and all RICH_MEDIA.
+    /// HTML code for the creative. This is a required field when applicable. This field is ignored if htmlCodeLocked is true. Applicable to the following creative types: all CUSTOM, FLASH_INPAGE, and HTML5_BANNER, and all RICH_MEDIA.
     #[serde(rename="htmlCode")]
     pub html_code: Option<String>,
     /// Whether the creative is SSL-compliant. This is a read-only field. Applicable to all creative types.
@@ -5179,28 +5183,8 @@ pub struct FloodlightActivity {
     /// Floodlight activity group ID of this floodlight activity. This is a required field.
     #[serde(rename="floodlightActivityGroupId")]
     pub floodlight_activity_group_id: Option<String>,
-    /// List of the user-defined variables used by this conversion tag. These map to the "u[1-20]=" in the tags. Each of these can have a user defined type.
-    /// Acceptable values are:
-    /// - "U1"
-    /// - "U2"
-    /// - "U3"
-    /// - "U4"
-    /// - "U5"
-    /// - "U6"
-    /// - "U7"
-    /// - "U8"
-    /// - "U9"
-    /// - "U10"
-    /// - "U11"
-    /// - "U12"
-    /// - "U13"
-    /// - "U14"
-    /// - "U15"
-    /// - "U16"
-    /// - "U17"
-    /// - "U18"
-    /// - "U19"
-    /// - "U20"
+    /// List of the user-defined variables used by this conversion tag. These map to the "u[1-100]=" in the tags. Each of these can have a user defined type.
+    /// Acceptable values are U1 to U100, inclusive.
     #[serde(rename="userDefinedVariableTypes")]
     pub user_defined_variable_types: Option<Vec<String>>,
     /// Value of the cat= paramter in the floodlight tag, which the ad servers use to identify the activity. This is optional: if empty, a new tag string will be generated for you. This string must be 1 to 8 characters long, with valid characters being [a-z][A-Z][0-9][-][ _ ]. This tag string must also be unique among activities of the same activity group. This field is read-only after insertion.
@@ -72149,6 +72133,8 @@ impl<'a, C, A> PlacementGeneratetagCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self
     }
     /// Tag formats to generate for these placements.
+    /// 
+    /// Note: PLACEMENT_TAG_STANDARD can only be generated for 1x1 placements.
     ///
     /// Append the given value to the *tag formats* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.

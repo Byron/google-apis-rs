@@ -1,12 +1,12 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"YWOzh2SDasdU84ArJnpYek-OMdg/vS6rayCgu04tWkxAcCer7mqEHaA\"",
+ "etag": "\"YWOzh2SDasdU84ArJnpYek-OMdg/odbYGRT1izLWfRhfVNwcTacV8sM\"",
  "discoveryVersion": "v1",
  "id": "sqladmin:v1beta4",
  "name": "sqladmin",
  "canonicalName": "SQL Admin",
  "version": "v1beta4",
- "revision": "20170502",
+ "revision": "20170807",
  "title": "Cloud SQL Administration API",
  "description": "Creates and configures Cloud SQL instances, which provide fully-managed MySQL databases.",
  "ownerDomain": "google.com",
@@ -21,7 +21,7 @@
  "basePath": "/sql/v1beta4/",
  "rootUrl": "https://www.googleapis.com/",
  "servicePath": "sql/v1beta4/",
- "batchPath": "batch",
+ "batchPath": "batch/sqladmin/v1beta4",
  "parameters": {
   "alt": {
    "type": "string",
@@ -344,7 +344,7 @@
     },
     "databaseVersion": {
      "type": "string",
-     "description": "The database engine type and version. The databaseVersion can not be changed after instance creation. Can be MYSQL_5_5, MYSQL_5_6 or MYSQL_5_7. Defaults to MYSQL_5_6. MYSQL_5_7 is applicable only to Second Generation instances."
+     "description": "The database engine type and version. The databaseVersion field can not be changed after instance creation. MySQL Second Generation instances: MYSQL_5_7 (default) or MYSQL_5_6. PostgreSQL instances: POSTGRES_9_6 MySQL First Generation instances: MYSQL_5_6 (default) or MYSQL_5_5"
     },
     "etag": {
      "type": "string",
@@ -363,6 +363,10 @@
        "description": "The name of the failover replica. If specified at instance creation, a failover replica is created for the instance. The name doesn't include the project ID. This property is applicable only to Second Generation instances."
       }
      }
+    },
+    "gceZone": {
+     "type": "string",
+     "description": "The GCE zone that the instance is serving from. In case when the instance is failed over to standby zone, this value may be different with what user specified in the settings."
     },
     "instanceType": {
      "type": "string",
@@ -647,6 +651,10 @@
      "type": "string",
      "description": "The file type for the specified uri.\nSQL: The file contains SQL statements.\nCSV: The file contains CSV data."
     },
+    "importUser": {
+     "type": "string",
+     "description": "The PostgreSQL user for this import operation. Defaults to cloudsqlsuperuser. Used only for PostgreSQL instances."
+    },
     "kind": {
      "type": "string",
      "description": "This is always sql#importContext.",
@@ -765,7 +773,7 @@
     },
     "requireSsl": {
      "type": "boolean",
-     "description": "Whether the mysqld should default to 'REQUIRE X509' for users connecting over IP."
+     "description": "Whether SSL connections over IP should be enforced or not."
     }
    }
   },
@@ -786,21 +794,6 @@
     "type": {
      "type": "string",
      "description": "The type of this IP address. A PRIMARY address is an address that can accept incoming connections. An OUTGOING address is the source address of connections originating from the instance, if supported."
-    }
-   }
-  },
-  "Labels": {
-   "id": "Labels",
-   "type": "object",
-   "description": "Reserved for future use.",
-   "properties": {
-    "key": {
-     "type": "string",
-     "description": "Reserved for future use."
-    },
-    "value": {
-     "type": "string",
-     "description": "Reserved for future use."
     }
    }
   },
@@ -1154,13 +1147,6 @@
      "description": "This is always sql#settings.",
      "default": "sql#settings"
     },
-    "labels": {
-     "type": "array",
-     "description": "Reserved for future use.",
-     "items": {
-      "$ref": "Labels"
-     }
-    },
     "locationPreference": {
      "$ref": "LocationPreference",
      "description": "The location preference settings. This allows the instance to be located as near as possible to either an App Engine app or GCE zone for better performance. App Engine co-location is only applicable to First Generation instances."
@@ -1189,7 +1175,7 @@
     },
     "storageAutoResize": {
      "type": "boolean",
-     "description": "Configuration to increase storage size automatically. The default value is false. Applies only to Second Generation instances."
+     "description": "Configuration to increase storage size automatically. The default value is true. Applies only to Second Generation instances."
     },
     "storageAutoResizeLimit": {
      "type": "string",
@@ -1204,6 +1190,14 @@
        "sql.instances.insert",
        "sql.instances.update"
       ]
+     }
+    },
+    "userLabels": {
+     "type": "object",
+     "description": "User-provided labels, represented as a dictionary where each label is a single key value pair.",
+     "additionalProperties": {
+      "type": "string",
+      "description": "An individual label entry, composed of a key and a value."
      }
     }
    }
@@ -2105,7 +2099,7 @@
      "parameters": {
       "filter": {
        "type": "string",
-       "description": "Reserved for future use.",
+       "description": "An expression for filtering the results of the request, such as by name or label.",
        "location": "query"
       },
       "maxResults": {

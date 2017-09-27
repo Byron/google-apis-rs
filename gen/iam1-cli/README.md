@@ -25,11 +25,26 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *iam* API at revision *20170515*. The CLI is at version *1.0.6*.
+This documentation was generated from the *iam* API at revision *20170919*. The CLI is at version *1.0.6*.
 
 ```bash
 iam1 [options]
+        organizations
+                roles-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                roles-delete <name> [-p <v>]... [-o <out>]
+                roles-get <name> [-p <v>]... [-o <out>]
+                roles-list <parent> [-p <v>]... [-o <out>]
+                roles-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                roles-undelete <name> (-r <kv>)... [-p <v>]... [-o <out>]
+        permissions
+                query-testable-permissions (-r <kv>)... [-p <v>]... [-o <out>]
         projects
+                roles-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                roles-delete <name> [-p <v>]... [-o <out>]
+                roles-get <name> [-p <v>]... [-o <out>]
+                roles-list <parent> [-p <v>]... [-o <out>]
+                roles-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                roles-undelete <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 service-accounts-create <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 service-accounts-delete <name> [-p <v>]... [-o <out>]
                 service-accounts-get <name> [-p <v>]... [-o <out>]
@@ -45,6 +60,8 @@ iam1 [options]
                 service-accounts-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 service-accounts-update <name> (-r <kv>)... [-p <v>]... [-o <out>]
         roles
+                get <name> [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
                 query-grantable-roles (-r <kv>)... [-p <v>]... [-o <out>]
   iam1 --help
 

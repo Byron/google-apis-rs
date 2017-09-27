@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *SQL Admin* crate version *1.0.6+20170502*, where *20170502* is the exact revision of the *sqladmin:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *SQL Admin* crate version *1.0.6+20170807*, where *20170807* is the exact revision of the *sqladmin:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *SQL Admin* *v1_beta4* API can be found at the
 //! [official documentation site](https://cloud.google.com/sql/docs/reference/latest).
@@ -724,6 +724,13 @@ impl ResponseResult for TiersListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ImportContext {
+    /// This is always sql#importContext.
+    pub kind: Option<String>,
+    /// The PostgreSQL user for this import operation. Defaults to cloudsqlsuperuser. Used only for PostgreSQL instances.
+    #[serde(rename="importUser")]
+    pub import_user: Option<String>,
+    /// The database (for example, guestbook) to which the import is made. If fileType is SQL and no database is specified, it is assumed that the database is specified in the file to be imported. If fileType is CSV, it must be specified.
+    pub database: Option<String>,
     /// The file type for the specified uri.
     /// SQL: The file contains SQL statements.
     /// CSV: The file contains CSV data.
@@ -734,10 +741,6 @@ pub struct ImportContext {
     pub csv_import_options: Option<ImportContextCsvImportOptions>,
     /// A path to the file in Google Cloud Storage from which the import is made. The URI is in the form gs://bucketName/fileName. Compressed gzip files (.gz) are supported when fileType is SQL.
     pub uri: Option<String>,
-    /// This is always sql#importContext.
-    pub kind: Option<String>,
-    /// The database (for example, guestbook) to which the import is made. If fileType is SQL and no database is specified, it is assumed that the database is specified in the file to be imported. If fileType is CSV, it must be specified.
-    pub database: Option<String>,
 }
 
 impl Part for ImportContext {}
@@ -876,7 +879,7 @@ impl Part for ImportContextCsvImportOptions {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IpConfiguration {
-    /// Whether the mysqld should default to 'REQUIRE X509' for users connecting over IP.
+    /// Whether SSL connections over IP should be enforced or not.
     #[serde(rename="requireSsl")]
     pub require_ssl: Option<bool>,
     /// Whether the instance should be assigned an IP address or not.
@@ -1162,8 +1165,6 @@ pub struct Settings {
     /// Reserved for future use.
     #[serde(rename="availabilityType")]
     pub availability_type: Option<String>,
-    /// Reserved for future use.
-    pub labels: Option<Vec<Labels>>,
     /// The activation policy specifies when the instance is activated; it is applicable only when the instance state is RUNNABLE. The activation policy cannot be updated together with other settings for Second Generation instances. Valid values:
     /// ALWAYS: The instance is on; it is not deactivated by inactivity.
     /// NEVER: The instance is off; it is not activated, even if a connection request arrives.
@@ -1173,6 +1174,9 @@ pub struct Settings {
     /// The settings for IP Management. This allows to enable or disable the instance IP and manage which external networks can connect to the instance. The IPv4 address cannot be disabled for Second Generation instances.
     #[serde(rename="ipConfiguration")]
     pub ip_configuration: Option<IpConfiguration>,
+    /// User-provided labels, represented as a dictionary where each label is a single key value pair.
+    #[serde(rename="userLabels")]
+    pub user_labels: Option<HashMap<String, String>>,
     /// Configuration specific to read replica instances. Indicates whether replication is enabled or not.
     #[serde(rename="databaseReplicationEnabled")]
     pub database_replication_enabled: Option<bool>,
@@ -1184,7 +1188,7 @@ pub struct Settings {
     /// The version of instance settings. This is a required field for update method to make sure concurrent updates are handled properly. During update, use the most recent settingsVersion value for this instance and do not try to update this value.
     #[serde(rename="settingsVersion")]
     pub settings_version: Option<String>,
-    /// Configuration to increase storage size automatically. The default value is false. Applies only to Second Generation instances.
+    /// Configuration to increase storage size automatically. The default value is true. Applies only to Second Generation instances.
     #[serde(rename="storageAutoResize")]
     pub storage_auto_resize: Option<bool>,
     /// The location preference settings. This allows the instance to be located as near as possible to either an App Engine app or GCE zone for better performance. App Engine co-location is only applicable to First Generation instances.
@@ -1401,21 +1405,6 @@ pub struct InstancesExportRequest {
 impl RequestValue for InstancesExportRequest {}
 
 
-/// Reserved for future use.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Labels {
-    /// Reserved for future use.
-    pub key: Option<String>,
-    /// Reserved for future use.
-    pub value: Option<String>,
-}
-
-impl Part for Labels {}
-
-
 /// User list response.
 /// 
 /// # Activities
@@ -1476,7 +1465,7 @@ pub struct DatabaseInstance {
     /// Connection name of the Cloud SQL instance used in connection strings.
     #[serde(rename="connectionName")]
     pub connection_name: Option<String>,
-    /// The database engine type and version. The databaseVersion can not be changed after instance creation. Can be MYSQL_5_5, MYSQL_5_6 or MYSQL_5_7. Defaults to MYSQL_5_6. MYSQL_5_7 is applicable only to Second Generation instances.
+    /// The database engine type and version. The databaseVersion field can not be changed after instance creation. MySQL Second Generation instances: MYSQL_5_7 (default) or MYSQL_5_6. PostgreSQL instances: POSTGRES_9_6 MySQL First Generation instances: MYSQL_5_6 (default) or MYSQL_5_5
     #[serde(rename="databaseVersion")]
     pub database_version: Option<String>,
     /// The instance type. This can be one of the following.
@@ -1524,6 +1513,9 @@ pub struct DatabaseInstance {
     /// Configuration specific to read-replicas replicating from on-premises masters.
     #[serde(rename="replicaConfiguration")]
     pub replica_configuration: Option<ReplicaConfiguration>,
+    /// The GCE zone that the instance is serving from. In case when the instance is failed over to standby zone, this value may be different with what user specified in the settings.
+    #[serde(rename="gceZone")]
+    pub gce_zone: Option<String>,
     /// The user settings.
     pub settings: Option<Settings>,
     /// The URI of this resource.
@@ -7971,7 +7963,7 @@ impl<'a, C, A> InstanceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._max_results = Some(new_value);
         self
     }
-    /// Reserved for future use.
+    /// An expression for filtering the results of the request, such as by name or label.
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> InstanceListCall<'a, C, A> {

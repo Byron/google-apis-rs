@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *storagetransfer* crate version *1.0.6+20170515*, where *20170515* is the exact revision of the *storagetransfer:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *storagetransfer* crate version *1.0.6+20170921*, where *20170921* is the exact revision of the *storagetransfer:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *storagetransfer* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/storage/transfer).
@@ -616,27 +616,26 @@ pub struct TransferOperation {
 impl Resource for TransferOperation {}
 
 
-/// An AwsS3Data can be a data source, but not a data sink.
-/// In an AwsS3Data, an object's name is the S3 object's key name.
+/// Response from ListTransferJobs.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list transfer jobs](struct.TransferJobListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AwsS3Data {
-    /// AWS access key used to sign the API requests to the AWS S3 bucket.
-    /// Permissions on the bucket must be granted to the access ID of the
-    /// AWS access key.
-    /// Required.
-    #[serde(rename="awsAccessKey")]
-    pub aws_access_key: Option<AwsAccessKey>,
-    /// S3 Bucket name (see
-    /// [Creating a bucket](http://docs.aws.amazon.com/AmazonS3/latest/dev/create-bucket-get-location-example.html)).
-    /// Required.
-    #[serde(rename="bucketName")]
-    pub bucket_name: Option<String>,
+pub struct ListTransferJobsResponse {
+    /// The list next page token.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// A list of transfer jobs.
+    #[serde(rename="transferJobs")]
+    pub transfer_jobs: Option<Vec<TransferJob>>,
 }
 
-impl Part for AwsS3Data {}
+impl ResponseResult for ListTransferJobsResponse {}
 
 
 /// An entry describing an error that has occurred.
@@ -645,13 +644,13 @@ impl Part for AwsS3Data {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ErrorLogEntry {
+    /// A list of messages that carry the error details.
+    #[serde(rename="errorDetails")]
+    pub error_details: Option<Vec<String>>,
     /// A URL that refers to the target (a data source, a data sink,
     /// or an object) with which the error is associated.
     /// Required.
     pub url: Option<String>,
-    /// A list of messages that carry the error details.
-    #[serde(rename="errorDetails")]
-    pub error_details: Option<Vec<String>>,
 }
 
 impl Part for ErrorLogEntry {}
@@ -689,7 +688,7 @@ impl Part for GcsData {}
 /// * MD5 - The base64-encoded MD5 hash of the object.
 /// 
 /// For an example of a valid TSV file, see
-/// [Transferring data from URLs](https://cloud.google.com/storage/transfer/#urls)
+/// [Transferring data from URLs](https://cloud.google.com/storage/transfer/create-url-list).
 /// 
 /// When transferring data based on a URL list, keep the following in mind:
 /// 
@@ -844,8 +843,8 @@ pub struct Status {
     pub message: Option<String>,
     /// The status code, which should be an enum value of google.rpc.Code.
     pub code: Option<i32>,
-    /// A list of messages that carry the error details.  There will be a
-    /// common set of message types for APIs to use.
+    /// A list of messages that carry the error details.  There is a common set of
+    /// message types for APIs to use.
     pub details: Option<Vec<HashMap<String, String>>>,
 }
 
@@ -883,11 +882,11 @@ impl ResponseResult for GoogleServiceAccount {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListOperationsResponse {
-    /// A list of operations that matches the specified filter in the request.
-    pub operations: Option<Vec<Operation>>,
     /// The standard List next-page token.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
+    /// A list of operations that matches the specified filter in the request.
+    pub operations: Option<Vec<Operation>>,
 }
 
 impl ResponseResult for ListOperationsResponse {}
@@ -984,7 +983,10 @@ pub struct UpdateTransferJobRequest {
     /// with the error `INVALID_ARGUMENT`.
     #[serde(rename="updateTransferJobFieldMask")]
     pub update_transfer_job_field_mask: Option<String>,
-    /// The job to update.
+    /// The job to update. `transferJob` is expected to specify only three fields:
+    /// `description`, `transferSpec`, and `status`.  An UpdateTransferJobRequest
+    /// that specifies other fields will be rejected with an error
+    /// `INVALID_ARGUMENT`.
     /// Required.
     #[serde(rename="transferJob")]
     pub transfer_job: Option<TransferJob>,
@@ -993,26 +995,27 @@ pub struct UpdateTransferJobRequest {
 impl RequestValue for UpdateTransferJobRequest {}
 
 
-/// Response from ListTransferJobs.
+/// An AwsS3Data can be a data source, but not a data sink.
+/// In an AwsS3Data, an object's name is the S3 object's key name.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list transfer jobs](struct.TransferJobListCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListTransferJobsResponse {
-    /// The list next page token.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// A list of transfer jobs.
-    #[serde(rename="transferJobs")]
-    pub transfer_jobs: Option<Vec<TransferJob>>,
+pub struct AwsS3Data {
+    /// AWS access key used to sign the API requests to the AWS S3 bucket.
+    /// Permissions on the bucket must be granted to the access ID of the
+    /// AWS access key.
+    /// Required.
+    #[serde(rename="awsAccessKey")]
+    pub aws_access_key: Option<AwsAccessKey>,
+    /// S3 Bucket name (see
+    /// [Creating a bucket](http://docs.aws.amazon.com/AmazonS3/latest/dev/create-bucket-get-location-example.html)).
+    /// Required.
+    #[serde(rename="bucketName")]
+    pub bucket_name: Option<String>,
 }
 
-impl ResponseResult for ListTransferJobsResponse {}
+impl Part for AwsS3Data {}
 
 
 /// TransferOptions uses three boolean parameters to define the actions
@@ -1026,10 +1029,13 @@ pub struct TransferOptions {
     #[serde(rename="overwriteObjectsAlreadyExistingInSink")]
     pub overwrite_objects_already_existing_in_sink: Option<bool>,
     /// Whether objects should be deleted from the source after they are
-    /// transferred to the sink.
+    /// transferred to the sink.  Note that this option and
+    /// `deleteObjectsUniqueInSink` are mutually exclusive.
     #[serde(rename="deleteObjectsFromSourceAfterTransfer")]
     pub delete_objects_from_source_after_transfer: Option<bool>,
-    /// Whether objects that exist only in the sink should be deleted.
+    /// Whether objects that exist only in the sink should be deleted.  Note that
+    /// this option and `deleteObjectsFromSourceAfterTransfer` are mutually
+    /// exclusive.
     #[serde(rename="deleteObjectsUniqueInSink")]
     pub delete_objects_unique_in_sink: Option<bool>,
 }
@@ -1047,13 +1053,12 @@ impl Part for TransferOptions {}
 /// 
 /// * [list transfer jobs](struct.TransferJobListCall.html) (none)
 /// * [create transfer jobs](struct.TransferJobCreateCall.html) (request|response)
-/// * [get transfer jobs](struct.TransferJobGetCall.html) (response)
 /// * [patch transfer jobs](struct.TransferJobPatchCall.html) (response)
+/// * [get transfer jobs](struct.TransferJobGetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TransferJob {
     /// Transfer specification.
-    /// Required.
     #[serde(rename="transferSpec")]
     pub transfer_spec: Option<TransferSpec>,
     /// Status of the job. This value MUST be specified for
@@ -1067,11 +1072,12 @@ pub struct TransferJob {
     /// This field cannot be changed by user requests.
     #[serde(rename="deletionTime")]
     pub deletion_time: Option<String>,
+    /// A description provided by the user for the job. Its max length is 1024
+    /// bytes when Unicode-encoded.
+    pub description: Option<String>,
     /// Schedule specification.
-    /// Required.
     pub schedule: Option<Schedule>,
     /// The ID of the Google Cloud Platform Console project that owns the job.
-    /// Required.
     #[serde(rename="projectId")]
     pub project_id: Option<String>,
     /// This field cannot be changed by user requests.
@@ -1085,9 +1091,6 @@ pub struct TransferJob {
     /// transfer job; otherwise, the requests result in an `INVALID_ARGUMENT`
     /// error.
     pub name: Option<String>,
-    /// A description provided by the user for the job. Its max length is 1024
-    /// bytes when Unicode-encoded.
-    pub description: Option<String>,
 }
 
 impl RequestValue for TransferJob {}
@@ -1135,7 +1138,7 @@ pub struct Operation {
     /// The error result of the operation in case of failure or cancellation.
     pub error: Option<Status>,
     /// If the value is `false`, it means the operation is still in progress.
-    /// If true, the operation is completed, and either `error` or `response` is
+    /// If `true`, the operation is completed, and either `error` or `response` is
     /// available.
     pub done: Option<bool>,
     /// The normal response of the operation in case of success.  If the original
@@ -1281,8 +1284,13 @@ impl<'a, C, A> TransferOperationMethods<'a, C, A> {
     /// Lists operations that match the specified filter in the request. If the
     /// server doesn't support this method, it returns `UNIMPLEMENTED`.
     /// 
-    /// NOTE: the `name` binding below allows API services to override the binding
-    /// to use different resource name schemes, such as `users/*/operations`.
+    /// NOTE: the `name` binding allows API services to override the binding
+    /// to use different resource name schemes, such as `users/*/operations`. To
+    /// override the binding, API services can add a binding such as
+    /// `"/v1/{name=users/*}/operations"` to their service configuration.
+    /// For backwards compatibility, the default name includes the operations
+    /// collection id, however overriding users must ensure the name binding
+    /// is the parent resource, without the operations collection id.
     /// 
     /// # Arguments
     ///
@@ -1754,12 +1762,12 @@ impl<'a, C, A> TransferOperationPauseCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> TransferOperationPauseCall<'a, C, A>
@@ -2039,12 +2047,12 @@ impl<'a, C, A> TransferOperationResumeCall<'a, C, A> where C: BorrowMut<hyper::C
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> TransferOperationResumeCall<'a, C, A>
@@ -2292,12 +2300,12 @@ impl<'a, C, A> TransferOperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> TransferOperationDeleteCall<'a, C, A>
@@ -2547,12 +2555,12 @@ impl<'a, C, A> TransferOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> TransferOperationGetCall<'a, C, A>
@@ -2590,8 +2598,13 @@ impl<'a, C, A> TransferOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// Lists operations that match the specified filter in the request. If the
 /// server doesn't support this method, it returns `UNIMPLEMENTED`.
 /// 
-/// NOTE: the `name` binding below allows API services to override the binding
-/// to use different resource name schemes, such as `users/*/operations`.
+/// NOTE: the `name` binding allows API services to override the binding
+/// to use different resource name schemes, such as `users/*/operations`. To
+/// override the binding, API services can add a binding such as
+/// `"/v1/{name=users/*}/operations"` to their service configuration.
+/// For backwards compatibility, the default name includes the operations
+/// collection id, however overriding users must ensure the name binding
+/// is the parent resource, without the operations collection id.
 ///
 /// A builder for the *list* method supported by a *transferOperation* resource.
 /// It is not used directly, but through a `TransferOperationMethods` instance.
@@ -2840,12 +2853,12 @@ impl<'a, C, A> TransferOperationListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> TransferOperationListCall<'a, C, A>
@@ -3093,12 +3106,12 @@ impl<'a, C, A> TransferOperationCancelCall<'a, C, A> where C: BorrowMut<hyper::C
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> TransferOperationCancelCall<'a, C, A>
@@ -3351,12 +3364,12 @@ impl<'a, C, A> GoogleServiceAccountGetCall<'a, C, A> where C: BorrowMut<hyper::C
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> GoogleServiceAccountGetCall<'a, C, A>
@@ -3610,12 +3623,12 @@ impl<'a, C, A> TransferJobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> TransferJobListCall<'a, C, A>
@@ -3897,12 +3910,12 @@ impl<'a, C, A> TransferJobPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> TransferJobPatchCall<'a, C, A>
@@ -4164,12 +4177,12 @@ impl<'a, C, A> TransferJobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> TransferJobGetCall<'a, C, A>
@@ -4411,12 +4424,12 @@ impl<'a, C, A> TransferJobCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> TransferJobCreateCall<'a, C, A>

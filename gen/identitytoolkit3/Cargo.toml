@@ -4,12 +4,12 @@
 [package]
 
 name = "google-identitytoolkit3"
-version = "1.0.6+20170425"
+version = "1.0.6+20170828"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Identity Toolkit (protocol v3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/identitytoolkit3"
 homepage = "https://developers.google.com/identity-toolkit/v3/"
-documentation = "https://docs.rs/google-identitytoolkit3/1.0.6+20170425"
+documentation = "https://docs.rs/google-identitytoolkit3/1.0.6+20170828"
 license = "MIT"
 keywords = ["identitytoolkit", "google", "protocol", "web", "api"]
 

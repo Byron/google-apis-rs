@@ -1,6 +1,6 @@
-site_name: cloudbilling v1.0.6+20170504
+site_name: Cloudbilling v1.0.6+20170813
 site_url: http://byron.github.io/google-apis-rs/google-cloudbilling1-cli
-site_description: A complete library to interact with cloudbilling (protocol v1)
+site_description: A complete library to interact with Cloudbilling (protocol v1)
 
 repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/cloudbilling1-cli
 
@@ -14,6 +14,8 @@ pages:
 - ['billing-accounts_projects-list.md', 'Billing Accounts', 'Projects List']
 - ['projects_get-billing-info.md', 'Projects', 'Get Billing Info']
 - ['projects_update-billing-info.md', 'Projects', 'Update Billing Info']
+- ['services_list.md', 'Services', 'List']
+- ['services_skus-list.md', 'Services', 'Skus List']
 
 theme: readthedocs
 

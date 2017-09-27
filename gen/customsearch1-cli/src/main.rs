@@ -136,9 +136,6 @@ impl<'n> Engine<'n> {
                 "cx" => {
                     call = call.cx(value.unwrap_or(""));
                 },
-                "cref" => {
-                    call = call.cref(value.unwrap_or(""));
-                },
                 "cr" => {
                     call = call.cr(value.unwrap_or(""));
                 },
@@ -158,7 +155,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["date-restrict", "or-terms", "high-range", "num", "cr", "img-type", "related-site", "gl", "search-type", "file-type", "start", "img-dominant-color", "lr", "site-search", "cref", "sort", "safe", "c2coff", "googlehost", "hq", "exact-terms", "hl", "low-range", "img-size", "img-color-type", "rights", "exclude-terms", "filter", "link-site", "cx", "site-search-filter"].iter().map(|v|*v));
+                                                                           v.extend(["date-restrict", "or-terms", "high-range", "num", "cr", "img-type", "related-site", "gl", "search-type", "file-type", "start", "img-dominant-color", "lr", "site-search", "sort", "safe", "c2coff", "googlehost", "hq", "exact-terms", "hl", "low-range", "img-size", "img-color-type", "rights", "exclude-terms", "filter", "link-site", "cx", "site-search-filter"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -316,8 +313,8 @@ fn main() {
     
     let mut app = App::new("customsearch1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.6+20160411")
-           .about("Lets you search over a website or collection of websites")
+           .version("1.0.6+20170615")
+           .about("Searches over a website or collection of websites")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_customsearch1_cli")
            .arg(Arg::with_name("folder")
                    .long("config-dir")

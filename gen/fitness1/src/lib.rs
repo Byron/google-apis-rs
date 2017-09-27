@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *fitness* crate version *1.0.6+20161128*, where *20161128* is the exact revision of the *fitness:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *fitness* crate version *1.0.6+20170830*, where *20170830* is the exact revision of the *fitness:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *fitness* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/fit/rest/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.Fitness.html) ... 
 //! 
 //! * users
-//!  * [*data sources create*](struct.UserDataSourceCreateCall.html), [*data sources datasets delete*](struct.UserDataSourceDatasetDeleteCall.html), [*data sources datasets get*](struct.UserDataSourceDatasetGetCall.html), [*data sources datasets patch*](struct.UserDataSourceDatasetPatchCall.html), [*data sources delete*](struct.UserDataSourceDeleteCall.html), [*data sources get*](struct.UserDataSourceGetCall.html), [*data sources list*](struct.UserDataSourceListCall.html), [*data sources patch*](struct.UserDataSourcePatchCall.html), [*data sources update*](struct.UserDataSourceUpdateCall.html), [*dataset aggregate*](struct.UserDatasetAggregateCall.html), [*sessions delete*](struct.UserSessionDeleteCall.html), [*sessions list*](struct.UserSessionListCall.html) and [*sessions update*](struct.UserSessionUpdateCall.html)
+//!  * [*data sources create*](struct.UserDataSourceCreateCall.html), [*data sources data point changes list*](struct.UserDataSourceDataPointChangeListCall.html), [*data sources datasets delete*](struct.UserDataSourceDatasetDeleteCall.html), [*data sources datasets get*](struct.UserDataSourceDatasetGetCall.html), [*data sources datasets patch*](struct.UserDataSourceDatasetPatchCall.html), [*data sources delete*](struct.UserDataSourceDeleteCall.html), [*data sources get*](struct.UserDataSourceGetCall.html), [*data sources list*](struct.UserDataSourceListCall.html), [*data sources patch*](struct.UserDataSourcePatchCall.html), [*data sources update*](struct.UserDataSourceUpdateCall.html), [*dataset aggregate*](struct.UserDatasetAggregateCall.html), [*sessions delete*](struct.UserSessionDeleteCall.html), [*sessions list*](struct.UserSessionListCall.html) and [*sessions update*](struct.UserSessionUpdateCall.html)
 //! 
 //! 
 //! 
@@ -453,42 +453,29 @@ impl Part for AggregateBy {}
 
 /// There is no detailed description.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [sessions list users](struct.UserSessionListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ValueMapValEntry {
-    /// no description provided
-    pub key: Option<String>,
-    /// no description provided
-    pub value: Option<MapValue>,
+pub struct ListSessionsResponse {
+    /// Flag to indicate server has more data to transfer
+    #[serde(rename="hasMoreData")]
+    pub has_more_data: Option<bool>,
+    /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// If includeDeleted is set to true in the request, this list will contain sessions deleted with original end times that are within the startTime and endTime frame.
+    #[serde(rename="deletedSession")]
+    pub deleted_session: Option<Vec<Session>>,
+    /// Sessions with an end time that is between startTime and endTime of the request.
+    pub session: Option<Vec<Session>>,
 }
 
-impl Part for ValueMapValEntry {}
-
-
-/// Holder object for the value of a single field in a data point.
-/// 
-/// A field value has a particular format and is only ever set to one of an integer or a floating point value. LINT.IfChange
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Value {
-    /// Map value. The valid key space and units for the corresponding value of each entry should be documented as part of the data type definition. Keys should be kept small whenever possible. Data streams with large keys and high data frequency may be down sampled.
-    #[serde(rename="mapVal")]
-    pub map_val: Option<Vec<ValueMapValEntry>>,
-    /// Floating point value. When this is set, other values must not be set.
-    #[serde(rename="fpVal")]
-    pub fp_val: Option<f64>,
-    /// Integer value. When this is set, other values must not be set.
-    #[serde(rename="intVal")]
-    pub int_val: Option<i32>,
-    /// String value. When this is set, other values must not be set. Strings should be kept small whenever possible. Data streams with large string values and high data frequency may be down sampled.
-    #[serde(rename="stringVal")]
-    pub string_val: Option<String>,
-}
-
-impl Part for Value {}
+impl ResponseResult for ListSessionsResponse {}
 
 
 /// There is no detailed description.
@@ -571,31 +558,29 @@ pub struct DataPoint {
 impl Part for DataPoint {}
 
 
-/// There is no detailed description.
+/// Holder object for the value of a single field in a data point.
 /// 
-/// # Activities
+/// A field value has a particular format and is only ever set to one of an integer or a floating point value. LINT.IfChange
 /// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [sessions list users](struct.UserSessionListCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListSessionsResponse {
-    /// Flag to indicate server has more data to transfer
-    #[serde(rename="hasMoreData")]
-    pub has_more_data: Option<bool>,
-    /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// If includeDeleted is set to true in the request, this list will contain sessions deleted with original end times that are within the startTime and endTime frame.
-    #[serde(rename="deletedSession")]
-    pub deleted_session: Option<Vec<Session>>,
-    /// Sessions with an end time that is between startTime and endTime of the request.
-    pub session: Option<Vec<Session>>,
+pub struct Value {
+    /// Map value. The valid key space and units for the corresponding value of each entry should be documented as part of the data type definition. Keys should be kept small whenever possible. Data streams with large keys and high data frequency may be down sampled.
+    #[serde(rename="mapVal")]
+    pub map_val: Option<Vec<ValueMapValEntry>>,
+    /// Floating point value. When this is set, other values must not be set.
+    #[serde(rename="fpVal")]
+    pub fp_val: Option<f64>,
+    /// Integer value. When this is set, other values must not be set.
+    #[serde(rename="intVal")]
+    pub int_val: Option<i32>,
+    /// String value. When this is set, other values must not be set. Strings should be kept small whenever possible. Data streams with large string values and high data frequency may be down sampled.
+    #[serde(rename="stringVal")]
+    pub string_val: Option<String>,
 }
 
-impl ResponseResult for ListSessionsResponse {}
+impl Part for Value {}
 
 
 /// There is no detailed description.
@@ -681,19 +666,37 @@ pub struct AggregateRequest {
 impl RequestValue for AggregateRequest {}
 
 
+/// There is no detailed description.
 /// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [dataset aggregate users](struct.UserDatasetAggregateCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AggregateResponse {
+    /// A list of buckets containing the aggregated data.
+    pub bucket: Option<Vec<AggregateBucket>>,
+}
+
+impl ResponseResult for AggregateResponse {}
+
+
+/// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DataType {
-    /// A field represents one dimension of a data type.
-    pub field: Option<Vec<DataTypeField>>,
-    /// Each data type has a unique, namespaced, name. All data types in the com.google namespace are shared as part of the platform.
-    pub name: Option<String>,
+pub struct ValueMapValEntry {
+    /// no description provided
+    pub key: Option<String>,
+    /// no description provided
+    pub value: Option<MapValue>,
 }
 
-impl Part for DataType {}
+impl Part for ValueMapValEntry {}
 
 
 /// A dataset represents a projection container for data points. They do not carry any info of their own. Datasets represent a set of data points from a particular data source. A data point can be found in more than one dataset.
@@ -728,22 +731,19 @@ impl RequestValue for Dataset {}
 impl ResponseResult for Dataset {}
 
 
-/// There is no detailed description.
 /// 
-/// # Activities
 /// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [dataset aggregate users](struct.UserDatasetAggregateCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AggregateResponse {
-    /// A list of buckets containing the aggregated data.
-    pub bucket: Option<Vec<AggregateBucket>>,
+pub struct DataType {
+    /// A field represents one dimension of a data type.
+    pub field: Option<Vec<DataTypeField>>,
+    /// Each data type has a unique, namespaced, name. All data types in the com.google namespace are shared as part of the platform.
+    pub name: Option<String>,
 }
 
-impl ResponseResult for AggregateResponse {}
+impl Part for DataType {}
 
 
 /// Sessions contain metadata, such as a user-friendly name and time interval information.
@@ -884,6 +884,34 @@ impl Part for DataTypeField {}
 
 /// There is no detailed description.
 /// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [data sources data point changes list users](struct.UserDataSourceDataPointChangeListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListDataPointChangesResponse {
+    /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Data points that have been removed and will not be included in any other request for dataset contents.
+    #[serde(rename="deletedDataPoint")]
+    pub deleted_data_point: Option<Vec<DataPoint>>,
+    /// The data stream ID of the data source with data point changes.
+    #[serde(rename="dataSourceId")]
+    pub data_source_id: Option<String>,
+    /// Data points listed.
+    #[serde(rename="insertedDataPoint")]
+    pub inserted_data_point: Option<Vec<DataPoint>>,
+}
+
+impl ResponseResult for ListDataPointChangesResponse {}
+
+
+/// There is no detailed description.
+/// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -944,7 +972,7 @@ pub struct DataSource {
     /// 
     /// The exact format of the data stream ID created by a REST client is: type:dataType.name:developer project number:device.manufacturer:device.model:device.uid:dataStreamName 
     /// 
-    /// When any of the optional fields that comprise of the data stream ID are blank, they will be omitted from the data stream ID. The minnimum viable data stream ID would be: type:dataType.name:developer project number
+    /// When any of the optional fields that comprise of the data stream ID are blank, they will be omitted from the data stream ID. The minimum viable data stream ID would be: type:dataType.name:developer project number
     /// 
     /// Finally, the developer project number is obfuscated when read by any REST or Android client that did not create the data source. Only the data source creator will see the developer project number in clear and normal form.
     #[serde(rename="dataStreamId")]
@@ -987,7 +1015,7 @@ impl ResponseResult for DataSource {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Fitness::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `data_sources_create(...)`, `data_sources_datasets_delete(...)`, `data_sources_datasets_get(...)`, `data_sources_datasets_patch(...)`, `data_sources_delete(...)`, `data_sources_get(...)`, `data_sources_list(...)`, `data_sources_patch(...)`, `data_sources_update(...)`, `dataset_aggregate(...)`, `sessions_delete(...)`, `sessions_list(...)` and `sessions_update(...)`
+/// // like `data_sources_create(...)`, `data_sources_data_point_changes_list(...)`, `data_sources_datasets_delete(...)`, `data_sources_datasets_get(...)`, `data_sources_datasets_patch(...)`, `data_sources_delete(...)`, `data_sources_get(...)`, `data_sources_list(...)`, `data_sources_patch(...)`, `data_sources_update(...)`, `dataset_aggregate(...)`, `sessions_delete(...)`, `sessions_list(...)` and `sessions_update(...)`
 /// // to build up your call.
 /// let rb = hub.users();
 /// # }
@@ -1228,6 +1256,27 @@ impl<'a, C, A> UserMethods<'a, C, A> {
             _user_id: user_id.to_string(),
             _session_id: session_id.to_string(),
             _current_time_millis: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// results ordered by descending end_time
+    /// 
+    /// # Arguments
+    ///
+    /// * `userId` - List data points for the person identified. Use "me" to indicate the authenticated user. Only "me" is supported at this time.
+    /// * `dataSourceId` - The data stream ID of the data source that created the dataset.
+    pub fn data_sources_data_point_changes_list(&self, user_id: &str, data_source_id: &str) -> UserDataSourceDataPointChangeListCall<'a, C, A> {
+        UserDataSourceDataPointChangeListCall {
+            hub: self.hub,
+            _user_id: user_id.to_string(),
+            _data_source_id: data_source_id.to_string(),
+            _page_token: Default::default(),
+            _limit: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4356,6 +4405,285 @@ impl<'a, C, A> UserSessionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
 }
 
 
+/// results ordered by descending end_time
+///
+/// A builder for the *dataSources.dataPointChanges.list* method supported by a *user* resource.
+/// It is not used directly, but through a `UserMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_fitness1 as fitness1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use fitness1::Fitness;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Fitness::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.users().data_sources_data_point_changes_list("userId", "dataSourceId")
+///              .page_token("labore")
+///              .limit(-39)
+///              .doit();
+/// # }
+/// ```
+pub struct UserDataSourceDataPointChangeListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Fitness<C, A>,
+    _user_id: String,
+    _data_source_id: String,
+    _page_token: Option<String>,
+    _limit: Option<i32>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for UserDataSourceDataPointChangeListCall<'a, C, A> {}
+
+impl<'a, C, A> UserDataSourceDataPointChangeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListDataPointChangesResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "fitness.users.dataSources.dataPointChanges.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        params.push(("userId", self._user_id.to_string()));
+        params.push(("dataSourceId", self._data_source_id.to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._limit {
+            params.push(("limit", value.to_string()));
+        }
+        for &field in ["alt", "userId", "dataSourceId", "pageToken", "limit"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "{userId}/dataSources/{dataSourceId}/dataPointChanges";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::ActivityRead.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{userId}", "userId"), ("{dataSourceId}", "dataSourceId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["dataSourceId", "userId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// List data points for the person identified. Use "me" to indicate the authenticated user. Only "me" is supported at this time.
+    ///
+    /// Sets the *user id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn user_id(mut self, new_value: &str) -> UserDataSourceDataPointChangeListCall<'a, C, A> {
+        self._user_id = new_value.to_string();
+        self
+    }
+    /// The data stream ID of the data source that created the dataset.
+    ///
+    /// Sets the *data source id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceDataPointChangeListCall<'a, C, A> {
+        self._data_source_id = new_value.to_string();
+        self
+    }
+    /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> UserDataSourceDataPointChangeListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// If specified, no more than this many data point changes will be included in the response. The default is 500 data point changes.
+    ///
+    /// Sets the *limit* query property to the given value.
+    pub fn limit(mut self, new_value: i32) -> UserDataSourceDataPointChangeListCall<'a, C, A> {
+        self._limit = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserDataSourceDataPointChangeListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceDataPointChangeListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ActivityRead`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> UserDataSourceDataPointChangeListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Updates the specified data source. The dataStreamId, dataType, type, dataStreamName, and device properties with the exception of version, cannot be modified.
 /// 
 /// Data sources are identified by their dataStreamId. This method supports patch semantics.
@@ -4672,7 +5000,7 @@ impl<'a, C, A> UserDataSourcePatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().data_sources_list("userId")
-///              .add_data_type_name("eirmod")
+///              .add_data_type_name("accusam")
 ///              .doit();
 /// # }
 /// ```

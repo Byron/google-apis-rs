@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *bigquery* API at revision *20170511*. The CLI is at version *1.0.6*.
+This documentation was generated from the *bigquery* API at revision *20170917*. The CLI is at version *1.0.6*.
 
 ```bash
 bigquery2 [options]
@@ -44,6 +44,7 @@ bigquery2 [options]
                 list <project-id> [-p <v>]... [-o <out>]
                 query <project-id> (-r <kv>)... [-p <v>]... [-o <out>]
         projects
+                get-service-account <project-id> [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]
         tabledata
                 insert-all <project-id> <dataset-id> <table-id> (-r <kv>)... [-p <v>]... [-o <out>]

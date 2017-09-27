@@ -147,10 +147,10 @@ impl<'n> Engine<'n> {
                     "schedule.schedule-end-date.day" => Some(("schedule.scheduleEndDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "schedule.schedule-end-date.year" => Some(("schedule.scheduleEndDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "last-modification-time" => Some(("lastModificationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["access-key-id", "aws-access-key", "aws-s3-data-source", "bucket-name", "creation-time", "day", "delete-objects-from-source-after-transfer", "delete-objects-unique-in-sink", "deletion-time", "description", "exclude-prefixes", "gcs-data-sink", "gcs-data-source", "hours", "http-data-source", "include-prefixes", "last-modification-time", "list-url", "max-time-elapsed-since-last-modification", "min-time-elapsed-since-last-modification", "minutes", "month", "name", "nanos", "object-conditions", "overwrite-objects-already-existing-in-sink", "project-id", "schedule", "schedule-end-date", "schedule-start-date", "seconds", "secret-access-key", "start-time-of-day", "status", "transfer-options", "transfer-spec", "year"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -381,10 +381,10 @@ impl<'n> Engine<'n> {
                     "transfer-job.schedule.schedule-end-date.day" => Some(("transferJob.schedule.scheduleEndDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "transfer-job.schedule.schedule-end-date.year" => Some(("transferJob.schedule.scheduleEndDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "transfer-job.project-id" => Some(("transferJob.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "transfer-job.description" => Some(("transferJob.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-job.last-modification-time" => Some(("transferJob.lastModificationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-job.creation-time" => Some(("transferJob.creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-job.name" => Some(("transferJob.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-job.description" => Some(("transferJob.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["access-key-id", "aws-access-key", "aws-s3-data-source", "bucket-name", "creation-time", "day", "delete-objects-from-source-after-transfer", "delete-objects-unique-in-sink", "deletion-time", "description", "exclude-prefixes", "gcs-data-sink", "gcs-data-source", "hours", "http-data-source", "include-prefixes", "last-modification-time", "list-url", "max-time-elapsed-since-last-modification", "min-time-elapsed-since-last-modification", "minutes", "month", "name", "nanos", "object-conditions", "overwrite-objects-already-existing-in-sink", "project-id", "schedule", "schedule-end-date", "schedule-start-date", "seconds", "secret-access-key", "start-time-of-day", "status", "transfer-job", "transfer-options", "transfer-spec", "update-transfer-job-field-mask", "year"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1182,8 +1182,13 @@ fn main() {
                     Some(r##"Lists operations that match the specified filter in the request. If the
         server doesn't support this method, it returns `UNIMPLEMENTED`.
         
-        NOTE: the `name` binding below allows API services to override the binding
-        to use different resource name schemes, such as `users/*/operations`."##),
+        NOTE: the `name` binding allows API services to override the binding
+        to use different resource name schemes, such as `users/*/operations`. To
+        override the binding, API services can add a binding such as
+        `"/v1/{name=users/*}/operations"` to their service configuration.
+        For backwards compatibility, the default name includes the operations
+        collection id, however overriding users must ensure the name binding
+        is the parent resource, without the operations collection id."##),
                     "Details at http://byron.github.io/google-apis-rs/google_storagetransfer1_cli/transfer-operations_list",
                   vec![
                     (Some(r##"name"##),
@@ -1268,7 +1273,7 @@ fn main() {
     
     let mut app = App::new("storagetransfer1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.6+20170515")
+           .version("1.0.6+20170921")
            .about("Transfers data from external data sources to a Google Cloud Storage bucket or between Google Cloud Storage buckets.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_storagetransfer1_cli")
            .arg(Arg::with_name("url")

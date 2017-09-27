@@ -12,6 +12,8 @@ api:
     - v2beta1
     adexchangeseller:
     - v2.0
+    adexperiencereport:
+    - v1
     admin:
     - directory_v1
     - reports_v1
@@ -23,7 +25,11 @@ api:
     - v3
     analyticsreporting:
     - v4
+    androiddeviceprovisioning:
+    - v1
     androidenterprise:
+    - v1
+    androidmanagement:
     - v1
     androidpublisher:
     - v2
@@ -41,6 +47,8 @@ api:
     - v1beta2
     bigquery:
     - v2
+    bigquerydatatransfer:
+    - v1
     blogger:
     - v3
     books:
@@ -59,7 +67,10 @@ api:
     - v2
     clouderrorreporting:
     - v1beta1
+    cloudfunctions:
+    - v1
     cloudkms:
+    - v1
     - v1beta1
     cloudlatencytest:
     - v2
@@ -70,8 +81,11 @@ api:
     - v1beta1
     cloudsearch:
     - v1
+    cloudtasks:
+    - v2beta2
     cloudtrace:
     - v1
+    - v2
     clouduseraccounts:
     - vm_beta
     compute:
@@ -93,7 +107,6 @@ api:
     - v1
     datastore:
     - v1
-    - v1beta2
     - v1beta3
     deploymentmanager:
     - v2
@@ -106,8 +119,11 @@ api:
     - v2.5
     - v2.6
     - v2.7
+    - v2.8
     discovery:
     - v1
+    dlp:
+    - v2beta1
     dns:
     - v1
     doubleclickbidmanager:
@@ -119,12 +135,13 @@ api:
     - v3
     firebasedynamiclinks:
     - v1
+    firebaseremoteconfig:
+    - v1
     firebaserules:
     - v1
     fitness:
     - v1
     freebase:
-    - v1
     - v1sandbox
     fusiontables:
     - v2
@@ -167,16 +184,20 @@ api:
     mirror:
     - v1
     ml:
-    - v1beta1
+    - v1
     monitoring:
     - v3
     oauth2:
     - v2
+    oslogin:
+    - v1beta
     pagespeedonline:
     - v2
     partners:
     - v2
     people:
+    - v1
+    playcustomapp:
     - v1
     playmoviespartner:
     - v1
@@ -216,15 +237,22 @@ api:
     - v1
     serviceregistry:
     - alpha
+    serviceuser:
+    - v1
     sheets:
     - v4
     siteverification:
     - v1
     slides:
     - v1
+    sourcerepo:
+    - v1
+    spanner:
+    - v1
     spectrum:
     - v1explorer
     speech:
+    - v1
     - v1beta1
     sqladmin:
     - v1beta4
@@ -232,13 +260,18 @@ api:
     - v1
     storagetransfer:
     - v1
+    streetviewpublish:
+    - v1
     surveys:
     - v2
     tagmanager:
     - v1
+    - v2
     taskqueue:
     - v1beta2
     tasks:
+    - v1
+    testing:
     - v1
     toolresults:
     - v1beta3
@@ -246,6 +279,10 @@ api:
     - v2
     urlshortener:
     - v1
+    vault:
+    - v1
+    videointelligence:
+    - v1beta1
     vision:
     - v1
     webfonts:

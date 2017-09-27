@@ -248,6 +248,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "force" => {
+                    call = call.force(arg_from_str(value.unwrap_or("false"), err, "force", "boolean"));
+                },
                 "dry-run" => {
                     call = call.dry_run(arg_from_str(value.unwrap_or("false"), err, "dry-run", "boolean"));
                 },
@@ -264,7 +267,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["dry-run"].iter().map(|v|*v));
+                                                                           v.extend(["dry-run", "force"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1481,6 +1484,7 @@ impl<'n> Engine<'n> {
                     "fetch-schedule.username" => Some(("fetchSchedule.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "fetch-schedule.hour" => Some(("fetchSchedule.hour", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "fetch-schedule.fetch-url" => Some(("fetchSchedule.fetchUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "fetch-schedule.paused" => Some(("fetchSchedule.paused", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "fetch-schedule.weekday" => Some(("fetchSchedule.weekday", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "fetch-schedule.time-zone" => Some(("fetchSchedule.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "fetch-schedule.password" => Some(("fetchSchedule.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1488,11 +1492,11 @@ impl<'n> Engine<'n> {
                     "fetch-schedule.day-of-month" => Some(("fetchSchedule.dayOfMonth", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "target-country" => Some(("targetCountry", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "file-name" => Some(("fileName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "intended-destinations" => Some(("intendedDestinations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "intended-destinations" => Some(("intendedDestinations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "attribute-language" => Some(("attributeLanguage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attribute-language", "column-delimiter", "content-language", "content-type", "day-of-month", "fetch-schedule", "fetch-url", "file-encoding", "file-name", "format", "hour", "id", "intended-destinations", "kind", "minute-of-hour", "name", "password", "quoting-mode", "target-country", "time-zone", "username", "weekday"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attribute-language", "column-delimiter", "content-language", "content-type", "day-of-month", "fetch-schedule", "fetch-url", "file-encoding", "file-name", "format", "hour", "id", "intended-destinations", "kind", "minute-of-hour", "name", "password", "paused", "quoting-mode", "target-country", "time-zone", "username", "weekday"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1648,6 +1652,7 @@ impl<'n> Engine<'n> {
                     "fetch-schedule.username" => Some(("fetchSchedule.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "fetch-schedule.hour" => Some(("fetchSchedule.hour", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "fetch-schedule.fetch-url" => Some(("fetchSchedule.fetchUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "fetch-schedule.paused" => Some(("fetchSchedule.paused", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "fetch-schedule.weekday" => Some(("fetchSchedule.weekday", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "fetch-schedule.time-zone" => Some(("fetchSchedule.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "fetch-schedule.password" => Some(("fetchSchedule.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1655,11 +1660,11 @@ impl<'n> Engine<'n> {
                     "fetch-schedule.day-of-month" => Some(("fetchSchedule.dayOfMonth", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "target-country" => Some(("targetCountry", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "file-name" => Some(("fileName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "intended-destinations" => Some(("intendedDestinations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "intended-destinations" => Some(("intendedDestinations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "attribute-language" => Some(("attributeLanguage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attribute-language", "column-delimiter", "content-language", "content-type", "day-of-month", "fetch-schedule", "fetch-url", "file-encoding", "file-name", "format", "hour", "id", "intended-destinations", "kind", "minute-of-hour", "name", "password", "quoting-mode", "target-country", "time-zone", "username", "weekday"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attribute-language", "column-delimiter", "content-language", "content-type", "day-of-month", "fetch-schedule", "fetch-url", "file-encoding", "file-name", "format", "hour", "id", "intended-destinations", "kind", "minute-of-hour", "name", "password", "paused", "quoting-mode", "target-country", "time-zone", "username", "weekday"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1756,6 +1761,7 @@ impl<'n> Engine<'n> {
                     "fetch-schedule.username" => Some(("fetchSchedule.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "fetch-schedule.hour" => Some(("fetchSchedule.hour", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "fetch-schedule.fetch-url" => Some(("fetchSchedule.fetchUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "fetch-schedule.paused" => Some(("fetchSchedule.paused", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "fetch-schedule.weekday" => Some(("fetchSchedule.weekday", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "fetch-schedule.time-zone" => Some(("fetchSchedule.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "fetch-schedule.password" => Some(("fetchSchedule.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1763,11 +1769,11 @@ impl<'n> Engine<'n> {
                     "fetch-schedule.day-of-month" => Some(("fetchSchedule.dayOfMonth", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "target-country" => Some(("targetCountry", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "file-name" => Some(("fileName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "intended-destinations" => Some(("intendedDestinations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "intended-destinations" => Some(("intendedDestinations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "attribute-language" => Some(("attributeLanguage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attribute-language", "column-delimiter", "content-language", "content-type", "day-of-month", "fetch-schedule", "fetch-url", "file-encoding", "file-name", "format", "hour", "id", "intended-destinations", "kind", "minute-of-hour", "name", "password", "quoting-mode", "target-country", "time-zone", "username", "weekday"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attribute-language", "column-delimiter", "content-language", "content-type", "day-of-month", "fetch-schedule", "fetch-url", "file-encoding", "file-name", "format", "hour", "id", "intended-destinations", "kind", "minute-of-hour", "name", "password", "paused", "quoting-mode", "target-country", "time-zone", "username", "weekday"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1921,6 +1927,12 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "language" => {
+                    call = call.language(value.unwrap_or(""));
+                },
+                "country" => {
+                    call = call.country(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1934,6 +1946,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["country", "language"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3148,10 +3161,10 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "shipment-id" => Some(("shipmentId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "operation-id" => Some(("operationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "carrier" => Some(("carrier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tracking-id" => Some(("trackingId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "operation-id" => Some(("operationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "shipment-id" => Some(("shipmentId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["carrier", "operation-id", "shipment-id", "tracking-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -3599,11 +3612,13 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "max-handling-time" => Some(("maxHandlingTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "adult" => Some(("adult", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "color" => Some(("color", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "additional-image-links" => Some(("additionalImageLinks", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "adwords-labels" => Some(("adwordsLabels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "item-group-id" => Some(("itemGroupId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "min-handling-time" => Some(("minHandlingTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "gtin" => Some(("gtin", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "expiration-date" => Some(("expirationDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "google-product-category" => Some(("googleProductCategory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3677,7 +3692,7 @@ impl<'n> Engine<'n> {
                     "age-group" => Some(("ageGroup", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-ads-title" => Some(("displayAdsTitle", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-image-links", "additional-product-types", "adult", "adwords-grouping", "adwords-labels", "adwords-redirect", "age-group", "amount", "availability", "availability-date", "brand", "channel", "color", "condition", "content-language", "currency", "custom-label0", "custom-label1", "custom-label2", "custom-label3", "custom-label4", "description", "display-ads-id", "display-ads-link", "display-ads-similar-ids", "display-ads-title", "display-ads-value", "energy-efficiency-class", "expiration-date", "gender", "google-product-category", "gtin", "id", "identifier-exists", "image-link", "installment", "is-bundle", "item-group-id", "kind", "link", "loyalty-points", "material", "mobile-link", "months", "mpn", "multipack", "name", "offer-id", "online-only", "pattern", "points-value", "price", "product-type", "promotion-ids", "ratio", "sale-price", "sale-price-effective-date", "sell-on-google-quantity", "shipping-height", "shipping-label", "shipping-length", "shipping-weight", "shipping-width", "size-system", "size-type", "sizes", "target-country", "title", "unit", "unit-pricing-base-measure", "unit-pricing-measure", "validated-destinations", "value"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-image-links", "additional-product-types", "adult", "adwords-grouping", "adwords-labels", "adwords-redirect", "age-group", "amount", "availability", "availability-date", "brand", "channel", "color", "condition", "content-language", "currency", "custom-label0", "custom-label1", "custom-label2", "custom-label3", "custom-label4", "description", "display-ads-id", "display-ads-link", "display-ads-similar-ids", "display-ads-title", "display-ads-value", "energy-efficiency-class", "expiration-date", "gender", "google-product-category", "gtin", "id", "identifier-exists", "image-link", "installment", "is-bundle", "item-group-id", "kind", "link", "loyalty-points", "material", "max-handling-time", "min-handling-time", "mobile-link", "months", "mpn", "multipack", "name", "offer-id", "online-only", "pattern", "points-value", "price", "product-type", "promotion-ids", "ratio", "sale-price", "sale-price-effective-date", "sell-on-google-quantity", "shipping-height", "shipping-label", "shipping-length", "shipping-weight", "shipping-width", "size-system", "size-type", "sizes", "target-country", "title", "unit", "unit-pricing-base-measure", "unit-pricing-measure", "validated-destinations", "value"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4800,7 +4815,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("claimwebsite",
-                    Some(r##"Claims the website of a Merchant Center sub-account. This method can only be called for multi-client accounts."##),
+                    Some(r##"Claims the website of a Merchant Center sub-account. This method can only be called for accounts to which the managing account has access: either the managing account itself for any Merchant Center account, or any sub-account when the managing account is a multi-client account."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/accounts_claimwebsite",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -4872,7 +4887,7 @@ fn main() {
                      Some(true)),
                   ]),
             ("get",
-                    Some(r##"Retrieves a Merchant Center account. This method can only be called for accounts to which the managing account has access: either the managing account itself or sub-accounts if the managing account is a multi-client account."##),
+                    Some(r##"Retrieves a Merchant Center account. This method can only be called for accounts to which the managing account has access: either the managing account itself for any Merchant Center account, or any sub-account when the managing account is a multi-client account."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/accounts_get",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -4950,7 +4965,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("patch",
-                    Some(r##"Updates a Merchant Center account. This method can only be called for accounts to which the managing account has access: either the managing account itself or sub-accounts if the managing account is a multi-client account. This method supports patch semantics."##),
+                    Some(r##"Updates a Merchant Center account. This method can only be called for accounts to which the managing account has access: either the managing account itself for any Merchant Center account, or any sub-account when the managing account is a multi-client account. This method supports patch semantics."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/accounts_patch",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -4984,7 +4999,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Updates a Merchant Center account. This method can only be called for accounts to which the managing account has access: either the managing account itself or sub-accounts if the managing account is a multi-client account."##),
+                    Some(r##"Updates a Merchant Center account. This method can only be called for accounts to which the managing account has access: either the managing account itself for any Merchant Center account, or any sub-account when the managing account is a multi-client account."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/accounts_update",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -5043,7 +5058,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Retrieves the status of a Merchant Center account. This method can only be called for accounts to which the managing account has access: either the managing account itself or sub-accounts if the managing account is a multi-client account."##),
+                    Some(r##"Retrieves the status of a Merchant Center account. This method can only be called for accounts to which the managing account has access: either the managing account itself for any Merchant Center account, or any sub-account when the managing account is a multi-client account."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/accountstatuses_get",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -5118,7 +5133,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Retrieves the tax settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself or sub-accounts if the managing account is a multi-client account."##),
+                    Some(r##"Retrieves the tax settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself for any Merchant Center account, or any sub-account when the managing account is a multi-client account."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/accounttax_get",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -5168,7 +5183,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("patch",
-                    Some(r##"Updates the tax settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself or sub-accounts if the managing account is a multi-client account. This method supports patch semantics."##),
+                    Some(r##"Updates the tax settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself for any Merchant Center account, or any sub-account when the managing account is a multi-client account. This method supports patch semantics."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/accounttax_patch",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -5202,7 +5217,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Updates the tax settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself or sub-accounts if the managing account is a multi-client account."##),
+                    Some(r##"Updates the tax settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself for any Merchant Center account, or any sub-account when the managing account is a multi-client account."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/accounttax_update",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -5261,7 +5276,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("delete",
-                    Some(r##"Deletes a datafeed from your Merchant Center account. This method can only be called for non-multi-client accounts."##),
+                    Some(r##"Deletes a datafeed configuration from your Merchant Center account. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/datafeeds_delete",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -5283,7 +5298,7 @@ fn main() {
                      Some(true)),
                   ]),
             ("get",
-                    Some(r##"Retrieves a datafeed from your Merchant Center account. This method can only be called for non-multi-client accounts."##),
+                    Some(r##"Retrieves a datafeed configuration from your Merchant Center account. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/datafeeds_get",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -5311,7 +5326,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("insert",
-                    Some(r##"Registers a datafeed with your Merchant Center account. This method can only be called for non-multi-client accounts."##),
+                    Some(r##"Registers a datafeed configuration with your Merchant Center account. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/datafeeds_insert",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -5361,7 +5376,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("patch",
-                    Some(r##"Updates a datafeed of your Merchant Center account. This method can only be called for non-multi-client accounts. This method supports patch semantics."##),
+                    Some(r##"Updates a datafeed configuration of your Merchant Center account. This method can only be called for non-multi-client accounts. This method supports patch semantics."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/datafeeds_patch",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -5395,7 +5410,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Updates a datafeed of your Merchant Center account. This method can only be called for non-multi-client accounts."##),
+                    Some(r##"Updates a datafeed configuration of your Merchant Center account. This method can only be called for non-multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/datafeeds_update",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -6253,7 +6268,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Retrieves the shipping settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself or sub-accounts if the managing account is a multi-client account."##),
+                    Some(r##"Retrieves the shipping settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself for any Merchant Center account, or any sub-account when the managing account is a multi-client account."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/shippingsettings_get",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -6325,7 +6340,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("patch",
-                    Some(r##"Updates the shipping settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself or sub-accounts if the managing account is a multi-client account. This method supports patch semantics."##),
+                    Some(r##"Updates the shipping settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself for any Merchant Center account, or any sub-account when the managing account is a multi-client account. This method supports patch semantics."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/shippingsettings_patch",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -6359,7 +6374,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Updates the shipping settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself or sub-accounts if the managing account is a multi-client account."##),
+                    Some(r##"Updates the shipping settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself for any Merchant Center account, or any sub-account when the managing account is a multi-client account."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/shippingsettings_update",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -6398,7 +6413,7 @@ fn main() {
     
     let mut app = App::new("content2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.6+20170519")
+           .version("1.0.6+20170926")
            .about("Manages product items, inventory, and Merchant Center accounts for Google Shopping.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_content2_cli")
            .arg(Arg::with_name("url")

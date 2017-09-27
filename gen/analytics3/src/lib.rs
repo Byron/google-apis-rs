@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *analytics* crate version *1.0.6+20170321*, where *20170321* is the exact revision of the *analytics:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *analytics* crate version *1.0.6+20170807*, where *20170807* is the exact revision of the *analytics:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *analytics* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/analytics/).
@@ -1635,11 +1635,14 @@ pub struct Upload {
     /// Custom data source Id to which this data import belongs.
     #[serde(rename="customDataSourceId")]
     pub custom_data_source_id: Option<String>,
-    /// A unique ID for this upload.
-    pub id: Option<String>,
     /// Account Id to which this upload belongs.
     #[serde(rename="accountId")]
     pub account_id: Option<String>,
+    /// Time this file is uploaded.
+    #[serde(rename="uploadTime")]
+    pub upload_time: Option<String>,
+    /// A unique ID for this upload.
+    pub id: Option<String>,
 }
 
 impl ResponseResult for Upload {}
@@ -1981,7 +1984,7 @@ pub struct LinkedForeignAccount {
     /// Web property ID of the form UA-XXXXX-YY to which this linked foreign account belongs.
     #[serde(rename="webPropertyId")]
     pub web_property_id: Option<String>,
-    /// The type of the foreign account. For example `ADWORDS_LINKS`.
+    /// The type of the foreign account. For example, `ADWORDS_LINKS`, `DBM_LINKS`, `MCC_LINKS` or `OPTIMIZE`.
     #[serde(rename="type")]
     pub type_: Option<String>,
     /// Boolean indicating whether this is eligible for search.
@@ -3356,45 +3359,47 @@ impl Part for CustomDataSourceParentLink {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CustomDataSource {
-    /// Resource type for Analytics custom data source.
-    pub kind: Option<String>,
-    /// Description of custom data source.
-    pub description: Option<String>,
-    /// IDs of views (profiles) linked to the custom data source.
-    #[serde(rename="profilesLinked")]
-    pub profiles_linked: Option<Vec<String>>,
-    /// no description provided
-    #[serde(rename="uploadType")]
-    pub upload_type: Option<String>,
-    /// Time this custom data source was created.
-    pub created: Option<String>,
     /// Time this custom data source was last modified.
     pub updated: Option<String>,
-    /// Account ID to which this custom data source belongs.
-    #[serde(rename="accountId")]
-    pub account_id: Option<String>,
+    /// Description of custom data source.
+    pub description: Option<String>,
+    /// Upload type of the custom data source.
+    #[serde(rename="uploadType")]
+    pub upload_type: Option<String>,
     /// no description provided
     #[serde(rename="childLink")]
     pub child_link: Option<CustomDataSourceChildLink>,
     /// Web property ID of the form UA-XXXXX-YY to which this custom data source belongs.
     #[serde(rename="webPropertyId")]
     pub web_property_id: Option<String>,
-    /// Parent link for this custom data source. Points to the web property to which this custom data source belongs.
-    #[serde(rename="parentLink")]
-    pub parent_link: Option<CustomDataSourceParentLink>,
     /// no description provided
     #[serde(rename="importBehavior")]
     pub import_behavior: Option<String>,
+    /// Custom data source ID.
+    pub id: Option<String>,
+    /// Account ID to which this custom data source belongs.
+    #[serde(rename="accountId")]
+    pub account_id: Option<String>,
+    /// Resource type for Analytics custom data source.
+    pub kind: Option<String>,
+    /// Name of this custom data source.
+    pub name: Option<String>,
+    /// Time this custom data source was created.
+    pub created: Option<String>,
+    /// IDs of views (profiles) linked to the custom data source.
+    #[serde(rename="profilesLinked")]
+    pub profiles_linked: Option<Vec<String>>,
+    /// Parent link for this custom data source. Points to the web property to which this custom data source belongs.
+    #[serde(rename="parentLink")]
+    pub parent_link: Option<CustomDataSourceParentLink>,
     /// Type of the custom data source.
     #[serde(rename="type")]
     pub type_: Option<String>,
-    /// Custom data source ID.
-    pub id: Option<String>,
     /// Link for this Analytics custom data source.
     #[serde(rename="selfLink")]
     pub self_link: Option<String>,
-    /// Name of this custom data source.
-    pub name: Option<String>,
+    /// Collection of schema headers of the custom data source.
+    pub schema: Option<Vec<String>>,
 }
 
 impl Part for CustomDataSource {}

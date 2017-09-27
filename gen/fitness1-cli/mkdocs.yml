@@ -1,4 +1,4 @@
-site_name: fitness v1.0.6+20161128
+site_name: fitness v1.0.6+20170830
 site_url: http://byron.github.io/google-apis-rs/google-fitness1-cli
 site_description: A complete library to interact with fitness (protocol v1)
 
@@ -10,6 +10,7 @@ site_dir: build_html
 pages:
 - ['index.md', 'Home']
 - ['users_data-sources-create.md', 'Users', 'Data Sources Create']
+- ['users_data-sources-data-point-changes-list.md', 'Users', 'Data Sources Data Point Changes List']
 - ['users_data-sources-datasets-delete.md', 'Users', 'Data Sources Datasets Delete']
 - ['users_data-sources-datasets-get.md', 'Users', 'Data Sources Datasets Get']
 - ['users_data-sources-datasets-patch.md', 'Users', 'Data Sources Datasets Patch']

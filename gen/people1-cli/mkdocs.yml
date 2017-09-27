@@ -1,4 +1,4 @@
-site_name: People Service v1.0.6+20170518
+site_name: People Service v1.0.6+20170925
 site_url: http://byron.github.io/google-apis-rs/google-people1-cli
 site_description: A complete library to interact with People Service (protocol v1)
 
@@ -9,9 +9,19 @@ site_dir: build_html
 
 pages:
 - ['index.md', 'Home']
+- ['contact-groups_batch-get.md', 'Contact Groups', 'Batch Get']
+- ['contact-groups_create.md', 'Contact Groups', 'Create']
+- ['contact-groups_delete.md', 'Contact Groups', 'Delete']
+- ['contact-groups_get.md', 'Contact Groups', 'Get']
+- ['contact-groups_list.md', 'Contact Groups', 'List']
+- ['contact-groups_members-modify.md', 'Contact Groups', 'Members Modify']
+- ['contact-groups_update.md', 'Contact Groups', 'Update']
 - ['people_connections-list.md', 'People', 'Connections List']
+- ['people_create-contact.md', 'People', 'Create Contact']
+- ['people_delete-contact.md', 'People', 'Delete Contact']
 - ['people_get.md', 'People', 'Get']
 - ['people_get-batch-get.md', 'People', 'Get Batch Get']
+- ['people_update-contact.md', 'People', 'Update Contact']
 
 theme: readthedocs
 

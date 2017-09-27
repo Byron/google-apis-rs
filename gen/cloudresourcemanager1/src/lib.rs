@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Resource Manager* crate version *1.0.6+20170517*, where *20170517* is the exact revision of the *cloudresourcemanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *Cloud Resource Manager* crate version *1.0.6+20170920*, where *20170920* is the exact revision of the *cloudresourcemanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *Cloud Resource Manager* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/resource-manager).
@@ -450,44 +450,56 @@ pub struct SetIamPolicyRequest {
 impl RequestValue for SetIamPolicyRequest {}
 
 
-/// Associates `members` with a `role`.
+/// A Lien represents an encumbrance on the actions that can be performed on a
+/// resource.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [create liens](struct.LienCreateCall.html) (request|response)
+/// * [delete liens](struct.LienDeleteCall.html) (none)
+/// * [list liens](struct.LienListCall.html) (none)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Binding {
-    /// Role that is assigned to `members`.
-    /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
-    /// Required
-    pub role: Option<String>,
-    /// Specifies the identities requesting access for a Cloud Platform resource.
-    /// `members` can have the following values:
+pub struct Lien {
+    /// A stable, user-visible/meaningful string identifying the origin of the
+    /// Lien, intended to be inspected programmatically. Maximum length of 200
+    /// characters.
     /// 
-    /// * `allUsers`: A special identifier that represents anyone who is
-    ///    on the internet; with or without a Google account.
+    /// Example: 'compute.googleapis.com'
+    pub origin: Option<String>,
+    /// The types of operations which should be blocked as a result of this Lien.
+    /// Each value should correspond to an IAM permission. The server will
+    /// validate the permissions against those for which Liens are supported.
     /// 
-    /// * `allAuthenticatedUsers`: A special identifier that represents anyone
-    ///    who is authenticated with a Google account or a service account.
+    /// An empty list is meaningless and will be rejected.
     /// 
-    /// * `user:{emailid}`: An email address that represents a specific Google
-    ///    account. For example, `alice@gmail.com` or `joe@example.com`.
+    /// Example: ['resourcemanager.projects.delete']
+    pub restrictions: Option<Vec<String>>,
+    /// Concise user-visible strings indicating why an action cannot be performed
+    /// on a resource. Maximum lenth of 200 characters.
     /// 
+    /// Example: 'Holds production API key'
+    pub reason: Option<String>,
+    /// A system-generated unique identifier for this Lien.
     /// 
-    /// * `serviceAccount:{emailid}`: An email address that represents a service
-    ///    account. For example, `my-other-app@appspot.gserviceaccount.com`.
+    /// Example: `liens/1234abcd`
+    pub name: Option<String>,
+    /// A reference to the resource this Lien is attached to. The server will
+    /// validate the parent against those for which Liens are supported.
     /// 
-    /// * `group:{emailid}`: An email address that represents a Google group.
-    ///    For example, `admins@example.com`.
-    /// 
-    /// 
-    /// * `domain:{domain}`: A Google Apps domain name that represents all the
-    ///    users of that domain. For example, `google.com` or `example.com`.
-    /// 
-    /// 
-    pub members: Option<Vec<String>>,
+    /// Example: `projects/1234`
+    pub parent: Option<String>,
+    /// The creation time of this Lien.
+    #[serde(rename="createTime")]
+    pub create_time: Option<String>,
 }
 
-impl Part for Binding {}
+impl RequestValue for Lien {}
+impl Resource for Lien {}
+impl ResponseResult for Lien {}
 
 
 /// Ignores policies set above this resource and restores the
@@ -555,10 +567,9 @@ impl Part for RestoreDefault {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Policy {
-    /// Associates a list of `members` to a `role`.
-    /// Multiple `bindings` must not be specified for the same `role`.
-    /// `bindings` with no members will result in an error.
-    pub bindings: Option<Vec<Binding>>,
+    /// Specifies cloud audit logging configuration for this policy.
+    #[serde(rename="auditConfigs")]
+    pub audit_configs: Option<Vec<AuditConfig>>,
     /// `etag` is used for optimistic concurrency control as a way to help
     /// prevent simultaneous updates of a policy from overwriting each other.
     /// It is strongly suggested that systems make use of the `etag` in the
@@ -570,9 +581,9 @@ pub struct Policy {
     /// If no `etag` is provided in the call to `setIamPolicy`, then the existing
     /// policy is overwritten blindly.
     pub etag: Option<String>,
-    /// Specifies cloud audit logging configuration for this policy.
-    #[serde(rename="auditConfigs")]
-    pub audit_configs: Option<Vec<AuditConfig>>,
+    /// Associates a list of `members` to a `role`.
+    /// `bindings` with no members will result in an error.
+    pub bindings: Option<Vec<Binding>>,
     /// Version of the `Policy`. The default version is 0.
     pub version: Option<i32>,
 }
@@ -685,8 +696,8 @@ pub struct Status {
     pub message: Option<String>,
     /// The status code, which should be an enum value of google.rpc.Code.
     pub code: Option<i32>,
-    /// A list of messages that carry the error details.  There will be a
-    /// common set of message types for APIs to use.
+    /// A list of messages that carry the error details.  There is a common set of
+    /// message types for APIs to use.
     pub details: Option<Vec<HashMap<String, String>>>,
 }
 
@@ -713,42 +724,20 @@ pub struct TestIamPermissionsResponse {
 impl ResponseResult for TestIamPermissionsResponse {}
 
 
-/// A page of the response received from the
-/// ListProjects
-/// method.
+/// A `Constraint` that allows or disallows a list of string values, which are
+/// configured by an Organization's policy administrator with a `Policy`.
 /// 
-/// A paginated response where more pages are available has
-/// `next_page_token` set. This token can be used in a subsequent request to
-/// retrieve the next request page.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list projects](struct.ProjectListCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListProjectsResponse {
-    /// Pagination token.
-    /// 
-    /// If the result set is too large to fit in a single response, this token
-    /// is returned. It encodes the position of the current result cursor.
-    /// Feeding this value into a new list request with the `page_token` parameter
-    /// gives the next page of the results.
-    /// 
-    /// When `next_page_token` is not filled in, there is no next page and
-    /// the list returned is the last page in the result set.
-    /// 
-    /// Pagination tokens have a limited lifetime.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The list of Projects that matched the list filter. This list can
-    /// be paginated.
-    pub projects: Option<Vec<Project>>,
+pub struct ListConstraint {
+    /// Optional. The Google Cloud Console will try to default to a configuration
+    /// that matches the value specified in this `Constraint`.
+    #[serde(rename="suggestedValue")]
+    pub suggested_value: Option<String>,
 }
 
-impl ResponseResult for ListProjectsResponse {}
+impl Part for ListConstraint {}
 
 
 /// The response returned from the ListAvailableOrgPolicyConstraints method.
@@ -775,28 +764,6 @@ pub struct ListAvailableOrgPolicyConstraintsResponse {
 }
 
 impl ResponseResult for ListAvailableOrgPolicyConstraintsResponse {}
-
-
-/// The response message for Liens.ListLiens.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list liens](struct.LienListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListLiensResponse {
-    /// Token to retrieve the next page of results, or empty if there are no more
-    /// results in the list.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// A list of Liens.
-    pub liens: Option<Vec<Lien>>,
-}
-
-impl ResponseResult for ListLiensResponse {}
 
 
 /// A container to reference an id for any resource type. A `resource` in Google
@@ -838,8 +805,8 @@ pub struct ListPolicy {
     /// The policy all_values state.
     #[serde(rename="allValues")]
     pub all_values: Option<String>,
-    /// List of values allowed  at this resource. an only be set if no values are
-    /// set for `denied_values` and `all_values` is set to
+    /// List of values allowed  at this resource. Can only be set if no values
+    /// are set for `denied_values` and `all_values` is set to
     /// `ALL_VALUES_UNSPECIFIED`.
     #[serde(rename="allowedValues")]
     pub allowed_values: Option<Vec<String>>,
@@ -999,68 +966,24 @@ pub struct BooleanPolicy {
 impl Part for BooleanPolicy {}
 
 
-/// Defines a Cloud Organization `Policy` which is used to specify `Constraints`
-/// for configurations of Cloud Platform resources.
+/// Response from the GetAncestry method.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [set org policy folders](struct.FolderSetOrgPolicyCall.html) (response)
-/// * [get org policy organizations](struct.OrganizationGetOrgPolicyCall.html) (response)
-/// * [get effective org policy projects](struct.ProjectGetEffectiveOrgPolicyCall.html) (response)
-/// * [set org policy organizations](struct.OrganizationSetOrgPolicyCall.html) (response)
-/// * [get effective org policy folders](struct.FolderGetEffectiveOrgPolicyCall.html) (response)
-/// * [get org policy folders](struct.FolderGetOrgPolicyCall.html) (response)
-/// * [get effective org policy organizations](struct.OrganizationGetEffectiveOrgPolicyCall.html) (response)
-/// * [get org policy projects](struct.ProjectGetOrgPolicyCall.html) (response)
-/// * [set org policy projects](struct.ProjectSetOrgPolicyCall.html) (response)
+/// * [get ancestry projects](struct.ProjectGetAncestryCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct OrgPolicy {
-    /// The time stamp the `Policy` was previously updated. This is set by the
-    /// server, not specified by the caller, and represents the last time a call to
-    /// `SetOrgPolicy` was made for that `Policy`. Any value set by the client will
-    /// be ignored.
-    #[serde(rename="updateTime")]
-    pub update_time: Option<String>,
-    /// Version of the `Policy`. Default version is 0;
-    pub version: Option<i32>,
-    /// An opaque tag indicating the current version of the `Policy`, used for
-    /// concurrency control.
-    /// 
-    /// When the `Policy` is returned from either a `GetPolicy` or a
-    /// `ListOrgPolicy` request, this `etag` indicates the version of the current
-    /// `Policy` to use when executing a read-modify-write loop.
-    /// 
-    /// When the `Policy` is returned from a `GetEffectivePolicy` request, the
-    /// `etag` will be unset.
-    /// 
-    /// When the `Policy` is used in a `SetOrgPolicy` method, use the `etag` value
-    /// that was returned from a `GetOrgPolicy` request as part of a
-    /// read-modify-write loop for concurrency control. Not setting the `etag`in a
-    /// `SetOrgPolicy` request will result in an unconditional write of the
-    /// `Policy`.
-    pub etag: Option<String>,
-    /// The name of the `Constraint` the `Policy` is configuring, for example,
-    /// `constraints/serviceuser.services`.
-    /// 
-    /// Immutable after creation.
-    pub constraint: Option<String>,
-    /// Restores the default behavior of the constraint; independent of
-    /// `Constraint` type.
-    #[serde(rename="restoreDefault")]
-    pub restore_default: Option<RestoreDefault>,
-    /// List of values either allowed or disallowed.
-    #[serde(rename="listPolicy")]
-    pub list_policy: Option<ListPolicy>,
-    /// For boolean `Constraints`, whether to enforce the `Constraint` or not.
-    #[serde(rename="booleanPolicy")]
-    pub boolean_policy: Option<BooleanPolicy>,
+pub struct GetAncestryResponse {
+    /// Ancestors are ordered from bottom to top of the resource hierarchy. The
+    /// first ancestor is the project itself, followed by the project's parent,
+    /// etc.
+    pub ancestor: Option<Vec<Ancestor>>,
 }
 
-impl ResponseResult for OrgPolicy {}
+impl ResponseResult for GetAncestryResponse {}
 
 
 /// The request sent to the SetOrgPolicyRequest method.
@@ -1187,20 +1110,20 @@ pub struct Constraint {
     /// Mutable.
     #[serde(rename="displayName")]
     pub display_name: Option<String>,
-    /// Detailed description of what this `Constraint` controls as well as how and
-    /// where it is enforced.
-    /// 
-    /// Mutable.
-    pub description: Option<String>,
+    /// Immutable value, required to globally be unique. For example,
+    /// `constraints/serviceuser.services`
+    pub name: Option<String>,
     /// Defines this constraint as being a BooleanConstraint.
     #[serde(rename="booleanConstraint")]
     pub boolean_constraint: Option<BooleanConstraint>,
     /// Defines this constraint as being a ListConstraint.
     #[serde(rename="listConstraint")]
     pub list_constraint: Option<ListConstraint>,
-    /// Immutable value, required to globally be unique. For example,
-    /// `constraints/serviceuser.services`
-    pub name: Option<String>,
+    /// Detailed description of what this `Constraint` controls as well as how and
+    /// where it is enforced.
+    /// 
+    /// Mutable.
+    pub description: Option<String>,
 }
 
 impl Part for Constraint {}
@@ -1220,24 +1143,27 @@ pub struct BooleanConstraint { _never_set: Option<bool> }
 impl Part for BooleanConstraint {}
 
 
-/// Response from the GetAncestry method.
+/// The request sent to the ClearOrgPolicy method.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [get ancestry projects](struct.ProjectGetAncestryCall.html) (response)
+/// * [clear org policy folders](struct.FolderClearOrgPolicyCall.html) (request)
+/// * [clear org policy organizations](struct.OrganizationClearOrgPolicyCall.html) (request)
+/// * [clear org policy projects](struct.ProjectClearOrgPolicyCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GetAncestryResponse {
-    /// Ancestors are ordered from bottom to top of the resource hierarchy. The
-    /// first ancestor is the project itself, followed by the project's parent,
-    /// etc.
-    pub ancestor: Option<Vec<Ancestor>>,
+pub struct ClearOrgPolicyRequest {
+    /// The current version, for concurrency control. Not sending an `etag`
+    /// will cause the `Policy` to be cleared blindly.
+    pub etag: Option<String>,
+    /// Name of the `Constraint` of the `Policy` to clear.
+    pub constraint: Option<String>,
 }
 
-impl ResponseResult for GetAncestryResponse {}
+impl RequestValue for ClearOrgPolicyRequest {}
 
 
 /// A Project is a high-level Google Cloud Platform entity.  It is a
@@ -1310,17 +1236,17 @@ pub struct Project {
     /// Example: <code>"environment" : "dev"</code>
     /// Read-write.
     pub labels: Option<HashMap<String, String>>,
-    /// Creation time.
-    /// 
-    /// Read-only.
-    #[serde(rename="createTime")]
-    pub create_time: Option<String>,
     /// The number uniquely identifying the project.
     /// 
     /// Example: <code>415104041262</code>
     /// Read-only.
     #[serde(rename="projectNumber")]
     pub project_number: Option<String>,
+    /// Creation time.
+    /// 
+    /// Read-only.
+    #[serde(rename="createTime")]
+    pub create_time: Option<String>,
     /// The Project lifecycle state.
     /// 
     /// Read-only.
@@ -1331,22 +1257,6 @@ pub struct Project {
 impl RequestValue for Project {}
 impl Resource for Project {}
 impl ResponseResult for Project {}
-
-
-/// The request sent to the UndeleteProject
-/// method.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [undelete projects](struct.ProjectUndeleteCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct UndeleteProjectRequest { _never_set: Option<bool> }
-
-impl RequestValue for UndeleteProjectRequest {}
 
 
 /// The request sent to the
@@ -1364,29 +1274,6 @@ impl RequestValue for UndeleteProjectRequest {}
 pub struct GetAncestryRequest { _never_set: Option<bool> }
 
 impl RequestValue for GetAncestryRequest {}
-
-
-/// The request sent to the ClearOrgPolicy method.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [clear org policy folders](struct.FolderClearOrgPolicyCall.html) (request)
-/// * [clear org policy organizations](struct.OrganizationClearOrgPolicyCall.html) (request)
-/// * [clear org policy projects](struct.ProjectClearOrgPolicyCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ClearOrgPolicyRequest {
-    /// The current version, for concurrency control. Not sending an `etag`
-    /// will cause the `Policy` to be cleared blindly.
-    pub etag: Option<String>,
-    /// Name of the `Constraint` of the `Policy` to clear.
-    pub constraint: Option<String>,
-}
-
-impl RequestValue for ClearOrgPolicyRequest {}
 
 
 /// The root node in the resource hierarchy to which a particular entity's
@@ -1439,20 +1326,42 @@ impl Resource for Organization {}
 impl ResponseResult for Organization {}
 
 
-/// A `Constraint` that allows or disallows a list of string values, which are
-/// configured by an Organization's policy administrator with a `Policy`.
+/// A page of the response received from the
+/// ListProjects
+/// method.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// A paginated response where more pages are available has
+/// `next_page_token` set. This token can be used in a subsequent request to
+/// retrieve the next request page.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list projects](struct.ProjectListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListConstraint {
-    /// Optional. The Google Cloud Console will try to default to a configuration
-    /// that matches the value specified in this `Constraint`.
-    #[serde(rename="suggestedValue")]
-    pub suggested_value: Option<String>,
+pub struct ListProjectsResponse {
+    /// Pagination token.
+    /// 
+    /// If the result set is too large to fit in a single response, this token
+    /// is returned. It encodes the position of the current result cursor.
+    /// Feeding this value into a new list request with the `page_token` parameter
+    /// gives the next page of the results.
+    /// 
+    /// When `next_page_token` is not filled in, there is no next page and
+    /// the list returned is the last page in the result set.
+    /// 
+    /// Pagination tokens have a limited lifetime.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The list of Projects that matched the list filter. This list can
+    /// be paginated.
+    pub projects: Option<Vec<Project>>,
 }
 
-impl Part for ListConstraint {}
+impl ResponseResult for ListProjectsResponse {}
 
 
 /// The request sent to the GetOrgPolicy method.
@@ -1503,6 +1412,22 @@ pub struct ListAvailableOrgPolicyConstraintsRequest {
 impl RequestValue for ListAvailableOrgPolicyConstraintsRequest {}
 
 
+/// The request sent to the UndeleteProject
+/// method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [undelete projects](struct.ProjectUndeleteCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UndeleteProjectRequest { _never_set: Option<bool> }
+
+impl RequestValue for UndeleteProjectRequest {}
+
+
 /// The request sent to the ListOrgPolicies method.
 /// 
 /// # Activities
@@ -1530,56 +1455,66 @@ pub struct ListOrgPoliciesRequest {
 impl RequestValue for ListOrgPoliciesRequest {}
 
 
-/// A Lien represents an encumbrance on the actions that can be performed on a
-/// resource.
+/// The response message for Liens.ListLiens.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [create liens](struct.LienCreateCall.html) (request|response)
-/// * [delete liens](struct.LienDeleteCall.html) (none)
-/// * [list liens](struct.LienListCall.html) (none)
+/// * [list liens](struct.LienListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Lien {
-    /// A stable, user-visible/meaningful string identifying the origin of the
-    /// Lien, intended to be inspected programmatically. Maximum length of 200
-    /// characters.
-    /// 
-    /// Example: 'compute.googleapis.com'
-    pub origin: Option<String>,
-    /// The types of operations which should be blocked as a result of this Lien.
-    /// Each value should correspond to an IAM permission. The server will
-    /// validate the permissions against those for which Liens are supported.
-    /// 
-    /// An empty list is meaningless and will be rejected.
-    /// 
-    /// Example: ['resourcemanager.projects.delete']
-    pub restrictions: Option<Vec<String>>,
-    /// Concise user-visible strings indicating why an action cannot be performed
-    /// on a resource. Maximum lenth of 200 characters.
-    /// 
-    /// Example: 'Holds production API key'
-    pub reason: Option<String>,
-    /// A system-generated unique identifier for this Lien.
-    /// 
-    /// Example: `liens/1234abcd`
-    pub name: Option<String>,
-    /// A reference to the resource this Lien is attached to. The server will
-    /// validate the parent against those for which Liens are supported.
-    /// 
-    /// Example: `projects/1234`
-    pub parent: Option<String>,
-    /// The creation time of this Lien.
-    #[serde(rename="createTime")]
-    pub create_time: Option<String>,
+pub struct ListLiensResponse {
+    /// Token to retrieve the next page of results, or empty if there are no more
+    /// results in the list.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// A list of Liens.
+    pub liens: Option<Vec<Lien>>,
 }
 
-impl RequestValue for Lien {}
-impl Resource for Lien {}
-impl ResponseResult for Lien {}
+impl ResponseResult for ListLiensResponse {}
+
+
+/// Associates `members` with a `role`.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Binding {
+    /// Role that is assigned to `members`.
+    /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
+    /// Required
+    pub role: Option<String>,
+    /// Specifies the identities requesting access for a Cloud Platform resource.
+    /// `members` can have the following values:
+    /// 
+    /// * `allUsers`: A special identifier that represents anyone who is
+    ///    on the internet; with or without a Google account.
+    /// 
+    /// * `allAuthenticatedUsers`: A special identifier that represents anyone
+    ///    who is authenticated with a Google account or a service account.
+    /// 
+    /// * `user:{emailid}`: An email address that represents a specific Google
+    ///    account. For example, `alice@gmail.com` or `joe@example.com`.
+    /// 
+    /// 
+    /// * `serviceAccount:{emailid}`: An email address that represents a service
+    ///    account. For example, `my-other-app@appspot.gserviceaccount.com`.
+    /// 
+    /// * `group:{emailid}`: An email address that represents a Google group.
+    ///    For example, `admins@example.com`.
+    /// 
+    /// 
+    /// * `domain:{domain}`: A Google Apps domain name that represents all the
+    ///    users of that domain. For example, `google.com` or `example.com`.
+    /// 
+    /// 
+    pub members: Option<Vec<String>>,
+}
+
+impl Part for Binding {}
 
 
 /// Specifies the audit configuration for a service.
@@ -1651,6 +1586,32 @@ pub struct AuditConfig {
 impl Part for AuditConfig {}
 
 
+/// The response returned from the ListOrgPolicies method. It will be empty
+/// if no `Policies` are set on the resource.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list org policies organizations](struct.OrganizationListOrgPolicyCall.html) (response)
+/// * [list org policies projects](struct.ProjectListOrgPolicyCall.html) (response)
+/// * [list org policies folders](struct.FolderListOrgPolicyCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListOrgPoliciesResponse {
+    /// Page token used to retrieve the next page. This is currently not used, but
+    /// the server may at any point start supplying a valid token.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The `Policies` that are set on the resource. It will be empty if no
+    /// `Policies` are set.
+    pub policies: Option<Vec<OrgPolicy>>,
+}
+
+impl ResponseResult for ListOrgPoliciesResponse {}
+
+
 /// The request sent to the `SearchOrganizations` method.
 /// 
 /// # Activities
@@ -1707,7 +1668,7 @@ pub struct Operation {
     /// The error result of the operation in case of failure or cancellation.
     pub error: Option<Status>,
     /// If the value is `false`, it means the operation is still in progress.
-    /// If true, the operation is completed, and either `error` or `response` is
+    /// If `true`, the operation is completed, and either `error` or `response` is
     /// available.
     pub done: Option<bool>,
     /// The normal response of the operation in case of success.  If the original
@@ -1754,30 +1715,68 @@ pub struct GetEffectiveOrgPolicyRequest {
 impl RequestValue for GetEffectiveOrgPolicyRequest {}
 
 
-/// The response returned from the ListOrgPolicies method. It will be empty
-/// if no `Policies` are set on the resource.
+/// Defines a Cloud Organization `Policy` which is used to specify `Constraints`
+/// for configurations of Cloud Platform resources.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list org policies organizations](struct.OrganizationListOrgPolicyCall.html) (response)
-/// * [list org policies projects](struct.ProjectListOrgPolicyCall.html) (response)
-/// * [list org policies folders](struct.FolderListOrgPolicyCall.html) (response)
+/// * [set org policy folders](struct.FolderSetOrgPolicyCall.html) (response)
+/// * [get org policy organizations](struct.OrganizationGetOrgPolicyCall.html) (response)
+/// * [get effective org policy organizations](struct.OrganizationGetEffectiveOrgPolicyCall.html) (response)
+/// * [set org policy organizations](struct.OrganizationSetOrgPolicyCall.html) (response)
+/// * [get effective org policy folders](struct.FolderGetEffectiveOrgPolicyCall.html) (response)
+/// * [get org policy folders](struct.FolderGetOrgPolicyCall.html) (response)
+/// * [get org policy projects](struct.ProjectGetOrgPolicyCall.html) (response)
+/// * [get effective org policy projects](struct.ProjectGetEffectiveOrgPolicyCall.html) (response)
+/// * [set org policy projects](struct.ProjectSetOrgPolicyCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListOrgPoliciesResponse {
-    /// Page token used to retrieve the next page. This is currently not used, but
-    /// the server may at any point start supplying a valid token.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The `Policies` that are set on the resource. It will be empty if no
-    /// `Policies` are set.
-    pub policies: Option<Vec<OrgPolicy>>,
+pub struct OrgPolicy {
+    /// The time stamp the `Policy` was previously updated. This is set by the
+    /// server, not specified by the caller, and represents the last time a call to
+    /// `SetOrgPolicy` was made for that `Policy`. Any value set by the client will
+    /// be ignored.
+    #[serde(rename="updateTime")]
+    pub update_time: Option<String>,
+    /// Version of the `Policy`. Default version is 0;
+    pub version: Option<i32>,
+    /// An opaque tag indicating the current version of the `Policy`, used for
+    /// concurrency control.
+    /// 
+    /// When the `Policy` is returned from either a `GetPolicy` or a
+    /// `ListOrgPolicy` request, this `etag` indicates the version of the current
+    /// `Policy` to use when executing a read-modify-write loop.
+    /// 
+    /// When the `Policy` is returned from a `GetEffectivePolicy` request, the
+    /// `etag` will be unset.
+    /// 
+    /// When the `Policy` is used in a `SetOrgPolicy` method, use the `etag` value
+    /// that was returned from a `GetOrgPolicy` request as part of a
+    /// read-modify-write loop for concurrency control. Not setting the `etag`in a
+    /// `SetOrgPolicy` request will result in an unconditional write of the
+    /// `Policy`.
+    pub etag: Option<String>,
+    /// The name of the `Constraint` the `Policy` is configuring, for example,
+    /// `constraints/serviceuser.services`.
+    /// 
+    /// Immutable after creation.
+    pub constraint: Option<String>,
+    /// Restores the default behavior of the constraint; independent of
+    /// `Constraint` type.
+    #[serde(rename="restoreDefault")]
+    pub restore_default: Option<RestoreDefault>,
+    /// List of values either allowed or disallowed.
+    #[serde(rename="listPolicy")]
+    pub list_policy: Option<ListPolicy>,
+    /// For boolean `Constraints`, whether to enforce the `Constraint` or not.
+    #[serde(rename="booleanPolicy")]
+    pub boolean_policy: Option<BooleanPolicy>,
 }
 
-impl ResponseResult for ListOrgPoliciesResponse {}
+impl ResponseResult for OrgPolicy {}
 
 
 /// The entity that owns an Organization. The lifetime of the Organization and
@@ -1843,16 +1842,14 @@ impl<'a, C, A> FolderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the effective `Policy` on a resource. This is the result of merging
-    /// `Policies` in the resource hierarchy. The returned `Policy` will not have
-    /// an `etag`set because it is a computed `Policy` across multiple resources.
+    /// Clears a `Policy` from a resource.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `resource` - The name of the resource to start computing the effective `Policy`.
-    pub fn get_effective_org_policy(&self, request: GetEffectiveOrgPolicyRequest, resource: &str) -> FolderGetEffectiveOrgPolicyCall<'a, C, A> {
-        FolderGetEffectiveOrgPolicyCall {
+    /// * `resource` - Name of the resource for the `Policy` to clear.
+    pub fn clear_org_policy(&self, request: ClearOrgPolicyRequest, resource: &str) -> FolderClearOrgPolicyCall<'a, C, A> {
+        FolderClearOrgPolicyCall {
             hub: self.hub,
             _request: request,
             _resource: resource.to_string(),
@@ -1864,14 +1861,16 @@ impl<'a, C, A> FolderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Clears a `Policy` from a resource.
+    /// Gets the effective `Policy` on a resource. This is the result of merging
+    /// `Policies` in the resource hierarchy. The returned `Policy` will not have
+    /// an `etag`set because it is a computed `Policy` across multiple resources.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `resource` - Name of the resource for the `Policy` to clear.
-    pub fn clear_org_policy(&self, request: ClearOrgPolicyRequest, resource: &str) -> FolderClearOrgPolicyCall<'a, C, A> {
-        FolderClearOrgPolicyCall {
+    /// * `resource` - The name of the resource to start computing the effective `Policy`.
+    pub fn get_effective_org_policy(&self, request: GetEffectiveOrgPolicyRequest, resource: &str) -> FolderGetEffectiveOrgPolicyCall<'a, C, A> {
+        FolderGetEffectiveOrgPolicyCall {
             hub: self.hub,
             _request: request,
             _resource: resource.to_string(),
@@ -2010,25 +2009,6 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Clears a `Policy` from a resource.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `resource` - Name of the resource for the `Policy` to clear.
-    pub fn clear_org_policy(&self, request: ClearOrgPolicyRequest, resource: &str) -> OrganizationClearOrgPolicyCall<'a, C, A> {
-        OrganizationClearOrgPolicyCall {
-            hub: self.hub,
-            _request: request,
-            _resource: resource.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
     /// Gets a `Policy` on a resource.
     /// 
     /// If no `Policy` is set on the resource, a `Policy` is returned with default
@@ -2095,6 +2075,9 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     /// existing policy. The `resource` field should be the organization's resource
     /// name, e.g. "organizations/123".
     /// 
+    /// Authorization requires the Google IAM permission
+    /// `resourcemanager.organizations.setIamPolicy` on the specified organization
+    /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
@@ -2156,6 +2139,9 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     /// order. New Organizations do not necessarily appear at the end of the
     /// results.
     /// 
+    /// Search will only return organizations on which the user has the permission
+    /// `resourcemanager.organizations.get`
+    /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
@@ -2174,6 +2160,9 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     /// Gets the access control policy for an Organization resource. May be empty
     /// if no such policy or resource exists. The `resource` field should be the
     /// organization's resource name, e.g. "organizations/123".
+    /// 
+    /// Authorization requires the Google IAM permission
+    /// `resourcemanager.organizations.getIamPolicy` on the specified organization
     /// 
     /// # Arguments
     ///
@@ -2196,6 +2185,8 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     /// Returns permissions that a caller has on the specified Organization.
     /// The `resource` field should be the organization's resource name,
     /// e.g. "organizations/123".
+    /// 
+    /// There are no permissions required for making this API call.
     /// 
     /// # Arguments
     ///
@@ -2227,6 +2218,25 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     /// * `resource` - Resource name of the resource to attach the `Policy`.
     pub fn set_org_policy(&self, request: SetOrgPolicyRequest, resource: &str) -> OrganizationSetOrgPolicyCall<'a, C, A> {
         OrganizationSetOrgPolicyCall {
+            hub: self.hub,
+            _request: request,
+            _resource: resource.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Clears a `Policy` from a resource.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `resource` - Name of the resource for the `Policy` to clear.
+    pub fn clear_org_policy(&self, request: ClearOrgPolicyRequest, resource: &str) -> OrganizationClearOrgPolicyCall<'a, C, A> {
+        OrganizationClearOrgPolicyCall {
             hub: self.hub,
             _request: request,
             _resource: resource.to_string(),
@@ -2429,6 +2439,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Returns the IAM access control policy for the specified Project.
     /// Permission is denied if the policy or the resource does not exist.
     /// 
+    /// Authorization requires the Google IAM permission
+    /// `resourcemanager.projects.getIamPolicy` on the project
+    /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
@@ -2455,6 +2468,10 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// percentile. As of 2016-08-29, we are observing 6 seconds 50th percentile
     /// latency. 95th percentile latency is around 11 seconds. We recommend
     /// polling at the 5th second with an exponential backoff.
+    /// 
+    /// Authorization requires the Google IAM permission
+    /// `resourcemanager.projects.create` on the specified parent for the new
+    /// project.
     /// 
     /// # Arguments
     ///
@@ -2584,6 +2601,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Returns permissions that a caller has on the specified Project.
     /// 
+    /// There are no permissions required for making this API call.
+    /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
@@ -2659,52 +2678,16 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sets the IAM access control policy for the specified Project. Replaces
-    /// any existing policy.
-    /// 
-    /// The following constraints apply when using `setIamPolicy()`:
-    /// 
-    /// + Project does not support `allUsers` and `allAuthenticatedUsers` as
-    /// `members` in a `Binding` of a `Policy`.
-    /// 
-    /// + The owner role can be granted only to `user` and `serviceAccount`.
-    /// 
-    /// + Service accounts can be made owners of a project directly
-    /// without any restrictions. However, to be added as an owner, a user must be
-    /// invited via Cloud Platform console and must accept the invitation.
-    /// 
-    /// + A user cannot be granted the owner role using `setIamPolicy()`. The user
-    /// must be granted the owner role using the Cloud Platform Console and must
-    /// explicitly accept the invitation.
-    /// 
-    /// + Invitations to grant the owner role cannot be sent using
-    /// `setIamPolicy()`;
-    /// they must be sent only using the Cloud Platform Console.
-    /// 
-    /// + Membership changes that leave the project without any owners that have
-    /// accepted the Terms of Service (ToS) will be rejected.
-    /// 
-    /// + There must be at least one owner who has accepted the Terms of
-    /// Service (ToS) agreement in the policy. Calling `setIamPolicy()` to
-    /// remove the last ToS-accepted owner from the policy will fail. This
-    /// restriction also applies to legacy projects that no longer have owners
-    /// who have accepted the ToS. Edits to IAM policies will be rejected until
-    /// the lack of a ToS-accepting owner is rectified.
-    /// 
-    /// + Calling this method requires enabling the App Engine Admin API.
-    /// 
-    /// Note: Removing service accounts from policies or changing their roles
-    /// can render services completely inoperable. It is important to understand
-    /// how the service account is being used before removing or updating its
-    /// roles.
+    /// Gets the effective `Policy` on a resource. This is the result of merging
+    /// `Policies` in the resource hierarchy. The returned `Policy` will not have
+    /// an `etag`set because it is a computed `Policy` across multiple resources.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `resource` - REQUIRED: The resource for which the policy is being specified.
-    ///                See the operation documentation for the appropriate value for this field.
-    pub fn set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectSetIamPolicyCall<'a, C, A> {
-        ProjectSetIamPolicyCall {
+    /// * `resource` - The name of the resource to start computing the effective `Policy`.
+    pub fn get_effective_org_policy(&self, request: GetEffectiveOrgPolicyRequest, resource: &str) -> ProjectGetEffectiveOrgPolicyCall<'a, C, A> {
+        ProjectGetEffectiveOrgPolicyCall {
             hub: self.hub,
             _request: request,
             _resource: resource.to_string(),
@@ -2762,16 +2745,56 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the effective `Policy` on a resource. This is the result of merging
-    /// `Policies` in the resource hierarchy. The returned `Policy` will not have
-    /// an `etag`set because it is a computed `Policy` across multiple resources.
+    /// Sets the IAM access control policy for the specified Project. Replaces
+    /// any existing policy.
+    /// 
+    /// The following constraints apply when using `setIamPolicy()`:
+    /// 
+    /// + Project does not support `allUsers` and `allAuthenticatedUsers` as
+    /// `members` in a `Binding` of a `Policy`.
+    /// 
+    /// + The owner role can be granted only to `user` and `serviceAccount`.
+    /// 
+    /// + Service accounts can be made owners of a project directly
+    /// without any restrictions. However, to be added as an owner, a user must be
+    /// invited via Cloud Platform console and must accept the invitation.
+    /// 
+    /// + A user cannot be granted the owner role using `setIamPolicy()`. The user
+    /// must be granted the owner role using the Cloud Platform Console and must
+    /// explicitly accept the invitation.
+    /// 
+    /// + Invitations to grant the owner role cannot be sent using
+    /// `setIamPolicy()`;
+    /// they must be sent only using the Cloud Platform Console.
+    /// 
+    /// + Membership changes that leave the project without any owners that have
+    /// accepted the Terms of Service (ToS) will be rejected.
+    /// 
+    /// + If the project is not part of an organization, there must be at least
+    /// one owner who has accepted the Terms of Service (ToS) agreement in the
+    /// policy. Calling `setIamPolicy()` to remove the last ToS-accepted owner
+    /// from the policy will fail. This restriction also applies to legacy
+    /// projects that no longer have owners who have accepted the ToS. Edits to
+    /// IAM policies will be rejected until the lack of a ToS-accepting owner is
+    /// rectified.
+    /// 
+    /// + Calling this method requires enabling the App Engine Admin API.
+    /// 
+    /// Note: Removing service accounts from policies or changing their roles
+    /// can render services completely inoperable. It is important to understand
+    /// how the service account is being used before removing or updating its
+    /// roles.
+    /// 
+    /// Authorization requires the Google IAM permission
+    /// `resourcemanager.projects.setIamPolicy` on the project
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `resource` - The name of the resource to start computing the effective `Policy`.
-    pub fn get_effective_org_policy(&self, request: GetEffectiveOrgPolicyRequest, resource: &str) -> ProjectGetEffectiveOrgPolicyCall<'a, C, A> {
-        ProjectGetEffectiveOrgPolicyCall {
+    /// * `resource` - REQUIRED: The resource for which the policy is being specified.
+    ///                See the operation documentation for the appropriate value for this field.
+    pub fn set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectSetIamPolicyCall<'a, C, A> {
+        ProjectSetIamPolicyCall {
             hub: self.hub,
             _request: request,
             _resource: resource.to_string(),
@@ -2850,6 +2873,290 @@ impl<'a, C, A> OperationMethods<'a, C, A> {
 // ###################
 // CallBuilders   ###
 // #################
+
+/// Clears a `Policy` from a resource.
+///
+/// A builder for the *clearOrgPolicy* method supported by a *folder* resource.
+/// It is not used directly, but through a `FolderMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_cloudresourcemanager1 as cloudresourcemanager1;
+/// use cloudresourcemanager1::ClearOrgPolicyRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use cloudresourcemanager1::CloudResourceManager;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudResourceManager::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = ClearOrgPolicyRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.folders().clear_org_policy(req, "resource")
+///              .doit();
+/// # }
+/// ```
+pub struct FolderClearOrgPolicyCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudResourceManager<C, A>,
+    _request: ClearOrgPolicyRequest,
+    _resource: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for FolderClearOrgPolicyCall<'a, C, A> {}
+
+impl<'a, C, A> FolderClearOrgPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "cloudresourcemanager.folders.clearOrgPolicy",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        params.push(("resource", self._resource.to_string()));
+        for &field in ["alt", "resource"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+resource}:clearOrgPolicy";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["resource"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: ClearOrgPolicyRequest) -> FolderClearOrgPolicyCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Name of the resource for the `Policy` to clear.
+    ///
+    /// Sets the *resource* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn resource(mut self, new_value: &str) -> FolderClearOrgPolicyCall<'a, C, A> {
+        self._resource = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> FolderClearOrgPolicyCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> FolderClearOrgPolicyCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> FolderClearOrgPolicyCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
 
 /// Gets the effective `Policy` on a resource. This is the result of merging
 /// `Policies` in the resource hierarchy. The returned `Policy` will not have
@@ -3126,290 +3433,6 @@ impl<'a, C, A> FolderGetEffectiveOrgPolicyCall<'a, C, A> where C: BorrowMut<hype
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> FolderGetEffectiveOrgPolicyCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Clears a `Policy` from a resource.
-///
-/// A builder for the *clearOrgPolicy* method supported by a *folder* resource.
-/// It is not used directly, but through a `FolderMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_cloudresourcemanager1 as cloudresourcemanager1;
-/// use cloudresourcemanager1::ClearOrgPolicyRequest;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use cloudresourcemanager1::CloudResourceManager;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = CloudResourceManager::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = ClearOrgPolicyRequest::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.folders().clear_org_policy(req, "resource")
-///              .doit();
-/// # }
-/// ```
-pub struct FolderClearOrgPolicyCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a CloudResourceManager<C, A>,
-    _request: ClearOrgPolicyRequest,
-    _resource: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for FolderClearOrgPolicyCall<'a, C, A> {}
-
-impl<'a, C, A> FolderClearOrgPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "cloudresourcemanager.folders.clearOrgPolicy",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
-        params.push(("resource", self._resource.to_string()));
-        for &field in ["alt", "resource"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v1/{+resource}:clearOrgPolicy";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
-            }
-            url = url.replace(find_this, &replace_with);
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["resource"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ClearOrgPolicyRequest) -> FolderClearOrgPolicyCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// Name of the resource for the `Policy` to clear.
-    ///
-    /// Sets the *resource* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> FolderClearOrgPolicyCall<'a, C, A> {
-        self._resource = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> FolderClearOrgPolicyCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> FolderClearOrgPolicyCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FolderClearOrgPolicyCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4566,290 +4589,6 @@ impl<'a, C, A> FolderListOrgPolicyCall<'a, C, A> where C: BorrowMut<hyper::Clien
 }
 
 
-/// Clears a `Policy` from a resource.
-///
-/// A builder for the *clearOrgPolicy* method supported by a *organization* resource.
-/// It is not used directly, but through a `OrganizationMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_cloudresourcemanager1 as cloudresourcemanager1;
-/// use cloudresourcemanager1::ClearOrgPolicyRequest;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use cloudresourcemanager1::CloudResourceManager;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = CloudResourceManager::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = ClearOrgPolicyRequest::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.organizations().clear_org_policy(req, "resource")
-///              .doit();
-/// # }
-/// ```
-pub struct OrganizationClearOrgPolicyCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a CloudResourceManager<C, A>,
-    _request: ClearOrgPolicyRequest,
-    _resource: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for OrganizationClearOrgPolicyCall<'a, C, A> {}
-
-impl<'a, C, A> OrganizationClearOrgPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "cloudresourcemanager.organizations.clearOrgPolicy",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
-        params.push(("resource", self._resource.to_string()));
-        for &field in ["alt", "resource"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v1/{+resource}:clearOrgPolicy";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
-            }
-            url = url.replace(find_this, &replace_with);
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["resource"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ClearOrgPolicyRequest) -> OrganizationClearOrgPolicyCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// Name of the resource for the `Policy` to clear.
-    ///
-    /// Sets the *resource* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> OrganizationClearOrgPolicyCall<'a, C, A> {
-        self._resource = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OrganizationClearOrgPolicyCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationClearOrgPolicyCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationClearOrgPolicyCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
 /// Gets a `Policy` on a resource.
 /// 
 /// If no `Policy` is set on the resource, a `Policy` is returned with default
@@ -5710,6 +5449,9 @@ impl<'a, C, A> OrganizationListOrgPolicyCall<'a, C, A> where C: BorrowMut<hyper:
 /// Sets the access control policy on an Organization resource. Replaces any
 /// existing policy. The `resource` field should be the organization's resource
 /// name, e.g. "organizations/123".
+/// 
+/// Authorization requires the Google IAM permission
+/// `resourcemanager.organizations.setIamPolicy` on the specified organization
 ///
 /// A builder for the *setIamPolicy* method supported by a *organization* resource.
 /// It is not used directly, but through a `OrganizationMethods` instance.
@@ -6537,6 +6279,9 @@ impl<'a, C, A> OrganizationGetEffectiveOrgPolicyCall<'a, C, A> where C: BorrowMu
 /// the specified filter. This method returns Organizations in an unspecified
 /// order. New Organizations do not necessarily appear at the end of the
 /// results.
+/// 
+/// Search will only return organizations on which the user has the permission
+/// `resourcemanager.organizations.get`
 ///
 /// A builder for the *search* method supported by a *organization* resource.
 /// It is not used directly, but through a `OrganizationMethods` instance.
@@ -6786,6 +6531,9 @@ impl<'a, C, A> OrganizationSearchCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// Gets the access control policy for an Organization resource. May be empty
 /// if no such policy or resource exists. The `resource` field should be the
 /// organization's resource name, e.g. "organizations/123".
+/// 
+/// Authorization requires the Google IAM permission
+/// `resourcemanager.organizations.getIamPolicy` on the specified organization
 ///
 /// A builder for the *getIamPolicy* method supported by a *organization* resource.
 /// It is not used directly, but through a `OrganizationMethods` instance.
@@ -7073,6 +6821,8 @@ impl<'a, C, A> OrganizationGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
 /// Returns permissions that a caller has on the specified Organization.
 /// The `resource` field should be the organization's resource name,
 /// e.g. "organizations/123".
+/// 
+/// There are no permissions required for making this API call.
 ///
 /// A builder for the *testIamPermissions* method supported by a *organization* resource.
 /// It is not used directly, but through a `OrganizationMethods` instance.
@@ -7634,6 +7384,290 @@ impl<'a, C, A> OrganizationSetOrgPolicyCall<'a, C, A> where C: BorrowMut<hyper::
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationSetOrgPolicyCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Clears a `Policy` from a resource.
+///
+/// A builder for the *clearOrgPolicy* method supported by a *organization* resource.
+/// It is not used directly, but through a `OrganizationMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_cloudresourcemanager1 as cloudresourcemanager1;
+/// use cloudresourcemanager1::ClearOrgPolicyRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use cloudresourcemanager1::CloudResourceManager;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudResourceManager::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = ClearOrgPolicyRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.organizations().clear_org_policy(req, "resource")
+///              .doit();
+/// # }
+/// ```
+pub struct OrganizationClearOrgPolicyCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudResourceManager<C, A>,
+    _request: ClearOrgPolicyRequest,
+    _resource: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for OrganizationClearOrgPolicyCall<'a, C, A> {}
+
+impl<'a, C, A> OrganizationClearOrgPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "cloudresourcemanager.organizations.clearOrgPolicy",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        params.push(("resource", self._resource.to_string()));
+        for &field in ["alt", "resource"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+resource}:clearOrgPolicy";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["resource"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: ClearOrgPolicyRequest) -> OrganizationClearOrgPolicyCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Name of the resource for the `Policy` to clear.
+    ///
+    /// Sets the *resource* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn resource(mut self, new_value: &str) -> OrganizationClearOrgPolicyCall<'a, C, A> {
+        self._resource = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OrganizationClearOrgPolicyCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationClearOrgPolicyCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationClearOrgPolicyCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8688,6 +8722,9 @@ impl<'a, C, A> ProjectDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 /// Returns the IAM access control policy for the specified Project.
 /// Permission is denied if the policy or the resource does not exist.
+/// 
+/// Authorization requires the Google IAM permission
+/// `resourcemanager.projects.getIamPolicy` on the project
 ///
 /// A builder for the *getIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -8976,6 +9013,10 @@ impl<'a, C, A> ProjectGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// percentile. As of 2016-08-29, we are observing 6 seconds 50th percentile
 /// latency. 95th percentile latency is around 11 seconds. We recommend
 /// polling at the 5th second with an exponential backoff.
+/// 
+/// Authorization requires the Google IAM permission
+/// `resourcemanager.projects.create` on the specified parent for the new
+/// project.
 ///
 /// A builder for the *create* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -10656,6 +10697,8 @@ impl<'a, C, A> ProjectListOrgPolicyCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
 
 /// Returns permissions that a caller has on the specified Project.
+/// 
+/// There are no permissions required for making this API call.
 ///
 /// A builder for the *testIamPermissions* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -11680,8 +11723,16 @@ impl<'a, C, A> ProjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// |NAME:howl|Equivalent to above.|
     /// |labels.color:*|The project has the label `color`.|
     /// |labels.color:red|The project's label `color` has the value `red`.|
-    /// |labels.color:red&nbsp;labels.size:big|The project's label `color` has the
-    /// value `red` and its label `size` has the value `big`.
+    /// |labels.color:red&nbsp;labels.size:big|The project's label `color` has the value `red` and its label `size` has the value `big`.
+    /// 
+    /// If you specify a filter that has both `parent.type` and `parent.id`, then
+    /// the `resourcemanager.projects.list` permission is checked on the parent.
+    /// If the user has this permission, all projects under the parent will be
+    /// returned after remaining filters have been applied. If the user lacks this
+    /// permission, then all projects for which the user has the
+    /// `resourcemanager.projects.get` permission will be returned after remaining
+    /// filters have been applied. If no filter is specified, the call will return
+    /// projects for which the user has `resourcemanager.projects.get` permissions.
     /// 
     /// Optional.
     ///
@@ -11755,46 +11806,11 @@ impl<'a, C, A> ProjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 }
 
 
-/// Sets the IAM access control policy for the specified Project. Replaces
-/// any existing policy.
-/// 
-/// The following constraints apply when using `setIamPolicy()`:
-/// 
-/// + Project does not support `allUsers` and `allAuthenticatedUsers` as
-/// `members` in a `Binding` of a `Policy`.
-/// 
-/// + The owner role can be granted only to `user` and `serviceAccount`.
-/// 
-/// + Service accounts can be made owners of a project directly
-/// without any restrictions. However, to be added as an owner, a user must be
-/// invited via Cloud Platform console and must accept the invitation.
-/// 
-/// + A user cannot be granted the owner role using `setIamPolicy()`. The user
-/// must be granted the owner role using the Cloud Platform Console and must
-/// explicitly accept the invitation.
-/// 
-/// + Invitations to grant the owner role cannot be sent using
-/// `setIamPolicy()`;
-/// they must be sent only using the Cloud Platform Console.
-/// 
-/// + Membership changes that leave the project without any owners that have
-/// accepted the Terms of Service (ToS) will be rejected.
-/// 
-/// + There must be at least one owner who has accepted the Terms of
-/// Service (ToS) agreement in the policy. Calling `setIamPolicy()` to
-/// remove the last ToS-accepted owner from the policy will fail. This
-/// restriction also applies to legacy projects that no longer have owners
-/// who have accepted the ToS. Edits to IAM policies will be rejected until
-/// the lack of a ToS-accepting owner is rectified.
-/// 
-/// + Calling this method requires enabling the App Engine Admin API.
-/// 
-/// Note: Removing service accounts from policies or changing their roles
-/// can render services completely inoperable. It is important to understand
-/// how the service account is being used before removing or updating its
-/// roles.
+/// Gets the effective `Policy` on a resource. This is the result of merging
+/// `Policies` in the resource hierarchy. The returned `Policy` will not have
+/// an `etag`set because it is a computed `Policy` across multiple resources.
 ///
-/// A builder for the *setIamPolicy* method supported by a *project* resource.
+/// A builder for the *getEffectiveOrgPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -11806,7 +11822,7 @@ impl<'a, C, A> ProjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_cloudresourcemanager1 as cloudresourcemanager1;
-/// use cloudresourcemanager1::SetIamPolicyRequest;
+/// use cloudresourcemanager1::GetEffectiveOrgPolicyRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -11820,33 +11836,34 @@ impl<'a, C, A> ProjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = SetIamPolicyRequest::default();
+/// let mut req = GetEffectiveOrgPolicyRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().set_iam_policy(req, "resource")
+/// let result = hub.projects().get_effective_org_policy(req, "resource")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectSetIamPolicyCall<'a, C, A>
+pub struct ProjectGetEffectiveOrgPolicyCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a CloudResourceManager<C, A>,
-    _request: SetIamPolicyRequest,
+    _request: GetEffectiveOrgPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectSetIamPolicyCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectGetEffectiveOrgPolicyCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectGetEffectiveOrgPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Policy)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, OrgPolicy)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -11854,7 +11871,7 @@ impl<'a, C, A> ProjectSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Clien
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "cloudresourcemanager.projects.setIamPolicy",
+        dlg.begin(MethodInfo { id: "cloudresourcemanager.projects.getEffectiveOrgPolicy",
                                http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("resource", self._resource.to_string()));
@@ -11870,20 +11887,23 @@ impl<'a, C, A> ProjectSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/projects/{resource}:setIamPolicy";
+        let mut url = self.hub._base_url.clone() + "v1/{+resource}:getEffectiveOrgPolicy";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{resource}", "resource")].iter() {
-            let mut replace_with: Option<&str> = None;
+        for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
+            let mut replace_with = String::new();
             for &(name, ref value) in params.iter() {
                 if name == param_name {
-                    replace_with = Some(value);
+                    replace_with = value.to_string();
                     break;
                 }
             }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+            }
+            url = url.replace(find_this, &replace_with);
         }
         {
             let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
@@ -11993,18 +12013,17 @@ impl<'a, C, A> ProjectSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectSetIamPolicyCall<'a, C, A> {
+    pub fn request(mut self, new_value: GetEffectiveOrgPolicyRequest) -> ProjectGetEffectiveOrgPolicyCall<'a, C, A> {
         self._request = new_value;
         self
     }
-    /// REQUIRED: The resource for which the policy is being specified.
-    /// See the operation documentation for the appropriate value for this field.
+    /// The name of the resource to start computing the effective `Policy`.
     ///
     /// Sets the *resource* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectSetIamPolicyCall<'a, C, A> {
+    pub fn resource(mut self, new_value: &str) -> ProjectGetEffectiveOrgPolicyCall<'a, C, A> {
         self._resource = new_value.to_string();
         self
     }
@@ -12014,7 +12033,7 @@ impl<'a, C, A> ProjectSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectSetIamPolicyCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectGetEffectiveOrgPolicyCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12041,7 +12060,7 @@ impl<'a, C, A> ProjectSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSetIamPolicyCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectGetEffectiveOrgPolicyCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12061,7 +12080,7 @@ impl<'a, C, A> ProjectSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSetIamPolicyCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectGetEffectiveOrgPolicyCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -12643,11 +12662,50 @@ impl<'a, C, A> ProjectUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
-/// Gets the effective `Policy` on a resource. This is the result of merging
-/// `Policies` in the resource hierarchy. The returned `Policy` will not have
-/// an `etag`set because it is a computed `Policy` across multiple resources.
+/// Sets the IAM access control policy for the specified Project. Replaces
+/// any existing policy.
+/// 
+/// The following constraints apply when using `setIamPolicy()`:
+/// 
+/// + Project does not support `allUsers` and `allAuthenticatedUsers` as
+/// `members` in a `Binding` of a `Policy`.
+/// 
+/// + The owner role can be granted only to `user` and `serviceAccount`.
+/// 
+/// + Service accounts can be made owners of a project directly
+/// without any restrictions. However, to be added as an owner, a user must be
+/// invited via Cloud Platform console and must accept the invitation.
+/// 
+/// + A user cannot be granted the owner role using `setIamPolicy()`. The user
+/// must be granted the owner role using the Cloud Platform Console and must
+/// explicitly accept the invitation.
+/// 
+/// + Invitations to grant the owner role cannot be sent using
+/// `setIamPolicy()`;
+/// they must be sent only using the Cloud Platform Console.
+/// 
+/// + Membership changes that leave the project without any owners that have
+/// accepted the Terms of Service (ToS) will be rejected.
+/// 
+/// + If the project is not part of an organization, there must be at least
+/// one owner who has accepted the Terms of Service (ToS) agreement in the
+/// policy. Calling `setIamPolicy()` to remove the last ToS-accepted owner
+/// from the policy will fail. This restriction also applies to legacy
+/// projects that no longer have owners who have accepted the ToS. Edits to
+/// IAM policies will be rejected until the lack of a ToS-accepting owner is
+/// rectified.
+/// 
+/// + Calling this method requires enabling the App Engine Admin API.
+/// 
+/// Note: Removing service accounts from policies or changing their roles
+/// can render services completely inoperable. It is important to understand
+/// how the service account is being used before removing or updating its
+/// roles.
+/// 
+/// Authorization requires the Google IAM permission
+/// `resourcemanager.projects.setIamPolicy` on the project
 ///
-/// A builder for the *getEffectiveOrgPolicy* method supported by a *project* resource.
+/// A builder for the *setIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -12659,7 +12717,7 @@ impl<'a, C, A> ProjectUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_cloudresourcemanager1 as cloudresourcemanager1;
-/// use cloudresourcemanager1::GetEffectiveOrgPolicyRequest;
+/// use cloudresourcemanager1::SetIamPolicyRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -12673,34 +12731,33 @@ impl<'a, C, A> ProjectUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = GetEffectiveOrgPolicyRequest::default();
+/// let mut req = SetIamPolicyRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().get_effective_org_policy(req, "resource")
+/// let result = hub.projects().set_iam_policy(req, "resource")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectGetEffectiveOrgPolicyCall<'a, C, A>
+pub struct ProjectSetIamPolicyCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a CloudResourceManager<C, A>,
-    _request: GetEffectiveOrgPolicyRequest,
+    _request: SetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectGetEffectiveOrgPolicyCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectSetIamPolicyCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectGetEffectiveOrgPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, OrgPolicy)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Policy)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -12708,7 +12765,7 @@ impl<'a, C, A> ProjectGetEffectiveOrgPolicyCall<'a, C, A> where C: BorrowMut<hyp
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "cloudresourcemanager.projects.getEffectiveOrgPolicy",
+        dlg.begin(MethodInfo { id: "cloudresourcemanager.projects.setIamPolicy",
                                http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("resource", self._resource.to_string()));
@@ -12724,23 +12781,20 @@ impl<'a, C, A> ProjectGetEffectiveOrgPolicyCall<'a, C, A> where C: BorrowMut<hyp
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+resource}:getEffectiveOrgPolicy";
+        let mut url = self.hub._base_url.clone() + "v1/projects/{resource}:setIamPolicy";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
-            let mut replace_with = String::new();
+        for &(find_this, param_name) in [("{resource}", "resource")].iter() {
+            let mut replace_with: Option<&str> = None;
             for &(name, ref value) in params.iter() {
                 if name == param_name {
-                    replace_with = value.to_string();
+                    replace_with = Some(value);
                     break;
                 }
             }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
-            }
-            url = url.replace(find_this, &replace_with);
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
             let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
@@ -12850,17 +12904,18 @@ impl<'a, C, A> ProjectGetEffectiveOrgPolicyCall<'a, C, A> where C: BorrowMut<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GetEffectiveOrgPolicyRequest) -> ProjectGetEffectiveOrgPolicyCall<'a, C, A> {
+    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectSetIamPolicyCall<'a, C, A> {
         self._request = new_value;
         self
     }
-    /// The name of the resource to start computing the effective `Policy`.
+    /// REQUIRED: The resource for which the policy is being specified.
+    /// See the operation documentation for the appropriate value for this field.
     ///
     /// Sets the *resource* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectGetEffectiveOrgPolicyCall<'a, C, A> {
+    pub fn resource(mut self, new_value: &str) -> ProjectSetIamPolicyCall<'a, C, A> {
         self._resource = new_value.to_string();
         self
     }
@@ -12870,7 +12925,7 @@ impl<'a, C, A> ProjectGetEffectiveOrgPolicyCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectGetEffectiveOrgPolicyCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectSetIamPolicyCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12897,7 +12952,7 @@ impl<'a, C, A> ProjectGetEffectiveOrgPolicyCall<'a, C, A> where C: BorrowMut<hyp
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectGetEffectiveOrgPolicyCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSetIamPolicyCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12917,7 +12972,7 @@ impl<'a, C, A> ProjectGetEffectiveOrgPolicyCall<'a, C, A> where C: BorrowMut<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectGetEffectiveOrgPolicyCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSetIamPolicyCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

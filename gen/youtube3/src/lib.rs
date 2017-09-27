@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *YouTube* crate version *1.0.6+20170130*, where *20170130* is the exact revision of the *youtube:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *YouTube* crate version *1.0.6+20170918*, where *20170918* is the exact revision of the *youtube:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *YouTube* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/youtube/v3).
@@ -645,6 +645,48 @@ pub struct VideoFileDetails {
 
 impl Part for VideoFileDetails {}
 
+
+/// A liveChatModerator resource represents a moderator for a YouTube live chat. A chat moderator has the ability to ban/unban users from a chat, remove message, etc.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [insert live chat moderators](struct.LiveChatModeratorInsertCall.html) (request|response)
+/// * [list live chat moderators](struct.LiveChatModeratorListCall.html) (none)
+/// * [delete live chat moderators](struct.LiveChatModeratorDeleteCall.html) (none)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct LiveChatModerator {
+    /// The snippet object contains basic details about the moderator.
+    pub snippet: Option<LiveChatModeratorSnippet>,
+    /// Identifies what kind of resource this is. Value: the fixed string "youtube#liveChatModerator".
+    pub kind: Option<String>,
+    /// Etag of this resource.
+    pub etag: Option<String>,
+    /// The ID that YouTube assigns to uniquely identify the moderator.
+    pub id: Option<String>,
+}
+
+impl RequestValue for LiveChatModerator {}
+impl Resource for LiveChatModerator {}
+impl ResponseResult for LiveChatModerator {}
+
+impl ToParts for LiveChatModerator {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.snippet.is_some() { r = r + "snippet,"; }
+        if self.kind.is_some() { r = r + "kind,"; }
+        if self.etag.is_some() { r = r + "etag,"; }
+        if self.id.is_some() { r = r + "id,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Basic details about a playlist, including title, description and thumbnails.
 /// 
@@ -2244,47 +2286,6 @@ impl ToParts for VideoCategoryListResponse {
     }
 }
 
-/// A liveChatBan resource represents a ban for a YouTube live chat.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [insert live chat bans](struct.LiveChatBanInsertCall.html) (request|response)
-/// * [delete live chat bans](struct.LiveChatBanDeleteCall.html) (none)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct LiveChatBan {
-    /// The snippet object contains basic details about the ban.
-    pub snippet: Option<LiveChatBanSnippet>,
-    /// Identifies what kind of resource this is. Value: the fixed string "youtube#liveChatBan".
-    pub kind: Option<String>,
-    /// Etag of this resource.
-    pub etag: Option<String>,
-    /// The ID that YouTube assigns to uniquely identify the ban.
-    pub id: Option<String>,
-}
-
-impl RequestValue for LiveChatBan {}
-impl Resource for LiveChatBan {}
-impl ResponseResult for LiveChatBan {}
-
-impl ToParts for LiveChatBan {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.snippet.is_some() { r = r + "snippet,"; }
-        if self.kind.is_some() { r = r + "kind,"; }
-        if self.etag.is_some() { r = r + "etag,"; }
-        if self.id.is_some() { r = r + "id,"; }
-        r.pop();
-        r
-    }
-}
-
 /// Video processing progress and completion time estimate.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2727,7 +2728,7 @@ pub struct LiveStreamStatus {
 impl Part for LiveStreamStatus {}
 
 
-/// Ratings schemes. The country-specific ratings are mostly for movies and shows. NEXT_ID: 69
+/// Ratings schemes. The country-specific ratings are mostly for movies and shows. NEXT_ID: 71
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -2793,9 +2794,12 @@ pub struct ContentRating {
     /// The video's Consejo de Calificación Cinematográfica (Chile) rating.
     #[serde(rename="cccRating")]
     pub ccc_rating: Option<String>,
-    /// The video's rating from Indonesia's Lembaga Sensor Film.
-    #[serde(rename="lsfRating")]
-    pub lsf_rating: Option<String>,
+    /// The video's rating from Ireland's Raidió Teilifís Éireann.
+    #[serde(rename="rteRating")]
+    pub rte_rating: Option<String>,
+    /// The rating system for MENA countries, a clone of MPAA. It is needed to
+    #[serde(rename="menaMpaaRating")]
+    pub mena_mpaa_rating: Option<String>,
     /// This property has been deprecated. Use the contentDetails.contentRating.cncRating instead.
     #[serde(rename="fmocRating")]
     pub fmoc_rating: Option<String>,
@@ -2892,6 +2896,9 @@ pub struct ContentRating {
     /// The video's Irish Film Classification Office (IFCO - Ireland) rating. See the IFCO website for more information.
     #[serde(rename="ifcoRating")]
     pub ifco_rating: Option<String>,
+    /// The rating system for trailer, DVD, and Ad in the US. See http://movielabs.com/md/ratings/v2.3/html/US_MPAAT_Ratings.html.
+    #[serde(rename="mpaatRating")]
+    pub mpaat_rating: Option<String>,
     /// The video's Australian Classification Board (ACB) or Australian Communications and Media Authority (ACMA) rating. ACMA ratings are used to classify children's television programming.
     #[serde(rename="acbRating")]
     pub acb_rating: Option<String>,
@@ -2901,9 +2908,9 @@ pub struct ContentRating {
     /// The video's rating in the Czech Republic.
     #[serde(rename="czfilmRating")]
     pub czfilm_rating: Option<String>,
-    /// The video's rating from Ireland's Raidió Teilifís Éireann.
-    #[serde(rename="rteRating")]
-    pub rte_rating: Option<String>,
+    /// The video's rating from Indonesia's Lembaga Sensor Film.
+    #[serde(rename="lsfRating")]
+    pub lsf_rating: Option<String>,
     /// The video's National Film Registry of the Russian Federation (MKRF - Russia) rating.
     #[serde(rename="russiaRating")]
     pub russia_rating: Option<String>,
@@ -5020,20 +5027,17 @@ impl ToParts for FanFundingEventListResponse {
 pub struct LiveBroadcast {
     /// The status object contains information about the event's status.
     pub status: Option<LiveBroadcastStatus>,
-    /// no description provided
-    #[serde(rename="topicDetails")]
-    pub topic_details: Option<LiveBroadcastTopicDetails>,
+    /// The snippet object contains basic details about the event, including its title, description, start time, and end time.
+    pub snippet: Option<LiveBroadcastSnippet>,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#liveBroadcast".
     pub kind: Option<String>,
     /// The statistics object contains info about the event's current stats. These include concurrent viewers and total chat count. Statistics can change (in either direction) during the lifetime of an event. Statistics are only returned while the event is live.
     pub statistics: Option<LiveBroadcastStatistics>,
+    /// Etag of this resource.
+    pub etag: Option<String>,
     /// The contentDetails object contains information about the event's video content, such as whether the content can be shown in an embedded video player or if it will be archived and therefore available for viewing after the event has concluded.
     #[serde(rename="contentDetails")]
     pub content_details: Option<LiveBroadcastContentDetails>,
-    /// The snippet object contains basic details about the event, including its title, description, start time, and end time.
-    pub snippet: Option<LiveBroadcastSnippet>,
-    /// Etag of this resource.
-    pub etag: Option<String>,
     /// The ID that YouTube assigns to uniquely identify the broadcast.
     pub id: Option<String>,
 }
@@ -5049,12 +5053,11 @@ impl ToParts for LiveBroadcast {
     fn to_parts(&self) -> String {
         let mut r = String::new();
         if self.status.is_some() { r = r + "status,"; }
-        if self.topic_details.is_some() { r = r + "topicDetails,"; }
+        if self.snippet.is_some() { r = r + "snippet,"; }
         if self.kind.is_some() { r = r + "kind,"; }
         if self.statistics.is_some() { r = r + "statistics,"; }
-        if self.content_details.is_some() { r = r + "contentDetails,"; }
-        if self.snippet.is_some() { r = r + "snippet,"; }
         if self.etag.is_some() { r = r + "etag,"; }
+        if self.content_details.is_some() { r = r + "contentDetails,"; }
         if self.id.is_some() { r = r + "id,"; }
         r.pop();
         r
@@ -5285,19 +5288,6 @@ pub struct PlaylistStatus {
 }
 
 impl Part for PlaylistStatus {}
-
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct LiveBroadcastTopicDetails {
-    /// no description provided
-    pub topics: Option<Vec<LiveBroadcastTopic>>,
-}
-
-impl Part for LiveBroadcastTopicDetails {}
 
 
 /// Settings and Info of the monitor stream
@@ -5772,29 +5762,34 @@ impl Part for CommentThreadSnippet {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LiveBroadcastContentDetails {
-    /// The date and time that the live stream referenced by boundStreamId was last updated.
-    #[serde(rename="boundStreamLastUpdateTimeMs")]
-    pub bound_stream_last_update_time_ms: Option<String>,
+    /// no description provided
+    #[serde(rename="closedCaptionsType")]
+    pub closed_captions_type: Option<String>,
+    /// This setting indicates whether the broadcast should automatically begin with an in-stream slate when you update the broadcast's status to live. After updating the status, you then need to send a liveCuepoints.insert request that sets the cuepoint's eventState to end to remove the in-stream slate and make your broadcast stream visible to viewers.
+    #[serde(rename="startWithSlate")]
+    pub start_with_slate: Option<bool>,
     /// The projection format of this broadcast. This defaults to rectangular.
     pub projection: Option<String>,
     /// This value uniquely identifies the live stream bound to the broadcast.
     #[serde(rename="boundStreamId")]
     pub bound_stream_id: Option<String>,
-    /// This setting indicates whether the broadcast video can be played in an embedded player. If you choose to archive the video (using the enableArchive property), this setting will also apply to the archived video.
-    #[serde(rename="enableEmbed")]
-    pub enable_embed: Option<bool>,
+    /// If both this and enable_low_latency are set, they must match. LATENCY_NORMAL should match enable_low_latency=false LATENCY_LOW should match enable_low_latency=true LATENCY_ULTRA_LOW should have enable_low_latency omitted.
+    #[serde(rename="latencyPreference")]
+    pub latency_preference: Option<String>,
+    /// no description provided
+    pub mesh: Option<String>,
     /// This setting indicates whether HTTP POST closed captioning is enabled for this broadcast. The ingestion URL of the closed captions is returned through the liveStreams API. This is mutually exclusive with using the closed_captions_type property, and is equivalent to setting closed_captions_type to CLOSED_CAPTIONS_HTTP_POST.
     #[serde(rename="enableClosedCaptions")]
     pub enable_closed_captions: Option<bool>,
     /// Indicates whether this broadcast has low latency enabled.
     #[serde(rename="enableLowLatency")]
     pub enable_low_latency: Option<bool>,
-    /// This setting indicates whether the broadcast should automatically begin with an in-stream slate when you update the broadcast's status to live. After updating the status, you then need to send a liveCuepoints.insert request that sets the cuepoint's eventState to end to remove the in-stream slate and make your broadcast stream visible to viewers.
-    #[serde(rename="startWithSlate")]
-    pub start_with_slate: Option<bool>,
-    /// no description provided
-    #[serde(rename="closedCaptionsType")]
-    pub closed_captions_type: Option<String>,
+    /// This setting indicates whether the broadcast video can be played in an embedded player. If you choose to archive the video (using the enableArchive property), this setting will also apply to the archived video.
+    #[serde(rename="enableEmbed")]
+    pub enable_embed: Option<bool>,
+    /// The monitorStream object contains information about the monitor stream, which the broadcaster can use to review the event content before the broadcast stream is shown publicly.
+    #[serde(rename="monitorStream")]
+    pub monitor_stream: Option<MonitorStreamInfo>,
     /// This setting indicates whether YouTube should enable content encryption for the broadcast.
     #[serde(rename="enableContentEncryption")]
     pub enable_content_encryption: Option<bool>,
@@ -5812,9 +5807,9 @@ pub struct LiveBroadcastContentDetails {
     /// Important: You must set the value to true and also set the enableArchive property's value to true if you want to make playback available immediately after the broadcast ends.
     #[serde(rename="enableDvr")]
     pub enable_dvr: Option<bool>,
-    /// The monitorStream object contains information about the monitor stream, which the broadcaster can use to review the event content before the broadcast stream is shown publicly.
-    #[serde(rename="monitorStream")]
-    pub monitor_stream: Option<MonitorStreamInfo>,
+    /// The date and time that the live stream referenced by boundStreamId was last updated.
+    #[serde(rename="boundStreamLastUpdateTimeMs")]
+    pub bound_stream_last_update_time_ms: Option<String>,
 }
 
 impl Part for LiveBroadcastContentDetails {}
@@ -5901,34 +5896,33 @@ impl ToParts for SearchListResponse {
     }
 }
 
-/// A liveChatModerator resource represents a moderator for a YouTube live chat. A chat moderator has the ability to ban/unban users from a chat, remove message, etc.
+/// A liveChatBan resource represents a ban for a YouTube live chat.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [insert live chat moderators](struct.LiveChatModeratorInsertCall.html) (request|response)
-/// * [list live chat moderators](struct.LiveChatModeratorListCall.html) (none)
-/// * [delete live chat moderators](struct.LiveChatModeratorDeleteCall.html) (none)
+/// * [insert live chat bans](struct.LiveChatBanInsertCall.html) (request|response)
+/// * [delete live chat bans](struct.LiveChatBanDeleteCall.html) (none)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct LiveChatModerator {
-    /// The snippet object contains basic details about the moderator.
-    pub snippet: Option<LiveChatModeratorSnippet>,
-    /// Identifies what kind of resource this is. Value: the fixed string "youtube#liveChatModerator".
+pub struct LiveChatBan {
+    /// The snippet object contains basic details about the ban.
+    pub snippet: Option<LiveChatBanSnippet>,
+    /// Identifies what kind of resource this is. Value: the fixed string "youtube#liveChatBan".
     pub kind: Option<String>,
     /// Etag of this resource.
     pub etag: Option<String>,
-    /// The ID that YouTube assigns to uniquely identify the moderator.
+    /// The ID that YouTube assigns to uniquely identify the ban.
     pub id: Option<String>,
 }
 
-impl RequestValue for LiveChatModerator {}
-impl Resource for LiveChatModerator {}
-impl ResponseResult for LiveChatModerator {}
+impl RequestValue for LiveChatBan {}
+impl Resource for LiveChatBan {}
+impl ResponseResult for LiveChatBan {}
 
-impl ToParts for LiveChatModerator {
+impl ToParts for LiveChatBan {
     /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
     /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
     /// the parts you want to see in the server response.
@@ -6003,22 +5997,6 @@ impl Part for SearchResultSnippet {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct LiveBroadcastTopicSnippet {
-    /// The date at which the topic was released. Filled for types: videoGame
-    #[serde(rename="releaseDate")]
-    pub release_date: Option<String>,
-    /// The name of the topic.
-    pub name: Option<String>,
-}
-
-impl Part for LiveBroadcastTopicSnippet {}
-
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FanFundingEventSnippet {
     /// The text contents of the comment left by the user.
     #[serde(rename="commentText")]
@@ -6043,24 +6021,6 @@ pub struct FanFundingEventSnippet {
 }
 
 impl Part for FanFundingEventSnippet {}
-
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct LiveBroadcastTopic {
-    /// Information about the topic matched.
-    pub snippet: Option<LiveBroadcastTopicSnippet>,
-    /// The type of the topic.
-    #[serde(rename="type")]
-    pub type_: Option<String>,
-    /// If this flag is set it means that we have not been able to match the topic title and type provided to a known entity.
-    pub unmatched: Option<bool>,
-}
-
-impl Part for LiveBroadcastTopic {}
 
 
 /// There is no detailed description.
@@ -8448,6 +8408,7 @@ impl<'a, C, A> ChannelBannerMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _on_behalf_of_content_owner: Default::default(),
+            _channel_id: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -25801,8 +25762,8 @@ impl<'a, C, A> LiveBroadcastControlCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // Values shown here are possibly random and not representative !
 /// let mut req = LiveBroadcast::default();
 /// req.status = Default::default(); // is LiveBroadcastStatus
-/// req.content_details = Default::default(); // is LiveBroadcastContentDetails
 /// req.snippet = Default::default(); // is LiveBroadcastSnippet
+/// req.content_details = Default::default(); // is LiveBroadcastContentDetails
 /// req.id = Some("vero".to_string());
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -26726,8 +26687,8 @@ impl<'a, C, A> LiveBroadcastTransitionCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // Values shown here are possibly random and not representative !
 /// let mut req = LiveBroadcast::default();
 /// req.status = Default::default(); // is LiveBroadcastStatus
-/// req.content_details = Default::default(); // is LiveBroadcastContentDetails
 /// req.snippet = Default::default(); // is LiveBroadcastSnippet
+/// req.content_details = Default::default(); // is LiveBroadcastContentDetails
 /// req.id = Some("invidunt".to_string());
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -27634,6 +27595,7 @@ impl<'a, C, A> LiveBroadcastListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.channel_banners().insert(req)
 ///              .on_behalf_of_content_owner("consetetur")
+///              .channel_id("erat")
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
@@ -27643,6 +27605,7 @@ pub struct ChannelBannerInsertCall<'a, C, A>
     hub: &'a YouTube<C, A>,
     _request: ChannelBannerResource,
     _on_behalf_of_content_owner: Option<String>,
+    _channel_id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -27665,11 +27628,14 @@ impl<'a, C, A> ChannelBannerInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "youtube.channelBanners.insert",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         if let Some(value) = self._on_behalf_of_content_owner {
             params.push(("onBehalfOfContentOwner", value.to_string()));
         }
-        for &field in ["alt", "onBehalfOfContentOwner"].iter() {
+        if let Some(value) = self._channel_id {
+            params.push(("channelId", value.to_string()));
+        }
+        for &field in ["alt", "onBehalfOfContentOwner", "channelId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -27908,6 +27874,13 @@ impl<'a, C, A> ChannelBannerInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
+    /// The channelId parameter identifies the YouTube channel to which the banner is uploaded. The channelId parameter was introduced as a required parameter in May 2017. As this was a backward-incompatible change, channelBanners.insert requests that do not specify this parameter will not return an error until six months have passed from the time that the parameter was introduced. Please see the API Terms of Service for the official policy regarding backward incompatible changes and the API revision history for the exact date that the parameter was introduced.
+    ///
+    /// Sets the *channel id* query property to the given value.
+    pub fn channel_id(mut self, new_value: &str) -> ChannelBannerInsertCall<'a, C, A> {
+        self._channel_id = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -27995,36 +27968,36 @@ impl<'a, C, A> ChannelBannerInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.search().list("part")
-///              .video_type("amet.")
+///              .video_type("dolores")
 ///              .video_syndicated("dolores")
-///              .video_license("dolores")
-///              .video_embeddable("et")
-///              .video_duration("sed")
-///              .video_dimension("et")
-///              .video_definition("aliquyam")
-///              .video_category_id("nonumy")
-///              .video_caption("sit")
-///              .type_("aliquyam")
-///              .topic_id("sadipscing")
-///              .safe_search("magna")
-///              .relevance_language("gubergren")
-///              .related_to_video_id("sit")
-///              .region_code("gubergren")
-///              .q("sit")
-///              .published_before("amet")
-///              .published_after("eirmod")
-///              .page_token("sanctus")
-///              .order("Lorem")
-///              .on_behalf_of_content_owner("amet.")
-///              .max_results(60)
-///              .location_radius("eirmod")
-///              .location("sadipscing")
-///              .for_mine(true)
-///              .for_developer(false)
+///              .video_license("et")
+///              .video_embeddable("sed")
+///              .video_duration("et")
+///              .video_dimension("aliquyam")
+///              .video_definition("nonumy")
+///              .video_category_id("sit")
+///              .video_caption("aliquyam")
+///              .type_("sadipscing")
+///              .topic_id("magna")
+///              .safe_search("gubergren")
+///              .relevance_language("sit")
+///              .related_to_video_id("gubergren")
+///              .region_code("sit")
+///              .q("amet")
+///              .published_before("eirmod")
+///              .published_after("sanctus")
+///              .page_token("Lorem")
+///              .order("amet.")
+///              .on_behalf_of_content_owner("diam")
+///              .max_results(62)
+///              .location_radius("sadipscing")
+///              .location("Lorem")
+///              .for_mine(false)
+///              .for_developer(true)
 ///              .for_content_owner(true)
-///              .event_type("dolore")
-///              .channel_type("et")
-///              .channel_id("At")
+///              .event_type("et")
+///              .channel_type("At")
+///              .channel_id("sit")
 ///              .doit();
 /// # }
 /// ```
@@ -28606,9 +28579,9 @@ impl<'a, C, A> SearchListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.super_chat_events().list("part")
-///              .page_token("ut")
-///              .max_results(23)
-///              .hl("tempor")
+///              .page_token("diam")
+///              .max_results(62)
+///              .hl("et")
 ///              .doit();
 /// # }
 /// ```
@@ -28872,7 +28845,7 @@ impl<'a, C, A> SuperChatEventListCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.thumbnails().set("videoId")
-///              .on_behalf_of_content_owner("erat")
+///              .on_behalf_of_content_owner("dolores")
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
@@ -29231,9 +29204,9 @@ impl<'a, C, A> ThumbnailSetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.fan_funding_events().list("part")
-///              .page_token("kasd")
-///              .max_results(34)
-///              .hl("clita")
+///              .page_token("et")
+///              .max_results(37)
+///              .hl("sed")
 ///              .doit();
 /// # }
 /// ```

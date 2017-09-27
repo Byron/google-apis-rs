@@ -1,6 +1,6 @@
-site_name: translate v1.0.6+20160627
+site_name: Translate v1.0.6+20170525
 site_url: http://byron.github.io/google-apis-rs/google-translate2-cli
-site_description: A complete library to interact with translate (protocol v2)
+site_description: A complete library to interact with Translate (protocol v2)
 
 repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/translate2-cli
 
@@ -9,9 +9,11 @@ site_dir: build_html
 
 pages:
 - ['index.md', 'Home']
+- ['detections_detect.md', 'Detections', 'Detect']
 - ['detections_list.md', 'Detections', 'List']
 - ['languages_list.md', 'Languages', 'List']
 - ['translations_list.md', 'Translations', 'List']
+- ['translations_translate.md', 'Translations', 'Translate']
 
 theme: readthedocs
 

@@ -1,4 +1,4 @@
-site_name: appengine v1.0.6+20170522
+site_name: appengine v1.0.6+20170914
 site_url: http://byron.github.io/google-apis-rs/google-appengine1-cli
 site_description: A complete library to interact with appengine (protocol v1)
 
@@ -9,7 +9,18 @@ site_dir: build_html
 
 pages:
 - ['index.md', 'Home']
+- ['apps_authorized-certificates-create.md', 'Apps', 'Authorized Certificates Create']
+- ['apps_authorized-certificates-delete.md', 'Apps', 'Authorized Certificates Delete']
+- ['apps_authorized-certificates-get.md', 'Apps', 'Authorized Certificates Get']
+- ['apps_authorized-certificates-list.md', 'Apps', 'Authorized Certificates List']
+- ['apps_authorized-certificates-patch.md', 'Apps', 'Authorized Certificates Patch']
+- ['apps_authorized-domains-list.md', 'Apps', 'Authorized Domains List']
 - ['apps_create.md', 'Apps', 'Create']
+- ['apps_domain-mappings-create.md', 'Apps', 'Domain Mappings Create']
+- ['apps_domain-mappings-delete.md', 'Apps', 'Domain Mappings Delete']
+- ['apps_domain-mappings-get.md', 'Apps', 'Domain Mappings Get']
+- ['apps_domain-mappings-list.md', 'Apps', 'Domain Mappings List']
+- ['apps_domain-mappings-patch.md', 'Apps', 'Domain Mappings Patch']
 - ['apps_get.md', 'Apps', 'Get']
 - ['apps_locations-get.md', 'Apps', 'Locations Get']
 - ['apps_locations-list.md', 'Apps', 'Locations List']

@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Android Enterprise* API at revision *20170516*. The CLI is at version *1.0.6*.
+This documentation was generated from the *Android Enterprise* API at revision *20170922*. The CLI is at version *1.0.6*.
 
 ```bash
 androidenterprise1 [options]
@@ -42,6 +42,7 @@ androidenterprise1 [options]
                 enroll <token> (-r <kv>)... [-p <v>]... [-o <out>]
                 generate-signup-url [-p <v>]... [-o <out>]
                 get <enterprise-id> [-p <v>]... [-o <out>]
+                get-android-device-policy-config <enterprise-id> [-p <v>]... [-o <out>]
                 get-service-account <enterprise-id> [-p <v>]... [-o <out>]
                 get-store-layout <enterprise-id> [-p <v>]... [-o <out>]
                 insert <token> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -49,6 +50,7 @@ androidenterprise1 [options]
                 pull-notification-set [-p <v>]... [-o <out>]
                 send-test-push-notification <enterprise-id> [-p <v>]... [-o <out>]
                 set-account <enterprise-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                set-android-device-policy-config <enterprise-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 set-store-layout <enterprise-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 unenroll <enterprise-id> [-p <v>]...
         entitlements

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Identity Toolkit* crate version *1.0.6+20170425*, where *20170425* is the exact revision of the *identitytoolkit:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *Identity Toolkit* crate version *1.0.6+20170828*, where *20170828* is the exact revision of the *identitytoolkit:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *Identity Toolkit* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/identity-toolkit/v3/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.IdentityToolkit.html) ... 
 //! 
 //! * [relyingparty](struct.Relyingparty.html)
-//!  * [*create auth uri*](struct.RelyingpartyCreateAuthUriCall.html), [*delete account*](struct.RelyingpartyDeleteAccountCall.html), [*download account*](struct.RelyingpartyDownloadAccountCall.html), [*get account info*](struct.RelyingpartyGetAccountInfoCall.html), [*get oob confirmation code*](struct.RelyingpartyGetOobConfirmationCodeCall.html), [*get project config*](struct.RelyingpartyGetProjectConfigCall.html), [*get public keys*](struct.RelyingpartyGetPublicKeyCall.html), [*get recaptcha param*](struct.RelyingpartyGetRecaptchaParamCall.html), [*reset password*](struct.RelyingpartyResetPasswordCall.html), [*set account info*](struct.RelyingpartySetAccountInfoCall.html), [*set project config*](struct.RelyingpartySetProjectConfigCall.html), [*sign out user*](struct.RelyingpartySignOutUserCall.html), [*signup new user*](struct.RelyingpartySignupNewUserCall.html), [*upload account*](struct.RelyingpartyUploadAccountCall.html), [*verify assertion*](struct.RelyingpartyVerifyAssertionCall.html), [*verify custom token*](struct.RelyingpartyVerifyCustomTokenCall.html) and [*verify password*](struct.RelyingpartyVerifyPasswordCall.html)
+//!  * [*create auth uri*](struct.RelyingpartyCreateAuthUriCall.html), [*delete account*](struct.RelyingpartyDeleteAccountCall.html), [*download account*](struct.RelyingpartyDownloadAccountCall.html), [*get account info*](struct.RelyingpartyGetAccountInfoCall.html), [*get oob confirmation code*](struct.RelyingpartyGetOobConfirmationCodeCall.html), [*get project config*](struct.RelyingpartyGetProjectConfigCall.html), [*get public keys*](struct.RelyingpartyGetPublicKeyCall.html), [*get recaptcha param*](struct.RelyingpartyGetRecaptchaParamCall.html), [*reset password*](struct.RelyingpartyResetPasswordCall.html), [*send verification code*](struct.RelyingpartySendVerificationCodeCall.html), [*set account info*](struct.RelyingpartySetAccountInfoCall.html), [*set project config*](struct.RelyingpartySetProjectConfigCall.html), [*sign out user*](struct.RelyingpartySignOutUserCall.html), [*signup new user*](struct.RelyingpartySignupNewUserCall.html), [*upload account*](struct.RelyingpartyUploadAccountCall.html), [*verify assertion*](struct.RelyingpartyVerifyAssertionCall.html), [*verify custom token*](struct.RelyingpartyVerifyCustomTokenCall.html), [*verify password*](struct.RelyingpartyVerifyPasswordCall.html) and [*verify phone number*](struct.RelyingpartyVerifyPhoneNumberCall.html)
 //! 
 //! 
 //! 
@@ -475,6 +475,34 @@ pub struct IdentitytoolkitRelyingpartyGetProjectConfigResponse {
 impl ResponseResult for IdentitytoolkitRelyingpartyGetProjectConfigResponse {}
 
 
+/// Request for Identitytoolkit-SendVerificationCode
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [send verification code relyingparty](struct.RelyingpartySendVerificationCodeCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct IdentitytoolkitRelyingpartySendVerificationCodeRequest {
+    /// The phone number to send the verification code to in E.164 format.
+    #[serde(rename="phoneNumber")]
+    pub phone_number: Option<String>,
+    /// Secret delivered to iOS app via APNS.
+    #[serde(rename="iosSecret")]
+    pub ios_secret: Option<String>,
+    /// Receipt of successful app token validation with APNS.
+    #[serde(rename="iosReceipt")]
+    pub ios_receipt: Option<String>,
+    /// Recaptcha solution.
+    #[serde(rename="recaptchaToken")]
+    pub recaptcha_token: Option<String>,
+}
+
+impl RequestValue for IdentitytoolkitRelyingpartySendVerificationCodeRequest {}
+
+
 /// Request to get the account information.
 /// 
 /// # Activities
@@ -492,6 +520,9 @@ pub struct IdentitytoolkitRelyingpartyGetAccountInfoRequest {
     /// GCP project number of the requesting delegated app. Currently only intended for Firebase V1 migration.
     #[serde(rename="delegatedProjectNumber")]
     pub delegated_project_number: Option<String>,
+    /// Privileged caller can query users by specified phone number.
+    #[serde(rename="phoneNumber")]
+    pub phone_number: Option<Vec<String>>,
     /// The list of emails of the users to inquiry.
     pub email: Option<Vec<String>>,
     /// The list of local ID's of the users to inquiry.
@@ -588,14 +619,63 @@ pub struct VerifyCustomTokenResponse {
     /// The GITKit token for authenticated user.
     #[serde(rename="idToken")]
     pub id_token: Option<String>,
-    /// The fixed string "identitytoolkit#VerifyCustomTokenResponse".
-    pub kind: Option<String>,
+    /// True if it's a new user sign-in, false if it's a returning user.
+    #[serde(rename="isNewUser")]
+    pub is_new_user: Option<bool>,
     /// If idToken is STS id token, then this field will be refresh token.
     #[serde(rename="refreshToken")]
     pub refresh_token: Option<String>,
+    /// The fixed string "identitytoolkit#VerifyCustomTokenResponse".
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for VerifyCustomTokenResponse {}
+
+
+/// Response for Identitytoolkit-VerifyPhoneNumber
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [verify phone number relyingparty](struct.RelyingpartyVerifyPhoneNumberCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct IdentitytoolkitRelyingpartyVerifyPhoneNumberResponse {
+    /// no description provided
+    #[serde(rename="expiresIn")]
+    pub expires_in: Option<String>,
+    /// no description provided
+    #[serde(rename="temporaryProofExpiresIn")]
+    pub temporary_proof_expires_in: Option<String>,
+    /// no description provided
+    #[serde(rename="refreshToken")]
+    pub refresh_token: Option<String>,
+    /// no description provided
+    #[serde(rename="localId")]
+    pub local_id: Option<String>,
+    /// no description provided
+    #[serde(rename="verificationProofExpiresIn")]
+    pub verification_proof_expires_in: Option<String>,
+    /// no description provided
+    #[serde(rename="idToken")]
+    pub id_token: Option<String>,
+    /// no description provided
+    #[serde(rename="isNewUser")]
+    pub is_new_user: Option<bool>,
+    /// no description provided
+    #[serde(rename="verificationProof")]
+    pub verification_proof: Option<String>,
+    /// no description provided
+    #[serde(rename="phoneNumber")]
+    pub phone_number: Option<String>,
+    /// no description provided
+    #[serde(rename="temporaryProof")]
+    pub temporary_proof: Option<String>,
+}
+
+impl ResponseResult for IdentitytoolkitRelyingpartyVerifyPhoneNumberResponse {}
 
 
 /// Request to verify the password.
@@ -688,30 +768,86 @@ pub struct VerifyPasswordResponse {
 impl ResponseResult for VerifyPasswordResponse {}
 
 
-/// Response of resetting the password.
+/// Request to set the account information.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [reset password relyingparty](struct.RelyingpartyResetPasswordCall.html) (response)
+/// * [set account info relyingparty](struct.RelyingpartySetAccountInfoCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ResetPasswordResponse {
-    /// The request type.
-    #[serde(rename="requestType")]
-    pub request_type: Option<String>,
-    /// The fixed string "identitytoolkit#ResetPasswordResponse".
-    pub kind: Option<String>,
-    /// The user's email. If the out-of-band code is for email recovery, the user's original email.
+pub struct IdentitytoolkitRelyingpartySetAccountInfoRequest {
+    /// GCP project number of the requesting delegated app. Currently only intended for Firebase V1 migration.
+    #[serde(rename="delegatedProjectNumber")]
+    pub delegated_project_number: Option<String>,
+    /// The out-of-band code of the change email request.
+    #[serde(rename="oobCode")]
+    pub oob_code: Option<String>,
+    /// The local ID of the user.
+    #[serde(rename="localId")]
+    pub local_id: Option<String>,
+    /// Timestamp in seconds for valid login token.
+    #[serde(rename="validSince")]
+    pub valid_since: Option<String>,
+    /// The photo url of the user.
+    #[serde(rename="photoUrl")]
+    pub photo_url: Option<String>,
+    /// Instance id token of the app.
+    #[serde(rename="instanceId")]
+    pub instance_id: Option<String>,
+    /// Last login timestamp.
+    #[serde(rename="lastLoginAt")]
+    pub last_login_at: Option<String>,
+    /// Whether to disable the user.
+    #[serde(rename="disableUser")]
+    pub disable_user: Option<bool>,
+    /// Whether return sts id token and refresh token instead of gitkit token.
+    #[serde(rename="returnSecureToken")]
+    pub return_secure_token: Option<bool>,
+    /// The new password of the user.
+    pub password: Option<String>,
+    /// The name of the user.
+    #[serde(rename="displayName")]
+    pub display_name: Option<String>,
+    /// The timestamp when the account is created.
+    #[serde(rename="createdAt")]
+    pub created_at: Option<String>,
+    /// The attributes users request to delete.
+    #[serde(rename="deleteAttribute")]
+    pub delete_attribute: Option<Vec<String>>,
+    /// Mark the user to upgrade to federated login.
+    #[serde(rename="upgradeToFederatedLogin")]
+    pub upgrade_to_federated_login: Option<bool>,
+    /// The GITKit token of the authenticated user.
+    #[serde(rename="idToken")]
+    pub id_token: Option<String>,
+    /// Mark the email as verified or not.
+    #[serde(rename="emailVerified")]
+    pub email_verified: Option<bool>,
+    /// The IDPs the user request to delete.
+    #[serde(rename="deleteProvider")]
+    pub delete_provider: Option<Vec<String>>,
+    /// The captcha challenge.
+    #[serde(rename="captchaChallenge")]
+    pub captcha_challenge: Option<String>,
+    /// The custom attributes to be set in the user's id token.
+    #[serde(rename="customAttributes")]
+    pub custom_attributes: Option<String>,
+    /// Privileged caller can update user with specified phone number.
+    #[serde(rename="phoneNumber")]
+    pub phone_number: Option<String>,
+    /// The associated IDPs of the user.
+    pub provider: Option<Vec<String>>,
+    /// Response to the captcha.
+    #[serde(rename="captchaResponse")]
+    pub captcha_response: Option<String>,
+    /// The email of the user.
     pub email: Option<String>,
-    /// If the out-of-band code is for email recovery, the user's new email.
-    #[serde(rename="newEmail")]
-    pub new_email: Option<String>,
 }
 
-impl ResponseResult for ResetPasswordResponse {}
+impl RequestValue for IdentitytoolkitRelyingpartySetAccountInfoRequest {}
 
 
 /// Response of signing out user.
@@ -820,6 +956,9 @@ pub struct IdentitytoolkitRelyingpartySignupNewUserRequest {
     /// Response to the captcha.
     #[serde(rename="captchaResponse")]
     pub captcha_response: Option<String>,
+    /// Privileged caller can create user with specified phone number.
+    #[serde(rename="phoneNumber")]
+    pub phone_number: Option<String>,
     /// The GITKit token of the authenticated user.
     #[serde(rename="idToken")]
     pub id_token: Option<String>,
@@ -1133,80 +1272,30 @@ pub struct IdentitytoolkitRelyingpartyResetPasswordRequest {
 impl RequestValue for IdentitytoolkitRelyingpartyResetPasswordRequest {}
 
 
-/// Request to set the account information.
+/// Response of resetting the password.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [set account info relyingparty](struct.RelyingpartySetAccountInfoCall.html) (request)
+/// * [reset password relyingparty](struct.RelyingpartyResetPasswordCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct IdentitytoolkitRelyingpartySetAccountInfoRequest {
-    /// GCP project number of the requesting delegated app. Currently only intended for Firebase V1 migration.
-    #[serde(rename="delegatedProjectNumber")]
-    pub delegated_project_number: Option<String>,
-    /// The out-of-band code of the change email request.
-    #[serde(rename="oobCode")]
-    pub oob_code: Option<String>,
-    /// The local ID of the user.
-    #[serde(rename="localId")]
-    pub local_id: Option<String>,
-    /// Timestamp in seconds for valid login token.
-    #[serde(rename="validSince")]
-    pub valid_since: Option<String>,
-    /// The photo url of the user.
-    #[serde(rename="photoUrl")]
-    pub photo_url: Option<String>,
-    /// Instance id token of the app.
-    #[serde(rename="instanceId")]
-    pub instance_id: Option<String>,
-    /// Last login timestamp.
-    #[serde(rename="lastLoginAt")]
-    pub last_login_at: Option<String>,
-    /// Whether to disable the user.
-    #[serde(rename="disableUser")]
-    pub disable_user: Option<bool>,
-    /// Whether return sts id token and refresh token instead of gitkit token.
-    #[serde(rename="returnSecureToken")]
-    pub return_secure_token: Option<bool>,
-    /// The new password of the user.
-    pub password: Option<String>,
-    /// The name of the user.
-    #[serde(rename="displayName")]
-    pub display_name: Option<String>,
-    /// The timestamp when the account is created.
-    #[serde(rename="createdAt")]
-    pub created_at: Option<String>,
-    /// The attributes users request to delete.
-    #[serde(rename="deleteAttribute")]
-    pub delete_attribute: Option<Vec<String>>,
-    /// Mark the user to upgrade to federated login.
-    #[serde(rename="upgradeToFederatedLogin")]
-    pub upgrade_to_federated_login: Option<bool>,
-    /// The GITKit token of the authenticated user.
-    #[serde(rename="idToken")]
-    pub id_token: Option<String>,
-    /// Mark the email as verified or not.
-    #[serde(rename="emailVerified")]
-    pub email_verified: Option<bool>,
-    /// The IDPs the user request to delete.
-    #[serde(rename="deleteProvider")]
-    pub delete_provider: Option<Vec<String>>,
-    /// The captcha challenge.
-    #[serde(rename="captchaChallenge")]
-    pub captcha_challenge: Option<String>,
-    /// Response to the captcha.
-    #[serde(rename="captchaResponse")]
-    pub captcha_response: Option<String>,
-    /// The associated IDPs of the user.
-    pub provider: Option<Vec<String>>,
-    /// The email of the user.
+pub struct ResetPasswordResponse {
+    /// The request type.
+    #[serde(rename="requestType")]
+    pub request_type: Option<String>,
+    /// The fixed string "identitytoolkit#ResetPasswordResponse".
+    pub kind: Option<String>,
+    /// The user's email. If the out-of-band code is for email recovery, the user's original email.
     pub email: Option<String>,
+    /// If the out-of-band code is for email recovery, the user's new email.
+    #[serde(rename="newEmail")]
+    pub new_email: Option<String>,
 }
 
-impl RequestValue for IdentitytoolkitRelyingpartySetAccountInfoRequest {}
+impl ResponseResult for ResetPasswordResponse {}
 
 
 /// Request to delete account.
@@ -1544,6 +1633,9 @@ impl ResponseResult for UploadAccountResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IdentitytoolkitRelyingpartyUploadAccountRequest {
+    /// no description provided
+    #[serde(rename="dkLen")]
+    pub dk_len: Option<i32>,
     /// The password hash algorithm.
     #[serde(rename="hashAlgorithm")]
     pub hash_algorithm: Option<String>,
@@ -1555,9 +1647,17 @@ pub struct IdentitytoolkitRelyingpartyUploadAccountRequest {
     pub allow_overwrite: Option<bool>,
     /// The account info to be stored.
     pub users: Option<Vec<UserInfo>>,
+    /// no description provided
+    pub parallelization: Option<i32>,
+    /// no description provided
+    #[serde(rename="blockSize")]
+    pub block_size: Option<i32>,
     /// If true, backend will do sanity check(including duplicate email and federated id) when uploading account.
     #[serde(rename="sanityCheck")]
     pub sanity_check: Option<bool>,
+    /// The following 4 fields are for standard scrypt algorithm.
+    #[serde(rename="cpuMemCost")]
+    pub cpu_mem_cost: Option<i32>,
     /// The key for to hash the password.
     #[serde(rename="signerKey")]
     pub signer_key: Option<String>,
@@ -1575,6 +1675,41 @@ pub struct IdentitytoolkitRelyingpartyUploadAccountRequest {
 }
 
 impl RequestValue for IdentitytoolkitRelyingpartyUploadAccountRequest {}
+
+
+/// Request for Identitytoolkit-VerifyPhoneNumber
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [verify phone number relyingparty](struct.RelyingpartyVerifyPhoneNumberCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct IdentitytoolkitRelyingpartyVerifyPhoneNumberRequest {
+    /// no description provided
+    #[serde(rename="verificationProof")]
+    pub verification_proof: Option<String>,
+    /// no description provided
+    pub code: Option<String>,
+    /// no description provided
+    #[serde(rename="phoneNumber")]
+    pub phone_number: Option<String>,
+    /// The session info previously returned by IdentityToolkit-SendVerificationCode.
+    #[serde(rename="sessionInfo")]
+    pub session_info: Option<String>,
+    /// no description provided
+    #[serde(rename="idToken")]
+    pub id_token: Option<String>,
+    /// no description provided
+    pub operation: Option<String>,
+    /// no description provided
+    #[serde(rename="temporaryProof")]
+    pub temporary_proof: Option<String>,
+}
+
+impl RequestValue for IdentitytoolkitRelyingpartyVerifyPhoneNumberRequest {}
 
 
 /// Template for an individual account info.
@@ -1618,6 +1753,9 @@ pub struct UserInfo {
     /// Whether the email has been verified.
     #[serde(rename="emailVerified")]
     pub email_verified: Option<bool>,
+    /// The custom attributes to be set in the user's id token.
+    #[serde(rename="customAttributes")]
+    pub custom_attributes: Option<String>,
     /// Version of the user's password.
     pub version: Option<i32>,
     /// User's phone number.
@@ -1659,6 +1797,25 @@ pub struct GetOobConfirmationCodeResponse {
 }
 
 impl ResponseResult for GetOobConfirmationCodeResponse {}
+
+
+/// Response for Identitytoolkit-SendVerificationCode
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [send verification code relyingparty](struct.RelyingpartySendVerificationCodeCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct IdentitytoolkitRelyingpartySendVerificationCodeResponse {
+    /// Encrypted session information
+    #[serde(rename="sessionInfo")]
+    pub session_info: Option<String>,
+}
+
+impl ResponseResult for IdentitytoolkitRelyingpartySendVerificationCodeResponse {}
 
 
 /// Response of signing up new user, creating anonymous user or anonymous user reauth.
@@ -1743,7 +1900,7 @@ impl ResponseResult for DeleteAccountResponse {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = IdentityToolkit::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `create_auth_uri(...)`, `delete_account(...)`, `download_account(...)`, `get_account_info(...)`, `get_oob_confirmation_code(...)`, `get_project_config(...)`, `get_public_keys(...)`, `get_recaptcha_param(...)`, `reset_password(...)`, `set_account_info(...)`, `set_project_config(...)`, `sign_out_user(...)`, `signup_new_user(...)`, `upload_account(...)`, `verify_assertion(...)`, `verify_custom_token(...)` and `verify_password(...)`
+/// // like `create_auth_uri(...)`, `delete_account(...)`, `download_account(...)`, `get_account_info(...)`, `get_oob_confirmation_code(...)`, `get_project_config(...)`, `get_public_keys(...)`, `get_recaptcha_param(...)`, `reset_password(...)`, `send_verification_code(...)`, `set_account_info(...)`, `set_project_config(...)`, `sign_out_user(...)`, `signup_new_user(...)`, `upload_account(...)`, `verify_assertion(...)`, `verify_custom_token(...)`, `verify_password(...)` and `verify_phone_number(...)`
 /// // to build up your call.
 /// let rb = hub.relyingparty();
 /// # }
@@ -1777,15 +1934,10 @@ impl<'a, C, A> RelyingpartyMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Signup new user.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    pub fn signup_new_user(&self, request: IdentitytoolkitRelyingpartySignupNewUserRequest) -> RelyingpartySignupNewUserCall<'a, C, A> {
-        RelyingpartySignupNewUserCall {
+    /// Get token signing public key.
+    pub fn get_public_keys(&self) -> RelyingpartyGetPublicKeyCall<'a, C, A> {
+        RelyingpartyGetPublicKeyCall {
             hub: self.hub,
-            _request: request,
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1803,6 +1955,18 @@ impl<'a, C, A> RelyingpartyMethods<'a, C, A> {
         RelyingpartyCreateAuthUriCall {
             hub: self.hub,
             _request: request,
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Get recaptcha secure param.
+    pub fn get_recaptcha_param(&self) -> RelyingpartyGetRecaptchaParamCall<'a, C, A> {
+        RelyingpartyGetRecaptchaParamCall {
+            hub: self.hub,
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1964,10 +2128,15 @@ impl<'a, C, A> RelyingpartyMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Get token signing public key.
-    pub fn get_public_keys(&self) -> RelyingpartyGetPublicKeyCall<'a, C, A> {
-        RelyingpartyGetPublicKeyCall {
+    /// Signup new user.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    pub fn signup_new_user(&self, request: IdentitytoolkitRelyingpartySignupNewUserRequest) -> RelyingpartySignupNewUserCall<'a, C, A> {
+        RelyingpartySignupNewUserCall {
             hub: self.hub,
+            _request: request,
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1976,10 +2145,15 @@ impl<'a, C, A> RelyingpartyMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Get recaptcha secure param.
-    pub fn get_recaptcha_param(&self) -> RelyingpartyGetRecaptchaParamCall<'a, C, A> {
-        RelyingpartyGetRecaptchaParamCall {
+    /// Verifies ownership of a phone number and creates/updates the user account accordingly.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    pub fn verify_phone_number(&self, request: IdentitytoolkitRelyingpartyVerifyPhoneNumberRequest) -> RelyingpartyVerifyPhoneNumberCall<'a, C, A> {
+        RelyingpartyVerifyPhoneNumberCall {
             hub: self.hub,
+            _request: request,
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2012,6 +2186,23 @@ impl<'a, C, A> RelyingpartyMethods<'a, C, A> {
     /// * `request` - No description provided.
     pub fn set_project_config(&self, request: IdentitytoolkitRelyingpartySetProjectConfigRequest) -> RelyingpartySetProjectConfigCall<'a, C, A> {
         RelyingpartySetProjectConfigCall {
+            hub: self.hub,
+            _request: request,
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Send SMS verification code.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    pub fn send_verification_code(&self, request: IdentitytoolkitRelyingpartySendVerificationCodeRequest) -> RelyingpartySendVerificationCodeCall<'a, C, A> {
+        RelyingpartySendVerificationCodeCall {
             hub: self.hub,
             _request: request,
             _delegate: Default::default(),
@@ -2284,9 +2475,9 @@ impl<'a, C, A> RelyingpartyGetOobConfirmationCodeCall<'a, C, A> where C: BorrowM
 }
 
 
-/// Signup new user.
+/// Get token signing public key.
 ///
-/// A builder for the *signupNewUser* method supported by a *relyingparty* resource.
+/// A builder for the *getPublicKeys* method supported by a *relyingparty* resource.
 /// It is not used directly, but through a `RelyingpartyMethods` instance.
 ///
 /// # Example
@@ -2298,7 +2489,6 @@ impl<'a, C, A> RelyingpartyGetOobConfirmationCodeCall<'a, C, A> where C: BorrowM
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_identitytoolkit3 as identitytoolkit3;
-/// use identitytoolkit3::IdentitytoolkitRelyingpartySignupNewUserRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -2309,35 +2499,29 @@ impl<'a, C, A> RelyingpartyGetOobConfirmationCodeCall<'a, C, A> where C: BorrowM
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = IdentityToolkit::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = IdentitytoolkitRelyingpartySignupNewUserRequest::default();
-/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.relyingparty().signup_new_user(req)
+/// let result = hub.relyingparty().get_public_keys()
 ///              .doit();
 /// # }
 /// ```
-pub struct RelyingpartySignupNewUserCall<'a, C, A>
+pub struct RelyingpartyGetPublicKeyCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a IdentityToolkit<C, A>,
-    _request: IdentitytoolkitRelyingpartySignupNewUserRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for RelyingpartySignupNewUserCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for RelyingpartyGetPublicKeyCall<'a, C, A> {}
 
-impl<'a, C, A> RelyingpartySignupNewUserCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> RelyingpartyGetPublicKeyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, SignupNewUserResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, IdentitytoolkitRelyingpartyGetPublicKeysResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -2345,9 +2529,9 @@ impl<'a, C, A> RelyingpartySignupNewUserCall<'a, C, A> where C: BorrowMut<hyper:
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "identitytoolkit.relyingparty.signupNewUser",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        dlg.begin(MethodInfo { id: "identitytoolkit.relyingparty.getPublicKeys",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((2 + self._additional_params.len()));
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -2360,7 +2544,7 @@ impl<'a, C, A> RelyingpartySignupNewUserCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "signupNewUser";
+        let mut url = self.hub._base_url.clone() + "publicKeys";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -2371,17 +2555,6 @@ impl<'a, C, A> RelyingpartySignupNewUserCall<'a, C, A> where C: BorrowMut<hyper:
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
@@ -2398,15 +2571,11 @@ impl<'a, C, A> RelyingpartySignupNewUserCall<'a, C, A> where C: BorrowMut<hyper:
                 }
             };
             let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -2457,22 +2626,13 @@ impl<'a, C, A> RelyingpartySignupNewUserCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: IdentitytoolkitRelyingpartySignupNewUserRequest) -> RelyingpartySignupNewUserCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartySignupNewUserCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartyGetPublicKeyCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2493,7 +2653,7 @@ impl<'a, C, A> RelyingpartySignupNewUserCall<'a, C, A> where C: BorrowMut<hyper:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartySignupNewUserCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyGetPublicKeyCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2513,7 +2673,7 @@ impl<'a, C, A> RelyingpartySignupNewUserCall<'a, C, A> where C: BorrowMut<hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RelyingpartySignupNewUserCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> RelyingpartyGetPublicKeyCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2755,6 +2915,216 @@ impl<'a, C, A> RelyingpartyCreateAuthUriCall<'a, C, A> where C: BorrowMut<hyper:
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> RelyingpartyCreateAuthUriCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Get recaptcha secure param.
+///
+/// A builder for the *getRecaptchaParam* method supported by a *relyingparty* resource.
+/// It is not used directly, but through a `RelyingpartyMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_identitytoolkit3 as identitytoolkit3;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use identitytoolkit3::IdentityToolkit;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = IdentityToolkit::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.relyingparty().get_recaptcha_param()
+///              .doit();
+/// # }
+/// ```
+pub struct RelyingpartyGetRecaptchaParamCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a IdentityToolkit<C, A>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for RelyingpartyGetRecaptchaParamCall<'a, C, A> {}
+
+impl<'a, C, A> RelyingpartyGetRecaptchaParamCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GetRecaptchaParamResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "identitytoolkit.relyingparty.getRecaptchaParam",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((2 + self._additional_params.len()));
+        for &field in ["alt"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "getRecaptchaParam";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartyGetRecaptchaParamCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyGetRecaptchaParamCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> RelyingpartyGetRecaptchaParamCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4935,9 +5305,9 @@ impl<'a, C, A> RelyingpartyDeleteAccountCall<'a, C, A> where C: BorrowMut<hyper:
 }
 
 
-/// Get token signing public key.
+/// Signup new user.
 ///
-/// A builder for the *getPublicKeys* method supported by a *relyingparty* resource.
+/// A builder for the *signupNewUser* method supported by a *relyingparty* resource.
 /// It is not used directly, but through a `RelyingpartyMethods` instance.
 ///
 /// # Example
@@ -4949,6 +5319,7 @@ impl<'a, C, A> RelyingpartyDeleteAccountCall<'a, C, A> where C: BorrowMut<hyper:
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_identitytoolkit3 as identitytoolkit3;
+/// use identitytoolkit3::IdentitytoolkitRelyingpartySignupNewUserRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -4959,29 +5330,35 @@ impl<'a, C, A> RelyingpartyDeleteAccountCall<'a, C, A> where C: BorrowMut<hyper:
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = IdentityToolkit::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = IdentitytoolkitRelyingpartySignupNewUserRequest::default();
+/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.relyingparty().get_public_keys()
+/// let result = hub.relyingparty().signup_new_user(req)
 ///              .doit();
 /// # }
 /// ```
-pub struct RelyingpartyGetPublicKeyCall<'a, C, A>
+pub struct RelyingpartySignupNewUserCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a IdentityToolkit<C, A>,
+    _request: IdentitytoolkitRelyingpartySignupNewUserRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for RelyingpartyGetPublicKeyCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for RelyingpartySignupNewUserCall<'a, C, A> {}
 
-impl<'a, C, A> RelyingpartyGetPublicKeyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> RelyingpartySignupNewUserCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, IdentitytoolkitRelyingpartyGetPublicKeysResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, SignupNewUserResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -4989,9 +5366,9 @@ impl<'a, C, A> RelyingpartyGetPublicKeyCall<'a, C, A> where C: BorrowMut<hyper::
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "identitytoolkit.relyingparty.getPublicKeys",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((2 + self._additional_params.len()));
+        dlg.begin(MethodInfo { id: "identitytoolkit.relyingparty.signupNewUser",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -5004,7 +5381,7 @@ impl<'a, C, A> RelyingpartyGetPublicKeyCall<'a, C, A> where C: BorrowMut<hyper::
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "publicKeys";
+        let mut url = self.hub._base_url.clone() + "signupNewUser";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5015,6 +5392,17 @@ impl<'a, C, A> RelyingpartyGetPublicKeyCall<'a, C, A> where C: BorrowMut<hyper::
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
@@ -5031,11 +5419,15 @@ impl<'a, C, A> RelyingpartyGetPublicKeyCall<'a, C, A> where C: BorrowMut<hyper::
                 }
             };
             let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
 
                 dlg.pre_request();
                 req.send()
@@ -5086,13 +5478,22 @@ impl<'a, C, A> RelyingpartyGetPublicKeyCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: IdentitytoolkitRelyingpartySignupNewUserRequest) -> RelyingpartySignupNewUserCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartyGetPublicKeyCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartySignupNewUserCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5113,7 +5514,7 @@ impl<'a, C, A> RelyingpartyGetPublicKeyCall<'a, C, A> where C: BorrowMut<hyper::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyGetPublicKeyCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartySignupNewUserCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5133,7 +5534,7 @@ impl<'a, C, A> RelyingpartyGetPublicKeyCall<'a, C, A> where C: BorrowMut<hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RelyingpartyGetPublicKeyCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> RelyingpartySignupNewUserCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5145,9 +5546,9 @@ impl<'a, C, A> RelyingpartyGetPublicKeyCall<'a, C, A> where C: BorrowMut<hyper::
 }
 
 
-/// Get recaptcha secure param.
+/// Verifies ownership of a phone number and creates/updates the user account accordingly.
 ///
-/// A builder for the *getRecaptchaParam* method supported by a *relyingparty* resource.
+/// A builder for the *verifyPhoneNumber* method supported by a *relyingparty* resource.
 /// It is not used directly, but through a `RelyingpartyMethods` instance.
 ///
 /// # Example
@@ -5159,6 +5560,7 @@ impl<'a, C, A> RelyingpartyGetPublicKeyCall<'a, C, A> where C: BorrowMut<hyper::
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_identitytoolkit3 as identitytoolkit3;
+/// use identitytoolkit3::IdentitytoolkitRelyingpartyVerifyPhoneNumberRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -5169,29 +5571,35 @@ impl<'a, C, A> RelyingpartyGetPublicKeyCall<'a, C, A> where C: BorrowMut<hyper::
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = IdentityToolkit::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = IdentitytoolkitRelyingpartyVerifyPhoneNumberRequest::default();
+/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.relyingparty().get_recaptcha_param()
+/// let result = hub.relyingparty().verify_phone_number(req)
 ///              .doit();
 /// # }
 /// ```
-pub struct RelyingpartyGetRecaptchaParamCall<'a, C, A>
+pub struct RelyingpartyVerifyPhoneNumberCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a IdentityToolkit<C, A>,
+    _request: IdentitytoolkitRelyingpartyVerifyPhoneNumberRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for RelyingpartyGetRecaptchaParamCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for RelyingpartyVerifyPhoneNumberCall<'a, C, A> {}
 
-impl<'a, C, A> RelyingpartyGetRecaptchaParamCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> RelyingpartyVerifyPhoneNumberCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, GetRecaptchaParamResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, IdentitytoolkitRelyingpartyVerifyPhoneNumberResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -5199,9 +5607,9 @@ impl<'a, C, A> RelyingpartyGetRecaptchaParamCall<'a, C, A> where C: BorrowMut<hy
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "identitytoolkit.relyingparty.getRecaptchaParam",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((2 + self._additional_params.len()));
+        dlg.begin(MethodInfo { id: "identitytoolkit.relyingparty.verifyPhoneNumber",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -5214,7 +5622,7 @@ impl<'a, C, A> RelyingpartyGetRecaptchaParamCall<'a, C, A> where C: BorrowMut<hy
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "getRecaptchaParam";
+        let mut url = self.hub._base_url.clone() + "verifyPhoneNumber";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5225,6 +5633,17 @@ impl<'a, C, A> RelyingpartyGetRecaptchaParamCall<'a, C, A> where C: BorrowMut<hy
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
@@ -5241,11 +5660,15 @@ impl<'a, C, A> RelyingpartyGetRecaptchaParamCall<'a, C, A> where C: BorrowMut<hy
                 }
             };
             let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
 
                 dlg.pre_request();
                 req.send()
@@ -5296,13 +5719,22 @@ impl<'a, C, A> RelyingpartyGetRecaptchaParamCall<'a, C, A> where C: BorrowMut<hy
     }
 
 
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: IdentitytoolkitRelyingpartyVerifyPhoneNumberRequest) -> RelyingpartyVerifyPhoneNumberCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartyGetRecaptchaParamCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartyVerifyPhoneNumberCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5323,7 +5755,7 @@ impl<'a, C, A> RelyingpartyGetRecaptchaParamCall<'a, C, A> where C: BorrowMut<hy
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyGetRecaptchaParamCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyVerifyPhoneNumberCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5343,7 +5775,7 @@ impl<'a, C, A> RelyingpartyGetRecaptchaParamCall<'a, C, A> where C: BorrowMut<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RelyingpartyGetRecaptchaParamCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> RelyingpartyVerifyPhoneNumberCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5826,6 +6258,247 @@ impl<'a, C, A> RelyingpartySetProjectConfigCall<'a, C, A> where C: BorrowMut<hyp
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> RelyingpartySetProjectConfigCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Send SMS verification code.
+///
+/// A builder for the *sendVerificationCode* method supported by a *relyingparty* resource.
+/// It is not used directly, but through a `RelyingpartyMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_identitytoolkit3 as identitytoolkit3;
+/// use identitytoolkit3::IdentitytoolkitRelyingpartySendVerificationCodeRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use identitytoolkit3::IdentityToolkit;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = IdentityToolkit::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = IdentitytoolkitRelyingpartySendVerificationCodeRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.relyingparty().send_verification_code(req)
+///              .doit();
+/// # }
+/// ```
+pub struct RelyingpartySendVerificationCodeCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a IdentityToolkit<C, A>,
+    _request: IdentitytoolkitRelyingpartySendVerificationCodeRequest,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for RelyingpartySendVerificationCodeCall<'a, C, A> {}
+
+impl<'a, C, A> RelyingpartySendVerificationCodeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, IdentitytoolkitRelyingpartySendVerificationCodeResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "identitytoolkit.relyingparty.sendVerificationCode",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        for &field in ["alt"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "sendVerificationCode";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: IdentitytoolkitRelyingpartySendVerificationCodeRequest) -> RelyingpartySendVerificationCodeCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartySendVerificationCodeCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartySendVerificationCodeCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> RelyingpartySendVerificationCodeCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

@@ -1855,9 +1855,9 @@ impl<'n> Engine<'n> {
                     "parent.id" => Some(("parent.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "lifecycle-state" => Some(("lifecycleState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "project-number" => Some(("projectNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "lifecycle-state" => Some(("lifecycleState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "id", "labels", "lifecycle-state", "name", "parent", "project-id", "project-number", "type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -2973,9 +2973,9 @@ impl<'n> Engine<'n> {
                     "parent.id" => Some(("parent.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "lifecycle-state" => Some(("lifecycleState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "project-number" => Some(("projectNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "lifecycle-state" => Some(("lifecycleState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "id", "labels", "lifecycle-state", "name", "parent", "project-id", "project-number", "type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -3649,7 +3649,10 @@ fn main() {
             ("get-iam-policy",
                     Some(r##"Gets the access control policy for an Organization resource. May be empty
         if no such policy or resource exists. The `resource` field should be the
-        organization's resource name, e.g. "organizations/123"."##),
+        organization's resource name, e.g. "organizations/123".
+        
+        Authorization requires the Google IAM permission
+        `resourcemanager.organizations.getIamPolicy` on the specified organization"##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli/organizations_get-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -3770,7 +3773,10 @@ fn main() {
                     Some(r##"Searches Organization resources that are visible to the user and satisfy
         the specified filter. This method returns Organizations in an unspecified
         order. New Organizations do not necessarily appear at the end of the
-        results."##),
+        results.
+        
+        Search will only return organizations on which the user has the permission
+        `resourcemanager.organizations.get`"##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli/organizations_search",
                   vec![
                     (Some(r##"kv"##),
@@ -3794,7 +3800,10 @@ fn main() {
             ("set-iam-policy",
                     Some(r##"Sets the access control policy on an Organization resource. Replaces any
         existing policy. The `resource` field should be the organization's resource
-        name, e.g. "organizations/123"."##),
+        name, e.g. "organizations/123".
+        
+        Authorization requires the Google IAM permission
+        `resourcemanager.organizations.setIamPolicy` on the specified organization"##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli/organizations_set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -3857,7 +3866,9 @@ fn main() {
             ("test-iam-permissions",
                     Some(r##"Returns permissions that a caller has on the specified Organization.
         The `resource` field should be the organization's resource name,
-        e.g. "organizations/123"."##),
+        e.g. "organizations/123".
+        
+        There are no permissions required for making this API call."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli/organizations_test-iam-permissions",
                   vec![
                     (Some(r##"resource"##),
@@ -3924,7 +3935,11 @@ fn main() {
         Our SLO permits Project creation to take up to 30 seconds at the 90th
         percentile. As of 2016-08-29, we are observing 6 seconds 50th percentile
         latency. 95th percentile latency is around 11 seconds. We recommend
-        polling at the 5th second with an exponential backoff."##),
+        polling at the 5th second with an exponential backoff.
+        
+        Authorization requires the Google IAM permission
+        `resourcemanager.projects.create` on the specified parent for the new
+        project."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli/projects_create",
                   vec![
                     (Some(r##"kv"##),
@@ -4084,7 +4099,10 @@ fn main() {
                   ]),
             ("get-iam-policy",
                     Some(r##"Returns the IAM access control policy for the specified Project.
-        Permission is denied if the policy or the resource does not exist."##),
+        Permission is denied if the policy or the resource does not exist.
+        
+        Authorization requires the Google IAM permission
+        `resourcemanager.projects.getIamPolicy` on the project"##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli/projects_get-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -4245,19 +4263,23 @@ fn main() {
         + Membership changes that leave the project without any owners that have
         accepted the Terms of Service (ToS) will be rejected.
         
-        + There must be at least one owner who has accepted the Terms of
-        Service (ToS) agreement in the policy. Calling `setIamPolicy()` to
-        remove the last ToS-accepted owner from the policy will fail. This
-        restriction also applies to legacy projects that no longer have owners
-        who have accepted the ToS. Edits to IAM policies will be rejected until
-        the lack of a ToS-accepting owner is rectified.
+        + If the project is not part of an organization, there must be at least
+        one owner who has accepted the Terms of Service (ToS) agreement in the
+        policy. Calling `setIamPolicy()` to remove the last ToS-accepted owner
+        from the policy will fail. This restriction also applies to legacy
+        projects that no longer have owners who have accepted the ToS. Edits to
+        IAM policies will be rejected until the lack of a ToS-accepting owner is
+        rectified.
         
         + Calling this method requires enabling the App Engine Admin API.
         
         Note: Removing service accounts from policies or changing their roles
         can render services completely inoperable. It is important to understand
         how the service account is being used before removing or updating its
-        roles."##),
+        roles.
+        
+        Authorization requires the Google IAM permission
+        `resourcemanager.projects.setIamPolicy` on the project"##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli/projects_set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -4318,7 +4340,9 @@ fn main() {
                      Some(false)),
                   ]),
             ("test-iam-permissions",
-                    Some(r##"Returns permissions that a caller has on the specified Project."##),
+                    Some(r##"Returns permissions that a caller has on the specified Project.
+        
+        There are no permissions required for making this API call."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli/projects_test-iam-permissions",
                   vec![
                     (Some(r##"resource"##),
@@ -4421,7 +4445,7 @@ fn main() {
     
     let mut app = App::new("cloudresourcemanager1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.6+20170517")
+           .version("1.0.6+20170920")
            .about("The Google Cloud Resource Manager API provides methods for creating, reading, and updating project metadata.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli")
            .arg(Arg::with_name("url")

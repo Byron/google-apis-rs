@@ -3,14 +3,14 @@ DO NOT EDIT !
 This file was generated automatically from 'src/mako/cli/README.md.mako'
 DO NOT EDIT !
 -->
-The `container1` command-line interface *(CLI)* allows to use most features of the *Google container* service from the comfort of your terminal.
+The `container1` command-line interface *(CLI)* allows to use most features of the *Google Container* service from the comfort of your terminal.
 
 By default all output is printed to standard out, but flags can be set to direct it into a file independent of your shell's
 capabilities. Errors will be printed to standard error, and cause the program's exit code to be non-zero.
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
-Everything else about the *container* API can be found at the
+Everything else about the *Container* API can be found at the
 [official documentation site](https://cloud.google.com/container-engine/).
 
 # Installation and Source Code
@@ -25,25 +25,35 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *container* API at revision *20170430*. The CLI is at version *1.0.6*.
+This documentation was generated from the *Container* API at revision *20170915*. The CLI is at version *1.0.6*.
 
 ```bash
 container1 [options]
         projects
+                zones-clusters-addons <project-id> <zone> <cluster-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 zones-clusters-complete-ip-rotation <project-id> <zone> <cluster-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 zones-clusters-create <project-id> <zone> (-r <kv>)... [-p <v>]... [-o <out>]
                 zones-clusters-delete <project-id> <zone> <cluster-id> [-p <v>]... [-o <out>]
                 zones-clusters-get <project-id> <zone> <cluster-id> [-p <v>]... [-o <out>]
                 zones-clusters-legacy-abac <project-id> <zone> <cluster-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 zones-clusters-list <project-id> <zone> [-p <v>]... [-o <out>]
+                zones-clusters-locations <project-id> <zone> <cluster-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                zones-clusters-logging <project-id> <zone> <cluster-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                zones-clusters-master <project-id> <zone> <cluster-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                zones-clusters-monitoring <project-id> <zone> <cluster-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                zones-clusters-node-pools-autoscaling <project-id> <zone> <cluster-id> <node-pool-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 zones-clusters-node-pools-create <project-id> <zone> <cluster-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 zones-clusters-node-pools-delete <project-id> <zone> <cluster-id> <node-pool-id> [-p <v>]... [-o <out>]
                 zones-clusters-node-pools-get <project-id> <zone> <cluster-id> <node-pool-id> [-p <v>]... [-o <out>]
                 zones-clusters-node-pools-list <project-id> <zone> <cluster-id> [-p <v>]... [-o <out>]
                 zones-clusters-node-pools-rollback <project-id> <zone> <cluster-id> <node-pool-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 zones-clusters-node-pools-set-management <project-id> <zone> <cluster-id> <node-pool-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                zones-clusters-node-pools-set-size <project-id> <zone> <cluster-id> <node-pool-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                zones-clusters-node-pools-update <project-id> <zone> <cluster-id> <node-pool-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 zones-clusters-resource-labels <project-id> <zone> <cluster-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                zones-clusters-set-maintenance-policy <project-id> <zone> <cluster-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 zones-clusters-set-master-auth <project-id> <zone> <cluster-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                zones-clusters-set-network-policy <project-id> <zone> <cluster-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 zones-clusters-start-ip-rotation <project-id> <zone> <cluster-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 zones-clusters-update <project-id> <zone> <cluster-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 zones-get-serverconfig <project-id> <zone> [-p <v>]... [-o <out>]

@@ -4,9 +4,9 @@
 [package]
 
 name = "google-container1-cli"
-version = "1.0.6+20170430"
+version = "1.0.6+20170915"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
-description = "A complete library to interact with container (protocol v1)"
+description = "A complete library to interact with Container (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/container1-cli"
 homepage = "https://cloud.google.com/container-engine/"
 documentation = "http://byron.github.io/google-apis-rs/google_container1_cli"
@@ -37,4 +37,4 @@ clap = "^2.0"
 
 [dependencies.google-container1]
 path = "../container1"
-version = "1.0.6+20170430"
+version = "1.0.6+20170915"

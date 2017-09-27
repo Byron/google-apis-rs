@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *proximitybeacon* crate version *1.0.6+20170517*, where *20170517* is the exact revision of the *proximitybeacon:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *proximitybeacon* crate version *1.0.6+20170913*, where *20170913* is the exact revision of the *proximitybeacon:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *proximitybeacon* *v1_beta1* API can be found at the
 //! [official documentation site](https://developers.google.com/beacons/proximity/).
@@ -479,12 +479,12 @@ pub struct ListBeaconsResponse {
     /// request to retrieve the next page of results.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
-    /// The beacons that matched the search criteria.
-    pub beacons: Option<Vec<Beacon>>,
     /// Estimate of the total number of beacons matched by the query. Higher
     /// values may be less accurate.
     #[serde(rename="totalCount")]
     pub total_count: Option<i64>,
+    /// The beacons that matched the search criteria.
+    pub beacons: Option<Vec<Beacon>>,
 }
 
 impl ResponseResult for ListBeaconsResponse {}
@@ -532,14 +532,14 @@ impl RequestValue for GetInfoForObservedBeaconsRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Namespace {
-    /// Resource name of this namespace. Namespaces names have the format:
-    /// <code>namespaces/<var>namespace</var></code>.
-    #[serde(rename="namespaceName")]
-    pub namespace_name: Option<String>,
     /// Specifies what clients may receive attachments under this namespace
     /// via `beaconinfo.getforobserved`.
     #[serde(rename="servingVisibility")]
     pub serving_visibility: Option<String>,
+    /// Resource name of this namespace. Namespaces names have the format:
+    /// <code>namespaces/<var>namespace</var></code>.
+    #[serde(rename="namespaceName")]
+    pub namespace_name: Option<String>,
 }
 
 impl RequestValue for Namespace {}
@@ -797,11 +797,11 @@ pub struct EphemeralIdRegistration {
     /// broadcasting a new ephemeral ID on average every 2^K seconds.
     #[serde(rename="rotationPeriodExponent")]
     pub rotation_period_exponent: Option<u32>,
-    /// The beacon's public key used for the Elliptic curve Diffie-Hellman
-    /// key exchange. When this field is populated, `service_ecdh_public_key`
+    /// The service's public key used for the Elliptic curve Diffie-Hellman
+    /// key exchange. When this field is populated, `beacon_ecdh_public_key`
     /// must also be populated, and `beacon_identity_key` must not be.
-    #[serde(rename="beaconEcdhPublicKey")]
-    pub beacon_ecdh_public_key: Option<String>,
+    #[serde(rename="serviceEcdhPublicKey")]
+    pub service_ecdh_public_key: Option<String>,
     /// The initial clock value of the beacon. The beacon's clock must have
     /// begun counting at this value immediately prior to transmitting this
     /// value to the resolving service. Significant delay in transmitting this
@@ -809,11 +809,11 @@ pub struct EphemeralIdRegistration {
     /// value is not provided, the default is zero.
     #[serde(rename="initialClockValue")]
     pub initial_clock_value: Option<String>,
-    /// The service's public key used for the Elliptic curve Diffie-Hellman
-    /// key exchange. When this field is populated, `beacon_ecdh_public_key`
+    /// The beacon's public key used for the Elliptic curve Diffie-Hellman
+    /// key exchange. When this field is populated, `service_ecdh_public_key`
     /// must also be populated, and `beacon_identity_key` must not be.
-    #[serde(rename="serviceEcdhPublicKey")]
-    pub service_ecdh_public_key: Option<String>,
+    #[serde(rename="beaconEcdhPublicKey")]
+    pub beacon_ecdh_public_key: Option<String>,
     /// The private key of the beacon. If this field is populated,
     /// `beacon_ecdh_public_key` and `service_ecdh_public_key` must not be
     /// populated.
@@ -1000,14 +1000,14 @@ impl ResponseResult for Empty {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Date {
-    /// Year of date. Must be from 1 to 9999, or 0 if specifying a date without
-    /// a year.
-    pub year: Option<i32>,
+    /// Month of year. Must be from 1 to 12.
+    pub month: Option<i32>,
     /// Day of month. Must be from 1 to 31 and valid for the year and month, or 0
     /// if specifying a year/month where the day is not significant.
     pub day: Option<i32>,
-    /// Month of year. Must be from 1 to 12.
-    pub month: Option<i32>,
+    /// Year of date. Must be from 1 to 9999, or 0 if specifying a date without
+    /// a year.
+    pub year: Option<i32>,
 }
 
 impl Part for Date {}

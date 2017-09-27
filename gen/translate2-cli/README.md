@@ -3,15 +3,15 @@ DO NOT EDIT !
 This file was generated automatically from 'src/mako/cli/README.md.mako'
 DO NOT EDIT !
 -->
-The `translate2` command-line interface *(CLI)* allows to use most features of the *Google translate* service from the comfort of your terminal.
+The `translate2` command-line interface *(CLI)* allows to use most features of the *Google Translate* service from the comfort of your terminal.
 
 By default all output is printed to standard out, but flags can be set to direct it into a file independent of your shell's
 capabilities. Errors will be printed to standard error, and cause the program's exit code to be non-zero.
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
-Everything else about the *translate* API can be found at the
-[official documentation site](https://developers.google.com/translate/v2/using_rest).
+Everything else about the *Translate* API can be found at the
+[official documentation site](https://code.google.com/apis/language/translate/v2/getting_started.html).
 
 # Installation and Source Code
 
@@ -25,19 +25,25 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *translate* API at revision *20160627*. The CLI is at version *1.0.6*.
+This documentation was generated from the *Translate* API at revision *20170525*. The CLI is at version *1.0.6*.
 
 ```bash
 translate2 [options]
         detections
+                detect (-r <kv>)... [-p <v>]... [-o <out>]
                 list <q>... [-p <v>]... [-o <out>]
         languages
                 list [-p <v>]... [-o <out>]
         translations
                 list <q>... <target> [-p <v>]... [-o <out>]
+                translate (-r <kv>)... [-p <v>]... [-o <out>]
   translate2 --help
 
 Configuration:
+  [--scope <url>]...
+            Specify the authentication a method should be executed in. Each scope
+            requires the user to grant this application permission to use it.
+            If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to
             a user-writable directory that we will create during the first invocation.

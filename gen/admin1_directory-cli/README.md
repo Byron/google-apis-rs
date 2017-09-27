@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *directory* API at revision *20170419*. The CLI is at version *1.0.6*.
+This documentation was generated from the *directory* API at revision *20170830*. The CLI is at version *1.0.6*.
 
 ```bash
 admin1-directory [options]
@@ -39,6 +39,7 @@ admin1-directory [options]
                 action <customer-id> <resource-id> (-r <kv>)... [-p <v>]...
                 get <customer-id> <device-id> [-p <v>]... [-o <out>]
                 list <customer-id> [-p <v>]... [-o <out>]
+                move-devices-to-ou <customer-id> <org-unit-path> (-r <kv>)... [-p <v>]...
                 patch <customer-id> <device-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 update <customer-id> <device-id> (-r <kv>)... [-p <v>]... [-o <out>]
         customers

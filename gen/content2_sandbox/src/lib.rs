@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Shopping Content* crate version *1.0.6+20170519*, where *20170519* is the exact revision of the *content:v2sandbox* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *Shopping Content* crate version *1.0.6+20170926*, where *20170926* is the exact revision of the *content:v2sandbox* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *Shopping Content* *v2_sandbox* API can be found at the
 //! [official documentation site](https://developers.google.com/shopping-content).
@@ -387,7 +387,7 @@ pub struct OrderLineItemShippingDetailsMethod {
     /// Minimum transit time.
     #[serde(rename="minDaysInTransit")]
     pub min_days_in_transit: Option<u32>,
-    /// The carrier for the shipping. Optional.
+    /// The carrier for the shipping. Optional. See shipments[].carrier for a list of acceptable values.
     pub carrier: Option<String>,
     /// The name of the shipping method.
     #[serde(rename="methodName")]
@@ -466,7 +466,7 @@ impl ResponseResult for OrdersAdvanceTestOrderResponse {}
 pub struct OrdersCustomBatchRequestEntryUpdateShipment {
     /// New status for the shipment. Not updated if missing.
     pub status: Option<String>,
-    /// The carrier handling the shipment. Not updated if missing.
+    /// The carrier handling the shipment. Not updated if missing. See shipments[].carrier in the  Orders resource representation for a list of acceptable values.
     pub carrier: Option<String>,
     /// The tracking id for the shipment. Not updated if missing.
     #[serde(rename="trackingId")]
@@ -525,20 +525,23 @@ impl RequestValue for OrdersCustomBatchRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OrdersShipLineItemsRequest {
-    /// The ID of the operation. Unique across all operations for a given order.
-    #[serde(rename="operationId")]
-    pub operation_id: Option<String>,
+    /// Deprecated. Please use shipmentInfo instead. The carrier handling the shipment. See shipments[].carrier in the  Orders resource representation for a list of acceptable values.
+    pub carrier: Option<String>,
+    /// Deprecated. Please use shipmentInfo instead. The tracking id for the shipment.
+    #[serde(rename="trackingId")]
+    pub tracking_id: Option<String>,
+    /// Deprecated. Please use shipmentInfo instead. The ID of the shipment.
+    #[serde(rename="shipmentId")]
+    pub shipment_id: Option<String>,
     /// Line items to ship.
     #[serde(rename="lineItems")]
     pub line_items: Option<Vec<OrderShipmentLineItemShipment>>,
-    /// The carrier handling the shipment.
-    pub carrier: Option<String>,
-    /// The tracking id for the shipment.
-    #[serde(rename="trackingId")]
-    pub tracking_id: Option<String>,
-    /// The ID of the shipment.
-    #[serde(rename="shipmentId")]
-    pub shipment_id: Option<String>,
+    /// Shipment information. This field is repeated because a single line item can be shipped in several packages (and have several tracking IDs).
+    #[serde(rename="shipmentInfos")]
+    pub shipment_infos: Option<Vec<OrdersCustomBatchRequestEntryShipLineItemsShipmentInfo>>,
+    /// The ID of the operation. Unique across all operations for a given order.
+    #[serde(rename="operationId")]
+    pub operation_id: Option<String>,
 }
 
 impl RequestValue for OrdersShipLineItemsRequest {}
@@ -556,6 +559,30 @@ pub struct OrderShipment {
     #[serde(rename="creationDate")]
     pub creation_date: Option<String>,
     /// The carrier handling the shipment.
+    /// 
+    /// Acceptable values are:  
+    /// - "gsx" 
+    /// - "ups" 
+    /// - "united parcel service" 
+    /// - "usps" 
+    /// - "united states postal service" 
+    /// - "fedex" 
+    /// - "dhl" 
+    /// - "ecourier" 
+    /// - "cxt" 
+    /// - "google" 
+    /// - "on trac" 
+    /// - "ontrac" 
+    /// - "on-trac" 
+    /// - "on_trac" 
+    /// - "delvic" 
+    /// - "dynamex" 
+    /// - "lasership" 
+    /// - "smartpost" 
+    /// - "fedex smartpost" 
+    /// - "mpx" 
+    /// - "uds" 
+    /// - "united delivery service"
     pub carrier: Option<String>,
     /// The tracking id for the shipment.
     #[serde(rename="trackingId")]
@@ -737,7 +764,7 @@ pub struct Order {
     pub net_amount: Option<Price>,
     /// The REST id of the order. Globally unique.
     pub id: Option<String>,
-    /// The details of the merchant provided promotions applied to the order. More details about the program are  here.
+    /// The details of the merchant provided promotions applied to the order. More details about the program are here.
     pub promotions: Option<Vec<OrderPromotion>>,
     /// Identifies what kind of resource this is. Value: the fixed string "content#order".
     pub kind: Option<String>,
@@ -778,6 +805,25 @@ pub struct Order {
 
 impl Resource for Order {}
 impl ResponseResult for Order {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct OrdersCustomBatchRequestEntryShipLineItemsShipmentInfo {
+    /// The carrier handling the shipment. See shipments[].carrier in the  Orders resource representation for a list of acceptable values.
+    pub carrier: Option<String>,
+    /// The tracking id for the shipment.
+    #[serde(rename="trackingId")]
+    pub tracking_id: Option<String>,
+    /// The ID of the shipment.
+    #[serde(rename="shipmentId")]
+    pub shipment_id: Option<String>,
+}
+
+impl Part for OrdersCustomBatchRequestEntryShipLineItemsShipmentInfo {}
 
 
 /// There is no detailed description.
@@ -1574,12 +1620,15 @@ pub struct OrdersCustomBatchRequestEntryShipLineItems {
     /// Line items to ship.
     #[serde(rename="lineItems")]
     pub line_items: Option<Vec<OrderShipmentLineItemShipment>>,
-    /// The carrier handling the shipment.
+    /// Deprecated. Please use shipmentInfo instead. The carrier handling the shipment. See shipments[].carrier in the  Orders resource representation for a list of acceptable values.
     pub carrier: Option<String>,
-    /// The tracking id for the shipment.
+    /// Shipment information. This field is repeated because a single line item can be shipped in several packages (and have several tracking IDs).
+    #[serde(rename="shipmentInfos")]
+    pub shipment_infos: Option<Vec<OrdersCustomBatchRequestEntryShipLineItemsShipmentInfo>>,
+    /// Deprecated. Please use shipmentInfo instead. The tracking id for the shipment.
     #[serde(rename="trackingId")]
     pub tracking_id: Option<String>,
-    /// The ID of the shipment.
+    /// Deprecated. Please use shipmentInfo instead. The ID of the shipment.
     #[serde(rename="shipmentId")]
     pub shipment_id: Option<String>,
 }
@@ -1649,7 +1698,16 @@ pub struct OrderPaymentMethod {
     /// The billing address.
     #[serde(rename="billingAddress")]
     pub billing_address: Option<OrderAddress>,
-    /// The type of instrument (VISA, Mastercard, etc).
+    /// The type of instrument.
+    /// 
+    /// Acceptable values are:  
+    /// - "AMEX" 
+    /// - "DISCOVER" 
+    /// - "JCB" 
+    /// - "MASTERCARD" 
+    /// - "UNIONPAY" 
+    /// - "VISA" 
+    /// - ""
     #[serde(rename="type")]
     pub type_: Option<String>,
     /// The last four digits of the card number.
@@ -1715,7 +1773,7 @@ impl ResponseResult for OrdersCancelResponse {}
 pub struct OrdersUpdateShipmentRequest {
     /// New status for the shipment. Not updated if missing.
     pub status: Option<String>,
-    /// The carrier handling the shipment. Not updated if missing.
+    /// The carrier handling the shipment. Not updated if missing. See shipments[].carrier in the  Orders resource representation for a list of acceptable values.
     pub carrier: Option<String>,
     /// The ID of the operation. Unique across all operations for a given order.
     #[serde(rename="operationId")]
@@ -1777,7 +1835,7 @@ impl Part for OrdersCustomBatchRequestEntryRefund {}
 pub struct TestOrder {
     /// The details of the customer who placed the order.
     pub customer: Option<TestOrderCustomer>,
-    /// The details of the merchant provided promotions applied to the order. More details about the program are  here.
+    /// The details of the merchant provided promotions applied to the order. More details about the program are here.
     pub promotions: Option<Vec<OrderPromotion>>,
     /// Identifies what kind of resource this is. Value: the fixed string "content#testOrder".
     pub kind: Option<String>,

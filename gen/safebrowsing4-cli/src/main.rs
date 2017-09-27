@@ -181,10 +181,10 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "client.client-version" => Some(("client.clientVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "client.client-id" => Some(("client.clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "api-client.client-version" => Some(("apiClient.clientVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "client.client-version" => Some(("client.clientVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "api-client.client-id" => Some(("apiClient.clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "api-client.client-version" => Some(("apiClient.clientVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "threat-info.threat-types" => Some(("threatInfo.threatTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "threat-info.platform-types" => Some(("threatInfo.platformTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "threat-info.threat-entry-types" => Some(("threatInfo.threatEntryTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -270,8 +270,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "client.client-version" => Some(("client.clientVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "client.client-id" => Some(("client.clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "client.client-version" => Some(("client.clientVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["client", "client-id", "client-version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -402,8 +402,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "client.client-version" => Some(("client.clientVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "client.client-id" => Some(("client.clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "client.client-version" => Some(("client.clientVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "threat-info.threat-types" => Some(("threatInfo.threatTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "threat-info.platform-types" => Some(("threatInfo.platformTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "threat-info.threat-entry-types" => Some(("threatInfo.threatEntryTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -771,8 +771,8 @@ fn main() {
     
     let mut app = App::new("safebrowsing4")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.6+20170509")
-           .about("The Safe Browsing API is an experimental API that allows client applications to check URLs against Google's constantly-updated blacklists of suspected phishing and malware pages. Your client application can use the API to download an encrypted table for local, client-side lookups of URLs.")
+           .version("1.0.6+20170921")
+           .about("Enables client applications to check web resources (most commonly URLs) against Google-generated lists of unsafe web resources.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_safebrowsing4_cli")
            .arg(Arg::with_name("folder")
                    .long("config-dir")

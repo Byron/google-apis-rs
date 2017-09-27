@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *customsearch* crate version *1.0.6+20160411*, where *20160411* is the exact revision of the *customsearch:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *customsearch* crate version *1.0.6+20170615*, where *20170615* is the exact revision of the *customsearch:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *customsearch* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/custom-search/v1/using_rest).
@@ -95,36 +95,35 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.cse().list("q")
-//!              .start(26)
-//!              .sort("erat")
-//!              .site_search_filter("sadipscing")
-//!              .site_search("dolor")
-//!              .search_type("eirmod")
-//!              .safe("elitr")
-//!              .rights("amet")
-//!              .related_site("no")
-//!              .or_terms("labore")
-//!              .num(62)
-//!              .lr("dolore")
-//!              .low_range("invidunt")
-//!              .link_site("aliquyam")
-//!              .img_type("accusam")
-//!              .img_size("Lorem")
-//!              .img_dominant_color("sea")
-//!              .img_color_type("et")
-//!              .hq("duo")
-//!              .hl("et")
-//!              .high_range("eirmod")
-//!              .googlehost("sanctus")
-//!              .gl("et")
-//!              .filter("amet")
-//!              .file_type("et")
-//!              .exclude_terms("consetetur")
-//!              .exact_terms("ut")
-//!              .date_restrict("ea")
-//!              .cx("sed")
-//!              .cref("dolor")
-//!              .cr("dolor")
+//!              .start(46)
+//!              .sort("eos")
+//!              .site_search_filter("erat")
+//!              .site_search("sadipscing")
+//!              .search_type("dolor")
+//!              .safe("eirmod")
+//!              .rights("elitr")
+//!              .related_site("amet")
+//!              .or_terms("no")
+//!              .num(65)
+//!              .lr("eirmod")
+//!              .low_range("dolore")
+//!              .link_site("invidunt")
+//!              .img_type("aliquyam")
+//!              .img_size("accusam")
+//!              .img_dominant_color("Lorem")
+//!              .img_color_type("sea")
+//!              .hq("et")
+//!              .hl("duo")
+//!              .high_range("et")
+//!              .googlehost("eirmod")
+//!              .gl("sanctus")
+//!              .filter("et")
+//!              .file_type("amet")
+//!              .exclude_terms("et")
+//!              .exact_terms("consetetur")
+//!              .date_restrict("ut")
+//!              .cx("ea")
+//!              .cr("sed")
 //!              .c2coff("dolor")
 //!              .doit();
 //! 
@@ -283,37 +282,36 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.cse().list("q")
-///              .start(5)
-///              .sort("amet.")
-///              .site_search_filter("voluptua.")
-///              .site_search("Lorem")
-///              .search_type("gubergren")
-///              .safe("justo")
-///              .rights("sit")
-///              .related_site("vero")
-///              .or_terms("diam")
-///              .num(35)
-///              .lr("consetetur")
-///              .low_range("sadipscing")
-///              .link_site("vero")
+///              .start(53)
+///              .sort("et")
+///              .site_search_filter("consetetur")
+///              .site_search("amet.")
+///              .search_type("voluptua.")
+///              .safe("Lorem")
+///              .rights("gubergren")
+///              .related_site("justo")
+///              .or_terms("sit")
+///              .num(75)
+///              .lr("diam")
+///              .low_range("rebum.")
+///              .link_site("consetetur")
 ///              .img_type("sadipscing")
-///              .img_size("invidunt")
-///              .img_dominant_color("consetetur")
-///              .img_color_type("dolore")
-///              .hq("duo")
-///              .hl("aliquyam")
-///              .high_range("Lorem")
-///              .googlehost("et")
-///              .gl("clita")
-///              .filter("consetetur")
-///              .file_type("takimata")
-///              .exclude_terms("nonumy")
-///              .exact_terms("kasd")
-///              .date_restrict("sanctus")
-///              .cx("takimata")
-///              .cref("At")
-///              .cr("labore")
-///              .c2coff("invidunt")
+///              .img_size("vero")
+///              .img_dominant_color("sadipscing")
+///              .img_color_type("invidunt")
+///              .hq("consetetur")
+///              .hl("dolore")
+///              .high_range("duo")
+///              .googlehost("aliquyam")
+///              .gl("Lorem")
+///              .filter("et")
+///              .file_type("clita")
+///              .exclude_terms("consetetur")
+///              .exact_terms("takimata")
+///              .date_restrict("nonumy")
+///              .cx("kasd")
+///              .cr("sanctus")
+///              .c2coff("takimata")
 ///              .doit();
 /// 
 /// match result {
@@ -663,8 +661,6 @@ pub struct Query {
     #[serde(rename="siteSearch")]
     pub site_search: Option<String>,
     /// no description provided
-    pub cref: Option<String>,
-    /// no description provided
     pub sort: Option<String>,
     /// no description provided
     pub hq: Option<String>,
@@ -870,7 +866,6 @@ impl<'a, C, A> CseMethods<'a, C, A> {
             _exact_terms: Default::default(),
             _date_restrict: Default::default(),
             _cx: Default::default(),
-            _cref: Default::default(),
             _cr: Default::default(),
             _c2coff: Default::default(),
             _delegate: Default::default(),
@@ -915,37 +910,36 @@ impl<'a, C, A> CseMethods<'a, C, A> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.cse().list("q")
-///              .start(6)
-///              .sort("rebum.")
-///              .site_search_filter("dolore")
-///              .site_search("nonumy")
-///              .search_type("sed")
-///              .safe("aliquyam")
-///              .rights("sit")
-///              .related_site("eirmod")
-///              .or_terms("consetetur")
-///              .num(16)
-///              .lr("sed")
-///              .low_range("ea")
-///              .link_site("gubergren")
-///              .img_type("aliquyam")
-///              .img_size("eos")
-///              .img_dominant_color("tempor")
-///              .img_color_type("sea")
-///              .hq("labore")
-///              .hl("ipsum")
-///              .high_range("aliquyam")
-///              .googlehost("dolores")
-///              .gl("sit")
-///              .filter("diam")
-///              .file_type("ut")
-///              .exclude_terms("justo")
-///              .exact_terms("est")
-///              .date_restrict("amet")
-///              .cx("accusam")
-///              .cref("clita")
-///              .cr("diam")
-///              .c2coff("justo")
+///              .start(15)
+///              .sort("invidunt")
+///              .site_search_filter("ea")
+///              .site_search("sadipscing")
+///              .search_type("rebum.")
+///              .safe("dolore")
+///              .rights("nonumy")
+///              .related_site("sed")
+///              .or_terms("aliquyam")
+///              .num(48)
+///              .lr("eirmod")
+///              .low_range("consetetur")
+///              .link_site("labore")
+///              .img_type("sed")
+///              .img_size("ea")
+///              .img_dominant_color("gubergren")
+///              .img_color_type("aliquyam")
+///              .hq("eos")
+///              .hl("tempor")
+///              .high_range("sea")
+///              .googlehost("labore")
+///              .gl("ipsum")
+///              .filter("aliquyam")
+///              .file_type("dolores")
+///              .exclude_terms("sit")
+///              .exact_terms("diam")
+///              .date_restrict("ut")
+///              .cx("justo")
+///              .cr("est")
+///              .c2coff("amet")
 ///              .doit();
 /// # }
 /// ```
@@ -982,7 +976,6 @@ pub struct CseListCall<'a, C, A>
     _exact_terms: Option<String>,
     _date_restrict: Option<String>,
     _cx: Option<String>,
-    _cref: Option<String>,
     _cr: Option<String>,
     _c2coff: Option<String>,
     _delegate: Option<&'a mut Delegate>,
@@ -1005,7 +998,7 @@ impl<'a, C, A> CseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
         };
         dlg.begin(MethodInfo { id: "search.cse.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((34 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((33 + self._additional_params.len()));
         params.push(("q", self._q.to_string()));
         if let Some(value) = self._start {
             params.push(("start", value.to_string()));
@@ -1091,16 +1084,13 @@ impl<'a, C, A> CseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
         if let Some(value) = self._cx {
             params.push(("cx", value.to_string()));
         }
-        if let Some(value) = self._cref {
-            params.push(("cref", value.to_string()));
-        }
         if let Some(value) = self._cr {
             params.push(("cr", value.to_string()));
         }
         if let Some(value) = self._c2coff {
             params.push(("c2coff", value.to_string()));
         }
-        for &field in ["alt", "q", "start", "sort", "siteSearchFilter", "siteSearch", "searchType", "safe", "rights", "relatedSite", "orTerms", "num", "lr", "lowRange", "linkSite", "imgType", "imgSize", "imgDominantColor", "imgColorType", "hq", "hl", "highRange", "googlehost", "gl", "filter", "fileType", "excludeTerms", "exactTerms", "dateRestrict", "cx", "cref", "cr", "c2coff"].iter() {
+        for &field in ["alt", "q", "start", "sort", "siteSearchFilter", "siteSearch", "searchType", "safe", "rights", "relatedSite", "orTerms", "num", "lr", "lowRange", "linkSite", "imgType", "imgSize", "imgDominantColor", "imgColorType", "hq", "hl", "highRange", "googlehost", "gl", "filter", "fileType", "excludeTerms", "exactTerms", "dateRestrict", "cx", "cr", "c2coff"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -1393,13 +1383,6 @@ impl<'a, C, A> CseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     /// Sets the *cx* query property to the given value.
     pub fn cx(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._cx = Some(new_value.to_string());
-        self
-    }
-    /// The URL of a linked custom search engine
-    ///
-    /// Sets the *cref* query property to the given value.
-    pub fn cref(mut self, new_value: &str) -> CseListCall<'a, C, A> {
-        self._cref = Some(new_value.to_string());
         self
     }
     /// Country restrict(s).

@@ -1819,12 +1819,13 @@ fn main() {
         + Membership changes that leave the project without any owners that have
         accepted the Terms of Service (ToS) will be rejected.
         
-        + There must be at least one owner who has accepted the Terms of
-        Service (ToS) agreement in the policy. Calling `setIamPolicy()` to
-        remove the last ToS-accepted owner from the policy will fail. This
-        restriction also applies to legacy projects that no longer have owners
-        who have accepted the ToS. Edits to IAM policies will be rejected until
-        the lack of a ToS-accepting owner is rectified.
+        + If the project is not part of an organization, there must be at least
+        one owner who has accepted the Terms of Service (ToS) agreement in the
+        policy. Calling `setIamPolicy()` to remove the last ToS-accepted owner
+        from the policy will fail. This restriction also applies to legacy
+        projects that no longer have owners who have accepted the ToS. Edits to
+        IAM policies will be rejected until the lack of a ToS-accepting owner is
+        rectified.
         
         + Calling this method requires enabling the App Engine Admin API.
         
@@ -1963,7 +1964,7 @@ fn main() {
     
     let mut app = App::new("cloudresourcemanager1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.6+20170517")
+           .version("1.0.6+20170920")
            .about("The Google Cloud Resource Manager API provides methods for creating, reading, and updating project metadata.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1_cli")
            .arg(Arg::with_name("url")

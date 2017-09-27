@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Resource Manager* crate version *1.0.6+20170517*, where *20170517* is the exact revision of the *cloudresourcemanager:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *Cloud Resource Manager* crate version *1.0.6+20170920*, where *20170920* is the exact revision of the *cloudresourcemanager:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *Cloud Resource Manager* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/resource-manager).
@@ -498,91 +498,29 @@ pub struct GetAncestryResponse {
 impl ResponseResult for GetAncestryResponse {}
 
 
-/// A Project is a high-level Google Cloud Platform entity.  It is a
-/// container for ACLs, APIs, App Engine Apps, VMs, and other
-/// Google Cloud Platform resources.
+/// The response returned from the `ListOrganizations` method.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [test iam permissions projects](struct.ProjectTestIamPermissionCall.html) (none)
-/// * [undelete projects](struct.ProjectUndeleteCall.html) (none)
-/// * [set iam policy projects](struct.ProjectSetIamPolicyCall.html) (none)
-/// * [get projects](struct.ProjectGetCall.html) (response)
-/// * [get ancestry projects](struct.ProjectGetAncestryCall.html) (none)
-/// * [update projects](struct.ProjectUpdateCall.html) (request|response)
-/// * [get iam policy projects](struct.ProjectGetIamPolicyCall.html) (none)
-/// * [delete projects](struct.ProjectDeleteCall.html) (none)
-/// * [create projects](struct.ProjectCreateCall.html) (request|response)
-/// * [list projects](struct.ProjectListCall.html) (none)
+/// * [list organizations](struct.OrganizationListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Project {
-    /// The user-assigned display name of the Project.
-    /// It must be 4 to 30 characters.
-    /// Allowed characters are: lowercase and uppercase letters, numbers,
-    /// hyphen, single-quote, double-quote, space, and exclamation point.
-    /// 
-    /// Example: <code>My Project</code>
-    /// Read-write.
-    pub name: Option<String>,
-    /// An optional reference to a parent Resource.
-    /// 
-    /// The only supported parent type is "organization". Once set, the parent
-    /// cannot be modified. The `parent` can be set on creation or using the
-    /// `UpdateProject` method; the end user must have the
-    /// `resourcemanager.projects.create` permission on the parent.
-    /// 
-    /// Read-write.
-    pub parent: Option<ResourceId>,
-    /// The unique, user-assigned ID of the Project.
-    /// It must be 6 to 30 lowercase letters, digits, or hyphens.
-    /// It must start with a letter.
-    /// Trailing hyphens are prohibited.
-    /// 
-    /// Example: <code>tokyo-rain-123</code>
-    /// Read-only after creation.
-    #[serde(rename="projectId")]
-    pub project_id: Option<String>,
-    /// The labels associated with this Project.
-    /// 
-    /// Label keys must be between 1 and 63 characters long and must conform
-    /// to the following regular expression: \[a-z\](\[-a-z0-9\]*\[a-z0-9\])?.
-    /// 
-    /// Label values must be between 0 and 63 characters long and must conform
-    /// to the regular expression (\[a-z\](\[-a-z0-9\]*\[a-z0-9\])?)?.
-    /// 
-    /// No more than 256 labels can be associated with a given resource.
-    /// 
-    /// Clients should store labels in a representation such as JSON that does not
-    /// depend on specific characters being disallowed.
-    /// 
-    /// Example: <code>"environment" : "dev"</code>
-    /// Read-write.
-    pub labels: Option<HashMap<String, String>>,
-    /// The number uniquely identifying the project.
-    /// 
-    /// Example: <code>415104041262</code>
-    /// Read-only.
-    #[serde(rename="projectNumber")]
-    pub project_number: Option<String>,
-    /// Creation time.
-    /// 
-    /// Read-only.
-    #[serde(rename="createTime")]
-    pub create_time: Option<String>,
-    /// The Project lifecycle state.
-    /// 
-    /// Read-only.
-    #[serde(rename="lifecycleState")]
-    pub lifecycle_state: Option<String>,
+pub struct ListOrganizationsResponse {
+    /// A pagination token to be used to retrieve the next page of results. If the
+    /// result is too large to fit within the page size specified in the request,
+    /// this field will be set with a token that can be used to fetch the next page
+    /// of results. If this field is empty, it indicates that this response
+    /// contains the last page of results.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The list of Organizations that matched the list query, possibly paginated.
+    pub organizations: Option<Vec<Organization>>,
 }
 
-impl RequestValue for Project {}
-impl Resource for Project {}
-impl ResponseResult for Project {}
+impl ResponseResult for ListOrganizationsResponse {}
 
 
 /// The request sent to the
@@ -646,10 +584,9 @@ impl RequestValue for GetAncestryRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Policy {
-    /// Associates a list of `members` to a `role`.
-    /// Multiple `bindings` must not be specified for the same `role`.
-    /// `bindings` with no members will result in an error.
-    pub bindings: Option<Vec<Binding>>,
+    /// Specifies cloud audit logging configuration for this policy.
+    #[serde(rename="auditConfigs")]
+    pub audit_configs: Option<Vec<AuditConfig>>,
     /// `etag` is used for optimistic concurrency control as a way to help
     /// prevent simultaneous updates of a policy from overwriting each other.
     /// It is strongly suggested that systems make use of the `etag` in the
@@ -661,9 +598,9 @@ pub struct Policy {
     /// If no `etag` is provided in the call to `setIamPolicy`, then the existing
     /// policy is overwritten blindly.
     pub etag: Option<String>,
-    /// Specifies cloud audit logging configuration for this policy.
-    #[serde(rename="auditConfigs")]
-    pub audit_configs: Option<Vec<AuditConfig>>,
+    /// Associates a list of `members` to a `role`.
+    /// `bindings` with no members will result in an error.
+    pub bindings: Option<Vec<Binding>>,
     /// Version of the `Policy`. The default version is 0.
     pub version: Option<i32>,
 }
@@ -777,29 +714,91 @@ pub struct UndeleteProjectRequest { _never_set: Option<bool> }
 impl RequestValue for UndeleteProjectRequest {}
 
 
-/// The response returned from the `ListOrganizations` method.
+/// A Project is a high-level Google Cloud Platform entity.  It is a
+/// container for ACLs, APIs, App Engine Apps, VMs, and other
+/// Google Cloud Platform resources.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list organizations](struct.OrganizationListCall.html) (response)
+/// * [test iam permissions projects](struct.ProjectTestIamPermissionCall.html) (none)
+/// * [undelete projects](struct.ProjectUndeleteCall.html) (none)
+/// * [set iam policy projects](struct.ProjectSetIamPolicyCall.html) (none)
+/// * [get projects](struct.ProjectGetCall.html) (response)
+/// * [get ancestry projects](struct.ProjectGetAncestryCall.html) (none)
+/// * [update projects](struct.ProjectUpdateCall.html) (request|response)
+/// * [get iam policy projects](struct.ProjectGetIamPolicyCall.html) (none)
+/// * [delete projects](struct.ProjectDeleteCall.html) (none)
+/// * [create projects](struct.ProjectCreateCall.html) (request|response)
+/// * [list projects](struct.ProjectListCall.html) (none)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListOrganizationsResponse {
-    /// A pagination token to be used to retrieve the next page of results. If the
-    /// result is too large to fit within the page size specified in the request,
-    /// this field will be set with a token that can be used to fetch the next page
-    /// of results. If this field is empty, it indicates that this response
-    /// contains the last page of results.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The list of Organizations that matched the list query, possibly paginated.
-    pub organizations: Option<Vec<Organization>>,
+pub struct Project {
+    /// The user-assigned display name of the Project.
+    /// It must be 4 to 30 characters.
+    /// Allowed characters are: lowercase and uppercase letters, numbers,
+    /// hyphen, single-quote, double-quote, space, and exclamation point.
+    /// 
+    /// Example: <code>My Project</code>
+    /// Read-write.
+    pub name: Option<String>,
+    /// An optional reference to a parent Resource.
+    /// 
+    /// The only supported parent type is "organization". Once set, the parent
+    /// cannot be modified. The `parent` can be set on creation or using the
+    /// `UpdateProject` method; the end user must have the
+    /// `resourcemanager.projects.create` permission on the parent.
+    /// 
+    /// Read-write.
+    pub parent: Option<ResourceId>,
+    /// The unique, user-assigned ID of the Project.
+    /// It must be 6 to 30 lowercase letters, digits, or hyphens.
+    /// It must start with a letter.
+    /// Trailing hyphens are prohibited.
+    /// 
+    /// Example: <code>tokyo-rain-123</code>
+    /// Read-only after creation.
+    #[serde(rename="projectId")]
+    pub project_id: Option<String>,
+    /// The labels associated with this Project.
+    /// 
+    /// Label keys must be between 1 and 63 characters long and must conform
+    /// to the following regular expression: \[a-z\](\[-a-z0-9\]*\[a-z0-9\])?.
+    /// 
+    /// Label values must be between 0 and 63 characters long and must conform
+    /// to the regular expression (\[a-z\](\[-a-z0-9\]*\[a-z0-9\])?)?.
+    /// 
+    /// No more than 256 labels can be associated with a given resource.
+    /// 
+    /// Clients should store labels in a representation such as JSON that does not
+    /// depend on specific characters being disallowed.
+    /// 
+    /// Example: <code>"environment" : "dev"</code>
+    /// Read-write.
+    pub labels: Option<HashMap<String, String>>,
+    /// The number uniquely identifying the project.
+    /// 
+    /// Example: <code>415104041262</code>
+    /// Read-only.
+    #[serde(rename="projectNumber")]
+    pub project_number: Option<String>,
+    /// Creation time.
+    /// 
+    /// Read-only.
+    #[serde(rename="createTime")]
+    pub create_time: Option<String>,
+    /// The Project lifecycle state.
+    /// 
+    /// Read-only.
+    #[serde(rename="lifecycleState")]
+    pub lifecycle_state: Option<String>,
 }
 
-impl ResponseResult for ListOrganizationsResponse {}
+impl RequestValue for Project {}
+impl Resource for Project {}
+impl ResponseResult for Project {}
 
 
 /// Response message for `TestIamPermissions` method.
@@ -870,7 +869,7 @@ impl ResponseResult for ListProjectsResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResourceId {
     /// Required field representing the resource type this id is for.
-    /// At present, the valid types are "project" and "organization".
+    /// At present, the valid types are "project", "folder", and "organization".
     #[serde(rename="type")]
     pub type_: Option<String>,
     /// Required field for the type-specific id. This should correspond to the id
@@ -1312,12 +1311,13 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// + Membership changes that leave the project without any owners that have
     /// accepted the Terms of Service (ToS) will be rejected.
     /// 
-    /// + There must be at least one owner who has accepted the Terms of
-    /// Service (ToS) agreement in the policy. Calling `setIamPolicy()` to
-    /// remove the last ToS-accepted owner from the policy will fail. This
-    /// restriction also applies to legacy projects that no longer have owners
-    /// who have accepted the ToS. Edits to IAM policies will be rejected until
-    /// the lack of a ToS-accepting owner is rectified.
+    /// + If the project is not part of an organization, there must be at least
+    /// one owner who has accepted the Terms of Service (ToS) agreement in the
+    /// policy. Calling `setIamPolicy()` to remove the last ToS-accepted owner
+    /// from the policy will fail. This restriction also applies to legacy
+    /// projects that no longer have owners who have accepted the ToS. Edits to
+    /// IAM policies will be rejected until the lack of a ToS-accepting owner is
+    /// rectified.
     /// 
     /// + Calling this method requires enabling the App Engine Admin API.
     /// 
@@ -1744,12 +1744,12 @@ impl<'a, C, A> OrganizationSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> OrganizationSetIamPolicyCall<'a, C, A>
@@ -2031,12 +2031,12 @@ impl<'a, C, A> OrganizationGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> OrganizationGetIamPolicyCall<'a, C, A>
@@ -2318,12 +2318,12 @@ impl<'a, C, A> OrganizationTestIamPermissionCall<'a, C, A> where C: BorrowMut<hy
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> OrganizationTestIamPermissionCall<'a, C, A>
@@ -2584,12 +2584,12 @@ impl<'a, C, A> OrganizationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> OrganizationGetCall<'a, C, A>
@@ -2870,12 +2870,12 @@ impl<'a, C, A> OrganizationUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> OrganizationUpdateCall<'a, C, A>
@@ -3139,12 +3139,12 @@ impl<'a, C, A> OrganizationListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> OrganizationListCall<'a, C, A>
@@ -3420,12 +3420,12 @@ impl<'a, C, A> ProjectTestIamPermissionCall<'a, C, A> where C: BorrowMut<hyper::
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectTestIamPermissionCall<'a, C, A>
@@ -3708,12 +3708,12 @@ impl<'a, C, A> ProjectUndeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectUndeleteCall<'a, C, A>
@@ -3974,12 +3974,12 @@ impl<'a, C, A> ProjectCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectCreateCall<'a, C, A>
@@ -4038,12 +4038,13 @@ impl<'a, C, A> ProjectCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// + Membership changes that leave the project without any owners that have
 /// accepted the Terms of Service (ToS) will be rejected.
 /// 
-/// + There must be at least one owner who has accepted the Terms of
-/// Service (ToS) agreement in the policy. Calling `setIamPolicy()` to
-/// remove the last ToS-accepted owner from the policy will fail. This
-/// restriction also applies to legacy projects that no longer have owners
-/// who have accepted the ToS. Edits to IAM policies will be rejected until
-/// the lack of a ToS-accepting owner is rectified.
+/// + If the project is not part of an organization, there must be at least
+/// one owner who has accepted the Terms of Service (ToS) agreement in the
+/// policy. Calling `setIamPolicy()` to remove the last ToS-accepted owner
+/// from the policy will fail. This restriction also applies to legacy
+/// projects that no longer have owners who have accepted the ToS. Edits to
+/// IAM policies will be rejected until the lack of a ToS-accepting owner is
+/// rectified.
 /// 
 /// + Calling this method requires enabling the App Engine Admin API.
 /// 
@@ -4291,12 +4292,12 @@ impl<'a, C, A> ProjectSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectSetIamPolicyCall<'a, C, A>
@@ -4545,12 +4546,12 @@ impl<'a, C, A> ProjectGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectGetCall<'a, C, A>
@@ -4830,12 +4831,12 @@ impl<'a, C, A> ProjectGetAncestryCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectGetAncestryCall<'a, C, A>
@@ -5115,12 +5116,12 @@ impl<'a, C, A> ProjectUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectUpdateCall<'a, C, A>
@@ -5397,12 +5398,12 @@ impl<'a, C, A> ProjectGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectGetIamPolicyCall<'a, C, A>
@@ -5671,12 +5672,12 @@ impl<'a, C, A> ProjectDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectDeleteCall<'a, C, A>
@@ -5917,8 +5918,16 @@ impl<'a, C, A> ProjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// |NAME:howl|Equivalent to above.|
     /// |labels.color:*|The project has the label `color`.|
     /// |labels.color:red|The project's label `color` has the value `red`.|
-    /// |labels.color:red&nbsp;labels.size:big|The project's label `color` has the
-    /// value `red` and its label `size` has the value `big`.
+    /// |labels.color:red&nbsp;labels.size:big|The project's label `color` has the value `red` and its label `size` has the value `big`.
+    /// 
+    /// If you specify a filter that has both `parent.type` and `parent.id`, then
+    /// the `resourcemanager.projects.list` permission is checked on the parent.
+    /// If the user has this permission, all projects under the parent will be
+    /// returned after remaining filters have been applied. If the user lacks this
+    /// permission, then all projects for which the user has the
+    /// `resourcemanager.projects.get` permission will be returned after remaining
+    /// filters have been applied. If no filter is specified, the call will return
+    /// projects for which the user has `resourcemanager.projects.get` permissions.
     /// 
     /// Optional.
     ///
@@ -5952,12 +5961,12 @@ impl<'a, C, A> ProjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectListCall<'a, C, A>

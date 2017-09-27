@@ -25,12 +25,23 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *appengine* API at revision *20170522*. The CLI is at version *1.0.6*.
+This documentation was generated from the *appengine* API at revision *20170914*. The CLI is at version *1.0.6*.
 
 ```bash
 appengine1 [options]
         apps
+                authorized-certificates-create <apps-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                authorized-certificates-delete <apps-id> <authorized-certificates-id> [-p <v>]... [-o <out>]
+                authorized-certificates-get <apps-id> <authorized-certificates-id> [-p <v>]... [-o <out>]
+                authorized-certificates-list <apps-id> [-p <v>]... [-o <out>]
+                authorized-certificates-patch <apps-id> <authorized-certificates-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                authorized-domains-list <apps-id> [-p <v>]... [-o <out>]
                 create (-r <kv>)... [-p <v>]... [-o <out>]
+                domain-mappings-create <apps-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                domain-mappings-delete <apps-id> <domain-mappings-id> [-p <v>]... [-o <out>]
+                domain-mappings-get <apps-id> <domain-mappings-id> [-p <v>]... [-o <out>]
+                domain-mappings-list <apps-id> [-p <v>]... [-o <out>]
+                domain-mappings-patch <apps-id> <domain-mappings-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 get <apps-id> [-p <v>]... [-o <out>]
                 locations-get <apps-id> <locations-id> [-p <v>]... [-o <out>]
                 locations-list <apps-id> [-p <v>]... [-o <out>]

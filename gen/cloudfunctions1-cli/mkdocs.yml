@@ -1,0 +1,19 @@
+site_name: Cloud Functions v1.0.6+20170920
+site_url: http://byron.github.io/google-apis-rs/google-cloudfunctions1-cli
+site_description: A complete library to interact with Cloud Functions (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/cloudfunctions1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['operations_get.md', 'Operations', 'Get']
+- ['operations_list.md', 'Operations', 'List']
+- ['projects_locations-list.md', 'Projects', 'Locations List']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+

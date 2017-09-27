@@ -4,11 +4,11 @@
 [package]
 
 name = "google-translate2-cli"
-version = "1.0.6+20160627"
+version = "1.0.6+20170525"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
-description = "A complete library to interact with translate (protocol v2)"
+description = "A complete library to interact with Translate (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/translate2-cli"
-homepage = "https://developers.google.com/translate/v2/using_rest"
+homepage = "https://code.google.com/apis/language/translate/v2/getting_started.html"
 documentation = "http://byron.github.io/google-apis-rs/google_translate2_cli"
 license = "MIT"
 keywords = ["translate", "google", "cli"]
@@ -37,4 +37,4 @@ clap = "^2.0"
 
 [dependencies.google-translate2]
 path = "../translate2"
-version = "1.0.6+20160627"
+version = "1.0.6+20170525"

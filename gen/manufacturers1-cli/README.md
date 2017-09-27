@@ -25,13 +25,15 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Manufacturer Center* API at revision *20170412*. The CLI is at version *1.0.6*.
+This documentation was generated from the *Manufacturer Center* API at revision *20170808*. The CLI is at version *1.0.6*.
 
 ```bash
 manufacturers1 [options]
         accounts
+                products-delete <parent> <name> [-p <v>]... [-o <out>]
                 products-get <parent> <name> [-p <v>]... [-o <out>]
                 products-list <parent> [-p <v>]... [-o <out>]
+                products-update <parent> <name> (-r <kv>)... [-p <v>]... [-o <out>]
   manufacturers1 --help
 
 Configuration:

@@ -1,0 +1,40 @@
+# DO NOT EDIT !
+# This file was generated automatically from 'src/mako/Cargo.toml.mako'
+# DO NOT EDIT !
+[package]
+
+name = "google-vault1-cli"
+version = "1.0.6+20170812"
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
+description = "A complete library to interact with Vault (protocol v1)"
+repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/vault1-cli"
+homepage = "https://developers.google.com/vault"
+documentation = "http://byron.github.io/google-apis-rs/google_vault1_cli"
+license = "MIT"
+keywords = ["vault", "google", "cli"]
+
+[[bin]]
+name = "vault1"
+
+[dev-dependencies]
+hyper-rustls = "^0.6"
+
+[dependencies]
+hyper = "^ 0.10"
+mime = "^ 0.2.0"
+serde = "^ 1.0"
+serde_json = "^ 1.0"
+serde_derive = "^ 1.0"
+yup-oauth2 = "^ 1.0"
+strsim = "^0.5"
+hyper-rustls = "^0.6"
+yup-hyper-mock = "^2.0"
+clap = "^2.0"
+
+[features]
+
+
+
+[dependencies.google-vault1]
+path = "../vault1"
+version = "1.0.6+20170812"

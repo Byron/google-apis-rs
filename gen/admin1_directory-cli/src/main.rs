@@ -434,6 +434,9 @@ impl<'n> Engine<'n> {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
+                "org-unit-path" => {
+                    call = call.org_unit_path(value.unwrap_or(""));
+                },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
                 },
@@ -453,7 +456,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["order-by", "projection", "max-results", "page-token", "sort-order", "query"].iter().map(|v|*v));
+                                                                           v.extend(["order-by", "projection", "max-results", "page-token", "sort-order", "query", "org-unit-path"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -481,6 +484,83 @@ impl<'n> Engine<'n> {
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _chromeosdevices_move_devices_to_ou(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "device-ids" => Some(("deviceIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["device-ids"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::ChromeOsMoveDevicesToOu = json::value::from_value(object).unwrap();
+        let mut call = self.hub.chromeosdevices().move_devices_to_ou(request, opt.value_of("customer-id").unwrap_or(""), opt.value_of("org-unit-path").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok(mut response) => {
                     Ok(())
                 }
             }
@@ -3703,12 +3783,13 @@ impl<'n> Engine<'n> {
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "resource-type" => Some(("resourceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "resource-description" => Some(("resourceDescription", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "generated-resource-name" => Some(("generatedResourceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etags" => Some(("etags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "resource-email" => Some(("resourceEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "resource-name" => Some(("resourceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "resource-id" => Some(("resourceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "resource-email" => Some(("resourceEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etags", "kind", "resource-description", "resource-email", "resource-id", "resource-name", "resource-type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etags", "generated-resource-name", "kind", "resource-description", "resource-email", "resource-id", "resource-name", "resource-type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3853,12 +3934,13 @@ impl<'n> Engine<'n> {
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "resource-type" => Some(("resourceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "resource-description" => Some(("resourceDescription", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "generated-resource-name" => Some(("generatedResourceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etags" => Some(("etags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "resource-email" => Some(("resourceEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "resource-name" => Some(("resourceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "resource-id" => Some(("resourceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "resource-email" => Some(("resourceEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etags", "kind", "resource-description", "resource-email", "resource-id", "resource-name", "resource-type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etags", "generated-resource-name", "kind", "resource-description", "resource-email", "resource-id", "resource-name", "resource-type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3944,12 +4026,13 @@ impl<'n> Engine<'n> {
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "resource-type" => Some(("resourceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "resource-description" => Some(("resourceDescription", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "generated-resource-name" => Some(("generatedResourceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etags" => Some(("etags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "resource-email" => Some(("resourceEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "resource-name" => Some(("resourceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "resource-id" => Some(("resourceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "resource-email" => Some(("resourceEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etags", "kind", "resource-description", "resource-email", "resource-id", "resource-name", "resource-type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etags", "generated-resource-name", "kind", "resource-description", "resource-email", "resource-id", "resource-name", "resource-type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -6819,6 +6902,9 @@ impl<'n> Engine<'n> {
                     ("list", Some(opt)) => {
                         call_result = self._chromeosdevices_list(opt, dry_run, &mut err);
                     },
+                    ("move-devices-to-ou", Some(opt)) => {
+                        call_result = self._chromeosdevices_move_devices_to_ou(opt, dry_run, &mut err);
+                    },
                     ("patch", Some(opt)) => {
                         call_result = self._chromeosdevices_patch(opt, dry_run, &mut err);
                     },
@@ -7396,7 +7482,7 @@ fn main() {
                   ]),
             ]),
         
-        ("chromeosdevices", "methods: 'action', 'get', 'list', 'patch' and 'update'", vec![
+        ("chromeosdevices", "methods: 'action', 'get', 'list', 'move-devices-to-ou', 'patch' and 'update'", vec![
             ("action",
                     Some(r##"Take action on Chrome OS Device"##),
                     "Details at http://byron.github.io/google-apis-rs/google_admin1_directory_cli/chromeosdevices_action",
@@ -7474,6 +7560,34 @@ fn main() {
                      Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
+                  ]),
+            ("move-devices-to-ou",
+                    Some(r##"Move or insert multiple Chrome OS Devices to Organization Unit"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_admin1_directory_cli/chromeosdevices_move-devices-to-ou",
+                  vec![
+                    (Some(r##"customer-id"##),
+                     None,
+                     Some(r##"Immutable ID of the G Suite account"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"org-unit-path"##),
+                     None,
+                     Some(r##"Full path of the target organization unit or its Id"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
                   ]),
             ("patch",
                     Some(r##"Update Chrome OS Device. This method supports patch semantics."##),
@@ -9799,7 +9913,7 @@ fn main() {
     
     let mut app = App::new("admin1-directory")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.6+20170419")
+           .version("1.0.6+20170830")
            .about("The Admin SDK Directory API lets you view and manage enterprise resources such as users and groups, administrative notifications, security features, and more.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_admin1_directory_cli")
            .arg(Arg::with_name("url")

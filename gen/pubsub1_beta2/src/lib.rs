@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Pubsub* crate version *1.0.6+20170502*, where *20170502* is the exact revision of the *pubsub:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *Pubsub* crate version *1.0.6+20170829*, where *20170829* is the exact revision of the *pubsub:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *Pubsub* *v1_beta2* API can be found at the
 //! [official documentation site](https://cloud.google.com/pubsub/docs).
@@ -227,18 +227,18 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
 #[derive(PartialEq, Eq, Hash)]
 pub enum Scope {
-    /// View and manage Pub/Sub topics and subscriptions
-    Full,
-
     /// View and manage your data across Google Cloud Platform services
     CloudPlatform,
+
+    /// View and manage Pub/Sub topics and subscriptions
+    Full,
 }
 
 impl AsRef<str> for Scope {
     fn as_ref(&self) -> &str {
         match *self {
-            Scope::Full => "https://www.googleapis.com/auth/pubsub",
             Scope::CloudPlatform => "https://www.googleapis.com/auth/cloud-platform",
+            Scope::Full => "https://www.googleapis.com/auth/pubsub",
         }
     }
 }
@@ -491,13 +491,13 @@ pub struct ModifyAckDeadlineRequest {
     /// another pull request.
     #[serde(rename="ackDeadlineSeconds")]
     pub ack_deadline_seconds: Option<i32>,
+    /// List of acknowledgment IDs.
+    #[serde(rename="ackIds")]
+    pub ack_ids: Option<Vec<String>>,
     /// The acknowledgment ID. Either this or ack_ids must be populated, but not
     /// both.
     #[serde(rename="ackId")]
     pub ack_id: Option<String>,
-    /// List of acknowledgment IDs.
-    #[serde(rename="ackIds")]
-    pub ack_ids: Option<Vec<String>>,
 }
 
 impl RequestValue for ModifyAckDeadlineRequest {}
@@ -566,9 +566,10 @@ impl RequestValue for PublishRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Policy {
     /// Associates a list of `members` to a `role`.
-    /// Multiple `bindings` must not be specified for the same `role`.
     /// `bindings` with no members will result in an error.
     pub bindings: Option<Vec<Binding>>,
+    /// Version of the `Policy`. The default version is 0.
+    pub version: Option<i32>,
     /// `etag` is used for optimistic concurrency control as a way to help
     /// prevent simultaneous updates of a policy from overwriting each other.
     /// It is strongly suggested that systems make use of the `etag` in the
@@ -580,8 +581,6 @@ pub struct Policy {
     /// If no `etag` is provided in the call to `setIamPolicy`, then the existing
     /// policy is overwritten blindly.
     pub etag: Option<String>,
-    /// Version of the `Policy`. The default version is 0.
-    pub version: Option<i32>,
 }
 
 impl ResponseResult for Policy {}
@@ -821,6 +820,7 @@ pub struct Binding {
     /// 
     /// * `group:{emailid}`: An email address that represents a Google group.
     ///    For example, `admins@example.com`.
+    /// 
     /// 
     /// * `domain:{domain}`: A Google Apps domain name that represents all the
     ///    users of that domain. For example, `google.com` or `example.com`.

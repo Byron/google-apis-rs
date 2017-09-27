@@ -25,40 +25,63 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Logging* API at revision *20170516*. The CLI is at version *1.0.6*.
+This documentation was generated from the *Logging* API at revision *20170918*. The CLI is at version *1.0.6*.
 
 ```bash
 logging2 [options]
         billing-accounts
+                exclusions-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                exclusions-delete <name> [-p <v>]... [-o <out>]
+                exclusions-get <name> [-p <v>]... [-o <out>]
+                exclusions-list <parent> [-p <v>]... [-o <out>]
+                exclusions-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 logs-delete <log-name> [-p <v>]... [-o <out>]
                 logs-list <parent> [-p <v>]... [-o <out>]
                 sinks-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 sinks-delete <sink-name> [-p <v>]... [-o <out>]
                 sinks-get <sink-name> [-p <v>]... [-o <out>]
                 sinks-list <parent> [-p <v>]... [-o <out>]
+                sinks-patch <sink-name> (-r <kv>)... [-p <v>]... [-o <out>]
                 sinks-update <sink-name> (-r <kv>)... [-p <v>]... [-o <out>]
         entries
                 list (-r <kv>)... [-p <v>]... [-o <out>]
                 write (-r <kv>)... [-p <v>]... [-o <out>]
         folders
+                exclusions-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                exclusions-delete <name> [-p <v>]... [-o <out>]
+                exclusions-get <name> [-p <v>]... [-o <out>]
+                exclusions-list <parent> [-p <v>]... [-o <out>]
+                exclusions-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 logs-delete <log-name> [-p <v>]... [-o <out>]
                 logs-list <parent> [-p <v>]... [-o <out>]
                 sinks-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 sinks-delete <sink-name> [-p <v>]... [-o <out>]
                 sinks-get <sink-name> [-p <v>]... [-o <out>]
                 sinks-list <parent> [-p <v>]... [-o <out>]
+                sinks-patch <sink-name> (-r <kv>)... [-p <v>]... [-o <out>]
                 sinks-update <sink-name> (-r <kv>)... [-p <v>]... [-o <out>]
         monitored-resource-descriptors
                 list [-p <v>]... [-o <out>]
         organizations
+                exclusions-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                exclusions-delete <name> [-p <v>]... [-o <out>]
+                exclusions-get <name> [-p <v>]... [-o <out>]
+                exclusions-list <parent> [-p <v>]... [-o <out>]
+                exclusions-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 logs-delete <log-name> [-p <v>]... [-o <out>]
                 logs-list <parent> [-p <v>]... [-o <out>]
                 sinks-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 sinks-delete <sink-name> [-p <v>]... [-o <out>]
                 sinks-get <sink-name> [-p <v>]... [-o <out>]
                 sinks-list <parent> [-p <v>]... [-o <out>]
+                sinks-patch <sink-name> (-r <kv>)... [-p <v>]... [-o <out>]
                 sinks-update <sink-name> (-r <kv>)... [-p <v>]... [-o <out>]
         projects
+                exclusions-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                exclusions-delete <name> [-p <v>]... [-o <out>]
+                exclusions-get <name> [-p <v>]... [-o <out>]
+                exclusions-list <parent> [-p <v>]... [-o <out>]
+                exclusions-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 logs-delete <log-name> [-p <v>]... [-o <out>]
                 logs-list <parent> [-p <v>]... [-o <out>]
                 metrics-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -70,6 +93,7 @@ logging2 [options]
                 sinks-delete <sink-name> [-p <v>]... [-o <out>]
                 sinks-get <sink-name> [-p <v>]... [-o <out>]
                 sinks-list <parent> [-p <v>]... [-o <out>]
+                sinks-patch <sink-name> (-r <kv>)... [-p <v>]... [-o <out>]
                 sinks-update <sink-name> (-r <kv>)... [-p <v>]... [-o <out>]
   logging2 --help
 

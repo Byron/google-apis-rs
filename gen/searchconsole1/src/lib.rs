@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Search Console* crate version *1.0.6+20170520*, where *20170520* is the exact revision of the *searchconsole:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *Search Console* crate version *1.0.6+20170926*, where *20170926* is the exact revision of the *searchconsole:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *Search Console* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/webmaster-tools/search-console-api/).

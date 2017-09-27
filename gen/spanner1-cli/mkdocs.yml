@@ -1,0 +1,54 @@
+site_name: Spanner v1.0.6+20170914
+site_url: http://byron.github.io/google-apis-rs/google-spanner1-cli
+site_description: A complete library to interact with Spanner (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/spanner1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['projects_instance-configs-get.md', 'Projects', 'Instance Configs Get']
+- ['projects_instance-configs-list.md', 'Projects', 'Instance Configs List']
+- ['projects_instances-create.md', 'Projects', 'Instances Create']
+- ['projects_instances-databases-create.md', 'Projects', 'Instances Databases Create']
+- ['projects_instances-databases-drop-database.md', 'Projects', 'Instances Databases Drop Database']
+- ['projects_instances-databases-get.md', 'Projects', 'Instances Databases Get']
+- ['projects_instances-databases-get-ddl.md', 'Projects', 'Instances Databases Get Ddl']
+- ['projects_instances-databases-get-iam-policy.md', 'Projects', 'Instances Databases Get Iam Policy']
+- ['projects_instances-databases-list.md', 'Projects', 'Instances Databases List']
+- ['projects_instances-databases-operations-cancel.md', 'Projects', 'Instances Databases Operations Cancel']
+- ['projects_instances-databases-operations-delete.md', 'Projects', 'Instances Databases Operations Delete']
+- ['projects_instances-databases-operations-get.md', 'Projects', 'Instances Databases Operations Get']
+- ['projects_instances-databases-operations-list.md', 'Projects', 'Instances Databases Operations List']
+- ['projects_instances-databases-sessions-begin-transaction.md', 'Projects', 'Instances Databases Sessions Begin Transaction']
+- ['projects_instances-databases-sessions-commit.md', 'Projects', 'Instances Databases Sessions Commit']
+- ['projects_instances-databases-sessions-create.md', 'Projects', 'Instances Databases Sessions Create']
+- ['projects_instances-databases-sessions-delete.md', 'Projects', 'Instances Databases Sessions Delete']
+- ['projects_instances-databases-sessions-execute-sql.md', 'Projects', 'Instances Databases Sessions Execute Sql']
+- ['projects_instances-databases-sessions-execute-streaming-sql.md', 'Projects', 'Instances Databases Sessions Execute Streaming Sql']
+- ['projects_instances-databases-sessions-get.md', 'Projects', 'Instances Databases Sessions Get']
+- ['projects_instances-databases-sessions-list.md', 'Projects', 'Instances Databases Sessions List']
+- ['projects_instances-databases-sessions-read.md', 'Projects', 'Instances Databases Sessions Read']
+- ['projects_instances-databases-sessions-rollback.md', 'Projects', 'Instances Databases Sessions Rollback']
+- ['projects_instances-databases-sessions-streaming-read.md', 'Projects', 'Instances Databases Sessions Streaming Read']
+- ['projects_instances-databases-set-iam-policy.md', 'Projects', 'Instances Databases Set Iam Policy']
+- ['projects_instances-databases-test-iam-permissions.md', 'Projects', 'Instances Databases Test Iam Permissions']
+- ['projects_instances-databases-update-ddl.md', 'Projects', 'Instances Databases Update Ddl']
+- ['projects_instances-delete.md', 'Projects', 'Instances Delete']
+- ['projects_instances-get.md', 'Projects', 'Instances Get']
+- ['projects_instances-get-iam-policy.md', 'Projects', 'Instances Get Iam Policy']
+- ['projects_instances-list.md', 'Projects', 'Instances List']
+- ['projects_instances-operations-cancel.md', 'Projects', 'Instances Operations Cancel']
+- ['projects_instances-operations-delete.md', 'Projects', 'Instances Operations Delete']
+- ['projects_instances-operations-get.md', 'Projects', 'Instances Operations Get']
+- ['projects_instances-operations-list.md', 'Projects', 'Instances Operations List']
+- ['projects_instances-patch.md', 'Projects', 'Instances Patch']
+- ['projects_instances-set-iam-policy.md', 'Projects', 'Instances Set Iam Policy']
+- ['projects_instances-test-iam-permissions.md', 'Projects', 'Instances Test Iam Permissions']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+

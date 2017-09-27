@@ -835,9 +835,9 @@ impl<'n> Engine<'n> {
                     "place-id" => Some(("placeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "ephemeral-id-registration.rotation-period-exponent" => Some(("ephemeralIdRegistration.rotationPeriodExponent", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "ephemeral-id-registration.initial-clock-value" => Some(("ephemeralIdRegistration.initialClockValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "ephemeral-id-registration.beacon-ecdh-public-key" => Some(("ephemeralIdRegistration.beaconEcdhPublicKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "ephemeral-id-registration.initial-eid" => Some(("ephemeralIdRegistration.initialEid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "ephemeral-id-registration.service-ecdh-public-key" => Some(("ephemeralIdRegistration.serviceEcdhPublicKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ephemeral-id-registration.initial-eid" => Some(("ephemeralIdRegistration.initialEid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ephemeral-id-registration.beacon-ecdh-public-key" => Some(("ephemeralIdRegistration.beaconEcdhPublicKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "ephemeral-id-registration.beacon-identity-key" => Some(("ephemeralIdRegistration.beaconIdentityKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "advertised-id.type" => Some(("advertisedId.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "advertised-id.id" => Some(("advertisedId.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -941,9 +941,9 @@ impl<'n> Engine<'n> {
                     "place-id" => Some(("placeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "ephemeral-id-registration.rotation-period-exponent" => Some(("ephemeralIdRegistration.rotationPeriodExponent", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "ephemeral-id-registration.initial-clock-value" => Some(("ephemeralIdRegistration.initialClockValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "ephemeral-id-registration.beacon-ecdh-public-key" => Some(("ephemeralIdRegistration.beaconEcdhPublicKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "ephemeral-id-registration.initial-eid" => Some(("ephemeralIdRegistration.initialEid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "ephemeral-id-registration.service-ecdh-public-key" => Some(("ephemeralIdRegistration.serviceEcdhPublicKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ephemeral-id-registration.initial-eid" => Some(("ephemeralIdRegistration.initialEid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ephemeral-id-registration.beacon-ecdh-public-key" => Some(("ephemeralIdRegistration.beaconEcdhPublicKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "ephemeral-id-registration.beacon-identity-key" => Some(("ephemeralIdRegistration.beaconIdentityKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "advertised-id.type" => Some(("advertisedId.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "advertised-id.id" => Some(("advertisedId.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1147,8 +1147,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "namespace-name" => Some(("namespaceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "serving-visibility" => Some(("servingVisibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "namespace-name" => Some(("namespaceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["namespace-name", "serving-visibility"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1961,7 +1961,7 @@ fn main() {
     
     let mut app = App::new("proximitybeacon1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.6+20170517")
+           .version("1.0.6+20170913")
            .about("Registers, manages, indexes, and searches beacons.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_proximitybeacon1_beta1_cli")
            .arg(Arg::with_name("url")

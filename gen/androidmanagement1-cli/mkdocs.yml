@@ -1,0 +1,37 @@
+site_name: Android Management v1.0.6+20170918
+site_url: http://byron.github.io/google-apis-rs/google-androidmanagement1-cli
+site_description: A complete library to interact with Android Management (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/androidmanagement1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['enterprises_applications-get.md', 'Enterprises', 'Applications Get']
+- ['enterprises_create.md', 'Enterprises', 'Create']
+- ['enterprises_devices-delete.md', 'Enterprises', 'Devices Delete']
+- ['enterprises_devices-get.md', 'Enterprises', 'Devices Get']
+- ['enterprises_devices-issue-command.md', 'Enterprises', 'Devices Issue Command']
+- ['enterprises_devices-list.md', 'Enterprises', 'Devices List']
+- ['enterprises_devices-operations-cancel.md', 'Enterprises', 'Devices Operations Cancel']
+- ['enterprises_devices-operations-delete.md', 'Enterprises', 'Devices Operations Delete']
+- ['enterprises_devices-operations-get.md', 'Enterprises', 'Devices Operations Get']
+- ['enterprises_devices-operations-list.md', 'Enterprises', 'Devices Operations List']
+- ['enterprises_devices-patch.md', 'Enterprises', 'Devices Patch']
+- ['enterprises_enrollment-tokens-create.md', 'Enterprises', 'Enrollment Tokens Create']
+- ['enterprises_enrollment-tokens-delete.md', 'Enterprises', 'Enrollment Tokens Delete']
+- ['enterprises_get.md', 'Enterprises', 'Get']
+- ['enterprises_patch.md', 'Enterprises', 'Patch']
+- ['enterprises_policies-delete.md', 'Enterprises', 'Policies Delete']
+- ['enterprises_policies-get.md', 'Enterprises', 'Policies Get']
+- ['enterprises_policies-list.md', 'Enterprises', 'Policies List']
+- ['enterprises_policies-patch.md', 'Enterprises', 'Policies Patch']
+- ['enterprises_web-tokens-create.md', 'Enterprises', 'Web Tokens Create']
+- ['signup-urls_create.md', 'Signup Urls', 'Create']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+

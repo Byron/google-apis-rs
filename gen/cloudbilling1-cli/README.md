@@ -3,14 +3,14 @@ DO NOT EDIT !
 This file was generated automatically from 'src/mako/cli/README.md.mako'
 DO NOT EDIT !
 -->
-The `cloudbilling1` command-line interface *(CLI)* allows to use most features of the *Google cloudbilling* service from the comfort of your terminal.
+The `cloudbilling1` command-line interface *(CLI)* allows to use most features of the *Google Cloudbilling* service from the comfort of your terminal.
 
 By default all output is printed to standard out, but flags can be set to direct it into a file independent of your shell's
 capabilities. Errors will be printed to standard error, and cause the program's exit code to be non-zero.
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
-Everything else about the *cloudbilling* API can be found at the
+Everything else about the *Cloudbilling* API can be found at the
 [official documentation site](https://cloud.google.com/billing/).
 
 # Installation and Source Code
@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *cloudbilling* API at revision *20170504*. The CLI is at version *1.0.6*.
+This documentation was generated from the *Cloudbilling* API at revision *20170813*. The CLI is at version *1.0.6*.
 
 ```bash
 cloudbilling1 [options]
@@ -36,6 +36,9 @@ cloudbilling1 [options]
         projects
                 get-billing-info <name> [-p <v>]... [-o <out>]
                 update-billing-info <name> (-r <kv>)... [-p <v>]... [-o <out>]
+        services
+                list [-p <v>]... [-o <out>]
+                skus-list <parent> [-p <v>]... [-o <out>]
   cloudbilling1 --help
 
 Configuration:

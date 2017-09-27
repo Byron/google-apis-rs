@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Android Publisher* crate version *1.0.6+20170425*, where *20170425* is the exact revision of the *androidpublisher:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *Android Publisher* crate version *1.0.6+20170913*, where *20170913* is the exact revision of the *androidpublisher:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *Android Publisher* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/android-publisher).
@@ -746,19 +746,22 @@ impl Part for MonthDay {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProductPurchase {
+    /// The order id associated with the purchase of the inapp product.
+    #[serde(rename="orderId")]
+    pub order_id: Option<String>,
     /// The consumption state of the inapp product. Possible values are:  
     /// - Yet to be consumed 
     /// - Consumed
     #[serde(rename="consumptionState")]
     pub consumption_state: Option<i32>,
-    /// A developer-specified string that contains supplemental information about an order.
-    #[serde(rename="developerPayload")]
-    pub developer_payload: Option<String>,
     /// This kind represents an inappPurchase object in the androidpublisher service.
     pub kind: Option<String>,
     /// The time the product was purchased, in milliseconds since the epoch (Jan 1, 1970).
     #[serde(rename="purchaseTimeMillis")]
     pub purchase_time_millis: Option<String>,
+    /// A developer-specified string that contains supplemental information about an order.
+    #[serde(rename="developerPayload")]
+    pub developer_payload: Option<String>,
     /// The purchase state of the order. Possible values are:  
     /// - Purchased 
     /// - Cancelled
@@ -1416,6 +1419,9 @@ impl ResponseResult for EntitlementsListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SubscriptionPurchase {
+    /// The order id of the latest recurring order associated with the purchase of the subscription.
+    #[serde(rename="orderId")]
+    pub order_id: Option<String>,
     /// This kind represents a subscriptionPurchase object in the androidpublisher service.
     pub kind: Option<String>,
     /// ISO 3166-1 alpha-2 billing country/region code of the user at the time the subscription was granted.
@@ -1429,7 +1435,8 @@ pub struct SubscriptionPurchase {
     pub auto_renewing: Option<bool>,
     /// The payment state of the subscription. Possible values are:  
     /// - Payment pending 
-    /// - Payment received
+    /// - Payment received 
+    /// - Free trial
     #[serde(rename="paymentState")]
     pub payment_state: Option<i32>,
     /// ISO 4217 currency code for the subscription price. For example, if the price is specified in British pounds sterling, price_currency_code is "GBP".
@@ -1440,7 +1447,8 @@ pub struct SubscriptionPurchase {
     pub expiry_time_millis: Option<String>,
     /// The reason why a subscription was cancelled or is not auto-renewing. Possible values are:  
     /// - User cancelled the subscription 
-    /// - Subscription was cancelled by the system, for example because of a billing problem
+    /// - Subscription was cancelled by the system, for example because of a billing problem 
+    /// - Subscription was replaced with a new subscription
     #[serde(rename="cancelReason")]
     pub cancel_reason: Option<i32>,
     /// Time at which the subscription was granted, in milliseconds since the Epoch.
@@ -1687,6 +1695,8 @@ impl RequestValue for ApksAddExternallyHostedRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ApkBinary {
+    /// A sha256 hash of the APK payload, encoded as a hex string and matching the output of the sha256sum command.
+    pub sha256: Option<String>,
     /// A sha1 hash of the APK payload, encoded as a hex string and matching the output of the sha1sum command.
     pub sha1: Option<String>,
 }
@@ -4413,7 +4423,7 @@ impl<'a, C, A> PurchaseVoidedpurchaseListCall<'a, C, A> where C: BorrowMut<hyper
         self._token = Some(new_value.to_string());
         self
     }
-    /// The time, in milliseconds since the Epoch, of the oldest voided in-app product purchase that you want to see in the response. The value of this parameter cannot be older than 30 days and is ignored if a pagination token is set. Default value is current time minus 30 days.
+    /// The time, in milliseconds since the Epoch, of the oldest voided in-app product purchase that you want to see in the response. The value of this parameter cannot be older than 30 days and is ignored if a pagination token is set. Default value is current time minus 30 days. Note: This filter is applied on the time at which the record is seen as voided by our systems and not the actual voided time returned in the response.
     ///
     /// Sets the *start time* query property to the given value.
     pub fn start_time(mut self, new_value: &str) -> PurchaseVoidedpurchaseListCall<'a, C, A> {
@@ -4432,7 +4442,7 @@ impl<'a, C, A> PurchaseVoidedpurchaseListCall<'a, C, A> where C: BorrowMut<hyper
         self._max_results = Some(new_value);
         self
     }
-    /// The time, in milliseconds since the Epoch, of the newest voided in-app product purchase that you want to see in the response. The value of this parameter cannot be greater than the current time and is ignored if a pagination token is set. Default value is current time.
+    /// The time, in milliseconds since the Epoch, of the newest voided in-app product purchase that you want to see in the response. The value of this parameter cannot be greater than the current time and is ignored if a pagination token is set. Default value is current time. Note: This filter is applied on the time at which the record is seen as voided by our systems and not the actual voided time returned in the response.
     ///
     /// Sets the *end time* query property to the given value.
     pub fn end_time(mut self, new_value: &str) -> PurchaseVoidedpurchaseListCall<'a, C, A> {

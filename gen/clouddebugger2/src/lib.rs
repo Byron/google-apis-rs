@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Debugger* crate version *1.0.6+20170413*, where *20170413* is the exact revision of the *clouddebugger:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *Cloud Debugger* crate version *1.0.6+20170919*, where *20170919* is the exact revision of the *clouddebugger:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *Cloud Debugger* *v2* API can be found at the
 //! [official documentation site](http://cloud.google.com/debugger).
@@ -407,7 +407,7 @@ pub struct ListBreakpointsResponse {
     /// List of breakpoints matching the request.
     /// The fields `id` and `location` are guaranteed to be set on each breakpoint.
     /// The fields: `stack_frames`, `evaluated_expressions` and `variable_table`
-    /// are cleared on each breakpoint regardless of it's status.
+    /// are cleared on each breakpoint regardless of its status.
     pub breakpoints: Option<Vec<Breakpoint>>,
 }
 
@@ -440,14 +440,14 @@ impl Part for CloudWorkspaceSourceContext {}
 pub struct StackFrame {
     /// Demangled function name at the call site.
     pub function: Option<String>,
-    /// Set of arguments passed to this function.
-    /// Note that this might not be populated for all stack frames.
-    pub arguments: Option<Vec<Variable>>,
+    /// Source location of the call site.
+    pub location: Option<SourceLocation>,
     /// Set of local variables at the stack frame location.
     /// Note that this might not be populated for all stack frames.
     pub locals: Option<Vec<Variable>>,
-    /// Source location of the call site.
-    pub location: Option<SourceLocation>,
+    /// Set of arguments passed to this function.
+    /// Note that this might not be populated for all stack frames.
+    pub arguments: Option<Vec<Variable>>,
 }
 
 impl Part for StackFrame {}
@@ -465,10 +465,9 @@ impl Part for StackFrame {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListDebuggeesResponse {
     /// List of debuggees accessible to the calling user.
-    /// Note that the `description` field is the only human readable field
-    /// that should be displayed to the user.
-    /// The fields `debuggee.id` and  `description` fields are guaranteed to be
-    /// set on each debuggee.
+    /// The fields `debuggee.id` and `description` are guaranteed to be set.
+    /// The `description` field is a human readable field provided by agents and
+    /// can be displayed to users.
     pub debuggees: Option<Vec<Debuggee>>,
 }
 
@@ -555,11 +554,12 @@ impl Part for AliasContext {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListActiveBreakpointsResponse {
-    /// The `wait_expired` field is set to true by the server when the
-    /// request times out and the field `success_on_timeout` is set to true.
+    /// If set to `true`, indicates that there is no change to the
+    /// list of active breakpoints and the server-selected timeout has expired.
+    /// The `breakpoints` field would be empty and should be ignored.
     #[serde(rename="waitExpired")]
     pub wait_expired: Option<bool>,
-    /// A wait token that can be used in the next method call to block until
+    /// A token that can be used in the next method call to block until
     /// the list of breakpoints changes.
     #[serde(rename="nextWaitToken")]
     pub next_wait_token: Option<String>,
@@ -675,6 +675,9 @@ impl Part for GerritSourceContext {}
 pub struct RegisterDebuggeeResponse {
     /// Debuggee resource.
     /// The field `id` is guranteed to be set (in addition to the echoed fields).
+    /// If the field `is_disabled` is set to `true`, the agent should disable
+    /// itself by removing all breakpoints and detaching from the application.
+    /// It should however continue to poll `RegisterDebuggee` until reenabled.
     pub debuggee: Option<Debuggee>,
 }
 
@@ -715,7 +718,8 @@ impl Part for SourceContext {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UpdateActiveBreakpointRequest {
     /// Updated breakpoint information.
-    /// The field 'id' must be set.
+    /// The field `id` must be set.
+    /// The agent must echo all Breakpoint specification fields in the update.
     pub breakpoint: Option<Breakpoint>,
 }
 
@@ -737,11 +741,11 @@ pub struct SourceLocation {
 impl Part for SourceLocation {}
 
 
-/// Represents the application to debug. The application may include one or more
+/// Represents the debugged application. The application may include one or more
 /// replicated processes executing the same code. Each of these processes is
 /// attached with a debugger agent, carrying out the debugging commands.
-/// The agents attached to the same debuggee are identified by using exactly the
-/// same field values when registering.
+/// Agents attached to the same debuggee identify themselves as such by using
+/// exactly the same Debuggee message value when registering.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -762,36 +766,33 @@ pub struct Debuggee {
     /// A set of custom debuggee properties, populated by the agent, to be
     /// displayed to the user.
     pub labels: Option<HashMap<String, String>>,
-    /// Debuggee uniquifier within the project.
-    /// Any string that identifies the application within the project can be used.
-    /// Including environment and version or build IDs is recommended.
+    /// Uniquifier to further distiguish the application.
+    /// It is possible that different applications might have identical values in
+    /// the debuggee message, thus, incorrectly identified as a single application
+    /// by the Controller service. This field adds salt to further distiguish the
+    /// application. Agents should consider seeding this field with value that
+    /// identifies the code, binary, configuration and environment.
     pub uniquifier: Option<String>,
     /// Project the debuggee is associated with.
-    /// Use the project number when registering a Google Cloud Platform project.
+    /// Use project number or id when registering a Google Cloud Platform project.
     pub project: Option<String>,
     /// References to the locations and revisions of the source code used in the
     /// deployed application.
-    /// 
-    /// NOTE: This field is deprecated. Consumers should use
-    /// `ext_source_contexts` if it is not empty. Debug agents should populate
-    /// both this field and `ext_source_contexts`.
     #[serde(rename="sourceContexts")]
     pub source_contexts: Option<Vec<SourceContext>>,
     /// References to the locations and revisions of the source code used in the
     /// deployed application.
     /// 
-    /// Contexts describing a remote repo related to the source code
-    /// have a `category` label of `remote_repo`. Source snapshot source
-    /// contexts have a `category` of `snapshot`.
+    /// NOTE: this field is experimental and can be ignored.
     #[serde(rename="extSourceContexts")]
     pub ext_source_contexts: Option<Vec<ExtendedSourceContext>>,
-    /// Version ID of the agent release. The version ID is structured as
-    /// following: `domain/type/vmajor.minor` (for example
-    /// `google.com/gcp-java/v1.1`).
+    /// Version ID of the agent.
+    /// Schema: `domain/language-platform/vmajor.minor` (for example
+    /// `google.com/java-gcp/v1.1`).
     #[serde(rename="agentVersion")]
     pub agent_version: Option<String>,
-    /// If set to `true`, indicates that the debuggee is considered as inactive by
-    /// the Controller service.
+    /// If set to `true`, indicates that Controller service does not detect any
+    /// activity from the debuggee agents and the application is possibly stopped.
     #[serde(rename="isInactive")]
     pub is_inactive: Option<bool>,
     /// Unique identifier for the debuggee generated by the controller service.
@@ -1150,14 +1151,14 @@ impl ResponseResult for SetBreakpointResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct StatusMessage {
-    /// Distinguishes errors from informational messages.
-    #[serde(rename="isError")]
-    pub is_error: Option<bool>,
+    /// Status message text.
+    pub description: Option<FormatMessage>,
     /// Reference to which the message applies.
     #[serde(rename="refersTo")]
     pub refers_to: Option<String>,
-    /// Status message text.
-    pub description: Option<FormatMessage>,
+    /// Distinguishes errors from informational messages.
+    #[serde(rename="isError")]
+    pub is_error: Option<bool>,
 }
 
 impl Part for StatusMessage {}
@@ -1229,12 +1230,11 @@ impl<'a, C, A> ControllerMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Updates the breakpoint state or mutable fields.
-    /// The entire Breakpoint message must be sent back to the controller
-    /// service.
+    /// The entire Breakpoint message must be sent back to the controller service.
     /// 
     /// Updates to active breakpoint fields are only allowed if the new value
     /// does not change the breakpoint specification. Updates to the `location`,
-    /// `condition` and `expression` fields should not alter the breakpoint
+    /// `condition` and `expressions` fields should not alter the breakpoint
     /// semantics. These may only make changes such as canonicalizing a value
     /// or snapping the location to the correct line of code.
     /// 
@@ -1259,14 +1259,14 @@ impl<'a, C, A> ControllerMethods<'a, C, A> {
     ///
     /// Registers the debuggee with the controller service.
     /// 
-    /// All agents attached to the same application should call this method with
-    /// the same request content to get back the same stable `debuggee_id`. Agents
-    /// should call this method again whenever `google.rpc.Code.NOT_FOUND` is
-    /// returned from any controller method.
+    /// All agents attached to the same application must call this method with
+    /// exactly the same request content to get back the same stable `debuggee_id`.
+    /// Agents should call this method again whenever `google.rpc.Code.NOT_FOUND`
+    /// is returned from any controller method.
     /// 
-    /// This allows the controller service to disable the agent or recover from any
-    /// data loss. If the debuggee is disabled by the server, the response will
-    /// have `is_disabled` set to `true`.
+    /// This protocol allows the controller service to disable debuggees, recover
+    /// from data loss, or change the `debuggee_id` format. Agents must handle
+    /// `debuggee_id` value changing upon re-registration.
     /// 
     /// # Arguments
     ///
@@ -1285,7 +1285,7 @@ impl<'a, C, A> ControllerMethods<'a, C, A> {
     ///
     /// Returns the list of all active breakpoints for the debuggee.
     /// 
-    /// The breakpoint specification (location, condition, and expression
+    /// The breakpoint specification (`location`, `condition`, and `expressions`
     /// fields) is semantically immutable, although the field values may
     /// change. For example, an agent may update the location line number
     /// to reflect the actual line where the breakpoint was set, but this
@@ -1396,7 +1396,7 @@ impl<'a, C, A> DebuggerMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all the debuggees that the user can set breakpoints to.
+    /// Lists all the debuggees that the user has access to.
     pub fn debuggees_list(&self) -> DebuggerDebuggeeListCall<'a, C, A> {
         DebuggerDebuggeeListCall {
             hub: self.hub,
@@ -1462,12 +1462,11 @@ impl<'a, C, A> DebuggerMethods<'a, C, A> {
 // #################
 
 /// Updates the breakpoint state or mutable fields.
-/// The entire Breakpoint message must be sent back to the controller
-/// service.
+/// The entire Breakpoint message must be sent back to the controller service.
 /// 
 /// Updates to active breakpoint fields are only allowed if the new value
 /// does not change the breakpoint specification. Updates to the `location`,
-/// `condition` and `expression` fields should not alter the breakpoint
+/// `condition` and `expressions` fields should not alter the breakpoint
 /// semantics. These may only make changes such as canonicalizing a value
 /// or snapping the location to the correct line of code.
 ///
@@ -1721,12 +1720,12 @@ impl<'a, C, A> ControllerDebuggeeBreakpointUpdateCall<'a, C, A> where C: BorrowM
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ControllerDebuggeeBreakpointUpdateCall<'a, C, A>
@@ -1763,14 +1762,14 @@ impl<'a, C, A> ControllerDebuggeeBreakpointUpdateCall<'a, C, A> where C: BorrowM
 
 /// Registers the debuggee with the controller service.
 /// 
-/// All agents attached to the same application should call this method with
-/// the same request content to get back the same stable `debuggee_id`. Agents
-/// should call this method again whenever `google.rpc.Code.NOT_FOUND` is
-/// returned from any controller method.
+/// All agents attached to the same application must call this method with
+/// exactly the same request content to get back the same stable `debuggee_id`.
+/// Agents should call this method again whenever `google.rpc.Code.NOT_FOUND`
+/// is returned from any controller method.
 /// 
-/// This allows the controller service to disable the agent or recover from any
-/// data loss. If the debuggee is disabled by the server, the response will
-/// have `is_disabled` set to `true`.
+/// This protocol allows the controller service to disable debuggees, recover
+/// from data loss, or change the `debuggee_id` format. Agents must handle
+/// `debuggee_id` value changing upon re-registration.
 ///
 /// A builder for the *debuggees.register* method supported by a *controller* resource.
 /// It is not used directly, but through a `ControllerMethods` instance.
@@ -1977,12 +1976,12 @@ impl<'a, C, A> ControllerDebuggeeRegisterCall<'a, C, A> where C: BorrowMut<hyper
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ControllerDebuggeeRegisterCall<'a, C, A>
@@ -2019,7 +2018,7 @@ impl<'a, C, A> ControllerDebuggeeRegisterCall<'a, C, A> where C: BorrowMut<hyper
 
 /// Returns the list of all active breakpoints for the debuggee.
 /// 
-/// The breakpoint specification (location, condition, and expression
+/// The breakpoint specification (`location`, `condition`, and `expressions`
 /// fields) is semantically immutable, although the field values may
 /// change. For example, an agent may update the location line number
 /// to reflect the actual line where the breakpoint was set, but this
@@ -2223,21 +2222,22 @@ impl<'a, C, A> ControllerDebuggeeBreakpointListCall<'a, C, A> where C: BorrowMut
         self._debuggee_id = new_value.to_string();
         self
     }
-    /// A wait token that, if specified, blocks the method call until the list
-    /// of active breakpoints has changed, or a server selected timeout has
-    /// expired.  The value should be set from the last returned response.
+    /// A token that, if specified, blocks the method call until the list
+    /// of active breakpoints has changed, or a server-selected timeout has
+    /// expired. The value should be set from the `next_wait_token` field in
+    /// the last response. The initial value should be set to `"init"`.
     ///
     /// Sets the *wait token* query property to the given value.
     pub fn wait_token(mut self, new_value: &str) -> ControllerDebuggeeBreakpointListCall<'a, C, A> {
         self._wait_token = Some(new_value.to_string());
         self
     }
-    /// If set to `true`, returns `google.rpc.Code.OK` status and sets the
-    /// `wait_expired` response field to `true` when the server-selected timeout
-    /// has expired (recommended).
+    /// If set to `true` (recommended), returns `google.rpc.Code.OK` status and
+    /// sets the `wait_expired` response field to `true` when the server-selected
+    /// timeout has expired.
     /// 
-    /// If set to `false`, returns `google.rpc.Code.ABORTED` status when the
-    /// server-selected timeout has expired (deprecated).
+    /// If set to `false` (deprecated), returns `google.rpc.Code.ABORTED` status
+    /// when the server-selected timeout has expired.
     ///
     /// Sets the *success on timeout* query property to the given value.
     pub fn success_on_timeout(mut self, new_value: bool) -> ControllerDebuggeeBreakpointListCall<'a, C, A> {
@@ -2269,12 +2269,12 @@ impl<'a, C, A> ControllerDebuggeeBreakpointListCall<'a, C, A> where C: BorrowMut
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ControllerDebuggeeBreakpointListCall<'a, C, A>
@@ -2511,7 +2511,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointGetCall<'a, C, A> where C: BorrowMut<hy
         self
     }
     /// The client version making the call.
-    /// Following: `domain/type/version` (e.g., `google.com/intellij/v1`).
+    /// Schema: `domain/type/version` (e.g., `google.com/intellij/v1`).
     ///
     /// Sets the *client version* query property to the given value.
     pub fn client_version(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointGetCall<'a, C, A> {
@@ -2543,12 +2543,12 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointGetCall<'a, C, A> where C: BorrowMut<hy
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> DebuggerDebuggeeBreakpointGetCall<'a, C, A>
@@ -2785,7 +2785,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointDeleteCall<'a, C, A> where C: BorrowMut
         self
     }
     /// The client version making the call.
-    /// Following: `domain/type/version` (e.g., `google.com/intellij/v1`).
+    /// Schema: `domain/type/version` (e.g., `google.com/intellij/v1`).
     ///
     /// Sets the *client version* query property to the given value.
     pub fn client_version(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointDeleteCall<'a, C, A> {
@@ -2817,12 +2817,12 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointDeleteCall<'a, C, A> where C: BorrowMut
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> DebuggerDebuggeeBreakpointDeleteCall<'a, C, A>
@@ -2857,7 +2857,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointDeleteCall<'a, C, A> where C: BorrowMut
 }
 
 
-/// Lists all the debuggees that the user can set breakpoints to.
+/// Lists all the debuggees that the user has access to.
 ///
 /// A builder for the *debuggees.list* method supported by a *debugger* resource.
 /// It is not used directly, but through a `DebuggerMethods` instance.
@@ -3039,7 +3039,7 @@ impl<'a, C, A> DebuggerDebuggeeListCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self
     }
     /// The client version making the call.
-    /// Following: `domain/type/version` (e.g., `google.com/intellij/v1`).
+    /// Schema: `domain/type/version` (e.g., `google.com/intellij/v1`).
     ///
     /// Sets the *client version* query property to the given value.
     pub fn client_version(mut self, new_value: &str) -> DebuggerDebuggeeListCall<'a, C, A> {
@@ -3071,12 +3071,12 @@ impl<'a, C, A> DebuggerDebuggeeListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> DebuggerDebuggeeListCall<'a, C, A>
@@ -3332,7 +3332,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointSetCall<'a, C, A> where C: BorrowMut<hy
         self
     }
     /// The client version making the call.
-    /// Following: `domain/type/version` (e.g., `google.com/intellij/v1`).
+    /// Schema: `domain/type/version` (e.g., `google.com/intellij/v1`).
     ///
     /// Sets the *client version* query property to the given value.
     pub fn client_version(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointSetCall<'a, C, A> {
@@ -3364,12 +3364,12 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointSetCall<'a, C, A> where C: BorrowMut<hy
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> DebuggerDebuggeeBreakpointSetCall<'a, C, A>
@@ -3654,7 +3654,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointListCall<'a, C, A> where C: BorrowMut<h
         self
     }
     /// The client version making the call.
-    /// Following: `domain/type/version` (e.g., `google.com/intellij/v1`).
+    /// Schema: `domain/type/version` (e.g., `google.com/intellij/v1`).
     ///
     /// Sets the *client version* query property to the given value.
     pub fn client_version(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointListCall<'a, C, A> {
@@ -3693,12 +3693,12 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointListCall<'a, C, A> where C: BorrowMut<h
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> DebuggerDebuggeeBreakpointListCall<'a, C, A>

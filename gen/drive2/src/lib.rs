@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *drive* crate version *1.0.6+20170512*, where *20170512* is the exact revision of the *drive:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *drive* crate version *1.0.6+20170915*, where *20170915* is the exact revision of the *drive:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *drive* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/drive/).
@@ -1431,7 +1431,7 @@ pub struct Permission {
     pub value: Option<String>,
     /// The ID of the user this permission refers to, and identical to the permissionId in the About and Files resources. When making a drive.permissions.insert request, exactly one of the id or value fields must be specified unless the permission type is anyone, in which case both id and value are ignored.
     pub id: Option<String>,
-    /// The authkey parameter required for this permission.
+    /// Deprecated.
     #[serde(rename="authKey")]
     pub auth_key: Option<String>,
     /// The ETag of the permission.
@@ -2253,6 +2253,9 @@ pub struct File {
     /// If the file has been explicitly trashed, the user who trashed it. Only populated for Team Drive files.
     #[serde(rename="trashingUser")]
     pub trashing_user: Option<User>,
+    /// List of permission IDs for users with access to this file.
+    #[serde(rename="permissionIds")]
+    pub permission_ids: Option<Vec<String>>,
     /// The number of quota bytes used by this file.
     #[serde(rename="quotaBytesUsed")]
     pub quota_bytes_used: Option<String>,
@@ -2476,7 +2479,7 @@ impl<'a, C, A> FileMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Exports a Google Doc to the requested MIME type and returns the exported content.
+    /// Exports a Google Doc to the requested MIME type and returns the exported content. Please note that the exported content is limited to 10MB.
     /// 
     /// # Arguments
     ///
@@ -5960,7 +5963,7 @@ impl<'a, C, A> FileTrashCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 }
 
 
-/// Exports a Google Doc to the requested MIME type and returns the exported content.
+/// Exports a Google Doc to the requested MIME type and returns the exported content. Please note that the exported content is limited to 10MB.
 ///
 /// This method supports **media download**. To enable it, adjust the builder like this:
 /// `.param("alt", "media")`.
@@ -6654,7 +6657,7 @@ impl<'a, C, A> FileListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// A comma-separated list of sort keys. Valid keys are 'createdDate', 'folder', 'lastViewedByMeDate', 'modifiedByMeDate', 'modifiedDate', 'quotaBytesUsed', 'recency', 'sharedWithMeDate', 'starred', and 'title'. Each key sorts ascending by default, but may be reversed with the 'desc' modifier. Example usage: ?orderBy=folder,modifiedDate desc,title. Please note that there is a current limitation for users with approximately one million files in which the requested sort order is ignored.
+    /// A comma-separated list of sort keys. Valid keys are 'createdDate', 'folder', 'lastViewedByMeDate', 'modifiedByMeDate', 'modifiedDate', 'quotaBytesUsed', 'recency', 'sharedWithMeDate', 'starred', 'title', and 'title_natural'. Each key sorts ascending by default, but may be reversed with the 'desc' modifier. Example usage: ?orderBy=folder,modifiedDate desc,title. Please note that there is a current limitation for users with approximately one million files in which the requested sort order is ignored.
     ///
     /// Sets the *order by* query property to the given value.
     pub fn order_by(mut self, new_value: &str) -> FileListCall<'a, C, A> {

@@ -1,0 +1,41 @@
+site_name: Cloud Machine Learning Engine v1.0.6+20170926
+site_url: http://byron.github.io/google-apis-rs/google-ml1-cli
+site_description: A complete library to interact with Cloud Machine Learning Engine (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/ml1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['projects_get-config.md', 'Projects', 'Get Config']
+- ['projects_jobs-cancel.md', 'Projects', 'Jobs Cancel']
+- ['projects_jobs-create.md', 'Projects', 'Jobs Create']
+- ['projects_jobs-get.md', 'Projects', 'Jobs Get']
+- ['projects_jobs-get-iam-policy.md', 'Projects', 'Jobs Get Iam Policy']
+- ['projects_jobs-list.md', 'Projects', 'Jobs List']
+- ['projects_jobs-set-iam-policy.md', 'Projects', 'Jobs Set Iam Policy']
+- ['projects_jobs-test-iam-permissions.md', 'Projects', 'Jobs Test Iam Permissions']
+- ['projects_models-create.md', 'Projects', 'Models Create']
+- ['projects_models-delete.md', 'Projects', 'Models Delete']
+- ['projects_models-get.md', 'Projects', 'Models Get']
+- ['projects_models-get-iam-policy.md', 'Projects', 'Models Get Iam Policy']
+- ['projects_models-list.md', 'Projects', 'Models List']
+- ['projects_models-set-iam-policy.md', 'Projects', 'Models Set Iam Policy']
+- ['projects_models-test-iam-permissions.md', 'Projects', 'Models Test Iam Permissions']
+- ['projects_models-versions-create.md', 'Projects', 'Models Versions Create']
+- ['projects_models-versions-delete.md', 'Projects', 'Models Versions Delete']
+- ['projects_models-versions-get.md', 'Projects', 'Models Versions Get']
+- ['projects_models-versions-list.md', 'Projects', 'Models Versions List']
+- ['projects_models-versions-set-default.md', 'Projects', 'Models Versions Set Default']
+- ['projects_operations-cancel.md', 'Projects', 'Operations Cancel']
+- ['projects_operations-delete.md', 'Projects', 'Operations Delete']
+- ['projects_operations-get.md', 'Projects', 'Operations Get']
+- ['projects_operations-list.md', 'Projects', 'Operations List']
+- ['projects_predict.md', 'Projects', 'Predict']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+
