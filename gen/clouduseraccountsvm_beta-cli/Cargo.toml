@@ -4,7 +4,7 @@
 [package]
 
 name = "google-clouduseraccountsvm_beta-cli"
-version = "1.0.6+20160316"
+version = "1.0.7+20160316"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud User Accounts (protocol vm_beta)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/clouduseraccountsvm_beta-cli"
@@ -37,4 +37,4 @@ clap = "^2.0"
 
 [dependencies.google-clouduseraccountsvm_beta]
 path = "../clouduseraccountsvm_beta"
-version = "1.0.6+20160316"
+version = "1.0.7+20160316"

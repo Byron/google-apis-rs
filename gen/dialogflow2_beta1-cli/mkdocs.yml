@@ -1,4 +1,4 @@
-site_name: Dialogflow v1.0.6+20171211
+site_name: Dialogflow v1.0.7+20171211
 site_url: http://byron.github.io/google-apis-rs/google-dialogflow2_beta1-cli
 site_description: A complete library to interact with Dialogflow (protocol v2beta1)
 

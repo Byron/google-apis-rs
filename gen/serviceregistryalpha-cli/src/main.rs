@@ -975,7 +975,7 @@ fn main() {
     
     let mut app = App::new("serviceregistryalpha")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.6+20160401")
+           .version("1.0.7+20160401")
            .about("Manages service endpoints in Service Registry and provides integration with DNS for service discovery and name resolution.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_serviceregistryalpha_cli")
            .arg(Arg::with_name("url")

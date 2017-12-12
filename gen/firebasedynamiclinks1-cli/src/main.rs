@@ -514,7 +514,7 @@ fn main() {
     
     let mut app = App::new("firebasedynamiclinks1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.6+20171205")
+           .version("1.0.7+20171205")
            .about("Programmatically creates and manages Firebase Dynamic Links.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_firebasedynamiclinks1_cli")
            .arg(Arg::with_name("url")

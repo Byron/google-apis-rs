@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Deployment Manager* API at revision *20160201*. The CLI is at version *1.0.6*.
+This documentation was generated from the *Deployment Manager* API at revision *20160201*. The CLI is at version *1.0.7*.
 
 ```bash
 deploymentmanager2-beta2 [options]

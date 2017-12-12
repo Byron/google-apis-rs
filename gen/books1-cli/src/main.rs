@@ -4706,7 +4706,7 @@ fn main() {
     
     let mut app = App::new("books1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.6+20170313")
+           .version("1.0.7+20170313")
            .about("Searches for books and manages your Google Books library.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_books1_cli")
            .arg(Arg::with_name("url")

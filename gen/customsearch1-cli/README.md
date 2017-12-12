@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *customsearch* API at revision *20170615*. The CLI is at version *1.0.6*.
+This documentation was generated from the *customsearch* API at revision *20170615*. The CLI is at version *1.0.7*.
 
 ```bash
 customsearch1 [options]

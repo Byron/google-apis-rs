@@ -4,7 +4,7 @@
 [package]
 
 name = "google-bigquery2-cli"
-version = "1.0.6+20171202"
+version = "1.0.7+20171202"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with bigquery (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/bigquery2-cli"
@@ -37,4 +37,4 @@ clap = "^2.0"
 
 [dependencies.google-bigquery2]
 path = "../bigquery2"
-version = "1.0.6+20171202"
+version = "1.0.7+20171202"

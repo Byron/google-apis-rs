@@ -318,7 +318,7 @@ fn main() {
     
     let mut app = App::new("abusiveexperiencereport1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.6+20171129")
+           .version("1.0.7+20171129")
            .about("View Abusive Experience Report data, and get a list of sites that have a significant number of abusive experiences.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_abusiveexperiencereport1_cli")
            .arg(Arg::with_name("url")

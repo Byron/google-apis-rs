@@ -4,7 +4,7 @@
 [package]
 
 name = "google-androidmanagement1-cli"
-version = "1.0.6+20171127"
+version = "1.0.7+20171127"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Android Management (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/androidmanagement1-cli"
@@ -37,4 +37,4 @@ clap = "^2.0"
 
 [dependencies.google-androidmanagement1]
 path = "../androidmanagement1"
-version = "1.0.6+20171127"
+version = "1.0.7+20171127"

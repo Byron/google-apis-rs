@@ -4,7 +4,7 @@
 [package]
 
 name = "google-drive2-cli"
-version = "1.0.6+20171201"
+version = "1.0.7+20171201"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with drive (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/drive2-cli"
@@ -37,4 +37,4 @@ clap = "^2.0"
 
 [dependencies.google-drive2]
 path = "../drive2"
-version = "1.0.6+20171201"
+version = "1.0.7+20171201"

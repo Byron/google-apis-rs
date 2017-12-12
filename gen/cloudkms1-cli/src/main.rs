@@ -2695,7 +2695,7 @@ fn main() {
     
     let mut app = App::new("cloudkms1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.6+20171201")
+           .version("1.0.7+20171201")
            .about("Manages encryption for your cloud services the same way you do on-premises. You can generate, use, rotate, and destroy AES256 encryption keys.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudkms1_cli")
            .arg(Arg::with_name("url")

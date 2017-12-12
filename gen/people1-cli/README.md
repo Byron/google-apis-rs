@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *People Service* API at revision *20171211*. The CLI is at version *1.0.6*.
+This documentation was generated from the *People Service* API at revision *20171211*. The CLI is at version *1.0.7*.
 
 ```bash
 people1 [options]

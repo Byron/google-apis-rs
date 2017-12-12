@@ -1,4 +1,4 @@
-site_name: dataproc v1.0.6+20171207
+site_name: dataproc v1.0.7+20171207
 site_url: http://byron.github.io/google-apis-rs/google-dataproc1-cli
 site_description: A complete library to interact with dataproc (protocol v1)
 

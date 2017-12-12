@@ -1021,7 +1021,7 @@ fn main() {
     
     let mut app = App::new("clouddebugger2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.6+20171016")
+           .version("1.0.7+20171016")
            .about("Examines the call stack and variables of a running application without stopping or slowing it down.
            ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_clouddebugger2_cli")

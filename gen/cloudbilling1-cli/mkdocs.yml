@@ -1,4 +1,4 @@
-site_name: Cloudbilling v1.0.6+20170813
+site_name: Cloudbilling v1.0.7+20170813
 site_url: http://byron.github.io/google-apis-rs/google-cloudbilling1-cli
 site_description: A complete library to interact with Cloudbilling (protocol v1)
 

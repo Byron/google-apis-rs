@@ -4,7 +4,7 @@
 [package]
 
 name = "google-tasks1-cli"
-version = "1.0.6+20141121"
+version = "1.0.7+20141121"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with tasks (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/tasks1-cli"
@@ -37,4 +37,4 @@ clap = "^2.0"
 
 [dependencies.google-tasks1]
 path = "../tasks1"
-version = "1.0.6+20141121"
+version = "1.0.7+20141121"

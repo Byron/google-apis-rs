@@ -686,7 +686,7 @@ fn main() {
     
     let mut app = App::new("manufacturers1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.6+20171207")
+           .version("1.0.7+20171207")
            .about("Public API for managing Manufacturer Center related data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_manufacturers1_cli")
            .arg(Arg::with_name("url")

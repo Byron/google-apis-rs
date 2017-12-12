@@ -6115,7 +6115,7 @@ fn main() {
     
     let mut app = App::new("classroom1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.6+20171211")
+           .version("1.0.7+20171211")
            .about("Manages classes, rosters, and invitations in Google Classroom.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_classroom1_cli")
            .arg(Arg::with_name("url")

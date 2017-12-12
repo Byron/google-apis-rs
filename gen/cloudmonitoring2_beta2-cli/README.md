@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Monitoring* API at revision *20170501*. The CLI is at version *1.0.6*.
+This documentation was generated from the *Cloud Monitoring* API at revision *20170501*. The CLI is at version *1.0.7*.
 
 ```bash
 cloudmonitoring2-beta2 [options]

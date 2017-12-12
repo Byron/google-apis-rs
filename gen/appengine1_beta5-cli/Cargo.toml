@@ -4,7 +4,7 @@
 [package]
 
 name = "google-appengine1_beta5-cli"
-version = "1.0.6+20171208"
+version = "1.0.7+20171208"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with appengine (protocol v1beta5)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/appengine1_beta5-cli"
@@ -37,4 +37,4 @@ clap = "^2.0"
 
 [dependencies.google-appengine1_beta5]
 path = "../appengine1_beta5"
-version = "1.0.6+20171208"
+version = "1.0.7+20171208"
